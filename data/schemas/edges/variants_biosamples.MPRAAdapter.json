@@ -29,7 +29,7 @@
         "genomic_element": {
           "type": "string",
           "description": "Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample.",
-          "example": "genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH",
+          "example": "genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH",
           "pattern": "^genomic_elements/",
           "collections": [
             "genomic_elements"

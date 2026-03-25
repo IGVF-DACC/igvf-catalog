@@ -126,7 +126,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
     biosample_term_key = 'CL_0000679'
-    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
@@ -135,7 +135,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
         '_key': expected_key,
         '_from': 'variants/NC_000009.12:136248440:T:C',
         '_to': 'ontology_terms/CL_0000679',
-        'genomic_element': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
+        'genomic_element': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH',
         'bed_score': 66,
         'log2FC': -0.0768,
         'DNA_count_ref': 0.5948,
@@ -308,6 +308,36 @@ def test_genomic_element_biosample_control_ignored_and_ref_loaded(tmp_path, mock
     )
     adapter.process_file()
     assert len(writer.contents) == 1
+
+
+def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids(tmp_path, mock_file_fileset):
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
+        'chr1\t10\t20\tElem_fwd\t["NC_000001.11:11:A:C"]\t["ref"]\ttest\t+\n'
+        'chr1\t10\t20\tElem_rev\t["NC_000001.11:11:A:C"]\t["ref"]\ttest\t-\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr1\t10\t20\tElem_fwd\t100\t+\t0.25\t1.0\t2.0\t3.0\t1.5\n'
+        'chr1\t10\t20\tElem_rev\t90\t-\t0.2\t1.0\t2.0\t3.0\t1.5\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='genomic_element_biosample',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    parsed = [json.loads(x) for x in writer.contents]
+    assert len(parsed) == 2
+    assert len({p['_key'] for p in parsed}) == 2
+    assert len({p['_from'] for p in parsed}) == 2
 
 
 def test_invalid_label(mock_file_fileset):

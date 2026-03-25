@@ -153,12 +153,38 @@ class MPRAAdapter(BaseAdapter):
             return ''
         return ' '.join(str(name).replace('_', ' ').strip().lower().split())
 
+    @staticmethod
+    def normalize_strand(strand):
+        value = (strand or '').strip()
+        if value in ('+', '-'):
+            return value
+        return '.'
+
+    @classmethod
+    def strand_token(cls, strand):
+        normalized = cls.normalize_strand(strand)
+        if normalized == '+':
+            return 'plus'
+        if normalized == '-':
+            return 'minus'
+        return 'na'
+
+    @classmethod
+    def make_design_key(cls, chr_, start, end, strand):
+        return (chr_, start, end, cls.normalize_strand(strand))
+
+    @classmethod
+    def build_mpra_element_id(cls, chr_, start, end, strand, suffix):
+        region_id = build_regulatory_region_id(chr_, start, end, 'MPRA')
+        return f'{region_id}_{cls.strand_token(strand)}_{suffix}'
+
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
                 try:
-                    key = (row['chr'], row['start'], row['end'])
+                    key = self.make_design_key(
+                        row['chr'], row['start'], row['end'], row.get('strand'))
                     self.design_elements.add(key)
                     # MPRA sequence designs TSV has a "name" column; we use it as the element node name.
                     self.coords_to_element_name[key] = row.get('name')
@@ -252,34 +278,35 @@ class MPRAAdapter(BaseAdapter):
             rows = list(reader)
             effect_counts_by_region = defaultdict(int)
             for row in rows:
-                effect_counts_by_region[(row[0], row[1], row[2])] += 1
+                effect_counts_by_region[self.make_design_key(
+                    row[0], row[1], row[2], row[5])] += 1
 
             missing_allele_multi_effect = []
             for row in rows:
-                chr_, start, end = row[0], row[1], row[2]
+                chr_, start, end, strand = row[0], row[1], row[2], row[5]
                 minus_q = self.safe_float(row[10]) if len(
                     row) > 10 and row[10] != '-1' else None
                 significant = minus_q is not None and minus_q >= self.THRESHOLD
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
-                element_id = region_id + '_' + element_id_suffix
-                element_key = (chr_, start, end)
+                element_id = self.build_mpra_element_id(
+                    chr_, start, end, strand, element_id_suffix)
+                element_key = self.make_design_key(chr_, start, end, strand)
 
                 if self.label == 'genomic_element':
-                    if self.has_sequence_designs and (chr_, start, end) not in self.design_elements:
+                    if self.has_sequence_designs and element_key not in self.design_elements:
                         raise ValueError(
-                            f'Genomic element {(chr_, start, end)} from {self.file_accession} is not present in the MPRA sequence designs file {self.reference_file_accession}.')
+                            f'Genomic element {(chr_, start, end, strand)} from {self.file_accession} is not present in the MPRA sequence designs file {self.reference_file_accession}.')
                     if element_id in seen_element_ids:
                         continue
                     seen_element_ids.add(element_id)
                     if self.has_sequence_designs:
                         # IGVF sequence designs TSV first column is the element design name
                         element_name = self.coords_to_element_name.get(
-                            (chr_, start, end)
-                        )
+                            element_key)
                         if element_name is None:
                             raise ValueError(
-                                f'Missing MPRA sequence design name for {(chr_, start, end)} in {self.reference_file_accession}.')
+                                f'Missing MPRA sequence design name for {(chr_, start, end, strand)} in {self.reference_file_accession}.')
                     else:
                         # ENCODE MPRA BED 4th column is the element name/design identifier
                         element_name = row[3]
@@ -289,6 +316,7 @@ class MPRAAdapter(BaseAdapter):
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
+                        'strand': strand,
                         'method': self.method,
                         'type': 'tested elements',
                         'source': self.source,
@@ -324,7 +352,7 @@ class MPRAAdapter(BaseAdapter):
                             # Only ref element effects should be loaded.
                             continue
                     edge_id = '_'.join(
-                        [region_id, self.file_accession, biosample_term_key])
+                        [region_id, self.strand_token(strand), self.file_accession, biosample_term_key])
                     minus_p = self.safe_float(row[9]) if len(
                         row) > 9 and row[9] != '-1' else None
                     minus_q_edge = self.safe_float(row[10]) if len(
@@ -333,7 +361,7 @@ class MPRAAdapter(BaseAdapter):
                         '_key': edge_id,
                         '_from': 'genomic_elements/' + element_id,
                         '_to': self.biosample_term,
-                        'strand': row[5],
+                        'strand': strand,
                         'log2FC': self.safe_float(row[6]),
                         'bed_score': self.safe_int(row[4]),
                         'DNA_count': self.safe_float(row[7]),
@@ -397,25 +425,25 @@ class MPRAAdapter(BaseAdapter):
     def _process_genomic_element_chunk(self, chunk):
         """Emit genomic_element nodes from variant->element mapping (genomic_element_from_variant label only)."""
         for element_coords_set in self.variant_to_element.values():
-            for chr_, start, end in element_coords_set:
-                key = (chr_, start, end)
+            for chr_, start, end, strand in element_coords_set:
+                key = (chr_, start, end, strand)
                 if key in self.seen_elements:
                     continue
                 self.seen_elements.add(key)
-                region_id = build_regulatory_region_id(
-                    chr_, start, end, 'MPRA')
-                _id = f'{region_id}_{self.reference_file_accession}'
+                _id = self.build_mpra_element_id(
+                    chr_, start, end, strand, self.reference_file_accession)
                 element_name = self.coords_to_element_name.get(
-                    (chr_, start, end))
+                    key)
                 if element_name is None:
                     raise ValueError(
-                        f'Missing MPRA sequence design name for {(chr_, start, end)} in {self.reference_file_accession}.')
+                        f'Missing MPRA sequence design name for {(chr_, start, end, strand)} in {self.reference_file_accession}.')
                 props = {
                     '_key': _id,
                     'name': element_name,
                     'chr': chr_,
                     'start': int(start),
                     'end': int(end),
+                    'strand': strand,
                     'method': self.method,
                     'type': 'tested elements',
                     'source': self.source,
@@ -447,9 +475,9 @@ class MPRAAdapter(BaseAdapter):
             variant_id = variant['_key']
             biosample_term_key = (self.biosample_term or '').split('/')[-1]
 
-            for element_chr, element_start, element_end in self.variant_to_element[spdi]:
-                element_id = build_regulatory_region_id(
-                    element_chr, element_start, element_end, 'MPRA') + f'_{self.reference_file_accession}'
+            for element_chr, element_start, element_end, element_strand in self.variant_to_element[spdi]:
+                element_id = self.build_mpra_element_id(
+                    element_chr, element_start, element_end, element_strand, self.reference_file_accession)
                 edge_key = f'{variant_id}_{element_id}_{biosample_term_key}_{self.file_accession}'
 
                 minus_q = self.safe_float(row[12])
