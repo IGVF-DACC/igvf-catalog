@@ -369,7 +369,7 @@ class MPRAAdapter(BaseAdapter):
                     '_from': f'variants/{variant_id}',
                     '_to': self.biosample_term,
                     'genomic_element': f'genomic_elements/{element_id}',
-                    'bed_score': int(row[4]),
+                    'bed_score': int(row[4]) if not row[4] == 'NaN' else None,
                     'log2FC': float(row[6]),
                     'DNA_count_ref': float(row[7]),
                     'RNA_count_ref': float(row[8]),
