@@ -7,7 +7,7 @@ import { TRPCError } from '@trpc/server'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -29,13 +29,25 @@ const interactionTypes = z.enum([
   'synthetic lethality (sensu BioGRID)',
   'synthetic rescue (sensu BioGRID)'
 ])
+const sources = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'source')
+const names = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'name')
+const labels = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'label')
+const methodsHuman = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'method')
+const methodsMouse = getCollectionEnumValuesOrThrow('edges', 'mm_genes_mm_genes', 'method')
+// need to combine methodsHuman and methodsMouse, remove duplicates and sort
+const methods = [...methodsHuman, ...methodsMouse]
+  .filter((value, index, self) => self.indexOf(value) === index)
+  .sort((a, b) => a.localeCompare(b))
+const methodsEnum = methods as [string, ...string[]]
 
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
-    source: z.enum(['COXPRESdb', 'BioGRID']).optional(),
-    name: z.enum(['interacts with', 'coexpressed with']).optional(),
-    'interaction type': interactionTypes.optional(),
-    z_score: z.string().trim().optional()
+    z_score: z.string().trim().optional(),
+    interaction_type: interactionTypes.optional(),
+    label: z.enum(labels).optional(),
+    method: z.enum(methodsEnum).optional(),
+    source: z.enum(sources).optional(),
+    name: z.enum(names).optional()
   })
 ).merge(commonEdgeParamsFormat)
 
@@ -50,6 +62,9 @@ const genesGenesRelativeFormat = z.object({
   confidence_value_biogrid: z.number().nullable().optional(),
   confidence_value_intact: z.number().nullable().optional(),
   pmids: z.array(z.string()).optional(),
+  label: z.string(),
+  method: z.string(),
+  class: z.string(),
   source: z.string(),
   source_url: z.string().optional(),
   name: z.string()
@@ -70,12 +85,12 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let genesSchema = HumangenesSchema
   let genesGenesSchema = HumangenesGenesSchema
-  const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
   if (input.organism === 'Mus musculus') {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
   const genesCollectionName = genesSchema.db_collection_name as string
+  const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
@@ -95,16 +110,9 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
-  let arrayFilters = ''
-  if (input['interaction type'] !== undefined) {
-    arrayFilters = `AND '${input['interaction type'] as string}' IN record.interaction_type[*]`
-    delete input['interaction type']
-  }
-
-  let filters = getFilterStatements(genesGenesSchema, input)
-  if (filters) {
-    filters = ` AND ${filters}`
-  }
+  const edgeFilters = getFilterStatements(genesGenesSchema, input)
+  const geneFilter = `(record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}'])`
+  const combinedFilter = [geneFilter, edgeFilters].filter((filter) => filter !== '').join(' AND ') || 'true'
 
   const sourceVerboseQuery = `
   FOR otherRecord IN ${genesCollectionName}
@@ -119,7 +127,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   const query = `
       FOR record IN ${genesGenesCollectionName}
-      FILTER (record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}']) ${filters} ${arrayFilters}
+      FILTER ${combinedFilter}
       SORT record._key
       LIMIT ${Number(input.page) * limit}, ${limit}
       RETURN MERGE({

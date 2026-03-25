@@ -11,7 +11,7 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 500
 
 const humanGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
-const mouseGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const mouseGeneSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 
 export const genesQueryFormat = z.object({

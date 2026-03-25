@@ -144,8 +144,9 @@ export const descriptions = {
     gene_name = A1BG, <br> \
     alias = HYST2477, <br> \
     z_score = gt:4, <br> \
+    label = genetic interference, <br> \
+    method = COXPRESdb, <br> \
     name = \'interacts with\' or \'coexpressed with\' <br> \
-    inverse_name = \'interacts with\' or \'coexpressed with\' <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
@@ -509,6 +510,8 @@ export const descriptions = {
   detection_method = affinity chromatography technology, <br> \
   interaction_type = physical association, <br> \
   pmid = 28514442, <br> \
+  label = affinity chromatography technology, <br> \
+  method = physical association, <br> \
   source = BioGRID. <br> \
   The limit parameter controls the page size and can not exceed 250. <br> \
   Pagination is 0-based.',
