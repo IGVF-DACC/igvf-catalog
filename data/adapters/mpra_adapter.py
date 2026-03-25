@@ -168,6 +168,7 @@ class MPRAAdapter(BaseAdapter):
                     self.variant_to_element[spdi].add(key)
 
     def process_file(self):
+        self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = 'regulatory element activity'
         self.collection_class = self.files_filesets.get('class')
@@ -187,7 +188,6 @@ class MPRAAdapter(BaseAdapter):
             return
 
         self.writer.open()
-        self._seen_genomic_element_ids = set()
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
@@ -321,13 +321,12 @@ class MPRAAdapter(BaseAdapter):
 
     def _process_genomic_element_chunk(self, chunk):
         """Emit genomic_element nodes from variant->element mapping (genomic_element_from_variant label only)."""
-        seen = set()
         for element_coords_set in self.variant_to_element.values():
             for chr_, start, end in element_coords_set:
                 key = (chr_, start, end)
-                if key in seen:
+                if key in self.seen_elements:
                     continue
-                seen.add(key)
+                self.seen_elements.add(key)
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
                 _id = f'{region_id}_{self.reference_file_accession}'

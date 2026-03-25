@@ -83,6 +83,25 @@ def test_elements_from_variant_file(mock_file_fileset):
                'tested elements' for p in parsed)
 
 
+def test_elements_from_variant_file_no_duplicates_across_chunks(mock_file_fileset):
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath='./samples/igvf_mpra_variant_effects.example.tsv',
+        label='genomic_element_from_variant',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
+        reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
+        writer=writer,
+        validate=True
+    )
+    # Force multiple chunk passes to ensure dedupe persists across chunks.
+    adapter.CHUNK_SIZE = 1
+    adapter.process_file()
+    parsed = [json.loads(x) for x in writer.contents]
+    keys = [p['_key'] for p in parsed]
+    assert len(keys) == len(set(keys))
+
+
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000009.12:136248440:T:C'})
 @patch('adapters.mpra_adapter.load_variant')
 def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
