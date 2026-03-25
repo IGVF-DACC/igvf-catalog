@@ -98,6 +98,7 @@ class MPRAAdapter(BaseAdapter):
         self.coords_to_element_name = {}
         self.design_name_alleles = defaultdict(set)
         self.design_element_alleles = defaultdict(set)
+        self.design_name_class = {}
         if self.has_sequence_designs:
             self.mpra_design_file = reference_filepath
             self.reference_source_url = reference_source_url or ''
@@ -146,6 +147,12 @@ class MPRAAdapter(BaseAdapter):
             return None
         return int(parsed) if parsed.is_integer() else None
 
+    @staticmethod
+    def normalize_design_name(name):
+        if not name:
+            return ''
+        return ' '.join(str(name).replace('_', ' ').strip().lower().split())
+
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
@@ -159,6 +166,10 @@ class MPRAAdapter(BaseAdapter):
                     pass
 
                 allele_raw = row.get('allele')
+                normalized_name = self.normalize_design_name(row.get('name'))
+                if normalized_name:
+                    self.design_name_class[normalized_name] = (
+                        row.get('class') or '').strip().lower()
                 if allele_raw not in (None, '', 'NA', 'NaN'):
                     try:
                         allele_values = ast.literal_eval(allele_raw)
@@ -176,8 +187,8 @@ class MPRAAdapter(BaseAdapter):
                         normalized = str(allele).strip().lower()
                         normalized_alleles.add(normalized)
                         self.design_element_alleles[key].add(normalized)
-                        if row.get('name'):
-                            self.design_name_alleles[row['name']].add(
+                        if normalized_name:
+                            self.design_name_alleles[normalized_name].add(
                                 normalized)
                     if 'ref' in normalized_alleles and 'alt' in normalized_alleles:
                         raise ValueError(
@@ -290,9 +301,18 @@ class MPRAAdapter(BaseAdapter):
 
                 elif self.label == 'genomic_element_biosample':
                     if self.has_sequence_designs:
+                        normalized_effect_name = self.normalize_design_name(
+                            row[3])
+                        effect_class = self.design_name_class.get(
+                            normalized_effect_name, '')
+                        if 'control' in effect_class:
+                            # Controls can be present without allele values and
+                            # should not produce genomic_element_biosample edges.
+                            continue
                         # Prefer design-name mapping when available; fallback to
                         # coordinate mapping for legacy files.
-                        alleles = self.design_name_alleles.get(row[3], set())
+                        alleles = self.design_name_alleles.get(
+                            normalized_effect_name, set())
                         if not alleles:
                             if effect_counts_by_region[element_key] > 1:
                                 missing_allele_multi_effect.append(
