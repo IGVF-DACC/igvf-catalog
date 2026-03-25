@@ -96,6 +96,7 @@ class MPRAAdapter(BaseAdapter):
         self.variant_to_element = defaultdict(set)
         self.design_elements = set()
         self.coords_to_element_name = {}
+        self.design_element_alleles = defaultdict(set)
         if self.has_sequence_designs:
             self.mpra_design_file = reference_filepath
             self.reference_source_url = reference_source_url or ''
@@ -156,6 +157,23 @@ class MPRAAdapter(BaseAdapter):
                 except Exception:
                     pass
 
+                allele_raw = row.get('allele')
+                if allele_raw not in (None, '', 'NA', 'NaN'):
+                    try:
+                        allele_values = ast.literal_eval(allele_raw)
+                    except (ValueError, SyntaxError) as e:
+                        raise ValueError(
+                            f'Malformed allele at row {i}: {allele_raw!r}') from e
+                    if not isinstance(allele_values, list):
+                        raise ValueError(
+                            f'Malformed allele at row {i}: expected list, got {type(allele_values).__name__}'
+                        )
+                    for allele in allele_values:
+                        if allele is None:
+                            continue
+                        self.design_element_alleles[key].add(
+                            str(allele).strip().lower())
+
                 if row.get('SPDI') in (None, '', 'NA', 'NaN'):
                     continue
                 try:
@@ -210,6 +228,8 @@ class MPRAAdapter(BaseAdapter):
 
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
+            mixed_allele_elements = []
+            missing_allele_elements = []
             for row in reader:
                 chr_, start, end = row[0], row[1], row[2]
                 minus_q = self.safe_float(row[10]) if len(
@@ -218,6 +238,7 @@ class MPRAAdapter(BaseAdapter):
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
                 element_id = region_id + '_' + element_id_suffix
+                element_key = (chr_, start, end)
 
                 if self.label == 'genomic_element':
                     if self.has_sequence_designs and (chr_, start, end) not in self.design_elements:
@@ -254,6 +275,18 @@ class MPRAAdapter(BaseAdapter):
                     self.writer.write(json.dumps(props) + '\n')
 
                 elif self.label == 'genomic_element_biosample':
+                    if self.has_sequence_designs:
+                        alleles = self.design_element_alleles.get(
+                            element_key, set())
+                        if not alleles:
+                            missing_allele_elements.append(element_key)
+                            continue
+                        if 'ref' in alleles and 'alt' in alleles:
+                            mixed_allele_elements.append(element_key)
+                            continue
+                        if 'ref' not in alleles:
+                            # Only ref element effects should be loaded.
+                            continue
                     edge_id = '_'.join(
                         [region_id, self.file_accession, biosample_term_key])
                     minus_p = self.safe_float(row[9]) if len(
@@ -287,6 +320,23 @@ class MPRAAdapter(BaseAdapter):
                     if self.validate:
                         self.validate_doc(props)
                     self.writer.write(json.dumps(props) + '\n')
+
+            if mixed_allele_elements or missing_allele_elements:
+                details = []
+                if mixed_allele_elements:
+                    details.append(
+                        f'mixed ref/alt allele annotations for {len(mixed_allele_elements)} elements '
+                        f'(examples: {mixed_allele_elements[:5]})'
+                    )
+                if missing_allele_elements:
+                    details.append(
+                        f'missing allele annotations for {len(missing_allele_elements)} elements '
+                        f'(examples: {missing_allele_elements[:5]})'
+                    )
+                raise ValueError(
+                    'Invalid MPRA sequence-design allele annotations for genomic_element_biosample load: '
+                    + '; '.join(details)
+                )
 
         self.writer.close()
 
