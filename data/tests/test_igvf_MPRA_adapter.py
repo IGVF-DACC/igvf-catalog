@@ -174,8 +174,10 @@ def test_genomic_element_biosample(mock_file_fileset):
         writer=writer,
         validate=True
     )
-    with pytest.raises(ValueError, match='missing allele annotations'):
-        adapter.process_file()
+    adapter.process_file()
+    parsed = [json.loads(x) for x in writer.contents]
+    assert all(p['_from'].startswith('genomic_elements/')
+               and p['_to'].startswith('ontology_terms/') for p in parsed)
 
 
 def test_genomic_element_biosample_ref_allele_only_writes(tmp_path, mock_file_fileset):
@@ -215,20 +217,19 @@ def test_genomic_element_biosample_mixed_ref_alt_is_flagged(tmp_path, mock_file_
     )
 
     writer = SpyWriter()
-    adapter = MPRAAdapter(
-        filepath=str(effects_file),
-        label='genomic_element_biosample',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
-        reference_filepath=str(design_file),
-        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
-        writer=writer,
-        validate=True
-    )
-    with pytest.raises(ValueError, match='mixed ref/alt allele annotations'):
-        adapter.process_file()
+    with pytest.raises(ValueError, match='unexpected mixed allele values'):
+        MPRAAdapter(
+            filepath=str(effects_file),
+            label='genomic_element_biosample',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+            reference_filepath=str(design_file),
+            reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+            writer=writer,
+            validate=True
+        )
 
 
-def test_genomic_element_biosample_missing_allele_is_flagged(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_missing_allele_writes(tmp_path, mock_file_fileset):
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\n'
@@ -249,7 +250,34 @@ def test_genomic_element_biosample_missing_allele_is_flagged(tmp_path, mock_file
         writer=writer,
         validate=True
     )
-    with pytest.raises(ValueError, match='missing allele annotations'):
+    adapter.process_file()
+    assert len(writer.contents) == 1
+
+
+def test_genomic_element_biosample_missing_allele_multi_effect_is_flagged(tmp_path, mock_file_fileset):
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'chr\tstart\tend\tname\tSPDI\tallele\n'
+        'chr1\t10\t20\tElem1\tNA\tNA\n'
+        'chr1\t10\t20\tElem2\tNA\t["ref"]\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr1\t10\t20\tElem1\t100\t+\t0.25\t1.0\t2.0\t3.0\t1.5\n'
+        'chr1\t10\t20\tElem2\t100\t+\t0.25\t1.0\t2.0\t3.0\t1.5\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='genomic_element_biosample',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+    with pytest.raises(ValueError, match='Missing allele annotations for regions with multiple element effects'):
         adapter.process_file()
 
 
