@@ -174,10 +174,8 @@ def test_genomic_element_biosample(mock_file_fileset):
         writer=writer,
         validate=True
     )
-    adapter.process_file()
-    parsed = [json.loads(x) for x in writer.contents]
-    assert all(p['_from'].startswith('genomic_elements/')
-               and p['_to'].startswith('ontology_terms/') for p in parsed)
+    with pytest.raises(ValueError, match='missing allele annotations'):
+        adapter.process_file()
 
 
 def test_genomic_element_biosample_ref_allele_only_writes(tmp_path, mock_file_fileset):
