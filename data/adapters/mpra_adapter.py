@@ -129,6 +129,21 @@ class MPRAAdapter(BaseAdapter):
             return 'genomic_elements_biosamples'
         return None
 
+    @staticmethod
+    def safe_float(value):
+        try:
+            parsed = float(value)
+            return None if parsed != parsed else parsed
+        except (TypeError, ValueError):
+            return None
+
+    @classmethod
+    def safe_int(cls, value):
+        parsed = cls.safe_float(value)
+        if parsed is None:
+            return None
+        return int(parsed) if parsed.is_integer() else None
+
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
@@ -197,7 +212,7 @@ class MPRAAdapter(BaseAdapter):
             reader = csv.reader(f, delimiter='\t')
             for row in reader:
                 chr_, start, end = row[0], row[1], row[2]
-                minus_q = float(row[10]) if len(
+                minus_q = self.safe_float(row[10]) if len(
                     row) > 10 and row[10] != '-1' else None
                 significant = minus_q is not None and minus_q >= self.THRESHOLD
                 region_id = build_regulatory_region_id(
@@ -241,19 +256,19 @@ class MPRAAdapter(BaseAdapter):
                 elif self.label == 'genomic_element_biosample':
                     edge_id = '_'.join(
                         [region_id, self.file_accession, biosample_term_key])
-                    minus_p = float(row[9]) if len(
+                    minus_p = self.safe_float(row[9]) if len(
                         row) > 9 and row[9] != '-1' else None
-                    minus_q_edge = float(row[10]) if len(
+                    minus_q_edge = self.safe_float(row[10]) if len(
                         row) > 10 and row[10] != '-1' else None
                     props = {
                         '_key': edge_id,
                         '_from': 'genomic_elements/' + element_id,
                         '_to': self.biosample_term,
                         'strand': row[5],
-                        'log2FC': float(row[6]),
-                        'bed_score': int(row[4]),
-                        'DNA_count': float(row[7]),
-                        'RNA_count': float(row[8]),
+                        'log2FC': self.safe_float(row[6]),
+                        'bed_score': self.safe_int(row[4]),
+                        'DNA_count': self.safe_float(row[7]),
+                        'RNA_count': self.safe_float(row[8]),
                         'minusLog10PValue': minus_p,
                         'minusLog10QValue': minus_q_edge,
                         'significant': significant,
@@ -363,24 +378,24 @@ class MPRAAdapter(BaseAdapter):
                     element_chr, element_start, element_end, 'MPRA') + f'_{self.reference_file_accession}'
                 edge_key = f'{variant_id}_{element_id}_{biosample_term_key}_{self.file_accession}'
 
-                minus_q = float(row[12])
+                minus_q = self.safe_float(row[12])
                 edge_props = {
                     '_key': edge_key,
                     '_from': f'variants/{variant_id}',
                     '_to': self.biosample_term,
                     'genomic_element': f'genomic_elements/{element_id}',
-                    'bed_score': int(row[4]) if not row[4] == 'NaN' else None,
-                    'log2FC': float(row[6]),
-                    'DNA_count_ref': float(row[7]),
-                    'RNA_count_ref': float(row[8]),
-                    'DNA_count_alt': float(row[9]),
-                    'RNA_count_alt': float(row[10]),
-                    'minusLog10PValue': float(row[11]),
+                    'bed_score': self.safe_int(row[4]),
+                    'log2FC': self.safe_float(row[6]),
+                    'DNA_count_ref': self.safe_float(row[7]),
+                    'RNA_count_ref': self.safe_float(row[8]),
+                    'DNA_count_alt': self.safe_float(row[9]),
+                    'RNA_count_alt': self.safe_float(row[10]),
+                    'minusLog10PValue': self.safe_float(row[11]),
                     'minusLog10QValue': minus_q,
-                    'significant': minus_q >= self.THRESHOLD,
-                    'postProbEffect': float(row[13]),
-                    'CI_lower_95': float(row[14]),
-                    'CI_upper_95': float(row[15]),
+                    'significant': minus_q is not None and minus_q >= self.THRESHOLD,
+                    'postProbEffect': self.safe_float(row[13]),
+                    'CI_lower_95': self.safe_float(row[14]),
+                    'CI_upper_95': self.safe_float(row[15]),
                     'class': self.collection_class,
                     'label': self.collection_label_variants_elements,
                     'name': 'modulates regulatory activity of',
