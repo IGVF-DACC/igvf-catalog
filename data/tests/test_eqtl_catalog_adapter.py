@@ -19,7 +19,7 @@ def mock_igvf_metadata_eqtl(mock_request, dataset_id='QTD000001'):
 def mock_igvf_metadata_splice_qtl(mock_request, dataset_id='QTD000001'):
     mock_request.return_value.json.return_value = {
         'catalog_class': 'observed data',
-        'catalog_method': 'splice_QTL',
+        'catalog_method': 'spliceQTL',
         'aliases': [f'igvf:igvf_catalog_ebi_eqtl_{dataset_id}']
     }
 

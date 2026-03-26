@@ -65,12 +65,12 @@
         },
         "method": {
           "enum": [
-            "splice_QTL"
+            "spliceQTL"
           ]
         },
         "label": {
           "enum": [
-            "splice_QTL"
+            "spliceQTL"
           ]
         },
         "intron_chr": {

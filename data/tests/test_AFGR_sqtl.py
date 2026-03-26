@@ -9,7 +9,7 @@ from adapters.writer import SpyWriter
 def mock_igvf_metadata(mock_request):
     mock_request.return_value.json.return_value = {
         'catalog_class': 'observed data',
-        'catalog_method': 'splice_QTL'
+        'catalog_method': 'spliceQTL'
     }
 
 

@@ -85,8 +85,8 @@ class EQTLCatalog(BaseAdapter):
             name = 'modulates expression of'
             inverse_name = 'expression modulated by'
             biological_process = 'ontology_terms/GO_0010468'
-        elif self.method == 'splice_QTL':
-            label = 'splice_QTL'
+        elif self.method == 'spliceQTL':
+            label = 'spliceQTL'
             name = 'modulates splicing of'
             inverse_name = 'splicing modulated by'
             biological_process = 'ontology_terms/GO_0043484'
@@ -166,7 +166,7 @@ class EQTLCatalog(BaseAdapter):
                     'credible_set_min_r2': float(row[11]),
                     'region': row[12]
                 }
-                if label == 'splice_QTL':
+                if label == 'spliceQTL':
                     molecular_trait_id_list = row[0].split(':')
                     _props['intron_chr'] = molecular_trait_id_list[0]
                     _props['intron_start'] = molecular_trait_id_list[1]
