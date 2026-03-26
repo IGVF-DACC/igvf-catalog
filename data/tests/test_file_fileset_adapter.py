@@ -34,7 +34,8 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
         'publication': None,
         'collections': ['genomic_elements_biosamples', 'genomic_elements'],
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF230JYM/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF230JYM/',
+        'download_link': 'https://www.encodeproject.org/files/ENCFF230JYM/@@download/ENCFF230JYM.bed.gz'
     }
 
 
@@ -65,7 +66,8 @@ def test_file_fileset_adapter_encode_E2G_annotation():
         'collections': ['genomic_elements', 'genomic_elements_genes'],
         'publication': None,
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF324XYW/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF324XYW/',
+        'download_link': 'https://www.encodeproject.org/files/ENCFF324XYW/@@download/ENCFF324XYW.bed.gz'
     }
 
 
@@ -99,7 +101,8 @@ def test_file_fileset_adapter_encode_caQTL():
             'genomic_elements',
         ],
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF103XRK/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF103XRK/',
+        'download_link': 'https://www.encodeproject.org/files/ENCFF103XRK/@@download/ENCFF103XRK.bed.gz'
     }
 
 
@@ -133,7 +136,8 @@ def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens():
             'genomic_elements_genes',
         ],
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF968BZL/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF968BZL/',
+        'download_link': 'https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv'
     }
 
 
@@ -164,7 +168,8 @@ def test_file_fileset_adapter_encode_ccREs():
         'publication': None,
         'collections': ['genomic_elements'],
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/',
+        'download_link': 'https://www.encodeproject.org/files/ENCFF420VPZ/@@download/ENCFF420VPZ.bed.gz'
     }
 
 
@@ -198,7 +203,8 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction():
             'variants_genomic_elements',
         ],
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/',
+        'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz'
     }
 
 
@@ -232,7 +238,8 @@ def test_file_fileset_adapter_igvf_sccripsr_screen():
             'genomic_elements',
         ],
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI9721OCVW/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI9721OCVW/',
+        'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/@@download/IGVFFI9721OCVW.tsv.gz'
     }
 
 
@@ -263,7 +270,8 @@ def test_file_fileset_adapter_igvf_sem_prediction():
         'publication': None,
         'collections': ['variants_proteins'],
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI2943RVII/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI2943RVII/',
+        'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI2943RVII/@@download/IGVFFI2943RVII.tsv.gz'
     }
 
 
