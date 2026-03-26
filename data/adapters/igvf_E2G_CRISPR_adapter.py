@@ -114,7 +114,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         return name_to_idx[column_name]
                 return None
 
-            if method == 'Perturb-seq':
+            if method in ['Perturb-seq', 'TAP-seq', 'Parse Perturb-seq']:
                 I = {
                     'p_val': get_column_index('p_val', 'sceptre_p_value'),
                     'log2_fc': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
