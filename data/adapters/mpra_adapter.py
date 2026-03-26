@@ -57,6 +57,12 @@ class MPRAAdapter(BaseAdapter):
 
     THRESHOLD = 1
     CHUNK_SIZE = 6500
+    BLACKLISTED_EFFECT_NAMES = {
+        # Cardiac/neuro design bug: ALT-only entries with no reference design and not explicitly designated as alts.
+        'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152590-g-c',
+        'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152590-g-t',
+        'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152592-g-c',
+    }
 
     def __init__(
         self,
@@ -233,6 +239,10 @@ class MPRAAdapter(BaseAdapter):
                 for spdi in spdi_list:
                     self.variant_to_element[spdi].add(key)
 
+    @classmethod
+    def _is_blacklisted_effect_name(cls, effect_name):
+        return (effect_name or '').strip().lower() in cls.BLACKLISTED_EFFECT_NAMES
+
     def process_file(self):
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
@@ -298,6 +308,9 @@ class MPRAAdapter(BaseAdapter):
                     if self.has_sequence_designs and element_key not in self.design_elements:
                         raise ValueError(
                             f'Genomic element {(chr_, start, end, strand)} from {self.file_accession} is not present in the MPRA sequence designs file {self.reference_file_accession}.')
+                    if self.has_sequence_designs and self._is_blacklisted_effect_name(row[3]):
+                        # Ignore known bad design entries.
+                        continue
                     if element_id in seen_element_ids:
                         continue
                     seen_element_ids.add(element_id)
@@ -348,6 +361,9 @@ class MPRAAdapter(BaseAdapter):
                                 continue
                             alleles = self.design_element_alleles.get(
                                 element_key, set())
+                        if self._is_blacklisted_effect_name(row[3]):
+                            # Ignore known bad design entries.
+                            continue
                         if alleles and 'ref' not in alleles:
                             # Only ref element effects should be loaded.
                             continue
