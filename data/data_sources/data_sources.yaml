@@ -1140,12 +1140,13 @@ genomic element gersbach E2G CRISPR:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz # Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz # Perturb-seq
+    - https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/@@download/IGVFFI1215LWLH.tsv.gz # Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/@@download/IGVFFI9721OCVW.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1067ITQF/@@download/IGVFFI1067ITQF.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI3089UGHM/@@download/IGVFFI3089UGHM.tsv.gz # CRISPR FACS screen
   source: IGVF
-  source_annotation: ['promoter', 'transcription start site']
+  source_annotation: ['enhancer', 'promoter']
   type: tested elements
 
 # Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_perturb_seq_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1157,6 +1158,7 @@ genomic element to gene gersbach E2G CRISPR:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz # Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz # Perturb-seq
+    - https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/@@download/IGVFFI1215LWLH.tsv.gz # Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/@@download/IGVFFI9721OCVW.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1067ITQF/@@download/IGVFFI1067ITQF.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz # CRISPR FACS screen

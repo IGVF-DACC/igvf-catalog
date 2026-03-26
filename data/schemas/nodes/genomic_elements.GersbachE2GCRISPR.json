@@ -33,8 +33,8 @@
           "description": "Source annotation for the genomic element",
           "example": "promoter",
           "enum": [
-            "promoter",
-            "transcription start site"
+            "enhancer",
+            "promoter"
           ]
         },
         "source": {
@@ -58,7 +58,6 @@
         }
       },
       "required": [
-        "promoter_of",
         "source_annotation",
         "files_filesets"
       ],

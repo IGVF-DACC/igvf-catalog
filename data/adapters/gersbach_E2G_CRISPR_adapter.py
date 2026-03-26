@@ -111,15 +111,17 @@ class GersbachE2GCRISPR(BaseAdapter):
                 intended_target_end = row[I['end']]
                 intended_target_name = row[I['promoter_gene']]
                 target_gene = row[I['target_gene']]
-                if not self.gene_validator.validate(intended_target_name):
-                    raise ValueError(
-                        f'Promoter gene: {intended_target_name} is not a valid gene.')
                 if not self.gene_validator.validate(target_gene):
                     raise ValueError(
                         f'Targeted gene: {target_gene} is not a valid gene.')
+                promoter_gene = None
+                source_annotation = 'enhancer'
+                if self.gene_validator.validate(intended_target_name):
+                    promoter_gene = intended_target_name
+                    source_annotation = 'promoter'
 
                 element_coordinates = (
-                    intended_target_chr, intended_target_start, intended_target_end, intended_target_name)
+                    intended_target_chr, intended_target_start, intended_target_end, promoter_gene, source_annotation)
                 if element_coordinates not in genomic_coordinates_to_element_id:
                     element_id = build_regulatory_region_id(
                         intended_target_chr, intended_target_start, intended_target_end, 'CRISPR')
@@ -170,9 +172,7 @@ class GersbachE2GCRISPR(BaseAdapter):
 
             if self.label == 'genomic_element':
                 for genomic_element, element_id in genomic_coordinates_to_element_id.items():
-                    source_annotation = 'promoter'
-                    if int(genomic_element[2]) - int(genomic_element[1]) == 1:
-                        source_annotation = 'transcription start site'
+                    source_annotation = genomic_element[4]
                     _id = element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
@@ -180,7 +180,6 @@ class GersbachE2GCRISPR(BaseAdapter):
                         'chr': genomic_element[0],
                         'start': int(genomic_element[1]),
                         'end': int(genomic_element[2]),
-                        'promoter_of': f'genes/{genomic_element[3]}',
                         'method': method,
                         'source_annotation': source_annotation,
                         'source': GersbachE2GCRISPR.SOURCE,
@@ -188,6 +187,8 @@ class GersbachE2GCRISPR(BaseAdapter):
                         'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession
                     }
+                    if genomic_element[3]:
+                        _props['promoter_of'] = f'genes/{genomic_element[3]}'
                     if self.validate:
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))

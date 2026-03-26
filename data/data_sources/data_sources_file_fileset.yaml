@@ -34,6 +34,7 @@ igvf_file_accessions:
   gersbach E2G CRISPR:
     - IGVFFI3069QCRA # Perturb-seq
     - IGVFFI5749WPVK # Perturb-seq
+    - IGVFFI1215LWLH # Perturb-seq
     - IGVFFI9721OCVW # CRISPR FACS screen
     - IGVFFI1067ITQF # CRISPR FACS screen
     - IGVFFI1336XWXJ # CRISPR FACS screen
