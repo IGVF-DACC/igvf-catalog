@@ -32,11 +32,17 @@ igvf_file_accessions:
   BlueSTARR:
     - IGVFFI1663LKVQ
   IGVF CRISPR E2G:
-    - IGVFFI3069QCRA # Perturb-seq
-    - IGVFFI5749WPVK # Perturb-seq
-    - IGVFFI1215LWLH # Perturb-seq
+    - IGVFFI3069QCRA # promoter Perturb-seq
+    - IGVFFI5749WPVK # promoter Perturb-seq
+    - IGVFFI1215LWLH # enhancer Perturb-seq
+    - IGVFFI6296RCJK # enhancer Perturb-seq
+    - IGVFFI6600VCYY # enhancer Perturb-seq
+    - IGVFFI7195XKBC # enhancer Perturb-seq
+    - IGVFFI9246AJEK # enhancer Perturb-seq
+    - IGVFFI3434YAPX # enhancer Perturb-seq
+    - IGVFFI1189RBGH # enhancer Perturb-seq
     - IGVFFI9721OCVW # CRISPR FACS screen
-    - IGVFFI1067ITQF # CRISPR FACS screen
+    - IGVFFI6268OASM # CRISPR FACS screen
     - IGVFFI1336XWXJ # CRISPR FACS screen
     - IGVFFI3089UGHM # CRISPR FACS screen
   Variant-EFFECTS:

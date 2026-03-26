@@ -156,19 +156,26 @@ class IGVFE2GCRISPR(BaseAdapter):
                 intended_target_chr = row[I['chr']]
                 intended_target_start = row[I['start']]
                 intended_target_end = row[I['end']]
+                intended_target_gene_raw = row[I['promoter_gene']]
                 intended_target_name = self._normalize_ensembl_gene_id(
-                    row[I['promoter_gene']])
-                target_gene_raw = row[I['target_gene']]
-                target_gene = self._normalize_ensembl_gene_id(target_gene_raw)
-                if not self.gene_validator.validate(target_gene):
+                    intended_target_gene_raw)
+                readout_gene_raw = row[I['target_gene']]
+                readout_gene = self._normalize_ensembl_gene_id(
+                    readout_gene_raw)
+                if not self.gene_validator.validate(readout_gene):
                     self.logger.warning(
-                        f'Skipping row: targeted gene "{target_gene_raw}" is not a valid gene after normalization ("{target_gene}").')
+                        f'Skipping row: readout gene "{readout_gene_raw}" is not a valid gene after normalization ("{readout_gene}").')
                     continue
                 promoter_gene = None
                 source_annotation = 'enhancer'
-                if self.gene_validator.validate(intended_target_name):
-                    promoter_gene = intended_target_name
-                    source_annotation = 'promoter'
+                if isinstance(intended_target_name, str) and re.match(r'^ENSG[0-9]{11}(?:_PAR_Y)?$', intended_target_name):
+                    if self.gene_validator.validate(intended_target_name):
+                        promoter_gene = intended_target_name
+                        source_annotation = 'promoter'
+                    else:
+                        self.logger.warning(
+                            f'Skipping row: intended promoter gene "{intended_target_gene_raw}" is not a valid gene after normalization ("{intended_target_name}").')
+                        continue
 
                 element_coordinates = (
                     intended_target_chr, intended_target_start, intended_target_end, promoter_gene, source_annotation)
@@ -179,7 +186,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                 else:
                     element_id = genomic_coordinates_to_element_id[element_coordinates]
 
-                if method in ['Perturb-seq', 'TAP-seq', 'Parse Perturb-seq']:
+                if method in ['Perturb-seq', 'TAP-seq']:
                     metrics = {
                         'p_value': float(row[I['p_val']]),
                         'log2FC': float(row[I['log2_fc']]),
@@ -202,12 +209,12 @@ class IGVFE2GCRISPR(BaseAdapter):
 
                 if self.label == 'genomic_element_gene':
                     _id = '_'.join(
-                        [element_id, target_gene, self.file_accession])
+                        [element_id, readout_gene, self.file_accession])
                     _source = 'genomic_elements/' + element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
                         '_from': _source,
-                        '_to': 'genes/' + target_gene,
+                        '_to': 'genes/' + readout_gene,
                         'source': IGVFE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
