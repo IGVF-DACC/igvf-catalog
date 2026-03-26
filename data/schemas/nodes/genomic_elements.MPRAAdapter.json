@@ -12,14 +12,10 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "MPRA_chr1_10410_10610_GRCh38_plus_ENCFF769REH"
+          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "name": {
-          "example": "MPRA_chr1_10410_10610_GRCh38_plus_ENCFF769REH"
-        },
-        "strand": {
-          "type": "string",
-          "description": "Strand of the tested MPRA element."
+          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "method": {
           "enum": [
@@ -47,7 +43,6 @@
         }
       },
       "required": [
-        "strand",
         "files_filesets"
       ],
       "additionalProperties": false

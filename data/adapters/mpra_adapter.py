@@ -174,9 +174,10 @@ class MPRAAdapter(BaseAdapter):
         return (chr_, start, end, cls.normalize_strand(strand))
 
     @classmethod
-    def build_mpra_element_id(cls, chr_, start, end, strand, suffix):
+    def build_mpra_element_node_id(cls, chr_, start, end, suffix):
+        """Genomic element node _key: coordinates + suffix only (strand lives on edges)."""
         region_id = build_regulatory_region_id(chr_, start, end, 'MPRA')
-        return f'{region_id}_{cls.strand_token(strand)}_{suffix}'
+        return f'{region_id}_{suffix}'
 
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
@@ -289,8 +290,8 @@ class MPRAAdapter(BaseAdapter):
                 significant = minus_q is not None and minus_q >= self.THRESHOLD
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
-                element_id = self.build_mpra_element_id(
-                    chr_, start, end, strand, element_id_suffix)
+                element_id = self.build_mpra_element_node_id(
+                    chr_, start, end, element_id_suffix)
                 element_key = self.make_design_key(chr_, start, end, strand)
 
                 if self.label == 'genomic_element':
@@ -316,7 +317,6 @@ class MPRAAdapter(BaseAdapter):
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
-                        'strand': strand,
                         'method': self.method,
                         'type': 'tested elements',
                         'source': self.source,
@@ -424,35 +424,43 @@ class MPRAAdapter(BaseAdapter):
 
     def _process_genomic_element_chunk(self, chunk):
         """Emit genomic_element nodes from variant->element mapping (genomic_element_from_variant label only)."""
+        coord_to_strands = defaultdict(set)
         for element_coords_set in self.variant_to_element.values():
             for chr_, start, end, strand in element_coords_set:
-                key = (chr_, start, end, strand)
-                if key in self.seen_elements:
-                    continue
-                self.seen_elements.add(key)
-                _id = self.build_mpra_element_id(
-                    chr_, start, end, strand, self.reference_file_accession)
+                coord_to_strands[(chr_, start, end)].add(strand)
+
+        for coord_key in sorted(coord_to_strands.keys()):
+            if coord_key in self.seen_elements:
+                continue
+            self.seen_elements.add(coord_key)
+            chr_, start, end = coord_key
+            strands = coord_to_strands[coord_key]
+            element_name = None
+            for strand in sorted(strands):
                 element_name = self.coords_to_element_name.get(
-                    key)
-                if element_name is None:
-                    raise ValueError(
-                        f'Missing MPRA sequence design name for {(chr_, start, end, strand)} in {self.reference_file_accession}.')
-                props = {
-                    '_key': _id,
-                    'name': element_name,
-                    'chr': chr_,
-                    'start': int(start),
-                    'end': int(end),
-                    'strand': strand,
-                    'method': self.method,
-                    'type': 'tested elements',
-                    'source': self.source,
-                    'source_url': self.reference_source_url,
-                    'files_filesets': f'files_filesets/{self.reference_file_accession}'
-                }
-                if self.validate:
-                    self.validate_doc(props)
-                self.writer.write(json.dumps(props) + '\n')
+                    self.make_design_key(chr_, start, end, strand))
+                if element_name:
+                    break
+            if element_name is None:
+                raise ValueError(
+                    f'Missing MPRA sequence design name for {coord_key} in {self.reference_file_accession}.')
+            _id = self.build_mpra_element_node_id(
+                chr_, start, end, self.reference_file_accession)
+            props = {
+                '_key': _id,
+                'name': element_name,
+                'chr': chr_,
+                'start': int(start),
+                'end': int(end),
+                'method': self.method,
+                'type': 'tested elements',
+                'source': self.source,
+                'source_url': self.reference_source_url,
+                'files_filesets': f'files_filesets/{self.reference_file_accession}'
+            }
+            if self.validate:
+                self.validate_doc(props)
+            self.writer.write(json.dumps(props) + '\n')
 
     def _process_variant_biosample_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
@@ -476,9 +484,16 @@ class MPRAAdapter(BaseAdapter):
             biosample_term_key = (self.biosample_term or '').split('/')[-1]
 
             for element_chr, element_start, element_end, element_strand in self.variant_to_element[spdi]:
-                element_id = self.build_mpra_element_id(
-                    element_chr, element_start, element_end, element_strand, self.reference_file_accession)
-                edge_key = f'{variant_id}_{element_id}_{biosample_term_key}_{self.file_accession}'
+                element_id = self.build_mpra_element_node_id(
+                    element_chr, element_start, element_end, self.reference_file_accession)
+                # Strand distinguishes edges when node id is coord-only.
+                edge_key = '_'.join([
+                    variant_id,
+                    element_id,
+                    self.strand_token(element_strand),
+                    biosample_term_key,
+                    self.file_accession,
+                ])
 
                 minus_q = self.safe_float(row[12])
                 edge_props = {

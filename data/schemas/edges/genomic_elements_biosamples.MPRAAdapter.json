@@ -13,7 +13,7 @@
           "description": "Unique identifier for the genomic element to biosample edge"
         },
         "_from": {
-          "example": "genomic_elements/MPRA_chr1_10410_10610_GRCh38_plus_ENCFF769REH",
+          "example": "genomic_elements/MPRA_chr1_10410_10610_GRCh38_ENCFF769REH",
           "pattern": "^genomic_elements/",
           "collections": [
             "genomic_elements"
