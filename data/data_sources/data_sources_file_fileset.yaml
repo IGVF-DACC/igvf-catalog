@@ -31,7 +31,7 @@ igvf donor:
 igvf_file_accessions:
   BlueSTARR:
     - IGVFFI1663LKVQ
-  gersbach E2G CRISPR:
+  IGVF CRISPR E2G:
     - IGVFFI3069QCRA # Perturb-seq
     - IGVFFI5749WPVK # Perturb-seq
     - IGVFFI1215LWLH # Perturb-seq

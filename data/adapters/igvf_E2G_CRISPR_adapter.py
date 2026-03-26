@@ -33,8 +33,20 @@ from adapters.writer import Writer
 # 0.0163096	0.4615330666666667	0.6634541544827465	ENSG00000204859	chr1	6582058	6582299	ENSG00000126353	CCR7
 # 0.6030225	0.9994257067617868	0.40989234019479	ENSG00000041988	chr1	6628499	6628691	ENSG00000126353	CCR7
 
+# Example rows from Quertermous's TAP-seq data
+# intended_target_name	Intended_target_gene_id	guide_id(s)	targeting_chr	targeting_start	targeting_end	gene_id	gene_symbol	sceptre_log2_fc	sceptre_p_value	sceptre_adj_p_value	significant	type
+# POLR3D	ENSG00000168495	POLR3D_1,POLR3D_2,POLR3D_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# SNRPD2	ENSG00000125743	SNRPD2_1,SNRPD2_2,SNRPD2_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# PSMA5	ENSG00000143106	PSMA5_1,PSMA5_2,PSMA5_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# SRSF3	ENSG00000112081	SRSF3_1,SRSF3_2,SRSF3_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# RPS7	ENSG00000171863	RPS7_1,RPS7_2,RPS7_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# MAN2A2	ENSG00000196547	MAN2A2_1,MAN2A2_2,MAN2A2_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# PPA1	ENSG00000180817	PPA1_1,PPA1_2,PPA1_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# RPS6	ENSG00000137154	RPS6_1,RPS6_2,RPS6_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
+# NSRP1	ENSG00000126653	NSRP1_1,NSRP1_2,NSRP1_3	chrX	100627108	100639991	ENSG00000000003	TSPAN6	0	1	1	FALSE	Indirect_targeting
 
-class GersbachE2GCRISPR(BaseAdapter):
+
+class IGVFE2GCRISPR(BaseAdapter):
 
     ALLOWED_LABELS = [
         'genomic_element',
@@ -96,18 +108,27 @@ class GersbachE2GCRISPR(BaseAdapter):
                 raise KeyError(
                     f"Missing expected column. Tried: {', '.join(column_names)}")
 
+            def get_optional_column_index(*column_names):
+                for column_name in column_names:
+                    if column_name in name_to_idx:
+                        return name_to_idx[column_name]
+                return None
+
             if method == 'Perturb-seq':
                 I = {
-                    'p_val': name_to_idx['p_val'],
-                    'avg_log2FC': name_to_idx['avg_log2FC'],
-                    'pct_1': name_to_idx['pct.1'],
-                    'pct_2': name_to_idx['pct.2'],
-                    'p_val_adj': name_to_idx['p_val_adj'],
-                    'target_gene': get_column_index('target_gene', 'ensembl_id'),
-                    'promoter_gene': name_to_idx['intended_target_name'],
-                    'chr': name_to_idx['intended_target_chr'],
-                    'start': name_to_idx['intended_target_start'],
-                    'end': name_to_idx['intended_target_end'],
+                    'p_val': get_column_index('p_val', 'sceptre_p_value'),
+                    'log2_fc': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
+                    'pct_1': get_optional_column_index('pct.1'),
+                    'pct_2': get_optional_column_index('pct.2'),
+                    'p_val_adj': get_column_index('p_val_adj', 'sceptre_adj_p_value'),
+                    'target_gene': get_column_index('target_gene', 'ensembl_id', 'gene_id'),
+                    'promoter_gene': get_column_index(
+                        'Intended_target_gene_id',
+                        'intended_target_name'
+                    ),
+                    'chr': get_column_index('intended_target_chr', 'targeting_chr'),
+                    'start': get_column_index('intended_target_start', 'targeting_start'),
+                    'end': get_column_index('intended_target_end', 'targeting_end'),
                 }
             elif method == 'CRISPR FACS screen':
                 I = {
@@ -153,14 +174,16 @@ class GersbachE2GCRISPR(BaseAdapter):
                 else:
                     element_id = genomic_coordinates_to_element_id[element_coordinates]
 
-                if method == 'Perturb-seq':
+                if method in ['Perturb-seq', 'TAP-seq']:
                     metrics = {
                         'p_value': float(row[I['p_val']]),
-                        'avg_log2FC': float(row[I['avg_log2FC']]),
-                        'pct_1': float(row[I['pct_1']]),
-                        'pct_2': float(row[I['pct_2']]),
+                        'log2FC': float(row[I['log2_fc']]),
                         'p_value_adj': float(row[I['p_val_adj']]),
                     }
+                    if I['pct_1'] is not None:
+                        metrics['pct_1'] = float(row[I['pct_1']])
+                    if I['pct_2'] is not None:
+                        metrics['pct_2'] = float(row[I['pct_2']])
                 elif method == 'CRISPR FACS screen':
                     metrics = {
                         'p_value': float(row[I['p_val']]),
@@ -176,7 +199,7 @@ class GersbachE2GCRISPR(BaseAdapter):
                         '_key': _id,
                         '_from': _source,
                         '_to': 'genes/' + target_gene,
-                        'source': GersbachE2GCRISPR.SOURCE,
+                        'source': IGVFE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'label': self.COLLECTION_LABEL,
@@ -206,7 +229,7 @@ class GersbachE2GCRISPR(BaseAdapter):
                         'end': int(genomic_element[2]),
                         'method': method,
                         'source_annotation': source_annotation,
-                        'source': GersbachE2GCRISPR.SOURCE,
+                        'source': IGVFE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession

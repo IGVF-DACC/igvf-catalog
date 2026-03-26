@@ -1131,12 +1131,12 @@ genomic element to gene expression association encode E2G CRISPR:
   source: ENCODE
   biological_context: ontology_terms/EFO_0002067
 
-# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
-genomic element gersbach E2G CRISPR:
+# Example: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/igvf_crispr_e2g_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element IGVF CRISPR E2G:
   collection: genomic_elements
   params:
     - label
-  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/igvf_crispr_e2g_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz # Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz # Perturb-seq
@@ -1149,12 +1149,12 @@ genomic element gersbach E2G CRISPR:
   source_annotation: ['enhancer', 'promoter']
   type: tested elements
 
-# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_perturb_seq_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
-genomic element to gene gersbach E2G CRISPR:
+# Example: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/igvf_crispr_e2g_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element to gene IGVF CRISPR E2G:
   collection: genomic_elements_genes
   params:
     - label
-  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements_genes/igvf_crispr_e2g_genomic_elements_genes_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz # Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz # Perturb-seq

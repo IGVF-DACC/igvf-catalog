@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/nodes/genomic_elements.GersbachE2GCRISPR.json",
+  "$id": "schemas/nodes/genomic_elements.IGVFE2GCRISPR.json",
   "allOf": [
     {
       "$ref": "node.base.json"

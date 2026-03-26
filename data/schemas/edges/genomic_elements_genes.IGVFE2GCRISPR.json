@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "edges/genomic_elements_genes.GersbachE2GCRISPR.json",
+  "$id": "edges/genomic_elements_genes.IGVFE2GCRISPR.json",
   "db_collection_name": "genomic_elements_genes",
   "allOf": [
     {
@@ -89,9 +89,9 @@
           "type": "number",
           "description": "The p-value of the genomic element to gene edge"
         },
-        "avg_log2FC": {
+        "log2FC": {
           "type": "number",
-          "description": "The average log2 fold change of the genomic element to gene edge. This is used as score in APIs for data with method 'Perturb-seq'."
+          "description": "The log2 fold change of the genomic element to gene edge. This is used as score in APIs for data with method 'Perturb-seq'."
         },
         "pct_1": {
           "type": "number",
