@@ -121,8 +121,9 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_enhancer_only_genomic_elements(
         )
         adapter.process_file()
 
-    first_item = json.loads(writer.contents[0])
-    assert len(writer.contents) == 1
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    assert len(parsed) == 1
+    first_item = parsed[0]
     assert first_item['_key'] == 'CRISPR_chr22_36387779_36388133_GRCh38_IGVFFI1215LWLH'
     assert first_item['source_annotation'] == 'enhancer'
     assert 'promoter_of' not in first_item
@@ -158,8 +159,9 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_uses_ensembl_id_column(mock_fil
         )
         adapter.process_file()
 
-    first_item = json.loads(writer.contents[0])
-    assert len(writer.contents) == 1
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    assert len(parsed) == 1
+    first_item = parsed[0]
     assert first_item['_to'] == 'genes/ENSG00000100345'
     assert first_item['avg_log2FC'] == -0.612084335
 
