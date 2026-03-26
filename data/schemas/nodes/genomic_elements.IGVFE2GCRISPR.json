@@ -26,7 +26,6 @@
           "enum": [
             "Perturb-seq",
             "TAP-seq",
-            "Parse Perturb-seq",
             "CRISPR FACS screen"
           ]
         },

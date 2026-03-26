@@ -68,6 +68,17 @@ class IGVFE2GCRISPR(BaseAdapter):
         )
         return normalized
 
+    @staticmethod
+    def _parse_bool(value):
+        if value is None:
+            return None
+        normalized = str(value).strip().lower()
+        if normalized in {'true', 't', '1'}:
+            return True
+        if normalized in {'false', 'f', '0'}:
+            return False
+        return None
+
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
@@ -114,7 +125,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         return name_to_idx[column_name]
                 return None
 
-            if method in ['Perturb-seq', 'TAP-seq', 'Parse Perturb-seq']:
+            if method in ['Perturb-seq', 'TAP-seq']:
                 I = {
                     'p_val': get_column_index('p_val', 'sceptre_p_value'),
                     'log2_fc': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
@@ -122,10 +133,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                     'pct_2': get_optional_column_index('pct.2'),
                     'p_val_adj': get_column_index('p_val_adj', 'sceptre_adj_p_value'),
                     'target_gene': get_column_index('target_gene', 'ensembl_id', 'gene_id'),
-                    'promoter_gene': get_column_index(
-                        'Intended_target_gene_id',
-                        'intended_target_name'
-                    ),
+                    'promoter_gene': get_column_index('intended_target_name'),
+                    'significant': get_optional_column_index('significant'),
                     'chr': get_column_index('intended_target_chr', 'targeting_chr'),
                     'start': get_column_index('intended_target_start', 'targeting_start'),
                     'end': get_column_index('intended_target_end', 'targeting_end'),
@@ -174,12 +183,16 @@ class IGVFE2GCRISPR(BaseAdapter):
                 else:
                     element_id = genomic_coordinates_to_element_id[element_coordinates]
 
-                if method in ['Perturb-seq', 'TAP-seq']:
+                if method in ['Perturb-seq', 'TAP-seq', 'Parse Perturb-seq']:
                     metrics = {
                         'p_value': float(row[I['p_val']]),
                         'log2FC': float(row[I['log2_fc']]),
                         'p_value_adj': float(row[I['p_val_adj']]),
                     }
+                    if I.get('significant') is not None:
+                        significant = self._parse_bool(row[I['significant']])
+                        if significant is not None:
+                            metrics['significant'] = significant
                     if I['pct_1'] is not None:
                         metrics['pct_1'] = float(row[I['pct_1']])
                     if I['pct_2'] is not None:
