@@ -62,6 +62,8 @@ class MPRAAdapter(BaseAdapter):
         'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152590-g-c',
         'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152590-g-t',
         'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152592-g-c',
+        'cardiac_neuro_cava_random:alt_smad4|ensg00000141646.15|eh38e3269116_fwd_tile1-1_smad4|ensg00000141646.15|eh38e3269116|18-51038257-g-a',
+        'cardiac_neuro_cava_random:alt_smad4|ensg00000141646.15|eh38e3269116_fwd_tile1-1_smad4|ensg00000141646.15|eh38e3269116|18-51038257-g-c',
     }
 
     def __init__(
@@ -344,6 +346,11 @@ class MPRAAdapter(BaseAdapter):
                     if self.has_sequence_designs:
                         normalized_effect_name = self.normalize_design_name(
                             row[3])
+                        # Must run before missing-allele handling: blacklisted rows
+                        # have no design alleles and share coordinates, which would
+                        # otherwise trigger missing_allele_multi_effect.
+                        if self._is_blacklisted_effect_name(row[3]):
+                            continue
                         effect_class = self.design_name_class.get(
                             normalized_effect_name, '')
                         if 'control' in effect_class:
@@ -361,9 +368,6 @@ class MPRAAdapter(BaseAdapter):
                                 continue
                             alleles = self.design_element_alleles.get(
                                 element_key, set())
-                        if self._is_blacklisted_effect_name(row[3]):
-                            # Ignore known bad design entries.
-                            continue
                         if alleles and 'ref' not in alleles:
                             # Only ref element effects should be loaded.
                             continue
