@@ -166,6 +166,41 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_uses_ensembl_id_column(mock_fil
     assert first_item['avg_log2FC'] == -0.612084335
 
 
+def test_gersbach_e2g_crispr_adapter_perturb_seq_strips_ensembl_version(mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'gersbach_perturb_seq_with_ensembl_version.txt.gz'
+    header = (
+        'p_val\tavg_log2FC\tpct.1\tpct.2\tp_val_adj\tgene_symbol\t'
+        'ensembl_id\tintended_target_name\tintended_target_chr\t'
+        'intended_target_start\tintended_target_end\n'
+    )
+    row = (
+        '0\t-0.612084335\t0.744\t0.994\t0\tMYH9\tENSG00000174038.13\t'
+        'chr22:36387779-36388133\tchr22\t36387779\t36388133\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(row)
+
+    with patch('adapters.gersbach_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.side_effect = lambda x: x == 'ENSG00000174038'
+
+        adapter = GersbachE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    assert len(parsed) == 1
+    first_item = parsed[0]
+    assert first_item['_to'] == 'genes/ENSG00000174038'
+
+
 def test_gersbach_e2g_crispr_adapter_facs_screen_genomic_elements(mock_file_fileset_facs_screen, mocker):
     writer = SpyWriter()
     with patch('adapters.gersbach_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:

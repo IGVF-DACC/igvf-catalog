@@ -1,6 +1,7 @@
 import csv
 import gzip
 import json
+import re
 from typing import Optional
 
 from adapters.base import BaseAdapter
@@ -41,6 +42,19 @@ class GersbachE2GCRISPR(BaseAdapter):
     ]
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
+
+    @staticmethod
+    def _normalize_ensembl_gene_id(gene_id: str) -> str:
+        if not gene_id:
+            return gene_id
+        normalized = gene_id.strip().rstrip(');,')
+        # Accept IDs like ENSG00000174038.13 by stripping version suffix.
+        normalized = re.sub(
+            r'^(ENSG[0-9]{11}(?:_PAR_Y)?)\.[0-9]+$',
+            r'\1',
+            normalized
+        )
+        return normalized
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
@@ -116,11 +130,13 @@ class GersbachE2GCRISPR(BaseAdapter):
                 intended_target_chr = row[I['chr']]
                 intended_target_start = row[I['start']]
                 intended_target_end = row[I['end']]
-                intended_target_name = row[I['promoter_gene']]
-                target_gene = row[I['target_gene']]
+                intended_target_name = self._normalize_ensembl_gene_id(
+                    row[I['promoter_gene']])
+                target_gene_raw = row[I['target_gene']]
+                target_gene = self._normalize_ensembl_gene_id(target_gene_raw)
                 if not self.gene_validator.validate(target_gene):
                     self.logger.warning(
-                        f'Skipping row: targeted gene "{target_gene}" is not a valid gene.')
+                        f'Skipping row: targeted gene "{target_gene_raw}" is not a valid gene after normalization ("{target_gene}").')
                     continue
                 promoter_gene = None
                 source_annotation = 'enhancer'
