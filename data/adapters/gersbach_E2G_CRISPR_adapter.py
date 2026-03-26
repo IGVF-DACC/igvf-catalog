@@ -75,6 +75,13 @@ class GersbachE2GCRISPR(BaseAdapter):
 
             name_to_idx = {h.strip(): i for i, h in enumerate(header)}
 
+            def get_column_index(*column_names):
+                for column_name in column_names:
+                    if column_name in name_to_idx:
+                        return name_to_idx[column_name]
+                raise KeyError(
+                    f"Missing expected column. Tried: {', '.join(column_names)}")
+
             if method == 'Perturb-seq':
                 I = {
                     'p_val': name_to_idx['p_val'],
@@ -82,7 +89,7 @@ class GersbachE2GCRISPR(BaseAdapter):
                     'pct_1': name_to_idx['pct.1'],
                     'pct_2': name_to_idx['pct.2'],
                     'p_val_adj': name_to_idx['p_val_adj'],
-                    'target_gene': name_to_idx['target_gene'],
+                    'target_gene': get_column_index('target_gene', 'ensembl_id'),
                     'promoter_gene': name_to_idx['intended_target_name'],
                     'chr': name_to_idx['intended_target_chr'],
                     'start': name_to_idx['intended_target_start'],
