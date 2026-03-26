@@ -119,8 +119,9 @@ class GersbachE2GCRISPR(BaseAdapter):
                 intended_target_name = row[I['promoter_gene']]
                 target_gene = row[I['target_gene']]
                 if not self.gene_validator.validate(target_gene):
-                    raise ValueError(
-                        f'Targeted gene: {target_gene} is not a valid gene.')
+                    self.logger.warning(
+                        f'Skipping row: targeted gene "{target_gene}" is not a valid gene.')
+                    continue
                 promoter_gene = None
                 source_annotation = 'enhancer'
                 if self.gene_validator.validate(intended_target_name):
