@@ -57,14 +57,20 @@ class MPRAAdapter(BaseAdapter):
 
     THRESHOLD = 1
     CHUNK_SIZE = 6500
-    BLACKLISTED_EFFECT_NAMES = {
-        # Cardiac/neuro design bug: ALT-only entries with no reference design and not explicitly designated as alts.
-        'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152590-g-c',
-        'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152590-g-t',
-        'cardiac_neuro_cava_random:alt_kansl1|ensg00000120071.15|eh38e3227108_rev_tile1-1_kansl1|ensg00000120071.15|eh38e3227108|17-46152592-g-c',
-        'cardiac_neuro_cava_random:alt_smad4|ensg00000141646.15|eh38e3269116_fwd_tile1-1_smad4|ensg00000141646.15|eh38e3269116|18-51038257-g-a',
-        'cardiac_neuro_cava_random:alt_smad4|ensg00000141646.15|eh38e3269116_fwd_tile1-1_smad4|ensg00000141646.15|eh38e3269116|18-51038257-g-c',
-    }
+    # Exact BED column-4 strings only (case-sensitive). Do not use a broad ALT_ prefix: some
+    # cardiac_neuro_cava_random:ALT_* rows may be valid.
+    BLACKLISTED_EFFECT_NAMES = frozenset({
+        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|EH38E3227108|17-46152590-G-C',
+        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|EH38E3227108|17-46152590-G-T',
+        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|EH38E3227108|17-46152592-G-C',
+        'cardiac_neuro_cava_random:ALT_SMAD4|ENSG00000141646.15|EH38E3269116_fwd_tile1-1_SMAD4|ENSG00000141646.15|EH38E3269116|18-51038257-G-A',
+        'cardiac_neuro_cava_random:ALT_SMAD4|ENSG00000141646.15|EH38E3269116_fwd_tile1-1_SMAD4|ENSG00000141646.15|EH38E3269116|18-51038257-G-C',
+        'cardiac_neuro_cava_random:ALT_NACC1|ENSG00000160877.7|EH38E3291666_fwd_tile1-1_NACC1|ENSG00000160877.7|EH38E3291666|19-13103813-C-A',
+        'cardiac_neuro_cava_random:ALT_NACC1|ENSG00000160877.7|EH38E3291666_fwd_tile1-1_NACC1|ENSG00000160877.7|EH38E3291666|19-13103814-C-A',
+        'cardiac_neuro_cava_random:ALT_MOGS|ENSG00000115275.15|EH38E2010443_rev_tile1-1_MOGS|ENSG00000115275.15|EH38E2010443|2-74477126-T-C',
+        'cardiac_neuro_cava_random:ALT_MOGS|ENSG00000115275.15|EH38E2010443_rev_tile1-1_MOGS|ENSG00000115275.15|EH38E2010443|2-74477129-T-G',
+        'cardiac_neuro_cava_random:ALT_HDLBP|ENSG00000115677.18|EH38E2090631_rev_tile1-1_HDLBP|ENSG00000115677.18|EH38E2090631|2-241366100-A-T',
+    })
 
     def __init__(
         self,
@@ -243,7 +249,7 @@ class MPRAAdapter(BaseAdapter):
 
     @classmethod
     def _is_blacklisted_effect_name(cls, effect_name):
-        return (effect_name or '').strip().lower() in cls.BLACKLISTED_EFFECT_NAMES
+        return (effect_name or '').strip() in cls.BLACKLISTED_EFFECT_NAMES
 
     def process_file(self):
         self.seen_elements = set()
