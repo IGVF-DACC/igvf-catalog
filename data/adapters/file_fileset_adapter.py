@@ -468,11 +468,14 @@ class FileFileSet:
         assay_term_ids = set()
         for input_file_set in fileset_object.get('input_file_sets', []):
             measurement_sets = set()
-            if input_file_set['@id'].startswith('/analysis-sets/'):
-                measurement_sets = measurement_sets | self.decompose_analysis_set_to_measurement_set_igvf(
-                    input_file_set['@id'])
-            if input_file_set['@id'].startswith('/measurement-sets/'):
-                measurement_sets.add(input_file_set['@id'])
+            input_id = input_file_set['@id']
+            if input_id.startswith('/analysis-sets/'):
+                measurement_sets.update(
+                    self.decompose_analysis_set_to_measurement_set_igvf(
+                        input_id)
+                )
+            elif input_id.startswith('/measurement-sets/'):
+                measurement_sets.add(input_id)
             for measurement_set in measurement_sets:
                 measurement_set_object = requests.get(
                     urljoin(self.api_url, measurement_set + '/@@object?format=json')).json()
@@ -487,6 +490,8 @@ class FileFileSet:
     def query_fileset_files_props_encode(self, accession):
         file_object = self.get_file_object(accession)
         source_url = urljoin(self.source_url, file_object['@id'])
+        href = file_object.get('href')
+        download_link = urljoin(self.api_url, href)
         dataset_object = requests.get(
             urljoin(self.api_url, file_object['dataset'] + '/@@embedded?format=json')).json()
         dataset_accession = dataset_object['accession']
@@ -558,13 +563,16 @@ class FileFileSet:
             'publication': publication_id,
             'collections': catalog_collections,
             'source': self.source,
-            'source_url': source_url
+            'source_url': source_url,
+            'download_link': download_link
         }
         return props, donor_ids, all_sample_types, disease_ids
 
     def query_fileset_files_props_igvf(self, accession):
         file_object = self.get_file_object(accession)
         source_url = urljoin(self.source_url, file_object['@id'])
+        href = file_object.get('href')
+        download_link = urljoin(self.api_url, href)
         class_type = file_object.get('catalog_class')
 
         fileset_object = requests.get(
@@ -573,7 +581,7 @@ class FileFileSet:
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
         catalog_collections = file_object.get('catalog_collections', [])
-        if not catalog_collections:
+        if not catalog_collections and fileset_object_type != 'PseudobulkSet':
             raise (ValueError(
                 f'Catalog collections are required for file_fileset {accession}.'))
 
@@ -588,10 +596,10 @@ class FileFileSet:
 
         if fileset_object_type == 'PredictionSet' and not (software):
             raise (ValueError(f'Prediction sets require software to be loaded.'))
-        if fileset_object_type not in ['PredictionSet', 'AnalysisSet', 'CuratedSet']:
+        if fileset_object_type not in ['PredictionSet', 'AnalysisSet', 'CuratedSet', 'PseudobulkSet']:
             raise (ValueError(
-                f'Loading data from file sets other than prediction sets, analysis sets, and curated sets is currently unsupported.'))
-        if fileset_object_type == 'AnalysisSet':
+                f'Loading data from file sets other than prediction sets, analysis sets, curated sets, and pseudobulk sets is currently unsupported.'))
+        if fileset_object_type in ['AnalysisSet', 'PseudobulkSet']:
             preferred_assay_titles, assay_term_ids = self.parse_analysis_set_igvf(
                 fileset_object)
             if len(preferred_assay_titles) != 1:
@@ -635,7 +643,8 @@ class FileFileSet:
             'publication': publication_id,
             'collections': catalog_collections,
             'source': self.source,
-            'source_url': source_url
+            'source_url': source_url,
+            'download_link': download_link
         }
         return props, donor_ids, sample_term_ids
 

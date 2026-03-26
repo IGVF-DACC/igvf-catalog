@@ -127,7 +127,9 @@ const filesFilesetsFormat = z.object({
   sample_ids: z.array(z.string()).nullish(),
   simple_sample_summaries: z.array(z.string()).nullish(),
   donors: z.array(z.string()).nullish(),
-  source: z.string()
+  source: z.string(),
+  source_url: z.string(),
+  download_link: z.string()
 })
 
 async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
