@@ -130,6 +130,7 @@ def main():
                              for item in args.accessions.split(',') if item.strip()]
 
     for label, filename in labels_to_run.items():
+        print(f'parsing data for label {label}')
         accessions = (
             manual_accessions
             if manual_accessions is not None
