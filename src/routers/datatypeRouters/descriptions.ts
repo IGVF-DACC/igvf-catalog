@@ -668,8 +668,8 @@ export const descriptions = {
   Example: query = Tell me about the gene SAMD11.',
 
   files_fileset: 'Retrieve data about a specific dataset.<br> \
-  Example: file_fileset_id = ENCFF094BVF,<br>\
-  fileset_id = ENCSR997TVR,<br>\
+  Example: file_fileset_id = ENCFF004PFU,<br>\
+  fileset_id = ENCSR359DFW,<br>\
   lab = jesse-engreitz,<br>\
   preferred_assay_title = DNase-seq,<br>\
   method = MPRA,<br>\

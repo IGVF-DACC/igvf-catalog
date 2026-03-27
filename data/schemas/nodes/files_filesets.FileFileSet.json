@@ -9,15 +9,15 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "ENCFF094BVF"
+          "example": "ENCFF004PFU"
         },
         "name": {
-          "example": "ENCFF094BVF"
+          "example": "ENCFF004PFU"
         },
         "file_set_id": {
           "type": "string",
           "description": "The file set id of the file set",
-          "example": "ENCFF094BVF"
+          "example": "ENCFF004PFU"
         },
         "lab": {
           "type": "string",
@@ -47,11 +47,22 @@
             "null"
           ],
           "description": "The preferred assay titles of the file set",
-          "example": [
-            "HiC"
-          ],
           "items": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "CRISPR FACS screen",
+              "DNase-seq",
+              "electroporated MPRA",
+              "lentiMPRA",
+              "MPRA",
+              "Perturb-seq",
+              "scATAC-seq",
+              "SGE",
+              "STARR-seq",
+              "VAMP-seq",
+              "VAMP-seq (MultiSTEP)",
+              "Variant-EFFECTS"
+            ]
           }
         },
         "assay_term_ids": {
@@ -110,11 +121,33 @@
             "null"
           ],
           "description": "The software of the file set",
-          "example": [
-            "Distal regulation ENCODE-rE2G"
-          ],
           "items": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "2024_multistep",
+              "BCalm",
+              "BEDTools",
+              "bigWigAverageOverBed",
+              "BIRD",
+              "BlueSTARR",
+              "CountESS",
+              "cV2F",
+              "cyp2c19_2c9",
+              "DESeq2",
+              "Distal regulation ENCODE-rE2G",
+              "DistalRegulationCRISPRdata",
+              "Engreitz Variant-EFFECTS scripts",
+              "ESM-1v",
+              "FRACTEL",
+              "MPRAflow tsv-to-bed",
+              "mpralm",
+              "MutPred2",
+              "pandas",
+              "Samtools",
+              "scATAC-seq processing scripts",
+              "SEMVAR",
+              "SGE Pipeline"
+            ]
           }
         },
         "samples": {

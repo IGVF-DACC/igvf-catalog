@@ -4,89 +4,19 @@ import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { db } from '../../../database'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
 const filesFilesetsSchema = getSchema('data/schemas/nodes/files_filesets.FileFileSet.json')
 const filesFilesetsCollectionName = filesFilesetsSchema.db_collection_name as string
 
-const LABS = [
-  'alan-boyle',
-  'bill-majoros',
-  'charles-gersbach',
-  'j-michael-cherry',
-  'jesse-engreitz',
-  'kushal-dey',
-  'lea-starita',
-  'mark-craven',
-  'nadav-ahituv',
-  'predrag-radivojac',
-  'roderic-guigo',
-  'tim-reddy',
-  'zhiping-weng'
-] as const
-
-const ASSAYS = [
-  'ATAC-seq',
-  'CAGE',
-  'ChIA-PET',
-  'ChIP-seq',
-  'CRISPR FACS screen',
-  'DNase-seq',
-  'HiC',
-  'lentiMPRA',
-  'Mint-ChIP-seq',
-  'MPRA',
-  'Perturb-seq',
-  'polyA plus RNA-seq',
-  'RNA-seq',
-  'SGE',
-  'STARR-seq',
-  'Variant-EFFECTS'
-] as const
-
-const METHOD = [
-  'BlueSTARR',
-  'candidate Cis-Regulatory Elements',
-  'caQTL',
-  'CRISPR enhancer perturbation screen',
-  'CRISPR FACS screen',
-  'cV2F',
-  'ENCODE-rE2G',
-  'ESM-1v',
-  'GRCh38 elements',
-  'MPRA',
-  'MutPred2',
-  'Perturb-seq',
-  'SEMVAR',
-  'SGE',
-  'STARR-seq',
-  'VAMP-seq',
-  'VAMP-seq (MultiSTEP)',
-  'Variant-EFFECTS'
-] as const
-
-const SOFTWARE = [
-  'BCalm',
-  'BEDTools',
-  'bigWigAverageOverBed',
-  'BlueSTARR',
-  'cV2F',
-  'Distal regulation ENCODE-rE2G',
-  'DistalRegulationCRISPRdata',
-  'EPIraction',
-  'ESM-1v variant scoring workflow',
-  'FRACTEL',
-  'MPRAflow tsv-to-bed',
-  'MutPred2',
-  'SEMVAR',
-  'SGE Pipeline'
-] as const
-
-const SOURCE = ['ENCODE', 'IGVF'] as const
-
-const CLASS = ['prediction', 'experiment', 'integrative analysis'] as const
+const LABS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'lab')
+const METHOD = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'method')
+const CLASS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'class')
+const SOURCE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'source')
+const ASSAYS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'preferred_assay_titles')
+const SOFTWARE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'software')
 
 const filesFilesetsQueryFormat = z.object({
   file_fileset_id: z.string().optional(),
