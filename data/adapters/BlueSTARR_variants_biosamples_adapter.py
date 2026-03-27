@@ -21,6 +21,7 @@ from adapters.writer import Writer
 class BlueSTARRVariantBiosample(BaseAdapter):
     SOURCE = 'IGVF'
     ELEMENT_FILE_ACCESSION = 'ENCFF420VPZ'  # CCRE from ENCODE
+    ACCESSION_WITH_CCRES = 'IGVFFI1663LKVQ'
 
     # Accessions:
     # IGVFFI3351LASN
@@ -87,14 +88,18 @@ class BlueSTARRVariantBiosample(BaseAdapter):
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
-            element_id = build_regulatory_region_id(
-                row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + BlueSTARRVariantBiosample.ELEMENT_FILE_ACCESSION
-            edge_key = _id + '_' + element_id + '_IGVFFI1663LKVQ'
+            genomic_element_id = None
+            if self.file_accession == BlueSTARRVariantBiosample.ACCESSION_WITH_CCRES:
+                genomic_element_id = 'genomic_elements/' + build_regulatory_region_id(
+                    row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + BlueSTARRVariantBiosample.ELEMENT_FILE_ACCESSION
+
+            edge_key = _id + '_' + self.biosample_term + '_' + self.file_accession
 
             edge_props = {
                 '_key': edge_key,
                 '_from': 'variants/' + _id,
-                '_to': 'ontology_terms/' + element_id,
+                '_to': 'ontology_terms/' + self.biosample_term,
+                'genomic_element': genomic_element_id,
                 'log2FC': float(row[3]),
                 'class': self.collection_class,
                 'label': self.collection_label,
