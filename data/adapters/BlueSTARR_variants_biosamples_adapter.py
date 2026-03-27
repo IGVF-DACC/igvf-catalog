@@ -38,7 +38,7 @@ class BlueSTARRVariantBiosample(BaseAdapter):
     ):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = self.filepath.split('.')[-2]
+        self.file_accession = self.filepath.split('/')[-1].split('.')[-2]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession + '/'
         self.collection_label = 'predicted variant effect on gene expression'
 
