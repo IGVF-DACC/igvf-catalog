@@ -231,10 +231,10 @@ class MPRAAdapter(BaseAdapter):
                         if normalized_name:
                             self.design_name_alleles[normalized_name].add(
                                 normalized)
-                    if 'ref' in normalized_alleles and 'alt' in normalized_alleles:
-                        raise ValueError(
-                            f'Malformed allele at row {i}: unexpected mixed allele values {allele_values!r}'
-                        )
+                    # Both ref and alt on one design row is valid: element-level activity
+                    # in the effects file applies to the reference tile; alt-only designs
+                    # for the same coordinate still skip biosample edges (see
+                    # genomic_element_biosample branch: 'ref' not in alleles).
 
                 if row.get('SPDI') in (None, '', 'NA', 'NaN'):
                     continue

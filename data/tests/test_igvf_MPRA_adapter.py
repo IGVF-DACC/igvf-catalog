@@ -205,7 +205,8 @@ def test_genomic_element_biosample_ref_allele_only_writes(tmp_path, mock_file_fi
     assert len(writer.contents) == 1
 
 
-def test_genomic_element_biosample_mixed_ref_alt_is_flagged(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_mixed_ref_alt_writes_ref_element_effect(tmp_path, mock_file_fileset):
+    """Design row with both ref and alt is valid; biosample edge loads (ref is present)."""
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\n'
@@ -217,16 +218,17 @@ def test_genomic_element_biosample_mixed_ref_alt_is_flagged(tmp_path, mock_file_
     )
 
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='unexpected mixed allele values'):
-        MPRAAdapter(
-            filepath=str(effects_file),
-            label='genomic_element_biosample',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
-            reference_filepath=str(design_file),
-            reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
-            writer=writer,
-            validate=True
-        )
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='genomic_element_biosample',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    assert len(writer.contents) == 1
 
 
 def test_genomic_element_biosample_missing_allele_writes(tmp_path, mock_file_fileset):
