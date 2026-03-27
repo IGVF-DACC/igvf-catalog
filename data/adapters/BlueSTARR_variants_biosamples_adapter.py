@@ -1,7 +1,7 @@
 import csv
 import json
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import build_variant_id, load_variant, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from typing import Optional
 from adapters.writer import Writer
 
@@ -19,6 +19,7 @@ from adapters.writer import Writer
 
 
 class BlueSTARRVariantBiosample(BaseAdapter):
+    ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
     ELEMENT_FILE_ACCESSION = 'ENCFF420VPZ'  # CCRE from ENCODE
     ACCESSION_WITH_CCRES = 'IGVFFI1663LKVQ'
@@ -44,10 +45,16 @@ class BlueSTARRVariantBiosample(BaseAdapter):
         self.collection_label = 'predicted variant effect on gene expression'
 
     def _get_schema_type(self):
-        return 'edges'
+        if self.label == 'variant_biosample':
+            return 'edges'
+        else:
+            return 'nodes'
 
     def _get_collection_name(self):
-        return 'variants_biosamples'
+        if self.label == 'variant_biosample':
+            return 'variants_biosamples'
+        else:
+            return 'variants'
 
     def process_file(self):
         self.writer.open()
@@ -66,13 +73,54 @@ class BlueSTARRVariantBiosample(BaseAdapter):
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
                 if i % chunk_size == 0:
-                    self.process_edge_chunk(chunk)
+                    if self.label == 'variant':
+                        self.process_variant_chunk(chunk)
+                    elif self.label == 'variant_biosample':
+                        self.process_edge_chunk(chunk)
                     chunk = []
 
             if chunk != []:
-                self.process_edge_chunk(chunk)
+                if self.label == 'variant':
+                    self.process_variant_chunk(chunk)
+                elif self.label == 'variant_biosample':
+                    self.process_edge_chunk(chunk)
 
         self.writer.close()
+
+    def process_variant_chunk(self, chunk):
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[4] for row in chunk])
+        skipped_spdis = []
+
+        unloaded_chunk = []
+        for row in chunk:
+            if row[4] not in loaded_spdis:
+                unloaded_chunk.append(row)
+
+        for row in unloaded_chunk:
+            spdi = row[4]
+            variant, skipped_message = load_variant(spdi)
+            if variant:
+                variant.update({
+                    'source': BlueSTARRVariantBiosample.SOURCE,
+                    'source_url': self.source_url,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                })
+                if self.validate:
+                    self.validate_doc(variant)
+                self.writer.write(json.dumps(variant) + '\n')
+
+            if skipped_message is not None:
+                skipped_spdis.append(skipped_message)
+
+        if skipped_spdis:
+            self.logger.warning(f'Skipped {len(skipped_spdis)} variants:')
+            for skipped in skipped_spdis:
+                self.logger.warning(
+                    f"  - {skipped['variant_id']}: {skipped['reason']}")
+            with open('./skipped_variants.jsonl', 'a') as out:
+                for skipped in skipped_spdis:
+                    out.write(json.dumps(skipped) + '\n')
 
     def process_edge_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
