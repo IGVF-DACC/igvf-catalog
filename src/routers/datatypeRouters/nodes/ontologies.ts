@@ -5,44 +5,23 @@ import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
 
 const ontologySchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
 const ontologyCollectionName = ontologySchema.db_collection_name as string
 
-const ontologySources = z.enum([
-  'BAO',
-  'Cellosaurus',
-  'CHEBI',
-  'CL',
-  'CLO',
-  'EFO',
-  'ENCODE',
-  'GO',
-  'HPO',
-  'MONDO',
-  'NCIT',
-  'OBA',
-  'Oncotree',
-  'ORPHANET',
-  'UBERON',
-  'VARIO'
-])
-const subontologies = z.enum([
-  'biological_process',
-  'cellular_component',
-  'molecular_function'
-])
+const ontologySources = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'source')
+const subontologies = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'subontology')
 
 export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   synonyms: z.string().optional(),
   description: z.string().trim().optional(),
-  source: ontologySources.optional(),
-  subontology: subontologies.optional()
+  source: z.enum(ontologySources).optional(),
+  subontology: z.enum(subontologies).optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 export const ontologyFormat = z.object({

@@ -7,11 +7,11 @@ import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
 import { TRPCError } from '@trpc/server'
 import { findTranscriptsFromProteinSearch } from '../edges/transcripts_proteins'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const REGION_IDX = 'idx_zkd_start_end'
-const STRUCTURE_TYPES = ['exon', 'intron', 'CDS', 'start_codon', 'stop_codon', 'UTR'] as const
+const STRUCTURE_TYPES = getCollectionEnumValuesOrThrow('nodes', 'genes_structure', 'type')
 
 const QueryFormat = z.object({
   gene_id: z.string().trim().optional(),

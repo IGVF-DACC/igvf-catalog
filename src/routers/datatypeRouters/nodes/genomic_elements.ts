@@ -4,27 +4,22 @@ import { publicProcedure } from '../../../trpc'
 import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
-import { genomicElementSourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
-import { getSchema } from '../schema'
+import { commonNodesParamsFormat } from '../params'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
 
-const METHODS = [
-  'ENCODE-rE2G',
-  'candidate Cis-Regulatory Elements',
-  'MPRA',
-  'caQTL',
-  'CRISPR FACS screen',
-  'Perturb-seq',
-  'CRISPR enhancer perturbation screen'
-] as const
+const METHODS = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'method')
+const SOURCES = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'source')
+const TYPES = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'type')
+const SOURCE_ANNOTATIONS = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'source_annotation')
 
 export const genomicElementsQueryFormat = z.object({
   region: z.string().trim().optional(),
-  source_annotation: genomicElementSourceAnnotation.optional(),
-  type: genomicElementType.optional(),
+  source_annotation: z.enum(SOURCE_ANNOTATIONS).optional(),
+  type: z.enum(TYPES).optional(),
   method: z.enum(METHODS).optional(),
-  source: genomicElementSource.optional()
+  source: z.enum(SOURCES).optional()
 }).merge(commonNodesParamsFormat)
 
 export const genomicElementFormat = z.object({

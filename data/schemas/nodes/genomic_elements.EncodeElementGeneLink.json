@@ -30,7 +30,11 @@
         "source_annotation": {
           "type": "string",
           "description": "Source annotation for the genomic element",
-          "example": "genic"
+          "enum": [
+            "genic",
+            "intergenic",
+            "promoter"
+          ]
         },
         "source": {
           "enum": [

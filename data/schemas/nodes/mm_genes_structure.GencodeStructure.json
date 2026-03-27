@@ -43,6 +43,7 @@
             "CDS",
             "UTR",
             "exon",
+            "intron",
             "start_codon",
             "stop_codon"
           ]
