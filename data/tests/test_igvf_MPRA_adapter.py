@@ -65,6 +65,39 @@ def test_genomic_element(mock_file_fileset):
                'tested elements' and p['method'] == 'MPRA' for p in parsed)
 
 
+def test_genomic_element_missing_design_entry_warns_and_skips(tmp_path, mock_file_fileset, caplog):
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr8\t100722043\t100722293\tElem_design_plus\tNA\tNA\t+\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr8\t100722043\t100722293\tElem_effect_minus\t995\t-\t4.06\t33.13\t572.85\t22.92\t20.60\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='genomic_element',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+
+    with caplog.at_level('WARNING'):
+        adapter.process_file()
+
+    assert len(writer.contents) == 0
+    assert any(
+        'Skipping genomic element' in rec.message and
+        'not present in MPRA sequence designs file' in rec.message
+        for rec in caplog.records
+    )
+
+
 def test_elements_from_variant_file(mock_file_fileset):
 
     writer = SpyWriter()

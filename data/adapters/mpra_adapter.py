@@ -314,8 +314,11 @@ class MPRAAdapter(BaseAdapter):
 
                 if self.label == 'genomic_element':
                     if self.has_sequence_designs and element_key not in self.design_elements:
-                        raise ValueError(
-                            f'Genomic element {(chr_, start, end, strand)} from {self.file_accession} is not present in the MPRA sequence designs file {self.reference_file_accession}.')
+                        self.logger.warning(
+                            f'Skipping genomic element {(chr_, start, end, strand)} from {self.file_accession}: '
+                            f'not present in MPRA sequence designs file {self.reference_file_accession}.'
+                        )
+                        continue
                     if self.has_sequence_designs and self._is_blacklisted_effect_name(row[3]):
                         # Ignore known bad design entries.
                         continue
