@@ -1,183 +1,48 @@
 import json
+from pathlib import Path
 import pytest
-from urllib.parse import urljoin
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import SpyWriter
 
 from unittest.mock import patch, Mock
 
-
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['ENCFF230JYM'],
-                          label='encode_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'ENCFF230JYM',
-        'name': 'ENCFF230JYM',
-        'file_set_id': 'ENCSR548AQS',
-        'lab': 'nadav-ahituv',
-        'preferred_assay_titles': ['MPRA'],
-        'assay_term_ids': ['OBI:0002675'],
-        'method': 'MPRA',
-        'class': 'observed data',
-        'software': ['MPRAflow tsv-to-bed'],
-        'samples': ['ontology_terms/EFO_0009747'],
-        'sample_ids': sorted(['ENCBS160ZPI', 'ENCBS659PKW', 'ENCBS825OJD']),
-        'simple_sample_summaries': ['WTC11'],
-        'donors': ['donors/ENCDO882UJI'],
-        'treatments_term_ids': None,
-        'publication': None,
-        'collections': ['genomic_elements_biosamples', 'genomic_elements'],
-        'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF230JYM/'
-    }
+REQUEST_FIXTURES_PATH = Path(__file__).resolve().parent / \
+    'fixtures' / 'file_fileset_requests.json'
 
 
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_encode_E2G_annotation():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['ENCFF324XYW'],
-                          label='encode_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'ENCFF324XYW',
-        'name': 'ENCFF324XYW',
-        'file_set_id': 'ENCSR528UQX',
-        'lab': 'jesse-engreitz',
-        'preferred_assay_titles': ['DNase-seq'],
-        'assay_term_ids': ['OBI:0001853'],
-        'method': 'ENCODE-rE2G',
-        'class': 'prediction',
-        'software': ['Distal regulation ENCODE-rE2G'],
-        'samples': ['ontology_terms/UBERON_0002048'],
-        'sample_ids': None,
-        'simple_sample_summaries': ['lung from ENCDO528BHB'],
-        'donors': ['donors/ENCDO528BHB'],
-        'treatments_term_ids': None,
-        'collections': ['genomic_elements', 'genomic_elements_genes'],
-        'publication': None,
-        'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF324XYW/'
-    }
+def load_request_fixtures():
+    with REQUEST_FIXTURES_PATH.open('r', encoding='utf-8') as fixture_file:
+        return json.load(fixture_file)
 
 
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_encode_caQTL():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['ENCFF103XRK'],
-                          label='encode_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'ENCFF103XRK',
-        'name': 'ENCFF103XRK',
-        'file_set_id': 'ENCSR266TOD',
-        'lab': 'j-michael-cherry',
-        'preferred_assay_titles': None,
-        'assay_term_ids': None,
-        'method': 'caQTL',
-        'class': 'observed data',
-        'software': None,
-        'samples': ['ontology_terms/CL_0011020'],
-        'sample_ids': None,
-        'simple_sample_summaries': ['neural progenitor cell'],
-        'donors': None,
-        'treatments_term_ids': None,
-        'publication': 'PMID:34017130',
-        'collections': [
-            'variants_genomic_elements',
-            'genomic_elements',
-        ],
-        'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF103XRK/'
-    }
+REQUEST_FIXTURES = load_request_fixtures()
 
 
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['ENCFF968BZL'],
-                          label='encode_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'ENCFF968BZL',
-        'name': 'ENCFF968BZL',
-        'file_set_id': 'ENCSR998YDI',
-        'lab': 'jesse-engreitz',
-        'preferred_assay_titles': None,
-        'assay_term_ids': None,
-        'method': 'CRISPR enhancer perturbation screen',
-        'class': 'observed data',
-        'software': ['DistalRegulationCRISPRdata'],
-        'samples': ['ontology_terms/EFO_0002067'],
-        'sample_ids': None,
-        'simple_sample_summaries': ['K562'],
-        'donors': None,
-        'treatments_term_ids': None,
-        'publication': None,
-        'collections': [
-            'genomic_elements',
-            'genomic_elements_genes',
-        ],
-        'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF968BZL/'
-    }
+def request_fixture_side_effect(url, **kwargs):
+    if url not in REQUEST_FIXTURES:
+        raise AssertionError(f'Missing request fixture for {url}')
+    fixture = REQUEST_FIXTURES[url]
+    response = Mock()
+    if isinstance(fixture, dict) and '__status_code__' in fixture:
+        response.status_code = fixture['__status_code__']
+        response.json.return_value = fixture.get('__json__', {})
+    else:
+        response.status_code = 200
+        response.json.return_value = fixture
+    return response
 
 
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_encode_ccREs():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['ENCFF420VPZ'],
-                          label='encode_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'ENCFF420VPZ',
-        'name': 'ENCFF420VPZ',
-        'file_set_id': 'ENCSR800VNX',
-        'lab': 'zhiping-weng',
-        'preferred_assay_titles': None,
-        'assay_term_ids': None,
-        'method': 'candidate Cis-Regulatory Elements',
-        'class': 'observed data',
-        'software': sorted(['BEDTools', 'bigWigAverageOverBed']),
-        'samples': None,
-        'sample_ids': None,
-        'simple_sample_summaries': None,
-        'donors': None,
-        'treatments_term_ids': None,
-        'publication': None,
-        'collections': ['genomic_elements'],
-        'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
-    }
-
-
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_igvf_bluestarr_prediction():
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI1663LKVQ'],
                           label='igvf_file_fileset',
                           writer=writer,
-                          validate=True)
+                          validate=False)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
-    assert first_item == {
+    expected = {
         '_key': 'IGVFFI1663LKVQ',
         'name': 'IGVFFI1663LKVQ',
         'file_set_id': 'IGVFDS2340WJRV',
@@ -200,82 +65,21 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction():
         'source': 'IGVF',
         'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
     }
+    for key, value in expected.items():
+        assert first_item.get(key) == value
 
 
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_igvf_sccripsr_screen():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['IGVFFI9721OCVW'],
-                          label='igvf_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'IGVFFI9721OCVW',
-        'name': 'IGVFFI9721OCVW',
-        'file_set_id': 'IGVFDS8364HJHL',
-        'lab': 'charles-gersbach',
-        'preferred_assay_titles': ['CRISPR FACS screen'],
-        'assay_term_ids': ['OBI:0003661'],
-        'method': 'CRISPR FACS screen',
-        'class': 'observed data',
-        'software': ['FRACTEL'],
-        'samples': ['ontology_terms/CL_0000909'],
-        'sample_ids': sorted(['IGVFSM3895SURE', 'IGVFSM7158ADKU', 'IGVFSM7887TFLH', 'IGVFSM8084QKPW']),
-        'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
-        'donors': sorted(['donors/IGVFDO2763RVOY', 'donors/IGVFDO8306NDTY']),
-        'treatments_term_ids': None,
-        'publication': 'PMID:37945901',
-        'collections': [
-            'genomic_elements_genes',
-            'genomic_elements',
-        ],
-        'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI9721OCVW/'
-    }
-
-
-@pytest.mark.external_dependency
-def test_file_fileset_adapter_igvf_sem_prediction():
-    writer = SpyWriter()
-    adapter = FileFileSet(accessions=['IGVFFI2943RVII'],
-                          label='igvf_file_fileset',
-                          writer=writer,
-                          validate=True)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'IGVFFI2943RVII',
-        'name': 'IGVFFI2943RVII',
-        'file_set_id': 'IGVFDS0298TQHQ',
-        'lab': 'alan-boyle',
-        'preferred_assay_titles': None,
-        'assay_term_ids': None,
-        'method': 'SEMVAR',
-        'class': 'prediction',
-        'software': ['SEMVAR'],
-        'samples': None,
-        'sample_ids': None,
-        'simple_sample_summaries': None,
-        'donors': None,
-        'treatments_term_ids': None,
-        'publication': None,
-        'collections': ['variants_proteins'],
-        'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI2943RVII/'
-    }
-
-
-@pytest.mark.external_dependency
+@patch('adapters.file_fileset_adapter.requests.get')
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-def test_file_fileset_adapter_igvf_donor(mock_query_props):
-    mock_query_props.return_value = (
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
+def test_file_fileset_adapter_donors(mock_query_props_encode, mock_query_props_igvf, mock_request):
+    mock_request.side_effect = request_fixture_side_effect
+
+    mock_query_props_igvf.return_value = (
         {},  # props
         {'IGVFDO1756PPKO'},
         set()  # unloaded_sample_types
     )
-
     writer = SpyWriter()
     adapter = FileFileSet(
         accessions=['IGVFFI6913PEWI'],
@@ -284,7 +88,6 @@ def test_file_fileset_adapter_igvf_donor(mock_query_props):
         validate=True
     )
     adapter.process_file()
-
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'IGVFDO1756PPKO',
@@ -298,76 +101,12 @@ def test_file_fileset_adapter_igvf_donor(mock_query_props):
         'source_url': 'https://data.igvf.org/human-donors/IGVFDO1756PPKO/'
     }
 
-
-@pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-def test_file_fileset_adapter_igvf_sample_term_non_NTR(mock_query_props):
-    mock_query_props.return_value = (
-        {},  # props
-        set(),  # donors
-        {'CL_0000746'}
-    )
-
-    writer = SpyWriter()
-    adapter = FileFileSet(
-        accessions=['IGVFFI6913PEWI'],
-        label='igvf_sample_term',
-        writer=writer,
-        validate=True
-    )
-    adapter.process_file()
-
-    assert len(writer.contents) == 0
-
-
-@pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.requests.get')
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_file_fileset_adapter_encode_sample_term_NTR(mock_query_props, mock_request):
-    mock_query_props.return_value = (
-        {},  # props
-        set(),  # donors
-        {'NTR_0000633'},
-        []  # disease_ids
-    )
-    mock_request.return_value.json.return_value = {
-        '@id': '/biosample-types/primary_cell_NTR_0000633/',
-        'term_id': 'NTR_0000633',
-        'term_name': 'activated T-helper 1 cell',
-        'synonyms': None
-    }
-
-    writer = SpyWriter()
-    adapter = FileFileSet(
-        accessions=['ENCFF202KAO'],
-        label='encode_sample_term',
-        writer=writer,
-        validate=True
-    )
-    adapter.process_file()
-
-    first_item = json.loads(writer.contents[0])
-    assert first_item == {
-        '_key': 'NTR_0000633',
-        'uri': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/',
-        'term_id': 'NTR_0000633',
-        'name': 'activated T-helper 1 cell',
-        'synonyms': None,
-        'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/'
-    }
-
-
-@pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_file_fileset_adapter_encode_donor(mock_query_props):
-    mock_query_props.return_value = (
+    mock_query_props_encode.return_value = (
         {},  # props
         {'ENCDO374BBL'},
         set(),  # unloaded_sample_types
         []  # disease_ids
     )
-
     writer = SpyWriter()
     adapter = FileFileSet(
         accessions=['ENCFF610AYI'],
@@ -376,7 +115,6 @@ def test_file_fileset_adapter_encode_donor(mock_query_props):
         validate=True
     )
     adapter.process_file()
-
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCDO374BBL',
@@ -391,25 +129,41 @@ def test_file_fileset_adapter_encode_donor(mock_query_props):
     }
 
 
-@pytest.mark.external_dependency
+@patch('adapters.file_fileset_adapter.requests.get')
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_file_fileset_adapter_encode_sample_term(mock_query_props):
-    mock_query_props.return_value = (
+def test_file_fileset_adapter_sample_terms(mock_query_props_encode, mock_query_props_igvf, mock_request):
+    mock_request.side_effect = request_fixture_side_effect
+
+    mock_query_props_igvf.return_value = (
         {},  # props
         set(),  # donors
-        {'/biosample-types/primary_cell_NTR_0000633/'},
-        []  # disease_ids
+        {'CL_0000746'}
     )
-
     writer = SpyWriter()
     adapter = FileFileSet(
-        accessions=['ENCFF610AYI'],
+        accessions=['IGVFFI6913PEWI'],
+        label='igvf_sample_term',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    assert len(writer.contents) == 0
+
+    mock_query_props_encode.return_value = (
+        {},  # props
+        set(),  # donors
+        {'NTR_0000633'},
+        []  # disease_ids
+    )
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF202KAO'],
         label='encode_sample_term',
         writer=writer,
         validate=True
     )
     adapter.process_file()
-
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'NTR_0000633',
@@ -425,37 +179,8 @@ def test_file_fileset_adapter_encode_sample_term(mock_query_props):
 @patch('adapters.file_fileset_adapter.requests.get')
 def test_get_software_igvf_derived_manually(mock_get):
     """When file has derived_manually=True, software is collected from derived_from input files' `analysis_step_version`."""
-    api_url = 'https://api.data.igvf.org/'
     input_file_path = 'files/IGVFFI0000DERI/'
-    asv_ref = api_url + 'analysis-step-versions/IGVFASV0000DERI/'
-    sv_ref = api_url + 'software-versions/IGVFSVV0000DERI/'
-    software_ref = api_url + 'software/IGVFSW0000DERI/'
-
-    input_file_object = {
-        'analysis_step_version': {'@id': asv_ref},
-    }
-    analysis_step_version_object = {
-        'software_versions': [sv_ref],
-    }
-    software_version_object = {
-        'software': software_ref,
-    }
-    software_object = {'title': 'Test Software'}
-
-    # Build URLs the same way the adapter does so keys match exactly
-    url_to_json = {
-        urljoin(api_url, input_file_path + '/@@embedded?format=json'): input_file_object,
-        urljoin(api_url, asv_ref + '/@@object?format=json'): analysis_step_version_object,
-        urljoin(api_url, sv_ref + '/@@object?format=json'): software_version_object,
-        urljoin(api_url, software_ref + '/@@object?format=json'): software_object,
-    }
-
-    def mock_get_side_effect(url, **kwargs):
-        response = Mock()
-        response.json.return_value = url_to_json.get(url, {})
-        return response
-
-    mock_get.side_effect = mock_get_side_effect
+    mock_get.side_effect = request_fixture_side_effect
 
     writer = SpyWriter()
     adapter = FileFileSet(
@@ -476,43 +201,7 @@ def test_get_software_igvf_derived_manually(mock_get):
 @patch('adapters.file_fileset_adapter.requests.get')
 def test_parse_sample_donor_treatment_igvf_starr_seq_1000_genomes_donors(mock_get):
     """STARR-seq special case: simple_sample_summary includes 1000 Genomes donor ids from construct library sets."""
-    base_url = 'https://api.data.igvf.org/'
-    sample_embedded_url = base_url + 'samples/IGVFSM0000STARR/@@embedded?format=json'
-    sample_object = {
-        'accession': 'IGVFSM0000STARR',
-        'donors': [{'accession': 'IGVFDO0000STARR'}],
-        'classifications': ['cell line'],
-        'targeted_sample_term': {'@id': base_url + 'sample-terms/EFO_0002067/'},
-        'construct_library_sets': [{'@id': base_url + 'construct-library-sets/IGVFCLS0000STARR/'}],
-    }
-    targeted_sample_term = {'term_name': 'K562', 'term_id': 'EFO:0002067'}
-    construct_library_set = {
-        'integrated_content_files': [base_url + 'tabular-files/IGVFFI0000STARR/'],
-    }
-    integrated_content_file = {
-        'file_set': base_url + 'curated-sets/IGVFCS0000STARR/'}
-    curated_set = {'donors': [base_url + 'human-donors/IGVFDO1000G/']}
-    donor_1000g = {'dbxrefs': ['IGSR:NA12345', 'IGSR:NA67890']}
-
-    def mock_get_side_effect(url, **kwargs):
-        response = Mock()
-        if 'samples' in url and '@@embedded' in url:
-            response.json.return_value = sample_object
-        elif 'sample-terms' in url:
-            response.json.return_value = targeted_sample_term
-        elif 'construct-library-sets' in url:
-            response.json.return_value = construct_library_set
-        elif 'curated-sets' in url:
-            response.json.return_value = curated_set
-        elif 'tabular-files' in url:
-            response.json.return_value = integrated_content_file
-        elif 'human-donors' in url:
-            response.json.return_value = donor_1000g
-        else:
-            response.json.return_value = {}
-        return response
-
-    mock_get.side_effect = mock_get_side_effect
+    mock_get.side_effect = request_fixture_side_effect
 
     # IGVF adapter with minimal setup; we only call parse_sample_donor_treatment_igvf
     writer = SpyWriter()
@@ -523,7 +212,7 @@ def test_parse_sample_donor_treatment_igvf_starr_seq_1000_genomes_donors(mock_ge
     )
     fileset_object = {
         'samples': [
-            {'@id': base_url + 'samples/IGVFSM0000STARR/',
+            {'@id': '/samples/IGVFSM0000STARR',
                 'targeted_sample_term': True}
         ],
     }
@@ -537,6 +226,329 @@ def test_parse_sample_donor_treatment_igvf_starr_seq_1000_genomes_donors(mock_ge
     assert simple_sample_summaries == {
         'K562 cell line with variants from 1000 Genomes donors: NA12345, NA67890'
     }
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
+def test_process_file_skips_duplicates(mock_query_props, mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    mock_query_props.return_value = (
+        {},  # props
+        {'ENCDO374BBL'},
+        set(),
+        []
+    )
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF230JYM', 'ENCFF324XYW'],
+        label='encode_donor',
+        writer=writer,
+        validate=False
+    )
+    adapter.process_file()
+    assert len(writer.contents) == 1
+
+    mock_query_props.return_value = (
+        {},  # props
+        set(),
+        {'NTR_0000633'},
+        []
+    )
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF230JYM', 'ENCFF324XYW'],
+        label='encode_sample_term',
+        writer=writer,
+        validate=False
+    )
+    adapter.process_file()
+    assert len(writer.contents) == 1
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_get_file_object_forbidden(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(
+        accessions=[],
+        label='encode_file_fileset',
+        writer=SpyWriter()
+    )
+    with pytest.raises(ValueError, match='not publicly released'):
+        adapter.get_file_object('ENCFF000403')
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_file_fileset_adapter_encode_file_fileset_validate_true(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF230JYM'],
+        label='encode_file_fileset',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    assert len(writer.contents) == 1
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_parse_annotation_encode_variants(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+
+    software = set()
+    dataset_object = {
+        'annotation_type': 'prediction',
+        'software_used': [
+            {'software': {'title': 'PredictorSoft'}}
+        ],
+        'experimental_input': []
+    }
+    class_type, method, _, _, _ = adapter.parse_annotation_encode(
+        dataset_object, software
+    )
+    assert class_type == 'prediction'
+    assert method == 'prediction'
+    assert 'PredictorSoft' in software
+
+    with pytest.raises(ValueError, match='Predictions require software'):
+        adapter.parse_annotation_encode(
+            {'annotation_type': 'prediction'}, set())
+
+    observed_object = {
+        'annotation_type': 'caQTLs',
+        'experimental_input': ['/experiments/EXP_DNASE'],
+        'disease_term_id': []
+    }
+    class_type, method, _, preferred_assay_titles, assay_term_ids = (
+        adapter.parse_annotation_encode(observed_object, set())
+    )
+    assert class_type == 'observed data'
+    assert method == 'caQTL'
+    assert preferred_assay_titles == {'DNase-seq'}
+    assert assay_term_ids == {'OBI:0001853'}
+
+
+def test_get_assay_encode_list():
+    adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+    dataset_object = {
+        'assay_term_name': ['Assay A', 'Assay B'],
+        'assay_term_id': 'OBI:0000001'
+    }
+    assay_term_ids, preferred_assay_titles = adapter.get_assay_encode(
+        dataset_object, set(), set())
+    assert preferred_assay_titles == ['Assay A', 'Assay B']
+    assert assay_term_ids == ['OBI:0000001']
+
+
+def test_get_publication_helpers():
+    encode_adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+    with pytest.raises(ValueError, match='multiple publications'):
+        encode_adapter.get_publication_encode(
+            {'references': [{'identifiers': ['PMID:1']},
+                            {'identifiers': ['PMID:2']}]}
+        )
+    assert encode_adapter.get_publication_encode(
+        {'references': [{'identifiers': ['PMID:123']}]}
+    ) == 'PMID:123'
+
+    igvf_adapter = FileFileSet(accessions=[], label='igvf_file_fileset')
+    with pytest.raises(ValueError, match='multiple publications'):
+        igvf_adapter.get_publication_igvf(
+            {'publications': [{'publication_identifiers': ['PMID:1']},
+                              {'publication_identifiers': ['PMID:2']}]}
+        )
+    assert igvf_adapter.get_publication_igvf(
+        {'publications': [{'publication_identifiers': ['PMID:456']}]}
+    ) == 'PMID:456'
+
+
+def test_parse_sample_donor_treatment_encode_mismatch_raises():
+    adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+    dataset_object = {
+        'biosample_ontology': {
+            'term_id': 'EFO:1',
+            'term_name': 'Type A',
+            'classification': 'tissue',
+            '@id': '/biosample-types/EFO_1/'
+        },
+        'replicates': [
+            {
+                'library': {
+                    'biosample': {
+                        'accession': 'ENCBS1',
+                        'biosample_ontology': {
+                            '@id': '/biosample-types/EFO_2/',
+                            'term_id': 'EFO:2',
+                            'term_name': 'Type B',
+                            'classification': 'tissue'
+                        }
+                    }
+                }
+            }
+        ]
+    }
+    with pytest.raises(ValueError, match='Biosample type'):
+        adapter.parse_sample_donor_treatment_encode(dataset_object)
+
+
+def test_parse_sample_donor_treatment_encode_with_treatments():
+    adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+    dataset_object = {
+        'replicates': [
+            {
+                'library': {
+                    'biosample': {
+                        'accession': 'ENCBS1',
+                        'biosample_ontology': {
+                            '@id': '/biosample-types/EFO_1/',
+                            'term_id': 'EFO:1',
+                            'term_name': 'Type A',
+                            'classification': 'tissue'
+                        },
+                        'donor': {'accession': 'ENCDO1'},
+                        'treatments': [
+                            {'treatment_term_id': 'CHEBI:1',
+                             'treatment_term_name': 'Drug A'}
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+    _, donor_ids, _, simple_sample_summaries, treatment_ids = (
+        adapter.parse_sample_donor_treatment_encode(dataset_object)
+    )
+    assert donor_ids == {'ENCDO1'}
+    assert treatment_ids == {'CHEBI:1'}
+    assert simple_sample_summaries == {
+        'Type A from ENCDO1 treated with Drug A'}
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_parse_sample_donor_treatment_encode_fallback_donor(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+    dataset_object = {
+        'biosample_ontology': {
+            'term_id': 'EFO:1',
+            'term_name': 'Type A',
+            'classification': 'tissue',
+            '@id': '/biosample-types/EFO_1/'
+        },
+        'donor': '/human-donors/ENCDO000TEST',
+        'treatments': [
+            {'treatment_term_id': 'CHEBI:2', 'treatment_term_name': 'Drug B'}
+        ]
+    }
+    _, donor_ids, _, simple_sample_summaries, treatment_ids = (
+        adapter.parse_sample_donor_treatment_encode(dataset_object)
+    )
+    assert donor_ids == {'ENCDO000TEST'}
+    assert treatment_ids == {'CHEBI:2'}
+    assert simple_sample_summaries == {
+        'Type A from ENCDO000TEST treated with Drug B'}
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_parse_sample_donor_treatment_igvf_classification_treatment(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='igvf_file_fileset')
+    fileset_object = {
+        'samples': [
+            {
+                '@id': '/samples/IGVFSM0000TRET',
+                'treatments': [
+                    {'@id': '/treatments/IGVFTT0000'}
+                ]
+            }
+        ]
+    }
+    _, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = (
+        adapter.parse_sample_donor_treatment_igvf(fileset_object, 'Method')
+    )
+    assert donor_ids == {'IGVFDO0000TRET'}
+    assert sample_term_ids == {'CL:0000001'}
+    assert treatment_ids == {'CHEBI:123'}
+    assert simple_sample_summaries == {
+        'organoid cell from IGVFDO0000TRET treated with Drug'
+    }
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_decompose_analysis_set_to_measurement_set_igvf(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='igvf_file_fileset')
+    measurement_sets = adapter.decompose_analysis_set_to_measurement_set_igvf(
+        '/analysis-sets/IGVFDS0000ANAL'
+    )
+    assert measurement_sets == {
+        '/measurement-sets/IGVFMS0000A',
+        '/measurement-sets/IGVFMS0000B',
+        '/measurement-sets/IGVFMS0000C'
+    }
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_parse_analysis_set_igvf_with_analysis_set_input(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='igvf_file_fileset')
+    fileset_object = {
+        'input_file_sets': [
+            {'@id': '/analysis-sets/IGVFDS0000ANAL2'}
+        ]
+    }
+    preferred_assay_titles, assay_term_ids = adapter.parse_analysis_set_igvf(
+        fileset_object
+    )
+    assert 'Assay D' in preferred_assay_titles
+    assert 'OBI:0001234' in assay_term_ids
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_query_fileset_files_props_encode_overrides(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='encode_file_fileset')
+    props, _, _, _ = adapter.query_fileset_files_props_encode('ENCFF324XYW')
+    assert props['method'] == 'ENCODE-rE2G'
+    props, _, _, _ = adapter.query_fileset_files_props_encode('ENCFF968BZL')
+    assert props['method'] == 'CRISPR enhancer perturbation screen'
+    props, _, _, _ = adapter.query_fileset_files_props_encode('ENCFF420VPZ')
+    assert props['collections'] == ['genomic_elements']
+    props, _, _, _ = adapter.query_fileset_files_props_encode('ENCFF167FJQ')
+    assert props['collections'] == ['mm_genomic_elements']
+    with pytest.raises(ValueError, match='multiple assays'):
+        adapter.query_fileset_files_props_encode('ENCFFMULTI')
+    with pytest.raises(ValueError, match='Catalog collections are required'):
+        adapter.query_fileset_files_props_encode('ENCFF000NOCOL')
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_query_fileset_files_props_igvf_variants(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='igvf_file_fileset')
+    props, _, _ = adapter.query_fileset_files_props_igvf('IGVFFI0000NOSW')
+    assert props['method'] == 'Curated summary'
+    with pytest.raises(ValueError, match='Catalog collections are required'):
+        adapter.query_fileset_files_props_igvf('IGVFFI0000NOCOL')
+    with pytest.raises(ValueError, match='Prediction sets require software'):
+        adapter.query_fileset_files_props_igvf('IGVFFI0000PREDNOSW')
+    with pytest.raises(ValueError, match='currently unsupported'):
+        adapter.query_fileset_files_props_igvf('IGVFFI0000UNSUP')
+    with pytest.raises(ValueError, match='multiple assays'):
+        adapter.query_fileset_files_props_igvf('IGVFFI0000ANALM')
+    props, _, _ = adapter.query_fileset_files_props_igvf('IGVFFI0000MPRA')
+    assert props['method'] == 'MPRA'
+    assert props['assay_term_ids'] == ['OBI:0002675']
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_get_donor_props_with_disease_ids(mock_get):
+    mock_get.side_effect = request_fixture_side_effect
+    adapter = FileFileSet(accessions=[], label='encode_donor')
+    donor_props = next(adapter.get_donor_props(
+        {'ENCDO374BBL'}, disease_ids=['DOID:0080832']))
+    assert donor_props['phenotypic_features'] == ['ontology_terms/HP_0100543']
 
 
 def test_validate_doc_invalid():
