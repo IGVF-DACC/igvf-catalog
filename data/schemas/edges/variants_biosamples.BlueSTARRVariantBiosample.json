@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json",
+  "$id": "schemas/edges/variants_biosamples.BlueSTARRVariantBiosample.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to genomic element edge"
+          "description": "Unique identifier for the variant to biosample edge"
         },
         "_from": {
           "example": "variants/NC_000005.10:1779518:G:A",
@@ -28,7 +28,7 @@
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2FC of the variant to genomic element edge"
+          "description": "Log2FC of the variant to biosample edge"
         },
         "class": {
           "enum": [
@@ -47,14 +47,14 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context of the variant to genomic element edge",
+          "description": "Biological context of the variant to biosample edge",
           "enum": [
             "K562"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term of the variant to genomic element edge",
+          "description": "Biosample term of the variant to biosample edge",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]
@@ -84,7 +84,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets of the variant to genomic element edge",
+          "description": "Filesets of the variant to biosample edge",
           "example": "files_filesets/IGVFFI1663LKVQ",
           "pattern": "^files_filesets/",
           "collections": [
