@@ -236,6 +236,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             if self.label == 'genomic_element':
                 for genomic_element, element_id in genomic_coordinates_to_element_id.items():
                     source_annotation = genomic_element[4]
+                    promoter_gene = genomic_element[3]
                     _id = element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
@@ -250,8 +251,11 @@ class IGVFE2GCRISPR(BaseAdapter):
                         'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession
                     }
-                    if genomic_element[3]:
-                        _props['promoter_of'] = f'genes/{genomic_element[3]}'
+                    if source_annotation == 'promoter':
+                        if not promoter_gene:
+                            raise ValueError(
+                                f'Promoter element {_id} is missing promoter_gene.')
+                        _props['promoter_of'] = f'genes/{promoter_gene}'
                     if self.validate:
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
