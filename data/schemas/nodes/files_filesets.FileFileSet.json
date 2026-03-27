@@ -22,7 +22,24 @@
         "lab": {
           "type": "string",
           "description": "The lab of the file set",
-          "example": "roderic-guigo"
+          "enum": [
+            "alan-boyle",
+            "bill-majoros",
+            "charles-gersbach",
+            "doug-fowler",
+            "j-michael-cherry",
+            "jay-shendure",
+            "jesse-engreitz",
+            "karen-mohlke",
+            "kushal-dey",
+            "lea-starita",
+            "mark-craven",
+            "nadav-ahituv",
+            "predrag-radivojac",
+            "thomas-quertermous",
+            "tim-reddy",
+            "zhiping-weng"
+          ]
         },
         "preferred_assay_titles": {
           "type": [
@@ -53,7 +70,30 @@
         "method": {
           "type": "string",
           "description": "The method of the file set",
-          "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
+          "enum": [
+            "BlueSTARR",
+            "candidate Cis-Regulatory Elements",
+            "caQTL",
+            "CRISPR enhancer perturbation screen",
+            "CRISPR FACS screen",
+            "cV2F",
+            "ENCODE-rE2G",
+            "ESM-1v",
+            "GRCh38 elements",
+            "Homo sapiens GRCh38 elements",
+            "Homo sapiens GRCh38 hg19 elements",
+            "MPRA",
+            "MutPred2",
+            "Perturb-seq",
+            "SEMVAR",
+            "SGE",
+            "STARR-seq",
+            "TAP-seq",
+            "VAMP-seq",
+            "VAMP-seq (MultiSTEP)",
+            "Variant-EFFECTS",
+            "scATAC-seq"
+          ]
         },
         "class": {
           "type": "string",
