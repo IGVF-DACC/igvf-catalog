@@ -375,6 +375,37 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
     assert len({p['_from'] for p in parsed}) == 1
 
 
+@pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample'])
+def test_igvffi1436trih_exclusion_list_is_applied(tmp_path, mock_file_fileset, label):
+    excluded_name = (
+        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|'
+        'EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|'
+        'EH38E3227108|17-46152590-G-C'
+    )
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
+        f'chr17\t46152515\t46152785\t{excluded_name}\tNA\tNA\ttest\t-\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        f'chr17\t46152515\t46152785\t{excluded_name}\t100\t-\t0.25\t1.0\t2.0\t3.0\t1.5\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label=label,
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    assert len(writer.contents) == 0
+
+
 def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label'):

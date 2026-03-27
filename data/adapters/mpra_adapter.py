@@ -35,6 +35,7 @@ import json
 from typing import Optional
 from collections import defaultdict
 import ast
+from pathlib import Path
 
 from adapters.base import BaseAdapter
 from adapters.helpers import (
@@ -57,20 +58,11 @@ class MPRAAdapter(BaseAdapter):
 
     THRESHOLD = 1
     CHUNK_SIZE = 6500
-    # Exact BED column-4 strings only (case-sensitive). Do not use a broad ALT_ prefix: some
-    # cardiac_neuro_cava_random:ALT_* rows may be valid.
-    BLACKLISTED_EFFECT_NAMES = frozenset({
-        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|EH38E3227108|17-46152590-G-C',
-        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|EH38E3227108|17-46152590-G-T',
-        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|EH38E3227108|17-46152592-G-C',
-        'cardiac_neuro_cava_random:ALT_SMAD4|ENSG00000141646.15|EH38E3269116_fwd_tile1-1_SMAD4|ENSG00000141646.15|EH38E3269116|18-51038257-G-A',
-        'cardiac_neuro_cava_random:ALT_SMAD4|ENSG00000141646.15|EH38E3269116_fwd_tile1-1_SMAD4|ENSG00000141646.15|EH38E3269116|18-51038257-G-C',
-        'cardiac_neuro_cava_random:ALT_NACC1|ENSG00000160877.7|EH38E3291666_fwd_tile1-1_NACC1|ENSG00000160877.7|EH38E3291666|19-13103813-C-A',
-        'cardiac_neuro_cava_random:ALT_NACC1|ENSG00000160877.7|EH38E3291666_fwd_tile1-1_NACC1|ENSG00000160877.7|EH38E3291666|19-13103814-C-A',
-        'cardiac_neuro_cava_random:ALT_MOGS|ENSG00000115275.15|EH38E2010443_rev_tile1-1_MOGS|ENSG00000115275.15|EH38E2010443|2-74477126-T-C',
-        'cardiac_neuro_cava_random:ALT_MOGS|ENSG00000115275.15|EH38E2010443_rev_tile1-1_MOGS|ENSG00000115275.15|EH38E2010443|2-74477129-T-G',
-        'cardiac_neuro_cava_random:ALT_HDLBP|ENSG00000115677.18|EH38E2090631_rev_tile1-1_HDLBP|ENSG00000115677.18|EH38E2090631|2-241366100-A-T',
-    })
+    IGVFFI1436TRIH_EXCLUSION_LIST = (
+        Path(__file__).resolve().parents[1] /
+        'data_loading_support_files' /
+        'MPRA_IGVFFI1436TRIH_element_exclusion_list.tsv'
+    )
 
     def __init__(
         self,
@@ -123,6 +115,7 @@ class MPRAAdapter(BaseAdapter):
             self.mpra_design_file = None
             self.reference_source_url = None
             self.reference_file_accession = None
+        self.excluded_effect_names = self._load_excluded_effect_names()
 
     def _open_file(self):
         """Open file as text, handling optional gzip."""
@@ -247,9 +240,31 @@ class MPRAAdapter(BaseAdapter):
                 for spdi in spdi_list:
                     self.variant_to_element[spdi].add(key)
 
-    @classmethod
-    def _is_blacklisted_effect_name(cls, effect_name):
-        return (effect_name or '').strip() in cls.BLACKLISTED_EFFECT_NAMES
+    def _load_excluded_effect_names(self):
+        accession = (self.reference_file_accession or '').strip()
+        if accession != 'IGVFFI1436TRIH':
+            return frozenset()
+        exclusion_path = self.IGVFFI1436TRIH_EXCLUSION_LIST
+        if not exclusion_path.exists():
+            raise FileNotFoundError(
+                f'Configured MPRA exclusion list not found for {accession}: {exclusion_path}'
+            )
+
+        names = set()
+        with open(exclusion_path, 'r') as f:
+            for line in f:
+                raw = line.strip()
+                if not raw:
+                    continue
+                # Some rows include a secondary alias separated by ';'.
+                for token in raw.split(';'):
+                    normalized = token.strip()
+                    if normalized:
+                        names.add(normalized)
+        return frozenset(names)
+
+    def _is_blacklisted_effect_name(self, effect_name):
+        return (effect_name or '').strip() in self.excluded_effect_names
 
     def process_file(self):
         self.seen_elements = set()
