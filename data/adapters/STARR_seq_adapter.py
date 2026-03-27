@@ -12,7 +12,7 @@ from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
-# Example rows from Gersbach's STARR-seq data
+# Example rows from Reddy's STARR-seq data
 # chr1	13527	13528	NC_000001.11:13527:C:G	228	+	-0.0278029095483658	0.7114327127487537	0.7149746114749761	0.1321046194607542	0.1093490723098078	NaN	NaN	0.228	0.412242	1.84585	-1	G
 # chr1	13769	13770	NC_000001.11:13769:C:G	312	+	-0.1017057269649259	0.6019815261720225	0.8937182643437201	0.1321046194607542	0.0	NaN	NaN	0.312	0.219367	1.58841	-1	C	G
 # chr1	13867	13868	NC_000001.11:13867:A:G	199	+	-0.0145221575215694	0.5472559328836568	0.7149746114749761	0.0	0.0	NaN	NaN	0.199	0.30534	1.93752	-1	A	G
@@ -29,8 +29,8 @@ class STARRseqVariantBiosample(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
-    # variants and variant annotations lower than 0.1 postProbEffect are not loaded
-    THRESHOLD = 0.1
+    # values strictly greater than .9 are considered significant
+    THRESHOLD = 0.9
 
     def __init__(
         self,
@@ -83,9 +83,6 @@ class STARRseqVariantBiosample(BaseAdapter):
             reader = csv.reader(f, delimiter='\t')
             chunk = []
             for i, row in enumerate(reader, 1):
-                postProbEffect = float(row[13])
-                if postProbEffect < STARRseqVariantBiosample.THRESHOLD:
-                    continue
                 chunk.append(row)
                 if i % STARRseqVariantBiosample.CHUNK_SIZE == 0:
                     self.process_chunk(chunk)
@@ -196,6 +193,7 @@ class STARRseqVariantBiosample(BaseAdapter):
                         'postProbEffect': float(row[13]),
                         'CI_lower_95': float(row[14]),
                         'CI_upper_95': float(row[15]),
+                        'significant': float(row[13]) > self.THRESHOLD,
                         'label': self.collection_label,
                         'method': self.method,
                         'class': self.collection_class,

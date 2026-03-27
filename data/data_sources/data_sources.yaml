@@ -1081,6 +1081,7 @@ variant to biosample starr-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI5057AAGP/@@download/IGVFFI5057AAGP.bed.gz
   source: IGVF
   label: variant effect on regulatory element activity
+  threshold: 0.9
 
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:

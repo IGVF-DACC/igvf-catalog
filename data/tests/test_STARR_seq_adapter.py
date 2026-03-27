@@ -10,6 +10,13 @@ mock_bed_data = (
     'NaN\tNaN\t0.35\t0.620196\t4.98262\t-1\tC\tT\n'
 )
 
+# Same row as mock_bed_data but postProbEffect (column 14 in 1-based TSV) is above THRESHOLD (0.9)
+mock_bed_data_significant = (
+    'chr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.1053361347394244\t'
+    '1.1178449514319324\t1.0921171037854174\t0\t0.2149853195124717\t'
+    'NaN\tNaN\t0.95\t0.620196\t4.98262\t-1\tC\tT\n'
+)
+
 
 # mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
 @pytest.fixture
@@ -80,6 +87,7 @@ def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_vari
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7664HHXI/'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
+    assert 'significant' not in first_item
 
 
 @patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
@@ -105,6 +113,7 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock
     assert first_item['inputCountAlt'] == 0.0
     assert first_item['outputCountAlt'] == 0.2149853195124717
     assert first_item['postProbEffect'] == 0.35
+    assert first_item['significant'] is False
     assert first_item['CI_lower_95'] == 0.620196
     assert first_item['CI_upper_95'] == 4.98262
     assert first_item['label'] == 'variant effect on regulatory element activity'
@@ -116,6 +125,26 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock
     assert first_item['biological_context'] == 'K562'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
     assert first_item['treatments_term_ids'] == None
+
+
+@patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
+def test_process_file_variant_biosample_significant_true(
+    mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator
+):
+    """Edges set significant=True when postProbEffect is strictly greater than THRESHOLD."""
+    writer = SpyWriter()
+    adapter = STARRseqVariantBiosample(
+        filepath='./samples/starr_seq.example.tsv',
+        writer=writer,
+        label='variant_biosample',
+        source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/',
+        validate=True,
+    )
+    with patch('builtins.open', mock_open(read_data=mock_bed_data_significant)):
+        adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item['postProbEffect'] == 0.95
+    assert first_item['significant'] is True
 
 
 def test_invalid_label(mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator):

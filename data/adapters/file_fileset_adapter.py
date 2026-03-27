@@ -575,12 +575,12 @@ class FileFileSet:
         catalog_collections = file_object.get('catalog_collections', [])
         if not catalog_collections:
             raise (ValueError(
-                f'Catalog collections are required for file_fileset {fileset_accession}.'))
+                f'Catalog collections are required for file_fileset {accession}.'))
 
         software = self.get_software_igvf(file_object)
         if not software:
             print(
-                f'Warning: no software found for file_fileset {fileset_accession}.')
+                f'Warning: no software found for file_fileset {accession}.')
 
         preferred_assay_titles = set()
         assay_term_ids = set()
