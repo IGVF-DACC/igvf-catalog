@@ -43,6 +43,7 @@ from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.igvf_MPRA_adapter import IGVFMPRAAdapter
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
+from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
@@ -129,6 +130,7 @@ LABEL_TO_ADAPTER = {
     'variant_disease_gene': ClinGen,
     'mpra_variants_elements': IGVFMPRAAdapter,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
+    'bluestarr_variant_biosample': BlueSTARRVariantBiosample,
     'variant_effects_variant_gene': VariantEFFECTSAdapter,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
