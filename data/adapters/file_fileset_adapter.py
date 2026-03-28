@@ -587,7 +587,11 @@ class FileFileSet:
             cell_qualifier = fileset_object.get('cell_qualifier')
             cell_type_term_name = fileset_object.get(
                 'cell_type').get('term_name')
-            cell_annotation = f'{cell_qualifier} {cell_type_term_name}'
+            # not all pseudobulk sets have a cell qualifier
+            if cell_qualifier:
+                cell_annotation = f'{cell_qualifier} {cell_type_term_name}'
+            else:
+                cell_annotation = cell_type_term_name
         if not catalog_collections and fileset_object_type != 'PseudobulkSet':
             raise (ValueError(
                 f'Catalog collections are required for file_fileset {accession}.'))
