@@ -1058,15 +1058,16 @@ variant starr-seq:
   source: IGVF
 
 # Example:
-# python3 data_parser.py --adapter bluestarr_variant_biosample --filepath IGVFFI1663LKVQ.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
-# python3 data_parser.py --adapter bluestarr_variant_biosample --filepath IGVFFI4012FKNC.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI4012FKNC.jsonl --output-bucket igvf-catalog-parsed-collections
-# python3 data_parser.py --adapter bluestarr_variant_biosample --filepath IGVFFI3351LASN.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI3351LASN.jsonl --output-bucket igvf-catalog-parsed-collections
-# python3 data_parser.py --adapter bluestarr_variant_biosample --filepath IGVFFI0818FMCC.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI0818FMCC.jsonl --output-bucket igvf-catalog-parsed-collections
+# python3 data_parser.py --adapter bluestarr_variant_biosample --label variant_biosample --filepath IGVFFI1663LKVQ.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
+# python3 data_parser.py --adapter bluestarr_variant_biosample --label variant_biosample --filepath IGVFFI4012FKNC.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI4012FKNC.jsonl --output-bucket igvf-catalog-parsed-collections
+# python3 data_parser.py --adapter bluestarr_variant_biosample --label variant_biosample --filepath IGVFFI3351LASN.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI3351LASN.jsonl --output-bucket igvf-catalog-parsed-collections
+# python3 data_parser.py --adapter bluestarr_variant_biosample --label variant_biosample --filepath IGVFFI0818FMCC.bed --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI0818FMCC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to biosample bluestarr:
   collection: variants_biosamples
   params:
     - filepath
-  command: python3 data_parser.py --adapter bluestarr_variant_biosample --filepath {filepath} --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
+    - label
+  command: python3 data_parser.py --label variant_biosample --adapter bluestarr_variant_biosample --filepath {filepath} --output-bucket-key variants_biosamples/bluestarr_variants_biosamples_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4012FKNC/@@download/IGVFFI4012FKNC.bed.gz
