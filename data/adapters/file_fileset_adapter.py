@@ -564,7 +564,8 @@ class FileFileSet:
             'collections': catalog_collections,
             'source': self.source,
             'source_url': source_url,
-            'download_link': download_link
+            'download_link': download_link,
+            'cell_annotation': None
         }
         return props, donor_ids, all_sample_types, disease_ids
 
@@ -581,6 +582,12 @@ class FileFileSet:
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
         catalog_collections = file_object.get('catalog_collections', [])
+        cell_annotation = None
+        if fileset_object_type == 'PseudobulkSet':
+            cell_qualifier = fileset_object.get('cell_qualifier')
+            cell_type_term_name = fileset_object.get(
+                'cell_type').get('term_name')
+            cell_annotation = f'{cell_qualifier} {cell_type_term_name}'
         if not catalog_collections and fileset_object_type != 'PseudobulkSet':
             raise (ValueError(
                 f'Catalog collections are required for file_fileset {accession}.'))
@@ -644,7 +651,8 @@ class FileFileSet:
             'collections': catalog_collections,
             'source': self.source,
             'source_url': source_url,
-            'download_link': download_link
+            'download_link': download_link,
+            'cell_annotation': cell_annotation
         }
         return props, donor_ids, sample_term_ids
 

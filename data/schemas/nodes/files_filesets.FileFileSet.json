@@ -245,6 +245,14 @@
           "type": "string",
           "description": "The download link of the file",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
+        },
+        "cell_annotation": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The cell annotation of the file set",
+          "example": "epluripotent epiblast cell"
         }
       },
       "required": [
@@ -261,13 +269,14 @@
         "donors",
         "treatments_term_ids",
         "publication",
-        "download_link"
+        "download_link",
+        "cell_annotation"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation"
   },
   "db_collection_name": "files_filesets"
 }
