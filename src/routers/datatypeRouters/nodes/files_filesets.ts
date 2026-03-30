@@ -17,6 +17,7 @@ const CLASS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'class')
 const SOURCE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'source')
 const ASSAYS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'preferred_assay_titles')
 const SOFTWARE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'software')
+const CELL_ANNOTATION = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'cell_annotation')
 
 const filesFilesetsQueryFormat = z.object({
   file_fileset_id: z.string().optional(),
@@ -28,6 +29,7 @@ const filesFilesetsQueryFormat = z.object({
   sample_term: z.string().optional(),
   sample_summary: z.string().optional(),
   software: z.enum(SOFTWARE).optional(),
+  cell_annotation: z.enum(CELL_ANNOTATION).optional(),
   source: z.enum(SOURCE).optional(),
   class: z.enum(CLASS).optional(),
   page: z.number().default(0),

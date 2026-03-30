@@ -252,7 +252,15 @@
             "null"
           ],
           "description": "The cell annotation of the file set",
-          "example": "epluripotent epiblast cell"
+          "enum": [
+            "extraembryonic parietal endodermal cell",
+            "extraembryonic visceral endodermal cell",
+            "intermediate extraembryonic parietal endodermal cell",
+            "mesodermal cell",
+            "neurectodermal cell",
+            "pluripotent epiblast cell",
+            "surface ectodermal cell"
+          ]
         }
       },
       "required": [
