@@ -127,9 +127,9 @@
           "type": "number",
           "description": "Log10pvalue for the variant to gene edge"
         },
-        "beta": {
+        "effect_size": {
           "type": "number",
-          "description": "Beta for the variant to gene edge"
+          "description": "Effect size for the variant to gene edge"
         },
         "standard_error": {
           "type": "number",
@@ -190,6 +190,6 @@
   "accessible_via": {
     "filter_by_range": "log10pvalue",
     "simplified_return": "class, method, label, source, log10pvalue, biological_context",
-    "return": "log10pvalue, p_value, posterior_inclusion_probability, beta, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term"
+    "return": "log10pvalue, p_value, posterior_inclusion_probability, effect_size, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term"
   }
 }
