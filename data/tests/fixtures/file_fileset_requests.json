@@ -1,0 +1,651 @@
+{
+  "https://www.encodeproject.org/ENCFF230JYM/@@embedded?format=json": {
+    "@id": "/files/ENCFF230JYM/",
+    "dataset": "/experiments/ENCSR548AQS",
+    "analysis_step_version": {
+      "software_versions": [
+        {
+          "software": {
+            "title": "MPRAflow tsv-to-bed"
+          }
+        }
+      ]
+    }
+  },
+  "https://www.encodeproject.org/experiments/ENCSR548AQS/@@embedded?format=json": {
+    "accession": "ENCSR548AQS",
+    "@type": [
+      "Experiment"
+    ],
+    "lab": {
+      "name": "nadav-ahituv"
+    },
+    "assay_term_name": "MPRA",
+    "assay_term_id": "OBI:0002675",
+    "biosample_ontology": {
+      "term_id": "EFO:0009747",
+      "term_name": "WTC11",
+      "classification": "cell line",
+      "@id": "/biosample-types/EFO_0009747/"
+    },
+    "replicates": [
+      {
+        "library": {
+          "biosample": {
+            "accession": "ENCBS160ZPI",
+            "biosample_ontology": {
+              "@id": "/biosample-types/EFO_0009747/",
+              "term_id": "EFO:0009747",
+              "term_name": "WTC11",
+              "classification": "cell line"
+            },
+            "donor": {
+              "accession": "ENCDO882UJI"
+            }
+          }
+        }
+      },
+      {
+        "library": {
+          "biosample": {
+            "accession": "ENCBS659PKW",
+            "biosample_ontology": {
+              "@id": "/biosample-types/EFO_0009747/",
+              "term_id": "EFO:0009747",
+              "term_name": "WTC11",
+              "classification": "cell line"
+            },
+            "donor": {
+              "accession": "ENCDO882UJI"
+            }
+          }
+        }
+      },
+      {
+        "library": {
+          "biosample": {
+            "accession": "ENCBS825OJD",
+            "biosample_ontology": {
+              "@id": "/biosample-types/EFO_0009747/",
+              "term_id": "EFO:0009747",
+              "term_name": "WTC11",
+              "classification": "cell line"
+            },
+            "donor": {
+              "accession": "ENCDO882UJI"
+            }
+          }
+        }
+      }
+    ],
+    "references": []
+  },
+  "https://www.encodeproject.org/ENCFF324XYW/@@embedded?format=json": {
+    "@id": "/files/ENCFF324XYW/",
+    "dataset": "/annotations/ENCSR528UQX",
+    "analysis_step_version": {
+      "software_versions": [
+        {
+          "software": {
+            "title": "Distal regulation ENCODE-rE2G"
+          }
+        }
+      ]
+    }
+  },
+  "https://www.encodeproject.org/annotations/ENCSR528UQX/@@embedded?format=json": {
+    "accession": "ENCSR528UQX",
+    "@type": [
+      "Annotation"
+    ],
+    "lab": {
+      "name": "jesse-engreitz"
+    },
+    "annotation_type": "prediction",
+    "experimental_input": [
+      "/experiments/EXP_DNASE"
+    ],
+    "biosample_ontology": {
+      "term_id": "UBERON:0002048",
+      "term_name": "lung",
+      "classification": "tissue",
+      "@id": "/biosample-types/UBERON_0002048/"
+    },
+    "donor": "/human-donors/ENCDO528BHB",
+    "references": []
+  },
+  "https://www.encodeproject.org/experiments/EXP_DNASE/@@object?format=json": {
+    "assay_term_name": "DNase-seq",
+    "assay_term_id": "OBI:0001853"
+  },
+  "https://www.encodeproject.org/human-donors/ENCDO528BHB/@@object?format=json": {
+    "accession": "ENCDO528BHB"
+  },
+  "https://www.encodeproject.org/ENCFF968BZL/@@embedded?format=json": {
+    "@id": "/files/ENCFF968BZL/",
+    "dataset": "/experiments/ENCSR998YDI",
+    "analysis_step_version": {
+      "software_versions": [
+        {
+          "software": {
+            "title": "DistalRegulationCRISPRdata"
+          }
+        }
+      ]
+    }
+  },
+  "https://www.encodeproject.org/experiments/ENCSR998YDI/@@embedded?format=json": {
+    "accession": "ENCSR998YDI",
+    "@type": [
+      "Experiment"
+    ],
+    "lab": {
+      "name": "jesse-engreitz"
+    },
+    "biosample_ontology": {
+      "term_id": "EFO:0002067",
+      "term_name": "K562",
+      "classification": "cell line",
+      "@id": "/biosample-types/EFO_0002067/"
+    },
+    "references": []
+  },
+  "https://www.encodeproject.org/ENCFF420VPZ/@@embedded?format=json": {
+    "@id": "/files/ENCFF420VPZ/",
+    "dataset": "/annotations/ENCSR800VNX",
+    "analysis_step_version": {
+      "software_versions": [
+        {
+          "software": {
+            "title": "BEDTools"
+          }
+        },
+        {
+          "software": {
+            "title": "bigWigAverageOverBed"
+          }
+        }
+      ]
+    }
+  },
+  "https://www.encodeproject.org/annotations/ENCSR800VNX/@@embedded?format=json": {
+    "accession": "ENCSR800VNX",
+    "@type": [
+      "Annotation"
+    ],
+    "lab": {
+      "name": "zhiping-weng"
+    },
+    "annotation_type": "candidate Cis-Regulatory Elements"
+  },
+  "https://www.encodeproject.org/ENCDO374BBL/@@embedded?format=json": {
+    "@id": "/human-donors/ENCDO374BBL/",
+    "accession": "ENCDO374BBL",
+    "sex": "male",
+    "age": "35",
+    "age_units": "year",
+    "ethnicity": []
+  },
+  "https://www.encodeproject.org/NTR_0000633/@@embedded?format=json": {
+    "@id": "/biosample-types/primary_cell_NTR_0000633/",
+    "term_id": "NTR_0000633",
+    "term_name": "activated T-helper 1 cell",
+    "synonyms": null
+  },
+  "https://api.data.igvf.org/IGVFFI1663LKVQ/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI1663LKVQ/",
+    "href": "/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz",
+    "catalog_class": "prediction",
+    "catalog_collections": [
+      "variants",
+      "variants_genomic_elements"
+    ],
+    "file_set": {
+      "@id": "/prediction-sets/IGVFDS2340WJRV"
+    },
+    "analysis_step_version": {
+      "@id": "/analysis-step-versions/IGVFASV0000BLUE"
+    }
+  },
+  "https://api.data.igvf.org/prediction-sets/IGVFDS2340WJRV/@@embedded?format=json": {
+    "accession": "IGVFDS2340WJRV",
+    "@type": [
+      "PredictionSet"
+    ],
+    "lab": {
+      "@id": "/labs/bill-majoros/"
+    },
+    "samples": [
+      {
+        "@id": "/samples/IGVFSM7883WOIS"
+      }
+    ],
+    "publications": []
+  },
+  "https://api.data.igvf.org/samples/IGVFSM7883WOIS/@@embedded?format=json": {
+    "accession": "IGVFSM7883WOIS",
+    "donors": [
+      {
+        "accession": "IGVFDO9208RPQQ"
+      }
+    ],
+    "sample_terms": [
+      {
+        "@id": "/sample-terms/EFO_0002067"
+      }
+    ],
+    "classifications": []
+  },
+  "https://api.data.igvf.org/sample-terms/EFO_0002067/@@object?format=json": {
+    "term_id": "EFO:0002067",
+    "term_name": "K562"
+  },
+  "https://api.data.igvf.org/analysis-step-versions/IGVFASV0000BLUE/@@object?format=json": {
+    "software_versions": [
+      "/software-versions/IGVFSVV0000BLUE"
+    ]
+  },
+  "https://api.data.igvf.org/software-versions/IGVFSVV0000BLUE/@@object?format=json": {
+    "software": "/software/IGVFSW0000BLUE"
+  },
+  "https://api.data.igvf.org/software/IGVFSW0000BLUE/@@object?format=json": {
+    "title": "BlueSTARR"
+  },
+  "https://api.data.igvf.org/IGVFDO1756PPKO/@@embedded?format=json": {
+    "@id": "/human-donors/IGVFDO1756PPKO/",
+    "accession": "IGVFDO1756PPKO",
+    "sex": "male",
+    "age": null,
+    "age_units": null,
+    "ethnicities": [
+      "Japanese"
+    ],
+    "phenotypic_features": []
+  },
+  "https://api.data.igvf.org/sample-terms/CL_0000746/@@embedded?format=json": {
+    "@id": "/sample-terms/CL_0000746/",
+    "term_id": "CL:0000746",
+    "term_name": "leukocyte",
+    "synonyms": null
+  },
+  "https://api.data.igvf.org/samples/IGVFSM0000STARR/@@embedded?format=json": {
+    "accession": "IGVFSM0000STARR",
+    "donors": [
+      {
+        "accession": "IGVFDO0000STARR"
+      }
+    ],
+    "classifications": [
+      "cell line"
+    ],
+    "targeted_sample_term": {
+      "@id": "/sample-terms/EFO_0002067"
+    },
+    "construct_library_sets": [
+      {
+        "@id": "/construct-library-sets/IGVFCLS0000STARR"
+      }
+    ]
+  },
+  "https://api.data.igvf.org/construct-library-sets/IGVFCLS0000STARR/@@object?skip_calculated=true&format=json": {
+    "integrated_content_files": [
+      "/tabular-files/IGVFFI0000STARR"
+    ]
+  },
+  "https://api.data.igvf.org/tabular-files/IGVFFI0000STARR/@@object?skip_calculated=true&format=json": {
+    "file_set": "/curated-sets/IGVFCS0000STARR"
+  },
+  "https://api.data.igvf.org/curated-sets/IGVFCS0000STARR/@@object?skip_calculated=true&format=json": {
+    "donors": [
+      "/human-donors/IGVFDO1000G"
+    ]
+  },
+  "https://api.data.igvf.org/human-donors/IGVFDO1000G/@@object?skip_calculated=true&format=json": {
+    "dbxrefs": [
+      "IGSR:NA12345",
+      "IGSR:NA67890"
+    ]
+  },
+  "https://api.data.igvf.org/files/IGVFFI0000DERI/@@embedded?format=json": {
+    "analysis_step_version": {
+      "@id": "/analysis-step-versions/IGVFASV0000DERI"
+    }
+  },
+  "https://api.data.igvf.org/analysis-step-versions/IGVFASV0000DERI/@@object?format=json": {
+    "software_versions": [
+      "/software-versions/IGVFSVV0000DERI"
+    ]
+  },
+  "https://api.data.igvf.org/software-versions/IGVFSVV0000DERI/@@object?format=json": {
+    "software": "/software/IGVFSW0000DERI"
+  },
+  "https://api.data.igvf.org/software/IGVFSW0000DERI/@@object?format=json": {
+    "title": "Test Software"
+  },
+  "https://www.encodeproject.org/ENCFF000403/@@embedded?format=json": {
+    "__status_code__": 403,
+    "__json__": {}
+  },
+  "https://www.encodeproject.org/human-donors/ENCDO000TEST/@@object?format=json": {
+    "accession": "ENCDO000TEST"
+  },
+  "https://api.data.igvf.org/samples/IGVFSM0000TRET/@@embedded?format=json": {
+    "accession": "IGVFSM0000TRET",
+    "donors": [
+      {
+        "accession": "IGVFDO0000TRET"
+      }
+    ],
+    "sample_terms": [
+      {
+        "@id": "/sample-terms/CL_0000001"
+      }
+    ],
+    "classifications": [
+      "organoid"
+    ],
+    "treatments": [
+      {
+        "@id": "/treatments/IGVFTT0000"
+      }
+    ]
+  },
+  "https://api.data.igvf.org/sample-terms/CL_0000001/@@object?format=json": {
+    "term_id": "CL:0000001",
+    "term_name": "organoid cell"
+  },
+  "https://api.data.igvf.org/treatments/IGVFTT0000/@@object?format=json": {
+    "treatment_term_id": "CHEBI:123",
+    "treatment_term_name": "Drug"
+  },
+  "https://api.data.igvf.org/analysis-sets/IGVFDS0000ANAL/@@embedded?format=json": {
+    "input_file_sets": [
+      {
+        "@id": "/measurement-sets/IGVFMS0000A"
+      },
+      {
+        "@id": "/auxiliary-sets/IGVFAS0000AUX"
+      },
+      {
+        "@id": "/construct-library-sets/IGVFCLS0000CL"
+      },
+      {
+        "@id": "/analysis-sets/IGVFDS0000SUB"
+      }
+    ]
+  },
+  "https://api.data.igvf.org/construct-library-sets/IGVFCLS0000CL/@@object_with_select_calculated_properties?field=applied_to_samples?format=json": {
+    "applied_to_samples": [
+      "/samples/IGVFSM0000APPL"
+    ]
+  },
+  "https://api.data.igvf.org/samples/IGVFSM0000APPL@@object_with_select_calculated_properties?field=file_sets?format=json": {
+    "file_sets": [
+      "/measurement-sets/IGVFMS0000B"
+    ]
+  },
+  "https://api.data.igvf.org/analysis-sets/IGVFDS0000SUB/@@embedded?format=json": {
+    "input_file_sets": [
+      {
+        "@id": "/measurement-sets/IGVFMS0000C"
+      }
+    ]
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000A/@@object?format=json": {
+    "preferred_assay_titles": [
+      "Assay A"
+    ],
+    "assay_term": "/assay-terms/OBI_0003002"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0003002/@@object?format=json": {
+    "term_id": "OBI:0003002"
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000C/@@object?format=json": {
+    "preferred_assay_titles": [
+      "Assay C"
+    ],
+    "assay_term": "/assay-terms/OBI_0003000"
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000B/@@object?format=json": {
+    "preferred_assay_titles": [
+      "Assay B"
+    ],
+    "assay_term": "/assay-terms/OBI_0003001"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0003000/@@object?format=json": {
+    "term_id": "OBI:0003000"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0003001/@@object?format=json": {
+    "term_id": "OBI:0003001"
+  },
+  "https://api.data.igvf.org/analysis-sets/IGVFDS0000ANAL2/@@embedded?format=json": {
+    "input_file_sets": [
+      {
+        "@id": "/analysis-sets/IGVFDS0000SUB2"
+      }
+    ]
+  },
+  "https://api.data.igvf.org/analysis-sets/IGVFDS0000SUB2/@@embedded?format=json": {
+    "input_file_sets": [
+      {
+        "@id": "/measurement-sets/IGVFMS0000D"
+      }
+    ]
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000D/@@object?format=json": {
+    "preferred_assay_titles": [
+      "Assay D"
+    ],
+    "assay_term": "/assay-terms/OBI_0001234"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0001234/@@object?format=json": {
+    "term_id": "OBI:0001234"
+  },
+  "https://www.encodeproject.org/ENCFF167FJQ/@@embedded?format=json": {
+    "@id": "/files/ENCFF167FJQ/",
+    "dataset": "/experiments/ENCSR167FJQ"
+  },
+  "https://www.encodeproject.org/experiments/ENCSR167FJQ/@@embedded?format=json": {
+    "accession": "ENCSR167FJQ",
+    "@type": [
+      "Experiment"
+    ],
+    "lab": {
+      "name": "test-lab"
+    },
+    "assay_term_name": "DNase-seq",
+    "assay_term_id": "OBI:0001853"
+  },
+  "https://www.encodeproject.org/ENCFF000NOCOL/@@embedded?format=json": {
+    "@id": "/files/ENCFF000NOCOL/",
+    "dataset": "/experiments/ENCSRNOCOL"
+  },
+  "https://www.encodeproject.org/experiments/ENCSRNOCOL/@@embedded?format=json": {
+    "accession": "ENCSRNOCOL",
+    "@type": [
+      "Experiment"
+    ],
+    "lab": {
+      "name": "test-lab"
+    },
+    "assay_term_name": "Unknown assay",
+    "assay_term_id": "OBI:0000000"
+  },
+  "https://www.encodeproject.org/ENCFFMULTI/@@embedded?format=json": {
+    "@id": "/files/ENCFFMULTI/",
+    "dataset": "/experiments/ENCSRMULTI"
+  },
+  "https://www.encodeproject.org/experiments/ENCSRMULTI/@@embedded?format=json": {
+    "accession": "ENCSRMULTI",
+    "@type": [
+      "Experiment"
+    ],
+    "lab": {
+      "name": "test-lab"
+    },
+    "assay_term_name": [
+      "Assay A",
+      "Assay B"
+    ],
+    "assay_term_id": "OBI:0000001"
+  },
+  "https://api.data.igvf.org/IGVFFI0000NOCOL/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI0000NOCOL/",
+    "catalog_class": "prediction",
+    "catalog_collections": [],
+    "file_set": {
+      "@id": "/prediction-sets/IGVFDS0000NOCOL"
+    }
+  },
+  "https://api.data.igvf.org/prediction-sets/IGVFDS0000NOCOL/@@embedded?format=json": {
+    "accession": "IGVFDS0000NOCOL",
+    "@type": [
+      "PredictionSet"
+    ],
+    "lab": {
+      "@id": "/labs/test-lab/"
+    },
+    "samples": []
+  },
+  "https://api.data.igvf.org/IGVFFI0000NOSW/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI0000NOSW/",
+    "catalog_class": "observed data",
+    "catalog_collections": [
+      "genomic_elements"
+    ],
+    "file_set": {
+      "@id": "/curated-sets/IGVFCS0000NOSW"
+    }
+  },
+  "https://api.data.igvf.org/curated-sets/IGVFCS0000NOSW/@@embedded?format=json": {
+    "accession": "IGVFCS0000NOSW",
+    "@type": [
+      "CuratedSet"
+    ],
+    "lab": {
+      "@id": "/labs/test-lab/"
+    },
+    "summary": "Curated summary",
+    "samples": []
+  },
+  "https://api.data.igvf.org/IGVFFI0000PREDNOSW/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI0000PREDNOSW/",
+    "catalog_class": "prediction",
+    "catalog_collections": [
+      "variants"
+    ],
+    "file_set": {
+      "@id": "/prediction-sets/IGVFDS0000PREDNOSW"
+    }
+  },
+  "https://api.data.igvf.org/prediction-sets/IGVFDS0000PREDNOSW/@@embedded?format=json": {
+    "accession": "IGVFDS0000PREDNOSW",
+    "@type": [
+      "PredictionSet"
+    ],
+    "lab": {
+      "@id": "/labs/test-lab/"
+    },
+    "samples": []
+  },
+  "https://api.data.igvf.org/IGVFFI0000UNSUP/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI0000UNSUP/",
+    "catalog_class": "observed data",
+    "catalog_collections": [
+      "genomic_elements"
+    ],
+    "file_set": {
+      "@id": "/other-sets/IGVFOS0000UNSUP"
+    }
+  },
+  "https://api.data.igvf.org/other-sets/IGVFOS0000UNSUP/@@embedded?format=json": {
+    "accession": "IGVFOS0000UNSUP",
+    "@type": [
+      "OtherSet"
+    ],
+    "lab": {
+      "@id": "/labs/test-lab/"
+    },
+    "samples": []
+  },
+  "https://api.data.igvf.org/IGVFFI0000ANALM/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI0000ANALM/",
+    "catalog_class": "observed data",
+    "catalog_collections": [
+      "genomic_elements"
+    ],
+    "file_set": {
+      "@id": "/analysis-sets/IGVFDS0000ANALM"
+    }
+  },
+  "https://api.data.igvf.org/analysis-sets/IGVFDS0000ANALM/@@embedded?format=json": {
+    "accession": "IGVFDS0000ANALM",
+    "@type": [
+      "AnalysisSet"
+    ],
+    "lab": {
+      "@id": "/labs/test-lab/"
+    },
+    "input_file_sets": [
+      {
+        "@id": "/measurement-sets/IGVFMS0000M1"
+      },
+      {
+        "@id": "/measurement-sets/IGVFMS0000M2"
+      }
+    ],
+    "samples": []
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000M1/@@object?format=json": {
+    "preferred_assay_titles": [
+      "Assay M1"
+    ],
+    "assay_term": "/assay-terms/OBI_0002000"
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000M2/@@object?format=json": {
+    "preferred_assay_titles": [
+      "Assay M2"
+    ],
+    "assay_term": "/assay-terms/OBI_0002001"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0002000/@@object?format=json": {
+    "term_id": "OBI:0002000"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0002001/@@object?format=json": {
+    "term_id": "OBI:0002001"
+  },
+  "https://api.data.igvf.org/IGVFFI0000MPRA/@@embedded?format=json": {
+    "@id": "/tabular-files/IGVFFI0000MPRA/",
+    "catalog_class": "observed data",
+    "catalog_collections": [
+      "genomic_elements"
+    ],
+    "file_set": {
+      "@id": "/analysis-sets/IGVFDS0000MPRA"
+    }
+  },
+  "https://api.data.igvf.org/analysis-sets/IGVFDS0000MPRA/@@embedded?format=json": {
+    "accession": "IGVFDS0000MPRA",
+    "@type": [
+      "AnalysisSet"
+    ],
+    "lab": {
+      "@id": "/labs/test-lab/"
+    },
+    "input_file_sets": [
+      {
+        "@id": "/measurement-sets/IGVFMS0000MPRA"
+      }
+    ],
+    "samples": []
+  },
+  "https://api.data.igvf.org/measurement-sets/IGVFMS0000MPRA/@@object?format=json": {
+    "preferred_assay_titles": [
+      "MPRA"
+    ],
+    "assay_term": "/assay-terms/OBI_0002675"
+  },
+  "https://api.data.igvf.org/assay-terms/OBI_0002675/@@object?format=json": {
+    "term_id": "OBI:0002675"
+  }
+}
