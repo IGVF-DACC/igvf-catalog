@@ -10,12 +10,12 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-const METHODS = ['ADASTRA', 'GVATdb', 'pQTL', 'SEMVAR'] as const
-const LABELS = ['allele-specific binding', 'pQTL', 'predicted allele-specific binding'] as const
-const SOURCES = ['ADASTRA', 'GVATdb', 'IGVF', 'UKB'] as const
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'method')
+const LABELS = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'label')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'source')
 
 const asbSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
 const ukbSchema = getSchema('data/schemas/edges/variants_proteins.pQTL.json')

@@ -8,7 +8,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, genesCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -52,8 +52,12 @@ const diseasesToGenesFormat = z.object({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   .transform(({ inheritance_mode, ...rest }) => ({ ClinGen_inheritance_mode: inheritance_mode, ...rest }))
 
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'diseases_genes', 'source')
+const VARIANT_DISEASE_SOURCE = 'ClinGen'
+// need to add ClinGen to the sources for genes to diseases query
+const SOURCES_WITH_CLINGEN = [...SOURCES, VARIANT_DISEASE_SOURCE] as [string, ...string[]]
 const genesDiseasesQueryFormat = z.object({
-  source: z.enum(['Orphanet', 'ClinGen']).optional()
+  source: z.enum(SOURCES_WITH_CLINGEN).optional()
 })
 
 const DiseasesGenesQueryFormat = z.object({

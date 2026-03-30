@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -14,25 +14,17 @@ const transcriptSchema = getSchema('data/schemas/nodes/transcripts.Gencode.json'
 const transcriptCollectionName = transcriptSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
 const proteinCollectionName = proteinSchema.db_collection_name as string
-const geneProductsTermsName = z.enum([
-  'involved in',
-  'is located in',
-  'has the function'
-])
-const geneProductsTermsInverseName = z.enum([
-  'has component',
-  'contains',
-  'is a function of'
-])
+const geneProductsTermsName = getCollectionEnumValuesOrThrow('edges', 'gene_products_terms', 'name')
+const geneProductsTermsInverseName = getCollectionEnumValuesOrThrow('edges', 'gene_products_terms', 'inverse_name')
 
 const goTermQueryFormat = z.object({
   go_term_id: z.string(),
-  name: geneProductsTermsInverseName.optional()
+  name: z.enum(geneProductsTermsInverseName).optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 const queryFormat = z.object({
   query: z.string(),
-  name: geneProductsTermsName.optional(),
+  name: z.enum(geneProductsTermsName).optional(),
   page: z.number().default(0),
   limit: z.number().optional()
 })

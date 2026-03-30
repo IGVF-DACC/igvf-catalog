@@ -34,7 +34,13 @@
     "assertion": {
       "type": "string",
       "description": "Assertion for the variant to disease edge",
-      "example": "Pathogenic"
+      "enum": [
+        "Benign",
+        "Likely Benign",
+        "Likely Pathogenic",
+        "Pathogenic",
+        "Uncertain Significance"
+      ]
     },
     "pmids": {
       "type": "array",

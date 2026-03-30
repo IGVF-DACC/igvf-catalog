@@ -8,17 +8,11 @@ import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const assertionTypes = z.enum([
-  'Benign',
-  'Likely Benign',
-  'Likely Pathogenic',
-  'Pathogenic',
-  'Uncertain Significance'
-])
+const assertionTypes = getCollectionEnumValuesOrThrow('edges', 'variants_diseases', 'assertion')
 
 export const variantReturnFormat = z.object({
   chr: z.string(),
@@ -44,7 +38,7 @@ const variantDiseaseFormat = z.object({
 })
 
 const variantDiseasQueryFormat = z.object({
-  assertion: assertionTypes.optional(),
+  assertion: z.enum(assertionTypes).optional(),
   pmid: z.string().trim().optional()
 })
 

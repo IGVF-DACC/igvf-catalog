@@ -7,7 +7,7 @@ import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
@@ -19,7 +19,7 @@ const ldCollectionName = ldSchemaObj.db_collection_name as string
 const variantsSchemaObj = getSchema('data/schemas/nodes/variants.Favor.json')
 const variantCollectionName = variantsSchemaObj.db_collection_name as string
 
-const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
+const ancestries = getCollectionEnumValuesOrThrow('edges', 'variants_variants', 'ancestry')
 
 const tfBindingFormat = z.object({
   motif: z.string(),
@@ -78,7 +78,7 @@ const variantsVariantsFormat = z.object({
 const variantLDQueryFormat = z.object({
   r2: z.string().trim().optional(),
   d_prime: z.string().trim().optional(),
-  ancestry: ancestries.optional()
+  ancestry: z.enum(ancestries).optional()
 })
 
 export async function findVariantLDSummary (input: paramsFormatType): Promise<any[]> {

@@ -7,12 +7,13 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, genomicElementType, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
 
 const MAX_PAGE_SIZE = 300
-const METHODS = ['caQTL', 'BlueSTARR', 'MPRA'] as const
-const SOURCES = ['IGVF', 'AFGR', 'ENCODE'] as const
+
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_genomic_elements', 'method')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_genomic_elements', 'source')
 
 const predictionFormat = z.object({
   distance_gene_variant: z.number(),

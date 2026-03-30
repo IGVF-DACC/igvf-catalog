@@ -11,7 +11,6 @@ import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'coding_variants_phenotypes', 'method')
-console.log(METHODS)
 
 const variantQueryFormat = z.object({
   variant_id: z.string().trim().optional(),

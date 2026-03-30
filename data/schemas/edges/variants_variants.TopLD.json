@@ -69,7 +69,12 @@
     "ancestry": {
       "type": "string",
       "description": "Ancestry for the variant to variant edge",
-      "example": "SAS"
+      "enum": [
+        "AFR",
+        "EAS",
+        "EUR",
+        "SAS"
+      ]
     },
     "label": {
       "type": "string",

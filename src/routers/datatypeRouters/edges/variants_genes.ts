@@ -9,21 +9,16 @@ import { geneFormat, geneSearch } from '../nodes/genes'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = ['eQTL', 'spliceQTL', 'Variant-EFFECTS'] as const
 
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'method')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'source')
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
 const MAX_LOG10_PVALUE = 400
 const MAX_SLOPE = 8.66426 // i.e. effect_size
-
-const QtlSources = z.enum([
-  'AFGR',
-  'EBI',
-  'IGVF'
-])
 
 const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
@@ -48,7 +43,7 @@ const variantsGenesQueryFormat = z.object({
   label: z.enum(['eQTL', 'spliceQTL', 'variant effect on gene expression']).optional(),
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
-  source: QtlSources.optional()
+  source: z.enum(SOURCES).optional()
 })
 
 const variantsQueryFormat = variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(['modulates expression of', 'modulates splicing of']).optional() })).merge(commonHumanEdgeParamsFormat)

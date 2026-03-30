@@ -8,12 +8,13 @@ import { TRPCError } from '@trpc/server'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_biosamples', 'method')
 const variantsBiosamplesQueryFormat = z.object({
-  method: z.enum(['STARR-seq']).optional()
+  method: z.enum(METHODS).optional()
 })
 const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),

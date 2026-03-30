@@ -8,13 +8,13 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-const METHODS = ['cV2F', 'SGE', 'GWAS'] as const
-const LABELS = ['protein variant effect', 'predicted variant effect on phenotype', 'GWAS'] as const
-const CLASS = ['observed data', 'prediction'] as const
-const SOURCES = ['IGVF', 'OpenTargets'] as const
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_phenotypes', 'method')
+const LABELS = getCollectionEnumValuesOrThrow('edges', 'variants_phenotypes', 'label')
+const CLASS = getCollectionEnumValuesOrThrow('edges', 'variants_phenotypes', 'class')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_phenotypes', 'source')
 
 const variantsPhenotypesQueryFormat = z.object({
   phenotype_id: z.string().trim().optional(),
