@@ -253,6 +253,7 @@
           ],
           "description": "The cell annotation of the file set",
           "enum": [
+            null,
             "extraembryonic parietal endodermal cell",
             "extraembryonic visceral endodermal cell",
             "intermediate extraembryonic parietal endodermal cell",
