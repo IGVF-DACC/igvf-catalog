@@ -141,12 +141,14 @@ class BlueSTARRVariantBiosample(BaseAdapter):
                 genomic_element_id = 'genomic_elements/' + build_regulatory_region_id(
                     row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + BlueSTARRVariantBiosample.ELEMENT_FILE_ACCESSION
 
-            edge_key = _id + '_' + self.biosample_term + '_' + self.file_accession
+            edge_key = _id + '_' + \
+                self.biosample_term.replaceAll(
+                    '/', '_') + '_' + self.file_accession
 
             edge_props = {
                 '_key': edge_key,
                 '_from': 'variants/' + _id,
-                '_to': 'ontology_terms/' + self.biosample_term,
+                '_to': self.biosample_term,
                 'genomic_element': genomic_element_id,
                 'log2FC': float(row[3]),
                 'class': self.collection_class,
