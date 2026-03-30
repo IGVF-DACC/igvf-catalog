@@ -195,6 +195,47 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
     }
 
 
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:25:A:C'})
+@patch('adapters.mpra_adapter.load_variant')
+def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000001.11:25:A:C',
+    }, None)
+
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'name\tsequence\tcategory\tclass\tsource\tref\tchr\tstart\tend\tstrand\tvariant_class\tvariant_pos\tSPDI\tallele\tinfo\n'
+        'tile_1_ref\tACGT\tvariant\ttest\tunc\tGRCh38\tchr1\t0\t250\t+\t["SNV"]\t[224]\t["NC_000001.11:25:A:C"]\t["ref"]\tNA\n'
+        'tile_1_alt\tACGT\tvariant\ttest\tunc\tGRCh38\tchr1\t0\t250\t+\t["SNV"]\t[224]\t["NC_000001.11:25:A:C"]\t["alt"]\tNA\n'
+        'tile_2_ref\tACGT\tvariant\ttest\tunc\tGRCh38\tchr1\t100\t350\t+\t["SNV"]\t[125]\t["NC_000001.11:25:A:C"]\t["ref"]\tNA\n'
+        'tile_2_alt\tACGT\tvariant\ttest\tunc\tGRCh38\tchr1\t100\t350\t+\t["SNV"]\t[125]\t["NC_000001.11:25:A:C"]\t["alt"]\tNA\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr1\t25\t26\tNC_000001.11:25:A:C\t3\t+\t0.1\t1\t2\t3\t4\t1.2\t0.2\t0.5\t-0.1\t0.1\t224\tA\tC\n'
+        'chr1\t25\t26\tNC_000001.11:25:A:C\t918\t+\t0.6\t1\t2\t3\t4\t3.4\t2.3\t0.8\t0.2\t1.0\t125\tA\tC\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='variant_biosample',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+
+    parsed = [json.loads(x) for x in writer.contents]
+    assert len(parsed) == 2
+
+    by_score = {p['bed_score']: p for p in parsed}
+    assert by_score[3]['genomic_element'] == 'genomic_elements/MPRA_chr1_0_250_GRCh38_IGVFFI0000REF'
+    assert by_score[918]['genomic_element'] == 'genomic_elements/MPRA_chr1_100_350_GRCh38_IGVFFI0000REF'
+
+
 def test_genomic_element_biosample(mock_file_fileset):
 
     writer = SpyWriter()

@@ -100,6 +100,7 @@ class MPRAAdapter(BaseAdapter):
             self.file_accession)
 
         self.variant_to_element = defaultdict(set)
+        self.variant_pos_to_element = defaultdict(set)
         self.design_elements = set()
         self.coords_to_element_name = {}
         self.design_name_alleles = defaultdict(set)
@@ -239,6 +240,22 @@ class MPRAAdapter(BaseAdapter):
 
                 for spdi in spdi_list:
                     self.variant_to_element[spdi].add(key)
+
+                variant_pos_raw = row.get('variant_pos')
+                if variant_pos_raw not in (None, '', 'NA', 'NaN'):
+                    try:
+                        variant_pos_list = ast.literal_eval(variant_pos_raw)
+                    except (ValueError, SyntaxError) as e:
+                        raise ValueError(
+                            f'Malformed variant_pos at row {i}: {variant_pos_raw!r}') from e
+                    if not isinstance(variant_pos_list, list):
+                        raise ValueError(
+                            f'Malformed variant_pos at row {i}: expected list, got {type(variant_pos_list).__name__}'
+                        )
+                    for spdi, variant_pos in zip(spdi_list, variant_pos_list):
+                        pos = self.safe_int(variant_pos)
+                        if pos is not None:
+                            self.variant_pos_to_element[(spdi, pos)].add(key)
 
     def _load_excluded_effect_names(self):
         accession = (self.reference_file_accession or '').strip()
@@ -526,8 +543,16 @@ class MPRAAdapter(BaseAdapter):
                 continue
             variant_id = variant['_key']
             biosample_term_key = (self.biosample_term or '').split('/')[-1]
+            bed_variant_pos = self.safe_int(row[16]) if len(row) > 16 else None
 
-            for element_chr, element_start, element_end, element_strand in self.variant_to_element[spdi]:
+            mapped_elements = set()
+            if bed_variant_pos is not None:
+                mapped_elements = self.variant_pos_to_element.get(
+                    (spdi, bed_variant_pos), set())
+            if not mapped_elements:
+                mapped_elements = self.variant_to_element[spdi]
+
+            for element_chr, element_start, element_end, element_strand in mapped_elements:
                 element_id = self.build_mpra_element_node_id(
                     element_chr, element_start, element_end, self.reference_file_accession)
                 # Strand distinguishes edges when node id is coord-only.
