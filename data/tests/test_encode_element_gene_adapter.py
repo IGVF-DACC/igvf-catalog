@@ -35,7 +35,7 @@ def test_encode_element_gene_adapter_genomic_element_gene(mock_file_fileset):
         with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
             with gzip.open(temp_file.name, 'wt') as f:
                 f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
-                f.write('chr1\t827140\t827667\te:chr1:827140-827667\tenhancer\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
+                f.write('chr1\t827140\t827667\te:chr1:827140-827667\tpromoter\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
             temp_file_path = temp_file.name
 
         try:
@@ -81,7 +81,7 @@ def test_encode_element_gene_adapter_genomic_element(mock_file_fileset):
     with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
-            f.write('chr1\t827140\t827667\te:chr1:827140-827667\tenhancer\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
+            f.write('chr1\t827140\t827667\te:chr1:827140-827667\tpromoter\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
         temp_file_path = temp_file.name
 
     try:

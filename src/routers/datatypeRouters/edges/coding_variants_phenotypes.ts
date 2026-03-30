@@ -7,10 +7,11 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-const METHODS = ['MutPred2', 'ESM-1v', 'VAMP-seq', 'VAMP-seq (MultiSTEP)', 'SGE'] as const
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'coding_variants_phenotypes', 'method')
+console.log(METHODS)
 
 const variantQueryFormat = z.object({
   variant_id: z.string().trim().optional(),
