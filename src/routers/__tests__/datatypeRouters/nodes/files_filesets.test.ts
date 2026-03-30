@@ -14,7 +14,7 @@ describe('filesFilesetsRouters.filesFilesets', () => {
     const mockResult = [{
       _id: '1',
       file_set_id: 'FS1',
-      lab: 'roderic-guigo',
+      lab: 'jesse-engreitz',
       preferred_assay_titles: ['HiC'],
       assay_term_ids: ['AT1'],
       method: 'MPRA',
@@ -24,16 +24,18 @@ describe('filesFilesetsRouters.filesFilesets', () => {
       sample_ids: ['SID1'],
       simple_sample_summaries: ['summary'],
       donors: ['donors/D1'],
-      source: 'ENCODE'
+      source: 'IGVF',
+      source_url: 'https://data.igvf.org/signal-files/IGVFFI8400FXRX/',
+      download_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig'
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('lab == "roderic-guigo"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, file_set_id, lab, preferred_assay_titles, method, class, software, samples, donors, source')
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('lab == "jesse-engreitz"')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, file_set_id, lab, preferred_assay_titles, method, class, software, samples, donors, source, source_url, download_link')
 
     const input = {
-      lab: 'roderic-guigo',
+      lab: 'jesse-engreitz',
       page: 0,
       limit: 10
     }

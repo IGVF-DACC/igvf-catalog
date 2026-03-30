@@ -100,7 +100,7 @@ https://api.catalog.igvf.org/api/pathways/genes?disease_ontology_terms=DOID_526&
 https://api.catalog.igvf.org/api/pathways/pathways?pathway_name=2-LTR%20circle%20formation&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/biosamples/genomic-elements?biosample_id=EFO_0001187&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/files-filesets?lab=jesse-engreitz&page=0
-https://api.catalog.igvf.org/api/files-filesets?fileset_id=ENCSR997TVR&preferred_assay_title=CAGE&class=prediction&page=0
+https://api.catalog.igvf.org/api/files-filesets?fileset_id=ENCSR359DFW&preferred_assay_title=CAGE&class=prediction&page=0
 https://api.catalog.igvf.org/api/genes/coding-variants/all-scores?gene_id=ENSG00000196584&dataset=SGE&page=0
 https://api.catalog.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000196584&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000196584&verbose=true&page=0

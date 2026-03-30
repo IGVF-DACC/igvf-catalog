@@ -129,11 +129,16 @@ export function getSchema (schemaFilePath: string): configType {
 }
 
 function extractEnumValues (schema: configType, fieldName: string): string[] {
-  const enumValues = schema?.properties?.[fieldName]?.enum
-  if (!Array.isArray(enumValues)) {
-    return []
+  const fieldSchema = schema?.properties?.[fieldName]
+  const enumValues = fieldSchema?.enum
+  if (Array.isArray(enumValues)) {
+    return enumValues.filter((value): value is string => typeof value === 'string')
   }
-  return enumValues.filter((value): value is string => typeof value === 'string')
+  const itemEnumValues = fieldSchema?.items?.enum
+  if (Array.isArray(itemEnumValues)) {
+    return itemEnumValues.filter((value): value is string => typeof value === 'string')
+  }
+  return []
 }
 
 export function getEnumValues (schemaFilePath: string, fieldName: string): string[] {

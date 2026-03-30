@@ -194,6 +194,7 @@
   },
   "https://api.data.igvf.org/IGVFFI1663LKVQ/@@embedded?format=json": {
     "@id": "/tabular-files/IGVFFI1663LKVQ/",
+    "href": "/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz",
     "catalog_class": "prediction",
     "catalog_collections": [
       "variants",

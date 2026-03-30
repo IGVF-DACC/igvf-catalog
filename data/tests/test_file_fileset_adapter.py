@@ -63,7 +63,9 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_get):
             'variants_genomic_elements',
         ],
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/',
+        'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz',
+        'cell_annotation': None
     }
     for key, value in expected.items():
         assert first_item.get(key) == value
