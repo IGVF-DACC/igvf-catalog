@@ -544,11 +544,19 @@ class MPRAAdapter(BaseAdapter):
             variant_id = variant['_key']
             biosample_term_key = (self.biosample_term or '').split('/')[-1]
             bed_variant_pos = self.safe_int(row[16]) if len(row) > 16 else None
+            bed_strand = self.normalize_strand(row[5]) if len(row) > 5 else '.'
 
             mapped_elements = set()
             if bed_variant_pos is not None:
                 mapped_elements = self.variant_pos_to_element.get(
                     (spdi, bed_variant_pos), set())
+                if len(mapped_elements) > 1:
+                    strand_matched = {
+                        element for element in mapped_elements
+                        if self.normalize_strand(element[3]) == bed_strand
+                    }
+                    if strand_matched:
+                        mapped_elements = strand_matched
             if not mapped_elements:
                 mapped_elements = self.variant_to_element[spdi]
 

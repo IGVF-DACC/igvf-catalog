@@ -236,6 +236,47 @@ def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_v
     assert by_score[918]['genomic_element'] == 'genomic_elements/MPRA_chr1_100_350_GRCh38_IGVFFI0000REF'
 
 
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000006.12:52763752:A:G'})
+@patch('adapters.mpra_adapter.load_variant')
+def test_variant_biosample_uses_strand_for_reverse_complement_designs(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000006.12:52763752:A:G',
+    }, None)
+
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'name\tsequence\tcategory\tclass\tsource\tref\tchr\tstart\tend\tstrand\tvariant_class\tvariant_pos\tSPDI\tallele\tinfo\n'
+        'tile_plus_ref\tACGT\tvariant\ttest\tunc\tGRCh38\tchr6\t52763627\t52763877\t+\t["SNV"]\t[125]\t["NC_000006.12:52763752:A:G"]\t["ref"]\tNA\n'
+        'tile_plus_alt\tACGT\tvariant\ttest\tunc\tGRCh38\tchr6\t52763627\t52763877\t+\t["SNV"]\t[125]\t["NC_000006.12:52763752:A:G"]\t["alt"]\tNA\n'
+        'tile_minus_ref\tACGT\tvariant\ttest\tunc\tGRCh38\tchr6\t52763627\t52763877\t-\t["SNV"]\t[125]\t["NC_000006.12:52763752:A:G"]\t["ref"]\tNA\n'
+        'tile_minus_alt\tACGT\tvariant\ttest\tunc\tGRCh38\tchr6\t52763627\t52763877\t-\t["SNV"]\t[125]\t["NC_000006.12:52763752:A:G"]\t["alt"]\tNA\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr6\t52763752\t52763753\tNC_000006.12:52763752:A:G\t352\t+\t0.13\t31\t16\t43\t25\t0.48\t0.30\t0.5\t-0.1\t0.1\t125\tA\tG\n'
+        'chr6\t52763752\t52763753\tNC_000006.12:52763752:A:G\t368\t-\t0.14\t29\t23\t67\t59\t0.51\t0.31\t0.6\t-0.1\t0.1\t125\tA\tG\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='variant_biosample',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+
+    parsed = [json.loads(x) for x in writer.contents]
+    assert len(parsed) == 2
+
+    by_score = {p['bed_score']: p for p in parsed}
+    assert '_plus_' in by_score[352]['_key']
+    assert '_minus_' in by_score[368]['_key']
+
+
 def test_genomic_element_biosample(mock_file_fileset):
 
     writer = SpyWriter()
