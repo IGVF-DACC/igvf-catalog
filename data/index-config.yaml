@@ -371,12 +371,9 @@ variants_drugs_genes:
 variants_genes:
   zkd_sparse:
     fields:
-      - slope, log10pvalue, beta
-      - log10pvalue, beta
-      - beta
-      - intron_start, intron_end
+      - slope, log10pvalue, effect_size
       - log10pvalue, effect_size
-      - effect_size
+      - intron_start, intron_end
   persistent:
     fields:
       - biosample_term, biological_context, label, source, files_filesets
@@ -384,6 +381,7 @@ variants_genes:
       - label, source, files_filesets
       - source, files_filesets
       - files_filesets
+      - effect_size
   inverted:
     fields: biological_context
     analyzers:
