@@ -137,8 +137,8 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
 
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
-          FILTER "${method}" IN s.scores[*].method
-          SORT v.protein_change.protein_id ASC, v.protein_change.aapos ASC
+          FILTER "${method}" IN s.variants[*].scores[**].method and s.protein_change.aapos != -1
+          SORT s.protein_change.protein_id ASC, s.protein_change.aapos ASC
           LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN s
       )
@@ -153,8 +153,11 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
       }
 
       obj.filter((item) => {
-        const filteredScores = (item.scores as any[]).filter((score) => score.method === method)
-        item.scores = filteredScores
+        const variants = item.variants as any[]
+        variants.forEach((variant) => {
+          variant.scores = (variant.scores as any[]).filter((score) => score.method === method)
+        })
+        item.variants = variants
         return item
       })
 
@@ -169,6 +172,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
       FILTER doc._key == "${input.gene_id as string}"
       RETURN (
         FOR v IN doc.variant_scores
+          FILTER v.protein_change.aapos != -1
           SORT v.protein_change.protein_id ASC, v.protein_change.aapos ASC
           LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN v
