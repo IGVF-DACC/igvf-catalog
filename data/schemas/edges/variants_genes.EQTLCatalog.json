@@ -177,7 +177,7 @@
         "posterior_inclusion_probability",
         "p_value",
         "log10pvalue",
-        "beta",
+        "effect_size",
         "standard_error",
         "z_score",
         "credible_set_min_r2",

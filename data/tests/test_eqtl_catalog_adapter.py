@@ -67,7 +67,7 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo, mock_re
         assert 'credible_set_size' in first_item
         assert 'posterior_inclusion_probability' in first_item
         assert 'p_value' in first_item
-        assert 'beta' in first_item
+        assert 'effect_size' in first_item
         assert 'standard_error' in first_item
         assert 'z_score' in first_item
         assert 'credible_set_min_r2' in first_item
