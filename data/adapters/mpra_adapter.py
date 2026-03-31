@@ -376,7 +376,7 @@ class MPRAAdapter(BaseAdapter):
                         'method': self.method,
                         'type': 'tested elements',
                         'source': self.source,
-                        'source_url': self.source_url,
+                        'source_url': self.reference_source_url or self.source_url,
                         'files_filesets': 'files_filesets/' + element_id_suffix
                     }
                     if self.validate:
