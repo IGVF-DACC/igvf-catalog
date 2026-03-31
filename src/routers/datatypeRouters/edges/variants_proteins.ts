@@ -16,6 +16,8 @@ const MAX_PAGE_SIZE = 100
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'method')
 const LABELS = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'label')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'source')
+const NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'name')
+const INVERSE_NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_proteins', 'inverse_name')
 
 const asbSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
 const ukbSchema = getSchema('data/schemas/edges/variants_proteins.pQTL.json')
@@ -31,11 +33,11 @@ const variantsProteinsQueryFormat = z.object({
   source: z.enum(SOURCES).optional(),
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
-  name: z.enum(['modulates binding of', 'associated with levels of']).optional()
+  name: z.enum(NAMES).optional()
 })
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
-  name: z.enum(['binding modulated by', 'level associated with']).optional(),
+  name: z.enum(INVERSE_NAMES).optional(),
   method: z.enum(METHODS).optional()
 }))
 

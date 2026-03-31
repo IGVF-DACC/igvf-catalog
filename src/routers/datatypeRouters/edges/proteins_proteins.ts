@@ -6,7 +6,7 @@ import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
-import { getEnumValuesOrThrow, getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 250
 const proteinProteinSchemaFile = 'data/schemas/edges/proteins_proteins.ProteinsInteraction.json'
@@ -19,55 +19,12 @@ const detectionMethods = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, '
 const methods = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'method'))
 const labels = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'label'))
 
-const interactionTypes = z.enum([
-  'acetylation reaction',
-  'adp ribosylation reaction',
-  'ampylation reaction',
-  'association',
-  'atpase reaction',
-  'cleavage reaction',
-  'colocalization',
-  'covalent binding',
-  'de-ADP-ribosylation reaction',
-  'deacetylation reaction',
-  'demethylation reaction',
-  'deneddylation reaction',
-  'dephosphorylation reaction',
-  'deubiquitination reaction',
-  'direct interaction',
-  'disulfide bond',
-  'dna cleavage',
-  'enzymatic reaction',
-  'glycosylation reaction',
-  'gtpase reaction',
-  'guanine nucleotide exchange factor reaction',
-  'hydroxylation reaction',
-  'lipid addition',
-  'lipoprotein cleavage reaction',
-  'methylation reaction',
-  'myristoylation reaction',
-  'neddylation reaction',
-  'oxidoreductase activity electron transfer reaction',
-  'palmitoylation reaction',
-  'phosphorylation reaction',
-  'phosphotransfer reaction',
-  'physical association',
-  'proline isomerization  reaction',
-  'protein cleavage',
-  'proximity',
-  'putative self interaction',
-  'rna cleavage',
-  'self interaction',
-  'sumoylation reaction',
-  'transglutamination reaction',
-  'ubiquitination reaction'
-]
-)
+const INTERACTION_TYPES = getCollectionEnumValuesOrThrow('edges', 'proteins_proteins', 'interaction_type')
 
 const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
   pmid: z.string().trim().optional(),
   detection_method: detectionMethods.optional(),
-  interaction_type: interactionTypes.optional(),
+  interaction_type: z.enum(INTERACTION_TYPES).optional(),
   label: labels.optional(),
   method: methods.optional(),
   source: sources.optional()
@@ -79,7 +36,7 @@ const proteinsProteinsFormat = z.object({
   'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
   detection_method: z.string(),
   detection_method_code: z.string(),
-  interaction_type: z.array(interactionTypes),
+  interaction_type: z.array(z.enum(INTERACTION_TYPES)),
   interaction_type_code: z.array(z.string()),
   confidence_value_biogrid: z.number().nullable(),
   confidence_value_intact: z.number().nullable(),

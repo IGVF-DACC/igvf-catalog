@@ -7,13 +7,14 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const INDEX_MDI_POS = 'idx_zkd_pos'
 
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
+const MOUSE_STRAINS = getCollectionEnumValuesOrThrow('nodes', 'mm_variants', 'strain')
 
 const frequencySources = z.enum([
   'bravo_af',
@@ -104,7 +105,7 @@ const variantsSummaryFormat = z.object({
 
 const variantsQueryFormat = variantsCommonQueryFormat.merge(z.object({
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
-  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional()
+  mouse_strain: z.enum(MOUSE_STRAINS).optional()
 })).merge(commonNodesParamsFormat)
 
 const variantsFreqQueryFormat = z.object({

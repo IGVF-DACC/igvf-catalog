@@ -5,14 +5,18 @@ import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonNodesParamsFormat, geneTypes, geneCollections, geneStudySets } from '../params'
-import { getSchema } from '../schema'
+import { commonNodesParamsFormat } from '../params'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
 const humanGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const mouseGeneSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+
+const GENE_TYPES = getCollectionEnumValuesOrThrow('nodes', 'genes', 'gene_type')
+const GENE_COLLECTIONS = getCollectionEnumValuesOrThrow('nodes', 'genes', 'collections')
+const GENE_STUDY_SETS = getCollectionEnumValuesOrThrow('nodes', 'genes', 'study_sets')
 
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
@@ -21,9 +25,9 @@ export const genesQueryFormat = z.object({
   name: z.string().trim().optional(),
   region: z.string().trim().optional(),
   synonym: z.string().trim().optional(),
-  collection: geneCollections.optional(),
-  study_set: geneStudySets.optional(),
-  gene_type: geneTypes.optional()
+  collection: z.enum(GENE_COLLECTIONS).optional(),
+  study_set: z.enum(GENE_STUDY_SETS).optional(),
+  gene_type: z.enum(GENE_TYPES).optional()
 }).merge(commonNodesParamsFormat)
 
 export const geneFormat = z.object({

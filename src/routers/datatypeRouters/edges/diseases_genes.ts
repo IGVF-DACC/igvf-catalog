@@ -61,7 +61,7 @@ const genesDiseasesQueryFormat = z.object({
 })
 
 const DiseasesGenesQueryFormat = z.object({
-  source: z.enum(['Orphanet']).default('Orphanet')
+  source: z.enum(SOURCES).default('Orphanet')
 })
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
