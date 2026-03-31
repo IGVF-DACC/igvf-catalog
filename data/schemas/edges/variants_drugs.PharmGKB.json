@@ -52,9 +52,17 @@
     "phenotype_categories": {
       "type": "array",
       "description": "Phenotype categories for the variant to drug edge",
-      "example": [
-        "Dosage"
-      ]
+      "items": {
+        "type": "string",
+        "enum": [
+          "Dosage",
+          "Efficacy",
+          "Metabolism/PK",
+          "Other",
+          "PD",
+          "Toxicity"
+        ]
+      }
     },
     "name": {
       "type": "string",

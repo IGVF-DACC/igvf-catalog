@@ -9,21 +9,19 @@ import { geneFormat, geneSearch } from '../nodes/genes'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
-import { getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = ['eQTL', 'spliceQTL', 'Variant-EFFECTS'] as const
 
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'method')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'source')
+const LABELS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'label')
+const NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'name')
+const INVERSE_NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'inverse_name')
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
 const MAX_LOG10_PVALUE = 400
 const MAX_SLOPE = 8.66426 // i.e. effect_size
-
-const QtlSources = z.enum([
-  'AFGR',
-  'EBI',
-  'IGVF'
-])
 
 const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
@@ -45,14 +43,14 @@ const variantsGenesQueryFormat = z.object({
   effect_size: z.string().optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
-  label: z.enum(['eQTL', 'spliceQTL', 'variant effect on gene expression']).optional(),
+  label: z.enum(LABELS).optional(),
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
-  source: QtlSources.optional()
+  source: z.enum(SOURCES).optional()
 })
 
-const variantsQueryFormat = variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(['modulates expression of', 'modulates splicing of']).optional() })).merge(commonHumanEdgeParamsFormat)
-const genesQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(['expression modulated by', 'splicing modulated by']).optional() })).merge(commonHumanEdgeParamsFormat)
+const variantsQueryFormat = variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(NAMES).optional() })).merge(commonHumanEdgeParamsFormat)
+const genesQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(INVERSE_NAMES).optional() })).merge(commonHumanEdgeParamsFormat)
 
 const completeQtlsFormat = z.object({
   gene: z.string().or(geneFormat).nullable(),

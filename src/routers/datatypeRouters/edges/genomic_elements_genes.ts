@@ -7,20 +7,11 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = [
-  'CRISPR enhancer perturbation screen',
-  'CRISPR FACS screen',
-  'ENCODE-rE2G',
-  'Perturb-seq'
-] as const
-
-const SOURCES = [
-  'ENCODE',
-  'IGVF'
-] as const
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
 const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
 const genomicElementsGenesGersbachE2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.GersbachE2GCRISPR.json')

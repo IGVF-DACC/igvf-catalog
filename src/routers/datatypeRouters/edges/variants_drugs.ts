@@ -8,7 +8,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -19,12 +19,10 @@ const drugCollectionName = drugSchemaObj.db_collection_name as string
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const humanVariantCollectionName = humanVariantSchema.db_collection_name as string
 
-const phenotypeList = z.enum([
-  'Dosage', 'Efficacy', 'Metabolism/PK', 'Other', 'PD', 'Toxicity'
-])
+const PHENOTYPE_CATEGORIES = getCollectionEnumValuesOrThrow('edges', 'variants_drugs', 'phenotype_categories')
 
 const variantsDrugsQueryFormat = z.object({
-  phenotype_categories: phenotypeList.optional(),
+  phenotype_categories: z.enum(PHENOTYPE_CATEGORIES).optional(),
   pmid: z.string().trim().optional()
 })
 

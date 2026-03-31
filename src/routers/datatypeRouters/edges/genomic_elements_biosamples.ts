@@ -8,11 +8,12 @@ import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 50
-const METHODS = ['MPRA'] as const
-const SOURCES = ['ENCODE', 'IGVF'] as const
+
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosamples', 'method')
+const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosamples', 'source')
 
 const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),

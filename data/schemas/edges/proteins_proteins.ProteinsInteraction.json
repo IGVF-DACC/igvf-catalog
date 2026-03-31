@@ -227,9 +227,52 @@
         "interaction_type": {
           "type": "array",
           "description": "The interaction type of the proteins interaction edge",
-          "example": [
-            "physical association"
-          ]
+          "items": {
+            "type": "string",
+            "enum": [
+              "acetylation reaction",
+              "adp ribosylation reaction",
+              "ampylation reaction",
+              "association",
+              "atpase reaction",
+              "cleavage reaction",
+              "colocalization",
+              "covalent binding",
+              "de-ADP-ribosylation reaction",
+              "deacetylation reaction",
+              "demethylation reaction",
+              "deneddylation reaction",
+              "dephosphorylation reaction",
+              "deubiquitination reaction",
+              "direct interaction",
+              "disulfide bond",
+              "dna cleavage",
+              "enzymatic reaction",
+              "glycosylation reaction",
+              "gtpase reaction",
+              "guanine nucleotide exchange factor reaction",
+              "hydroxylation reaction",
+              "lipid addition",
+              "lipoprotein cleavage reaction",
+              "methylation reaction",
+              "myristoylation reaction",
+              "neddylation reaction",
+              "oxidoreductase activity electron transfer reaction",
+              "palmitoylation reaction",
+              "phosphorylation reaction",
+              "phosphotransfer reaction",
+              "physical association",
+              "proline isomerization  reaction",
+              "protein cleavage",
+              "proximity",
+              "putative self interaction",
+              "rna cleavage",
+              "self interaction",
+              "sumoylation reaction",
+              "transglutamination reaction",
+              "ubiquitination reaction"
+            ]
+          }
         },
         "interaction_type_code": {
           "type": "array",

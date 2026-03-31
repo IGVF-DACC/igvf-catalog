@@ -6,12 +6,12 @@ import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 import { geneSearch } from '../nodes/genes'
 
 const QUERY_LIMIT = 500
 
-const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
+const DATASETS = getCollectionEnumValuesOrThrow('edges', 'coding_variants_phenotypes', 'method')
 
 const geneQueryFormat = genesCommonQueryFormat.merge(z.object({
   method: z.enum(DATASETS).optional(),
@@ -34,7 +34,7 @@ const codingVariantsScoresFormat = z.object({
     hgvsp: z.string().nullish(),
     aapos: z.number().nullish(),
     ref: z.string().nullish(),
-    alt: z.string().nullish(),
+    alt: z.string().nullish()
   }),
   variants: z.array(z.object({
     variant: variantSimplifiedFormat,

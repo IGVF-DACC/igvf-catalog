@@ -13,7 +13,11 @@
       "properties": {
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element"
+          "description": "Source annotation for the genomic element",
+          "enum": [
+            "enhancer",
+            "negative control"
+          ]
         },
         "files_filesets": {
           "type": "string",

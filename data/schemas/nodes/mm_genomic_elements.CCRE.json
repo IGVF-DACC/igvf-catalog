@@ -14,7 +14,16 @@
           "source_annotation": {
             "type": "string",
             "description": "Source annotation of the CCRE",
-            "example": "CA-CTCF: chromatin accessible + CTCF binding"
+            "enum": [
+              "CA-CTCF: chromatin accessible + CTCF binding",
+              "CA-TF: chromatin accessible + TF binding",
+              "CA-H3K4me3: chromatin accessible + H3K4me3 high signal",
+              "PLS: Promoter-like signal",
+              "pELS: proximal Enhancer-like signal",
+              "dELS: distal Enhancer-like signal",
+              "TF: TF binding",
+              "CA: chromatin accessible"
+            ]
           },
           "method": {
             "enum": [
