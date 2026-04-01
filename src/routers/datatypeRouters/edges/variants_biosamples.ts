@@ -76,6 +76,13 @@ function variantQueryValidation (input: paramsFormatType): void {
 }
 
 function biosampleQueryValidation (input: paramsFormatType): void {
+  if (input.biosample_id === 'EFO_000206') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'The biosample_id EFO_000206 is currently not supported via this API. Please contact us if you need to query this data.'
+    })
+  }
+
   if (Object.keys(input).filter(item => !['biosample_id', 'biosample_name'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
