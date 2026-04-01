@@ -333,6 +333,8 @@ variants:
 variants_biosamples:
   persistent:
     fields:
+      - _to, genomic_element
+      - _from, genomic_element
       - method, files_filesets
       - files_filesets
 

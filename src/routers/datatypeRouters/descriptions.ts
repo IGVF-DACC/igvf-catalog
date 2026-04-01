@@ -710,6 +710,7 @@ export const descriptions = {
   biosample_name = k562, <br> \
   method = STARR-seq, <br> \
   files_fileset = IGVFFI0099XJHU, <br> \
+  element_type = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 

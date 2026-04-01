@@ -173,7 +173,6 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     }
   `
 
-  console.log(query)
   return await ((await db.query(query)).all())
 }
 
