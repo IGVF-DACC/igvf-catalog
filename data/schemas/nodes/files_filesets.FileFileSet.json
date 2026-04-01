@@ -59,6 +59,7 @@
               "scATAC-seq",
               "SGE",
               "STARR-seq",
+              "TAP-seq",
               "VAMP-seq",
               "VAMP-seq (MultiSTEP)",
               "Variant-EFFECTS"
@@ -146,6 +147,8 @@
               "Samtools",
               "scATAC-seq processing scripts",
               "SEMVAR",
+              "Sceptre",
+              "Seurat",
               "SGE Pipeline"
             ]
           }

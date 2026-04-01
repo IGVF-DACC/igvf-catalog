@@ -34,7 +34,7 @@ from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
-from adapters.gersbach_E2G_CRISPR_adapter import GersbachE2GCRISPR
+from adapters.igvf_E2G_CRISPR_adapter import IGVFE2GCRISPR
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
@@ -84,7 +84,7 @@ LABEL_TO_ADAPTER = {
     'encode_mpra_genomic_element_biosample': EncodeMPRA,
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
-    'gersbach_genomic_element_gene_crispr': GersbachE2GCRISPR,
+    'igvf_genomic_element_gene_crispr': IGVFE2GCRISPR,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,
