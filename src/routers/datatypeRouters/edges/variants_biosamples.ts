@@ -15,7 +15,8 @@ const MAX_PAGE_SIZE = 100
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_biosamples', 'method')
 const variantsBiosamplesQueryFormat = z.object({
   method: z.enum(METHODS).optional(),
-  element_type: z.string().optional()
+  element_type: z.string().optional(),
+  significant: z.enum(['true', 'false']).optional()
 })
 const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),
@@ -47,6 +48,7 @@ const returnFormat = z.object({
   postProbEffect: z.number().nullish(),
   CI_lower_95: z.number().nullish(),
   CI_upper_95: z.number().nullish(),
+  significant: z.boolean().nullish(),
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
@@ -147,10 +149,17 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     delete input.element_type
   }
 
+  let filterSignificant = ''
+  if (input.significant !== undefined) {
+    filterSignificant = `FILTER record.significant == ${input.significant as string}`
+    delete input.significant
+  }
+
   const query = `
     FOR record IN ${variantToBiosamplesCollecionName as string}
     FILTER ${filterCondition} ${methodFilter} ${filesetFilter}
     ${filterGenomicElements}
+    ${filterSignificant}
     LIMIT ${input.page as number * input.limit}, ${input.limit}
     RETURN {
       'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
@@ -164,6 +173,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'postProbEffect': record.postProbEffect,
       'CI_lower_95': record.CI_lower_95,
       'CI_upper_95': record.CI_upper_95,
+      'significant': record.significant,
       'label': record.label,
       'method': record.method,
       'class': record.class,
@@ -173,6 +183,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     }
   `
 
+  console.log(query)
   return await ((await db.query(query)).all())
 }
 
