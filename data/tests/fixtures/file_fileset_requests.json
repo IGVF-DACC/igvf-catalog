@@ -240,6 +240,10 @@
     "term_id": "EFO:0002067",
     "term_name": "K562"
   },
+  "https://api.data.igvf.org/sample-terms/CL_0000540/@@object?format=json": {
+    "term_id": "CL:0000540",
+    "term_name": "neuron"
+  },
   "https://api.data.igvf.org/analysis-step-versions/IGVFASV0000BLUE/@@object?format=json": {
     "software_versions": [
       "/software-versions/IGVFSVV0000BLUE"
@@ -279,8 +283,9 @@
       "cell line"
     ],
     "targeted_sample_term": {
-      "@id": "/sample-terms/EFO_0002067"
+      "@id": "/sample-terms/CL_0000540"
     },
+    "sample_terms":[{"@id": "/sample-terms/EFO_0002067"}],
     "construct_library_sets": [
       {
         "@id": "/construct-library-sets/IGVFCLS0000STARR"

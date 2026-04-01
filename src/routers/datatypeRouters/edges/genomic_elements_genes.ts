@@ -150,7 +150,7 @@ function buildQuery (params: {
           ${getDBReturnStatements(genomicElementsGenesEncodeElementGeneLinkSchema)}
         } :
         record.method == 'Perturb-seq' ? {
-          'score': record.avg_log2FC,
+          'score': record.log2FC,
           'p_value': record.p_value_adj,
           ${getDBReturnStatements(genomicElementsGenesGersbachE2GCrisprSchema)}
         } : {}

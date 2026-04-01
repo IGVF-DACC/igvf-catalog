@@ -30,10 +30,9 @@
             "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json",
             "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
             "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
-            "EncodeMPRA": "schemas/nodes/genomic_elements.EncodeMPRA.json",
-            "GersbachE2GCRISPR": "schemas/nodes/genomic_elements.GersbachE2GCRISPR.json",
+            "IGVFE2GCRISPR": "schemas/nodes/genomic_elements.IGVFE2GCRISPR.json",
             "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
-            "IGVFMPRAAdapter": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json"
+            "MPRAAdapter": "schemas/nodes/genomic_elements.MPRAAdapter.json"
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
@@ -79,7 +78,7 @@
             "cV2F": "schemas/nodes/variants.cV2F.json",
             "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
-            "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json",
+            "MPRAAdapter": "schemas/nodes/variants.MPRAAdapter.json",
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
             "SGE": "schemas/nodes/variants.SGE.json",
             "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
@@ -126,13 +125,12 @@
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
         },
         "genomic_elements_biosamples": {
-            "EncodeMPRA": "schemas/edges/genomic_elements_biosamples.EncodeMPRA.json",
-            "IGVFMPRAAdapter": "schemas/edges/genomic_elements_biosamples.IGVFMPRAAdapter.json"
+            "MPRAAdapter": "schemas/edges/genomic_elements_biosamples.MPRAAdapter.json"
         },
         "genomic_elements_genes": {
             "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
             "EncodeElementGeneLink": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
-            "GersbachE2GCRISPR": "schemas/edges/genomic_elements_genes.GersbachE2GCRISPR.json"
+            "IGVFE2GCRISPR": "schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json"
         },
         "genomic_elements_mm_genomic_elements": {
             "HumanMouseElementAdapter": "schemas/edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json"
@@ -165,6 +163,7 @@
             "GencodeProtein": "schemas/edges/transcripts_proteins.GencodeProtein.json"
         },
         "variants_biosamples": {
+            "MPRAAdapter": "schemas/edges/variants_biosamples.MPRAAdapter.json",
             "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
         },
         "variants_coding_variants": {
@@ -193,8 +192,7 @@
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
-            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json",
-            "IGVFMPRAAdapter": "schemas/edges/variants_genomic_elements.IGVFMPRAAdapter.json"
+            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
         },
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",

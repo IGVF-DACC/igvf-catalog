@@ -1,6 +1,6 @@
 import argparse
 import boto3
-from active_adapters import LABEL_TO_ADAPTER
+from active_adapters import KEY_TO_ADAPTER
 
 from adapters.writer import get_writer
 
@@ -17,7 +17,7 @@ parser.add_argument('--output-bucket-key', type=str, default=None,
 parser.add_argument('--output-local-path', type=str, default=None,
                     help='The local path to use, for example "path/to/output.file". For ontology, please provide the prefix of the output files.')
 parser.add_argument('--adapter', help='Loads the sample data for an adapter.',
-                    choices=LABEL_TO_ADAPTER.keys(), required=True)
+                    choices=KEY_TO_ADAPTER.keys(), required=True)
 parser.add_argument('--aws-profile', type=str, default=None,
                     help='The AWS profile to use, for example "igvf-dev".')
 parser.add_argument('--version-tag', type=str, default=None,
@@ -140,7 +140,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         version_tag=non_adapter_signature_namespace.version_tag
     )
 
-    adapter = LABEL_TO_ADAPTER[non_adapter_signature_namespace.adapter](
+    adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
         adapter_signature_namespace.filepath,
         adapter_signature_namespace.ontology,
         node_primary_writer=writer_primary,
@@ -158,7 +158,7 @@ else:
         version_tag=non_adapter_signature_namespace.version_tag
     )
 
-    adapter = LABEL_TO_ADAPTER[non_adapter_signature_namespace.adapter](
+    adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
         **vars(adapter_signature_namespace), writer=writer)
 
 adapter.process_file()

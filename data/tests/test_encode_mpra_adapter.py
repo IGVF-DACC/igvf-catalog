@@ -4,7 +4,7 @@ import tempfile
 import gzip
 import os
 from unittest.mock import patch
-from adapters.encode_mpra_adapter import EncodeMPRA
+from adapters.mpra_adapter import MPRAAdapter
 from adapters.writer import SpyWriter
 
 
@@ -12,7 +12,7 @@ from adapters.writer import SpyWriter
 @pytest.fixture
 def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
-    with patch('adapters.encode_mpra_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.mpra_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'MPRA',
             'class': 'observed data',
@@ -33,11 +33,11 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset):
         temp_file_path = temp_file.name
 
     try:
-        adapter = EncodeMPRA(filepath=temp_file_path,
-                             label='genomic_element',
-                             source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                             writer=writer,
-                             validate=True)
+        adapter = MPRAAdapter(filepath=temp_file_path,
+                              label='genomic_element',
+                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
+                              writer=writer,
+                              validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
@@ -46,7 +46,7 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset):
         assert 'start' in first_item
         assert 'end' in first_item
         assert first_item['type'] == 'tested elements'
-        assert first_item['source'] == EncodeMPRA.SOURCE
+        assert first_item['source'] == 'ENCODE'
         assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF802FUV/'
     finally:
         os.unlink(temp_file_path)
@@ -63,18 +63,17 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
         temp_file_path = temp_file.name
 
     try:
-        adapter = EncodeMPRA(filepath=temp_file_path,
-                             label='genomic_element_biosample',
-                             source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                             writer=writer,
-                             validate=True)
+        adapter = MPRAAdapter(filepath=temp_file_path,
+                              label='genomic_element_biosample',
+                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
+                              writer=writer,
+                              validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
         assert '_key' in first_item
         assert '_from' in first_item
         assert '_to' in first_item
-        assert 'element_name' in first_item
         assert 'strand' in first_item
         assert 'log2FC' in first_item
         assert 'bed_score' in first_item
@@ -83,28 +82,40 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
         assert first_item['method'] == 'MPRA'
         assert first_item['class'] == 'observed data'
         assert first_item['label'] == 'regulatory element activity'
-        assert first_item['source'] == EncodeMPRA.SOURCE
+        assert first_item['source'] == 'ENCODE'
         assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF802FUV/'
+        assert first_item.get('minusLog10PValue') is None
+        assert first_item.get('minusLog10QValue') is None
     finally:
         os.unlink(temp_file_path)
 
 
 def test_encode_mpra_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_biosample'):
-        EncodeMPRA(filepath='dummy.bed.gz',
-                   label='invalid_label',
-                   source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                   writer=writer)
+    with pytest.raises(ValueError, match='Invalid label:'):
+        MPRAAdapter(filepath='dummy.bed.gz',
+                    label='invalid_label',
+                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
+                    writer=writer)
+
+
+def test_encode_mpra_adapter_no_sequence_design_variant_label(mock_file_fileset):
+    """Without reference_filepath, variant label is not allowed (ENCODE has no sequence designs)."""
+    writer = SpyWriter()
+    with pytest.raises(ValueError, match='ENCODE MPRA files do not have MPRA sequence designs'):
+        MPRAAdapter(filepath='dummy.bed.gz',
+                    label='variant',
+                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
+                    writer=writer)
 
 
 def test_encode_mpra_adapter_initialization(mock_file_fileset):
     writer = SpyWriter()
-    for label in EncodeMPRA.ALLOWED_LABELS:
-        adapter = EncodeMPRA(filepath='dummy.bed.gz',
-                             label=label,
-                             source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                             writer=writer)
+    for label in ['genomic_element', 'genomic_element_biosample']:
+        adapter = MPRAAdapter(filepath='dummy.bed.gz',
+                              label=label,
+                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
+                              writer=writer)
         assert adapter.filepath == 'dummy.bed.gz'
         assert adapter.label == label
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF802FUV/'
@@ -114,11 +125,11 @@ def test_encode_mpra_adapter_initialization(mock_file_fileset):
 
 def test_encode_mpra_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
-    adapter = EncodeMPRA(filepath='dummy.bed.gz',
-                         label='genomic_element',
-                         source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                         writer=writer,
-                         validate=True)
+    adapter = MPRAAdapter(filepath='dummy.bed.gz',
+                          label='genomic_element',
+                          source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
+                          writer=writer,
+                          validate=True)
 
     invalid_doc = {
         'invalid_field': 'invalid_value',

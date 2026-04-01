@@ -34,11 +34,17 @@ igvf_file_accessions:
     - IGVFFI5288RAAV
     - IGVFFI0818FMCC
     - IGVFFI3351LASN
-  gersbach E2G CRISPR:
-    - IGVFFI3069QCRA # Perturb-seq
-    - IGVFFI5749WPVK # Perturb-seq
+  IGVF CRISPR E2G:
+    - IGVFFI3069QCRA # promoter Perturb-seq
+    - IGVFFI5749WPVK # promoter Perturb-seq
+    - IGVFFI1215LWLH # enhancer Perturb-seq
+    - IGVFFI6296RCJK # enhancer Perturb-seq
+    - IGVFFI6600VCYY # enhancer Perturb-seq
+    - IGVFFI7195XKBC # enhancer Perturb-seq
+    - IGVFFI9246AJEK # enhancer Perturb-seq
+    - IGVFFI3434YAPX # enhancer Perturb-seq
     - IGVFFI9721OCVW # CRISPR FACS screen
-    - IGVFFI1067ITQF # CRISPR FACS screen
+    - IGVFFI6268OASM # CRISPR FACS screen
     - IGVFFI1336XWXJ # CRISPR FACS screen
     - IGVFFI3089UGHM # CRISPR FACS screen
   Variant-EFFECTS:
@@ -337,12 +343,14 @@ igvf_file_accessions:
       - IGVFFI4864MRQQ
       - IGVFFI9553FYQF
       - IGVFFI4328UUGV
+      - IGVFFI2950PCZI
     MPRA sequence designs:
       - IGVFFI4914OUJH
       - IGVFFI7321WGMD
       - IGVFFI1436TRIH
       - IGVFFI7237HYCA
       - IGVFFI5172VOJF
+      - IGVFFI9852HQHD
   VAMP-seq:
     - IGVFFI0629IIQU
     - IGVFFI2574RDFO

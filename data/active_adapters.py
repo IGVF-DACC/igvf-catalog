@@ -24,7 +24,7 @@ from adapters.depmap_adapter import DepMap
 from adapters.ebi_complex_adapter import EBIComplex
 from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
-from adapters.encode_mpra_adapter import EncodeMPRA
+from adapters.mpra_adapter import MPRAAdapter
 from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
@@ -34,14 +34,13 @@ from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
-from adapters.gersbach_E2G_CRISPR_adapter import GersbachE2GCRISPR
+from adapters.igvf_E2G_CRISPR_adapter import IGVFE2GCRISPR
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
-from adapters.igvf_MPRA_adapter import IGVFMPRAAdapter
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
@@ -53,7 +52,7 @@ from adapters.cV2F_variant_phenotype_adapter import cV2F
 from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 
-LABEL_TO_ADAPTER = {
+KEY_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
     'gencode_transcripts': Gencode,
     'transcribed_to': Gencode,
@@ -81,11 +80,9 @@ LABEL_TO_ADAPTER = {
     'encode_genomic_element_gene_treatment_protein': EncodeElementGeneLink,
     'encode_donor': EncodeElementGeneLink,
     'encode_biosample': EncodeElementGeneLink,
-    'encode_mpra_genomic_element': EncodeMPRA,
-    'encode_mpra_genomic_element_biosample': EncodeMPRA,
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
-    'gersbach_genomic_element_gene_crispr': GersbachE2GCRISPR,
+    'igvf_genomic_element_gene_crispr': IGVFE2GCRISPR,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,
@@ -128,7 +125,7 @@ LABEL_TO_ADAPTER = {
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
-    'mpra_variants_elements': IGVFMPRAAdapter,
+    'mpra': MPRAAdapter,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
     'bluestarr_variant_biosample': BlueSTARRVariantBiosample,
     'variant_effects_variant_gene': VariantEFFECTSAdapter,

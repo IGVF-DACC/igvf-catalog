@@ -376,23 +376,24 @@ class FileFileSet:
             donor_accessions = [donor['accession']
                                 for donor in sample_object['donors']]
             donor_ids.update(donor_accessions)
-            if 'targeted_sample_term' in sample:
+            has_targeted = 'targeted_sample_term' in sample
+            sample_term_names = set()
+            for sample_term in sample_object['sample_terms']:
+                sample_term_object = requests.get(
+                    urljoin(self.api_url, sample_term['@id'] + '/@@object?format=json')).json()
+                sample_term_names.add(sample_term_object.get('term_name'))
+                if not has_targeted:
+                    sample_term_ids.add(sample_term_object.get('term_id'))
+            sample_term_names = ', '.join(sorted(list(sample_term_names)))
+            if has_targeted:
                 targeted_sample_term_object = requests.get(
                     urljoin(self.api_url, sample_object['targeted_sample_term']['@id'] + '/@@object?format=json')).json()
                 targeted_sample_term_name = targeted_sample_term_object['term_name']
                 classifications = ', '.join(
                     sorted(sample_object['classifications']))
-                simple_sample_summary = f'{targeted_sample_term_name} {classifications}'
+                simple_sample_summary = f'{sample_term_names} {classifications} induced to {targeted_sample_term_name}'
                 sample_term_ids.add(targeted_sample_term_object['term_id'])
             else:
-                sample_terms = sample_object['sample_terms']
-                sample_term_names = set()
-                for sample_term in sample_terms:
-                    sample_term_object = requests.get(
-                        urljoin(self.api_url, sample_term['@id'] + '/@@object?format=json')).json()
-                    sample_term_names.add(sample_term_object.get('term_name'))
-                    sample_term_ids.add(sample_term_object.get('term_id'))
-                sample_term_names = ', '.join(sorted(list(sample_term_names)))
                 simple_sample_summary = f'{sample_term_names}'
             if any(classification in ['organoid', 'gastruloid', 'embryoid', 'differentiated cell specimen', 'reprogrammed cell specimen'] for classification in sample_object['classifications']):
                 donor_accessions = ', '.join(sorted(donor_accessions))
