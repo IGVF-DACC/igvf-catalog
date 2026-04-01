@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/variants_genomic_elements.IGVFMPRAAdapter.json",
+  "$id": "schemas/edges/variants_biosamples.MPRAAdapter.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -20,6 +20,15 @@
           ]
         },
         "_to": {
+          "example": "ontology_terms/CL_0000679",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "genomic_element": {
+          "type": "string",
+          "description": "Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample.",
           "example": "genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH",
           "pattern": "^genomic_elements/",
           "collections": [
@@ -57,6 +66,10 @@
         "minusLog10QValue": {
           "type": "number",
           "description": "Minus log10 Q value for the edge"
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "True if this edge met the significance threshold (e.g. minusLog10QValue >= 1)."
         },
         "postProbEffect": {
           "type": "number",
@@ -136,13 +149,15 @@
       "required": [
         "_key",
         "label",
+        "significant",
         "files_filesets",
         "biosample_term",
         "biological_context",
-        "treatments_term_ids"
+        "treatments_term_ids",
+        "genomic_element"
       ],
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "variants_genomic_elements"
+  "db_collection_name": "variants_biosamples"
 }

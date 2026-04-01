@@ -20,7 +20,7 @@ from adapters.depmap_adapter import DepMap
 from adapters.ebi_complex_adapter import EBIComplex
 from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
-from adapters.encode_mpra_adapter import EncodeMPRA
+from adapters.mpra_adapter import MPRAAdapter
 from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
@@ -64,8 +64,8 @@ ADAPTERS = {
     'encode_genomic_element_gene': EncodeElementGeneLink(filepath='./samples/epiraction_ENCFF712SUP.bed.gz', label='genomic_element_gene', source='ENCODE_EpiRaction', source_url='https://www.encodeproject.org/files/ENCFF712SUP/', biological_context='CL_0000765'),
     'encode_donor': EncodeElementGeneLink(filepath='./samples/E2G_ENCFF617FJH.bed.gz', label='donor', source='ENCODE-E2G-DNaseOnly', source_url='https://www.encodeproject.org/files/ENCFF617FJH/', biological_context='EFO_0001203'),
     'encode_biosample': EncodeElementGeneLink(filepath='./samples/E2G_ENCFF728HSS.bed.gz', label='ontology_term', source='ENCODE-E2G-DNaseOnly', source_url='https://www.encodeproject.org/files/ENCFF728HSS/', biological_context='NTR_0000502'),
-    'encode_mpra_genomic_element': EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element', source_url='https://www.encodeproject.org/files/ENCFF802FUV/', biological_context='EFO_0002067'),
-    'encode_mpra_genomic_element_biosample': EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element_biosample', source_url='https://www.encodeproject.org/files/ENCFF802FUV/', biological_context='EFO_0002067'),
+    'mpra_genomic_element': MPRAAdapter(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element', source_url='https://www.encodeproject.org/files/ENCFF802FUV/'),
+    'mpra_genomic_element_biosample': MPRAAdapter(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element_biosample', source_url='https://www.encodeproject.org/files/ENCFF802FUV/'),
     'encode_genomic_element_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element'),
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element_gene'),
     'encode_file_fileset': FileFileSet(accession='ENCFF923FSV', label='encode_file_fileset'),

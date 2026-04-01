@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/genomic_elements_biosamples.IGVFMPRAAdapter.json",
+  "$id": "schemas/edges/genomic_elements_biosamples.MPRAAdapter.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -26,11 +26,6 @@
             "ontology_terms"
           ]
         },
-        "element_name": {
-          "type": "string",
-          "description": "The element name of the genomic element to biosample edge",
-          "example": "WTC11_seq26582_F"
-        },
         "bed_score": {
           "type": "integer",
           "description": "The bed score of the genomic element to biosample edge"
@@ -52,12 +47,16 @@
           "description": "The RNA count of the genomic element to biosample edge"
         },
         "minusLog10PValue": {
-          "type": "number",
-          "description": "The minus log10 P value of the genomic element to biosample edge"
+          "type": ["number", "null"],
+          "description": "The minus log10 P value (null when not available)."
         },
         "minusLog10QValue": {
-          "type": "number",
-          "description": "The minus log10 Q value of the genomic element to biosample edge"
+          "type": ["number", "null"],
+          "description": "The minus log10 Q value (null when not available)."
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "True if this edge met the significance threshold (e.g. minusLog10QValue >= 1)."
         },
         "label": {
           "enum": [
@@ -86,7 +85,8 @@
         },
         "source": {
           "enum": [
-            "IGVF"
+            "IGVF",
+            "ENCODE"
           ]
         },
         "source_url": {
@@ -125,14 +125,12 @@
       },
       "required": [
         "_key",
-        "element_name",
         "bed_score",
         "strand",
         "log2FC",
         "DNA_count",
         "RNA_count",
-        "minusLog10PValue",
-        "minusLog10QValue",
+        "significant",
         "files_filesets",
         "biosample_term",
         "biological_context",
@@ -141,5 +139,8 @@
       "additionalProperties": false
     }
   ],
+  "accessible_via": {
+    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, source, source_url"
+  },
   "db_collection_name": "genomic_elements_biosamples"
 }

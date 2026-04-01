@@ -224,9 +224,66 @@ def test_parse_sample_donor_treatment_igvf_starr_seq_1000_genomes_donors(mock_ge
     )
 
     assert sample_ids == {'IGVFSM0000STARR'}
-    assert 'EFO:0002067' in sample_term_ids
+    assert 'CL:0000540' in sample_term_ids
     assert simple_sample_summaries == {
-        'K562 cell line with variants from 1000 Genomes donors: NA12345, NA67890'
+        'K562 cell line induced to neuron with variants from 1000 Genomes donors: NA12345, NA67890'
+    }
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_parse_sample_donor_treatment_igvf_targeted_sample_term(mock_get):
+    """Targeted sample (e.g. lentiMPRA): summary is '{sample_term_names} {classifications} induced to {targeted}'
+    (matches igvfd Biosample summary order) and sample_term_ids contains only the targeted term id."""
+    base_url = 'https://api.data.igvf.org/'
+    # Modeled on IGVFDS9979HNMM: WTC-11 induced to cardiac muscle cell (differentiated cell specimen)
+    sample_object = {
+        'accession': 'IGVFSM3359VZOR',
+        'donors': [{'accession': 'IGVFDO1756PPKO'}],
+        'classifications': ['differentiated cell specimen'],
+        'sample_terms': [{'@id': base_url + 'sample-terms/EFO_0009747/'}],
+        'targeted_sample_term': {'@id': base_url + 'sample-terms/CL_0000746/'},
+    }
+    wtc11_term = {'term_name': 'GM25256 (WTC-11)', 'term_id': 'EFO:0009747'}
+    cardiac_muscle_term = {
+        'term_name': 'cardiac muscle cell', 'term_id': 'CL:0000746'}
+
+    def mock_get_side_effect(url, **kwargs):
+        response = Mock()
+        if 'IGVFSM3359VZOR' in url and '@@embedded' in url:
+            response.json.return_value = sample_object
+        elif 'EFO_0009747' in url:
+            response.json.return_value = wtc11_term
+        elif 'CL_0000746' in url:
+            response.json.return_value = cardiac_muscle_term
+        else:
+            response.json.return_value = {}
+        return response
+
+    mock_get.side_effect = mock_get_side_effect
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['IGVFFI0708TBIQ'],
+        label='igvf_file_fileset',
+        writer=writer,
+    )
+    fileset_object = {
+        'samples': [
+            {'@id': base_url + 'in-vitro-systems/IGVFSM3359VZOR/',
+                'targeted_sample_term': True},
+        ],
+    }
+
+    sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = (
+        adapter.parse_sample_donor_treatment_igvf(fileset_object, 'MPRA')
+    )
+
+    assert sample_ids == {'IGVFSM3359VZOR'}
+    assert donor_ids == {'IGVFDO1756PPKO'}
+    # only targeted term, not EFO:0009747
+    assert sample_term_ids == {'CL:0000746'}
+    assert simple_sample_summaries == {
+        'GM25256 (WTC-11) differentiated cell specimen induced to cardiac muscle cell from IGVFDO1756PPKO',
     }
 
 
