@@ -224,9 +224,9 @@ def test_parse_sample_donor_treatment_igvf_starr_seq_1000_genomes_donors(mock_ge
     )
 
     assert sample_ids == {'IGVFSM0000STARR'}
-    assert 'EFO:0002067' in sample_term_ids
+    assert 'CL:0000540' in sample_term_ids
     assert simple_sample_summaries == {
-        'K562 with variants from 1000 Genomes donors: NA12345, NA67890'
+        'K562 cell line induced to neuron with variants from 1000 Genomes donors: NA12345, NA67890'
     }
 
 
