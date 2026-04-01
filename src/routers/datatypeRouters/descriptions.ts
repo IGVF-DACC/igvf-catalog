@@ -707,8 +707,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   biosamples_variants: 'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br> \
-  ATTENTION: biosample_id = EFO_000206 is NOT supported via this API. We currently have over 71 million records matching this biosample ID. Please contact us if you need to query this data. <br> \
-  Example: biosample_id = EFO_0001086, <br> \
+  Example: biosample_id = EFO_0002067, <br> \
   biosample_name = k562, <br> \
   method = STARR-seq, <br> \
   files_fileset = IGVFFI0099XJHU, <br> \
