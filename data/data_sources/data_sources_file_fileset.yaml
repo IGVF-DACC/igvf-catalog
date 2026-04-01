@@ -31,6 +31,9 @@ igvf donor:
 igvf_file_accessions:
   BlueSTARR:
     - IGVFFI1663LKVQ
+    - IGVFFI5288RAAV
+    - IGVFFI0818FMCC
+    - IGVFFI3351LASN
   IGVF CRISPR E2G:
     - IGVFFI3069QCRA # promoter Perturb-seq
     - IGVFFI5749WPVK # promoter Perturb-seq

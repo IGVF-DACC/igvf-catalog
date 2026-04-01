@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_biosamples.BlueSTARRVariantBiosample.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to biosample edge"
+        },
+        "_from": {
+          "example": "variants/NC_000005.10:1779518:G:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/c003f2e98a5817b37ce38ee6d199b560bdcc497f30973e8689b16ba75944465c",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "Log2FC of the variant to biosample edge"
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted variant effect on gene expression"
+          ]
+        },
+        "method": {
+          "enum": [
+            "BlueSTARR"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context of the variant to biosample edge",
+          "enum": [
+            "K562"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term of the variant to biosample edge",
+          "enum": [
+            "ontology_terms/EFO_0002067"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates regulatory activity of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "regulatory activity modulated by"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI3351LASN/",
+            "https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/",
+            "https://data.igvf.org/tabular-files/IGVFFI5288RAAV/",
+            "https://data.igvf.org/tabular-files/IGVFFI0818FMCC/"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets of the variant to biosample edge",
+          "example": "files_filesets/IGVFFI1663LKVQ",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "log2FC",
+        "biological_context",
+        "biosample_term",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants_biosamples"
+}
