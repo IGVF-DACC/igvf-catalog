@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { validRegion, distanceGeneVariant } from '../_helpers'
@@ -8,11 +7,24 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
+import {
+  chQuery, getChSelectStatements, getChFilterConditions,
+  getChTableSchema, loadJsonSchema, type QueryParams
+} from '../clickhouse_helpers'
 import { getCollectionEnumValuesOrThrow } from '../schema'
 
 const TABLE = 'variants'
 const MAX_PAGE_SIZE = 500
 const MOUSE_STRAINS = getCollectionEnumValuesOrThrow('nodes', 'mm_variants', 'strain')
+
+// ---------------------------------------------------------------------------
+// Schemas (loaded once at import time)
+// ---------------------------------------------------------------------------
+
+const variantsChSchema = getChTableSchema('variants')
+const favorSchema = loadJsonSchema('nodes/variants.Favor.json')
+
+const VARIANT_SELECT = getChSelectStatements(favorSchema, variantsChSchema, 'v')
 
 const frequencySources = z.enum([
   'bravo_af',
@@ -186,10 +198,6 @@ export const variantSimplifiedFormat = z.object({
 // ClickHouse SQL helpers
 // ---------------------------------------------------------------------------
 
-function esc (value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
-}
-
 function parseRegion (region: string): { chr: string, start: number, end: number } {
   const breakdown = validRegion(region)
   if (breakdown == null) {
@@ -201,30 +209,49 @@ function parseRegion (region: string): { chr: string, start: number, end: number
   return { chr: breakdown[1], start: parseInt(breakdown[2]), end: parseInt(breakdown[3]) }
 }
 
-function buildVariantWhere (params: paramsFormatType): string {
+function buildVariantWhere (input: paramsFormatType, params: QueryParams): string {
   const conds: string[] = []
 
-  if (params.variant_id !== undefined) conds.push(`id = '${esc(params.variant_id as string)}'`)
-  if (params.spdi !== undefined) conds.push(`spdi = '${esc(params.spdi as string)}'`)
-  if (params.hgvs !== undefined) conds.push(`hgvs = '${esc(params.hgvs as string)}'`)
-  if (params.rsid !== undefined) conds.push(`has(rsid, '${esc(params.rsid as string)}')`)
-  if (params.ca_id !== undefined) conds.push(`ca_id = '${esc(params.ca_id as string)}'`)
-
-  if (params.region !== undefined) {
-    const r = parseRegion(params.region as string)
-    conds.push(`chr = '${esc(r.chr)}'`)
-    conds.push(`pos >= ${r.start}`)
-    conds.push(`pos < ${r.end}`)
+  // variant_id -> id column (name mismatch, explicit handling)
+  if (input.variant_id !== undefined) {
+    conds.push('v.id = {_variant_id:String}')
+    params._variant_id = input.variant_id as string
   }
 
-  if (params.GENCODE_category !== undefined) {
-    conds.push(`annotations.funseq_description = '${esc(params.GENCODE_category as string)}'`)
+  // Schema-driven simple equality/array filters: spdi, hgvs, ca_id, rsid
+  const simpleFilters: Record<string, string | undefined> = {}
+  if (input.spdi !== undefined) simpleFilters.spdi = input.spdi as string
+  if (input.hgvs !== undefined) simpleFilters.hgvs = input.hgvs as string
+  if (input.ca_id !== undefined) simpleFilters.ca_id = input.ca_id as string
+  if (input.rsid !== undefined) simpleFilters.rsid = input.rsid as string
+
+  const schemaConds = getChFilterConditions(favorSchema, variantsChSchema, simpleFilters, 'v', params)
+  conds.push(...schemaConds)
+
+  // Region filter (complex, explicit handling with parameterized values)
+  if (input.region !== undefined) {
+    const r = parseRegion(input.region as string)
+    conds.push('v.chr = {_region_chr:String}')
+    params._region_chr = r.chr
+    conds.push('v.pos >= {_region_start:Float64}')
+    params._region_start = r.start
+    conds.push('v.pos < {_region_end:Float64}')
+    params._region_end = r.end
   }
 
-  if (params.source !== undefined) {
-    const dbField = (params.source as string).replace('gnomad_', '')
-    conds.push(`annotations.${dbField} >= ${params.minimum_af ?? 0}`)
-    conds.push(`annotations.${dbField} < ${params.maximum_af ?? 1}`)
+  // Annotation-specific filters (JSON path, domain-specific)
+  if (input.GENCODE_category !== undefined) {
+    conds.push('v.annotations.funseq_description = {_gencode:String}')
+    params._gencode = input.GENCODE_category as string
+  }
+
+  // Frequency source filter — field name is from Zod enum (safe), values are parameterized
+  if (input.source !== undefined) {
+    const dbField = (input.source as string).replace('gnomad_', '')
+    conds.push(`v.annotations.${dbField} >= {_min_af:Float64}`)
+    params._min_af = (input.minimum_af as number) ?? 0
+    conds.push(`v.annotations.${dbField} < {_max_af:Float64}`)
+    params._max_af = (input.maximum_af as number) ?? 1
   }
 
   return conds.length > 0 ? `WHERE ${conds.join(' AND ')}` : ''
@@ -278,7 +305,7 @@ function transformVariantRow (row: any): any {
     : (row.annotations ?? null)
 
   return {
-    _id: row.id,
+    _id: row._id,
     chr: row.chr,
     pos: row.pos,
     rsid: row.rsid ?? null,
@@ -297,34 +324,39 @@ function transformVariantRow (row: any): any {
   }
 }
 
-async function chQuery<T = any> (sql: string): Promise<T[]> {
-  const resultSet = await db.query({ query: sql, format: 'JSONEachRow' })
-  return await resultSet.json()
-}
-
 // ---------------------------------------------------------------------------
 // Query functions
 // ---------------------------------------------------------------------------
 
 export async function findVariantIDBySpdi (spdi: string): Promise<string | null> {
-  const rows = await chQuery<{ id: string }>(`SELECT id FROM ${TABLE} WHERE spdi = '${esc(spdi)}' LIMIT 1`)
+  const rows = await chQuery<{ id: string }>(
+    `SELECT id FROM ${TABLE} WHERE spdi = {_spdi:String} LIMIT 1`,
+    { _spdi: spdi }
+  )
   return rows[0]?.id ?? null
 }
 
 export async function findVariantIDByRSID (rsid: string): Promise<string[]> {
-  const rows = await chQuery<{ id: string }>(`SELECT id FROM ${TABLE} WHERE has(rsid, '${esc(rsid)}')`)
+  const rows = await chQuery<{ id: string }>(
+    `SELECT id FROM ${TABLE} WHERE has(rsid, {_rsid:String})`,
+    { _rsid: rsid }
+  )
   return rows.map(r => r.id)
 }
 
 export async function findVariantIDByHgvs (hgvs: string): Promise<string | null> {
-  const rows = await chQuery<{ id: string }>(`SELECT id FROM ${TABLE} WHERE hgvs = '${esc(hgvs)}' LIMIT 1`)
+  const rows = await chQuery<{ id: string }>(
+    `SELECT id FROM ${TABLE} WHERE hgvs = {_hgvs:String} LIMIT 1`,
+    { _hgvs: hgvs }
+  )
   return rows[0]?.id ?? null
 }
 
 export async function findVariantIDsByRegion (region: string): Promise<string[]> {
   const r = parseRegion(region)
   const rows = await chQuery<{ id: string }>(
-    `SELECT id FROM ${TABLE} WHERE chr = '${esc(r.chr)}' AND pos >= ${r.start} AND pos < ${r.end}`
+    `SELECT id FROM ${TABLE} WHERE chr = {_chr:String} AND pos >= {_start:Float64} AND pos < {_end:Float64}`,
+    { _chr: r.chr, _start: r.start, _end: r.end }
   )
   return rows.map(row => row.id)
 }
@@ -346,10 +378,13 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   const page = (input.page as number) ?? 0
   delete input.page
 
-  const where = buildVariantWhere(input)
-  const sql = `SELECT * FROM ${TABLE} ${where} ORDER BY id LIMIT ${limit} OFFSET ${page * limit}`
+  const params: QueryParams = {}
+  const where = buildVariantWhere(input, params)
+  params._lim = limit
+  params._off = page * limit
+  const sql = `SELECT ${VARIANT_SELECT} FROM ${TABLE} v ${where} ORDER BY v.id LIMIT {_lim:UInt32} OFFSET {_off:UInt32}`
 
-  const rows = await chQuery(sql)
+  const rows = await chQuery(sql, params)
   return rows.map(transformVariantRow)
 }
 
@@ -516,11 +551,12 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     }
   }
 
-  const where = buildVariantWhere(input)
+  const params: QueryParams = {}
+  const where = buildVariantWhere(input, params)
   if (where === '') return []
 
-  const sql = `SELECT id FROM ${TABLE} ${where}`
-  const rows = await chQuery<{ id: string }>(sql)
+  const sql = `SELECT v.id FROM ${TABLE} v ${where}`
+  const rows = await chQuery<{ id: string }>(sql, params)
   return rows.map(r => r.id)
 }
 
@@ -537,10 +573,13 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
   const page = (input.page as number) ?? 0
   delete input.page
 
-  const where = buildVariantWhere(input)
-  const sql = `SELECT * FROM ${TABLE} ${where} ORDER BY id LIMIT ${limit} OFFSET ${page * limit}`
+  const params: QueryParams = {}
+  const where = buildVariantWhere(input, params)
+  params._lim = limit
+  params._off = page * limit
+  const sql = `SELECT ${VARIANT_SELECT} FROM ${TABLE} v ${where} ORDER BY v.id LIMIT {_lim:UInt32} OFFSET {_off:UInt32}`
 
-  const rows = await chQuery(sql)
+  const rows = await chQuery(sql, params)
   return rows.map(transformVariantRow)
 }
 
@@ -576,10 +615,10 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
       annotations.af_nfe AS af_nfe,
       annotations.af_sas AS af_sas
     FROM ${TABLE}
-    WHERE chr = '${esc(r.chr)}' AND pos >= ${r.start} AND pos < ${r.end}
+    WHERE chr = {_chr:String} AND pos >= {_start:Float64} AND pos < {_end:Float64}
   `
 
-  const rows = await chQuery(sql)
+  const rows = await chQuery(sql, { _chr: r.chr, _start: r.start, _end: r.end })
 
   if (rows.length === 0) return []
 

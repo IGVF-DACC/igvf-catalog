@@ -66,5 +66,9 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "method, label, class, source, source_url, equivalent_ontology_term, version, name, inverse_name"
+  },
+  "db_collection_name": "variants_phenotypes"
 }
