@@ -14,7 +14,7 @@ const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes'
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
 const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
-const genomicElementsGenesGersbachE2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.GersbachE2GCRISPR.json')
+const genomicElementsGenesIGVFE2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
 const genomicElementsGenesEncodeElementGeneLinkSchema = getSchema('data/schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
@@ -144,7 +144,7 @@ function buildQuery (params: {
         record.method == 'CRISPR FACS screen' ? {
           'score': record.effect_size,
           'p_value': record.p_value_adj,
-          ${getDBReturnStatements(genomicElementsGenesGersbachE2GCrisprSchema)}
+          ${getDBReturnStatements(genomicElementsGenesIGVFE2GCrisprSchema)}
         } :
         record.method == 'ENCODE-rE2G' ? {
           ${getDBReturnStatements(genomicElementsGenesEncodeElementGeneLinkSchema)}
@@ -152,7 +152,7 @@ function buildQuery (params: {
         record.method == 'Perturb-seq' ? {
           'score': record.log2FC,
           'p_value': record.p_value_adj,
-          ${getDBReturnStatements(genomicElementsGenesGersbachE2GCrisprSchema)}
+          ${getDBReturnStatements(genomicElementsGenesIGVFE2GCrisprSchema)}
         } : {}
       )
   `

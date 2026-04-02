@@ -14,7 +14,9 @@ const MAX_PAGE_SIZE = 100
 
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_biosamples', 'method')
 const variantsBiosamplesQueryFormat = z.object({
-  method: z.enum(METHODS).optional()
+  method: z.enum(METHODS).optional(),
+  element_id: z.string().optional(),
+  significant: z.enum(['true', 'false']).optional()
 })
 const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),
@@ -22,17 +24,31 @@ const biosamplesQueryFormat = z.object({
   files_fileset: z.string().optional()
 }).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
+const genomicElementFormat = z.object({
+  _id: z.string(),
+  name: z.string().nullish(),
+  chr: z.string().nullish(),
+  start: z.number().nullish(),
+  end: z.number().nullish(),
+  type: z.string().nullish(),
+  source: z.string().nullish(),
+  source_url: z.string().nullish(),
+  source_annotation: z.string().nullish()
+})
+
 const returnFormat = z.object({
   variant: z.string().or(variantFormat).optional(),
   biosample: z.string().or(ontologyFormat).optional(),
-  log2FoldChange: z.number().optional(),
-  inputCountRef: z.number().optional(),
-  inputCountAlt: z.number().optional(),
-  outputCountRef: z.number().optional(),
-  outputCountAlt: z.number().optional(),
-  postProbEffect: z.number().optional(),
-  CI_lower_95: z.number().optional(),
-  CI_upper_95: z.number().optional(),
+  genomic_element: z.string().or(genomicElementFormat).nullish(),
+  log2FoldChange: z.number().nullish(),
+  DNA_count_ref: z.number().nullish(),
+  DNA_count_alt: z.number().nullish(),
+  RNA_count_ref: z.number().nullish(),
+  RNA_count_alt: z.number().nullish(),
+  postProbEffect: z.number().nullish(),
+  CI_lower_95: z.number().nullish(),
+  CI_upper_95: z.number().nullish(),
+  significant: z.boolean().nullish(),
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
@@ -46,6 +62,8 @@ const BiosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.js
 const BiosampleCollectionName = BiosampleSchema.db_collection_name as string
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const variantCollectionName = variantSchema.db_collection_name as string
+const genomicElementsSchema = getSchema('data/schemas/nodes/genomic_elements.base.json')
+const genomicElementsCollectionName = genomicElementsSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'region', 'ca_id', 'method', 'files_fileset'].includes(item))
@@ -86,6 +104,12 @@ FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(BiosampleSchema).replaceAll('record', 'otherRecord')}}
 `
 
+const genomicElementVerboseQuery = `
+FOR otherRecord IN ${genomicElementsCollectionName}
+FILTER otherRecord._key == PARSE_IDENTIFIER(record.genomic_element).key
+RETURN {${getDBReturnStatements(genomicElementsSchema).replaceAll('record', 'otherRecord')}}
+`
+
 async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantIds: string[] | undefined, biosampleIds: string[] | undefined): Promise<any[]> {
   input.limit = getLimit(input)
 
@@ -119,21 +143,38 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     return []
   }
 
+  let filterGenomicElements = ''
+  if (input.element_id !== undefined) {
+    filterGenomicElements = `FILTER record.genomic_element == 'genomic_elements/${input.element_id as string}'`
+    delete input.element_id
+  }
+
+  let filterSignificant = ''
+  if (input.significant !== undefined) {
+    filterSignificant = `FILTER record.significant == ${input.significant as string}`
+    delete input.significant
+  }
+
   const query = `
     FOR record IN ${variantToBiosamplesCollecionName as string}
     FILTER ${filterCondition} ${methodFilter} ${filesetFilter}
+    ${filterGenomicElements}
+    ${filterSignificant}
+    SORT record._key
     LIMIT ${input.page as number * input.limit}, ${input.limit}
     RETURN {
       'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
       'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
-      'log2FoldChange': record.log2FoldChange,
-      'inputCountRef': record.inputCountRef,
-      'inputCountAlt': record.inputCountAlt,
-      'outputCountRef': record.outputCountRef,
-      'outputCountAlt': record.outputCountAlt,
+      'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record.genomic_element'},
+      'log2FoldChange': record.log2FoldChange OR record.log2FC,
+      'DNA_count_ref': record.DNA_count_ref,
+      'DNA_count_alt': record.DNA_count_alt,
+      'RNA_count_ref': record.RNA_count_ref,
+      'RNA_count_alt': record.RNA_count_alt,
       'postProbEffect': record.postProbEffect,
       'CI_lower_95': record.CI_lower_95,
       'CI_upper_95': record.CI_upper_95,
+      'significant': record.significant,
       'label': record.label,
       'method': record.method,
       'class': record.class,
