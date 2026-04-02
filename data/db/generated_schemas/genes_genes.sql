@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS genes_genes (
+	label String,
+	class String,
+	method String,
+	name String,
+	inverse_name String,
+	source String,
+	source_url String,
+	detection_method String,
+	detection_method_code String,
+	interaction_type Array(String),
+	interaction_type_code Array(String),
+	confidence_value_biogrid Nullable(Float64),
+	confidence_value_intact Nullable(Float64),
+	pmids Array(String),
+	z_score Float64,
+	molecular_function String,
+	associated process String,
+	id String PRIMARY KEY,
+	genes_1_id String,
+	genes_2_id String
+);

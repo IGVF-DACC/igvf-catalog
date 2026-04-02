@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS mm_genes (
+	name String,
+	source String,
+	source_url String,
+	gene_id String,
+	gene_type String,
+	chr String,
+	start Float64,
+	end Float64,
+	strand String,
+	symbol String,
+	version String,
+	organism String,
+	study_sets Array(String),
+	collections Array(String),
+	version_number String,
+	mgi String,
+	synonyms Array(String),
+	entrez String,
+	id String PRIMARY KEY
+);

@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS files_filesets (
+	name String,
+	source String,
+	source_url String,
+	file_set_id String,
+	lab String,
+	preferred_assay_titles Array(String),
+	assay_term_ids Array(String),
+	method String,
+	class String,
+	software Array(String),
+	samples Array(String),
+	sample_ids Array(String),
+	simple_sample_summaries Array(String),
+	donors Array(String),
+	treatments_term_ids Array(String),
+	publication Nullable(String),
+	collections Array(String),
+	id String PRIMARY KEY
+);
