@@ -700,7 +700,7 @@ export const descriptions = {
   region = chr1:15563-15567 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
   files_fileset = IGVFFI1323RCIE, <br> \
-  element_type = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
+  element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
   significant = true, <br> \
   method = STARR-seq. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -711,7 +711,7 @@ export const descriptions = {
   biosample_name = k562, <br> \
   method = STARR-seq, <br> \
   files_fileset = IGVFFI0099XJHU, <br> \
-  element_type = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
+  element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
   significant = true, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',

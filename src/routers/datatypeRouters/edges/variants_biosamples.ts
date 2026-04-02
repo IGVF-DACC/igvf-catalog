@@ -15,7 +15,7 @@ const MAX_PAGE_SIZE = 100
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_biosamples', 'method')
 const variantsBiosamplesQueryFormat = z.object({
   method: z.enum(METHODS).optional(),
-  element_type: z.string().optional(),
+  element_id: z.string().optional(),
   significant: z.enum(['true', 'false']).optional()
 })
 const biosamplesQueryFormat = z.object({
@@ -144,9 +144,9 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
   }
 
   let filterGenomicElements = ''
-  if (input.element_type !== undefined) {
-    filterGenomicElements = `FILTER record.genomic_element == 'genomic_elements/${input.element_type as string}'`
-    delete input.element_type
+  if (input.element_id !== undefined) {
+    filterGenomicElements = `FILTER record.genomic_element == 'genomic_elements/${input.element_id as string}'`
+    delete input.element_id
   }
 
   let filterSignificant = ''
