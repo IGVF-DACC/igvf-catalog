@@ -58,8 +58,11 @@ config: Dict[str, Any] = {
             ],
             'open_api_config_type': 'development',
             'waf': {
-                'enabled': True,
+                'enabled': False,
                 'arn': 'arn:aws:wafv2:us-east-1:109189702753:global/webacl/CatalogApiDemoWaf-v9YHHYiqvZMK/268fd2dc-d329-46ee-84ae-bcea38b9f38e'
+            },
+            'cloudfront': {
+                'enabled': False,
             }
         },
         'dev': {
@@ -77,6 +80,9 @@ config: Dict[str, Any] = {
             'waf': {
                 'enabled': True,
                 'arn': 'arn:aws:wafv2:us-east-1:109189702753:global/webacl/CatalogApiDemoWaf-v9YHHYiqvZMK/268fd2dc-d329-46ee-84ae-bcea38b9f38e'
+            },
+            'cloudfront': {
+                'enabled': True,
             }
         },
         'production': {
@@ -95,6 +101,9 @@ config: Dict[str, Any] = {
             'waf': {
                 'enabled': True,
                 'arn': 'arn:aws:wafv2:us-east-1:636503752262:global/webacl/CatalogApiProdWaf-ccz1vSrmHv56/9cafbe16-cc6d-4eef-b4fb-81199a132b76'
+            },
+            'cloudfront': {
+                'enabled': True,
             }
         },
     }
@@ -118,6 +127,7 @@ class Config:
     open_api_config_type: str
     frontend: Dict[str, Any]
     tags: List[Tuple[str, str]]
+    cloudfront: Dict[str, bool]
     url_prefix: Optional[str] = None
     use_subdomain: bool = True
     waf: Optional[Dict[str, Any]] = None

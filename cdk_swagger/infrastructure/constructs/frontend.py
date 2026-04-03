@@ -86,7 +86,8 @@ class Frontend(Construct):
         self._configure_task_scaling()
         self._add_alarms()
         self._define_custom_cache_policy()
-        self._define_cloudfront_distribution()
+        if self.props.config.cloudfront.get('enabled'):
+            self._define_cloudfront_distribution()
 
     def _define_docker_assets(self) -> None:
         self.application_image = ContainerImage.from_asset(
@@ -134,6 +135,9 @@ class Frontend(Construct):
             certificate=self.props.existing_resources.domain.certificate,
             domain_zone=self.props.existing_resources.domain.zone,
             redirect_http=True,
+            # if cloudfront is enabled we set the domain name in cloudfront distribution
+            domain_name=None if self.props.config.cloudfront.get(
+                'enabled') else self.domain_name,
         )
 
     def _add_application_container_to_task(self) -> None:

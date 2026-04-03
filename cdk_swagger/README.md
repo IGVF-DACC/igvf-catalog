@@ -202,6 +202,10 @@ git checkout -b dev-keenan
 
 Then use this new branch to deploy your pipeline.
 
+### Enabling/disabling cloudfront/WAF
+
+In config, if you want to enable cloudfront and waf, set the boolean. Note that WAF will only be enabled if cloudfront is enabled. These settings cannot be changed in place without manually deleting Route53 records between deployments, which is not recommended.
+
 ## Useful commands
 
 * `cdk ls`          list all stacks in the app
