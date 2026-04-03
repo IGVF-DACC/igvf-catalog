@@ -58,11 +58,11 @@ config: Dict[str, Any] = {
             ],
             'open_api_config_type': 'development',
             'waf': {
-                'enabled': True,
+                'enabled': False,
                 'arn': 'arn:aws:wafv2:us-east-1:109189702753:global/webacl/CatalogApiDemoWaf-v9YHHYiqvZMK/268fd2dc-d329-46ee-84ae-bcea38b9f38e'
             },
             'cloudfront': {
-                'enabled': True,
+                'enabled': False,
             }
         },
         'dev': {
