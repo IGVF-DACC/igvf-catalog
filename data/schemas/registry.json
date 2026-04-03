@@ -76,7 +76,6 @@
         "variants": {
             "Favor": "schemas/nodes/variants.Favor.json",
             "cV2F": "schemas/nodes/variants.cV2F.json",
-            "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
             "MPRAAdapter": "schemas/nodes/variants.MPRAAdapter.json",
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
@@ -191,8 +190,7 @@
         },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
-            "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
-            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
+            "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json"
         },
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",

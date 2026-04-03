@@ -6,7 +6,7 @@ import { distanceGeneVariant, getDBReturnStatements, getFilterStatements, params
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
-import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, genomicElementType, variantsCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
 
@@ -14,7 +14,8 @@ const MAX_PAGE_SIZE = 300
 
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_genomic_elements', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_genomic_elements', 'source')
-
+// need to drop candidate cis regulatory element and tested elements for this endpoint
+const GENOMIC_ELEMENT_TYPES = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'type').filter(type => type !== 'candidate cis regulatory element' && type !== 'tested elements') as [string, ...string[]]
 const predictionFormat = z.object({
   distance_gene_variant: z.number(),
   element_chr: z.string(),
@@ -86,7 +87,7 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
 
 const genomicBiosamplesQuery = genomicElementCommonQueryFormat
   .merge(z.object({
-    region_type: genomicElementType.optional(),
+    region_type: z.enum(GENOMIC_ELEMENT_TYPES).optional(),
     biosample_term: z.string().optional(),
     biological_context: z.string().optional(),
     method: z.enum(METHODS).optional(),

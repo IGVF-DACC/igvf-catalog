@@ -411,8 +411,10 @@ variants_phenotypes_studies:
 variants_phenotypes:
   persistent:
     fields:
-      - method, source, files_filesets
-      - source, files_filesets
+      - method, source, label, class, files_filesets
+      - source, label, class, files_filesets
+      - label, class, files_filesets
+      - class, files_filesets
       - files_filesets
 
 variants_phenotypes_coding_variants:
@@ -430,11 +432,12 @@ variants_proteins:
   persistent:
     fields:
       - files_filesets, _key, source, label
-      - method, label, source, files_filesets
-      - label, source, files_filesets
-      - source, files_filesets
+      - method, label, source, files_filesets, name
+      - label, source, files_filesets, name
+      - source, files_filesets, name
       - effect_on_binding, files_filesets
-      - files_filesets
+      - files_filesets, name
+      - name
 
 variants_variants:
   persistent:
