@@ -180,7 +180,7 @@ When redeploying the same branch with changes, **CloudFront** may prevent you fr
 
 To refresh the cache:
 
-1. Log in to the AWS Console and navigate to CloudFront:  
+1. Log in to the AWS Console and navigate to CloudFront:
    https://us-east-1.console.aws.amazon.com/cloudfront/v4/home?region=us-west-2#/distributions
 
 2. Locate your demo’s distribution by checking the **“Alternate domain names (CNAMEs)”** column.
