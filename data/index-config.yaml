@@ -411,11 +411,11 @@ variants_phenotypes_studies:
 variants_phenotypes:
   persistent:
     fields:
-      - method, source, label, class, files_filesets,
-      - source, label, class, files_filesets,
-      - label, class, files_filesets,
-      - class, files_filesets,
-      - files_filesets,
+      - method, source, label, class, files_filesets
+      - source, label, class, files_filesets
+      - label, class, files_filesets
+      - class, files_filesets
+      - files_filesets
 
 variants_phenotypes_coding_variants:
   persistent:
