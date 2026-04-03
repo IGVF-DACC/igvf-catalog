@@ -173,6 +173,23 @@ By default demo stacks have a lifetime of 72 hours, after which they get destroy
 
 In `turn-off-on-friday-night` tag, any value other than `yes` is interpreted as a negative (as well as the absence of the tag).
 
+
+## Cleaning up CloudFront cache
+
+When redeploying the same branch with changes, **CloudFront** may prevent you from seeing the updated deployment due to caching.
+
+To refresh the cache:
+
+1. Log in to the AWS Console and navigate to CloudFront:  
+   https://us-east-1.console.aws.amazon.com/cloudfront/v4/home?region=us-west-2#/distributions
+
+2. Locate your demo’s distribution by checking the **“Alternate domain names (CNAMEs)”** column.
+
+3. Open the distribution, go to the **Invalidations** tab, and create a new invalidation with the path: /*
+
+4. Wait for the invalidation process to complete, then reload your demo.
+
+
 ## Notes on demos
 
 Avoid deploying a demo stack to our primary/shared branches (e.g. `dev` or `main`) as these already have their own pipelines associated with them. If you want to deploy your own demo that matches `dev`, for example, first checkout `dev`, pull all of the changes, and then copy them to your own branch with a special name:
