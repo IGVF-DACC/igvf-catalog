@@ -73,26 +73,10 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   }
 
   let scoreQuery = ''
-  if (input.dataset === 'SGE') {
-    scoreQuery = `
-      LET sgeVariantPhenotypeIds = (
-        FOR v IN variants_phenotypes_coding_variants
-          FILTER v._to IN codingVariantsIds
-          LET file_doc = DOCUMENT(v.files_filesets)
-          FILTER file_doc.preferred_assay_titles[0] == "SGE"
-          RETURN v._from
-      )
-
-      FOR p IN variants_phenotypes
-        FILTER p._id IN sgeVariantPhenotypeIds
-        SORT p.score DESC
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN p.score
-    `
-  } else if (input.dataset === 'VAMP-seq') {
+  if (input.dataset === 'VAMP-seq' || input.dataset === 'SGE') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from IN codingVariantsIds && p.method == "VAMP-seq"
+        FILTER p._from IN codingVariantsIds && p.method == "${input.dataset as string}"
         SORT p.score DESC
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.score

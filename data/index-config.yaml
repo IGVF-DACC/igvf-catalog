@@ -435,9 +435,11 @@ variants_proteins:
       - method, label, source, files_filesets, name
       - label, source, files_filesets, name
       - source, files_filesets, name
-      - effect_on_binding, files_filesets
+      - effect_on_binding, files_filesets HEAD
       - files_filesets, name
       - name
+      - files_filesets
+      - method
 
 variants_variants:
   persistent:

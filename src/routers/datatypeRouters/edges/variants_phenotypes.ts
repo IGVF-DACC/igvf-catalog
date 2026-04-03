@@ -345,7 +345,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     FOR record IN ${variantToPhenotypeCollectionName}
         FILTER ${queryFilter.join(' AND ')} AND record.source == 'IGVF'
         ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
-        SORT '_key'
+        SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
           name: record.name,
@@ -368,7 +368,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
           FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
           FILTER edgeRecord._from == record._id ${gwasHyperEdgeFilter}
           ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
-          SORT '_key'
+          SORT edgeRecord._key
           RETURN {
             rsid: DOCUMENT(record._from).rsid,
             study: ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
@@ -383,7 +383,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
         LET igvf = (
           FILTER record.source == 'IGVF'
-          SORT '_key'
+          SORT record._key
           ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
           RETURN {
             name: record.name,

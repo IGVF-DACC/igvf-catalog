@@ -85,7 +85,7 @@ def main():
 
     for url in urls:
         if TEST_DEV:
-            url = url.replace('api.catalog', 'catalog-api-dev.demo')
+            url = url.replace('api.catalogkg', 'catalog-api-dev.demo')
 
         print(f'Fetching: {url}')
 

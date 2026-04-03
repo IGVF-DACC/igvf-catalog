@@ -351,6 +351,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     verbose,
     nameField: 'name'
   })
+
   let result: any[] = []
   if (isVariantQuery) {
     result = await (await db.query(query, { variantIDs })).all()
