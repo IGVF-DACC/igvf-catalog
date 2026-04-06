@@ -154,6 +154,7 @@ class FileFileSet:
             query = '&'.join(part for part in [
                              ids_query, fields_query] if part)
             url = f'{api_url}search/?{query}&format=json&limit=all'
+            print(url)
             response = requests.get(url)
             objects.extend(response.json().get('@graph', []))
         return objects
@@ -241,30 +242,10 @@ class FileFileSet:
                     id_type='@id',
                     api_url=FileFileSet.IGVF_API
                 )
-                software_ids = []
                 for software_version_object in software_version_objects:
                     software = software_version_object.get('software')
-                    if isinstance(software, dict):
-                        title = software.get('title')
-                        if title:
-                            software_titles.add(title)
-                        software_id = software.get('@id')
-                        if software_id:
-                            software_ids.append(software_id)
-                    elif isinstance(software, str):
-                        software_ids.append(software)
-                if software_ids:
-                    software_objects = FileFileSet.get_batch_objects(
-                        software_ids,
-                        fields=['title'],
-                        id_type='@id',
-                        api_url=FileFileSet.IGVF_API
-                    )
-                    software_titles.update(
-                        software_object['title']
-                        for software_object in software_objects
-                        if software_object.get('title')
-                    )
+                    software_titles.add(software.get('title'))
+
         return software_titles
 
     @staticmethod
