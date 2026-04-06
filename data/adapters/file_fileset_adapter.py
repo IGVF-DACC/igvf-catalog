@@ -127,32 +127,65 @@ class FileFileSet:
         self.writer.write(json.dumps(obj) + '\n')
 
     @staticmethod
-    def build_igvf_search_url(
+    def get_batch_objects(
         ids: list[str],
         fields: list[str] | None = None,
-        id_type: str = 'accession'
-    ) -> str:
+        id_type: str = 'accession',
+        api_url: str = IGVF_API
+    ) -> list[dict]:
         if id_type not in ['accession', '@id']:
             raise ValueError('id_type must be "accession" or "@id".')
         fields = fields or []
-        ids_query = '&'.join(f'{id_type}={item_id}' for item_id in ids)
+        if not ids:
+            return []
+        if isinstance(ids, (set, frozenset)):
+            ids = sorted(ids)
+        else:
+            ids = list(ids)
+        batch_size = 50 if id_type == 'accession' else 20
         fields_query = '&'.join(f'field={field}' for field in fields)
-        query = '&'.join(part for part in [ids_query, fields_query] if part)
-        return f'https://api.data.igvf.org/search/?{query}'
+        objects: list[dict] = []
+        for start in range(0, len(ids), batch_size):
+            batch_ids = ids[start:start + batch_size]
+            ids_query = '&'.join(
+                f'{id_type}={item_id}' for item_id in batch_ids)
+            query = '&'.join(part for part in [
+                             ids_query, fields_query] if part)
+            url = f'{api_url}search/?{query}&format=json&limit=all'
+            response = requests.get(url)
+            objects.extend(response.json().get('@graph', []))
+        return objects
 
     def process_file(self):
         self.writer.open()
         visited_donors = set()
         visited_sample_terms = set()
-        for accession in self.accessions:
-            print(f'Processing {accession}')
+        file_objects = self.get_batch_objects(
+            self.accessions,
+            fields=[
+                '@id',
+                'accession',
+                'href',
+                'dataset',
+                'analysis_step_version',
+                'derived_manually',
+                'derived_from',
+                'catalog_class',
+                'file_set',
+                'catalog_collections'
+            ],
+            id_type='accession',
+            api_url=self.api_url
+        )
+        for file_object in file_objects:
+            print(f'Processing {file_object["accession"]}')
 
             if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
                 props, donors, sample_types, disease_ids = self.query_fileset_files_props_encode(
-                    accession)
+                    file_object)
             else:
                 props, donors, sample_types = self.query_fileset_files_props_igvf(
-                    accession)
+                    file_object)
                 disease_ids = []  # IGVF does not return this
 
             if self.label in ['encode_donor', 'igvf_donor']:
@@ -205,20 +238,41 @@ class FileFileSet:
                 'software_versions', [])
             software_version_ids = [software_version['@id']
                                     for software_version in software_versions]
-            # batch search query may not work for software versions, so we need to search one by one
-            for software_version_id in software_version_ids:
-                url = urljoin(self.api_url, software_version_id +
-                              '/@@object?format=json')
-                response = requests.get(url)
-                software_version_object = response.json()
-                software_object = requests.get(
-                    urljoin(self.api_url, software_version_object['software'] + '/@@object?format=json')).json()
-                software_titles.add(software_object['title'])
+            if software_version_ids:
+                software_version_objects = self.get_batch_objects(
+                    software_version_ids,
+                    fields=['software'],
+                    id_type='@id',
+                    api_url=self.api_url
+                )
+                software_ids = []
+                for software_version_object in software_version_objects:
+                    software = software_version_object.get('software')
+                    if isinstance(software, dict):
+                        title = software.get('title')
+                        if title:
+                            software_titles.add(title)
+                        software_id = software.get('@id')
+                        if software_id:
+                            software_ids.append(software_id)
+                    elif isinstance(software, str):
+                        software_ids.append(software)
+                if software_ids:
+                    software_objects = self.get_batch_objects(
+                        software_ids,
+                        fields=['title'],
+                        id_type='@id',
+                        api_url=self.api_url
+                    )
+                    software_titles.update(
+                        software_object['title']
+                        for software_object in software_objects
+                        if software_object.get('title')
+                    )
         return software_titles
 
     def get_software_igvf(self, file_object):
         software = set()
-        accession = file_object['accession']
         if 'analysis_step_version' in file_object:
             software.update(
                 self._software_titles_from_analysis_step_version(file_object.get('analysis_step_version')))
@@ -228,10 +282,8 @@ class FileFileSet:
                 input_file_accession = input_file_id.split('/')[-2]
                 input_file_accessions.add(input_file_accession)
 
-            url_input_files = self.build_igvf_search_url(
-                list(input_file_accessions), ['analysis_step_version'])
-            response_input_files = requests.get(url_input_files)
-            input_file_objects = response_input_files.json()['@graph']
+            input_file_objects = self.get_batch_objects(
+                list(input_file_accessions), ['analysis_step_version'], api_url=self.api_url)
             for input_file_object in input_file_objects:
 
                 software.update(
@@ -260,14 +312,17 @@ class FileFileSet:
             class_type = 'observed data'
             if dataset_object['annotation_type'] == 'caQTLs':
                 method = 'caQTL'
-
-        for experiment in dataset_object.get('experimental_input', []):
-            experiment_object = requests.get(
-                urljoin(self.api_url, experiment + '/@@object?format=json')).json()
-            assay_term_name = experiment_object.get('assay_term_name', '')
+        experiment_objects = self.get_batch_objects(
+            dataset_object.get('experimental_input', []),
+            fields=['assay_term_name', 'assay_term_id'],
+            id_type='@id',
+            api_url=self.api_url
+        )
+        for experiment_object in experiment_objects:
+            assay_term_name = experiment_object.get('assay_term_name')
             if assay_term_name:
                 preferred_assay_titles.add(assay_term_name)
-            assay_term_id = experiment_object.get('assay_term_id', '')
+            assay_term_id = experiment_object.get('assay_term_id')
             if assay_term_id:
                 assay_term_ids.add(assay_term_id)
 
@@ -351,11 +406,12 @@ class FileFileSet:
                             simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
                     biosample_treatments = biosample.get('treatments', [])
                     if biosample_treatments:
-                        treatment_ids = set()
+                        treatment_term_ids = set()
+                        treatment_term_names = set()
                         for treatment in biosample_treatments:
                             treatment_id = treatment.get('treatment_term_id')
                             if treatment_id:
-                                treatment_ids.add(treatment_id)
+                                treatment_term_ids.add(treatment_id)
                             treatment_term_names.add(
                                 treatment['treatment_term_name'])
                         treatment_term_names = ', '.join(
@@ -364,7 +420,7 @@ class FileFileSet:
                     simple_sample_summaries.add(simple_sample_summary)
         if not (simple_sample_summaries) and biosample_type_term:
             simple_sample_summary = f'{biosample_type_term}'
-            donor = dataset_object.get('donor', '')
+            donor = dataset_object.get('donor')
             if donor:
                 donor_object = requests.get(
                     urljoin(self.api_url, donor + '/@@object?format=json')).json()
@@ -377,14 +433,14 @@ class FileFileSet:
             for treatment in treatments:
                 treatment_id = treatment.get('treatment_term_id')
                 if treatment_id:
-                    treatment_ids.add(treatment_id)
+                    treatment_term_ids.add(treatment_id)
                     treatment_term_names.add(treatment['treatment_term_name'])
             if treatment_term_names:
                 treatment_term_names = ', '.join(
                     sorted(list(treatment_term_names)))
                 simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
             simple_sample_summaries.add(simple_sample_summary)
-        return sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_ids
+        return sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_term_ids
 
     def parse_sample_donor_treatment_igvf(
         self,
@@ -399,10 +455,12 @@ class FileFileSet:
         samples = fileset_object.get('samples', [])
         for sample in samples:
             sample_accessions.add(sample['accession'])
-        url_samples = self.build_igvf_search_url(list(sample_accessions), [
-                                                 'accession', 'donors', 'sample_terms', 'targeted_sample_term', 'classifications', 'treatments', 'construct_library_sets'])
-        response = requests.get(url_samples)
-        sample_objects = response.json()['@graph']
+        sample_objects = self.get_batch_objects(
+            list(sample_accessions),
+            ['accession', 'donors', 'sample_terms', 'targeted_sample_term',
+                'classifications', 'treatments', 'construct_library_sets'],
+            api_url=self.api_url
+        )
 
         for sample_object in sample_objects:
             for donor in sample_object['donors']:
@@ -441,10 +499,8 @@ class FileFileSet:
                 treatment_term_names = ', '.join(
                     sorted(list(treatment_term_names)))
                 simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
-                url_treatments = self.build_igvf_search_url(
-                    list(treatment_ids), ['treatment_term_id'], '@id')
-                response_treatments = requests.get(url_treatments)
-                treatment_objects = response_treatments.json()['@graph']
+                treatment_objects = self.get_batch_objects(
+                    list(treatment_ids), ['treatment_term_id'], '@id', api_url=self.api_url)
                 for treatment_object in treatment_objects:
                     treatment_term_ids.add(
                         treatment_object['treatment_term_id'])
@@ -461,12 +517,8 @@ class FileFileSet:
                 for construct_library_set in sample_object.get('construct_library_sets', []):
                     construct_library_set_accessions.add(
                         construct_library_set['accession'])
-                url_construct_library_sets = self.build_igvf_search_url(
-                    list(construct_library_set_accessions), ['integrated_content_files'])
-                response_construct_library_sets = requests.get(
-                    url_construct_library_sets)
-                construct_library_set_objects = response_construct_library_sets.json()[
-                    '@graph']
+                construct_library_set_objects = self.get_batch_objects(
+                    list(construct_library_set_accessions), ['integrated_content_files'], api_url=self.api_url)
 
                 for construct_library_set_object in construct_library_set_objects:
                     integrated_content_files = construct_library_set_object.get(
@@ -474,26 +526,18 @@ class FileFileSet:
                     for integrated_content_file in integrated_content_files:
                         integrated_content_files_accessions.add(
                             integrated_content_file['accession'])
-                url_integrated_content_files = self.build_igvf_search_url(
-                    list(integrated_content_files_accessions), ['file_set'])
-                response_integrated_content_files = requests.get(
-                    url_integrated_content_files)
-                integrated_content_files_objects = response_integrated_content_files.json()[
-                    '@graph']
+                integrated_content_files_objects = self.get_batch_objects(
+                    list(integrated_content_files_accessions), ['file_set'], api_url=self.api_url)
                 for integrated_content_file_object in integrated_content_files_objects:
                     curated_set = integrated_content_file_object['file_set']
                     curated_set_accessions.add(curated_set['accession'])
-                url_curated_sets = self.build_igvf_search_url(
-                    list(curated_set_accessions), ['donors'])
-                response_curated_sets = requests.get(url_curated_sets)
-                curated_sets_objects = response_curated_sets.json()['@graph']
+                curated_sets_objects = self.get_batch_objects(
+                    list(curated_set_accessions), ['donors'], api_url=self.api_url)
                 for curated_set_object in curated_sets_objects:
                     for donor in curated_set_object.get('donors', []):
                         donors_accessions.add(donor['accession'])
-                url_donors = self.build_igvf_search_url(
-                    list(donors_accessions), ['dbxrefs'])
-                response_donors = requests.get(url_donors)
-                donors_objects = response_donors.json()['@graph']
+                donors_objects = self.get_batch_objects(
+                    list(donors_accessions), ['dbxrefs'], api_url=self.api_url)
                 for donor_object in donors_objects:
                     dbxrefs = donor_object.get('dbxrefs', [])
                     for dbxref in dbxrefs:
@@ -514,27 +558,48 @@ class FileFileSet:
         analysis_set_object = requests.get(
             urljoin(self.api_url, analysis_set_id + '/@@embedded?format=json')).json()
         input_file_sets = analysis_set_object.get('input_file_sets', [])
+        construct_library_set_ids = set()
         for input_file_set in input_file_sets:
-            if input_file_set['@id'].startswith('/measurement-sets/'):
-                measurement_sets_accession.add(input_file_set['accession'])
-            elif input_file_set['@id'].startswith('/auxiliary-sets/'):
+            input_file_set_id = input_file_set.get('@id')
+            if not input_file_set_id:
+                continue
+            if input_file_set_id.startswith('/measurement-sets/'):
+                accession = input_file_set.get('accession') if isinstance(
+                    input_file_set, dict) else None
+                if not accession:
+                    accession = input_file_set_id.strip('/').split('/')[-1]
+                measurement_sets_accession.add(accession)
+            elif input_file_set_id.startswith('/auxiliary-sets/'):
                 continue  # auxiliary sets are not analyzed without measurement sets so they can be skipped
-            elif input_file_set['@id'].startswith('/construct-library-sets/'):
-                construct_library_set_object = requests.get(
-                    urljoin(self.api_url, input_file_set['@id'] + '/@@object_with_select_calculated_properties?field=applied_to_samples?format=json')).json()
-                for sample in construct_library_set_object.get('applied_to_samples', []):
-                    # need to check whic file has construct library set applied to it
-                    print(f'has applied_to_samples')
-                    sample_object = requests.get(
-                        urljoin(self.api_url, sample + '@@object_with_select_calculated_properties?field=file_sets?format=json')).json()
+            elif input_file_set_id.startswith('/construct-library-sets/'):
+                construct_library_set_ids.add(input_file_set_id)
+            elif input_file_set_id.startswith('/analysis-sets/'):
+                self.decompose_analysis_set_to_measurement_set_igvf(
+                    input_file_set_id, measurement_sets_accession)
+        if construct_library_set_ids:
+            construct_library_set_objects = self.get_batch_objects(
+                list(construct_library_set_ids),
+                fields=['applied_to_samples'],
+                id_type='@id',
+                api_url=self.api_url
+            )
+            sample_ids = set()
+            for construct_library_set_object in construct_library_set_objects:
+                sample_ids.update(construct_library_set_object.get(
+                    'applied_to_samples', []))
+            if sample_ids:
+                sample_objects = self.get_batch_objects(
+                    list(sample_ids),
+                    fields=['file_sets'],
+                    id_type='@id',
+                    api_url=self.api_url
+                )
+                for sample_object in sample_objects:
                     for file_set in sample_object.get('file_sets', []):
                         if file_set.startswith('/measurement-sets/'):
                             # construct library sets should be associated with some measurement set
-                            accession = file_set.split('/')[-1]
+                            accession = file_set.strip('/').split('/')[-1]
                             measurement_sets_accession.add(accession)
-            elif input_file_set['@id'].startswith('/analysis-sets/'):
-                self.decompose_analysis_set_to_measurement_set_igvf(
-                    input_file_set['@id'], measurement_sets_accession)
         return measurement_sets_accession
 
     def parse_analysis_set_igvf(self, fileset_object):
@@ -550,11 +615,13 @@ class FileFileSet:
                         input_id)
                 )
             elif input_id.startswith('/measurement-sets/'):
-                measurement_set_accessions.add(input_file_set['accession'])
-        url = self.build_igvf_search_url(list(measurement_set_accessions), [
-                                         'preferred_assay_titles', 'assay_term'])
-        response = requests.get(url)
-        measurement_set_objects = response.json()['@graph']
+                accession = input_file_set.get('accession') if isinstance(
+                    input_file_set, dict) else None
+                if not accession:
+                    accession = input_id.strip('/').split('/')[-1]
+                measurement_set_accessions.add(accession)
+        measurement_set_objects = self.get_batch_objects(
+            list(measurement_set_accessions), ['preferred_assay_titles', 'assay_term'], api_url=self.api_url)
         for measurement_set_object in measurement_set_objects:
             preferred_assay_titles.add(
                 measurement_set_object.get('preferred_assay_titles')[0])
@@ -564,8 +631,7 @@ class FileFileSet:
             assay_term_ids.add(assay_term_id)
         return preferred_assay_titles, assay_term_ids
 
-    def query_fileset_files_props_encode(self, accession):
-        file_object = self.get_file_object(accession)
+    def query_fileset_files_props_encode(self, file_object):
         source_url = urljoin(self.source_url, file_object['@id'])
         href = file_object.get('href')
         download_link = urljoin(self.api_url, href)
@@ -608,12 +674,12 @@ class FileFileSet:
             ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
         all_sample_types = list(sample_term_to_sample_type.values())
         # manually set the method to ENCODE-rE2G for file ENCFF968BZL
-        if accession == 'ENCFF968BZL':
+        if file_object['accession'] == 'ENCFF968BZL':
             method = 'CRISPR enhancer perturbation screen'
 
-        if accession == 'ENCFF420VPZ':
+        if file_object['accession'] == 'ENCFF420VPZ':
             catalog_collections = ['genomic_elements']
-        elif accession == 'ENCFF167FJQ':
+        elif file_object['accession'] == 'ENCFF167FJQ':
             catalog_collections = ['mm_genomic_elements']
         else:
             catalog_collections = self.METHOD_TO_COLLECTIONS_ENCODE.get(
@@ -623,8 +689,8 @@ class FileFileSet:
                 f'Catalog collections are required for file_fileset {dataset_accession}.'))
 
         props = {
-            '_key': accession,
-            'name': accession,
+            '_key': file_object['accession'],
+            'name': file_object['accession'],
             'file_set_id': dataset_accession,
             'lab': lab,
             'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
@@ -646,8 +712,7 @@ class FileFileSet:
         }
         return props, donor_ids, all_sample_types, disease_ids
 
-    def query_fileset_files_props_igvf(self, accession):
-        file_object = self.get_file_object(accession)
+    def query_fileset_files_props_igvf(self, file_object):
         source_url = urljoin(self.source_url, file_object['@id'])
         href = file_object.get('href')
         download_link = urljoin(self.api_url, href)
@@ -671,12 +736,12 @@ class FileFileSet:
                 cell_annotation = cell_type_term_name
         if not catalog_collections and fileset_object_type != 'PseudobulkSet':
             raise (ValueError(
-                f'Catalog collections are required for file_fileset {accession}.'))
+                f'Catalog collections are required for file_fileset {file_object["accession"]}.'))
 
         software = self.get_software_igvf(file_object)
         if not software:
             print(
-                f'Warning: no software found for file_fileset {accession}.')
+                f'Warning: no software found for file_fileset {file_object["accession"]}.')
 
         preferred_assay_titles = set()
         assay_term_ids = set()
@@ -714,8 +779,8 @@ class FileFileSet:
             ':', '_') for sample_term_id in sample_term_ids]
 
         props = {
-            '_key': accession,
-            'name': accession,
+            '_key': file_object['accession'],
+            'name': file_object['accession'],
             'file_set_id': fileset_accession,
             'lab': lab,
             'preferred_assay_titles': preferred_assay_titles,
@@ -738,12 +803,15 @@ class FileFileSet:
         return props, donor_ids, sample_term_ids
 
     def get_donor_props(self, donor_accessions, disease_ids=[]):
-        print(f'get_donor_props, donors: {donor_accessions}')
-        for donor_accession in donor_accessions:
-            print(f'donor: {donor_accession}')
-            donor_url = urljoin(self.api_url, donor_accession +
-                                '/@@embedded?format=json')
-            donor_object = requests.get(donor_url).json()
+        donor_accessions = list(donor_accessions)
+        donor_objects = self.get_batch_objects(
+            donor_accessions,
+            fields=['sex', 'age', 'age_units', 'ethnicities',
+                    'ethnicity', 'phenotypic_features', 'accession'],
+            id_type='accession',
+            api_url=self.api_url
+        )
+        for donor_object in donor_objects:
             id = donor_object['@id']
             source_url = urljoin(self.source_url, id)
 
@@ -788,13 +856,17 @@ class FileFileSet:
             yield doc
 
     def get_sample_term_props(self, sample_terms):
-        for sample_term in sample_terms:
-            if self.source == 'IGVF':
-                sample_term_object = requests.get(
-                    self.api_url + 'sample-terms/' + sample_term + '/@@embedded?format=json').json()
-            else:
-                sample_term_object = requests.get(
-                    self.api_url + sample_term + '/@@embedded?format=json').json()
+        # sample_term in igvf example: CL_0000679, in encode example: /biosample-types/primary_cell_CL_0002536/
+        if self.source == 'IGVF':
+            sample_terms = ['/sample-terms/' + sample_term +
+                            '/' for sample_term in sample_terms]
+        sample_term_objects = self.get_batch_objects(
+            sample_terms,
+            fields=['term_id', 'term_name', 'synonyms'],
+            id_type='@id',
+            api_url=self.api_url
+        )
+        for sample_term_object in sample_term_objects:
             term_id = sample_term_object['term_id'].replace(':', '_')
             if term_id.startswith('NTR'):
                 uri = urljoin(self.source_url, sample_term_object['@id'])
