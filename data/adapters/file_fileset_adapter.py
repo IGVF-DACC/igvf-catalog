@@ -14,6 +14,8 @@ class FileFileSet:
     IGVF_API = 'https://api.data.igvf.org/'
     ENCODE_SOURCE_URL = 'https://www.encodeproject.org/'
     IGVF_SOURCE_URL = 'https://data.igvf.org/'
+    SOURCE_ENCODE = 'ENCODE'
+    SOURCE_IGVF = 'IGVF'
 
     ENCODE_disease_id_mapping = {
         'DOID:0080832': 'HP:0100543',
@@ -93,11 +95,11 @@ class FileFileSet:
         if label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
             self.api_url = self.ENCODE_API
             self.source_url = self.ENCODE_SOURCE_URL
-            self.source = 'ENCODE'
+            self.source = FileFileSet.SOURCE_ENCODE
         elif label in ['igvf_file_fileset', 'igvf_donor', 'igvf_sample_term']:
             self.api_url = self.IGVF_API
             self.source_url = self.IGVF_SOURCE_URL
-            self.source = 'IGVF'
+            self.source = FileFileSet.SOURCE_IGVF
         self.writer = writer
         self.accessions = accessions
         self.validate = validate
@@ -189,7 +191,7 @@ class FileFileSet:
                 disease_ids = []  # IGVF does not return this
 
             if self.label in ['encode_donor', 'igvf_donor']:
-                for donor_props in self.get_donor_props(donors, disease_ids):
+                for donor_props in self.get_donor_props(self.api_url, self.source_url, self.source, donors, disease_ids):
                     if donor_props['_key'] in visited_donors:
                         continue
                     visited_donors.add(donor_props['_key'])
@@ -197,7 +199,7 @@ class FileFileSet:
                         self.validate_doc(donor_props)
                     self.write_jsonl(donor_props)
             elif self.label in ['encode_sample_term', 'igvf_sample_term']:
-                for sample_props in self.get_sample_term_props(sample_types):
+                for sample_props in self.get_sample_term_props(self.api_url, self.source_url, self.source, sample_types):
                     if sample_props['_key'] in visited_sample_terms:
                         continue
                     visited_sample_terms.add(sample_props['_key'])
@@ -211,15 +213,8 @@ class FileFileSet:
 
         self.writer.close()
 
-    def get_file_object(self, accession):
-        url = urljoin(self.api_url, accession + '/@@embedded?format=json')
-        response = requests.get(url)
-        if response.status_code == 403:
-            raise ValueError(
-                f'{accession} is not publicly released or access is restricted.')
-        return response.json()
-
-    def get_software_encode(self, file_object):
+    @staticmethod
+    def get_software_encode(file_object):
         software = set()
         software_versions = file_object.get(
             'analysis_step_version', {}).get('software_versions', [])
@@ -231,7 +226,8 @@ class FileFileSet:
         software.update(software_titles)
         return software
 
-    def _software_titles_from_analysis_step_version(self, analysis_step_version):
+    @staticmethod
+    def _software_titles_from_analysis_step_version_igvf(analysis_step_version):
         software_titles = set()
         if analysis_step_version:
             software_versions = analysis_step_version.get(
@@ -239,11 +235,11 @@ class FileFileSet:
             software_version_ids = [software_version['@id']
                                     for software_version in software_versions]
             if software_version_ids:
-                software_version_objects = self.get_batch_objects(
+                software_version_objects = FileFileSet.get_batch_objects(
                     software_version_ids,
                     fields=['software'],
                     id_type='@id',
-                    api_url=self.api_url
+                    api_url=FileFileSet.IGVF_API
                 )
                 software_ids = []
                 for software_version_object in software_version_objects:
@@ -258,11 +254,11 @@ class FileFileSet:
                     elif isinstance(software, str):
                         software_ids.append(software)
                 if software_ids:
-                    software_objects = self.get_batch_objects(
+                    software_objects = FileFileSet.get_batch_objects(
                         software_ids,
                         fields=['title'],
                         id_type='@id',
-                        api_url=self.api_url
+                        api_url=FileFileSet.IGVF_API
                     )
                     software_titles.update(
                         software_object['title']
@@ -271,26 +267,28 @@ class FileFileSet:
                     )
         return software_titles
 
-    def get_software_igvf(self, file_object):
+    @staticmethod
+    def get_software_igvf(file_object):
         software = set()
         if 'analysis_step_version' in file_object:
             software.update(
-                self._software_titles_from_analysis_step_version(file_object.get('analysis_step_version')))
+                FileFileSet._software_titles_from_analysis_step_version_igvf(file_object.get('analysis_step_version')))
         elif file_object.get('derived_manually'):
             input_file_accessions = set()
             for input_file_id in file_object.get('derived_from', []):
                 input_file_accession = input_file_id.split('/')[-2]
                 input_file_accessions.add(input_file_accession)
 
-            input_file_objects = self.get_batch_objects(
-                list(input_file_accessions), ['analysis_step_version'], api_url=self.api_url)
+            input_file_objects = FileFileSet.get_batch_objects(
+                list(input_file_accessions), ['analysis_step_version'], api_url=FileFileSet.IGVF_API)
             for input_file_object in input_file_objects:
 
                 software.update(
-                    self._software_titles_from_analysis_step_version(input_file_object.get('analysis_step_version')))
+                    FileFileSet._software_titles_from_analysis_step_version_igvf(input_file_object.get('analysis_step_version')))
         return software
 
-    def parse_annotation_encode(self, dataset_object, software):
+    @staticmethod
+    def parse_annotation_encode(dataset_object, software):
         preferred_assay_titles = set()
         assay_term_ids = set()
         method = dataset_object['annotation_type']
@@ -312,11 +310,11 @@ class FileFileSet:
             class_type = 'observed data'
             if dataset_object['annotation_type'] == 'caQTLs':
                 method = 'caQTL'
-        experiment_objects = self.get_batch_objects(
+        experiment_objects = FileFileSet.get_batch_objects(
             dataset_object.get('experimental_input', []),
             fields=['assay_term_name', 'assay_term_id'],
             id_type='@id',
-            api_url=self.api_url
+            api_url=FileFileSet.ENCODE_API
         )
         for experiment_object in experiment_objects:
             assay_term_name = experiment_object.get('assay_term_name')
@@ -330,7 +328,8 @@ class FileFileSet:
 
         return class_type, method, disease_ids, preferred_assay_titles, assay_term_ids
 
-    def get_assay_encode(self, dataset_object, preferred_assay_titles, assay_term_ids):
+    @staticmethod
+    def get_assay_encode(dataset_object, preferred_assay_titles, assay_term_ids):
         assay_term_name = dataset_object.get('assay_term_name', [])
         if assay_term_name and not (preferred_assay_titles):
             if isinstance(assay_term_name, str):
@@ -344,7 +343,8 @@ class FileFileSet:
         assay_term_ids = sorted(list(assay_term_ids))
         return assay_term_ids, preferred_assay_titles
 
-    def get_publication_encode(self, dataset_object):
+    @staticmethod
+    def get_publication_encode(dataset_object):
         publication_id = None
         publications = dataset_object.get('references', [])
         if publications:
@@ -356,7 +356,8 @@ class FileFileSet:
                 publication_id = publication_identifiers[0]
         return publication_id
 
-    def get_publication_igvf(self, fileset_object):
+    @staticmethod
+    def get_publication_igvf(fileset_object):
         publication_id = None
         publications = fileset_object.get('publications', [])
         if publications:
@@ -366,8 +367,8 @@ class FileFileSet:
             publication_id = publications[0]['publication_identifiers'][0]
         return publication_id
 
+    @staticmethod
     def parse_sample_donor_treatment_encode(
-        self,
         dataset_object
     ):
         sample_ids = set()
@@ -423,7 +424,7 @@ class FileFileSet:
             donor = dataset_object.get('donor')
             if donor:
                 donor_object = requests.get(
-                    urljoin(self.api_url, donor + '/@@object?format=json')).json()
+                    urljoin(FileFileSet.ENCODE_API, donor + '/@@object?format=json')).json()
                 donor_accession = donor_object['accession']
                 donor_ids.add(donor_accession)
                 if classification in ['in vitro differentiated cells', 'primary cell', 'tissue', 'organoid']:
@@ -442,8 +443,8 @@ class FileFileSet:
             simple_sample_summaries.add(simple_sample_summary)
         return sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_term_ids
 
+    @staticmethod
     def parse_sample_donor_treatment_igvf(
-        self,
         fileset_object,
         method
     ):
@@ -455,11 +456,11 @@ class FileFileSet:
         samples = fileset_object.get('samples', [])
         for sample in samples:
             sample_accessions.add(sample['accession'])
-        sample_objects = self.get_batch_objects(
+        sample_objects = FileFileSet.get_batch_objects(
             list(sample_accessions),
             ['accession', 'donors', 'sample_terms', 'targeted_sample_term',
                 'classifications', 'treatments', 'construct_library_sets'],
-            api_url=self.api_url
+            api_url=FileFileSet.IGVF_API
         )
 
         for sample_object in sample_objects:
@@ -499,8 +500,8 @@ class FileFileSet:
                 treatment_term_names = ', '.join(
                     sorted(list(treatment_term_names)))
                 simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
-                treatment_objects = self.get_batch_objects(
-                    list(treatment_ids), ['treatment_term_id'], '@id', api_url=self.api_url)
+                treatment_objects = FileFileSet.get_batch_objects(
+                    list(treatment_ids), ['treatment_term_id'], '@id', api_url=FileFileSet.IGVF_API)
                 for treatment_object in treatment_objects:
                     treatment_term_ids.add(
                         treatment_object['treatment_term_id'])
@@ -517,8 +518,8 @@ class FileFileSet:
                 for construct_library_set in sample_object.get('construct_library_sets', []):
                     construct_library_set_accessions.add(
                         construct_library_set['accession'])
-                construct_library_set_objects = self.get_batch_objects(
-                    list(construct_library_set_accessions), ['integrated_content_files'], api_url=self.api_url)
+                construct_library_set_objects = FileFileSet.get_batch_objects(
+                    list(construct_library_set_accessions), ['integrated_content_files'], api_url=FileFileSet.IGVF_API)
 
                 for construct_library_set_object in construct_library_set_objects:
                     integrated_content_files = construct_library_set_object.get(
@@ -526,18 +527,18 @@ class FileFileSet:
                     for integrated_content_file in integrated_content_files:
                         integrated_content_files_accessions.add(
                             integrated_content_file['accession'])
-                integrated_content_files_objects = self.get_batch_objects(
-                    list(integrated_content_files_accessions), ['file_set'], api_url=self.api_url)
+                integrated_content_files_objects = FileFileSet.get_batch_objects(
+                    list(integrated_content_files_accessions), ['file_set'], api_url=FileFileSet.IGVF_API)
                 for integrated_content_file_object in integrated_content_files_objects:
                     curated_set = integrated_content_file_object['file_set']
                     curated_set_accessions.add(curated_set['accession'])
-                curated_sets_objects = self.get_batch_objects(
-                    list(curated_set_accessions), ['donors'], api_url=self.api_url)
+                curated_sets_objects = FileFileSet.get_batch_objects(
+                    list(curated_set_accessions), ['donors'], api_url=FileFileSet.IGVF_API)
                 for curated_set_object in curated_sets_objects:
                     for donor in curated_set_object.get('donors', []):
                         donors_accessions.add(donor['accession'])
-                donors_objects = self.get_batch_objects(
-                    list(donors_accessions), ['dbxrefs'], api_url=self.api_url)
+                donors_objects = FileFileSet.get_batch_objects(
+                    list(donors_accessions), ['dbxrefs'], api_url=FileFileSet.IGVF_API)
                 for donor_object in donors_objects:
                     dbxrefs = donor_object.get('dbxrefs', [])
                     for dbxref in dbxrefs:
@@ -552,11 +553,12 @@ class FileFileSet:
             simple_sample_summaries.add(simple_sample_summary)
         return sample_accessions, donor_accessions, sample_term_ids, simple_sample_summaries, treatment_term_ids
 
-    def decompose_analysis_set_to_measurement_set_igvf(self, analysis_set_id, measurement_sets_accession=None):
+    @staticmethod
+    def decompose_analysis_set_to_measurement_set_igvf(analysis_set_id, measurement_sets_accession=None):
         if measurement_sets_accession is None:
             measurement_sets_accession = set()
         analysis_set_object = requests.get(
-            urljoin(self.api_url, analysis_set_id + '/@@embedded?format=json')).json()
+            urljoin(FileFileSet.IGVF_API, analysis_set_id + '/@@embedded?format=json')).json()
         input_file_sets = analysis_set_object.get('input_file_sets', [])
         construct_library_set_ids = set()
         for input_file_set in input_file_sets:
@@ -574,25 +576,25 @@ class FileFileSet:
             elif input_file_set_id.startswith('/construct-library-sets/'):
                 construct_library_set_ids.add(input_file_set_id)
             elif input_file_set_id.startswith('/analysis-sets/'):
-                self.decompose_analysis_set_to_measurement_set_igvf(
+                FileFileSet.decompose_analysis_set_to_measurement_set_igvf(
                     input_file_set_id, measurement_sets_accession)
         if construct_library_set_ids:
-            construct_library_set_objects = self.get_batch_objects(
+            construct_library_set_objects = FileFileSet.get_batch_objects(
                 list(construct_library_set_ids),
                 fields=['applied_to_samples'],
                 id_type='@id',
-                api_url=self.api_url
+                api_url=FileFileSet.IGVF_API
             )
             sample_ids = set()
             for construct_library_set_object in construct_library_set_objects:
                 sample_ids.update(construct_library_set_object.get(
                     'applied_to_samples', []))
             if sample_ids:
-                sample_objects = self.get_batch_objects(
+                sample_objects = FileFileSet.get_batch_objects(
                     list(sample_ids),
                     fields=['file_sets'],
                     id_type='@id',
-                    api_url=self.api_url
+                    api_url=FileFileSet.IGVF_API
                 )
                 for sample_object in sample_objects:
                     for file_set in sample_object.get('file_sets', []):
@@ -602,7 +604,8 @@ class FileFileSet:
                             measurement_sets_accession.add(accession)
         return measurement_sets_accession
 
-    def parse_analysis_set_igvf(self, fileset_object):
+    @staticmethod
+    def parse_analysis_set_igvf(fileset_object):
         input_file_sets = fileset_object.get('input_file_sets', [])
         preferred_assay_titles = set()
         assay_term_ids = set()
@@ -611,7 +614,7 @@ class FileFileSet:
             input_id = input_file_set['@id']
             if input_id.startswith('/analysis-sets/'):
                 measurement_set_accessions.update(
-                    self.decompose_analysis_set_to_measurement_set_igvf(
+                    FileFileSet.decompose_analysis_set_to_measurement_set_igvf(
                         input_id)
                 )
             elif input_id.startswith('/measurement-sets/'):
@@ -620,8 +623,8 @@ class FileFileSet:
                 if not accession:
                     accession = input_id.strip('/').split('/')[-1]
                 measurement_set_accessions.add(accession)
-        measurement_set_objects = self.get_batch_objects(
-            list(measurement_set_accessions), ['preferred_assay_titles', 'assay_term'], api_url=self.api_url)
+        measurement_set_objects = FileFileSet.get_batch_objects(
+            list(measurement_set_accessions), ['preferred_assay_titles', 'assay_term'], api_url=FileFileSet.IGVF_API)
         for measurement_set_object in measurement_set_objects:
             preferred_assay_titles.add(
                 measurement_set_object.get('preferred_assay_titles')[0])
@@ -631,17 +634,18 @@ class FileFileSet:
             assay_term_ids.add(assay_term_id)
         return preferred_assay_titles, assay_term_ids
 
-    def query_fileset_files_props_encode(self, file_object):
-        source_url = urljoin(self.source_url, file_object['@id'])
+    @staticmethod
+    def query_fileset_files_props_encode(file_object):
+        source_url = urljoin(FileFileSet.ENCODE_SOURCE_URL, file_object['@id'])
         href = file_object.get('href')
-        download_link = urljoin(self.api_url, href)
+        download_link = urljoin(FileFileSet.ENCODE_API, href)
         dataset_object = requests.get(
-            urljoin(self.api_url, file_object['dataset'] + '/@@embedded?format=json')).json()
+            urljoin(FileFileSet.ENCODE_API, file_object['dataset'] + '/@@embedded?format=json')).json()
         dataset_accession = dataset_object['accession']
         dataset_type = dataset_object['@type'][0]
         lab = dataset_object['lab']['name']
 
-        software = self.get_software_encode(file_object)
+        software = FileFileSet.get_software_encode(file_object)
 
         preferred_assay_titles = set()
         assay_term_ids = set()
@@ -649,14 +653,14 @@ class FileFileSet:
         class_type = 'observed data'
         disease_ids = []
         if dataset_type == 'Annotation':
-            class_type, method, disease_ids, preferred_assay_titles, assay_term_ids = self.parse_annotation_encode(
+            class_type, method, disease_ids, preferred_assay_titles, assay_term_ids = FileFileSet.parse_annotation_encode(
                 dataset_object, software)
             if software and method not in ['candidate Cis-Regulatory Elements', 'caQTL', 'MPRA']:
                 method = list(software)[0]
                 # manually set the method to ENCODE-rE2G for Distal regulation ENCODE-rE2G
                 if method == 'Distal regulation ENCODE-rE2G':
                     method = 'ENCODE-rE2G'
-        assay_term_ids, preferred_assay_titles = self.get_assay_encode(
+        assay_term_ids, preferred_assay_titles = FileFileSet.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
         if class_type == 'observed data' and preferred_assay_titles:
             if len(preferred_assay_titles) != 1:
@@ -665,9 +669,9 @@ class FileFileSet:
             else:
                 method = preferred_assay_titles[0]
 
-        publication_id = self.get_publication_encode(dataset_object)
+        publication_id = FileFileSet.get_publication_encode(dataset_object)
 
-        sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_ids = self.parse_sample_donor_treatment_encode(
+        sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_ids = FileFileSet.parse_sample_donor_treatment_encode(
             dataset_object)
 
         sample_term_ids = [sample_term_id.replace(
@@ -682,7 +686,7 @@ class FileFileSet:
         elif file_object['accession'] == 'ENCFF167FJQ':
             catalog_collections = ['mm_genomic_elements']
         else:
-            catalog_collections = self.METHOD_TO_COLLECTIONS_ENCODE.get(
+            catalog_collections = FileFileSet.METHOD_TO_COLLECTIONS_ENCODE.get(
                 method, [])
         if not catalog_collections:
             raise (ValueError(
@@ -693,33 +697,34 @@ class FileFileSet:
             'name': file_object['accession'],
             'file_set_id': dataset_accession,
             'lab': lab,
-            'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
-            'assay_term_ids': self.none_if_empty(assay_term_ids),
+            'preferred_assay_titles': FileFileSet.none_if_empty(preferred_assay_titles),
+            'assay_term_ids': FileFileSet.none_if_empty(assay_term_ids),
             'method': method,
             'class': class_type,
-            'software': self.none_if_empty(software),
+            'software': FileFileSet.none_if_empty(software),
             'samples': [f'ontology_terms/{sample_term_id}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
-            'sample_ids': self.none_if_empty(sample_ids),
-            'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
+            'sample_ids': FileFileSet.none_if_empty(sample_ids),
+            'simple_sample_summaries': FileFileSet.none_if_empty(simple_sample_summaries),
             'donors': sorted([f'donors/{donor_id}' for donor_id in donor_ids]) if donor_ids else None,
-            'treatments_term_ids': self.none_if_empty(treatment_ids),
+            'treatments_term_ids': FileFileSet.none_if_empty(treatment_ids),
             'publication': publication_id,
             'collections': catalog_collections,
-            'source': self.source,
+            'source': FileFileSet.SOURCE_ENCODE,
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': None
         }
         return props, donor_ids, all_sample_types, disease_ids
 
-    def query_fileset_files_props_igvf(self, file_object):
-        source_url = urljoin(self.source_url, file_object['@id'])
+    @staticmethod
+    def query_fileset_files_props_igvf(file_object):
+        source_url = urljoin(FileFileSet.IGVF_SOURCE_URL, file_object['@id'])
         href = file_object.get('href')
-        download_link = urljoin(self.api_url, href)
+        download_link = urljoin(FileFileSet.IGVF_API, href)
         class_type = file_object.get('catalog_class')
 
         fileset_object = requests.get(
-            urljoin(self.api_url, file_object['file_set']['@id'] + '/@@embedded?format=json')).json()
+            urljoin(FileFileSet.IGVF_API, file_object['file_set']['@id'] + '/@@embedded?format=json')).json()
         fileset_accession = fileset_object['accession']
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
@@ -738,7 +743,7 @@ class FileFileSet:
             raise (ValueError(
                 f'Catalog collections are required for file_fileset {file_object["accession"]}.'))
 
-        software = self.get_software_igvf(file_object)
+        software = FileFileSet.get_software_igvf(file_object)
         if not software:
             print(
                 f'Warning: no software found for file_fileset {file_object["accession"]}.')
@@ -753,7 +758,7 @@ class FileFileSet:
             raise (ValueError(
                 f'Loading data from file sets other than prediction sets, analysis sets, curated sets, and pseudobulk sets is currently unsupported.'))
         if fileset_object_type in ['AnalysisSet', 'PseudobulkSet']:
-            preferred_assay_titles, assay_term_ids = self.parse_analysis_set_igvf(
+            preferred_assay_titles, assay_term_ids = FileFileSet.parse_analysis_set_igvf(
                 fileset_object)
             if len(preferred_assay_titles) != 1:
                 raise (ValueError(
@@ -762,16 +767,17 @@ class FileFileSet:
         if fileset_object_type == 'CuratedSet' and not method:
             method = fileset_object.get('summary')
 
-        preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
-        assay_term_ids = self.none_if_empty(assay_term_ids)
+        preferred_assay_titles = FileFileSet.none_if_empty(
+            preferred_assay_titles)
+        assay_term_ids = FileFileSet.none_if_empty(assay_term_ids)
 
         # manually set the method to MPRA, not necessary for ENCODE since preferred_assay_titles == ['MPRA']
         if assay_term_ids == ['OBI:0002675']:
             method = 'MPRA'
 
-        publication_id = self.get_publication_igvf(fileset_object)
+        publication_id = FileFileSet.get_publication_igvf(fileset_object)
 
-        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = self.parse_sample_donor_treatment_igvf(
+        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = FileFileSet.parse_sample_donor_treatment_igvf(
             fileset_object,
             method)
 
@@ -787,56 +793,59 @@ class FileFileSet:
             'assay_term_ids': assay_term_ids,
             'method': method,
             'class': class_type,
-            'software': self.none_if_empty(software),
+            'software': FileFileSet.none_if_empty(software),
             'samples': [f'ontology_terms/{sample_term_id}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
-            'sample_ids': self.none_if_empty(sample_ids),
-            'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
+            'sample_ids': FileFileSet.none_if_empty(sample_ids),
+            'simple_sample_summaries': FileFileSet.none_if_empty(simple_sample_summaries),
             'donors': sorted([f'donors/{donor_id}' for donor_id in donor_ids]) if donor_ids else None,
-            'treatments_term_ids': self.none_if_empty(treatment_ids),
+            'treatments_term_ids': FileFileSet.none_if_empty(treatment_ids),
             'publication': publication_id,
             'collections': catalog_collections,
-            'source': self.source,
+            'source': FileFileSet.SOURCE_IGVF,
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': cell_annotation
         }
         return props, donor_ids, sample_term_ids
 
-    def get_donor_props(self, donor_accessions, disease_ids=[]):
+    @staticmethod
+    def get_donor_props(api_url, source_url, source, donor_accessions, disease_ids=None):
+        if disease_ids is None:
+            disease_ids = []
         donor_accessions = list(donor_accessions)
-        donor_objects = self.get_batch_objects(
+        donor_objects = FileFileSet.get_batch_objects(
             donor_accessions,
             fields=['sex', 'age', 'age_units', 'ethnicities',
                     'ethnicity', 'phenotypic_features', 'accession'],
             id_type='accession',
-            api_url=self.api_url
+            api_url=api_url
         )
         for donor_object in donor_objects:
             id = donor_object['@id']
-            source_url = urljoin(self.source_url, id)
+            source_url = urljoin(source_url, id)
 
             accession = donor_object['accession']
             sex = donor_object.get('sex')
             age = donor_object.get('age')
             age_units = donor_object.get('age_units')
 
-            if self.source == 'IGVF':
+            if source == FileFileSet.SOURCE_IGVF:
                 phenotypic_features = donor_object.get(
                     'phenotypic_features', [])
-                phenotypic_feature_ids = self.none_if_empty([
+                phenotypic_feature_ids = FileFileSet.none_if_empty([
                     f"ontology_terms/{pf['feature']['term_id'].replace(':', '_')}"
                     for pf in phenotypic_features
                 ])
-                ethnicities = self.none_if_empty(
+                ethnicities = FileFileSet.none_if_empty(
                     donor_object.get('ethnicities', []))
 
-            elif self.source == 'ENCODE':
-                ethnicities = self.none_if_empty(
+            elif source == FileFileSet.SOURCE_ENCODE:
+                ethnicities = FileFileSet.none_if_empty(
                     donor_object.get('ethnicity', []))
                 phenotypic_feature_ids = None
                 if disease_ids:
-                    phenotypic_feature_ids = self.none_if_empty([
-                        f"ontology_terms/{self.ENCODE_disease_id_mapping.get(disease_id, disease_id).replace(':', '_')}"
+                    phenotypic_feature_ids = FileFileSet.none_if_empty([
+                        f"ontology_terms/{FileFileSet.ENCODE_disease_id_mapping.get(disease_id, disease_id).replace(':', '_')}"
                         for disease_id in disease_ids
                     ])
 
@@ -848,37 +857,35 @@ class FileFileSet:
                 'age_units': age_units,
                 'ethnicities': ethnicities,
                 'phenotypic_features': phenotypic_feature_ids,
-                'source': self.source,
+                'source': source,
                 'source_url': source_url
             }
-            if self.validate:
-                self.validate_doc(doc)
+
             yield doc
 
-    def get_sample_term_props(self, sample_terms):
+    @staticmethod
+    def get_sample_term_props(api_url, source_url, source, sample_terms):
         # sample_term in igvf example: CL_0000679, in encode example: /biosample-types/primary_cell_CL_0002536/
-        if self.source == 'IGVF':
+        if source == FileFileSet.SOURCE_IGVF:
             sample_terms = ['/sample-terms/' + sample_term +
                             '/' for sample_term in sample_terms]
-        sample_term_objects = self.get_batch_objects(
+        sample_term_objects = FileFileSet.get_batch_objects(
             sample_terms,
             fields=['term_id', 'term_name', 'synonyms'],
             id_type='@id',
-            api_url=self.api_url
+            api_url=api_url
         )
         for sample_term_object in sample_term_objects:
             term_id = sample_term_object['term_id'].replace(':', '_')
             if term_id.startswith('NTR'):
-                uri = urljoin(self.source_url, sample_term_object['@id'])
+                uri = urljoin(source_url, sample_term_object['@id'])
                 _props = {
                     '_key': term_id,
                     'uri': uri,
                     'term_id': term_id,
                     'name': sample_term_object['term_name'],
-                    'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
-                    'source': self.source,
+                    'synonyms': FileFileSet.none_if_empty(sample_term_object.get('synonyms', None)),
+                    'source': source,
                     'source_url': uri
                 }
-                if self.validate:
-                    self.validate_doc(_props)
                 yield _props
