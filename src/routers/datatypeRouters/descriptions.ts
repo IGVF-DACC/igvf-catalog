@@ -646,9 +646,7 @@ export const descriptions = {
   method = VAMP-seq, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based. <br><br> \
-  We currently do not support searching by id = GO_0003674 or name = molecular_function due to the very large number of matching edges (even with pagination). <br> \
-  If you need this matching data, please contact us.',
+  Pagination is 0-based.',
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
   Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \

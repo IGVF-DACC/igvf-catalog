@@ -142,13 +142,6 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
     }
   }
 
-  if (phenotypeIds.includes('ontology_terms/GO_0003674')) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'GO_0003674 / GO Molecular function is not supported at this time due to the very large number of matching edges. Please contact us if you need this data.'
-    })
-  }
-
   const empty = phenotypeIds === '[]'
   if (empty) {
     methodFilter = methodFilter.replace('AND', '')
@@ -162,6 +155,9 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
 
     FOR phenoEdges IN coding_variants_phenotypes
       FILTER ${empty ? '' : 'phenoEdges._to IN phenotypes'} ${methodFilter} ${filesetFilter}
+      SORT phenoEdges._key
+      LIMIT ${input.page as number * limit}, ${limit}
+
       LET cv = DOCUMENT(phenoEdges._from)
       LET phenotype = DOCUMENT(phenoEdges._to)
       LET variant = DOCUMENT(FIRST(
@@ -169,8 +165,6 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         FILTER v._to == phenoEdges._from
         RETURN v._from
       ))
-      SORT phenoEdges._key
-      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'coding_variant': {
             _id: cv._key,
@@ -254,20 +248,22 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     ${emptyCodingVariantsParams
       ? ''
       : `FOR cv in coding_variants
-          ${codingVariantFilters.replaceAll('record.', 'cv.')}`
+          ${codingVariantFilters.replaceAll('record', 'cv')}`
       }
 
     FOR phenoEdges IN coding_variants_phenotypes
     FILTER ${emptyCodingVariantsParams ? '' : 'phenoEdges._from == cv._id'} ${methodFilter} ${filesetFilter.replace('record.', 'phenoEdges.')}
     ${emptyCodingVariantsParams ? 'LET cv = DOCUMENT(phenoEdges._from)' : ''}
+    SORT phenoEdges._key
+    LIMIT ${page * limit}, ${limit}
+
     LET variant = DOCUMENT(FIRST(
       FOR v IN variants_coding_variants
       FILTER v._to == phenoEdges._from
       RETURN v._from
     ))
     LET phenotype = DOCUMENT(phenoEdges._to)
-    SORT phenoEdges._key
-    LIMIT ${page * limit}, ${limit}
+
     RETURN {
       'coding_variant': {
         _id: cv._key,
