@@ -37,7 +37,6 @@ igvf_file_accessions:
   IGVF CRISPR E2G:
     - IGVFFI3069QCRA # promoter Perturb-seq
     - IGVFFI5749WPVK # promoter Perturb-seq
-    - IGVFFI1215LWLH # enhancer Perturb-seq
     - IGVFFI6296RCJK # enhancer Perturb-seq
     - IGVFFI6600VCYY # enhancer Perturb-seq
     - IGVFFI7195XKBC # enhancer Perturb-seq
