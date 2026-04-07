@@ -89,7 +89,7 @@ class FileFileSet:
     ):
         if label not in FileFileSet.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(FileFileSet.ALLOWED_LABELS))
+                             ', '.join(FileFileSet.ALLOWED_LABELS))
 
         self.label = label
         if label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
@@ -154,7 +154,6 @@ class FileFileSet:
             query = '&'.join(part for part in [
                              ids_query, fields_query] if part)
             url = f'{api_url}search/?{query}&format=json&limit=all'
-            print(url)
             response = requests.get(url)
             objects.extend(response.json().get('@graph', []))
         return objects
@@ -190,7 +189,6 @@ class FileFileSet:
                 props, donors, sample_types = self.query_fileset_files_props_igvf(
                     file_object)
                 disease_ids = []  # IGVF does not return this
-
             if self.label in ['encode_donor', 'igvf_donor']:
                 for donor_props in self.get_donor_props(self.api_url, self.source_url, self.source, donors, disease_ids):
                     if donor_props['_key'] in visited_donors:
@@ -211,7 +209,6 @@ class FileFileSet:
                 if self.validate:
                     self.validate_doc(props)
                 self.write_jsonl(props)
-
         self.writer.close()
 
     @staticmethod
@@ -426,7 +423,7 @@ class FileFileSet:
 
     @staticmethod
     def parse_sample_donor_treatment_igvf(
-        fileset_object,
+        samples,
         method
     ):
         sample_accessions = set()
@@ -434,7 +431,6 @@ class FileFileSet:
         donor_accessions = set()
         simple_sample_summaries = set()
         treatment_term_ids = set()
-        samples = fileset_object.get('samples', [])
         for sample in samples:
             sample_accessions.add(sample['accession'])
         sample_objects = FileFileSet.get_batch_objects(
@@ -443,7 +439,6 @@ class FileFileSet:
                 'classifications', 'treatments', 'construct_library_sets'],
             api_url=FileFileSet.IGVF_API
         )
-
         for sample_object in sample_objects:
             for donor in sample_object['donors']:
                 donor_accessions.add(donor['accession'])
@@ -583,11 +578,11 @@ class FileFileSet:
                             # construct library sets should be associated with some measurement set
                             accession = file_set.strip('/').split('/')[-1]
                             measurement_sets_accession.add(accession)
+
         return measurement_sets_accession
 
     @staticmethod
     def parse_analysis_set_igvf(fileset_object):
-        input_file_sets = fileset_object.get('input_file_sets', [])
         preferred_assay_titles = set()
         assay_term_ids = set()
         measurement_set_accessions = set()
@@ -758,8 +753,9 @@ class FileFileSet:
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
 
+        samples = fileset_object.get('samples', [])
         sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = FileFileSet.parse_sample_donor_treatment_igvf(
-            fileset_object,
+            samples,
             method)
 
         sample_term_ids = [sample_term_id.replace(
