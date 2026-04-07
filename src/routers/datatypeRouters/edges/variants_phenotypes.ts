@@ -312,6 +312,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
 
+  let igvfOnly = false
+
   const queryFilter = []
   if (hasVariantQuery) {
     queryFilter.push(`record._from IN ['${variantIDs.join('\', \'')}']`)
@@ -322,6 +324,9 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   }
 
   if (input.method !== undefined) {
+    if (input.method !== 'GWAS') {
+      igvfOnly = true
+    }
     queryFilter.push(`record.method == '${input.method as string}'`)
   }
 
@@ -333,7 +338,6 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     queryFilter.push(`record.label == '${input.label as string}'`)
   }
 
-  let igvfOnly = false
   if (filesetFilter !== '') {
     queryFilter.push(filesetFilter)
     igvfOnly = true

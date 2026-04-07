@@ -241,30 +241,25 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     codingVariantFilters = `FILTER ${codingVariantFilters}`
   }
 
-  const empty = Object.keys(input).length === 0
+  const emptyCodingVariantsParams = Object.keys(input).length === 0
 
-  let codingVariantsQuery = `
-    LET coding_variants = (
-      FOR record IN coding_variants
-      ${codingVariantFilters}
-      RETURN record._id
-    )
-  `
-
-  if (empty) {
+  if (emptyCodingVariantsParams) {
     methodFilter = methodFilter.replace('AND', '')
     if (methodFilter.trim() === '') {
       filesetFilter = filesetFilter.replace('AND', '')
     }
-    codingVariantsQuery = ''
   }
 
   const query = `
-    ${codingVariantsQuery}
+    ${emptyCodingVariantsParams
+      ? ''
+      : `FOR cv in coding_variants
+          ${codingVariantFilters.replaceAll('record.', 'cv.')}`
+      }
 
     FOR phenoEdges IN coding_variants_phenotypes
-    FILTER ${empty ? '' : 'phenoEdges._from IN coding_variants'} ${methodFilter} ${filesetFilter.replace('record.', 'phenoEdges.')}
-    LET cv = DOCUMENT(phenoEdges._from)
+    FILTER ${emptyCodingVariantsParams ? '' : 'phenoEdges._from == cv._id'} ${methodFilter} ${filesetFilter.replace('record.', 'phenoEdges.')}
+    ${emptyCodingVariantsParams ? 'LET cv = DOCUMENT(phenoEdges._from)' : ''}
     LET variant = DOCUMENT(FIRST(
       FOR v IN variants_coding_variants
       FILTER v._to == phenoEdges._from
@@ -272,7 +267,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     ))
     LET phenotype = DOCUMENT(phenoEdges._to)
     SORT phenoEdges._key
-    ${empty ? `LIMIT ${page * limit}, ${limit}` : ''}
+    LIMIT ${page * limit}, ${limit}
     RETURN {
       'coding_variant': {
         _id: cv._key,

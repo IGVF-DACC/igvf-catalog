@@ -19,6 +19,8 @@ coding_variants_phenotypes:
       - method, files_filesets
       - files_filesets
       - files_filesets, _key
+      - _from, _key
+      - method, _key
   persistent_sparse:
     fields:
       - abundance_score
@@ -337,6 +339,8 @@ variants_biosamples:
       - _from, genomic_element
       - method, files_filesets
       - files_filesets
+      - method, _key
+      - files_filesets, _key
 
 variants_coding_variants:
   persistent:
@@ -398,6 +402,7 @@ variants_genomic_elements:
       - source, method, files_filesets
       - method, files_filesets
       - files_filesets
+      - method, _key
   inverted:
     fields: biological_context
     analyzers:
@@ -416,6 +421,8 @@ variants_phenotypes:
       - label, class, files_filesets
       - class, files_filesets
       - files_filesets
+      - method, _key
+      - files_filesets, _key
 
 variants_phenotypes_coding_variants:
   persistent:
