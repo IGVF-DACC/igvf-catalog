@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "IGVF Catalog API",
   "main": "index.js",
+  "engine": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev:server": "tsx watch src/index",
     "dev:client": "wait-port 2023 && tsx src/client",
