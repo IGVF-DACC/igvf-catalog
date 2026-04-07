@@ -46,14 +46,16 @@
 - Patch and reload outdated S3 data file (DSERV-1128)
 - Load MANE-select tag in transcripts and proteins (DSERV-990)
   - MANE-select status is now tagged on transcripts and their associated proteins
-- Reload public GWAS studies into `variants/phenotypes` (DSERV-1172)
-- Reload splice QTLs and eQTLs into `variants/genes` (DSERV-1174)
+- Reload public data to update `class`, `method`, `label` and `source`
+  - Reload public GWAS studies into `variants_phenotypes` (DSERV-1172)
+  - Reload splice QTLs and eQTLs into `variants_genes` (DSERV-1174)
+  - Reload public caQTLs into `variants_genomic_elements` (DSERV-1176)
+  - Reload BioGrid/IntAct data for `genes_genes` and `proteins_proteins`
+   (DSERV-1179)
+  - Reload COXPRESdb gene co-expression data into `genes_genes` (DSERV-1180)
+  - Reload public `variants_proteins` data (DSERV-1159)
 - Replace beta with effect size in EBI QTL data (DSERV-1216)
-- Reload public caQTLs into `variants/genomic-elements` (DSERV-1176)
-- Reload BioGrid/IntAct data for `genes/genes` and `proteins/proteins` (DSERV-1179)
-- Reload COXPRESdb gene co-expression data into `genes/genes` (DSERV-1180)
-- Reload public `variants/proteins` data (DSERV-1159)
-- Reload SGE data into `coding_variants/phenotypes` (DSERV-1156)
+- Reload SGE data into both `variants_phenotypes` and `coding_variants_phenotypes` collections (DSERV-1156)
 - Reload collections with `biological_context` to include `biosample_term` (DSERV-1165)
 - ADASTRA data consolidated into `variants_proteins`; `variants_proteins_terms` collection removed (DSERV-1126, DSERV-1152)
 - Reconcile `content_type` spliceQTL and `catalog_method` splice_QTL for consistency (DSERV-1190)
