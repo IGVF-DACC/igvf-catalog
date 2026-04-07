@@ -401,8 +401,8 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  autocomplete: 'Autocomplete names for genes and proteins based on prefix search.<br> \
-  Example: term = TP53, <br> \
+  autocomplete: 'Autocomplete names for genes based on prefix search.<br> \
+  Example: term = ATF2, <br> \
   Pagination is 0-based.',
 
   complex: 'Retrieve complexes.<br> \
