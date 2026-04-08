@@ -325,6 +325,61 @@ function transformVariantRow (row: any): any {
 }
 
 // ---------------------------------------------------------------------------
+// Two-step lean-projection lookup
+// ---------------------------------------------------------------------------
+
+const LEAN_LOOKUP_COLS = ['spdi', 'ca_id', 'hgvs'] as const
+
+function buildIdCondition (ids: string[], params: QueryParams): { condition: string, empty: boolean } {
+  if (ids.length === 0) return { condition: '', empty: true }
+  if (ids.length === 1) {
+    params._resolved_id = ids[0]
+    return { condition: 'v.id = {_resolved_id:String}', empty: false }
+  }
+  const placeholders = ids.map((id, i) => {
+    params[`_rid_${i}`] = id
+    return `{_rid_${i}:String}`
+  })
+  return { condition: `v.id IN (${placeholders.join(',')})`, empty: false }
+}
+
+async function resolveViaLeanProjection (
+  input: paramsFormatType,
+  params: QueryParams
+): Promise<{ condition: string, empty: boolean } | null> {
+  // rsid: resolve via the rsid_to_variant lookup table (materialized view)
+  if (input.rsid !== undefined) {
+    const rows = await chQuery<{ variant_id: string }>(
+      'SELECT variant_id FROM rsid_to_variant WHERE rsid = {_rsid:String}',
+      { _rsid: input.rsid as string }
+    )
+    delete input.rsid
+    return buildIdCondition(rows.map(r => r.variant_id), params)
+  }
+
+  // spdi, ca_id, hgvs: resolve via lean projections on variants table
+  for (const col of LEAN_LOOKUP_COLS) {
+    const val = input[col]
+    if (val === undefined) continue
+
+    const rows = await chQuery<{ id: string }>(
+      `SELECT id FROM ${TABLE} WHERE ${col} = {_lp_val:String}`,
+      { _lp_val: val as string }
+    )
+    delete input[col]
+    return buildIdCondition(rows.map(r => r.id), params)
+  }
+
+  return null
+}
+
+function combineWhere (baseWhere: string, extraCondition: string | null): string {
+  if (extraCondition === null) return baseWhere
+  if (baseWhere === '') return `WHERE ${extraCondition}`
+  return `${baseWhere} AND ${extraCondition}`
+}
+
+// ---------------------------------------------------------------------------
 // Query functions
 // ---------------------------------------------------------------------------
 
@@ -337,11 +392,11 @@ export async function findVariantIDBySpdi (spdi: string): Promise<string | null>
 }
 
 export async function findVariantIDByRSID (rsid: string): Promise<string[]> {
-  const rows = await chQuery<{ id: string }>(
-    `SELECT id FROM ${TABLE} WHERE has(rsid, {_rsid:String})`,
+  const rows = await chQuery<{ variant_id: string }>(
+    'SELECT variant_id FROM rsid_to_variant WHERE rsid = {_rsid:String}',
     { _rsid: rsid }
   )
-  return rows.map(r => r.id)
+  return rows.map(r => r.variant_id)
 }
 
 export async function findVariantIDByHgvs (hgvs: string): Promise<string | null> {
@@ -379,7 +434,15 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   delete input.page
 
   const params: QueryParams = {}
-  const where = buildVariantWhere(input, params)
+
+  const resolved = await resolveViaLeanProjection(input, params)
+  if (resolved?.empty === true) return []
+
+  const where = combineWhere(
+    buildVariantWhere(input, params),
+    resolved?.condition ?? null
+  )
+
   params._lim = limit
   params._off = page * limit
   const sql = `SELECT ${VARIANT_SELECT} FROM ${TABLE} v ${where} ORDER BY v.id LIMIT {_lim:UInt32} OFFSET {_off:UInt32}`
@@ -574,7 +637,15 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
   delete input.page
 
   const params: QueryParams = {}
-  const where = buildVariantWhere(input, params)
+
+  const resolved = await resolveViaLeanProjection(input, params)
+  if (resolved?.empty === true) return []
+
+  const where = combineWhere(
+    buildVariantWhere(input, params),
+    resolved?.condition ?? null
+  )
+
   params._lim = limit
   params._off = page * limit
   const sql = `SELECT ${VARIANT_SELECT} FROM ${TABLE} v ${where} ORDER BY v.id LIMIT {_lim:UInt32} OFFSET {_off:UInt32}`
