@@ -17,23 +17,16 @@ const autocompleteFormat = z.object({
   uri: z.string()
 })
 
-// currently supports: gene, protein, and disease
+// currently supports genes only
 async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
   const term = (input.term as string).toUpperCase()
 
   const query = `
-    LET genes = (FOR gene in genes
+    FOR gene in genes
     FILTER STARTS_WITH(gene.name, "${term}")
-    RETURN { type: "gene", term: gene.name, uri: CONCAT("/genes/", gene._key) })
-
-    LET proteins = (FOR protein in proteins
-    FILTER STARTS_WITH(protein.name, "${term}") OR (protein.uniprot_names[0] != null AND STARTS_WITH(protein.uniprot_names[0], "${term}"))
-    RETURN { type: "protein", term: protein.name, uri: CONCAT("/proteins/", protein._key) })
-
-    FOR result IN UNION_DISTINCT(genes, proteins)
-    SORT LENGTH(result.term) ASC
+    SORT LENGTH(gene.name) ASC
     LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
-    RETURN result
+    RETURN { type: "gene", term: gene.name, uri: CONCAT("/genes/", gene._key) }
   `
   const results = await ((await db.query(query)).all())
   return results
