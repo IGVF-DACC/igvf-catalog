@@ -614,6 +614,24 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     }
   }
 
+  // Fast path: resolve rsid via lookup table, spdi/ca_id/hgvs via lean projections
+  if (input.rsid !== undefined) {
+    const rows = await chQuery<{ variant_id: string }>(
+      'SELECT variant_id FROM rsid_to_variant WHERE rsid = {_rsid:String}',
+      { _rsid: input.rsid as string }
+    )
+    return rows.map(r => r.variant_id)
+  }
+  for (const col of LEAN_LOOKUP_COLS) {
+    if (input[col] !== undefined) {
+      const rows = await chQuery<{ id: string }>(
+        `SELECT id FROM ${TABLE} WHERE ${col} = {_lp_val:String}`,
+        { _lp_val: input[col] as string }
+      )
+      return rows.map(r => r.id)
+    }
+  }
+
   const params: QueryParams = {}
   const where = buildVariantWhere(input, params)
   if (where === '') return []

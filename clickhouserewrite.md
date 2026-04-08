@@ -248,3 +248,9 @@ All other routers in `src/routers/datatypeRouters/edges/` and `src/routers/datat
 4. Use three-query pagination for endpoints that merge results from multiple sources
 5. Use lean projections + two-step ID resolution for high-cardinality string lookups on large tables
 6. Use materialized view lookup tables for array column lookups (e.g. `rsid`)
+
+### Important: always use optimized variant lookups
+
+Any endpoint that resolves variant identifiers (`spdi`, `hgvs`, `ca_id`, `rsid`) to variant IDs **must** use the optimized lookup paths — lean projections for `spdi`/`hgvs`/`ca_id` and the `rsid_to_variant` materialized view for `rsid`. Never query the `variants` table directly with `WHERE spdi = ...`, `WHERE hgvs = ...`, or `WHERE has(rsid, ...)` when selecting full rows or when used as a subquery without the lean projection.
+
+This applies to both direct variant queries (`/variants`) and any edge endpoint that accepts variant identifiers as input (e.g. `/variants/phenotypes`, `/variants/genes`, etc.). The `variantIDSearch()` and `findVariantIDByRSID()` functions in `variants.ts` already use the optimized paths and should be reused by all edge routers that resolve variant identifiers. Bypassing these functions with direct `has(rsid, ...)` or unaliased `WHERE spdi = ...` queries against the 1.2B-row `variants` table will result in 60s+ timeouts.
