@@ -159,8 +159,8 @@ class GWAS(BaseAdapter):
             'source': 'OpenTargets',
             'source_url': self.SOURCE_URL,
             'version': 'October 2022 (22.10)',
-            'name': 'collected in',
-            'inverse_name': 'collects',
+            'name': 'associated with',
+            'inverse_name': 'associated with',
             'class': self.collection_class,
             'method': self.method,
             'label': self.method

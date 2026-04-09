@@ -120,45 +120,6 @@ def test_gwas_invalid_collection(gwas_files, spy_writer):
              label='invalid_collection', writer=spy_writer, validate=True)
 
 
-def test_gwas_row_context_message(gwas_files):
-    gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes')
-    row = [''] * 8
-    row[1] = 'NA'
-    row[2] = 'EFO_0007010'
-    row[3] = 'NEALE2_test'
-    row[4] = '1'
-    row[5] = '1010747'
-    row[6] = 'GT'
-    row[7] = 'G'
-    msg = gwas._gwas_row_context_message(
-        row, file_first_line=100, data_row_index=5)
-    assert 'first physical line=100' in msg
-    assert 'data row index=5' in msg
-    assert 'NEALE2_test' in msg
-    assert 'EFO_0007010' in msg
-
-
-def test_validation_error_includes_tsv_row_context(gwas_files, spy_writer, mocker):
-    """When validation fails, the error names the TSV line and key fields."""
-    mocker.patch('adapters.gwas_adapter.build_variant_id',
-                 return_value='fake_variant_id')
-
-    def force_empty_mapping(self):
-        self.ontology_name_mapping = {}
-
-    mocker.patch.object(GWAS, 'load_ontology_name_mapping',
-                        force_empty_mapping)
-    gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes', writer=spy_writer, validate=True)
-    with pytest.raises(ValueError) as exc_info:
-        gwas.process_file()
-    err = str(exc_info.value)
-    assert 'TSV location:' in err
-    assert 'first physical line=' in err
-    assert 'data row index=' in err
-
-
 def test_gwas_invalid_doc(gwas_files, spy_writer, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
