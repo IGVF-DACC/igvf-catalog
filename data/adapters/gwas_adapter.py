@@ -32,6 +32,7 @@ class GWAS(BaseAdapter):
     API_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG'
     ALLOWED_LABELS = ['studies',
                       'variants_phenotypes']
+    SOURCE = 'OpenTargets'
 
     def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
@@ -89,7 +90,7 @@ class GWAS(BaseAdapter):
             'trait_reported': row[31],
             'trait_efos': row[32],
             'trait_category': row[33],
-            'source': 'OpenTargets',
+            'source': self.SOURCE,
             'version': 'October 2022 (22.10)',
             'source_url': self.SOURCE_URL
         }
@@ -141,7 +142,7 @@ class GWAS(BaseAdapter):
 
         key = hashlib.sha256(
             # combination of variant_id + phenotype_id + study_id
-            (variant_id + '_' + ontology_term_id + '_' + study_id).encode()).hexdigest()
+            (variant_id + '_' + ontology_term_id + '_' + study_id + '_' + self.SOURCE).encode()).hexdigest()
 
         if key in self.processed_keys:
             return None
@@ -175,7 +176,7 @@ class GWAS(BaseAdapter):
             'p_val': pvalue,
             'log10pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
-            'source': 'OpenTargets',
+            'source': self.SOURCE,
             'source_url': self.SOURCE_URL,
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
