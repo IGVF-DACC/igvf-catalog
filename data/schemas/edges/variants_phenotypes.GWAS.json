@@ -141,12 +141,12 @@
         },
         "name": {
           "enum": [
-            "collected in"
+            "associated with"
           ]
         },
         "inverse_name": {
           "enum": [
-            "collects"
+            "associated with"
           ]
         },
         "version": {
