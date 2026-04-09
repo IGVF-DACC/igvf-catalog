@@ -17,13 +17,6 @@ from adapters.writer import Writer
 # 1:1008088:T:C   NA      EFO_0007937     GCST006585_950  1       1008088 T       C       +       0.73554206      0.5305998818099342      0.9404842381900658                              2.0     -12     2e-12   ['European=3200']     []              3200            PMID:30072576   Emilsson V      2018-08-02      Science Co-regulatory networks of human serum proteins link genetics to disease.        False   1       GCST    Blood protein levels [ISG15, 14151_4_3]       ['EFO_0007937'] measurement     1       988598  A       AG      0.825908352025  True    0.0     0.0     0.0     1.0     0.0
 
 
-# GWAS variant to gene - scored file (v2g_scored_igvf):
-# (note: v2g_igvf has the same columns except for the last 4)
-# variant_id      gene_id chr_id  position        ref_allele      alt_allele      feature type_id source_id          fpred_labels    fpred_scores    fpred_max_label fpred_max_score qtl_beta        qtl_se  qtl_pval           qtl_score       interval_score  qtl_score_q     interval_score_q        d       distance_score  distance_score_q   overall_score   source_list     source_score_list
-# 5:141242639:G:T ENSG00000204961 5       141242639       G       T       MACROPHAGES_M0  pchic   javierre2016       []      []                                                      8.56622816615577                0.7                                0.0663983903420523      ['canonical_tss' 'javierre2016']        [0.2 0.8]
-# 5:141242639:G:T ENSG00000204961 5       141242639       G       T       MACROPHAGES_M1  pchic   javierre2016       []      []                                                      9.03867857946432                0.7                                0.0663983903420523      ['canonical_tss' 'javierre2016']        [0.2 0.8]
-# 5:141242736:GT:G        ENSG00000253953 5       141242736       GT      G       unspecified     distance           canonical_tss   []      []                                                                                 144962.0        6.898359570094232e-06   0.7     0.0929577464788732      ['canonical_tss' 'javierre2016']   [0.7 0.7]
-
 # Important! We need to handle the case where breaklines happen in the middle of certain lines, like:
 # 6:32387828:G:A	ENSG00000237541	6	32387828	G	A	ROSMAP-BRAIN_NAIVE	eqtl	eqtl	[]	[]			0.364989	0.0521153	7.24831e-12	11.139763240771314		0.6					0.4462776659959758	"['sqtl' 'pqtl' 'javierre2016' 'thurman2012' 'jung2019' 'canonical_tss'
 # 'eqtl']"	[0.7 0.9 0.7 0.  0.  0.3 0.9]
@@ -106,16 +99,42 @@ class GWAS(BaseAdapter):
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
 
         equivalent_term_id = None
+        phenotype_term = None
+        mondo_id = None
+        efo_id = None
         # give preference to MONDO if defined, otherwise, use EFO term
         if row[1] != 'NA':
-            ontology_term_id = row[1]
-            equivalent_term_id = row[2]
+            mondo_id = row[1]
+            efo_id = row[2]
         else:
-            ontology_term_id = row[2]
+            efo_id = row[2]
 
         # MANY records have no ontology term. Ignoring those lines.
-        if not ontology_term_id:
+        if not mondo_id and not efo_id:
             return None
+
+        mondo_term = self.ontology_name_mapping.get(mondo_id)
+        efo_term = self.ontology_name_mapping.get(efo_id)
+        if mondo_term:
+            phenotype_term = mondo_term
+            ontology_term_id = mondo_id
+            if efo_term:
+                equivalent_term_id = efo_id
+        elif efo_term:
+            phenotype_term = efo_term
+            ontology_term_id = efo_id
+            if mondo_term:
+                equivalent_term_id = mondo_id
+        else:
+            self.logger.warning(
+                f'No phenotype term found for variant {variant_id} with mondo id {mondo_id} and efo id {efo_id}')
+            if mondo_id:
+                ontology_term_id = mondo_id
+                if efo_id:
+                    equivalent_term_id = efo_id
+            else:
+                ontology_term_id = efo_id
+
         study_id = row[3]
         studies_variants_key = self.generate_studies_variants_key(
             row)  # key used for tagged_variants
@@ -143,7 +162,7 @@ class GWAS(BaseAdapter):
             'lead_pos': int(row[5]) - 1,
             'lead_ref': row[6],
             'lead_alt': row[7],
-            'phenotype_term': self.ontology_name_mapping.get(ontology_term_id),
+            'phenotype_term': phenotype_term,
             'direction': row[8],
             'beta': float(row[9] or 0),
             'beta_ci_lower': float(row[10] or 0),
@@ -168,10 +187,10 @@ class GWAS(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        # tagged variants & genes info go to heyperedge collection
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
+            self.logger.info(f'Collected {len(tagged)} tagged variants')
 
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()

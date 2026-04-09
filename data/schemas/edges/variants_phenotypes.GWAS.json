@@ -34,7 +34,7 @@
           "example": "G"
         },
         "phenotype_term": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "Phenotype term for the variant to phenotype edge",
           "example": "chronic obstructive pulmonary disease"
         },
