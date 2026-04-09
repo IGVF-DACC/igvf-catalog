@@ -11,8 +11,8 @@ interface Configuration {
     password: string
   }
   agentOptions?: {
-    maxSockets: number
-    keepAlive: boolean
+    connections: number
+    pipelining: boolean
     timeout: number
   }
 }
@@ -28,8 +28,8 @@ const configuration: Configuration = {
 
 if (dbConfig.agentOptions !== undefined) {
   configuration.agentOptions = {
-    maxSockets: dbConfig.agentOptions.maxSockets,
-    keepAlive: dbConfig.agentOptions.keepAlive,
+    connections: dbConfig.agentOptions.connections,
+    pipelining: dbConfig.agentOptions.pipelining,
     timeout: dbConfig.agentOptions.timeout
   }
 }
