@@ -9,7 +9,7 @@ if (envData.host.port === 80 || envData.host.port === 443 || envData.environment
 }
 
 export const swaggerConfig = {
-  customCss: '.swagger-ui .opblock-description-wrapper p {font-size: 18px; line-height: 1.5em}',
+  customCss: '.swagger-ui .auth-wrapper {display: none}',
   swaggerOptions: {
     tryItOutEnabled: true
   }
