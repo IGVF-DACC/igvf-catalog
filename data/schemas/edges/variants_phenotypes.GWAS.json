@@ -158,6 +158,11 @@
           "type": "string",
           "description": "Unique identifier for the edge, generated as a hash of the source and target node IDs",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "study": {
+          "type": "string",
+          "description": "Studies ID for the variant to phenotype edge",
+          "example": "studies/GCST006368"
         }
       },
       "required": [
@@ -180,7 +185,8 @@
         "log10pvalue",
         "tagged_variants",
         "version",
-        "_key"
+        "_key",
+        "study"
       ]
     }
   ],

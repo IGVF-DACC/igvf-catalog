@@ -158,6 +158,7 @@ class GWAS(BaseAdapter):
             '_to': 'ontology_terms/' + ontology_term_id,
             '_from': 'variants/' + variant_id,
             '_key': key,
+            'study': 'studies/' + study_id,
             'equivalent_ontology_term': equivalent_term_id,
             'lead_chrom': row[4],
             'lead_pos': int(row[5]) - 1,
