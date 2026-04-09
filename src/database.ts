@@ -1,5 +1,5 @@
 import { Database } from 'arangojs'
-import { envData } from './env'
+import { DEFAULT_KEEP_ALIVE, DEFAULT_MAX_SOCKETS, DEFAULT_TIMEOUT, envData } from './env'
 
 const dbConfig = envData.database
 
@@ -23,14 +23,11 @@ const configuration: Configuration = {
   auth: {
     username: dbConfig.auth.username,
     password: dbConfig.auth.password
-  }
-}
-
-if (dbConfig.agentOptions !== undefined) {
-  configuration.agentOptions = {
-    connections: dbConfig.agentOptions.connections,
-    pipelining: dbConfig.agentOptions.pipelining,
-    timeout: dbConfig.agentOptions.timeout
+  },
+  agentOptions: {
+    connections: dbConfig.agentOptions?.connections ?? DEFAULT_MAX_SOCKETS,
+    pipelining: dbConfig.agentOptions?.pipelining ?? DEFAULT_KEEP_ALIVE,
+    timeout: dbConfig.agentOptions?.timeout ?? DEFAULT_TIMEOUT
   }
 }
 
