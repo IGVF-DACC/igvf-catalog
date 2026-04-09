@@ -3,7 +3,7 @@ import envConfig from '../config/development.json'
 
 const DEFAULT_PORT = '2023'
 const DEFAULT_MAX_SOCKETS = 5
-const DEFAULT_KEEP_ALIVE = 'true'
+const DEFAULT_KEEP_ALIVE = 0
 const DEFAULT_TIMEOUT = 60000
 
 const envSchema = z.object({
@@ -22,7 +22,7 @@ const envSchema = z.object({
     }),
     agentOptions: z.object({
       connections: z.number(),
-      pipelining: z.boolean(),
+      pipelining: z.number(),
       timeout: z.number()
     }).optional()
   }),
@@ -47,7 +47,10 @@ if (typeof environment !== 'undefined') {
     config.database.auth.username = process.env.IGVF_CATALOG_ARANGODB_USERNAME ?? config.database.auth.username
     config.database.auth.password = process.env.IGVF_CATALOG_ARANGODB_PASSWORD ?? config.database.auth.password
     config.database.agentOptions.connections = process.env.IGVF_CATALOG_ARANGODB_AGENT_MAX_SOCKETS !== undefined ? parseInt(process.env.IGVF_CATALOG_ARANGODB_AGENT_MAX_SOCKETS) : (config.database.agentOptions?.connections ?? DEFAULT_MAX_SOCKETS)
+
     config.database.agentOptions.pipelining = process.env.IGVF_CATALOG_ARANGODB_AGENT_KEEP_ALIVE !== undefined ? (process.env.IGVF_CATALOG_ARANGODB_AGENT_KEEP_ALIVE === 'true') : (config.database.agentOptions?.pipelining ?? DEFAULT_KEEP_ALIVE)
+    config.database.agentOptions.pipelining = config.database.agentOptions.pipelining ? 1 : 0
+
     config.database.agentOptions.timeout = process.env.IGVF_CATALOG_ARANGODB_AGENT_TIMEOUT !== undefined ? parseInt(process.env.IGVF_CATALOG_ARANGODB_AGENT_TIMEOUT) : (config.database.agentOptions?.timeout ?? DEFAULT_TIMEOUT)
     config.catalog_llm_query_service_url = process.env.IGVF_CATALOG_LLM_QUERY_SERVICE_URL ?? config.catalog_llm_query_service_url
   }

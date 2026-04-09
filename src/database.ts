@@ -12,7 +12,7 @@ interface Configuration {
   }
   agentOptions?: {
     connections: number
-    pipelining: boolean
+    pipelining: number
     timeout: number
   }
 }

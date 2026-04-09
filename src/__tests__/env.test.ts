@@ -47,7 +47,7 @@ describe('env.ts', () => {
       expect(envData.database.auth.username).toBe('prod_user')
       expect(envData.database.auth.password).toBe('prod_pass')
       expect(envData.database.agentOptions.connections).toBe(20)
-      expect(envData.database.agentOptions.pipelining).toBe(false)
+      expect(envData.database.agentOptions.pipelining).toBe(0)
       expect(envData.database.agentOptions.timeout).toBe(120000)
       expect(envData.catalog_llm_query_service_url).toBe('https://llm.prod')
     })
