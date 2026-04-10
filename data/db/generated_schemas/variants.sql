@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS variants (
+	name String,
+	source String,
+	source_url String,
+	chr String,
+	pos Float64,
+	rsid Array(String),
+	ref String,
+	alt String,
+	qual String,
+	filter Nullable(String),
+	variation_type String,
+	annotations JSON,
+	spdi String,
+	hgvs String,
+	vrs_digest String,
+	ca_id String,
+	organism String,
+	files_filesets String,
+	id String PRIMARY KEY
+);

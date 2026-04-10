@@ -293,5 +293,8 @@
       "additionalProperties": false
     }
   ],
+  "accessible_via": {
+    "return": "name, source, source_url, score, method, class, label, files_filesets, biosample_term, biological_context, protein_id, exon, target, consequence, standard_error, 95_ci_upper, 95_ci_lower, amino_acid_change, hgvs_p, functional_consequence, functional_consequence_zscore, variant_qc_flag, snvlib_lib1, snvlib_lib2, D05_R1_lib1, D05_R1_lib2, D05_R2_lib1, D05_R2_lib2, D05_R3_lib1, D05_R3_lib2, D13_R1_lib1, D13_R1_lib2, D13_R2_lib1, D13_R2_lib2, D13_R3_lib1, D13_R3_lib2"
+  },
   "db_collection_name": "variants_phenotypes"
 }
