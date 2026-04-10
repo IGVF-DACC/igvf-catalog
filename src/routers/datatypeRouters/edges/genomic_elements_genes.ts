@@ -14,8 +14,6 @@ const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes'
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
 const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
-const genomicElementsGenesIGVFE2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
-const genomicElementsGenesEncodeElementGeneLinkSchema = getSchema('data/schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -132,29 +130,22 @@ function buildQuery (params: {
     FOR record IN edgeRecords
       LET gene = ${verbose ? 'geneMap[record._to]' : 'record._to'}
       LET element = ${verbose ? 'elementMap[record._from]' : 'record._from'}
-      LET base = {
+      LET p_value = record.method IN ['CRISPR FACS screen', 'Perturb-seq', 'TAP-seq'] ? record.p_value_adj : record.p_value
+      RETURN {
         'gene': gene,
         'genomic_element': element,
-        'name': record.${edgeNameField}
+        'name': record.${edgeNameField},
+        'class': record.class,
+        'label': record.label,
+        'method': record.method,
+        'source': record.source,
+        'source_url': record.source_url,
+        'files_filesets': record.files_filesets,
+        'biological_context': record.biological_context,
+        'biosample_term': record.biosample_term,
+        'score': record.score || record.effect_size || record.log2FC,
+        'p_value': p_value
       }
-      RETURN MERGE(base,
-        record.method == 'CRISPR enhancer perturbation screen' ? {
-          ${getDBReturnStatements(genomicElementsGenesEncode2GCrisprSchema)}
-        } :
-        record.method == 'CRISPR FACS screen' ? {
-          'score': record.effect_size,
-          'p_value': record.p_value_adj,
-          ${getDBReturnStatements(genomicElementsGenesIGVFE2GCrisprSchema)}
-        } :
-        record.method == 'ENCODE-rE2G' ? {
-          ${getDBReturnStatements(genomicElementsGenesEncodeElementGeneLinkSchema)}
-        } :
-        record.method == 'Perturb-seq' ? {
-          'score': record.log2FC,
-          'p_value': record.p_value_adj,
-          ${getDBReturnStatements(genomicElementsGenesIGVFE2GCrisprSchema)}
-        } : {}
-      )
   `
 }
 
