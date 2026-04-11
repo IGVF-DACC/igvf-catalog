@@ -81,12 +81,12 @@ const variantPhenotypeToStudy = getSchema('data/schemas/edges/variants_phenotype
 const variantPhenotypeToStudyCollectionName = variantPhenotypeToStudy.db_collection_name as string
 
 export function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'log10pvalue', 'files_fileset', 'method'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'files_fileset', 'method'].includes(item))
 
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one variant property or log10pvalue or files_filesets must be defined.'
+      message: 'At least one variant property, or method, or files_filesets must be defined.'
     })
   }
 }
