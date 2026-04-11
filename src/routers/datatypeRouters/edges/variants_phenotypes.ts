@@ -403,6 +403,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
         RETURN UNION(gwas, igvf)[0]
     )
+    FILTER u != NULL
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN u
   `
