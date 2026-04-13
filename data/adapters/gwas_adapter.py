@@ -113,7 +113,9 @@ class GWAS(BaseAdapter):
         # MANY records have no ontology term. Ignoring those lines.
         if not mondo_id and not efo_id:
             return None
-        # needs to handle two special cases: use MONDO_0003900 to replace EFO_10019866, use MONDO_0005328 to replace MONDO_0001524
+        # needs to handle two special cases:
+        # 1. file has EFO_10019866 and needs rewrite it to EFO_1001986 for equivalent_ontology_term
+        # 2. use MONDO_0005328 to replace MONDO_0001524
         if efo_id == 'EFO_10019866':
             mondo_id = 'MONDO_0003900'
             efo_id = 'EFO_1001986'
@@ -124,12 +126,12 @@ class GWAS(BaseAdapter):
         if mondo_term:
             phenotype_term = mondo_term
             ontology_term_id = mondo_id
-            if efo_term:
+            if efo_id:
                 equivalent_term_id = efo_id
         elif efo_term:
             phenotype_term = efo_term
             ontology_term_id = efo_id
-            if mondo_term:
+            if mondo_id:
                 equivalent_term_id = mondo_id
         else:
             self.logger.warning(
