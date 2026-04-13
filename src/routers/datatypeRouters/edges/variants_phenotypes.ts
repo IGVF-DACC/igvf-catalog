@@ -313,6 +313,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   `
 
   let igvfOnly = false
+  let gwasOnly = false
 
   const queryFilter = []
   if (hasVariantQuery) {
@@ -326,6 +327,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   if (input.method !== undefined) {
     if (input.method !== 'GWAS') {
       igvfOnly = true
+    } else {
+      gwasOnly = true
     }
     queryFilter.push(`record.method == '${input.method as string}'`)
   }
@@ -335,6 +338,11 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   }
 
   if (input.label !== undefined) {
+    if (input.label === 'GWAS') {
+      gwasOnly = true
+    } else {
+      igvfOnly = true
+    }
     queryFilter.push(`record.label == '${input.label as string}'`)
   }
 
@@ -359,6 +367,27 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
           method: record.method,
           class: record.class,
           phenotype_term: DOCUMENT(record._to).name,
+          variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
+        }
+  `
+
+  const singleGWASQuery = `
+  FOR record IN ${variantToPhenotypeCollectionName}
+      FILTER ${queryFilter.join(' AND ')}
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
+        FILTER edgeRecord._from == record._id ${gwasHyperEdgeFilter}
+        ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
+        SORT edgeRecord._key
+        RETURN {
+          rsid: DOCUMENT(record._from).rsid,
+          study: ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
+          ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+          name: edgeRecord.name,
+          method: record.method,
+          label: record.label,
+          class: record.class,
           variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
         }
   `
@@ -411,6 +440,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   let query = combinedQuery
   if (igvfOnly) {
     query = singleIGVFQuery
+  } else if (gwasOnly) {
+    query = singleGWASQuery
   }
 
   return await ((await db.query(query)).all())
