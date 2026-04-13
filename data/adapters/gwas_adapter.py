@@ -113,7 +113,12 @@ class GWAS(BaseAdapter):
         # MANY records have no ontology term. Ignoring those lines.
         if not mondo_id and not efo_id:
             return None
-
+        # needs to handle two special cases: use MONDO_0003900 to replace EFO_10019866, use MONDO_0005328 to replace MONDO_0001524
+        if efo_id == 'EFO_10019866':
+            mondo_id = 'MONDO_0003900'
+            efo_id = 'EFO_1001986'
+        if mondo_id == 'MONDO_0001524':
+            mondo_id = 'MONDO_0005328'
         mondo_term = self.ontology_name_mapping.get(mondo_id)
         efo_term = self.ontology_name_mapping.get(efo_id)
         if mondo_term:
