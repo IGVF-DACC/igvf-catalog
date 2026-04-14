@@ -102,5 +102,10 @@
     }
   ],
   "additionalProperties": false,
-  "db_collection_name": "variants_phenotypes"
+  "db_collection_name": "variants_phenotypes",
+  "accessible_via": {
+    "return": "name, score, files_filesets, biosample_term, biological_context, method, class, label, source, source_url",
+    "filter_by_range": "score"
+  }
+
 }
