@@ -17,13 +17,6 @@ from adapters.writer import Writer
 # 1:1008088:T:C   NA      EFO_0007937     GCST006585_950  1       1008088 T       C       +       0.73554206      0.5305998818099342      0.9404842381900658                              2.0     -12     2e-12   ['European=3200']     []              3200            PMID:30072576   Emilsson V      2018-08-02      Science Co-regulatory networks of human serum proteins link genetics to disease.        False   1       GCST    Blood protein levels [ISG15, 14151_4_3]       ['EFO_0007937'] measurement     1       988598  A       AG      0.825908352025  True    0.0     0.0     0.0     1.0     0.0
 
 
-# GWAS variant to gene - scored file (v2g_scored_igvf):
-# (note: v2g_igvf has the same columns except for the last 4)
-# variant_id      gene_id chr_id  position        ref_allele      alt_allele      feature type_id source_id          fpred_labels    fpred_scores    fpred_max_label fpred_max_score qtl_beta        qtl_se  qtl_pval           qtl_score       interval_score  qtl_score_q     interval_score_q        d       distance_score  distance_score_q   overall_score   source_list     source_score_list
-# 5:141242639:G:T ENSG00000204961 5       141242639       G       T       MACROPHAGES_M0  pchic   javierre2016       []      []                                                      8.56622816615577                0.7                                0.0663983903420523      ['canonical_tss' 'javierre2016']        [0.2 0.8]
-# 5:141242639:G:T ENSG00000204961 5       141242639       G       T       MACROPHAGES_M1  pchic   javierre2016       []      []                                                      9.03867857946432                0.7                                0.0663983903420523      ['canonical_tss' 'javierre2016']        [0.2 0.8]
-# 5:141242736:GT:G        ENSG00000253953 5       141242736       GT      G       unspecified     distance           canonical_tss   []      []                                                                                 144962.0        6.898359570094232e-06   0.7     0.0929577464788732      ['canonical_tss' 'javierre2016']   [0.7 0.7]
-
 # Important! We need to handle the case where breaklines happen in the middle of certain lines, like:
 # 6:32387828:G:A	ENSG00000237541	6	32387828	G	A	ROSMAP-BRAIN_NAIVE	eqtl	eqtl	[]	[]			0.364989	0.0521153	7.24831e-12	11.139763240771314		0.6					0.4462776659959758	"['sqtl' 'pqtl' 'javierre2016' 'thurman2012' 'jung2019' 'canonical_tss'
 # 'eqtl']"	[0.7 0.9 0.7 0.  0.  0.3 0.9]
@@ -36,13 +29,15 @@ class GWAS(BaseAdapter):
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
     SOURCE_URL = 'https://data.igvf.org/reference-files/IGVFFI1309WDQG'
+    API_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG'
     ALLOWED_LABELS = ['studies',
-                      'variants_phenotypes', 'variants_phenotypes_studies']
+                      'variants_phenotypes']
+    SOURCE = 'OpenTargets'
 
     def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
 
-        file_metadata = requests.get(GWAS.SOURCE_URL).json()
+        file_metadata = requests.get(GWAS.API_URL).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
 
@@ -63,7 +58,7 @@ class GWAS(BaseAdapter):
     def line_appears_broken(self, row):
         return row[-1].startswith('"[') and not row[-1].endswith(']"')
 
-    def studies_variants_key(self, row):
+    def generate_studies_variants_key(self, row):
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
         study_id = row[3]
 
@@ -95,20 +90,66 @@ class GWAS(BaseAdapter):
             'trait_reported': row[31],
             'trait_efos': row[32],
             'trait_category': row[33],
-            'source': 'OpenTargets',
+            'source': self.SOURCE,
             'version': 'October 2022 (22.10)',
             'source_url': self.SOURCE_URL
         }
         return props
 
-    def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants):
+    def process_variants_phenotypes(self, row, tagged_variants):
+        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+
+        equivalent_term_id = None
+        phenotype_term = None
+        mondo_id = None
+        efo_id = None
+        # give preference to MONDO if defined, otherwise, use EFO term
+        if row[1] != 'NA':
+            mondo_id = row[1]
+            efo_id = row[2]
+        else:
+            efo_id = row[2]
+
+        # MANY records have no ontology term. Ignoring those lines.
+        if not mondo_id and not efo_id:
+            return None
+        # needs to handle two special cases:
+        # 1. file has EFO_10019866 and needs rewrite it to EFO_1001986 for equivalent_ontology_term
+        # 2. use MONDO_0005328 to replace MONDO_0001524
+        if efo_id == 'EFO_10019866':
+            mondo_id = 'MONDO_0003900'
+            efo_id = 'EFO_1001986'
+        if mondo_id == 'MONDO_0001524':
+            mondo_id = 'MONDO_0005328'
+        mondo_term = self.ontology_name_mapping.get(mondo_id)
+        efo_term = self.ontology_name_mapping.get(efo_id)
+        if mondo_term:
+            phenotype_term = mondo_term
+            ontology_term_id = mondo_id
+            if efo_id:
+                equivalent_term_id = efo_id
+        elif efo_term:
+            phenotype_term = efo_term
+            ontology_term_id = efo_id
+            if mondo_id:
+                equivalent_term_id = mondo_id
+        else:
+            self.logger.warning(
+                f'No phenotype term found for variant {variant_id} with mondo id {mondo_id} and efo id {efo_id}')
+            if mondo_id:
+                ontology_term_id = mondo_id
+                if efo_id:
+                    equivalent_term_id = efo_id
+            else:
+                ontology_term_id = efo_id
+
         study_id = row[3]
-        studies_variants_key = self.studies_variants_key(
+        studies_variants_key = self.generate_studies_variants_key(
             row)  # key used for tagged_variants
 
         key = hashlib.sha256(
             # combination of variant_id + phenotype_id + study_id
-            (edge_key + '_' + study_id).encode()).hexdigest()
+            (variant_id + '_' + ontology_term_id + '_' + study_id + '_' + self.SOURCE).encode()).hexdigest()
 
         if key in self.processed_keys:
             return None
@@ -121,14 +162,16 @@ class GWAS(BaseAdapter):
             log_pvalue = -1 * log10(pvalue)
 
         return {
-            '_to': 'studies/' + study_id,
-            '_from': 'variants_phenotypes/' + edge_key,
+            '_to': 'ontology_terms/' + ontology_term_id,
+            '_from': 'variants/' + variant_id,
             '_key': key,
+            'study': 'studies/' + study_id,
+            'equivalent_ontology_term': equivalent_term_id,
             'lead_chrom': row[4],
             'lead_pos': int(row[5]) - 1,
             'lead_ref': row[6],
             'lead_alt': row[7],
-            'phenotype_term': self.ontology_name_mapping.get(phenotype_id),
+            'phenotype_term': phenotype_term,
             'direction': row[8],
             'beta': float(row[9] or 0),
             'beta_ci_lower': float(row[10] or 0),
@@ -141,43 +184,7 @@ class GWAS(BaseAdapter):
             'p_val': pvalue,
             'log10pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
-            'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)',
-            'name': 'collected in',
-            'inverse_name': 'collects'
-        }
-
-    def process_variants_phenotypes(self, row):
-        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
-
-        ontology_term_id = 'ontology_terms/'
-
-        equivalent_term_id = None
-        # give preference to MONDO if defined, otherwise, use EFO term
-        if row[1] != 'NA':
-            ontology_term_id = ontology_term_id + row[1]
-            equivalent_term_id = 'ontology_terms/' + row[2]
-        else:
-            ontology_term_id = ontology_term_id + row[2]
-
-        # MANY records have no ontology term. Ignoring those lines.
-        if ontology_term_id == 'ontology_terms/':
-            return None
-
-        key = hashlib.sha256(
-            (variant_id + '_' + ontology_term_id).encode()).hexdigest()
-
-        if self.label == 'variants_phenotypes':
-            if key in self.processed_keys:
-                return None
-            self.processed_keys.add(key)
-
-        return {
-            '_from': 'variants/' + variant_id,
-            '_to': ontology_term_id,
-            '_key': key,
-            'equivalent_ontology_term': equivalent_term_id,
-            'source': 'OpenTargets',
+            'source': self.SOURCE,
             'source_url': self.SOURCE_URL,
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
@@ -189,10 +196,10 @@ class GWAS(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        # tagged variants & genes info go to heyperedge collection
-        if self.label == 'variants_phenotypes_studies':
+        if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
+            self.logger.info(f'Collected {len(tagged)} tagged variants')
 
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()
@@ -227,17 +234,8 @@ class GWAS(BaseAdapter):
             if self.label == 'studies':
                 props = self.process_studies(row)
             elif self.label == 'variants_phenotypes':
-                props = self.process_variants_phenotypes(row)
-            elif self.label == 'variants_phenotypes_studies':
-                edge_props = self.process_variants_phenotypes(row)
-                if edge_props is None:
-                    continue
-                else:
-                    # i.e. the _from key in this hyperedge collection
-                    edge_key = edge_props['_key']
-                    phenotype_id = edge_props['_to'].split('/')[1]
-                    props = self.process_variants_phenotypes_studies(
-                        row, edge_key, phenotype_id, tagged)
+                props = self.process_variants_phenotypes(
+                    row, tagged)
             if props is None:
                 continue
             if self.validate:
@@ -268,7 +266,7 @@ class GWAS(BaseAdapter):
                 continue
 
             # grouping tagged variants by main variant + study
-            key = self.studies_variants_key(row)
+            key = self.generate_studies_variants_key(row)
 
             # a few rows are incomplete. Filling empty values with None
             row = row + [None] * (len(header) - len(row))

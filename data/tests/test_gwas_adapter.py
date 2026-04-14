@@ -1,5 +1,4 @@
 import json
-from this import d
 import pytest
 from adapters.gwas_adapter import GWAS
 from adapters.writer import SpyWriter
@@ -66,7 +65,7 @@ def test_get_tagged_variants(gwas_files, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes_studies')
+                label='variants_phenotypes')
     tagged_variants = gwas.get_tagged_variants()
 
     assert len(tagged_variants) > 0
@@ -81,7 +80,7 @@ def test_get_tagged_variants(gwas_files, mocker):
 
 def test_load_ontology_name_mapping(gwas_files):
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes_studies')
+                label='variants_phenotypes')
     gwas.load_ontology_name_mapping()
 
     assert hasattr(gwas, 'ontology_name_mapping')
@@ -120,29 +119,12 @@ def test_gwas_invalid_collection(gwas_files, spy_writer):
         GWAS(gwas_files['variants_to_ontology'],
              label='invalid_collection', writer=spy_writer, validate=True)
 
-# test gwas_collection == 'variants_phenotypes_studies' for adapter
-
-
-def test_gwas_variants_phenotypes_studies(gwas_files, spy_writer, mocker):
-    mocker.patch('adapters.gwas_adapter.build_variant_id',
-                 return_value='fake_variant_id')
-    gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes_studies', writer=spy_writer, validate=True)
-    gwas.process_file()
-
-    assert len(spy_writer.contents) > 0
-    for item in spy_writer.contents:
-        if item.startswith('{'):
-            data = json.loads(item)
-            assert '_key' in data
-            assert 'lead_chrom' in data
-
 
 def test_gwas_invalid_doc(gwas_files, spy_writer, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes_studies', writer=spy_writer, validate=True)
+                label='variants_phenotypes', writer=spy_writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123
@@ -156,28 +138,29 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                label='variants_phenotypes_studies')
+                label='variants_phenotypes')
 
     # Load ontology mapping first
     gwas.load_ontology_name_mapping()
 
     # Mock a row with pvalue = 0 (empty string or 0)
-    # Need to create a row with enough fields for the variants_phenotypes_studies processing
-    mock_row = [''] * 28  # Create a row with 28 empty fields
-    mock_row[3] = 'test_study_id'  # study_id
-    mock_row[4] = 'chr1'  # lead_chrom
-    mock_row[5] = '100'  # lead_pos
-    mock_row[6] = 'A'  # lead_ref
-    mock_row[7] = 'T'  # lead_alt
+    mock_row = [''] * 18
+    mock_row[1] = 'NA'
+    mock_row[2] = 'EFO_0007010'
+    mock_row[3] = 'test_study_id'
+    mock_row[4] = '1'
+    mock_row[5] = '100'
+    mock_row[6] = 'A'
+    mock_row[7] = 'T'
+    mock_row[15] = '1'
+    mock_row[16] = '-3'
     mock_row[17] = '0'  # Set pvalue to 0
 
     # Create tagged_variants data with the expected key
-    studies_variants_key = gwas.studies_variants_key(mock_row)
+    studies_variants_key = gwas.generate_studies_variants_key(mock_row)
     tagged_variants = {studies_variants_key: []}
 
-    # Test the process_variants_phenotypes_studies method which contains the pvalue logic
-    result = gwas.process_variants_phenotypes_studies(
-        mock_row, 'test_edge_key', 'test_phenotype_id', tagged_variants)
+    result = gwas.process_variants_phenotypes(mock_row, tagged_variants)
 
     # Should use MAX_LOG10_PVALUE when pvalue is 0
     assert result['log10pvalue'] == gwas.MAX_LOG10_PVALUE
@@ -188,13 +171,14 @@ def test_gwas_empty_ontology_term_handling(gwas_files, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes')
+                label='variants_phenotypes')
 
     # Mock a row with empty ontology term
-    mock_row = [''] * 20  # Create a row with 20 empty fields
-    mock_row[19] = 'ontology_terms/'  # Set ontology term to empty
+    mock_row = [''] * 18
+    mock_row[1] = 'NA'
+    mock_row[2] = ''
 
-    result = gwas.process_variants_phenotypes(mock_row)
+    result = gwas.process_variants_phenotypes(mock_row, {})
 
     # Should return None for empty ontology terms
     assert result is None
@@ -210,14 +194,37 @@ def test_gwas_broken_line_handling_in_process_file(gwas_files, spy_writer, mocke
     import os
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as f:
-        # Write a proper header that matches the expected format
-        f.write(
-            'variant_id\tstudy_id\tphenotype_id\tontology_term_id\tchr\tpos\tref\talt\tother_fields\n')
+        # Write a header with enough columns for GWAS parsing
+        header = [f'col_{i}' for i in range(47)]
+        f.write('\t'.join(header) + '\n')
         # Write a broken line (incomplete - missing newline)
         f.write('incomplete_line_without_newline')
         # Write a complete line
-        f.write(
-            'complete_line\tstudy1\tphenotype1\tontology1\tchr1\t100\tA\tT\tother\n')
+        row = [''] * 47
+        row[1] = 'NA'
+        row[2] = 'EFO_0007010'
+        row[3] = 'study1'
+        row[4] = '1'
+        row[5] = '100'
+        row[6] = 'A'
+        row[7] = 'T'
+        row[15] = '1'
+        row[16] = '-3'
+        row[17] = '1e-8'
+        row[34] = '1'
+        row[35] = '1000'
+        row[36] = 'A'
+        row[37] = 'T'
+        row[38] = '0.1'
+        row[39] = 'False'
+        row[40] = '0.0'
+        row[41] = '0.0'
+        row[42] = '0.0'
+        row[43] = '1.0'
+        row[44] = '0.0'
+        row[45] = '1.0'
+        row[46] = '0.1'
+        f.write('\t'.join(row) + '\n')
         temp_file = f.name
 
     try:
