@@ -123,7 +123,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   }
 
   if (input.files_fileset !== undefined) {
-    input.files_filesets = `'files_filesets/${input.files_fileset as string}'`
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
   }
 
@@ -198,7 +198,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   delete input.organism
 
   if (input.files_fileset !== undefined) {
-    input.files_filesets = `'files_filesets/${input.files_fileset as string}'`
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
   }
 
@@ -253,6 +253,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         })
     )
   `
+  console.log(query)
   let result = []
   if (hasVariantQuery) {
     result = await ((await db.query(query, { variantIDs })).all())
