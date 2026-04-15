@@ -293,6 +293,7 @@ genomic_elements_genes:
       - files_filesets
       - score, files_filesets
       - _from, files_filesets
+      - _to, _key
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
 
