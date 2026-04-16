@@ -40,7 +40,7 @@ export const codingVariantsFormat = z.object({
   transcript_id: z.string().nullable(),
   aapos: z.number().nullable(),
   hgvsp: z.string().nullable(),
-  hgvs: z.string().nullish(),
+  hgvsc: z.string().nullish(),
   refcodon: z.string().nullable(),
   codonpos: z.number().nullable(),
   SIFT_score: z.number().nullable(),
