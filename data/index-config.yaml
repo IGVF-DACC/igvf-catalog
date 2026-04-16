@@ -247,8 +247,9 @@ proteins:
       - dbxrefs[*].id
       - protein_id
       - uniprot_ids[*]
+      - name
   inverted:
-    fields: uniprot_names[*], uniprot_full_names[*], dbxrefs[*].id
+    fields: name, uniprot_names[*], uniprot_full_names[*], dbxrefs[*].id
     analyzers:
       - text_en_no_stem
       - text_delimiter
