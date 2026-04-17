@@ -17,6 +17,9 @@ const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosam
 
 const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),
+  strand: z.string().nullable(),
+  minusLog10PValue: z.number().nullable(),
+  minusLog10QValue: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
