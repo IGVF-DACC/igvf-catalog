@@ -13,7 +13,7 @@ describe('autocompleteRouters.autocomplete', () => {
       { type: 'gene', term: 'BRCA1', name: 'BRCA1', uri: '/genes/GENE1' }
     ]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue(mockResults)
+      all: jest.fn().mockResolvedValue([mockResults])
     } as any)
 
     const input = { term: 'brca', page: 0 }
@@ -50,7 +50,7 @@ describe('autocompleteRouters.autocomplete', () => {
       { type: 'gene', term: 'GENE2', name: 'GENE2', uri: '/genes/GENE2' }
     ]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue(mockResults)
+      all: jest.fn().mockResolvedValue([mockResults])
     } as any)
 
     const input = { term: 'GENE', page: 2 }
