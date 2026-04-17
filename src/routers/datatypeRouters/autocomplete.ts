@@ -14,6 +14,7 @@ const autocompleteQueryFormat = z.object({
 const autocompleteFormat = z.object({
   term: z.string(),
   type: z.string(),
+  name: z.string(),
   uri: z.string()
 })
 
@@ -22,21 +23,34 @@ async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
   const term = (input.term as string).toUpperCase()
 
   const query = `
-    LET genes = (FOR gene in genes
-    FILTER STARTS_WITH(gene.name, "${term}")
-    RETURN { type: "gene", term: gene.name, uri: CONCAT("/genes/", gene._key) })
+    LET genesByName = (
+      FOR gene IN genes
+        FILTER STARTS_WITH(gene.name, "${term}")
+        SORT LENGTH(gene.name) ASC
+        LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
+        RETURN { type: "gene", term: gene.name, name: gene.name, uri: CONCAT("/genes/", gene._key) }
+    )
 
-    LET proteins = (FOR protein in proteins
-    FILTER STARTS_WITH(protein.name, "${term}") OR (protein.uniprot_names[0] != null AND STARTS_WITH(protein.uniprot_names[0], "${term}"))
-    RETURN { type: "protein", term: protein.name, uri: CONCAT("/proteins/", protein._key) })
+    LET genesBySynonym = (
+      FOR gene IN genes
+        FOR synonym IN (gene.synonyms || [])
+          FILTER STARTS_WITH(synonym, "${term}")
+            AND NOT CONTAINS(synonym, " ")
+            AND NOT STARTS_WITH(gene.name, "${term}") // avoid duplicates with genesByName
+          SORT LENGTH(synonym) ASC
+          LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
+          RETURN { type: "gene", term: synonym, name: gene.name, uri: CONCAT("/genes/", gene._key) }
+    )
 
-    FOR result IN UNION_DISTINCT(genes, proteins)
-    SORT LENGTH(result.term) ASC
-    LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
-    RETURN result
+    RETURN UNION(genesByName, genesBySynonym)
   `
   const results = await ((await db.query(query)).all())
-  return results
+
+  if (results.length > 0) {
+    return results[0]
+  }
+
+  return []
 }
 
 const autocomplete = publicProcedure
