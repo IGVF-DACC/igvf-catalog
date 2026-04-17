@@ -317,7 +317,7 @@ const codingVariantsFromGenes = publicProcedure
   .query(async ({ input }) => await findCodingVariantsFromGenes(input))
 
 const allCodingVariantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants_all_scores } })
   .input(allVariantsQueryFormat)
   .output(z.array(z.number().optional()))
   .query(async ({ input }) => await findAllCodingVariantsFromGenes(input))

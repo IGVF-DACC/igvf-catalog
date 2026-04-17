@@ -59,7 +59,7 @@ for (const frequency in frequencySources.Values) {
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'cadd_rawscore': record['annotations']['cadd_rawscore'], 'cadd_phred': record['annotations']['cadd_phred'], 'GENCODE_category': record['annotations']['funseq_description'] }`
 
 const variantsFromRegionsFormat = z.object({
-  region: z.string().trim().optional()
+  region: z.string().trim()
 })
 
 export const singleVariantQueryFormat = z.object({
