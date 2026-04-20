@@ -188,7 +188,7 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = { uniprot_name: 'ProteinF', page: 0 }
+    const input = { uniprot_full_name: 'ProteinF', page: 0 }
     const result = await proteinsRouters.proteins({
       input,
       ctx: {},
@@ -216,7 +216,7 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = { protein_name: 'ProteinG', page: 0, limit: 1000 }
+    const input = { name: 'ProteinG', page: 0, limit: 1000 }
     const result = await proteinsRouters.proteins({
       input,
       ctx: {},
