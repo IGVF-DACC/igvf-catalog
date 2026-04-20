@@ -25,7 +25,7 @@ async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
   const query = `
     LET genesByName = (
       FOR gene IN genes
-        FILTER STARTS_WITH(gene.name, "${term}")
+        FILTER STARTS_WITH(UPPER(gene.name), "${term}")
         SORT LENGTH(gene.name) ASC
         LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
         RETURN { type: "gene", term: gene.name, name: gene.name, uri: CONCAT("/genes/", gene._key) }
@@ -34,7 +34,7 @@ async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
     LET genesBySynonym = (
       FOR gene IN genes
         FOR synonym IN (gene.synonyms || [])
-          FILTER STARTS_WITH(synonym, "${term}")
+          FILTER STARTS_WITH(UPPER(synonym), "${term}")
             AND NOT CONTAINS(synonym, " ")
             AND NOT STARTS_WITH(gene.name, "${term}") // avoid duplicates with genesByName
           SORT LENGTH(synonym) ASC
