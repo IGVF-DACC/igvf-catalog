@@ -27,6 +27,7 @@ This document tracks the prototype migration of the IGVF Catalog API from Arango
 |---|---|---|
 | `src/routers/datatypeRouters/nodes/variants.ts` | `GET /variants`, `GET /variants/summary` | Ported and tested |
 | `src/routers/datatypeRouters/edges/variants_phenotypes.ts` | `GET /phenotypes/variants`, `GET /variants/phenotypes` | Ported and tested |
+| `src/routers/datatypeRouters/edges/genes_coding_variants.ts` | `GET /genes/coding-variants/scores`, `GET /genes/coding-variants/all-scores` | Ported and tested |
 
 ### Data tooling
 
@@ -46,6 +47,9 @@ This document tracks the prototype migration of the IGVF Catalog API from Arango
 | `studies` | Loaded | `/phenotypes/variants` (verbose GWAS), `/variants/phenotypes` (verbose GWAS) | GWAS study metadata, joined in verbose mode. |
 | `variants_phenotypes_studies` | Loaded | `/phenotypes/variants` (GWAS path), `/variants/phenotypes` (GWAS path) | Hyperedge table connecting variant-phenotype pairs to studies. Contains GWAS statistics (`log10pvalue`, `beta`, `p_val`, etc.). |
 | `motifs` | Loaded | Not yet used by ported endpoints | Loaded as part of the import tooling validation. |
+| `coding_variants` | ~1.56B rows | `/genes/coding-variants/scores`, `/genes/coding-variants/all-scores` | Protein-level coding variant records. `id` = `{gene_name}_{transcript}_{hgvsp}_{hgvsc}` — gene name is the id prefix, enabling implicit PK clustering per gene. |
+| `coding_variants_phenotypes` | ~1.1B rows | `/genes/coding-variants/scores`, `/genes/coding-variants/all-scores` | Edge table from coding variants to ontology terms (phenotypes). `id` = `{coding_variants_id}_{ontology_term}_{fileset}`. `coding_variants_id` is always a prefix of `id`. The `variants` column stores the linked genomic variant FK for assay types where the phenotype is tied to a specific nucleotide change (SGE). |
+| `variants_coding_variants` | ~1.56B rows | `/genes/coding-variants/scores` | Edge table from genomic variants to coding variants. `id` = `{variants_id}_{coding_variants_id}`. `variants_id` (RefSeq accession) is the id prefix, enabling chromosome-level PK filtering. |
 
 ## Endpoint testing results
 
@@ -53,11 +57,11 @@ This document tracks the prototype migration of the IGVF Catalog API from Arango
 
 | Parameters | Result | Latency |
 |---|---|---|
-| `phenotype_id=GO_0003674&source=IGVF&limit=2` | 2 IGVF records returned | ~500ms |
+| `phenotype_id=GO_0003674&source=IGVF&limit=2` | 2 IGVF records with all fields | ~500ms |
 | `phenotype_id=GO_0003674&source=OpenTargets&limit=2` | `[]` (no GWAS data for this phenotype) | ~600ms |
 | `phenotype_id=GO_0003674&limit=2` (no source filter) | 2 records via combined pagination | ~600ms |
 | `phenotype_name=molecular_function&source=IGVF&limit=2` | 2 records (name → ID lookup) | ~1.7s |
-| `method=cV2F&limit=2` (no phenotype, IGVF-only) | 2 records | ~600ms |
+| `method=cV2F&limit=2` (no phenotype, IGVF-only) | 2 records with `phenotype_id`, `files_filesets`, `biosample_term`, `biological_context` | ~600ms |
 | `phenotype_id=GO_0003674&source=IGVF&limit=1&verbose=true` | Full variant object expanded | ~600ms |
 | Pagination: `page=0` vs `page=1` | Different results | ~500ms each |
 
@@ -65,9 +69,26 @@ This document tracks the prototype migration of the IGVF Catalog API from Arango
 
 | Parameters | Result | Latency |
 |---|---|---|
-| `variant_id=NC_000001.11:91420:T:C&limit=3` | 3 IGVF records | ~600ms |
+| `variant_id=NC_000001.11:91420:T:C&limit=3` | 3 IGVF records with all fields | ~600ms |
+| `variant_id=NC_000001.11:91420:T:C&limit=1&method=cV2F` | FK string for `variant` in non-verbose mode | ~600ms |
 | `variant_id=NC_000001.11:91420:T:C&limit=1&verbose=true` | Full variant object expanded | ~3.6s |
 | `rsid=rs58658771&limit=2` | 2 records (via rsid lookup table) | ~350ms |
+
+### `GET /api/genes/coding-variants/scores`
+
+| Parameters | Result | Latency |
+|---|---|---|
+| `gene_id=ENSG00000164308&limit=2` | ERAP2 — 2 protein_change groups with variants and scores | fast |
+| `gene_id=ENSG00000139618&limit=2` | BRCA2 (large gene, 563K coding variants) — 2 records | fast |
+| `gene_id=ENSG00000164308&method=MutPred2&limit=3` | Method-filtered results, only MutPred2 scores | fast |
+| `gene_name=BRCA2&limit=2` | Gene name resolution path | fast |
+
+### `GET /api/genes/coding-variants/all-scores`
+
+| Parameters | Result | Latency |
+|---|---|---|
+| `gene_id=ENSG00000164308&dataset=ESM-1v&limit=5` | ERAP2 — descending ESM-1v scores | fast |
+| `gene_id=ENSG00000139618&dataset=MutPred2&limit=5` | BRCA2 — descending MutPred2 scores | fast |
 
 ## Design decisions
 
@@ -210,6 +231,72 @@ Region queries filter by `chr` and `pos`. The `variants` table primary key is `i
 | 5kb | ~1.8-4.1s | ~475ms |
 | 10kb | ~1.6-3.5s | ~265-291ms |
 
+## Architecture of the `genes_coding_variants.ts` router
+
+The router serves two endpoints backed by four ClickHouse tables:
+
+```
+resolveGene(input)  →  genes table  →  { name, chr }
+        ↓
+Step A: paginate hgvsp values  →  coding_variants  (or JOIN with cvp for filtered path)
+        ↓
+Step B: CV metadata for page   →  coding_variants  WHERE hgvsp IN (≤25 values)
+        ↓
+Step C: phenotype scores       →  coding_variants_phenotypes  WHERE startsWith(id, genePrefix)
+        |                                                            + coding_variants_id IN (bounded list)
+        ↓ (cvp.variants populated?)
+        ├─ YES (SGE etc.) → variant ID extracted directly from cvp.variants
+        └─ NO (MutPred2, ESM-1v) → Step D: VCV lookup WHERE startsWith(id, chrPrefix)
+                                                             + coding_variants_id IN (bounded list)
+        ↓
+Step E: variant objects        →  variants  WHERE id IN (bounded list)
+        ↓
+Step F: assemble output in TypeScript (group by hgvsp, deduplicate by variant_id)
+```
+
+### Key design decisions
+
+#### 1. Paginate at the `hgvsp` level first (paginate-first strategy)
+
+The naive approach — fetch all coding variant IDs for the gene, then use them in an `IN` clause on `coding_variants_phenotypes` — fails for large genes. BRCA2 has 563K coding variants. `sqlInList(563K IDs)` produces a ~250KB SQL string that exceeds ClickHouse's `max_query_size` limit.
+
+The fix: paginate at the `hgvsp` (amino acid change) level before touching any large table. `coding_variants` has the same 1.56B rows as `variants_coding_variants`, but since its `id` starts with the gene name, ClickHouse's MergeTree sort order clusters all rows for a gene together. A `GROUP BY hgvsp ORDER BY min(protein_id), min(aapos) LIMIT 25` on `coding_variants WHERE gene_name = ?` processes only that gene's rows and returns 25 hgvsp strings in ~50ms.
+
+All subsequent `sqlInList` calls are now bounded:
+- hgvsp strings in step B: ≤ 25
+- `coding_variants_id` values in steps C and D: ≤ 25 hgvsps × ~10 CVs/hgvsp = ~250 IDs (~12KB)
+- `variants_id` values in step E: similarly bounded (~250 SHA-256 hashes ~16KB)
+
+#### 2. `startsWith(id, genePrefix)` on `coding_variants_phenotypes`
+
+`coding_variants_phenotypes` has 1.1B rows sorted by `id`. The `id` column is structured as `{coding_variants_id}_{ontology_term}_{fileset}`, and `coding_variants_id` always starts with `{gene_name}_`. This means all phenotype rows for a gene form a contiguous block in the sorted order.
+
+Querying `WHERE coding_variants_id IN (250 IDs)` is a full 1.1B row scan (28 seconds cold). Querying `WHERE startsWith(id, 'BRCA2_') AND coding_variants_id IN (250 IDs)` uses ClickHouse's primary key index to skip all non-BRCA2 granules, reducing the effective scan to ~360K rows (0.022 seconds).
+
+The predicate `startsWith(id, prefix)` is equivalent to a half-open range `id >= prefix AND id < prefix_successor`. ClickHouse's sparse primary key index can prune granules where the entire `[min_id, max_id]` range falls outside this interval.
+
+#### 3. `cvp.variants` eliminates the VCV lookup for variant-linked phenotypes
+
+`coding_variants_phenotypes` has a `variants` column that stores the linked genomic variant FK (`variants/NC_000013.11:...`) for assay types where the phenotype is tied to a specific nucleotide change (SGE, VAMP-seq). Extracting the variant ID directly from this column eliminates a separate `variants_coding_variants` lookup for those records, avoiding the need to touch the 1.56B-row VCV table at all for SGE data.
+
+For protein-level phenotypes (MutPred2, ESM-1v), `cvp.variants` is empty. These still require a VCV lookup.
+
+#### 4. `startsWith(id, chrPrefix)` on `variants_coding_variants`
+
+`variants_coding_variants` has 1.56B rows sorted by `id`. The `id` column is `{variants_id}_{coding_variants_id}`, where `variants_id` is a RefSeq accession (e.g., `NC_000013.11:32316460:A:G`). All variants on a chromosome cluster together in the sorted order.
+
+Querying `WHERE coding_variants_id IN (250 IDs)` is a full 1.56B row scan (28 seconds cold). Adding `AND startsWith(id, 'NC_000013.')` restricts the scan to chr13 rows only (~65K rows, 0.046 seconds).
+
+The gene's chromosome is fetched from the `genes` table in the first query. A static map (`CHR_TO_REFSEQ_PREFIX`) translates the `chr` field (e.g., `chr13`) to the RefSeq prefix without the version number suffix (e.g., `NC_000013.`), making it robust across assembly point-release updates. If a gene's chromosome is not in the map (e.g., unplaced contigs), the VCV lookup is skipped entirely and those coding variants appear with empty `variants[]` arrays.
+
+#### 5. Score column safety for `all-scores`
+
+`coding_variants_phenotypes` uses different column names for different scoring methods (`score`, `esm_1v_score`, `pathogenicity_score`), and all are non-nullable `Float64`. The column name is selected from a static `DATASET_SCORE_COL` map keyed on the Zod-validated `dataset` enum value — it is never interpolated from raw user input.
+
+#### 6. Score deduplication within a `protein_change` group
+
+Multiple coding variant IDs can share the same `hgvsp` string and map to the same genomic variant (e.g., the same nucleotide change annotated against different transcripts). When assembling the `variants[]` array, these are deduplicated by variant ID. Scores from different coding variant records for the same (variant, method, source_url) triple are deduplicated with a linear scan (bounded by methods × filesets per variant — typically ≤ 12 entries).
+
 ## Architecture of the `variants_phenotypes.ts` router
 
 The router is structured in layers:
@@ -230,6 +317,34 @@ Output (Zod-validated tRPC response)
 
 The Zod schemas, tRPC route definitions, and `variantQueryValidation` function were kept unchanged from the ArangoDB version. The `variantIDSearch` import from `variants.ts` (already migrated) is reused as-is.
 
+### Fields returned by IGVF (cV2F) records
+
+The `IGVF_SELECT` constant is built by `getChSelectStatements` from the cV2F JSON schema's `accessible_via.return` list, which includes:
+
+- `name`, `source`, `source_url`, `score`, `method`, `class`, `label` — core edge fields
+- `files_filesets` — FK to the files/filesets collection (stored as `files_filesets/{IGVFFI...}`)
+- `biosample_term` — ontology term FK for the biosample (stored as `ontology_terms/{...}`)
+- `biological_context` — human-readable context string (e.g. `"heart"`, `"HepG2"`)
+
+In addition, two fields are added via `extraSelect`:
+- `phenotype_id` — from `vp.ontology_terms_id`, the ontology term ID of the linked phenotype
+- `phenotype_term` — from `ot.name` via a JOIN on `ontology_terms`
+
+Non-verbose mode returns `variant` as an FK string (`variants/{id}`). Verbose mode fetches the full variant object via a batch primary key lookup.
+
+### Comparison with ArangoDB PROD
+
+| Field | LOCAL (ClickHouse) | PROD (ArangoDB) | Match? |
+|---|---|---|---|
+| `name`, `source`, `source_url`, `score`, `method`, `class` | ✓ | ✓ | ✓ |
+| `phenotype_term` | ✓ | ✓ | ✓ |
+| `phenotype_id` | ✓ (added) | ✓ | ✓ |
+| `files_filesets` | ✓ (added) | ✓ | ✓ |
+| `biosample_term` | ✓ (added) | ✓ | ✓ |
+| `biological_context` | ✓ (added) | ✓ | ✓ |
+| `variant` (non-verbose) | FK string | FK string | ✓ |
+| `variant` (verbose) | expanded object | expanded object | ✓ |
+
 ## Known limitations
 
 1. **Large IN clauses** from `variantIDSearch()` region queries could produce thousands of IDs. Currently acceptable since regions are capped at 10kb, but a subquery or temp table approach would be more robust.
@@ -237,6 +352,9 @@ The Zod schemas, tRPC route definitions, and `variantQueryValidation` function w
 3. **No mouse variant support**: The rewrite focuses on human variants only. Mouse variant logic was removed from `variants.ts`.
 4. **`ontology_terms` JOIN performance**: The `ontology_terms` table is small enough for hash JOINs, but this assumption should be validated as data grows.
 5. **Cold-cache latency for region queries**: Region queries take 1.5-4s on cold cache due to reading `annotations` JSON from disk. A lean projection `ORDER BY chr, pos` could help if needed, but current performance is acceptable.
+6. **`variants_coding_variants` has no secondary index on `coding_variants_id`**: The VCV lookup in `genes_coding_variants.ts` works around this by filtering on the chromosome RefSeq prefix (`startsWith(id, 'NC_000013.')`), which restricts the scan from 1.56B to ~65K rows. The proper fix is a lean projection: `ALTER TABLE variants_coding_variants ADD PROJECTION proj_by_cv_id (SELECT coding_variants_id, variants_id ORDER BY coding_variants_id); ALTER TABLE variants_coding_variants MATERIALIZE PROJECTION proj_by_cv_id;` — but materializing 1.56B rows is a multi-hour operation.
+7. **Coding variants with no genomic variant link**: Some `hgvsp` groups have an empty `variants[]` array. This happens when neither `cvp.variants` is populated nor a VCV entry exists for those coding variants on the gene's chromosome. This is a data-coverage issue, not a query bug.
+8. **`coding_variants` gene name resolution drops fuzzy matching**: The original AQL endpoint used a Levenshtein/BM25 fuzzy fallback for gene name resolution. The ClickHouse port uses exact match only (no text indexes). Unmatched gene names return `[]` instead of a fuzzy suggestion.
 
 ## What remains to port
 

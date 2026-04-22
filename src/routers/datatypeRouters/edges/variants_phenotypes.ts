@@ -38,7 +38,12 @@ const studyGwasSchema = loadJsonSchema('nodes/studies.GWAS.json')
 // ---------------------------------------------------------------------------
 
 const IGVF_SELECT = getChSelectStatements(cV2FSchema, vpChSchema, 'vp', {
-  extraSelect: ['vp.id AS vp_id', 'vp.variants_id AS variants_id', 'ot.name AS phenotype_term']
+  extraSelect: [
+    'vp.id AS vp_id',
+    'vp.variants_id AS variants_id',
+    'ot.name AS phenotype_term',
+    'vp.ontology_terms_id AS phenotype_id'
+  ]
 })
 
 const GWAS_VP_SELECT = getChSelectStatements(gwasVpSchema, vpChSchema, 'vp', {
@@ -118,6 +123,10 @@ const igvfVariantPhenotypeFormat = z.object({
   method: z.string().nullable(),
   class: z.string().nullish(),
   phenotype_term: z.string().nullable(),
+  phenotype_id: z.string().nullish(),
+  files_filesets: z.string().nullish(),
+  biosample_term: z.string().nullish(),
+  biological_context: z.string().nullish(),
   variant: z.string().or(variantSimplifiedFormat)
 })
 
@@ -346,6 +355,10 @@ function toIgvfResult (row: any, variantMap: Map<string, any> | null): any {
     method: row.method ?? null,
     class: row.class ?? null,
     phenotype_term: row.phenotype_term ?? null,
+    phenotype_id: row.phenotype_id ?? null,
+    files_filesets: row.files_filesets ?? null,
+    biosample_term: row.biosample_term ?? null,
+    biological_context: row.biological_context ?? null,
     variant: variantField(row, variantMap)
   }
 }
@@ -574,9 +587,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   ])
 
   const allRows = [...igvfRows, ...gwasRows]
-  const needVariants = verbose || true
   const [variantMap, studyMap] = await Promise.all([
-    needVariants ? fetchVariantDetails(Array.from(new Set(allRows.map(r => r.variants_id)))) : null,
+    verbose ? fetchVariantDetails(Array.from(new Set(allRows.map(r => r.variants_id)))) : null,
     verbose ? fetchStudyDetails(Array.from(new Set(gwasRows.map(r => r.studies_id)))) : null
   ])
 

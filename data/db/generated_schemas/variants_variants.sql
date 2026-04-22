@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS variants_variants (
-	chr String,
+	chr LowCardinality(String),
 	negated Bool,
 	variant_1_base_pair String,
 	variant_2_base_pair String,
@@ -7,12 +7,12 @@ CREATE TABLE IF NOT EXISTS variants_variants (
 	variant_2_rsid String,
 	r2 Float64,
 	d_prime Float64,
-	ancestry String,
+	ancestry LowCardinality(String),
 	label String,
 	name String,
 	inverse_name String,
-	source String,
-	source_url String,
+	source LowCardinality(String),
+	source_url LowCardinality(String),
 	id String PRIMARY KEY,
 	variants_1_id String,
 	variants_2_id String
