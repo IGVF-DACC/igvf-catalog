@@ -306,11 +306,7 @@
     }
   ],
   "accessible_via": {
-<<<<<<< HEAD
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link"
-=======
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, crispr_modality"
->>>>>>> abad398 (added crispr_modality)
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, crispr_modality"
   },
   "db_collection_name": "files_filesets"
 }
