@@ -410,11 +410,6 @@ variants_genomic_elements:
     analyzers:
       - text_en_no_stem
 
-variants_phenotypes_studies:
-  zkd:
-    fields:
-      - log10pvalue
-
 variants_phenotypes:
   persistent:
     fields:

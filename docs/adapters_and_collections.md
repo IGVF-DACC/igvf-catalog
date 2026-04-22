@@ -28,7 +28,6 @@ Each adapter can write to several collections. Below is the table to display the
 | GAF                  | gaf_adapter               | go_terms_annotations                                    |
 | GWAS                 | gwas_adapter              | studies                                                 |
 |                      |                           | variants_phenotypes                                     |
-|                      |                           | variants_phenotypes_studies                             |
 | Motif                | motif_adapter             | motifs                                                  |
 |                      |                           | motifs_proteins                                         |
 | Coxpresdb            | coxpresdb_adapter         | genes_genes                                             |
