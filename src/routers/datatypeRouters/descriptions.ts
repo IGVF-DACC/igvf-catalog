@@ -515,7 +515,6 @@ export const descriptions = {
   Example: variant_id = NC_000001.11:1628997:GGG:GG,<br> \
   hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG,<br> \
-  rsid = rs1317845941,<br> \
   ca_id = CA1522823495,<br> \
   files_fileset = ENCFF705MLV.',
 
