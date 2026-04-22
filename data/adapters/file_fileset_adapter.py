@@ -74,7 +74,7 @@ class FileFileSet:
     }
     METHOD_TO_COLLECTIONS_ENCODE = {
         'caQTL': ['variants_genomic_elements', 'genomic_elements'],
-        'CRISPR enhancer perturbation screen': ['genomic_elements', 'genomic_elements_genes'],
+        'CRISPR screen': ['genomic_elements', 'genomic_elements_genes'],
         'MPRA': ['genomic_elements_biosamples', 'genomic_elements'],
         'ENCODE-rE2G': ['genomic_elements', 'genomic_elements_genes'],
     }
@@ -668,7 +668,7 @@ class FileFileSet:
         # manually set the method and modality for file ENCFF968BZL
         crispr_modality = None
         if file_object['accession'] == 'ENCFF968BZL':
-            method = 'CRISPR enhancer perturbation screen'
+            method = 'CRISPR screen'
             crispr_modality = 'interference'
 
         if file_object['accession'] == 'ENCFF420VPZ':
@@ -795,6 +795,12 @@ class FileFileSet:
         # manually set the method to MPRA, not necessary for ENCODE since preferred_assay_titles == ['MPRA']
         if assay_term_ids == ['OBI:0002675']:
             method = 'MPRA'
+
+        if preferred_assay_titles:
+            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq'}):
+                method = 'Perturb-seq'
+            elif set(preferred_assay_titles) == {'CRISPR FACS screen'}:
+                method = 'CRISPR screen'
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
 

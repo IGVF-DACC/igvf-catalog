@@ -362,7 +362,7 @@ def test_query_fileset_files_props_igvf_with_crispr_modality():
                         props, donor_ids, sample_term_ids = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
     assert props['crispr_modality'] == 'interference'
-    assert props['method'] == 'CRISPR FACS screen'
+    assert props['method'] == 'CRISPR screen'
     assert donor_ids == {'IGVFDO0000TEST'}
     assert sample_term_ids == ['EFO_0002067']
 

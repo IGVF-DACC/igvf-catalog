@@ -101,6 +101,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         method = file_fileset['method']
+        crispr_modality = file_fileset.get('crispr_modality')
         genomic_coordinates_to_element_id = {}
         with gzip.open(self.filepath, 'rt') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
@@ -121,7 +122,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         return name_to_idx[column_name]
                 return None
 
-            if method in ['Perturb-seq', 'TAP-seq']:
+            if method == 'Perturb-seq':
                 I = {
                     'p_val': get_column_index('p_val', 'sceptre_p_value'),
                     'log2_fc': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
@@ -135,7 +136,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                     'start': get_column_index('intended_target_start', 'targeting_start'),
                     'end': get_column_index('intended_target_end', 'targeting_end'),
                 }
-            elif method == 'CRISPR FACS screen':
+            elif method == 'CRISPR screen':
                 I = {
                     'p_val': name_to_idx['FRACTEL_pval'],
                     'p_val_adj': name_to_idx['FRACTEL_pval_fdr_corr'],
@@ -186,7 +187,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                 else:
                     element_id = genomic_coordinates_to_element_id[element_coordinates]
 
-                if method in ['Perturb-seq', 'TAP-seq']:
+                if method == 'Perturb-seq':
                     metrics = {
                         'p_value': float(row[I['p_val']]),
                         'log2FC': float(row[I['log2_fc']]),
@@ -200,7 +201,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         metrics['pct_1'] = float(row[I['pct_1']])
                     if I['pct_2'] is not None:
                         metrics['pct_2'] = float(row[I['pct_2']])
-                elif method == 'CRISPR FACS screen':
+                elif method == 'CRISPR screen':
                     metrics = {
                         'p_value': float(row[I['p_val']]),
                         'p_value_adj': float(row[I['p_val_adj']]),
@@ -223,6 +224,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'method': method,
+                        'crispr_modality': crispr_modality,
                         'biological_context': file_fileset['simple_sample_summaries'][0],
                         'biosample_term': file_fileset['samples'][0],
                         'treatments_term_ids': file_fileset['treatments_term_ids'],

@@ -93,6 +93,19 @@
             "Variant-EFFECTS"
           ]
         },
+        "crispr_modality": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            null,
+            "interference",
+            "activation",
+            "prime editing"
+          ]
+        },
         "biological_context": {
           "type": "string",
           "description": "Biological context for the variant to gene edge",
@@ -128,6 +141,7 @@
         "label",
         "source_url",
         "files_filesets",
+        "crispr_modality",
         "biological_context",
         "biosample_term",
         "treatments_term_ids"
@@ -139,6 +153,6 @@
   "accessible_via": {
     "filter_by_range": "effect_size",
     "simplified_return": "label, source, effect_size, biological_context",
-    "return": "effect_size, log2_fold_change, p_nominal_nlog10, fdr_nlog10, source, label, method, class, source_url, biological_context, biosample_term"
+    "return": "effect_size, log2_fold_change, p_nominal_nlog10, fdr_nlog10, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
   }
 }

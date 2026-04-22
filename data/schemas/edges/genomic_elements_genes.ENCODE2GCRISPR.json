@@ -48,7 +48,18 @@
         },
         "method": {
           "enum": [
-            "CRISPR enhancer perturbation screen"
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            null,
+            "interference"
           ]
         },
         "class": {
@@ -110,6 +121,7 @@
         "log10pvalue",
         "significant",
         "files_filesets",
+        "crispr_modality",
         "biological_context",
         "biosample_term"
       ],
@@ -119,7 +131,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "score",
-    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, score, p_value"
+    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, score, p_value"
   },
   "db_collection_name": "genomic_elements_genes"
 }
