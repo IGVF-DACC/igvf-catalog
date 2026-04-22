@@ -269,6 +269,19 @@
           "type": ["string", "null"],
           "description": "The genome browser link of the file set",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
+        },
+        "crispr_modality": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The CRISPR modality of the file set",
+          "enum": [
+            null,
+            "interference",
+            "activation",
+            "prime editing"
+          ]
         }
       },
       "required": [
@@ -286,13 +299,18 @@
         "treatments_term_ids",
         "publication",
         "download_link",
-        "cell_annotation"
+        "cell_annotation",
+        "crispr_modality"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
+<<<<<<< HEAD
     "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link"
+=======
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, crispr_modality"
+>>>>>>> abad398 (added crispr_modality)
   },
   "db_collection_name": "files_filesets"
 }

@@ -64,7 +64,7 @@
       "title": "scATAC-seq processing scripts"
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFSM4284RDJK&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFSM4284RDJK&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&field=modifications&format=json&limit=all": [
     {
       "@id": "/in-vitro-systems/IGVFSM4284RDJK/",
       "@type": ["InVitroSystem", "Biosample", "Sample", "Item"],
@@ -948,7 +948,7 @@
       ]
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFSM6820XJKR&accession=IGVFSM4284RDJK&accession=IGVFSM9475FJUV&accession=IGVFSM7126ZMPT&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&format=json&limit=all" : [
+  "https://api.data.igvf.org/search/?accession=IGVFSM6820XJKR&accession=IGVFSM4284RDJK&accession=IGVFSM9475FJUV&accession=IGVFSM7126ZMPT&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&field=modifications&format=json&limit=all" : [
     {
       "@id": "/in-vitro-systems/IGVFSM7126ZMPT/",
       "@type": [
@@ -6577,7 +6577,7 @@
       ]
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFSM3422QUYJ&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFSM3422QUYJ&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&field=modifications&format=json&limit=all": [
     {
       "@id": "/in-vitro-systems/IGVFSM3422QUYJ/",
       "@type": [
