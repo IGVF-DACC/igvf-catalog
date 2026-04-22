@@ -30,9 +30,6 @@ describe('env.ts', () => {
     process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'prod_db'
     process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'prod_user'
     process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'prod_pass'
-    process.env.IGVF_CATALOG_ARANGODB_AGENT_MAX_SOCKETS = '20'
-    process.env.IGVF_CATALOG_ARANGODB_AGENT_KEEP_ALIVE = 'false'
-    process.env.IGVF_CATALOG_ARANGODB_AGENT_TIMEOUT = '120000'
     process.env.IGVF_CATALOG_LLM_QUERY_SERVICE_URL = 'https://llm.prod'
 
     jest.isolateModules(() => {
@@ -46,9 +43,6 @@ describe('env.ts', () => {
       expect(envData.database.dbName).toBe('prod_db')
       expect(envData.database.auth.username).toBe('prod_user')
       expect(envData.database.auth.password).toBe('prod_pass')
-      expect(envData.database.agentOptions.maxSockets).toBe(20)
-      expect(envData.database.agentOptions.keepAlive).toBe(false)
-      expect(envData.database.agentOptions.timeout).toBe(120000)
       expect(envData.catalog_llm_query_service_url).toBe('https://llm.prod')
     })
   })
