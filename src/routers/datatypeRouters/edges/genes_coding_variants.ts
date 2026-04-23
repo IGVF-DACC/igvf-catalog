@@ -230,7 +230,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     LET codingVariants = (
       FOR cv IN ${codingVariantCollectionName}
         FILTER cv.gene_name == gene_name
-        RETURN cv._id
+        RETURN CONCAT("coding_variants/", cv._key)
     )
     LET variantMap = (
       FOR vcv IN variants_coding_variants

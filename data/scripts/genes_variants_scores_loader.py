@@ -54,7 +54,7 @@ with open(GENES, 'r') as file:
                 LET codingVariants = (
                     FOR cv IN coding_variants
                     FILTER cv.gene_name == @name
-                    RETURN cv._id
+                    RETURN CONCAT("coding_variants/", cv._key)
                 )
 
                 LET variantMap = (
