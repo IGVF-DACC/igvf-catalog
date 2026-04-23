@@ -59,8 +59,9 @@
           "description": "True if this edge met the significance threshold (e.g. minusLog10QValue >= 1)."
         },
         "label": {
+          "description": "Reference-tile (REF) MPRA activity; not alternate-allele–specific element effects.",
           "enum": [
-            "regulatory element activity"
+            "regulatory reference element activity"
           ]
         },
         "name": {

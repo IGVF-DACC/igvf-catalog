@@ -182,6 +182,26 @@ class MPRAAdapter(BaseAdapter):
         return (chr_, start, end, cls.normalize_strand(strand))
 
     @classmethod
+    def design_row_allele_role(cls, allele_values):
+        """ref | alt | none — whether this design row is the ref tile, alt-only, or no alleles (non‑variant MPRA).
+
+        'ref': allele list includes the reference (e.g. [\"ref\"] or [\"ref\", \"alt\"] on one row).
+        'alt': only alternate (e.g. [\"alt\"]) — must not drive element names, design membership, or variant→tile mapping.
+        'none': missing/empty allele column or no ref/alt tokens (typical for MPRA without tested variants).
+        """
+        if not isinstance(allele_values, list) or not allele_values:
+            return 'none'
+        s = {
+            str(a).strip().lower() for a in allele_values
+            if a is not None
+        }
+        if 'ref' in s:
+            return 'ref'
+        if 'alt' in s:
+            return 'alt'
+        return 'none'
+
+    @classmethod
     def build_mpra_element_node_id(cls, chr_, start, end, suffix):
         """Genomic element node _key: coordinates + suffix only (strand lives on edges)."""
         region_id = build_regulatory_region_id(chr_, start, end, 'MPRA')
@@ -194,17 +214,11 @@ class MPRAAdapter(BaseAdapter):
                 try:
                     key = self.make_design_key(
                         row['chr'], row['start'], row['end'], row.get('strand'))
-                    self.design_elements.add(key)
-                    # MPRA sequence designs TSV has a "name" column; we use it as the element node name.
-                    self.coords_to_element_name[key] = row.get('name')
                 except Exception:
-                    pass
+                    continue
 
                 allele_raw = row.get('allele')
-                normalized_name = self.normalize_design_name(row.get('name'))
-                if normalized_name:
-                    self.design_name_class[normalized_name] = (
-                        row.get('class') or '').strip().lower()
+                allele_values = None
                 if allele_raw not in (None, '', 'NA', 'NaN'):
                     try:
                         allele_values = ast.literal_eval(allele_raw)
@@ -215,22 +229,33 @@ class MPRAAdapter(BaseAdapter):
                         raise ValueError(
                             f'Malformed allele at row {i}: expected list, got {type(allele_values).__name__}'
                         )
-                    normalized_alleles = set()
+                name_role = self.design_row_allele_role(allele_values or [])
+
+                # Only ref (or non-variant) rows define catalog elements, names, and variant→tile
+                # mapping. Alt-only rows still contribute to design_name_alleles / design_element_alleles
+                # so biosample edges for ALT_* effect names are correctly skipped.
+                if name_role in ('ref', 'none'):
+                    self.design_elements.add(key)
+                    if row.get('name') is not None and str(row.get('name')).strip():
+                        # Prefer ref / non-variant name; never let a later alt-only row overwrite.
+                        self.coords_to_element_name[key] = row.get('name')
+
+                normalized_name = self.normalize_design_name(row.get('name'))
+                if normalized_name:
+                    self.design_name_class[normalized_name] = (
+                        row.get('class') or '').strip().lower()
+                if allele_values is not None:
                     for allele in allele_values:
                         if allele is None:
                             continue
                         normalized = str(allele).strip().lower()
-                        normalized_alleles.add(normalized)
                         self.design_element_alleles[key].add(normalized)
                         if normalized_name:
                             self.design_name_alleles[normalized_name].add(
                                 normalized)
-                    # Both ref and alt on one design row is valid: element-level activity
-                    # in the effects file applies to the reference tile; alt-only designs
-                    # for the same coordinate still skip biosample edges (see
-                    # genomic_element_biosample branch: 'ref' not in alleles).
 
-                if row.get('SPDI') in (None, '', 'NA', 'NaN'):
+                if row.get('SPDI') in (None, '', 'NA', 'NaN') or name_role not in (
+                        'ref', 'none'):
                     continue
                 try:
                     spdi_list = ast.literal_eval(row['SPDI'])
@@ -286,7 +311,8 @@ class MPRAAdapter(BaseAdapter):
     def process_file(self):
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
-        self.collection_label_elements_biosamples = 'regulatory element activity'
+        self.collection_label_elements_biosamples = (
+            'regulatory reference element activity')
         self.collection_class = self.files_filesets.get('class')
         self.method = self.files_filesets.get('method')
         samples = self.files_filesets.get('samples') or []
@@ -578,8 +604,9 @@ class MPRAAdapter(BaseAdapter):
                     '_from': f'variants/{variant_id}',
                     '_to': self.biosample_term,
                     'genomic_element': f'genomic_elements/{element_id}',
-                    'bed_score': self.safe_int(row[4]),
+                    'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
+                    'bed_score': self.safe_int(row[4]),
                     'DNA_count_ref': self.safe_float(row[7]),
                     'RNA_count_ref': self.safe_float(row[8]),
                     'DNA_count_alt': self.safe_float(row[9]),
