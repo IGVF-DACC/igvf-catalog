@@ -79,6 +79,39 @@ def test_genomic_element_uses_ref_name_when_ref_and_alt_share_coords(
     assert parsed[0]['name'] == 'REF_name'
 
 
+def test_genomic_element_mixed_ref_alt_on_one_row_is_single_ref_element(
+        tmp_path, mock_file_fileset):
+    """['ref', 'alt'] on one line: one ref tile; alt in the list pairs with that ref at same locus."""
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'name\tsequence\tcategory\tclass\tsource\tref\tchr\tstart\tend\t'
+        'strand\tvariant_class\tvariant_pos\tSPDI\tallele\tinfo\n'
+        'one_tile_mixed\tN\tvariant\ttest\tunc\tGRCh38\tchr1\t10\t20\t+'
+        '\t["SNV"]\t[12]\t["NC_000001.11:11:A:C"]\t["ref", "alt"]\tNA\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr1\t10\t20\ty\t100\t+\t0.25\t1.0\t2.0\t3.0\t1.5\n'
+    )
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='genomic_element',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    parsed = [json.loads(x) for x in writer.contents]
+    assert len(parsed) == 1
+    assert parsed[0]['name'] == 'one_tile_mixed'
+    assert parsed[0]['chr'] == 'chr1'
+    assert parsed[0]['start'] == 10
+    assert parsed[0]['end'] == 20
+
+
 def test_genomic_element(mock_file_fileset):
 
     writer = SpyWriter()

@@ -183,10 +183,15 @@ class MPRAAdapter(BaseAdapter):
 
     @classmethod
     def design_row_allele_role(cls, allele_values):
-        """ref | alt | none — whether this design row is the ref tile, alt-only, or no alleles (non‑variant MPRA).
+        """ref | alt | none — how this design row relates to the catalog genomic element.
 
-        'ref': allele list includes the reference (e.g. [\"ref\"] or [\"ref\", \"alt\"] on one row).
-        'alt': only alternate (e.g. [\"alt\"]) — must not drive element names, design membership, or variant→tile mapping.
+        'ref': the row defines the **reference** tile. Includes [\"ref\"] alone, or a **mixed** list
+        [\"ref\", \"alt\"]: both labels describe the same locus; the alt is the alternate-haplotype
+        assayed for the *same* (chr, start, end, strand) as the ref. The single catalog
+        `genomic_element` is that ref tile; there is not a second element for the alt in the list.
+        'alt': alt-**only** (e.g. [\"alt\"]) — a second row at the same coords for the separate ALT
+        sequence; must not drive `coords_to_element_name`, `design_elements`, or variant→tile for
+        the ref tile.
         'none': missing/empty allele column or no ref/alt tokens (typical for MPRA without tested variants).
         """
         if not isinstance(allele_values, list) or not allele_values:
@@ -231,8 +236,11 @@ class MPRAAdapter(BaseAdapter):
                         )
                 name_role = self.design_row_allele_role(allele_values or [])
 
-                # Only ref (or non-variant) rows define catalog elements, names, and variant→tile
-                # mapping. Alt-only rows still contribute to design_name_alleles / design_element_alleles
+                # Only ref (or non-variant) rows define the catalog `genomic_element` and its name.
+                # Mixed [\"ref\", \"alt\"] on one row is still a single ref element (same coordinates/
+                # strand; alt in the list is the paired alternate readout, not a second node).
+                # Alt-only *rows* (separate TSV line with [\"alt\"] only) must not overwrite that.
+                # All rows (including alt-only) still add to design_name_alleles / design_element_alleles
                 # so biosample edges for ALT_* effect names are correctly skipped.
                 if name_role in ('ref', 'none'):
                     self.design_elements.add(key)
