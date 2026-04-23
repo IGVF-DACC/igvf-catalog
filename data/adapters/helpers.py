@@ -788,3 +788,20 @@ def get_file_fileset_by_accession_in_arangodb(accession):
     db = ArangoDB().get_igvf_connection()
     files_filesets_collection = db.collection('files_filesets')
     return files_filesets_collection.get(accession)
+
+
+def get_file_accessions_in_same_fileset(accession):
+    """Return all file accessions (_key) that share the same file_set_id as the given file.
+
+    Used when loading variant nodes from multi-file experiments (e.g. STARR-seq) so that
+    variants from sibling files are not treated as "already loaded" - each file in the
+    experiment should emit its variant nodes.
+    """
+    file_doc = get_file_fileset_by_accession_in_arangodb(accession)
+    if not file_doc or 'file_set_id' not in file_doc:
+        return [accession]
+    file_set_id = file_doc['file_set_id']
+    db = ArangoDB().get_igvf_connection()
+    query = 'FOR f IN files_filesets FILTER f.file_set_id == @file_set_id RETURN f._key'
+    cursor = db.aql.execute(query, bind_vars={'file_set_id': file_set_id})
+    return list(cursor)
