@@ -47,6 +47,38 @@ def test_variant(mock_load_variant, mock_check, mock_file_fileset):
         '"spdi": "NC_000009.12:135961939:C:T"' in entry for entry in writer.contents)
 
 
+def test_genomic_element_uses_ref_name_when_ref_and_alt_share_coords(
+        tmp_path, mock_file_fileset):
+    """Alt-only rows must not overwrite the element name; non-variant (no allele) still loads."""
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'name\tsequence\tcategory\tclass\tsource\tref\tchr\tstart\tend\t'
+        'strand\tvariant_class\tvariant_pos\tSPDI\tallele\tinfo\n'
+        'ALT_only_name\tN\tvariant\ttest\tunc\tGRCh38\tchr1\t10\t20\t+'
+        '\t["SNV"]\t[12]\t["NC_000001.11:11:A:C"]\t["alt"]\tNA\n'
+        'REF_name\tN\tvariant\ttest\tunc\tGRCh38\tchr1\t10\t20\t+'
+        '\t["SNV"]\t[12]\t["NC_000001.11:11:A:C"]\t["ref"]\tNA\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr1\t10\t20\tignored_in_igvf\t100\t+\t0.25\t1.0\t2.0\t3.0\t1.5\n'
+    )
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='genomic_element',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000REF/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+    parsed = [json.loads(x) for x in writer.contents]
+    assert len(parsed) == 1
+    assert parsed[0]['name'] == 'REF_name'
+
+
 def test_genomic_element(mock_file_fileset):
 
     writer = SpyWriter()
@@ -169,6 +201,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
         '_from': 'variants/NC_000009.12:136248440:T:C',
         '_to': 'ontology_terms/CL_0000679',
         'genomic_element': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
+        'strand': '+',
         'bed_score': 66,
         'log2FC': -0.0768,
         'DNA_count_ref': 0.5948,
@@ -233,7 +266,9 @@ def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_v
 
     by_score = {p['bed_score']: p for p in parsed}
     assert by_score[3]['genomic_element'] == 'genomic_elements/MPRA_chr1_0_250_GRCh38_IGVFFI0000REF'
+    assert by_score[3]['strand'] == '+'
     assert by_score[918]['genomic_element'] == 'genomic_elements/MPRA_chr1_100_350_GRCh38_IGVFFI0000REF'
+    assert by_score[918]['strand'] == '+'
 
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000006.12:52763752:A:G'})
@@ -275,6 +310,8 @@ def test_variant_biosample_uses_strand_for_reverse_complement_designs(mock_load_
     by_score = {p['bed_score']: p for p in parsed}
     assert '_plus_' in by_score[352]['_key']
     assert '_minus_' in by_score[368]['_key']
+    assert by_score[352]['strand'] == '+'
+    assert by_score[368]['strand'] == '-'
 
 
 def test_genomic_element_biosample(mock_file_fileset):

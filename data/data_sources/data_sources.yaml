@@ -1282,7 +1282,7 @@ genomic element to biosample igvf mpra:
 
   source: IGVF
   threshold: 1
-  label: regulatory element activity
+  label: regulatory reference element activity
 
 # Example: python3 data_parser.py --adapter mpra --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_from_variant --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element from variants igvf mpra:
