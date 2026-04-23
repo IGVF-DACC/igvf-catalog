@@ -89,11 +89,10 @@
             "CRISPR enhancer perturbation screen",
             "CRISPR FACS screen",
             "cV2F",
+            "elements",
             "ENCODE-rE2G",
             "ESM-1v",
-            "GRCh38 elements",
-            "Homo sapiens GRCh38 elements",
-            "Homo sapiens GRCh38 hg19 elements",
+            "Homo sapiens elements",
             "MPRA",
             "MutPred2",
             "Perturb-seq",
@@ -265,6 +264,11 @@
             "pluripotent epiblast cell",
             "surface ectodermal cell"
           ]
+        },
+        "genome_browser_link": {
+          "type": ["string", "null"],
+          "description": "The genome browser link of the file set",
+          "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         }
       },
       "required": [
