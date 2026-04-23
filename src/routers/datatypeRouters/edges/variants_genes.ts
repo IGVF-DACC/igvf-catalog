@@ -68,6 +68,7 @@ const completeQtlsFormat = z.object({
   z_score: z.number().nullish(),
   credible_set_min_r2: z.number().nullish(),
   method: z.string().nullish(),
+  crispr_modality: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
   label: z.string(),
