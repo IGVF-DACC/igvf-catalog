@@ -258,6 +258,10 @@ def test_fileset_query_files_props_igvf():
     assert props['method'] == 'scATAC-seq'
     assert props['class'] == 'observed data'
     assert props['software'] == ['scATAC-seq processing scripts']
+    assert props['genome_browser_link'] == (
+        'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/'
+        'IGVFFI8400FXRX.bigWig'
+    )
     assert donor_ids == {'IGVFDO3898MNLZ'}
     assert sample_term_ids == ['UBERON_0014374']
 
@@ -584,7 +588,7 @@ def test_query_fileset_files_props_encode():
         props, donor_ids, sample_types, disease_ids = FileFileSet.query_fileset_files_props_encode(
             file_object)
     assert props == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF309LDU/'}
     assert donor_ids == {'ENCDO948PMW'}
     assert sample_types == ['/biosample-types/tissue_UBERON_0002626/']
     assert disease_ids == []
@@ -623,7 +627,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF309LDU/'}
 
     writer = SpyWriter()
     adapter = FileFileSet(accessions=[
@@ -632,7 +636,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'IGVFFI5688VHRS', 'name': 'IGVFFI5688VHRS', 'file_set_id': 'IGVFDS2175LLDQ', 'lab': 'tim-reddy', 'preferred_assay_titles': ['STARR-seq'], 'assay_term_ids': ['OBI:0002041'], 'method': 'STARR-seq', 'class': 'observed data', 'software': ['BIRD', 'Samtools', 'pandas'], 'samples': ['ontology_terms/EFO_0002067'], 'sample_ids': ['IGVFSM3422QUYJ'], 'simple_sample_summaries': [
-        'K562 with variants from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None}
+        'K562 with variants from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None}
 
     write = SpyWriter()
     adapter = FileFileSet(
