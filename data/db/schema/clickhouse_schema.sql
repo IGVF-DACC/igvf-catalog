@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS variants (
 	ref String,
 	alt String,
  	qual String,
-	filter String,
 	variation_type String,
 	annotations JSON,
 	spdi String,
