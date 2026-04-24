@@ -98,7 +98,10 @@ class EQTLCatalog(BaseAdapter):
         found_dataset = False
         with open(self.METADATA_PATH, 'r') as f:
             metadata_reader = csv.reader(f, delimiter='\t')
-            next(metadata_reader)
+            for row in metadata_reader:
+                if row and row[0].startswith('#'):
+                    continue
+                break  # first non-comment row is the header
             for row in metadata_reader:
                 if row[1] == dataset_id:
                     biosample_term = f'ontology_terms/{row[4]}'
@@ -182,7 +185,11 @@ class EQTLCatalog(BaseAdapter):
         study_list = []
         with open(self.METADATA_PATH, 'r') as f:
             metadata_reader = csv.reader(f, delimiter='\t')
-            next(metadata_reader)
+            # we added comment in metadata file. Need to skip the comment row when reading the file.
+            for row in metadata_reader:
+                if row and row[0].startswith('#'):
+                    continue
+                break  # first non-comment row is the header
             for row in metadata_reader:
                 if row[8] in ['ge', 'leafcutter'] and row[6] == 'naive':
                     if row[0] not in study_list:
