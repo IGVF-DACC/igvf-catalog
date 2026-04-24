@@ -17,6 +17,15 @@
         "name": {
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
+        "strand": {
+          "type": "string",
+          "description": "Strand of the MPRA element tile",
+          "enum": [
+            "+",
+            "-",
+            "."
+          ]
+        },
         "method": {
           "enum": [
             "MPRA"
@@ -43,7 +52,8 @@
         }
       },
       "required": [
-        "files_filesets"
+        "files_filesets",
+        "strand"
       ],
       "additionalProperties": false
     }
