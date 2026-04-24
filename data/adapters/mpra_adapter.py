@@ -15,13 +15,9 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
   Designs are required to map SPDI/variant pos → tile for linking to element edges.
 
 **Assumptions**
-  1. **Node _key** — ``build_regulatory_region_id`` + *accession*; strand is **not** in the
-     genomic element _key. ``make_design_key`` (chr, start, end, strand) selects the design
-     name and filters; the node id is coordinate + suffix only, so the same base interval
-     on opposite strands can share one ``genomic_element`` _key. ``genomic_element`` output
-     dedupes on ``element_id`` (``seen_element_ids``); first winning row in file order
-     for that id controls whether a second strand row is skipped. ``genomic_element_biosample``
-     edges are keyed with ``strand_token`` in ``edge_id`` so +/− can each get an edge.
+  1. **Node _key** — ``build_regulatory_region_id`` + normalized strand token + *accession*.
+     ``make_design_key`` (chr, start, end, strand) selects the design name and filters.
+     Opposite strands for the same interval become distinct ``genomic_element`` nodes.
   2. **ref vs alt** — ``design_row_allele_role``; rows that *define* the catalog tile are
      those for which ``_design_row_defines_catalog_element`` is true (``ref`` or non-variant
      ``none``). Alt-only design rows do not set ``coords_to_element_name`` or SPDI → tile; they only
@@ -256,10 +252,10 @@ class MPRAAdapter(BaseAdapter):
         return name_role in ('ref', 'none')
 
     @classmethod
-    def build_mpra_element_node_id(cls, chr_, start, end, suffix):
-        """Genomic element node _key: coordinates + suffix only (strand lives on edges)."""
+    def build_mpra_element_node_id(cls, chr_, start, end, strand, suffix):
+        """Genomic element node _key: coordinates + strand token + suffix."""
         region_id = build_regulatory_region_id(chr_, start, end, 'MPRA')
-        return f'{region_id}_{suffix}'
+        return f'{region_id}_{cls.strand_token(strand)}_{suffix}'
 
     def load_mpra_design_mapping(self, mpra_design_file):
         # IGVF designs TSV: per-row `allele` / `SPDI` / `variant_pos` drive the maps in the
@@ -361,7 +357,7 @@ class MPRAAdapter(BaseAdapter):
         return (effect_name or '').strip() in self.excluded_effect_names
 
     def process_file(self):
-        # genomic_element_from_variant: dedupe (chr,start,end) across chunks
+        # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = (
@@ -428,7 +424,7 @@ class MPRAAdapter(BaseAdapter):
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
                 element_id = self.build_mpra_element_node_id(
-                    chr_, start, end, element_id_suffix)
+                    chr_, start, end, strand, element_id_suffix)
                 element_key = self.make_design_key(chr_, start, end, strand)
 
                 if self.label == 'genomic_element':
@@ -460,6 +456,7 @@ class MPRAAdapter(BaseAdapter):
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
+                        'strand': self.normalize_strand(strand),
                         'method': self.method,
                         'type': 'tested elements',
                         'source': self.source,
@@ -576,34 +573,29 @@ class MPRAAdapter(BaseAdapter):
         The ``chunk`` argument is unused (variant file is not re-parsed here); coordinates
         come from the design TSV. ``self.seen_elements`` dedupes across chunk invocations.
         """
-        coord_to_strands = defaultdict(set)
+        keys = set()
         for element_coords_set in self.variant_to_element.values():
             for chr_, start, end, strand in element_coords_set:
-                coord_to_strands[(chr_, start, end)].add(strand)
+                keys.add(self.make_design_key(chr_, start, end, strand))
 
-        for coord_key in sorted(coord_to_strands.keys()):
-            if coord_key in self.seen_elements:
+        for key in sorted(keys):
+            if key in self.seen_elements:
                 continue
-            self.seen_elements.add(coord_key)
-            chr_, start, end = coord_key
-            strands = coord_to_strands[coord_key]
-            element_name = None
-            for strand in sorted(strands):
-                element_name = self.coords_to_element_name.get(
-                    self.make_design_key(chr_, start, end, strand))
-                if element_name:
-                    break
+            self.seen_elements.add(key)
+            chr_, start, end, strand = key
+            element_name = self.coords_to_element_name.get(key)
             if element_name is None:
                 raise ValueError(
-                    f'Missing MPRA sequence design name for {coord_key} in {self.reference_file_accession}.')
+                    f'Missing MPRA sequence design name for {(chr_, start, end, strand)} in {self.reference_file_accession}.')
             _id = self.build_mpra_element_node_id(
-                chr_, start, end, self.reference_file_accession)
+                chr_, start, end, strand, self.reference_file_accession)
             props = {
                 '_key': _id,
                 'name': element_name,
                 'chr': chr_,
                 'start': int(start),
                 'end': int(end),
+                'strand': self.normalize_strand(strand),
                 'method': self.method,
                 'type': 'tested elements',
                 'source': self.source,
@@ -654,8 +646,7 @@ class MPRAAdapter(BaseAdapter):
 
             for element_chr, element_start, element_end, element_strand in mapped_elements:
                 element_id = self.build_mpra_element_node_id(
-                    element_chr, element_start, element_end, self.reference_file_accession)
-                # Strand distinguishes edges when node id is coord-only.
+                    element_chr, element_start, element_end, element_strand, self.reference_file_accession)
                 edge_key = '_'.join([
                     variant_id,
                     element_id,

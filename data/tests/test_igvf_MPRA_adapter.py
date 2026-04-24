@@ -224,7 +224,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
     biosample_term_key = 'CL_0000679'
-    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_plus_{biosample_term_key}_IGVFFI1323RCIE'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_plus_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
@@ -233,7 +233,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
         '_key': expected_key,
         '_from': 'variants/NC_000009.12:136248440:T:C',
         '_to': 'ontology_terms/CL_0000679',
-        'genomic_element': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
+        'genomic_element': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH',
         'strand': '+',
         'bed_score': 66,
         'log2FC': -0.0768,
@@ -298,9 +298,9 @@ def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_v
     assert len(parsed) == 2
 
     by_score = {p['bed_score']: p for p in parsed}
-    assert by_score[3]['genomic_element'] == 'genomic_elements/MPRA_chr1_0_250_GRCh38_IGVFFI0000REF'
+    assert by_score[3]['genomic_element'] == 'genomic_elements/MPRA_chr1_0_250_GRCh38_plus_IGVFFI0000REF'
     assert by_score[3]['strand'] == '+'
-    assert by_score[918]['genomic_element'] == 'genomic_elements/MPRA_chr1_100_350_GRCh38_IGVFFI0000REF'
+    assert by_score[918]['genomic_element'] == 'genomic_elements/MPRA_chr1_100_350_GRCh38_plus_IGVFFI0000REF'
     assert by_score[918]['strand'] == '+'
 
 
@@ -524,7 +524,7 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
     parsed = [json.loads(x) for x in writer.contents]
     assert len(parsed) == 2
     assert len({p['_key'] for p in parsed}) == 2
-    assert len({p['_from'] for p in parsed}) == 1
+    assert len({p['_from'] for p in parsed}) == 2
 
 
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample'])
