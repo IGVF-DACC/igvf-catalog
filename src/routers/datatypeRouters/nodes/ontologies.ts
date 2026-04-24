@@ -19,7 +19,6 @@ export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   synonyms: z.string().optional(),
-  description: z.string().trim().optional(),
   source: z.enum(ontologySources).optional(),
   subontology: z.enum(subontologies).optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
@@ -91,20 +90,6 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
     delete input.name
   }
 
-  if (input.description !== undefined) {
-    const description = (input.description as string).toLowerCase()
-
-    queryStatementsToken.push(`TOKENS("${decodeURIComponent(description)}", "text_en_no_stem") ALL in record.description`)
-    queryStatementsFuzzy.push(`LEVENSHTEIN_MATCH(
-      record.description,
-      TOKENS("${decodeURIComponent(description)}", "text_en_no_stem")[0],
-      1,    // max distance
-      false // without transpositions
-    )`)
-
-    delete input.description
-  }
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -151,7 +136,7 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
 export async function ontologySearch (input: paramsFormatType): Promise<any[]> {
   const objects = await exactMatchSearch(input)
 
-  if ((('name' in input && input.name !== undefined) || ('description' in input && input.description !== undefined)) && objects.length === 0) {
+  if (('name' in input && input.name !== undefined) && objects.length === 0) {
     return await fuzzyTextSearch(input)
   }
 
