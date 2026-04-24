@@ -538,7 +538,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. <br> \
-  Example: variant_id = NC_000001.11:630556:T:C.<br> \
+  Example: variant_id = NC_000001.11:630556:T:C<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -575,14 +575,14 @@ export const descriptions = {
   region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
-  Example: query = ENSP00000384707 or ENST00000663609. <br> \
-  name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
+  Example: query = ENSP00000384707, <br> \
+  name = involved in<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
   go_terms_annotations: 'Retrieve annotations associated with a GO term. <br> \
-  Example: go_term_id = GO_1990590. <br> \
-  name = \'has component\' or \'contains\' or \'is a function of\' <br> \
+  Example: go_term_id = GO_1990590, <br> \
+  name = has component<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -599,7 +599,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. <br> \
-  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189 (maximum length: 10kb).',
+  Example: region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
   Example: variant_id = NC_000012.12:102917129:T:C <br> \

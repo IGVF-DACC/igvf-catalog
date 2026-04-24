@@ -6,8 +6,8 @@ import urllib.parse
 import json
 import re
 
-OPENAPI_URL = 'http://api.catalogkg.igvf.org/openapi'
-BASE_URL = 'http://api.catalog.igvf.org/api'
+OPENAPI_URL = 'https://api.catalogkg.igvf.org/openapi'
+BASE_URL = 'https://api.catalogkg.igvf.org/api'
 
 VALUE_EXPANSIONS = {
     'Homo': 'Homo sapiens',
