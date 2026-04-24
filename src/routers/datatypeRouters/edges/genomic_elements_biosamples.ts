@@ -18,8 +18,11 @@ const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosam
 const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),
   strand: z.string().nullable(),
-  minusLog10PValue: z.number().nullable(),
-  minusLog10QValue: z.number().nullable(),
+  p_value: z.number().nullable(), // minusLog10PValue
+  fdr: z.number().nullable(), // minusLog10QValue
+  DNA_count: z.number().nullish(),
+  RNA_count: z.number().nullish(),
+  significant: z.boolean().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
@@ -125,6 +128,8 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+        'fdr': record.minusLog10QValue,
+        'p_value': record.minusLog10PValue,
         'name': record.inverse_name,
         'class': record.class,
         'method': record.method
@@ -203,6 +208,8 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+        'fdr': record.minusLog10QValue,
+        'p_value': record.minusLog10PValue,
         'name': record.name,
         'class': record.class,
         'method': record.method

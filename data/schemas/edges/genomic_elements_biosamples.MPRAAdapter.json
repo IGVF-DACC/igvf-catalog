@@ -140,7 +140,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, strand, minusLog10PValue, minusLog10QValue, source, source_url"
+    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, strand, minusLog10PValue, minusLog10QValue, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }
