@@ -70,6 +70,23 @@ const outputFormat = z.array(z.object({
   gene: z.string().or(geneOutputFormat)
 }))
 
+const grnOutputFormat = z.object({
+  gene: z.string(),
+  genomic_element: z.object({
+    chr: z.string(),
+    start: z.number(),
+    end: z.number()
+  }),
+  promoter_of: z.string().nullish(),
+  class: z.string(),
+  method: z.string(),
+  source: z.string(),
+  biological_context: z.string(),
+  files_filesets: z.string(),
+  score: z.number().nullish(),
+  p_value: z.number().nullish()
+})
+
 const buildEdgeFilter = (input: paramsFormatType): string => {
   if (input.files_fileset !== undefined) {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
@@ -385,7 +402,7 @@ async function gnrFromGeneRegulator (input: paramsFormatType): Promise<any> {
   geneQueryValidation(input)
   const limit = applyLimit(input)
 
-  const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
+  const geneInput: paramsFormatType = { _key: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
   delete input.gene_id
   delete input.hgnc_id
   delete input.alias
@@ -446,7 +463,7 @@ async function gnrFromGeneTarget (input: paramsFormatType): Promise<any> {
   geneQueryValidation(input)
   const limit = applyLimit(input)
 
-  const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
+  const geneInput: paramsFormatType = { _key: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
   delete input.gene_id
   delete input.hgnc_id
   delete input.alias
@@ -480,7 +497,6 @@ async function gnrFromGeneTarget (input: paramsFormatType): Promise<any> {
         }
   `
 
-  console.log(query)
   const objs = (await db.query(query)).all()
   if (Array.isArray(objs) && objs.length > 0) {
     return objs
@@ -589,13 +605,13 @@ const genesFromGenomicElements = publicProcedure
 const grnTargets = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/grn/targets', description: descriptions.grn_targets } })
   .input(gnrGeneQueryFormat)
-  .output(z.any())
+  .output(z.array(grnOutputFormat))
   .query(async ({ input }) => await gnrFromGeneTarget(input))
 
 const grnRegulators = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/grn/regulators', description: descriptions.grn_regulators } })
   .input(gnrGeneQueryFormat)
-  .output(z.any())
+  .output(z.array(grnOutputFormat))
   .query(async ({ input }) => await gnrFromGeneRegulator(input))
 
 export const genomicElementsGenesRouters = {
