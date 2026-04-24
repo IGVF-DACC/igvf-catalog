@@ -56,7 +56,7 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  const geneInput: paramsFormatType = { gene_id, hgnc: hgnc_id, name, synonyms: alias, organism, page: 0 }
 
   if (input.alias !== undefined) {
     geneInput.synonym = input.alias

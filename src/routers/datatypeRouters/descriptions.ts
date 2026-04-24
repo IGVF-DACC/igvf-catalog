@@ -714,6 +714,22 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
+  grn_targets: 'Retrieve gene regulatory targets for a given gene.<br> \
+  Example: gene_id = ENSG00000031698, <br> \
+  gene_name = SARS1, <br> \
+  hgnc = HGNC:10537, <br> \
+  alias = SERRS, <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.',
+
+  grn_regulators: 'Retrieve gene regulators for a given gene.<br> \
+  Example: gene_id = ENSG00000031698, <br> \
+  gene_name = SARS1, <br> \
+  hgnc = HGNC:10537, <br> \
+  alias = SERRS, <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.',
+
   genes_genomic_elements: 'Retrieve genomic elements and gene pairs by querying genes.<br> \
   One of those fields is required: gene_id, hgnc_id, gene_name, alias, method, files_fileset. <br> \
   Example: gene_id = ENSG00000187961, <br> \

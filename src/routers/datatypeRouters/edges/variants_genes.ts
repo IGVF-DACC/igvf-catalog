@@ -440,7 +440,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
   if (isGeneQuery) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const geneInput: paramsFormatType = (({ gene_id, hgnc_id, gene_name: name, alias }) => ({ gene_id, hgnc_id, name, alias, organism: 'Homo sapiens', page: 0 }))(input)
+    const geneInput: paramsFormatType = (({ gene_id, hgnc_id, gene_name: name, alias }) => ({ gene_id, hgnc: hgnc_id, name, synonyms: alias, organism: 'Homo sapiens', page: 0 }))(input)
     delete input.gene_id
     delete input.hgnc_id
     delete input.gene_name
