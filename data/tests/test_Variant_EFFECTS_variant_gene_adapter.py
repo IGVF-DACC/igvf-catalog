@@ -44,7 +44,6 @@ mock_tsv_data = (
         'organism': 'Homo sapiens',
         'rsid': [],
         'qual': '100',
-        'filter': 'PASS',
         'annotations': {},
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
@@ -95,7 +94,6 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
         'organism': 'Homo sapiens',
         'rsid': [],
         'qual': '100',
-        'filter': 'PASS',
         'annotations': {},
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'

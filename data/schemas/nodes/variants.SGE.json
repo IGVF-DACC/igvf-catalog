@@ -33,7 +33,6 @@
       "required": [
         "rsid",
         "qual",
-        "filter",
         "annotations",
         "vrs_digest",
         "ca_id",
