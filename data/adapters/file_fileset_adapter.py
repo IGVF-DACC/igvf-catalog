@@ -672,17 +672,19 @@ class FileFileSet:
             files = dataset_object.get('files', [])
             for file in files:
                 file_format = file.get('file_format')
-                if file_format == 'bed' and file.get('preferred_default'):
+                if file_format == 'bigInteract' and file.get('preferred_default'):
+                    href = file.get('href')
                     genome_browser_link = urljoin(
-                        FileFileSet.ENCODE_API, file['@id'])
+                        FileFileSet.ENCODE_API, href)
                     break
-        elif method == 'candidate Cis-Regulatory Elements':
+        elif method in ['candidate Cis-Regulatory Elements', 'MPRA']:
             files = dataset_object.get('files', [])
             for file in files:
                 file_format = file.get('file_format')
                 if file_format == 'bigBed':
+                    href = file.get('href')
                     genome_browser_link = urljoin(
-                        FileFileSet.ENCODE_API, file['@id'])
+                        FileFileSet.ENCODE_API, href)
                     break
 
         props = {
