@@ -1,12 +1,31 @@
 """
-Unified MPRA adapter for both IGVF and ENCODE MPRA data.
+MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
 
-- IGVF: requires reference_filepath (MPRA sequence designs TSV). Supports all labels
-  (genomic_element, genomic_element_biosample, variant, genomic_element_from_variant,
-  variant_biosample). Input: TSV effect files.
-- ENCODE: no MPRA sequence designs reference file. Supports only genomic_element and genomic_element_biosample.
-  Input: BED (optionally gzipped). Output format is the same; minusLog10PValue,
-  minusLog10QValue, and treatments_term_ids are set to None where not available.
+**Pipelines**
+  * **IGVF** — load *MPRA sequence designs* (``reference_filepath``) once, then an *effect* file
+    per run (``filepath``). Designs supply tile metadata (incl. ``allele`` / ``SPDI``);
+    effect files are BED; column usage is noted on the methods that read them.
+  * **ENCODE** — no designs file. Effect file is BED (optional ``.gz``); 4th column = element
+    name.
+
+**Labels (``self.label``)**
+  * ``genomic_element`` / ``genomic_element_biosample`` — element-level activity. Designs are required
+  for IGVF to attribute the element to design file for joining with variant edges.
+  * ``variant`` / ``variant_biosample`` / ``genomic_element_from_variant`` — IGVF variant activity.
+  Designs are required to map SPDI/variant pos → tile for linking to element edges.
+
+**Assumptions**
+  1. **Node _key** — ``build_regulatory_region_id`` + normalized strand token + *accession*.
+     ``make_design_key`` (chr, start, end, strand) selects the design name and filters.
+     Opposite strands for the same interval become distinct ``genomic_element`` nodes.
+  2. **ref vs alt** — ``design_row_allele_role``; rows that *define* the catalog tile are
+     those for which ``_design_row_defines_catalog_element`` is true (``ref`` or non-variant
+     ``none``). Alt-only design rows do not set ``coords_to_element_name`` or SPDI → tile; they only
+     populate allele sets to skip ``ALT_``* effect names for ref-only biosample edges. A
+     *single* row with ``[ref, alt]`` is one reference tile (not two elements).
+  3. **Significance** — ``minusLog10QValue >= THRESHOLD`` (default 1) when Q is available.
+  4. **IGVFFI1436TRIH** — optional name exclusion file (``IGVFFI1436TRIH_EXCLUSION_LIST``).
+
 """
 
 # Example rows from ENCODE lenti-MPRA bed file ENCFF802FUV.bed: (the last two columns are the same for all rows)
@@ -48,6 +67,28 @@ from adapters.writer import Writer
 
 
 class MPRAAdapter(BaseAdapter):
+    """
+    IGVF loads a *sequence designs* TSV into the following in-memory structures:
+
+    * ``design_elements`` — set of ``make_design_key`` tuples (chr, start, end, norm strand)
+      for rows that *define* the ref/non-variant tile (see
+      :meth:`_design_row_defines_catalog_element`). Drives IGVF effect row filtering
+      (``genomic_element``: design must have seen this key).
+    * ``coords_to_element_name`` — design ``name`` for that key, only from catalog-defining
+      rows (alt-only rows do not overwrite).
+    * ``design_name_class`` / ``design_name_alleles`` / ``design_element_alleles`` — per
+      *normalized* effect BED *name* and per coordinate key: ``class`` string and the set
+      of ``ref``/``alt`` tags from the ``allele`` column. Used to skip controls, to require
+      ``ref`` for ref-only biosample edges, and to detect ambiguous multi-name regions without
+      alleles.
+    * ``variant_to_element`` / ``variant_pos_to_element`` — map SPDI (and optional bed
+      ``variant_pos``) to the same design keys, **only** from catalog-defining rows, so
+      hyper-edges point at the ref tile, not a separate ``alt``-only line.
+
+    The effect file is always ``filepath``; ``get_file_fileset_by_accession_in_arangodb`` ties
+    ``file_accession`` to ``files_filesets`` (method, class, biosample, etc.).
+    """
+
     ALLOWED_LABELS = [
         'genomic_element',
         'genomic_element_biosample',
@@ -182,29 +223,54 @@ class MPRAAdapter(BaseAdapter):
         return (chr_, start, end, cls.normalize_strand(strand))
 
     @classmethod
-    def build_mpra_element_node_id(cls, chr_, start, end, suffix):
-        """Genomic element node _key: coordinates + suffix only (strand lives on edges)."""
+    def design_row_allele_role(cls, allele_values):
+        """Return ``'ref'`` | ``'alt'`` | ``'none'`` for the parsed ``allele`` list.
+
+        ``'ref'`` if the list contains ``ref`` (including mixed ``[ref, alt]`` = one ref tile).
+        ``'alt'`` only for alt-only rows. ``'none'`` for missing/empty lists or no ref/alt tokens.
+        See module docstring and :meth:`_design_row_defines_catalog_element`.
+        """
+        if not isinstance(allele_values, list) or not allele_values:
+            return 'none'
+        s = {
+            str(a).strip().lower() for a in allele_values
+            if a is not None
+        }
+        if 'ref' in s:
+            return 'ref'
+        if 'alt' in s:
+            return 'alt'
+        return 'none'
+
+    @staticmethod
+    def _design_row_defines_catalog_element(name_role):
+        """Whether the design row may set ``design_elements``, ``coords_to_element_name``, and SPDI/variant_pos → tile.
+
+        True for **ref** and **non-variant (none)** rows; false for **alt-only** rows. See
+        module docstring.
+        """
+        return name_role in ('ref', 'none')
+
+    @classmethod
+    def build_mpra_element_node_id(cls, chr_, start, end, strand, suffix):
+        """Genomic element node _key: coordinates + strand token + suffix."""
         region_id = build_regulatory_region_id(chr_, start, end, 'MPRA')
-        return f'{region_id}_{suffix}'
+        return f'{region_id}_{cls.strand_token(strand)}_{suffix}'
 
     def load_mpra_design_mapping(self, mpra_design_file):
+        # IGVF designs TSV: per-row `allele` / `SPDI` / `variant_pos` drive the maps in the
+        # class docstring. Alt-only rows only contribute to allele *sets*, not to catalog keys.
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
                 try:
                     key = self.make_design_key(
                         row['chr'], row['start'], row['end'], row.get('strand'))
-                    self.design_elements.add(key)
-                    # MPRA sequence designs TSV has a "name" column; we use it as the element node name.
-                    self.coords_to_element_name[key] = row.get('name')
                 except Exception:
-                    pass
+                    continue
 
                 allele_raw = row.get('allele')
-                normalized_name = self.normalize_design_name(row.get('name'))
-                if normalized_name:
-                    self.design_name_class[normalized_name] = (
-                        row.get('class') or '').strip().lower()
+                allele_values = None
                 if allele_raw not in (None, '', 'NA', 'NaN'):
                     try:
                         allele_values = ast.literal_eval(allele_raw)
@@ -215,22 +281,29 @@ class MPRAAdapter(BaseAdapter):
                         raise ValueError(
                             f'Malformed allele at row {i}: expected list, got {type(allele_values).__name__}'
                         )
-                    normalized_alleles = set()
+                name_role = self.design_row_allele_role(allele_values or [])
+
+                if self._design_row_defines_catalog_element(name_role):
+                    self.design_elements.add(key)
+                    if row.get('name') is not None and str(row.get('name')).strip():
+                        self.coords_to_element_name[key] = row.get('name')
+
+                normalized_name = self.normalize_design_name(row.get('name'))
+                if normalized_name:
+                    self.design_name_class[normalized_name] = (
+                        row.get('class') or '').strip().lower()
+                if allele_values is not None:
                     for allele in allele_values:
                         if allele is None:
                             continue
                         normalized = str(allele).strip().lower()
-                        normalized_alleles.add(normalized)
                         self.design_element_alleles[key].add(normalized)
                         if normalized_name:
                             self.design_name_alleles[normalized_name].add(
                                 normalized)
-                    # Both ref and alt on one design row is valid: element-level activity
-                    # in the effects file applies to the reference tile; alt-only designs
-                    # for the same coordinate still skip biosample edges (see
-                    # genomic_element_biosample branch: 'ref' not in alleles).
 
-                if row.get('SPDI') in (None, '', 'NA', 'NaN'):
+                if row.get('SPDI') in (None, '', 'NA', 'NaN') or not self._design_row_defines_catalog_element(
+                        name_role):
                     continue
                 try:
                     spdi_list = ast.literal_eval(row['SPDI'])
@@ -284,9 +357,11 @@ class MPRAAdapter(BaseAdapter):
         return (effect_name or '').strip() in self.excluded_effect_names
 
     def process_file(self):
+        # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
-        self.collection_label_elements_biosamples = 'regulatory element activity'
+        self.collection_label_elements_biosamples = (
+            'regulatory reference element activity')
         self.collection_class = self.files_filesets.get('class')
         self.method = self.files_filesets.get('method')
         samples = self.files_filesets.get('samples') or []
@@ -317,7 +392,15 @@ class MPRAAdapter(BaseAdapter):
         self.writer.close()
 
     def _process_element_effects_file(self):
-        """Process BED/TSV element effects (same format for IGVF and ENCODE). Writes genomic_element and/or genomic_element_biosample."""
+        """Element-activity BED/TSV: one row per tile × strand in the MPRA output.
+
+        Columns (0-based): 0=chr, 1=start, 2=end, 3=name, 4=bed score, 5=strand, 6=log2FC,
+        7=DNA, 8=RNA, 9=``-log10P`` (or -1 if absent), 10=``-log10Q`` (or -1). IGVF joins the
+        sequence designs; ENCODE uses col 3 for ``name`` and ``design_elements`` is unused.
+
+        Writes ``genomic_element`` nodes and/or ``genomic_element_biosample`` edges depending on
+        ``self.label`` (both branches are in the same loop; only one label per run is active).
+        """
         self.writer.open()
         seen_element_ids = set()
         biosample_term_key = (self.biosample_term or '').split('/')[-1]
@@ -341,7 +424,7 @@ class MPRAAdapter(BaseAdapter):
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
                 element_id = self.build_mpra_element_node_id(
-                    chr_, start, end, element_id_suffix)
+                    chr_, start, end, strand, element_id_suffix)
                 element_key = self.make_design_key(chr_, start, end, strand)
 
                 if self.label == 'genomic_element':
@@ -373,6 +456,7 @@ class MPRAAdapter(BaseAdapter):
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
+                        'strand': self.normalize_strand(strand),
                         'method': self.method,
                         'type': 'tested elements',
                         'source': self.source,
@@ -484,35 +568,34 @@ class MPRAAdapter(BaseAdapter):
                     out.write(json.dumps(skipped_message) + '\n')
 
     def _process_genomic_element_chunk(self, chunk):
-        """Emit genomic_element nodes from variant->element mapping (genomic_element_from_variant label only)."""
-        coord_to_strands = defaultdict(set)
+        """``genomic_element_from_variant``: ``genomic_element`` nodes for coords in ``variant_to_element``.
+
+        The ``chunk`` argument is unused (variant file is not re-parsed here); coordinates
+        come from the design TSV. ``self.seen_elements`` dedupes across chunk invocations.
+        """
+        keys = set()
         for element_coords_set in self.variant_to_element.values():
             for chr_, start, end, strand in element_coords_set:
-                coord_to_strands[(chr_, start, end)].add(strand)
+                keys.add(self.make_design_key(chr_, start, end, strand))
 
-        for coord_key in sorted(coord_to_strands.keys()):
-            if coord_key in self.seen_elements:
+        for key in sorted(keys):
+            if key in self.seen_elements:
                 continue
-            self.seen_elements.add(coord_key)
-            chr_, start, end = coord_key
-            strands = coord_to_strands[coord_key]
-            element_name = None
-            for strand in sorted(strands):
-                element_name = self.coords_to_element_name.get(
-                    self.make_design_key(chr_, start, end, strand))
-                if element_name:
-                    break
+            self.seen_elements.add(key)
+            chr_, start, end, strand = key
+            element_name = self.coords_to_element_name.get(key)
             if element_name is None:
                 raise ValueError(
-                    f'Missing MPRA sequence design name for {coord_key} in {self.reference_file_accession}.')
+                    f'Missing MPRA sequence design name for {(chr_, start, end, strand)} in {self.reference_file_accession}.')
             _id = self.build_mpra_element_node_id(
-                chr_, start, end, self.reference_file_accession)
+                chr_, start, end, strand, self.reference_file_accession)
             props = {
                 '_key': _id,
                 'name': element_name,
                 'chr': chr_,
                 'start': int(start),
                 'end': int(end),
+                'strand': self.normalize_strand(strand),
                 'method': self.method,
                 'type': 'tested elements',
                 'source': self.source,
@@ -524,6 +607,7 @@ class MPRAAdapter(BaseAdapter):
             self.writer.write(json.dumps(props) + '\n')
 
     def _process_variant_biosample_chunk(self, chunk):
+        """IGVF variant×biosample BED: SPDI in col 3, optional ``variant_pos`` in col 16 for disambiguation of the same variant on different strands."""
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[3] for row in chunk])
         for row in chunk:
@@ -562,8 +646,7 @@ class MPRAAdapter(BaseAdapter):
 
             for element_chr, element_start, element_end, element_strand in mapped_elements:
                 element_id = self.build_mpra_element_node_id(
-                    element_chr, element_start, element_end, self.reference_file_accession)
-                # Strand distinguishes edges when node id is coord-only.
+                    element_chr, element_start, element_end, element_strand, self.reference_file_accession)
                 edge_key = '_'.join([
                     variant_id,
                     element_id,
@@ -578,8 +661,9 @@ class MPRAAdapter(BaseAdapter):
                     '_from': f'variants/{variant_id}',
                     '_to': self.biosample_term,
                     'genomic_element': f'genomic_elements/{element_id}',
-                    'bed_score': self.safe_int(row[4]),
+                    'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
+                    'bed_score': self.safe_int(row[4]),
                     'DNA_count_ref': self.safe_float(row[7]),
                     'RNA_count_ref': self.safe_float(row[8]),
                     'DNA_count_alt': self.safe_float(row[9]),
