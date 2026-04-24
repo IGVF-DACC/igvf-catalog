@@ -53,12 +53,10 @@
         },
         "crispr_modality": {
           "type": [
-            "string",
-            "null"
+            "string"
           ],
           "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
-            null,
             "interference"
           ]
         },
