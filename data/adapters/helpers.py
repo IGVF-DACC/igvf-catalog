@@ -699,12 +699,13 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if error is not None:
         return variant_json, error
 
+    pos_from_spdi = spdi.split(':')[1]
+
     variant_json = {
         '_key': _id,
         'name': spdi,
         'chr': f'chr{chr}' if not chr.startswith('chr') else chr,
-        'pos': int(pos_start) - 1,  # 0-indexed
-        'pos': pos_start,
+        'pos': pos_from_spdi,
         'ref': ref,
         'alt': alt,
         'variation_type': variation_type,
