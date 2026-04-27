@@ -434,8 +434,7 @@ async function findVariantsRegionSummary (input: paramsFormatType): Promise<any>
           (FOR r IN variants_proteins         FILTER r._from == variant RETURN r.method),
           (FOR r IN variants_biosamples       FILTER r._from == variant RETURN r.method),
           (FOR r IN variants_genomic_elements FILTER r._from == variant RETURN r.method),
-          (FOR r IN variants_phenotypes       FILTER r._from == variant RETURN r.method),
-          (FOR r IN variants_proteins         FILTER r._from == variant RETURN r.method)
+          (FOR r IN variants_phenotypes       FILTER r._from == variant RETURN r.method)
         ]
         FOR method IN coll
           RETURN method
