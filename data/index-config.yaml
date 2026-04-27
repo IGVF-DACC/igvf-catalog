@@ -290,9 +290,7 @@ genomic_elements_genes:
   persistent:
     fields:
       - method
-      - crispr_modality
       - method, files_filesets
-      - crispr_modality, files_filesets
       - source, files_filesets
       - files_filesets
       - score, files_filesets
@@ -300,8 +298,6 @@ genomic_elements_genes:
       - _to, _key
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
-      - biosample_term, biological_context, source, crispr_modality, files_filesets
-      - biological_context, source, crispr_modality, files_filesets
 
   inverted:
     fields: biological_context
@@ -392,7 +388,6 @@ variants_genes:
       - biological_context, label, source, files_filesets
       - label, source, files_filesets
       - source, files_filesets
-      - crispr_modality, files_filesets
       - files_filesets
       - effect_size
   inverted:
