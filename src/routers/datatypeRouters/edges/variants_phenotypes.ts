@@ -5,7 +5,7 @@ import { type paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { TRPCError } from '@trpc/server'
-import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
+import { variantIDSearch, variantSimplifiedFormat, parseRegion } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 import {
   chQuery, sqlInList, getChSelectStatements, getChFilterConditions,
@@ -166,6 +166,10 @@ function pvalueCondition (filter: { op: string, val: number, val2?: number }, pa
 interface VpFilter {
   phenotypeIds?: string[]
   variantIds?: string[]
+  // For region inputs: a 1kb region can yield thousands of variant IDs, which
+  // would blow ClickHouse's max_query_size when serialized as an IN list.
+  // Push the region down as a subquery on the variants table instead.
+  variantsRegion?: { chr: string, start: number, end: number }
   method?: string
   cls?: string
   label?: string
@@ -184,7 +188,15 @@ function buildVpWhere (filter: VpFilter, params: QueryParams): string {
     }
   }
 
-  if (filter.variantIds !== undefined && filter.variantIds.length > 0) {
+  if (filter.variantsRegion !== undefined) {
+    // Region pushed down as subquery — variants table is sorted by id (which
+    // starts with the chromosome RefSeq accession), so chr/pos filters are
+    // granule-pruned. Avoids materializing thousands of IDs in TS/SQL.
+    conds.push('vp.variants_id IN (SELECT id FROM variants WHERE chr = {_vp_chr:String} AND pos >= {_vp_pos_start:Float64} AND pos < {_vp_pos_end:Float64})')
+    params._vp_chr = filter.variantsRegion.chr
+    params._vp_pos_start = filter.variantsRegion.start
+    params._vp_pos_end = filter.variantsRegion.end
+  } else if (filter.variantIds !== undefined && filter.variantIds.length > 0) {
     conds.push(`vp.variants_id IN (${sqlInList(filter.variantIds)})`)
   }
 
@@ -553,10 +565,20 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     ['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region'].includes(item)
   )
   if (hasVariantQuery) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) =>
-      ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
-    vpFilter.variantIds = await variantIDSearch(variantInput)
+    if (input.region !== undefined) {
+      // Region path: push a subquery into vp instead of materializing IDs.
+      // Enforce the 10kb cap (was previously enforced inside variantIDSearch).
+      const r = parseRegion(input.region as string)
+      if (r.end - r.start > 10000) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Region span exceeds 10kb.' })
+      }
+      vpFilter.variantsRegion = r
+    } else {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid }) =>
+        ({ variant_id, spdi, hgvs, ca_id, rsid }))(input)
+      vpFilter.variantIds = await variantIDSearch(variantInput)
+    }
   }
 
   if (input.phenotype_id !== undefined) {

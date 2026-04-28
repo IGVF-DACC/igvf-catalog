@@ -34,7 +34,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 CH_BASE = 'http://localhost:2023/api'
-AR_BASE = 'https://catalog-api-timing-test.demo.igvf.org/api'
+AR_BASE = 'https://api.catalogkg.igvf.org/api'
 DEFAULT_RUNS = 5
 DEFAULT_TIMEOUT = 90  # seconds
 

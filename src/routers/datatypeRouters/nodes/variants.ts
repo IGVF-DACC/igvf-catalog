@@ -198,7 +198,7 @@ export const variantSimplifiedFormat = z.object({
 // ClickHouse SQL helpers
 // ---------------------------------------------------------------------------
 
-function parseRegion (region: string): { chr: string, start: number, end: number } {
+export function parseRegion (region: string): { chr: string, start: number, end: number } {
   const breakdown = validRegion(region)
   if (breakdown == null) {
     throw new TRPCError({

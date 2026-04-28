@@ -32,22 +32,6 @@ const DATASET_SCORE_COL: Readonly<Record<string, string>> = {
   MutPred2: 'pathogenicity_score'
 }
 
-// Human hg38 chromosome → RefSeq accession prefix.
-// variants_coding_variants.id = '{variants_id}_{coding_variants_id}', and
-// variants_id starts with the RefSeq accession (e.g. NC_000013.11:...).
-// Using startsWith(id, chrPrefix) restricts the 1.56B-row VCV scan to only
-// the current gene's chromosome (~65K rows for chr13, vs full table scan).
-const CHR_TO_REFSEQ_PREFIX: Readonly<Record<string, string>> = {
-  chr1: 'NC_000001.', chr2: 'NC_000002.', chr3: 'NC_000003.',
-  chr4: 'NC_000004.', chr5: 'NC_000005.', chr6: 'NC_000006.',
-  chr7: 'NC_000007.', chr8: 'NC_000008.', chr9: 'NC_000009.',
-  chr10: 'NC_000010.', chr11: 'NC_000011.', chr12: 'NC_000012.',
-  chr13: 'NC_000013.', chr14: 'NC_000014.', chr15: 'NC_000015.',
-  chr16: 'NC_000016.', chr17: 'NC_000017.', chr18: 'NC_000018.',
-  chr19: 'NC_000019.', chr20: 'NC_000020.', chr21: 'NC_000021.',
-  chr22: 'NC_000022.', chrX: 'NC_000023.', chrY: 'NC_000024.',
-  chrM: 'NC_012920.'
-}
 
 // ---------------------------------------------------------------------------
 // Zod input / output formats
@@ -100,9 +84,8 @@ function validateInput (input: paramsFormatType): void {
   }
 }
 
-// ClickHouse-only gene resolver. Returns { name, chr } or null if not found.
-// chr is needed to derive the RefSeq prefix for variants_coding_variants lookups.
-async function resolveGene (input: paramsFormatType): Promise<{ name: string, chr: string } | null> {
+// ClickHouse-only gene resolver. Returns { name } or null if not found.
+async function resolveGene (input: paramsFormatType): Promise<{ name: string } | null> {
   const params: QueryParams = {}
   let condition: string
 
@@ -124,8 +107,8 @@ async function resolveGene (input: paramsFormatType): Promise<{ name: string, ch
     return null
   }
 
-  const rows = await chQuery<{ name: string, chr: string }>(
-    `SELECT name, chr FROM genes WHERE ${condition} LIMIT 1`,
+  const rows = await chQuery<{ name: string }>(
+    `SELECT name FROM genes WHERE ${condition} LIMIT 1`,
     params
   )
   return rows[0] ?? null
@@ -134,13 +117,6 @@ async function resolveGene (input: paramsFormatType): Promise<{ name: string, ch
 // Strip the 'variants/' collection prefix from a stored FK value.
 function bareVariantId (raw: string): string {
   return raw.startsWith('variants/') ? raw.slice('variants/'.length) : raw
-}
-
-// Normalize VCV chr values to 'chrN' format ('7' → 'chr7', 'MT' → 'chrM').
-function normalizeChr (raw: string): string {
-  if (raw.startsWith('chr')) return raw
-  if (raw === 'MT') return 'chrM'
-  return `chr${raw}`
 }
 
 // ---------------------------------------------------------------------------
@@ -158,31 +134,16 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
   const method = input.method as string | undefined
   const filesFileset = input.files_fileset as string | undefined
 
-  // Step 1: resolve gene name and chromosome from any accepted gene identifier.
-  // chr is used to build the RefSeq prefix for VCV lookups.
   const gene = await resolveGene(input)
   if (gene === null) return []
-  const { name: geneName, chr } = gene
-
-  // coding_variants_phenotypes.id = {coding_variants_id}_{ontology_term}_{fileset}
-  // where coding_variants_id always starts with "{gene_name}_".
-  // startsWith(id, genePrefix) uses the primary key index to skip all other
-  // genes' rows: ~360K for BRCA2 vs a 1.1B full scan.
-  const genePrefix = geneName + '_'
-
-  // variants_coding_variants.id = {variants_id}_{coding_variants_id}
-  // where variants_id starts with the chromosome's RefSeq accession.
-  // startsWith(id, chrPrefix) restricts the 1.56B VCV scan to only the
-  // chromosome's rows (~65K for chr13). Undefined when chr is not in the map
-  // (unplaced contigs); in that case we skip the VCV lookup.
-  const chrPrefix = CHR_TO_REFSEQ_PREFIX[chr]
+  const { name: geneName } = gene
 
   // Step A: paginate at hgvsp (protein_change) level — bounds all subsequent
   // sqlInList calls to at most `limit` hgvsp strings and ~limit*10 CV IDs.
   let hgvspPage: string[]
 
   if (method === undefined && filesFileset === undefined) {
-    // No filter: paginate directly from the small coding_variants table.
+    // No filter: paginate directly from the coding_variants table.
     const hgvspRows = await chQuery<{ hgvsp: string }>(
       `SELECT hgvsp
        FROM coding_variants
@@ -194,33 +155,46 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     )
     hgvspPage = hgvspRows.map(r => r.hgvsp)
   } else {
-    // Filtered path: join with coding_variants_phenotypes to apply filters.
-    // startsWith on cvp.id restricts cvp to only this gene's rows.
+    // Filtered path: find hgvsp values that have at least one CVP record
+    // matching the method/fileset filters. The proj_by_cv_id projection on
+    // coding_variants_phenotypes (sorted by coding_variants_id) is used to
+    // efficiently restrict CVP to this gene's rows via the IN subquery.
     const filterWhere: string[] = []
     const filterParams: QueryParams = {
       _gname: geneName,
-      _gene_prefix: genePrefix,
       _lim: limit,
       _off: page * limit
     }
 
     if (method !== undefined) {
-      filterWhere.push('cvp.method = {_method:String}')
+      filterWhere.push('method = {_method:String}')
       filterParams._method = method
     }
     if (filesFileset !== undefined) {
-      filterWhere.push('cvp.files_filesets = {_fileset:String}')
+      filterWhere.push('files_filesets = {_fileset:String}')
       filterParams._fileset = `files_filesets/${filesFileset}`
     }
 
     const extraWhere = filterWhere.length > 0 ? ' AND ' + filterWhere.join(' AND ') : ''
 
+    // Two-level subquery: the inner SELECT uses the CVP proj_by_cv_id lean
+    // projection (SELECT id WHERE coding_variants_id IN ... is fully in the
+    // projection). The outer WHERE uses the primary key on those IDs, so
+    // ClickHouse prunes to only the gene's granules before applying the filter.
     const hgvspRows = await chQuery<{ hgvsp: string }>(
       `SELECT cv.hgvsp
        FROM coding_variants cv
-       JOIN coding_variants_phenotypes cvp ON cvp.coding_variants_id = cv.id
        WHERE cv.gene_name = {_gname:String}
-         AND startsWith(cvp.id, {_gene_prefix:String})${extraWhere}
+         AND cv.id IN (
+           SELECT DISTINCT coding_variants_id
+           FROM coding_variants_phenotypes
+           WHERE id IN (
+             SELECT id FROM coding_variants_phenotypes
+             WHERE coding_variants_id IN (
+               SELECT id FROM coding_variants WHERE gene_name = {_gname:String}
+             )
+           )${extraWhere}
+         )
        GROUP BY cv.hgvsp
        ORDER BY min(cv.protein_id) ASC, min(cv.aapos) ASC
        LIMIT {_lim:UInt32} OFFSET {_off:UInt32}`,
@@ -257,49 +231,66 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
   // Step C: phenotype scores + variant IDs for active CV IDs.
   //
-  // startsWith(cvp.id, genePrefix) uses the primary key to skip all other
-  // genes' rows (~360K BRCA2 rows scanned vs 1.1B full scan).
+  // Two-step using the proj_by_cv_id lean projection on coding_variants_phenotypes
+  // (sorted by coding_variants_id). activeCvIds is bounded to ≤limit*10 (~250) IDs.
+  //
+  // C1: resolve CVP primary keys via projection — SELECT id WHERE coding_variants_id IN
+  // is fully satisfiable from the projection (both columns are stored there).
   //
   // cvp.variants stores the linked genomic variant ID with 'variants/' prefix
   // for records where the phenotype is directly tied to a specific variant
   // (e.g. SGE). For protein-level phenotypes (MutPred2, ESM-1v), cvp.variants
   // may be empty — those are resolved via VCV in step D.
-  const phenoWhere: string[] = [
-    `startsWith(cvp.id, {_gene_prefix:String})`,
-    `cvp.coding_variants_id IN (${sqlInList(activeCvIds)})`
-  ]
-  const phenoParams: QueryParams = { _gene_prefix: genePrefix }
+  const cvpIdRows = await chQuery<{ id: string }>(
+    `SELECT id FROM coding_variants_phenotypes
+     WHERE coding_variants_id IN (${sqlInList(activeCvIds)})`
+  )
+  const cvpIds = cvpIdRows.map(r => r.id)
 
-  if (method !== undefined) {
-    phenoWhere.push('cvp.method = {_method:String}')
-    phenoParams._method = method
-  }
-  if (filesFileset !== undefined) {
-    phenoWhere.push('cvp.files_filesets = {_fileset:String}')
-    phenoParams._fileset = `files_filesets/${filesFileset}`
-  }
-
-  const phenoRows = await chQuery<{
+  let phenoRows: Array<{
     coding_variants_id: string
     method: string
     score_value: number
     source_url: string
     variants: string
-  }>(
-    `SELECT
-      cvp.coding_variants_id,
-      cvp.method,
-      cvp.source_url,
-      cvp.variants,
-      CASE
-        WHEN cvp.method = 'MutPred2' THEN cvp.pathogenicity_score
-        WHEN cvp.method = 'ESM-1v'   THEN cvp.esm_1v_score
-        ELSE                              cvp.score
-      END AS score_value
-    FROM coding_variants_phenotypes cvp
-    WHERE ${phenoWhere.join(' AND ')}`,
-    phenoParams
-  )
+  }> = []
+
+  if (cvpIds.length > 0) {
+    // C2: fetch full rows by primary key, applying method/fileset filters
+    const phenoWhere: string[] = [`cvp.id IN (${sqlInList(cvpIds)})`]
+    const phenoParams: QueryParams = {}
+
+    if (method !== undefined) {
+      phenoWhere.push('cvp.method = {_method:String}')
+      phenoParams._method = method
+    }
+    if (filesFileset !== undefined) {
+      phenoWhere.push('cvp.files_filesets = {_fileset:String}')
+      phenoParams._fileset = `files_filesets/${filesFileset}`
+    }
+
+    phenoRows = await chQuery<{
+      coding_variants_id: string
+      method: string
+      score_value: number
+      source_url: string
+      variants: string
+    }>(
+      `SELECT
+        cvp.coding_variants_id,
+        cvp.method,
+        cvp.source_url,
+        cvp.variants,
+        CASE
+          WHEN cvp.method = 'MutPred2' THEN cvp.pathogenicity_score
+          WHEN cvp.method = 'ESM-1v'   THEN cvp.esm_1v_score
+          ELSE                              cvp.score
+        END AS score_value
+      FROM coding_variants_phenotypes cvp
+      WHERE ${phenoWhere.join(' AND ')}`,
+      phenoParams
+    )
+  }
 
   // Build per-CV lookups.
   // Variant IDs from cvp.variants (populated for SGE etc.); others fall back to VCV.
@@ -316,17 +307,16 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
   }
 
   // Step D: VCV lookup for CVs whose variant ID was not in cvp.variants.
-  // Uses startsWith(vcv.id, chrPrefix) to restrict the 1.56B-row VCV table
-  // to only the gene's chromosome (~65K rows), making the lookup fast.
+  // The proj_by_cv_id lean projection on variants_coding_variants stores
+  // (coding_variants_id, variants_id) sorted by coding_variants_id, which
+  // fully satisfies this SELECT/WHERE — ClickHouse reads from the projection.
   const needsVcv = activeCvIds.filter(id => !cvToVariantId.has(id))
-  if (needsVcv.length > 0 && chrPrefix !== undefined) {
+  if (needsVcv.length > 0) {
     const vcvRows = await chQuery<{ variants_id: string, coding_variants_id: string }>(
       `SELECT vcv.variants_id, vcv.coding_variants_id
        FROM variants_coding_variants vcv
-       WHERE startsWith(vcv.id, {_chr_prefix:String})
-         AND vcv.coding_variants_id IN (${sqlInList(needsVcv)})
-       LIMIT 1 BY vcv.coding_variants_id`,
-      { _chr_prefix: chrPrefix }
+       WHERE vcv.coding_variants_id IN (${sqlInList(needsVcv)})
+       LIMIT 1 BY vcv.coding_variants_id`
     )
     for (const row of vcvRows) {
       cvToVariantId.set(row.coding_variants_id, row.variants_id)
@@ -433,19 +423,23 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   const geneName = geneRows[0]?.name
   if (geneName === undefined) return []
 
-  // coding_variants_phenotypes.id starts with "{gene_name}_", so
-  // startsWith(id, genePrefix) restricts the scan to only this gene's rows
-  // (~360K for BRCA2) rather than a 1.1B full table scan.
-  const genePrefix = geneName + '_'
-
+  // Two-level subquery: inner uses proj_by_cv_id lean projection to resolve
+  // CVP primary keys by coding_variants_id. Outer uses those IDs as a primary
+  // key filter — ClickHouse's min/max pruning restricts reads to the gene's
+  // contiguous block in the main table before applying the method filter.
   const scoreRows = await chQuery<{ score_value: number }>(
     `SELECT cvp.${scoreCol} AS score_value
      FROM coding_variants_phenotypes cvp
-     WHERE startsWith(cvp.id, {_gene_prefix:String})
-       AND cvp.method = {_method:String}
+     WHERE cvp.id IN (
+       SELECT id FROM coding_variants_phenotypes
+       WHERE coding_variants_id IN (
+         SELECT id FROM coding_variants WHERE gene_name = {_gname:String}
+       )
+     )
+     AND cvp.method = {_method:String}
      ORDER BY cvp.${scoreCol} DESC
      LIMIT {_lim:UInt32} OFFSET {_off:UInt32}`,
-    { _gene_prefix: genePrefix, _method: dataset, _lim: limit, _off: page * limit }
+    { _gname: geneName, _method: dataset, _lim: limit, _off: page * limit }
   )
 
   return scoreRows.map(r => r.score_value)
