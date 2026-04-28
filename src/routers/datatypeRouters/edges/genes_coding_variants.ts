@@ -27,7 +27,6 @@ const allVariantsQueryFormat = z.object({
 
 const codingVariantsScoresFormat = z.object({
   protein_change: z.object({
-    coding_variant_id: z.string().nullish(),
     protein_id: z.string().nullish(),
     protein_name: z.string().nullish(),
     transcript_id: z.string().nullish(),
@@ -41,7 +40,8 @@ const codingVariantsScoresFormat = z.object({
     scores: z.array(z.object({
       method: z.string(),
       score: z.number().nullish(),
-      source_url: z.string().nullish()
+      source_url: z.string().nullish(),
+      files_filesets: z.string().nullish()
     }))
   })).nullish()
 })
@@ -230,7 +230,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     LET codingVariants = (
       FOR cv IN ${codingVariantCollectionName}
         FILTER cv.gene_name == gene_name
-        RETURN cv._id
+        RETURN CONCAT("coding_variants/", cv._key)
     )
     LET variantMap = (
       FOR vcv IN variants_coding_variants
@@ -259,7 +259,8 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
           variant: variantByCodingVariant[p._from],
           score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
           method: p.method,
-          source_url: p.source_url
+          source_url: p.source_url,
+          files_filesets: p.files_filesets
         }
     )
     LET allResults = (
@@ -276,7 +277,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         COLLECT variant = result.variant INTO variantGroup = result
         RETURN {
           variant: variant,
-          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }],
+          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url, files_filesets: CURRENT.files_filesets }],
           maxScore: MAX(variantGroup[*].score),
           protein_change: FIRST(variantGroup).protein_change,
           cvDoc: FIRST(variantGroup).cvDoc
@@ -285,13 +286,13 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
     FOR vws IN variantWithScores
       COLLECT protein_change = vws.protein_change INTO grouped = vws
+      FILTER protein_change.aapos != -1
       LET maxScore = MAX(grouped[*].maxScore)
-      SORT protein_change.protein_id ASC, protein_change.aapos ASC
-      LIMIT ${page as number * limit}, ${limit}
       LET firstCvDoc = FIRST(grouped).cvDoc
+      SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC
+      LIMIT ${page as number * limit}, ${limit}
       RETURN {
         protein_change: {
-          coding_variant_id: firstCvDoc._key,
           protein_id: firstCvDoc.protein_id,
           protein_name: firstCvDoc.protein_name,
           transcript_id: firstCvDoc.transcript_id,
