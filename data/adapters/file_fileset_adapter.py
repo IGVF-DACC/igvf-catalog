@@ -721,7 +721,7 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': None,
-            'genome_browser_link': genome_browser_link
+            'genome_browser_link': genome_browser_link,
             'crispr_modality': None
         }
         return props, donor_ids, all_sample_types, disease_ids
@@ -833,7 +833,7 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': cell_annotation,
-            'genome_browser_link': genome_browser_link
+            'genome_browser_link': genome_browser_link,
             'crispr_modality': modality
         }
         return props, donor_ids, sample_term_ids
