@@ -62,7 +62,8 @@ const filesFilesetsFormat = z.object({
   source: z.string(),
   source_url: z.string(),
   download_link: z.string(),
-  cell_annotation: z.string().nullish()
+  cell_annotation: z.string().nullish(),
+  genome_browser_link: z.string().nullish()
 })
 
 async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
