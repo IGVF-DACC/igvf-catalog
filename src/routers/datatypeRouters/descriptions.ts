@@ -741,5 +741,14 @@ export const descriptions = {
   source = ENCODE, <br> \
   Set verbose = true to retrieve full info on the genes, genomic element.<br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  genes_qtls: 'Retrieve eQTLs from genes.<br> \
+  Example: gene_id = ENSG00000259943, <br> \
+  gene_name = ZMPSTE24-DT, <br> \
+  method = eQTL, <br> \
+  biological_context = CD4+ TCM cell. <br> \
+  source = EBI. <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'
 }

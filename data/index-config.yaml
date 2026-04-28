@@ -444,6 +444,7 @@ variants_proteins:
       - name
       - files_filesets
       - method
+      - gene, method, source, biological_context, _key
 
 variants_variants:
   persistent:
