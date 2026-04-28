@@ -11,7 +11,8 @@ INPUT_FILE = 'urls.txt'
 OUTPUT_DIR = 'responses'
 TIME_LOG_FILE = 'average_response_time.csv'
 DIFF_LOG_FILE = 'differences.txt'
-TEST_DEV = True
+TEST_DEV = False
+TEST_LOCAL = True
 
 RED = '\033[91m'
 YELLOW = '\033[93m'
@@ -93,7 +94,7 @@ def save_average_times(times):
 
 
 def random_invalid_string(length=12):
-    chars = string.ascii_letters + string.digits + '!@#$%^&*'
+    chars = string.ascii_letters + string.digits
     return ''.join(random.choices(chars, k=length))
 
 
@@ -137,6 +138,9 @@ def main():
     for url in urls:
         if TEST_DEV:
             url = url.replace('api.catalogkg', 'catalog-api-dev.demo')
+        elif TEST_LOCAL:
+            url = url.replace('https://api.catalogkg.igvf.org',
+                              'http://localhost:2023')
 
         print(f'Fetching: {url}')
         status_code, response_text, response_time = fetch_url(url)
