@@ -132,7 +132,6 @@ export const variantFormat = z.object({
   ca_id: z.string().nullish(),
   strain: z.array(z.string()).nullish(),
   qual: z.string().nullish(),
-  filter: z.string().nullish(),
   files_filesets: z.string().nullish(),
   annotations: z.object({
     bravo_af: z.number().nullish(),
