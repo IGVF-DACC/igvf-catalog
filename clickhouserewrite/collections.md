@@ -1,0 +1,14 @@
+# Collections loaded into ClickHouse
+
+| Table | Row count (approx) | Needed by | Notes |
+|---|---|---|---|
+| `variants` | ~1.2 billion | `/variants`, `/variants/phenotypes` (verbose), `/phenotypes/variants` (verbose) | Human variants only (FAVOR + IGVF). Primary key is `id` (SPDI-like identifier). Has lean projections on `spdi`, `ca_id`, `hgvs` for fast two-step lookups. See [design-decisions/06-lean-projections.md](design-decisions/06-lean-projections.md). |
+| `rsid_to_variant` | — | `/variants?rsid=...` | Auto-updating lookup table (materialized view). Unnests `Array(String)` rsid column into `(rsid, variant_id)` pairs sorted by `rsid`. See [design-decisions/07-rsid-materialized-view.md](design-decisions/07-rsid-materialized-view.md). |
+| `variants_phenotypes` | Loaded | `/phenotypes/variants`, `/variants/phenotypes` | Edge table linking variants to ontology terms. FK columns: `variants_id`, `ontology_terms_id`. |
+| `ontology_terms` | Loaded | `/phenotypes/variants` (phenotype name resolution) | Joined to resolve phenotype names from IDs. |
+| `studies` | Loaded | `/phenotypes/variants` (verbose GWAS), `/variants/phenotypes` (verbose GWAS) | GWAS study metadata, joined in verbose mode. |
+| `variants_phenotypes_studies` | Loaded | `/phenotypes/variants` (GWAS path), `/variants/phenotypes` (GWAS path) | Hyperedge table connecting variant-phenotype pairs to studies. Contains GWAS statistics (`log10pvalue`, `beta`, `p_val`, etc.). |
+| `motifs` | Loaded | Not yet used by ported endpoints | Loaded as part of the import tooling validation. |
+| `coding_variants` | ~1.56B rows | `/genes/coding-variants/scores`, `/genes/coding-variants/all-scores` | Protein-level coding variant records. `id` = `{gene_name}_{transcript}_{hgvsp}_{hgvsc}` — gene name is the id prefix, enabling implicit PK clustering per gene. |
+| `coding_variants_phenotypes` | ~1.1B rows | `/genes/coding-variants/scores`, `/genes/coding-variants/all-scores` | Edge table from coding variants to ontology terms (phenotypes). `id` = `{coding_variants_id}_{ontology_term}_{fileset}`. The `variants` column stores the linked genomic variant FK for assay types where the phenotype is tied to a specific nucleotide change (SGE). Has `proj_by_cv_id` lean projection `(SELECT coding_variants_id, id ORDER BY coding_variants_id)` for efficient two-step lookup by `coding_variants_id`. See [design-decisions/gcv-02-cvp-two-step.md](design-decisions/gcv-02-cvp-two-step.md). |
+| `variants_coding_variants` | ~1.56B rows | `/genes/coding-variants/scores` | Edge table from genomic variants to coding variants. `id` = `{variants_id}_{coding_variants_id}`. Has `proj_by_cv_id` lean projection `(SELECT coding_variants_id, variants_id ORDER BY coding_variants_id)` which fully satisfies the Step D query by primary key. See [design-decisions/gcv-04-vcv-projection.md](design-decisions/gcv-04-vcv-projection.md). |

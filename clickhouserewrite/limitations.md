@@ -1,0 +1,9 @@
+# Known limitations
+
+1. **`/variants/summary` is broken**: The endpoint funnels every response through `nearestGenes()` in `variants.ts`, which calls `nearestGeneSearch` from the still-AQL `genes.ts`. That code does `await db.query(stringQuery)` against the ClickHouse client (which expects an object) using an AQL query body. The client throws `Cannot read properties of undefined (reading 'trim')` because it tries to read `params.query.trim()` on the string argument. Fix requires porting `nearestGeneSearch` (or inlining the gene-nearest logic in `variants.ts` against the already-loaded `genes` table). Affects all input forms (`variant_id`, `rsid`, `spdi`, `region`).
+2. **Other routers still use ArangoDB types**: Files like `coding_variants_phenotypes.ts`, `diseases_genes.ts`, etc. still call `db.query(string)` with ArangoDB's `Database` type, producing TypeScript errors. These are not yet ported.
+3. **No mouse variant support**: The rewrite focuses on human variants only. Mouse variant logic was removed from `variants.ts`.
+4. **`ontology_terms` JOIN performance**: The `ontology_terms` table is small enough for hash JOINs, but this assumption should be validated as data grows.
+5. **Cold-cache latency for region queries**: Region queries take 1.5-4s on cold cache due to reading `annotations` JSON from disk. A lean projection `ORDER BY chr, pos` could help if needed, but current performance is acceptable.
+6. **Coding variants with no genomic variant link**: Some `hgvsp` groups have an empty `variants[]` array. This happens when neither `cvp.variants` is populated nor a VCV entry exists for those coding variants. This is a data-coverage issue, not a query bug.
+7. **`coding_variants` gene name resolution drops fuzzy matching**: The original AQL endpoint used a Levenshtein/BM25 fuzzy fallback for gene name resolution. The ClickHouse port uses exact match only (no text indexes). Unmatched gene names return `[]` instead of a fuzzy suggestion.
