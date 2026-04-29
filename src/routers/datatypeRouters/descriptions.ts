@@ -690,7 +690,7 @@ export const descriptions = {
   dataset = VAMP-seq',
 
   variants_biosamples: 'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br> \
-  Example: variant_id = NC_000001.11:14772:C:T.<br> \
+  Example: variant_id = NC_000001.11:14772:C:T,<br> \
   spdi = NC_000001.11:14772:C:T, <br> \
   hgvs = NC_000001.11:g.14773C>T, <br> \
   rsid = rs1234567890, <br> \

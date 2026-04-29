@@ -29,7 +29,8 @@ const genomicElementsToBiosampleFormat = z.object({
   biosample: z.string().or(ontologyFormat).optional(),
   name: z.string(),
   class: z.string().optional(),
-  method: z.string().optional()
+  method: z.string().optional(),
+  files_filesets: z.string().nullish()
 })
 
 const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.MPRAAdapter.json')
@@ -212,7 +213,8 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'p_value': record.minusLog10PValue,
         'name': record.name,
         'class': record.class,
-        'method': record.method
+        'method': record.method,
+        'files_filesets': record.files_filesets
       }
   `
 

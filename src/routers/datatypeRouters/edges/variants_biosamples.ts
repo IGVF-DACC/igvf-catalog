@@ -56,7 +56,8 @@ const returnFormat = z.object({
   class: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const variantToBiosamplesCollecionName = 'variants_biosamples'
@@ -184,7 +185,8 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'class': record.class,
       'source': record.source,
       'source_url': record.source_url,
-      'name': record.name
+      'name': record.name,
+      'files_filesets': record.files_filesets
     }
   `
 
