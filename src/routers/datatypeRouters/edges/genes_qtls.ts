@@ -7,6 +7,7 @@ import { paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat } from '../params'
+import { variantSearch } from '../nodes/variants'
 
 const MAX_PAGE_SIZE = 100
 
@@ -50,13 +51,25 @@ const METHODS = z.enum(['eQTL', 'pQTL', 'spliceQTL', 'caQTL'])
 const geneQuery = z.object({
   gene_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
+  region: z.string().trim().optional(),
+  biological_context: z.string().trim().optional(),
+  method: METHODS.optional(),
+  source: SOURCES.optional()
+}).merge(commonHumanEdgeParamsFormat).omit({ verbose: true })
+
+const variantQuery = z.object({
+  variant_id: z.string().trim().optional(),
+  spdi: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
+  region: z.string().trim().optional(),
   biological_context: z.string().trim().optional(),
   method: METHODS.optional(),
   source: SOURCES.optional()
 }).merge(commonHumanEdgeParamsFormat).omit({ verbose: true })
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'gene_name'].includes(item) || input[item] === undefined)
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'gene_name', 'region'].includes(item) || input[item] === undefined)
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -65,6 +78,15 @@ function validateGeneInput (input: paramsFormatType): void {
   }
 }
 
+function validateVariantInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'rsid', 'ca_id', 'region'].includes(item) || input[item] === undefined)
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one variant property must be defined.'
+    })
+  }
+}
 function getFilterClauseAndBindVars (input: paramsFormatType): { filterClause: string, bindVars: Record<string, unknown> } {
   const clauses: string[] = []
   const bindVars: Record<string, unknown> = {}
@@ -88,11 +110,11 @@ function getFilterClauseAndBindVars (input: paramsFormatType): { filterClause: s
   }
 }
 
-function qtlReturnObject (genomicElementExpr: string): string {
+function qtlReturnObject (geneExpr: string, genomicElementExpr: string): string {
   return `{
     _key: record._key,
     variant: { chr: variant.chr, pos: variant.pos, SPDI: variant.spdi, rsid: variant.rsid },
-    gene: { name: geneRecord.name, id: geneRecord._key },
+    gene: ${geneExpr},
     genomic_element: ${genomicElementExpr},
     source: record.source,
     method: record.method,
@@ -112,45 +134,56 @@ function qtlReturnObject (genomicElementExpr: string): string {
 function variantsGenesQuery (filterClause: string, withLimit: boolean): string {
   return `
   FOR record IN variants_genes
-  FILTER record._to == @geneID ${filterClause}
+  FILTER record._to IN @geneIDs ${filterClause}
   LET variant = DOCUMENT(record._from)
   LET geneRecord = DOCUMENT(record._to)
   SORT record._key
   ${withLimit ? 'LIMIT @offset, @limit' : ''}
-  RETURN ${qtlReturnObject('null')}
+  RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
   `
 }
 
 function variantsProteinsQuery (filterClause: string, withLimit: boolean): string {
   return `
   FOR record IN variants_proteins
-  FILTER record.gene == @geneID ${filterClause}
+  FILTER record.gene IN @geneIDs ${filterClause}
   LET variant = DOCUMENT(record._from)
   LET geneRecord = DOCUMENT(record.gene)
   SORT record._key
   ${withLimit ? 'LIMIT @offset, @limit' : ''}
-  RETURN ${qtlReturnObject('null')}
+  RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
   `
 }
 
 function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean): string {
   return `
-  LET geneRecord = DOCUMENT(@geneID)
-  FILTER geneRecord != null
-  LET genomicElementIDs = (
-    FOR ge IN genomic_elements
-    FILTER ge.chr == geneRecord.chr
-      AND ge.end >= geneRecord.start
-      AND ge.start <= geneRecord.end
-    RETURN ge._id
+  LET genomicElementGenePairs = (
+    FOR g IN @geneIDs
+      LET geneRecord = DOCUMENT(g)
+      FILTER geneRecord != null
+      FOR ge IN genomic_elements
+      FILTER ge.chr == geneRecord.chr
+        AND ge.end >= geneRecord.start
+        AND ge.start <= geneRecord.end
+      COLLECT element_id = ge._id INTO grouped = g
+      RETURN { element_id: element_id, gene_id: FIRST(grouped[*].g) }
   )
+  LET genomicElementIDs = genomicElementGenePairs[*].element_id
   FOR record IN variants_genomic_elements
   FILTER record._to IN genomicElementIDs ${filterClause}
   LET variant = DOCUMENT(record._from)
   LET genomicElement = DOCUMENT(record._to)
+  LET geneID = FIRST(
+    FOR pair IN genomicElementGenePairs
+    FILTER pair.element_id == record._to
+    RETURN pair.gene_id
+  )
+  LET geneRecord = DOCUMENT(geneID)
+  FILTER geneRecord != null
   SORT record._key
   ${withLimit ? 'LIMIT @offset, @limit' : ''}
   RETURN ${qtlReturnObject(
+      '{ name: geneRecord.name, id: geneRecord._key }',
       `{
       name: genomicElement.name,
       chr: genomicElement.chr,
@@ -165,10 +198,11 @@ function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean)
 async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, gene_name, organism } = input
-  const geneInput: paramsFormatType = { gene_id, name: gene_name, organism, page: 0 }
+  const { gene_id, gene_name, region, organism } = input
+  const geneInput: paramsFormatType = { gene_id, name: gene_name, region, organism, page: 0 }
   delete input.gene_id
   delete input.gene_name
+  delete input.region
   delete input.organism
 
   const genes = await geneSearch(geneInput)
@@ -176,7 +210,6 @@ async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   if (geneIDs.length === 0) {
     return []
   }
-  const geneID = geneIDs[0]
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -187,7 +220,7 @@ async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   const offset = page * limit
 
   const { filterClause, bindVars } = getFilterClauseAndBindVars(input)
-  const baseBindVars = { geneID, offset, limit, ...bindVars }
+  const baseBindVars = { geneIDs, offset, limit, ...bindVars }
 
   if (input.method !== undefined) {
     if (input.method === 'eQTL' || input.method === 'spliceQTL') {
@@ -221,12 +254,92 @@ async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   return await (await db.query(allQTLsQuery, baseBindVars)).all()
 }
 
+async function qtlsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  validateVariantInput(input)
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { variant_id, spdi, rsid, ca_id, region, organism } = input
+  const variantInput: paramsFormatType = { variant_id, spdi, rsid, ca_id, region, organism, page: 0 }
+  delete input.variant_id
+  delete input.spdi
+  delete input.rsid
+  delete input.ca_id
+  delete input.region
+  delete input.organism
+  const variants = await variantSearch(variantInput)
+  const variantIDs = variants.map(variant => `variants/${variant._id as string}`)
+  if (variantIDs.length === 0) {
+    return []
+  }
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+  const page = (input.page as number) ?? 0
+  const offset = page * limit
+
+  const { filterClause, bindVars } = getFilterClauseAndBindVars(input)
+  const baseBindVars = { variantIDs, offset, limit, ...bindVars }
+
+  const query = `
+    LET variantsGenes = (
+      FOR record IN variants_genes
+      FILTER record._from IN @variantIDs AND record.method in ['eQTL', 'spliceQTL'] ${filterClause}
+      LET variant = DOCUMENT(record._from)
+      FILTER variant != null
+      LET geneRecord = DOCUMENT(record._to)
+      FILTER geneRecord != null
+      RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
+    )
+    LET variantsProteins = (
+      FOR record IN variants_proteins
+      FILTER record._from IN @variantIDs AND record.method == 'pQTL' ${filterClause}
+      LET variant = DOCUMENT(record._from)
+      FILTER variant != null
+      LET geneRecord = DOCUMENT(record.gene)
+      FILTER geneRecord != null
+      RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
+    )
+    LET variantsGenomicElements = (
+      FOR record IN variants_genomic_elements
+      FILTER record._from IN @variantIDs AND record.method == 'caQTL' ${filterClause}
+      LET variant = DOCUMENT(record._from)
+      FILTER variant != null
+      LET genomicElementRecord = DOCUMENT(record._to)
+      FILTER genomicElementRecord != null
+      LET geneRecord = FIRST(
+        FOR g IN genes
+        FILTER g.chr == variant.chr
+          AND g.end >= variant.pos
+          AND g.start < variant.pos
+        SORT g._key
+        LIMIT 1
+        RETURN g
+      )
+      RETURN ${qtlReturnObject('geneRecord == null ? null : { name: geneRecord.name, id: geneRecord._key }', '{ name: genomicElementRecord.name, chr: genomicElementRecord.chr, start: genomicElementRecord.start, stop: genomicElementRecord.end, type: genomicElementRecord.type }')}
+    )
+    FOR record IN UNION(variantsGenes, variantsProteins, variantsGenomicElements)
+    SORT record._key ASC
+    LIMIT @offset, @limit
+    RETURN record
+  `
+  return await (await db.query(query, baseBindVars)).all()
+}
+
 const qtlsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/qtls', description: descriptions.genes_qtls } })
   .input(geneQuery)
   .output(z.array(outputFormat))
   .query(async ({ input }) => await qtlsFromGeneSearch(input))
 
+const qtlsFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/qtls', description: descriptions.variants_qtls } })
+  .input(variantQuery)
+  .output(z.array(outputFormat))
+  .query(async ({ input }) => await qtlsFromVariantSearch(input))
+
 export const genesQTLsRouters = {
-  qtlsFromGenes
+  qtlsFromGenes,
+  qtlsFromVariants
 }
