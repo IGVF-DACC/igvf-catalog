@@ -86,6 +86,17 @@ const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.GWAS.json')
 const variantsPhenotypeNonGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.cV2F.json')
 
+function valueValidation (input: paramsFormatType): void {
+  if (input.log10pvalue !== undefined) {
+    if (isNaN(Number(input.log10pvalue)) && !(input.log10pvalue as string).includes(':')) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'log10pvalue must be a number or a string in the format of "operator:value", where operator can be one of "gt", "gte", "lt" or "lte".'
+      })
+    }
+  }
+}
+
 export function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'files_fileset', 'method'].includes(item))
 
@@ -95,6 +106,8 @@ export function variantQueryValidation (input: paramsFormatType): void {
       message: 'At least one variant property, or method, or files_filesets must be defined.'
     })
   }
+
+  valueValidation(input)
 }
 
 function phenotypeQueryValidation (input: paramsFormatType): void {
@@ -106,6 +119,8 @@ function phenotypeQueryValidation (input: paramsFormatType): void {
       message: 'At least one phenotype property, or method, or files_filesets must be defined.'
     })
   }
+
+  valueValidation(input)
 }
 
 function buildCombinedFilter (phenotypeFilter: string, nonGWASFilter: string, GWASFilter: string): string {
@@ -274,7 +289,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         })
     )
   `
-  console.log(query)
+
   let result = []
   if (hasVariantQuery) {
     result = await ((await db.query(query, { variantIDs })).all())
