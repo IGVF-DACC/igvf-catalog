@@ -158,7 +158,7 @@ function variantsProteinsQuery (filterClause: string, withLimit: boolean): strin
 }
 
 function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean): string {
-  const query = `
+  return `
   LET genomicElementGenePairs = (
     FOR g IN @geneIDs
       LET geneRecord = DOCUMENT(g)
@@ -195,8 +195,6 @@ function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean)
     }`
     )}
   `
-  console.log(query)
-  return query
 }
 
 async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
