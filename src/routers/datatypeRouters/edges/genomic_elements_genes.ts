@@ -30,7 +30,7 @@ const edgeQueryFormat = z.object({
 
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
-const gnrGeneQueryFormat = genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
+const gnrGeneQueryFormat = genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({verbose: true})
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -71,13 +71,13 @@ const outputFormat = z.array(z.object({
 }))
 
 const grnOutputFormat = z.object({
-  gene: z.string(),
+  regulated_gene: z.string(),
   genomic_element: z.object({
     chr: z.string(),
     start: z.number(),
-    end: z.number()
+    end: z.number(),
+    regulator: z.string().nullish(),
   }),
-  promoter_of: z.string().nullish(),
   class: z.string(),
   method: z.string(),
   source: z.string(),
@@ -435,13 +435,11 @@ async function gnrFromGeneRegulator (input: paramsFormatType): Promise<any> {
       SORT trecord._key
       LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-      LET tgenomic_element = DOCUMENT(trecord._from)
-      LET promoter_of_gene = DOCUMENT(tgenomic_element.promoter_of)
+      LET tge = DOCUMENT(trecord._from)
 
       RETURN {
-        gene:               target_gene.name,
-        genomic_element:    KEEP(tgenomic_element, ['start', 'end', 'chr']),
-        promoter_of:        promoter_of_gene.name,
+        regulated_gene:     target_gene.name,
+        genomic_element:    { 'start': tge.start, 'end': tge.end, 'chr': tge.chr, 'regulator': tge.promoter_of },
         class:              trecord.class,
         method:             trecord.method,
         source:             trecord.source,
@@ -480,13 +478,13 @@ async function gnrFromGeneTarget (input: paramsFormatType): Promise<any> {
 
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-          LET genomic_element = DOCUMENT(record._from)
-          LET gene_promoter_of = DOCUMENT(genomic_element.promoter_of)
+          LET ge = DOCUMENT(record._from)
+          LET name_gene_promoter_of = DOCUMENT(ge.promoter_of).name
 
           RETURN {
-          'gene': gene.name,
-          'genomic_element': KEEP(genomic_element, ["start", "end", "chr"]),
-          'promoter_of': gene_promoter_of.name,
+          'regulated_gene': gene.name,
+          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator': ge.promoter_of },
+          'promoter_of': name_gene_promoter_of,
           'class': record.class,
           'method': record.method,
           'source': record.source,
