@@ -243,6 +243,9 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
+  variants_region_summary: 'Retrieve a summary count of all methods reporting variants in a given region.<br> \
+    Example: region = chr1:1157520-1158520 (maximum length: 10kb).',
+
   coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
     Example: coding_variant_name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
     hgvsp = p.Gly30Ser, <br> \

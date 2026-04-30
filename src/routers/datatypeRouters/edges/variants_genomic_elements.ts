@@ -117,6 +117,14 @@ const variantsQueryFormat = variantsCommonQueryFormat
   .merge(commonHumanEdgeParamsFormat)
   .omit({ organism: true, verbose: true })
 
+const regionSummaryFormat = z.object({
+  variant_count: z.number(),
+  by_method: z.array(z.object({
+    method: z.string(),
+    count: z.number()
+  }))
+})
+
 const humanGeneCollectionName = 'genes' as string
 const mouseGeneCollectionName = 'mm_genes' as string
 const humanGenomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
@@ -404,6 +412,63 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     }
   `
   return await (await db.query(query)).all()
+}
+
+async function findVariantsRegionSummary (input: paramsFormatType): Promise<any> {
+  if (input.region === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region parameter is required.'
+    })
+  }
+
+  const processedInput = preProcessVariantParams({ region: input.region })
+  const coordinates = (processedInput.pos as string).split(':')[1].split('-').map(Number)
+
+  if (coordinates[1] - coordinates[0] > 10000) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region length cannot exceed 10kb.'
+    })
+  }
+
+  const query = `
+    LET variant_keys = (
+      FOR v IN variants
+        FILTER ${getFilterStatements(humanVariantSchema, processedInput).replaceAll('record', 'v')}
+        RETURN v._id
+    )
+
+    LET all_methods = (
+      FOR variant IN variant_keys
+        FOR coll IN [
+          (FOR r IN variants_genes            FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_proteins         FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_biosamples       FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_genomic_elements FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_phenotypes       FILTER r._from == variant RETURN r.method)
+        ]
+        FOR method IN coll
+          RETURN method
+    )
+
+    LET method_counts = (
+      FOR method IN all_methods
+        COLLECT m = method WITH COUNT INTO count
+        RETURN { method: m, count: count }
+    )
+
+    RETURN {
+      variant_count: LENGTH(variant_keys),
+      by_method: method_counts
+    }
+  `
+
+  const obj = await (await db.query(query)).all()
+  if (Array.isArray(obj) && obj.length > 0) {
+    return obj[0]
+  }
+  return obj
 }
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
@@ -708,6 +773,12 @@ const predictionsFromVariants = publicProcedure
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
+const variantsRegionSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/region-summary', description: descriptions.variants_region_summary } })
+  .input(z.object({ region: z.string() }))
+  .output(regionSummaryFormat)
+  .query(async ({ input }) => await findVariantsRegionSummary(input))
+
 const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
   .input(variantsQueryFormat)
@@ -731,5 +802,6 @@ export const variantsGenomicElementsRouters = {
   genomicElementsFromVariantsCount,
   genomicElementsPredictionsFromVariant,
   variantsFromGenomicElements,
-  genomicElementsFromVariants
+  genomicElementsFromVariants,
+  variantsRegionSummary
 }
