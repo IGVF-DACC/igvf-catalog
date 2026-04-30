@@ -14,7 +14,7 @@ const MAX_PAGE_SIZE = 100
 const variantReturnFormat = z.object({
   chr: z.string(),
   pos: z.number(),
-  SPDI: z.string().nullish(),
+  spdi: z.string().nullish(),
   rsid: z.union([z.string(), z.array(z.string())]).nullish()
 })
 
@@ -36,13 +36,14 @@ const outputFormat = z.object({
   regulatory_type: z.string().nullish(), // pQTL only
   gene_consequence: z.string().nullish(), // pQTL only
   biological_context: z.string().nullish(),
-  nLog10Pvalue: z.number().nullish(),
+  nlog10pvalue: z.number().nullish(),
   effect_size: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(), // EBI eQTL and spliceQTL only
   intron_chr: z.string().nullish(), // spliceQTL only
   intron_start: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
   intron_end: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
-  study: z.string().nullish() // EBI eQTL and spliceQTL only
+  study: z.string().nullish(), // EBI eQTL and spliceQTL only
+  files_filesets: z.string().nullish()
 })
 
 const SOURCES = z.enum(['AFGRS', 'EBI', 'IGVF', 'ENCODE', 'UKB'])
@@ -113,7 +114,7 @@ function getFilterClauseAndBindVars (input: paramsFormatType): { filterClause: s
 function qtlReturnObject (geneExpr: string, genomicElementExpr: string): string {
   return `{
     _key: record._key,
-    variant: { chr: variant.chr, pos: variant.pos, SPDI: variant.spdi, rsid: variant.rsid },
+    variant: { chr: variant.chr, pos: variant.pos, spdi: variant.spdi, rsid: variant.rsid },
     gene: ${geneExpr},
     genomic_element: ${genomicElementExpr},
     source: record.source,
@@ -121,13 +122,14 @@ function qtlReturnObject (geneExpr: string, genomicElementExpr: string): string 
     regulatory_type: record.regulatory_type,
     gene_consequence: record.gene_consequence,
     biological_context: record.biological_context,
-    nLog10Pvalue: record.log10pvalue,
+    nlog10pvalue: record.log10pvalue,
     effect_size: HAS(record, 'effect_size') ? record.effect_size : record.beta,
     posterior_inclusion_probability: record.posterior_inclusion_probability,
     intron_chr: record.intron_chr,
     intron_start: record.intron_start,
     intron_end: record.intron_end,
-    study: record.study
+    study: record.study,
+    files_filesets: record.files_filesets
   }`
 }
 
@@ -135,10 +137,10 @@ function variantsGenesQuery (filterClause: string, withLimit: boolean): string {
   return `
   FOR record IN variants_genes
   FILTER record._to IN @geneIDs ${filterClause}
-  LET variant = DOCUMENT(record._from)
-  LET geneRecord = DOCUMENT(record._to)
   SORT record._key
   ${withLimit ? 'LIMIT @offset, @limit' : ''}
+  LET variant = DOCUMENT(record._from)
+  LET geneRecord = DOCUMENT(record._to)
   RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
   `
 }
@@ -147,16 +149,16 @@ function variantsProteinsQuery (filterClause: string, withLimit: boolean): strin
   return `
   FOR record IN variants_proteins
   FILTER record.gene IN @geneIDs ${filterClause}
-  LET variant = DOCUMENT(record._from)
-  LET geneRecord = DOCUMENT(record.gene)
   SORT record._key
   ${withLimit ? 'LIMIT @offset, @limit' : ''}
+  LET variant = DOCUMENT(record._from)
+  LET geneRecord = DOCUMENT(record.gene)
   RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
   `
 }
 
 function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean): string {
-  return `
+  const query = `
   LET genomicElementGenePairs = (
     FOR g IN @geneIDs
       LET geneRecord = DOCUMENT(g)
@@ -164,13 +166,15 @@ function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean)
       FOR ge IN genomic_elements
       FILTER ge.chr == geneRecord.chr
         AND ge.end >= geneRecord.start
-        AND ge.start <= geneRecord.end
+        AND ge.start < geneRecord.end
       COLLECT element_id = ge._id INTO grouped = g
-      RETURN { element_id: element_id, gene_id: FIRST(grouped[*].g) }
+      RETURN { element_id: element_id, gene_id: FIRST(grouped) }
   )
   LET genomicElementIDs = genomicElementGenePairs[*].element_id
   FOR record IN variants_genomic_elements
   FILTER record._to IN genomicElementIDs ${filterClause}
+  SORT record._key
+  ${withLimit ? 'LIMIT @offset, @limit' : ''}
   LET variant = DOCUMENT(record._from)
   LET genomicElement = DOCUMENT(record._to)
   LET geneID = FIRST(
@@ -180,8 +184,6 @@ function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean)
   )
   LET geneRecord = DOCUMENT(geneID)
   FILTER geneRecord != null
-  SORT record._key
-  ${withLimit ? 'LIMIT @offset, @limit' : ''}
   RETURN ${qtlReturnObject(
       '{ name: geneRecord.name, id: geneRecord._key }',
       `{
@@ -193,6 +195,8 @@ function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean)
     }`
     )}
   `
+  console.log(query)
+  return query
 }
 
 async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
