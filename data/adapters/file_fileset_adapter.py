@@ -444,8 +444,7 @@ class FileFileSet:
             for donor in sample_object['donors']:
                 donor_accessions.add(donor['accession'])
             for modification in sample_object.get('modifications', []):
-                modification_types = modification.get('@type', [])
-                if 'CrisprModification' not in modification_types:
+                if not modification['@id'].startswith('/crispr-modifications/'):
                     continue
                 crispr_modalities.add(modification['modality'])
             targeted_sample_term_obj = sample_object.get(

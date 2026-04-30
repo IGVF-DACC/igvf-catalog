@@ -239,11 +239,11 @@ def test_parse_sample_donor_treatment_igvf_crispr_modality():
         'construct_library_sets': [],
         'modifications': [
             {
-                '@type': ['CrisprModification', 'Modification', 'Item'],
+                '@id': '/crispr-modifications/IGVFCM0001AAAA/',
                 'modality': 'interference'
             },
             {
-                '@type': ['ProteinModification', 'Modification', 'Item'],
+                '@id': '/modifications/IGVFMF0001AAAA/',
                 'modality': 'ignored'
             }
         ]
@@ -266,7 +266,7 @@ def test_parse_sample_donor_treatment_igvf_multiple_crispr_modalities_error():
             'sample_terms': [{'term_name': 'K562', '@id': '/sample-terms/EFO_0002067/'}],
             'classifications': ['cell line'],
             'construct_library_sets': [],
-            'modifications': [{'@type': ['CrisprModification', 'Modification', 'Item'], 'modality': 'interference'}]
+            'modifications': [{'@id': '/crispr-modifications/IGVFCM0001AAAA/', 'modality': 'interference'}]
         },
         {
             'accession': 'IGVFSM0002BBBB',
@@ -274,7 +274,7 @@ def test_parse_sample_donor_treatment_igvf_multiple_crispr_modalities_error():
             'sample_terms': [{'term_name': 'K562', '@id': '/sample-terms/EFO_0002067/'}],
             'classifications': ['cell line'],
             'construct_library_sets': [],
-            'modifications': [{'@type': ['CrisprModification', 'Modification', 'Item'], 'modality': 'activation'}]
+            'modifications': [{'@id': '/crispr-modifications/IGVFCM0002BBBB/', 'modality': 'activation'}]
         }
     ]
     with patch.object(FileFileSet, 'get_batch_objects', return_value=sample_objects):

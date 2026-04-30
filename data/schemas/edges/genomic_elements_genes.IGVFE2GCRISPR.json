@@ -70,7 +70,8 @@
           "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
             "interference",
-            "activation"
+            "activation",
+            "knockout"
           ]
         },
         "class": {
