@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { distanceGeneVariant, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
@@ -34,7 +34,8 @@ const predictionFormat = z.object({
   score: z.number(),
   model: z.string(),
   dataset: z.string(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const genomicElementsPredictionsFormat = z.object({
@@ -116,13 +117,32 @@ const variantsQueryFormat = variantsCommonQueryFormat
   .merge(commonHumanEdgeParamsFormat)
   .omit({ organism: true, verbose: true })
 
+const regionSummaryFormat = z.object({
+  variant_count: z.number(),
+  by_method: z.array(z.object({
+    method: z.string(),
+    count: z.number()
+  }))
+})
+
 const humanGeneCollectionName = 'genes' as string
 const mouseGeneCollectionName = 'mm_genes' as string
 const humanGenomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const mouseGenomicElementSchema = getSchema('data/schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes' as string
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
 const variantsGenomicElementsAFGRCAQtl = getSchema('data/schemas/edges/variants_genomic_elements.AFGRCAQtl.json')
+
+function validateVariantPredictionsInput (input: paramsFormatType): void {
+  const isInvalidInput = Object.keys(input).every(item => !['spdi', 'hgvs', 'rsid', 'ca_id', 'variant_id'].includes(item))
+  if (isInvalidInput) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id'
+    })
+  }
+}
 
 function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['spdi', 'hgvs', 'rsid', 'ca_id', 'variant_id', 'region', 'method', 'files_fileset'].includes(item))
@@ -394,16 +414,77 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
   return await (await db.query(query)).all()
 }
 
+async function findVariantsRegionSummary (input: paramsFormatType): Promise<any> {
+  if (input.region === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region parameter is required.'
+    })
+  }
+
+  const processedInput = preProcessVariantParams({ region: input.region })
+  const coordinates = (processedInput.pos as string).split(':')[1].split('-').map(Number)
+
+  if (coordinates[1] - coordinates[0] > 10000) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region length cannot exceed 10kb.'
+    })
+  }
+
+  const query = `
+    LET variant_keys = (
+      FOR v IN variants
+        FILTER ${getFilterStatements(humanVariantSchema, processedInput).replaceAll('record', 'v')}
+        RETURN v._id
+    )
+
+    LET all_methods = (
+      FOR variant IN variant_keys
+        FOR coll IN [
+          (FOR r IN variants_genes            FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_proteins         FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_biosamples       FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_genomic_elements FILTER r._from == variant RETURN r.method),
+          (FOR r IN variants_phenotypes       FILTER r._from == variant RETURN r.method)
+        ]
+        FOR method IN coll
+          RETURN method
+    )
+
+    LET method_counts = (
+      FOR method IN all_methods
+        COLLECT m = method WITH COUNT INTO count
+        RETURN { method: m, count: count }
+    )
+
+    RETURN {
+      variant_count: LENGTH(variant_keys),
+      by_method: method_counts
+    }
+  `
+
+  const obj = await (await db.query(query)).all()
+  if (Array.isArray(obj) && obj.length > 0) {
+    return obj[0]
+  }
+  return obj
+}
+
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
-  validateVariantInput(input)
+  validateVariantPredictionsInput(input)
 
   let genomicElementSchema = humanGenomicElementSchema
   let geneCollectionName = humanGeneCollectionName
+  let variantSchema = humanVariantSchema
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
     geneCollectionName = mouseGeneCollectionName
+    variantSchema = mouseVariantSchema
   }
+  delete input.organism
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -416,26 +497,9 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     delete input.files_fileset
   }
 
-  if (Object.keys(input).filter((key) => !['limit', 'page'].includes(key)).length === 1 && input.organism !== undefined) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one node property for variant must be defined.'
-    })
-  }
-
   const page = input.page as number
 
-  input.page = 0
-  const variant = (await variantSearch(input))
-
-  if (variant.length === 0) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'Variant not found.'
-    })
-  }
-
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], genomicElementSchema)
+  input.page = 0 // for variants query
 
   const geneVerboseQuery = `
     FOR otherRecord IN ${geneCollectionName}
@@ -444,29 +508,40 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   `
 
   const query = `
-    FOR record IN ${genomicElementToGeneCollectionName}
-    LET targetGene = (${geneVerboseQuery})[0]
-    FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL ${filesetFilter}
-    SORT record._key
-    LIMIT ${page * limit}, ${limit}
-    RETURN {
-      'id': record._from,
-      'cell_type': record.biological_context,
-      'target_gene': targetGene,
-      'score': record.score,
-      'model': record.source,
-      'dataset': record.source_url,
-      'name': record.name
-    }
+    FOR variant IN ${variantSchema.db_collection_name as string}
+    FILTER ${getFilterStatements(variantSchema, preProcessVariantParams(input)).replaceAll('record', 'variant')}
+
+      FOR ge IN ${genomicElementSchema.db_collection_name as string}
+      FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end >= variant.pos
+
+        FOR record IN ${genomicElementToGeneCollectionName}
+          FILTER record._from == ge._id ${filesetFilter}
+          LET targetGene = (${geneVerboseQuery})[0]
+          FILTER targetGene != NULL
+          SORT record._key
+          LIMIT ${page * limit}, ${limit}
+
+          LET distToStart = ABS(variant.pos - targetGene.start)
+          LET distToEnd   = ABS(variant.pos - targetGene.end)
+
+          RETURN {
+            'id': record._from,
+            'cell_type': record.biological_context,
+            'target_gene': targetGene,
+            'score': record.score,
+            'model': record.source,
+            'dataset': record.source_url,
+            'name': record.name,
+            'distance_gene_variant': MIN([distToStart, distToEnd]),
+            'element_chr': ge.chr,
+            'element_start': ge.start,
+            'element_end': ge.end,
+            'element_type': ge.type,
+            'files_filesets': record.files_filesets
+          }
   `
 
-  const genomicElementGenes = await (await db.query(query)).all()
-
-  for (let i = 0; i < genomicElementGenes.length; i++) {
-    const distance = { distance_gene_variant: distanceGeneVariant(genomicElementGenes[i].target_gene.start, genomicElementGenes[i].target_gene.end, variant[0].pos) }
-    genomicElementGenes[i] = { ...distance, ...genomicElementsPerID[genomicElementGenes[i].id], ...genomicElementGenes[i] }
-  }
-  return genomicElementGenes
+  return await (await db.query(query)).all()
 }
 
 async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): Promise<any> {
@@ -698,6 +773,12 @@ const predictionsFromVariants = publicProcedure
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
+const variantsRegionSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/region-summary', description: descriptions.variants_region_summary } })
+  .input(z.object({ region: z.string() }))
+  .output(regionSummaryFormat)
+  .query(async ({ input }) => await findVariantsRegionSummary(input))
+
 const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
   .input(variantsQueryFormat)
@@ -721,5 +802,6 @@ export const variantsGenomicElementsRouters = {
   genomicElementsFromVariantsCount,
   genomicElementsPredictionsFromVariant,
   variantsFromGenomicElements,
-  genomicElementsFromVariants
+  genomicElementsFromVariants,
+  variantsRegionSummary
 }

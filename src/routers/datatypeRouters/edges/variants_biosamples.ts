@@ -49,12 +49,15 @@ const returnFormat = z.object({
   CI_lower_95: z.number().nullish(),
   CI_upper_95: z.number().nullish(),
   significant: z.boolean().nullish(),
+  p_value: z.number().nullish(), // minusLog10PValue
+  fdr: z.number().nullish(), // minusLog10QValue
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const variantToBiosamplesCollecionName = 'variants_biosamples'
@@ -175,12 +178,15 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'CI_lower_95': record.CI_lower_95,
       'CI_upper_95': record.CI_upper_95,
       'significant': record.significant,
+      'p_value': record.minusLog10PValue,
+      'fdr': record.minusLog10QValue,
       'label': record.label,
       'method': record.method,
       'class': record.class,
       'source': record.source,
       'source_url': record.source_url,
-      'name': record.name
+      'name': record.name,
+      'files_filesets': record.files_filesets
     }
   `
 

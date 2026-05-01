@@ -54,7 +54,7 @@ with open(GENES, 'r') as file:
                 LET codingVariants = (
                     FOR cv IN coding_variants
                     FILTER cv.gene_name == @name
-                    RETURN cv._id
+                    RETURN CONCAT("coding_variants/", cv._key)
                 )
 
                 LET variantMap = (
@@ -84,7 +84,8 @@ with open(GENES, 'r') as file:
                         variant: variantByCodingVariant[p._from],
                         score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
                         method: p.method,
-                        source_url: p.source_url
+                        source_url: p.source_url,
+                        files_filesets: p.files_filesets
                     }
                 )
 
@@ -108,7 +109,7 @@ with open(GENES, 'r') as file:
                     COLLECT variant = result.variant INTO variantGroup = result
                     RETURN {
                         variant: variant,
-                        scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }],
+                        scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url, files_filesets: CURRENT.files_filesets }],
                         maxScore: MAX(variantGroup[*].score),
                         protein_change: FIRST(variantGroup).protein_change,
                         cvDoc: FIRST(variantGroup).cvDoc
@@ -120,12 +121,10 @@ with open(GENES, 'r') as file:
                     'variant_scores': (
                         FOR vws IN variantWithScores
                         COLLECT protein_change = vws.protein_change INTO grouped = vws
-                        LET maxScore = MAX(grouped[*].maxScore)
-                        SORT maxScore DESC
                         LET firstCvDoc = FIRST(grouped).cvDoc
+                        SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC
                         RETURN {
                             protein_change: {
-                                coding_variant_id: firstCvDoc._key,
                                 protein_id: firstCvDoc.protein_id,
                                 protein_name: firstCvDoc.protein_name,
                                 transcript_id: firstCvDoc.transcript_id,

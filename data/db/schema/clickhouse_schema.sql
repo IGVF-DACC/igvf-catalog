@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS variants (
 	ref String,
 	alt String,
  	qual String,
-	filter String,
 	variation_type String,
 	annotations JSON,
 	spdi String,
@@ -375,33 +374,6 @@ CREATE TABLE IF NOT EXISTS variants_phenotypes (
 	variants_id String,
 	ontology_terms_id String
 );
-
-CREATE TABLE IF NOT EXISTS variants_phenotypes_studies (
-	lead_chrom String,
-	lead_pos UInt32,
-	lead_ref String,
-	lead_alt String,
-	phenotype_term String,
-	direction String,
-	beta Float64,
-	beta_ci_lower Float64,
-	beta_ci_upper Float64,
-	odds_ratio Float64,
-	oddsr_ci_lower Float64,
-	oddsr_ci_upper Float64,
-	p_val_mantissa Float64,
-	p_val_exponent Float64,
-	p_val Float64,
-	log10pvalue Float64,
-	tagged_variants Array(JSON),
-	source String,
-	version String,
-	name String,
-	inverse_name String,
-	variants_phenotypes_id String,
-	studies_id String
-)
-engine MergeTree order by (variants_phenotypes_id, studies_id);
 
 CREATE TABLE IF NOT EXISTS drugs (
 	name String,

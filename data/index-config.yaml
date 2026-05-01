@@ -71,6 +71,7 @@ files_filesets:
       - lab
       - preferred_assay_titles[*]
       - method
+      - crispr_modality
       - donors[*]
       - samples[*]
       - simple_sample_summaries[*]
@@ -410,11 +411,6 @@ variants_genomic_elements:
     fields: biological_context
     analyzers:
       - text_en_no_stem
-
-variants_phenotypes_studies:
-  zkd:
-    fields:
-      - log10pvalue
 
 variants_phenotypes:
   persistent:

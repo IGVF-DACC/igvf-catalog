@@ -60,8 +60,18 @@
         "method": {
           "enum": [
             "Perturb-seq",
-            "TAP-seq",
-            "CRISPR FACS screen"
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": [
+            "string"
+          ],
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            "interference",
+            "activation",
+            "knockout"
           ]
         },
         "class": {
@@ -118,6 +128,7 @@
       "required": [
         "_key",
         "files_filesets",
+        "crispr_modality",
         "biosample_term",
         "biological_context",
         "treatments_term_ids",
@@ -127,7 +138,7 @@
       "additionalProperties": false,
       "accessible_via": {
         "filter_by_range": "score, p_value_adj",
-        "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term"
+        "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
       }
     }
   ]

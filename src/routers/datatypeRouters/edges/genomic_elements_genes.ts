@@ -68,6 +68,7 @@ const outputFormat = z.array(z.object({
   biological_context: z.string(),
   biosample_term: z.string(),
   files_filesets: z.string(),
+  crispr_modality: z.string().nullish(),
   score: z.number().nullable(),
   p_value: z.number().or(z.string()).nullish(),
   genomic_element: z.string().or(elementOutputFormat),
@@ -166,6 +167,7 @@ function buildQuery (params: {
         'files_filesets': record.files_filesets,
         'biological_context': record.biological_context,
         'biosample_term': record.biosample_term,
+        'crispr_modality': record.crispr_modality,
         'score': record.score || record.effect_size || record.log2FC,
         'p_value': p_value
       }

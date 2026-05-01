@@ -1,6 +1,6 @@
 # Production Dockerfile for AWS CDK deployment
-# Use Node.js 20.12-bookworm-slim as base image
-FROM node:20.12-bookworm-slim AS base
+# Use Node.js 20.20.2-bookworm-slim as base image
+FROM node:20.20.2-bookworm-slim AS base
 
 # Set working directory
 WORKDIR /app
@@ -23,7 +23,7 @@ COPY babel.config.js ./
 RUN npm run build
 
 # Production stage
-FROM node:20.12-bookworm-slim AS production
+FROM node:20.20.2-bookworm-slim AS production
 
 # Install dumb-init for proper signal handling
 RUN apt-get update && apt-get install -y dumb-init && rm -rf /var/lib/apt/lists/*

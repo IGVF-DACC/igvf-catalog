@@ -197,9 +197,6 @@
             "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
             "SGE": "schemas/edges/variants_phenotypes.SGE.json"
         },
-        "variants_phenotypes_studies": {
-            "GWAS": "schemas/edges/variants_phenotypes_studies.GWAS.json"
-        },
         "variants_proteins": {
             "ASB": "schemas/edges/variants_proteins.ASB.json",
             "ASB_GVATDB": "schemas/edges/variants_proteins.ASB_GVATDB.json",

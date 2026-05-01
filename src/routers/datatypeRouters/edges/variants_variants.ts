@@ -241,6 +241,20 @@ function validateInput (input: paramsFormatType): void {
       message: 'At least one variant property must be defined.'
     })
   }
+
+  if (input.r2 && (isNaN(Number(input.r2)) && !(input.r2 as string).includes(':'))) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'r2 must be a number or a string in the format of "operator:value", where operator can be one of "gt", "gte", "lt" or "lte".'
+    })
+  }
+
+  if (input.d_prime && (isNaN(Number(input.d_prime)) && !(input.d_prime as string).includes(':'))) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'd_prime must be a number or a string in the format of "operator:value", where operator can be one of "gt", "gte", "lt" or "lte".'
+    })
+  }
 }
 
 async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
