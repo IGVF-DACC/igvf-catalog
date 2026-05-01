@@ -251,6 +251,10 @@ Retrieve MPRA experiments by querying positions of genomic elements. <br>   Set 
                 },
                 "method": {
                   "type": "string"
+                },
+                "files_filesets": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [

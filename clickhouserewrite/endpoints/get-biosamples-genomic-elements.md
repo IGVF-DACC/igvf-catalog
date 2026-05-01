@@ -250,6 +250,10 @@ Retrieve MPRA expriments by querying cell ontology terms. <br>   Set verbose = t
                 },
                 "method": {
                   "type": "string"
+                },
+                "files_filesets": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [

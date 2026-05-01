@@ -159,10 +159,6 @@ Retrieve variants associated with the query drugs from pharmGKB.<br>   Set verbo
                           "type": "string",
                           "nullable": true
                         },
-                        "filter": {
-                          "type": "string",
-                          "nullable": true
-                        },
                         "files_filesets": {
                           "type": "string",
                           "nullable": true

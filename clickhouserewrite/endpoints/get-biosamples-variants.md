@@ -176,10 +176,6 @@ Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br>   E
                           "type": "string",
                           "nullable": true
                         },
-                        "filter": {
-                          "type": "string",
-                          "nullable": true
-                        },
                         "files_filesets": {
                           "type": "string",
                           "nullable": true
@@ -516,6 +512,10 @@ Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br>   E
                 },
                 "name": {
                   "type": "string"
+                },
+                "files_filesets": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [

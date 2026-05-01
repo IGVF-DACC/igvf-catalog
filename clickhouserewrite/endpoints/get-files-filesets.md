@@ -88,8 +88,7 @@ Retrieve data about a specific dataset.<br>   Example: file_fileset_id = ENCFF00
         "type": "string",
         "enum": [
           "BlueSTARR",
-          "CRISPR FACS screen",
-          "CRISPR enhancer perturbation screen",
+          "CRISPR screen",
           "ENCODE-rE2G",
           "ESM-1v",
           "Homo sapiens elements",
@@ -108,6 +107,20 @@ Retrieve data about a specific dataset.<br>   Example: file_fileset_id = ENCFF00
           "candidate Cis-Regulatory Elements",
           "elements",
           "scATAC-seq"
+        ]
+      }
+    },
+    {
+      "name": "crispr_modality",
+      "in": "query",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "activation",
+          "interference",
+          "knockout",
+          "prime editing"
         ]
       }
     },
@@ -325,6 +338,10 @@ Retrieve data about a specific dataset.<br>   Example: file_fileset_id = ENCFF00
                   "nullable": true
                 },
                 "genome_browser_link": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "crispr_modality": {
                   "type": "string",
                   "nullable": true
                 }

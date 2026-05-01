@@ -167,6 +167,10 @@ Retrieve element gene predictions associated with a given variant.<br>   Example
                 },
                 "name": {
                   "type": "string"
+                },
+                "files_filesets": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [

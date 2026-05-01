@@ -1,6 +1,6 @@
 # `GET /variants/summary`
 
-**Status:** ⚠ Broken
+**Status:** ✅ ClickHouse-ported
 
 **Router file:** [`src/routers/datatypeRouters/nodes/variants.ts`](../../src/routers/datatypeRouters/nodes/variants.ts)
 
@@ -207,4 +207,4 @@ Retrieve genetic variants summary.<br>    Example: variant_id = NC_000020.11:365
 
 ## Implementation notes
 
-_(none yet)_
+Endpoint code is unchanged in `variants.ts`; the previous breakage was its dependency on the still-AQL `nearestGeneSearch` in `genes.ts`. That dependency is now ClickHouse-native — see [`get-genes.md`](get-genes.md) and [`routers/genes.md`](../routers/genes.md). All four input forms (`variant_id`, `rsid`, `spdi`, `region`) verified live.

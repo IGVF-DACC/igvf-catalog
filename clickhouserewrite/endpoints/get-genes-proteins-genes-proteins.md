@@ -65,6 +65,10 @@ Retrieve genes or proteins associated with either genes or proteins that match a
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "files_filesets": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -96,6 +100,10 @@ Retrieve genes or proteins associated with either genes or proteins that match a
                     },
                     "organism": {
                       "type": "string"
+                    },
+                    "files_filesets": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -126,6 +134,10 @@ Retrieve genes or proteins associated with either genes or proteins that match a
                             "items": {
                               "type": "string"
                             }
+                          },
+                          "files_filesets": {
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [
@@ -156,6 +168,10 @@ Retrieve genes or proteins associated with either genes or proteins that match a
                           },
                           "organism": {
                             "type": "string"
+                          },
+                          "files_filesets": {
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [

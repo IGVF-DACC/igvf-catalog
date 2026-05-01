@@ -260,10 +260,6 @@ Retrieve genetic variants in linkage disequilibrium (LD).<br>    The following p
                             "type": "string",
                             "nullable": true
                           },
-                          "filter": {
-                            "type": "string",
-                            "nullable": true
-                          },
                           "files_filesets": {
                             "type": "string",
                             "nullable": true

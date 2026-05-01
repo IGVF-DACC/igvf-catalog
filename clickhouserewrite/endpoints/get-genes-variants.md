@@ -330,10 +330,6 @@ Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalo
                           "type": "string",
                           "nullable": true
                         },
-                        "filter": {
-                          "type": "string",
-                          "nullable": true
-                        },
                         "files_filesets": {
                           "type": "string",
                           "nullable": true
@@ -564,6 +560,10 @@ Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalo
                   "nullable": true
                 },
                 "method": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "crispr_modality": {
                   "type": "string",
                   "nullable": true
                 },

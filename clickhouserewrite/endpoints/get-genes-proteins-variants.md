@@ -131,6 +131,10 @@ Retrieve variants associated with genes or proteins that match a query. <br>   E
                                   },
                                   "organism": {
                                     "type": "string"
+                                  },
+                                  "files_filesets": {
+                                    "type": "string",
+                                    "nullable": true
                                   }
                                 },
                                 "required": [
@@ -172,6 +176,10 @@ Retrieve variants associated with genes or proteins that match a query. <br>   E
                             "items": {
                               "type": "string"
                             }
+                          },
+                          "files_filesets": {
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [
@@ -204,6 +212,10 @@ Retrieve variants associated with genes or proteins that match a query. <br>   E
                                 },
                                 "name": {
                                   "type": "string"
+                                },
+                                "files_filesets": {
+                                  "type": "string",
+                                  "nullable": true
                                 }
                               },
                               "required": [
@@ -229,6 +241,10 @@ Retrieve variants associated with genes or proteins that match a query. <br>   E
                                 },
                                 "name": {
                                   "type": "string"
+                                },
+                                "files_filesets": {
+                                  "type": "string",
+                                  "nullable": true
                                 }
                               },
                               "required": [

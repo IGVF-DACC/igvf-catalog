@@ -1,6 +1,6 @@
 # `GET /genes`
 
-**Status:** ❌ AQL-only
+**Status:** ✅ ClickHouse-ported
 
 **Router file:** [`src/routers/datatypeRouters/nodes/genes.ts`](../../src/routers/datatypeRouters/nodes/genes.ts)
 
@@ -294,4 +294,14 @@ Retrieve genes.<br>   Example: organism = Homo sapiens, <br>   name = SAMD1, <br
 
 ## Implementation notes
 
-_(none yet)_
+Single ClickHouse query — replaces the AQL three-tier "exact, then text-index, then Levenshtein" flow with one unified score-ordered query when `name` is provided.
+
+Backed by [`src/routers/datatypeRouters/nodes/genes.ts`](../../src/routers/datatypeRouters/nodes/genes.ts) → `geneSearch`. Architecture writeup: [`routers/genes.md`](../routers/genes.md). Indexing primitives that make this fast: bloom-filter skip indexes for identifier columns and a `(chr, start)` projection for region intersect; see [`testing.md`](../testing.md) for per-query benchmarks (T01-T13).
+
+Behaviour deltas vs. the AQL original:
+
+- **Case-insensitive** name/symbol/synonym match via materialized `name_lower` / `symbol_lower` / `synonyms_lower` columns. The AQL exact tier was case-sensitive (UX bug).
+- **Fuzzy is always-on** and ranked by `editDistanceUTF8` (≤ 2). Exact name/symbol → score 0; exact synonym → score 1; fuzzy → score 3 or 4 (see routers/genes.md for the score expression).
+- **`gene_id` accepts both unversioned (`ENSG00000139618`, hits the PK) and versioned (`ENSG00000139618.18`, hits `idx_gene_id`) forms.**
+- **Mouse genes** flow through the same code path, filtered by the `organism` column. Returns `[]` until mouse data is loaded.
+- **Synonym fuzzy** preserved from the AQL Phase B against `record.alias`, with a per-synonym length prefilter to keep the cost bounded.

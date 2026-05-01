@@ -54,11 +54,9 @@ Retrieve genomic elements and gene pairs by querying genes.<br>   One of those f
       "schema": {
         "type": "string",
         "enum": [
-          "CRISPR FACS screen",
-          "CRISPR enhancer perturbation screen",
+          "CRISPR screen",
           "ENCODE-rE2G",
-          "Perturb-seq",
-          "TAP-seq"
+          "Perturb-seq"
         ]
       }
     },
@@ -177,6 +175,10 @@ Retrieve genomic elements and gene pairs by querying genes.<br>   One of those f
                 },
                 "files_filesets": {
                   "type": "string"
+                },
+                "crispr_modality": {
+                  "type": "string",
+                  "nullable": true
                 },
                 "score": {
                   "type": "number",

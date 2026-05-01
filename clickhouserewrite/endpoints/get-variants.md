@@ -176,10 +176,6 @@ Retrieve genetic variants.<br>   Example: organism = Homo sapiens or Mus musculu
                   "type": "string",
                   "nullable": true
                 },
-                "filter": {
-                  "type": "string",
-                  "nullable": true
-                },
                 "files_filesets": {
                   "type": "string",
                   "nullable": true

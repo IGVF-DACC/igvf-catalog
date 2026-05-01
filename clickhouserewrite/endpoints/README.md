@@ -4,7 +4,7 @@ Auto-generated from `https://catalog-api-dev.demo.igvf.org/openapi`. Re-run `scr
 
 **Status legend:** ✅ ClickHouse-ported · 🚧 Mixed · ❌ AQL-only · ⚠ Broken · ℹ︎ No DB call · ❓ Not in router files
 
-**Counts:** ℹ︎ No DB call = 2, ⚠ Broken = 1, ✅ ClickHouse-ported = 7, ❌ AQL-only = 59, 🚧 Mixed = 11
+**Counts:** ℹ︎ No DB call = 2, ✅ ClickHouse-ported = 9, ❌ AQL-only = 58, ❓ Not in router files = 1, 🚧 Mixed = 11
 
 ## /autocomplete
 
@@ -72,7 +72,7 @@ Auto-generated from `https://catalog-api-dev.demo.igvf.org/openapi`. Re-run `scr
 
 | Method | Path | Status | Router |
 |---|---|---|---|
-| GET | [`/genes`](get-genes.md) | ❌ AQL-only | [`src/routers/datatypeRouters/nodes/genes.ts`](../../src/routers/datatypeRouters/nodes/genes.ts) |
+| GET | [`/genes`](get-genes.md) | ✅ ClickHouse-ported | [`src/routers/datatypeRouters/nodes/genes.ts`](../../src/routers/datatypeRouters/nodes/genes.ts) |
 | GET | [`/genes/coding-variants/all-scores`](get-genes-coding-variants-all-scores.md) | ✅ ClickHouse-ported | [`src/routers/datatypeRouters/edges/genes_coding_variants.ts`](../../src/routers/datatypeRouters/edges/genes_coding_variants.ts) |
 | GET | [`/genes/coding-variants/scores`](get-genes-coding-variants-scores.md) | ✅ ClickHouse-ported | [`src/routers/datatypeRouters/edges/genes_coding_variants.ts`](../../src/routers/datatypeRouters/edges/genes_coding_variants.ts) |
 | GET | [`/genes/diseases`](get-genes-diseases.md) | ❌ AQL-only | [`src/routers/datatypeRouters/edges/diseases_genes.ts`](../../src/routers/datatypeRouters/edges/diseases_genes.ts) |
@@ -202,6 +202,7 @@ Auto-generated from `https://catalog-api-dev.demo.igvf.org/openapi`. Re-run `scr
 | GET | [`/variants/predictions`](get-variants-predictions.md) | 🚧 Mixed | [`src/routers/datatypeRouters/edges/variants_genomic_elements.ts`](../../src/routers/datatypeRouters/edges/variants_genomic_elements.ts) |
 | GET | [`/variants/predictions-count`](get-variants-predictions-count.md) | 🚧 Mixed | [`src/routers/datatypeRouters/edges/variants_genomic_elements.ts`](../../src/routers/datatypeRouters/edges/variants_genomic_elements.ts) |
 | GET | [`/variants/proteins`](get-variants-proteins.md) | ❌ AQL-only | [`src/routers/datatypeRouters/edges/variants_proteins.ts`](../../src/routers/datatypeRouters/edges/variants_proteins.ts) |
-| GET | [`/variants/summary`](get-variants-summary.md) | ⚠ Broken | [`src/routers/datatypeRouters/nodes/variants.ts`](../../src/routers/datatypeRouters/nodes/variants.ts) |
+| GET | [`/variants/region-summary`](get-variants-region-summary.md) | ❓ Not in router files | _—_ |
+| GET | [`/variants/summary`](get-variants-summary.md) | ✅ ClickHouse-ported | [`src/routers/datatypeRouters/nodes/variants.ts`](../../src/routers/datatypeRouters/nodes/variants.ts) |
 | GET | [`/variants/variant-ld`](get-variants-variant-ld.md) | ❌ AQL-only | [`src/routers/datatypeRouters/edges/variants_variants.ts`](../../src/routers/datatypeRouters/edges/variants_variants.ts) |
 | GET | [`/variants/variant-ld/summary`](get-variants-variant-ld-summary.md) | ❌ AQL-only | [`src/routers/datatypeRouters/edges/variants_variants.ts`](../../src/routers/datatypeRouters/edges/variants_variants.ts) |

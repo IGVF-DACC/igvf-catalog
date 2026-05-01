@@ -6,14 +6,14 @@
 
 ## Description
 
-Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br>   Example: variant_id = NC_000001.11:14772:C:T.<br>   spdi = NC_000001.11:14772:C:T, <br>   hgvs = NC_000001.11:g.14773C>T, <br>   rsid = rs1234567890, <br>   ca_id = CA10655131, <br>   region = chr1:15563-15567 (maximum length: 10kb), <br>   organism = Homo sapiens, <br>   files_fileset = IGVFFI1323RCIE, <br>   element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br>   significant = true, <br>   method = STARR-seq. <br>   The limit parameter controls the page size and can not exceed 100. <br>   Pagination is 0-based.
+Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br>   Example: variant_id = NC_000001.11:14772:C:T,<br>   spdi = NC_000001.11:14772:C:T, <br>   hgvs = NC_000001.11:g.14773C>T, <br>   rsid = rs1234567890, <br>   ca_id = CA10655131, <br>   region = chr1:15563-15567 (maximum length: 10kb), <br>   organism = Homo sapiens, <br>   files_fileset = IGVFFI1323RCIE, <br>   element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br>   significant = true, <br>   method = STARR-seq. <br>   The limit parameter controls the page size and can not exceed 100. <br>   Pagination is 0-based.
 
 ## OpenAPI excerpt
 
 ```json
 {
   "operationId": "biosamplesFromVariants",
-  "description": "Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br>   Example: variant_id = NC_000001.11:14772:C:T.<br>   spdi = NC_000001.11:14772:C:T, <br>   hgvs = NC_000001.11:g.14773C>T, <br>   rsid = rs1234567890, <br>   ca_id = CA10655131, <br>   region = chr1:15563-15567 (maximum length: 10kb), <br>   organism = Homo sapiens, <br>   files_fileset = IGVFFI1323RCIE, <br>   element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br>   significant = true, <br>   method = STARR-seq. <br>   The limit parameter controls the page size and can not exceed 100. <br>   Pagination is 0-based.",
+  "description": "Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br>   Example: variant_id = NC_000001.11:14772:C:T,<br>   spdi = NC_000001.11:14772:C:T, <br>   hgvs = NC_000001.11:g.14773C>T, <br>   rsid = rs1234567890, <br>   ca_id = CA10655131, <br>   region = chr1:15563-15567 (maximum length: 10kb), <br>   organism = Homo sapiens, <br>   files_fileset = IGVFFI1323RCIE, <br>   element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br>   significant = true, <br>   method = STARR-seq. <br>   The limit parameter controls the page size and can not exceed 100. <br>   Pagination is 0-based.",
   "parameters": [
     {
       "name": "spdi",
@@ -205,10 +205,6 @@ Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br>   Exa
                           "nullable": true
                         },
                         "qual": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "filter": {
                           "type": "string",
                           "nullable": true
                         },
@@ -548,6 +544,10 @@ Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br>   Exa
                 },
                 "name": {
                   "type": "string"
+                },
+                "files_filesets": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [

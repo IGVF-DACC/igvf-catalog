@@ -210,10 +210,6 @@ Retrieve genetic variants within a genomic region by frequencies.<br>    Example
                   "type": "string",
                   "nullable": true
                 },
-                "filter": {
-                  "type": "string",
-                  "nullable": true
-                },
                 "files_filesets": {
                   "type": "string",
                   "nullable": true

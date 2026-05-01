@@ -66,12 +66,10 @@ Retrieve genomic elements.<br>   Example: region = chr1:1157520-1158189, <br>   
       "schema": {
         "type": "string",
         "enum": [
-          "CRISPR FACS screen",
-          "CRISPR enhancer perturbation screen",
+          "CRISPR screen",
           "ENCODE-rE2G",
           "MPRA",
           "Perturb-seq",
-          "TAP-seq",
           "caQTL",
           "candidate Cis-Regulatory Elements",
           "integrative"
