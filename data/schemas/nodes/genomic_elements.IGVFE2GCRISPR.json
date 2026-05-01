@@ -25,8 +25,7 @@
         "method": {
           "enum": [
             "Perturb-seq",
-            "TAP-seq",
-            "CRISPR FACS screen"
+            "CRISPR screen"
           ]
         },
         "source_annotation": {

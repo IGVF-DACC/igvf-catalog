@@ -36,6 +36,7 @@ class VariantEFFECTSAdapter(BaseAdapter):
         self.simple_sample_summaries = file_fileset['simple_sample_summaries']
         self.biosample_term = file_fileset['samples'][0]
         self.treatments_term_ids = file_fileset['treatments_term_ids']
+        self.crispr_modality = file_fileset.get('crispr_modality')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -146,6 +147,7 @@ class VariantEFFECTSAdapter(BaseAdapter):
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
                         'method': 'Variant-EFFECTS',
+                        'crispr_modality': self.crispr_modality,
                         'biological_context': self.simple_sample_summaries[0],
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,

@@ -71,6 +71,7 @@ files_filesets:
       - lab
       - preferred_assay_titles[*]
       - method
+      - crispr_modality
       - donors[*]
       - samples[*]
       - simple_sample_summaries[*]

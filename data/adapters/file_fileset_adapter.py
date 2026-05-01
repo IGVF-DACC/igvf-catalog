@@ -74,7 +74,7 @@ class FileFileSet:
     }
     METHOD_TO_COLLECTIONS_ENCODE = {
         'caQTL': ['variants_genomic_elements', 'genomic_elements'],
-        'CRISPR enhancer perturbation screen': ['genomic_elements', 'genomic_elements_genes'],
+        'CRISPR screen': ['genomic_elements', 'genomic_elements_genes'],
         'MPRA': ['genomic_elements_biosamples', 'genomic_elements'],
         'ENCODE-rE2G': ['genomic_elements', 'genomic_elements_genes'],
     }
@@ -431,17 +431,22 @@ class FileFileSet:
         donor_accessions = set()
         simple_sample_summaries = set()
         treatment_term_ids = set()
+        crispr_modalities = set()
         for sample in samples:
             sample_accessions.add(sample['accession'])
         sample_objects = FileFileSet.get_batch_objects(
             list(sample_accessions),
             ['accession', 'donors', 'sample_terms', 'targeted_sample_term',
-                'classifications', 'treatments', 'construct_library_sets'],
+                'classifications', 'treatments', 'construct_library_sets', 'modifications'],
             api_url=FileFileSet.IGVF_API
         )
         for sample_object in sample_objects:
             for donor in sample_object['donors']:
                 donor_accessions.add(donor['accession'])
+            for modification in sample_object.get('modifications', []):
+                if not modification['@id'].startswith('/crispr-modifications/'):
+                    continue
+                crispr_modalities.add(modification['modality'])
             targeted_sample_term_obj = sample_object.get(
                 'targeted_sample_term')
             sample_term_names = set()
@@ -527,7 +532,12 @@ class FileFileSet:
                     simple_sample_summary = f'{simple_sample_summary} with variants from 1000 Genomes donors: {thousand_genomes_ids}'
 
             simple_sample_summaries.add(simple_sample_summary)
-        return sample_accessions, donor_accessions, sample_term_ids, simple_sample_summaries, treatment_term_ids
+        if len(crispr_modalities) > 1:
+            raise ValueError(
+                'Loading analysis sets with multiple CRISPR modalities is unsupported.')
+        crispr_modality = next(iter(crispr_modalities)
+                               ) if crispr_modalities else None
+        return sample_accessions, donor_accessions, sample_term_ids, simple_sample_summaries, treatment_term_ids, crispr_modality
 
     @staticmethod
     def decompose_analysis_set_to_measurement_set_igvf(analysis_set_id, measurement_sets_accession=None):
@@ -654,9 +664,11 @@ class FileFileSet:
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
         all_sample_types = list(sample_term_to_sample_type.values())
-        # manually set the method to ENCODE-rE2G for file ENCFF968BZL
+        # manually set the method and modality for file ENCFF968BZL
+        crispr_modality = None
         if file_object['accession'] == 'ENCFF968BZL':
-            method = 'CRISPR enhancer perturbation screen'
+            method = 'CRISPR screen'
+            crispr_modality = 'interference'
 
         if file_object['accession'] == 'ENCFF420VPZ':
             catalog_collections = ['genomic_elements']
@@ -708,7 +720,8 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': None,
-            'genome_browser_link': genome_browser_link
+            'genome_browser_link': genome_browser_link,
+            'crispr_modality': None
         }
         return props, donor_ids, all_sample_types, disease_ids
 
@@ -782,10 +795,16 @@ class FileFileSet:
         if assay_term_ids == ['OBI:0002675']:
             method = 'MPRA'
 
+        if preferred_assay_titles:
+            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq'}):
+                method = 'Perturb-seq'
+            elif set(preferred_assay_titles) == {'CRISPR FACS screen'}:
+                method = 'CRISPR screen'
+
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
 
         samples = fileset_object.get('samples', [])
-        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = FileFileSet.parse_sample_donor_treatment_igvf(
+        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids, modality = FileFileSet.parse_sample_donor_treatment_igvf(
             samples,
             method)
 
@@ -813,7 +832,8 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': cell_annotation,
-            'genome_browser_link': genome_browser_link
+            'genome_browser_link': genome_browser_link,
+            'crispr_modality': modality
         }
         return props, donor_ids, sample_term_ids
 

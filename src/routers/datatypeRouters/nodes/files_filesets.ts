@@ -16,6 +16,7 @@ const METHOD = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'method
 const CLASS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'class')
 const SOURCE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'source')
 const ASSAYS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'preferred_assay_titles')
+const CRISPR_MODALITY = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'crispr_modality')
 const SOFTWARE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'software')
 const CELL_ANNOTATION = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'cell_annotation')
 
@@ -25,6 +26,7 @@ const filesFilesetsQueryFormat = z.object({
   lab: z.enum(LABS).optional(),
   preferred_assay_title: z.enum(ASSAYS).optional(),
   method: z.enum(METHOD).optional(),
+  crispr_modality: z.enum(CRISPR_MODALITY).optional(),
   donor_id: z.string().optional(),
   sample_term: z.string().optional(),
   sample_summary: z.string().optional(),
@@ -63,7 +65,8 @@ const filesFilesetsFormat = z.object({
   source_url: z.string(),
   download_link: z.string(),
   cell_annotation: z.string().nullish(),
-  genome_browser_link: z.string().nullish()
+  genome_browser_link: z.string().nullish(),
+  crispr_modality: z.string().nullish()
 })
 
 async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
