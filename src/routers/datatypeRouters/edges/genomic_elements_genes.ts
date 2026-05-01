@@ -14,6 +14,7 @@ const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes'
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
 const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
+const genomicElementsIGVF2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -29,6 +30,11 @@ const edgeQueryFormat = z.object({
 })
 
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+
+const gnrGeneQueryFormat = z.object({
+  regulation_type: z.enum(['Regulator', 'Response']),
+  p_value: z.string().optional()
+}).merge(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true}))
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -68,6 +74,23 @@ const outputFormat = z.array(z.object({
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
+
+const grnOutputFormat = z.object({
+  regulator_gene: z.string(),
+  genomic_element: z.object({
+    chr: z.string(),
+    start: z.number(),
+    end: z.number(),
+    response_gene: z.string(),
+  }),
+  class: z.string(),
+  method: z.string(),
+  source: z.string(),
+  biological_context: z.string(),
+  files_filesets: z.string(),
+  score: z.number().nullish(),
+  p_value: z.number().nullish()
+})
 
 const buildEdgeFilter = (input: paramsFormatType): string => {
   if (input.files_fileset !== undefined) {
@@ -381,6 +404,86 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   })
 }
 
+async function gnrSearch (input: paramsFormatType): Promise<any> {
+  geneQueryValidation(input)
+  const limit = applyLimit(input)
+
+  const geneInput: paramsFormatType = { _key: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
+  delete input.gene_id
+  delete input.hgnc_id
+  delete input.alias
+  delete input.gene_name
+  delete input.organism
+
+  let pvalueFilter = ''
+  if (input.p_value !== undefined) {
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
+  }
+
+  const regulatorQuery = `
+    FOR gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
+
+        FOR record in genomic_elements_genes
+          FILTER record._to == gene._id AND record.method == \'Perturb-seq\'
+          ${pvalueFilter}
+          SORT record._key
+
+          LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+          LET ge = DOCUMENT(record._from)
+
+          RETURN {
+          'regulator_gene': gene.name,
+          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': DOCUMENT(ge.promoter_of).name },
+          'class': record.class,
+          'method': record.method,
+          'source': record.source,
+          'files_filesets': record.files_filesets,
+          'biological_context': record.biological_context,
+          'score': record.score || record.effect_size || record.log2FC,
+          'p_value': record.p_value_adj
+        }
+  `
+
+  const responseQuery = `
+    FOR gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
+
+        FOR ge in genomic_elements
+          FILTER ge.promoter_of == gene._id
+
+          FOR record in genomic_elements_genes
+            FILTER record._from == ge._id
+            ${pvalueFilter}
+            SORT record._key
+            LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+            RETURN {
+            'regulator_gene': DOCUMENT(record._to).name,
+            'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': gene.name },
+            'class': record.class,
+            'method': record.method,
+            'source': record.source,
+            'files_filesets': record.files_filesets,
+            'biological_context': record.biological_context,
+            'score': record.score || record.effect_size || record.log2FC,
+            'p_value': record.p_value_adj
+          }
+  `
+
+  let query = regulatorQuery
+  if (input.regulation_type == 'Response') {
+    query = responseQuery
+  }
+
+  const objs = (await db.query(query)).all()
+  if (Array.isArray(objs) && objs.length > 0) {
+    return objs
+  }
+  return objs
+}
+
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   elementQueryValidation(input)
@@ -479,7 +582,14 @@ const genesFromGenomicElements = publicProcedure
   .output(outputFormat)
   .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
+const grn = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn } })
+  .input(gnrGeneQueryFormat)
+  .output(z.array(grnOutputFormat))
+  .query(async ({ input }) => await gnrSearch(input))
+
 export const genomicElementsGenesRouters = {
   genomicElementsFromGenes,
-  genesFromGenomicElements
+  genesFromGenomicElements,
+  grn
 }
