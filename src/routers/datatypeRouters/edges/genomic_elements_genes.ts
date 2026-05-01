@@ -14,6 +14,7 @@ const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes'
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
 const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
+const genomicElementsIGVF2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -30,7 +31,10 @@ const edgeQueryFormat = z.object({
 
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
-const gnrGeneQueryFormat = z.object({regulation_type: z.enum(['Regulator', 'Response'])}).merge(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true}))
+const gnrGeneQueryFormat = z.object({
+  regulation_type: z.enum(['Regulator', 'Response']),
+  p_value: z.string().optional()
+}).merge(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true}))
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -409,12 +413,18 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
   delete input.gene_name
   delete input.organism
 
+  let pvalueFilter = ''
+  if (input.p_value !== undefined) {
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
+  }
+
   const regulatorQuery = `
     FOR gene IN genes
         FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
           FILTER record._to == gene._id AND record.method == \'Perturb-seq\'
+          ${pvalueFilter}
           SORT record._key
 
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
@@ -443,6 +453,7 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
 
           FOR record in genomic_elements_genes
             FILTER record._from == ge._id
+            ${pvalueFilter}
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
 

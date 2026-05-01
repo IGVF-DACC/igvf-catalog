@@ -720,6 +720,7 @@ export const descriptions = {
   gene_name = TCF7L1, <br> \
   hgnc = HGNC:11640, <br> \
   alias = TCF3, <br> \
+  p_value = gte:0, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 

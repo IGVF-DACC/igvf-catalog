@@ -124,3 +124,5 @@ https://api.catalogkg.igvf.org/api/phenotypes/coding-variants?method=VAMP-seq
 https://api.catalogkg.igvf.org/api/files-filesets?method=Variant-EFFECTS
 https://api.catalogkg.igvf.org/api/biosamples/variants?method=STARR-seq
 https://api.catalogkg.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000186092&page=0&limit=8&method=MutPred2
+https://api.catalogkg.igvf.org/api//gene-regulatory-network?regulation_type=Regulator&p_value=gte%3A0&gene_id=ENSG00000152284&page=0
+https://api.catalogkg.igvf.org/api//gene-regulatory-network?regulation_type=Response&gene_id=ENSG00000152284&page=0
