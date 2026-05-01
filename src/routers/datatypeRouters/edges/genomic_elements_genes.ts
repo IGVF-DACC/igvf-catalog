@@ -30,7 +30,7 @@ const edgeQueryFormat = z.object({
 
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
-const gnrGeneQueryFormat = genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({verbose: true})
+const gnrGeneQueryFormat = z.object({regulation_type: z.enum(['Regulator', 'Response'])}).merge(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true}))
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -71,12 +71,12 @@ const outputFormat = z.array(z.object({
 }))
 
 const grnOutputFormat = z.object({
-  regulated_gene: z.string(),
+  regulator_gene: z.string(),
   genomic_element: z.object({
     chr: z.string(),
     start: z.number(),
     end: z.number(),
-    regulator: z.string().nullish(),
+    response_gene: z.string(),
   }),
   class: z.string(),
   method: z.string(),
@@ -398,7 +398,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   })
 }
 
-async function gnrFromGeneRegulator (input: paramsFormatType): Promise<any> {
+async function gnrSearch (input: paramsFormatType): Promise<any> {
   geneQueryValidation(input)
   const limit = applyLimit(input)
 
@@ -409,82 +409,21 @@ async function gnrFromGeneRegulator (input: paramsFormatType): Promise<any> {
   delete input.gene_name
   delete input.organism
 
-  const query = `
-    LET target_gene = FIRST(
-      FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
-        RETURN gene
-    )
-
-    LET promoter_gene_ids = (
-      FOR record IN genomic_elements_genes
-        FILTER record._to == target_gene._id AND record.method == 'Perturb-seq'
-        LET genomic_element = DOCUMENT(record._from)
-        FILTER genomic_element.promoter_of != null
-        RETURN DISTINCT genomic_element.promoter_of
-    )
-
-    LET trecords = (
-      FOR promoter_gene_id IN promoter_gene_ids
-        FOR trecord IN genomic_elements_genes
-          FILTER trecord._to == promoter_gene_id AND trecord.method == 'Perturb-seq'
-          RETURN trecord
-    )
-
-    FOR trecord IN trecords
-      SORT trecord._key
-      LIMIT ${(input.page as number || 0) * limit}, ${limit}
-
-      LET tge = DOCUMENT(trecord._from)
-
-      RETURN {
-        regulated_gene:     target_gene.name,
-        genomic_element:    { 'start': tge.start, 'end': tge.end, 'chr': tge.chr, 'regulator': tge.promoter_of },
-        class:              trecord.class,
-        method:             trecord.method,
-        source:             trecord.source,
-        files_filesets:     trecord.files_filesets,
-        biological_context: trecord.biological_context,
-        score:              trecord.score || trecord.effect_size || trecord.log2FC,
-        p_value:            trecord.p_value_adj
-      }
-  `
-
-  const objs = (await db.query(query)).all()
-  if (Array.isArray(objs) && objs.length > 0) {
-    return objs
-  }
-  return objs
-}
-
-async function gnrFromGeneTarget (input: paramsFormatType): Promise<any> {
-  geneQueryValidation(input)
-  const limit = applyLimit(input)
-
-  const geneInput: paramsFormatType = { _key: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
-  delete input.gene_id
-  delete input.hgnc_id
-  delete input.alias
-  delete input.gene_name
-  delete input.organism
-
-  const query = `
+  const regulatorQuery = `
     FOR gene IN genes
         FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
-          FILTER record._to == gene._id AND record.method == 'Perturb-seq'
+          FILTER record._to == gene._id AND record.method == \'Perturb-seq\'
           SORT record._key
 
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
           LET ge = DOCUMENT(record._from)
-          LET name_gene_promoter_of = DOCUMENT(ge.promoter_of).name
 
           RETURN {
-          'regulated_gene': gene.name,
-          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator': ge.promoter_of },
-          'promoter_of': name_gene_promoter_of,
+          'regulator_gene': gene.name,
+          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': DOCUMENT(ge.promoter_of).name },
           'class': record.class,
           'method': record.method,
           'source': record.source,
@@ -494,6 +433,36 @@ async function gnrFromGeneTarget (input: paramsFormatType): Promise<any> {
           'p_value': record.p_value_adj
         }
   `
+
+  const responseQuery = `
+    FOR gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
+
+        FOR ge in genomic_elements
+          FILTER ge.promoter_of == gene._id
+
+          FOR record in genomic_elements_genes
+            FILTER record._from == ge._id
+            SORT record._key
+            LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+            RETURN {
+            'regulator_gene': DOCUMENT(record._to).name,
+            'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': gene.name },
+            'class': record.class,
+            'method': record.method,
+            'source': record.source,
+            'files_filesets': record.files_filesets,
+            'biological_context': record.biological_context,
+            'score': record.score || record.effect_size || record.log2FC,
+            'p_value': record.p_value_adj
+          }
+  `
+
+  let query = regulatorQuery
+  if (input.regulation_type == 'Response') {
+    query = responseQuery
+  }
 
   const objs = (await db.query(query)).all()
   if (Array.isArray(objs) && objs.length > 0) {
@@ -600,21 +569,14 @@ const genesFromGenomicElements = publicProcedure
   .output(outputFormat)
   .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
-const grnTargets = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/grn/targets', description: descriptions.grn_targets } })
+const grn = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn } })
   .input(gnrGeneQueryFormat)
   .output(z.array(grnOutputFormat))
-  .query(async ({ input }) => await gnrFromGeneTarget(input))
-
-const grnRegulators = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/grn/regulators', description: descriptions.grn_regulators } })
-  .input(gnrGeneQueryFormat)
-  .output(z.array(grnOutputFormat))
-  .query(async ({ input }) => await gnrFromGeneRegulator(input))
+  .query(async ({ input }) => await gnrSearch(input))
 
 export const genomicElementsGenesRouters = {
   genomicElementsFromGenes,
   genesFromGenomicElements,
-  grnTargets,
-  grnRegulators
+  grn
 }

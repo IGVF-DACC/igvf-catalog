@@ -714,19 +714,12 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  grn_targets: 'Retrieve gene regulatory targets for a given gene.<br> \
-  Example: gene_id = ENSG00000031698, <br> \
-  gene_name = SARS1, <br> \
-  hgnc = HGNC:10537, <br> \
-  alias = SERRS, <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
-
-  grn_regulators: 'Retrieve gene regulators for a given gene.<br> \
-  Example: gene_id = ENSG00000031698, <br> \
-  gene_name = SARS1, <br> \
-  hgnc = HGNC:10537, <br> \
-  alias = SERRS, <br> \
+  grn: 'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+  Example: regulation_type = Regulator, <br> \
+  gene_id = ENSG00000152284, <br> \
+  gene_name = TCF7L1, <br> \
+  hgnc = HGNC:11640, <br> \
+  alias = TCF3, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
