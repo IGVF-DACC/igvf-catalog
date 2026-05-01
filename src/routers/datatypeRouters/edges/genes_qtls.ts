@@ -245,9 +245,9 @@ async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const allQTLsQuery = `
-  LET variantsGenes = (${variantsGenesQuery(filterClause, false)})
-  LET variantsProteins = (${variantsProteinsQuery(filterClause, false)})
-  LET variantsGenomicElements = (${variantsGenomicElementsQuery(filterClause, false)})
+  LET variantsGenes = (${variantsGenesQuery(`AND record.method IN ['eQTL', 'spliceQTL'] ${filterClause}`, false)})
+  LET variantsProteins = (${variantsProteinsQuery(`AND record.method == 'pQTL' ${filterClause}`, false)})
+  LET variantsGenomicElements = (${variantsGenomicElementsQuery(`AND record.method == 'caQTL' ${filterClause}`, false)})
   FOR record IN UNION(variantsGenes, variantsProteins, variantsGenomicElements)
     SORT record._key ASC
     LIMIT @offset, @limit
