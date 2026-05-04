@@ -32,35 +32,31 @@
           "pattern": "^ontology_terms/"
         },
         "biological_context": {
-          "type": ["string", "null"],
-          "description": "Human-readable biosample name (e.g. tibial nerve)"
+          "type": "string",
+          "description": "Biosample name from GTEx(e.g. tibial nerve)"
         },
         "phenotype": {
-          "type": ["string", "null"],
-          "description": "Ontology term reference for the associated phenotype or disease trait",
+          "type": "string",
+          "description": "Ontology term reference for the associated phenotype or disease trait from GWAS",
           "pattern": "^ontology_terms/"
         },
         "vcp": {
           "type": "number",
-          "description": "Variant Colocalization Probability (0–1)",
-          "minimum": 0,
-          "maximum": 1
+          "description": "Variant Colocalization Probability (0–1)"
         },
-        "gene_ensembl": {
-          "type": ["string", "null"],
-          "description": "Ensembl gene ID associated with the colocalization"
-        },
-        "gene_name": {
-          "type": ["string", "null"],
-          "description": "HUGO gene symbol associated with the colocalization"
+        "gene": {
+          "type": "string",
+          "description": "ArangoDB reference to the gene associated with the colocalization",
+          "pattern": "^genes/",
+          "collections": ["genes"]
         },
         "trait_name": {
-          "type": ["string", "null"],
+          "type": "string",
           "description": "Name of the associated disease or trait"
         },
         "label": {
           "enum": [
-            "variant colocalization with molecular trait"
+            "predicted variant effect on phenotype"
           ]
         },
         "method": {
@@ -104,7 +100,12 @@
       "required": [
         "_key",
         "biosample_term",
+        "biological_context",
+        "phenotype",
         "vcp",
+        "gene",
+        "trait_name",
+        "source_url",
         "files_filesets"
       ],
       "additionalProperties": false

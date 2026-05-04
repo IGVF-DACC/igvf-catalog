@@ -3,6 +3,7 @@ import gzip
 import json
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, load_variant, split_spdi, bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.gene_validator import GeneValidator
 from typing import Optional
 from adapters.writer import Writer
 
@@ -25,11 +26,11 @@ class ColocBoostVariantBiosample(BaseAdapter):
         **kwargs
     ):
         super().__init__(filepath, label, writer, validate)
-        # Extract accession from filename: IGVFFI1234ABCD.tsv.gz -> IGVFFI1234ABCD
         filename = self.filepath.split('/')[-1]
         self.file_accession = filename.split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession + '/'
-        self.collection_label = 'variant colocalization with molecular trait'
+        self.collection_label = 'predicted variant effect on phenotype'
+        self.gene_validator = GeneValidator()
 
     def _get_schema_type(self):
         if self.label == 'variant_biosample':
@@ -67,6 +68,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     self.process_edge_chunk(chunk)
 
         self.writer.close()
+        self.gene_validator.log()
 
     def process_variant_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
@@ -122,11 +124,26 @@ class ColocBoostVariantBiosample(BaseAdapter):
             phenotype = ('ontology_terms/' + ontology_term_raw.replace(':',
                          '_')) if ontology_term_raw else None
 
+            if len(uberon_terms) != len(biosample_names):
+                self.logger.warning(
+                    f'Skipping {spdi}: UBERONTerm count ({len(uberon_terms)}) '
+                    f'does not match BiosampleTermName count ({len(biosample_names)})'
+                )
+                continue
+
+            gene_ensembl_raw = row.get('GeneEnsembl', '').strip()
+            gene = None
+            if gene_ensembl_raw:
+                if not self.gene_validator.validate(gene_ensembl_raw):
+                    self.logger.warning(
+                        f'Skipping {spdi}: invalid gene ID {gene_ensembl_raw}')
+                    continue
+                gene = 'genes/' + gene_ensembl_raw
+
             for i, uberon_term in enumerate(uberon_terms):
                 biosample_term_id = uberon_term.replace(':', '_')
                 biosample_ref = 'ontology_terms/' + biosample_term_id
-                biological_context = biosample_names[i] if i < len(
-                    biosample_names) else None
+                biological_context = biosample_names[i]
                 edge_key = _id + '_' + biosample_term_id + '_' + self.file_accession
 
                 edge_props = {
@@ -137,8 +154,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     'biological_context': biological_context,
                     'phenotype': phenotype,
                     'vcp': float(row['VCP']),
-                    'gene_ensembl': row.get('GeneEnsembl') or None,
-                    'gene_name': row.get('GeneName') or None,
+                    'gene': gene,
                     'trait_name': row.get('TraitName') or None,
                     'label': self.collection_label,
                     'method': self.method,

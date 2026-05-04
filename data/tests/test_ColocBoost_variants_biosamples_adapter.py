@@ -2,7 +2,7 @@ import json
 import pytest
 from adapters.ColocBoost_variants_biosamples_adapter import ColocBoostVariantBiosample
 from adapters.writer import SpyWriter
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, MagicMock
 
 MOCK_SPDI = 'NC_000001.11:112503772:T:C'
 MOCK_VARIANT_ID = 'NC_000001.11:112503772:T:C'
@@ -41,6 +41,15 @@ def mock_file_fileset():
             'class': 'prediction'
         }
         yield mock_get
+
+
+@pytest.fixture(autouse=True)
+def mock_gene_validator():
+    with patch('adapters.ColocBoost_variants_biosamples_adapter.GeneValidator') as mock_cls:
+        instance = MagicMock()
+        instance.validate.return_value = True
+        mock_cls.return_value = instance
+        yield instance
 
 
 @pytest.fixture
@@ -126,10 +135,9 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_split_spdi, mock_b
     assert item['biological_context'] == 'tibial nerve'
     assert item['phenotype'] == 'ontology_terms/EFO_0006340'
     assert item['vcp'] == 0.9993
-    assert item['gene_ensembl'] == 'ENSG00000134245'
-    assert item['gene_name'] == 'WNT2B'
+    assert item['gene'] == 'genes/ENSG00000134245'
     assert item['trait_name'] == 'mean arterial pressure'
-    assert item['label'] == 'variant colocalization with molecular trait'
+    assert item['label'] == 'predicted variant effect on phenotype'
     assert item['method'] == 'ColocBoost'
     assert item['class'] == 'prediction'
     assert item['name'] == 'colocalizes with'
