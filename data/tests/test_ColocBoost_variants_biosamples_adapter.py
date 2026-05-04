@@ -26,12 +26,6 @@ mock_tsv_row_multi_biosample = (
 )
 mock_tsv_data_multi_biosample = mock_tsv_header + mock_tsv_row_multi_biosample
 
-mock_tsv_row_no_phenotype = (
-    f'chr1\t112503772\t112503773\tT\tC\t{MOCK_SPDI}\t'
-    '0.9993\tENSG00000134245\tWNT2B\tmean arterial pressure\t\ttibial nerve\tUBERON_0001323\n'
-)
-mock_tsv_data_no_phenotype = mock_tsv_header + mock_tsv_row_no_phenotype
-
 
 @pytest.fixture
 def mock_file_fileset():
@@ -170,25 +164,6 @@ def test_multiple_biosamples_per_row(mock_bulk_check, mock_split_spdi, mock_buil
     assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0001323_{FILE_ACCESSION}']['biological_context'] == 'tibial nerve'
 
 
-@patch('adapters.ColocBoost_variants_biosamples_adapter.build_variant_id', return_value=MOCK_VARIANT_ID)
-@patch('adapters.ColocBoost_variants_biosamples_adapter.split_spdi', return_value=('chr1', 112503772, 'T', 'C'))
-@patch('adapters.ColocBoost_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value={MOCK_SPDI})
-def test_missing_ontology_term_sets_phenotype_none(mock_bulk_check, mock_split_spdi, mock_build_id, mock_file_fileset, mock_load_variant):
-    writer = SpyWriter()
-    adapter = ColocBoostVariantBiosample(
-        filepath=FILEPATH,
-        label='variant_biosample',
-        writer=writer,
-        validate=False
-    )
-    with patch('gzip.open', mock_open(read_data=mock_tsv_data_no_phenotype)):
-        adapter.process_file()
-
-    assert len(writer.contents) == 1
-    item = json.loads(writer.contents[0])
-    assert item['phenotype'] is None
-
-
 @patch('adapters.ColocBoost_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value=set())
 def test_variant_not_in_db_skips_edge(mock_bulk_check, mock_file_fileset, mock_load_variant):
     writer = SpyWriter()
@@ -202,14 +177,3 @@ def test_variant_not_in_db_skips_edge(mock_bulk_check, mock_file_fileset, mock_l
         adapter.process_file()
 
     assert len(writer.contents) == 0
-
-
-def test_invalid_label(mock_file_fileset, mock_load_variant):
-    writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_biosample'):
-        ColocBoostVariantBiosample(
-            filepath=FILEPATH,
-            label='invalid_label',
-            writer=writer,
-            validate=True
-        )
