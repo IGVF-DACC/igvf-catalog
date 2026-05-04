@@ -85,7 +85,9 @@
             "SGE": "schemas/nodes/variants.SGE.json",
             "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
             "IGVFV2GCRISPR": "schemas/nodes/variants.IGVFV2GCRISPR.json",
-            "CRISPRVariantPhenotype": "schemas/nodes/variants.CRISPRVariantPhenotype.json"
+            "CRISPRVariantPhenotype": "schemas/nodes/variants.CRISPRVariantPhenotype.json",
+            "ColocBoostVariantBiosample": "schemas/nodes/variants.ColocBoostVariantBiosample.json",
+            "VariantEFFECTSAdapter": "schemas/nodes/variants.VariantEFFECTSAdapter.json"
         }
     },
     "edges": {
@@ -173,7 +175,8 @@
         },
         "variants_biosamples": {
             "MPRAAdapter": "schemas/edges/variants_biosamples.MPRAAdapter.json",
-            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
+            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json",
+            "ColocBoostVariantBiosample": "schemas/edges/variants_biosamples.ColocBoostVariantBiosample.json"
         },
         "variants_coding_variants": {
             "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",

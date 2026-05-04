@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_biosamples.ColocBoostVariantBiosample.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to biosample edge"
+        },
+        "_from": {
+          "example": "variants/NC_000001.11:100:G:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/UBERON_0001323",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Ontology term reference for the biosample",
+          "pattern": "^ontology_terms/"
+        },
+        "phenotype": {
+          "type": ["string", "null"],
+          "description": "Ontology term reference for the associated phenotype or disease trait",
+          "pattern": "^ontology_terms/"
+        },
+        "vcp": {
+          "type": "number",
+          "description": "Variant Colocalization Probability (0–1)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "gene_ensembl": {
+          "type": ["string", "null"],
+          "description": "Ensembl gene ID associated with the colocalization"
+        },
+        "gene_name": {
+          "type": ["string", "null"],
+          "description": "HUGO gene symbol associated with the colocalization"
+        },
+        "trait_name": {
+          "type": ["string", "null"],
+          "description": "Name of the associated disease or trait"
+        },
+        "label": {
+          "enum": [
+            "variant colocalization with molecular trait"
+          ]
+        },
+        "method": {
+          "enum": [
+            "ColocBoost"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "name": {
+          "enum": [
+            "colocalizes with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "colocalized by variant"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "type": "string",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Fileset reference for this colocalization result",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "biosample_term",
+        "vcp",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants_biosamples"
+}
