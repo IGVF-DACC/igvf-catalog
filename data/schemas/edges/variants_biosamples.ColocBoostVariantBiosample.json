@@ -31,6 +31,10 @@
           "description": "Ontology term reference for the biosample",
           "pattern": "^ontology_terms/"
         },
+        "biological_context": {
+          "type": ["string", "null"],
+          "description": "Human-readable biosample name (e.g. tibial nerve)"
+        },
         "phenotype": {
           "type": ["string", "null"],
           "description": "Ontology term reference for the associated phenotype or disease trait",

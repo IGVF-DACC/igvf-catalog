@@ -6,9 +6,10 @@ from adapters.helpers import build_variant_id, load_variant, split_spdi, bulk_ch
 from typing import Optional
 from adapters.writer import Writer
 
-# Example lines from ColocBoost file (tab-separated with header):
-# VariantChr	VariantStart	VariantEnd	EffectAllele	OtherAllele	SPDI_ID	BiosampleTerm	OntologyTerm	VCP	GeneEnsembl	GeneName	TraitName
-# chr1	754503	754504	C	T	NC_000001.11:754503:T:C	UBERON_0001323	EFO_0006340	0.9263	ENSG00000237491	LINC01128	mean arterial pressure
+# Example lines from ColocBoost file IGVFFI7493PNOA:
+# VariantChr	VariantStart	VariantEnd	EffectAllele	OtherAllele	SPDI_ID	VCP	GeneEnsembl	GeneName	TraitName	OntologyTerm	BiosampleTermName	UBERONTerm
+# chr1	112503772	112503773	T	C	NC_000001.11:112503772:T:C	0.999369103613997	ENSG00000134245	WNT2B	mean arterial pressure	EFO_0006340	tibial nerve	UBERON_0001323
+# chr1	112691075	112691076	T	C	NC_000001.11:112691075:T:C	0.105606886580907	ENSG00000155363	MOV10	mean arterial pressure	EFO_0006340	tibial artery;breast;sigmoid colon;gastroesophageal junction;esophagus muscularis;lung;tibial nerve;ovary;stomach;thyroid gland	UBERON_0007610;UBERON_0008367;UBERON_0001159;UBERON_0004550;UBERON_0004648;UBERON_0008952;UBERON_0001323;UBERON_0000992;UBERON_0000945;UBERON_0002046
 
 
 class ColocBoostVariantBiosample(BaseAdapter):
@@ -110,18 +111,22 @@ class ColocBoostVariantBiosample(BaseAdapter):
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
-            # BiosampleTerm per row; comma-separated to support multiple biosamples -> multiple edges
-            biosample_terms = [t.strip()
-                               for t in row['BiosampleTerm'].split(',') if t.strip()]
+            # UBERONTerm per row; semicolon-separated for multiple biosamples -> multiple edges
+            uberon_terms = [t.strip()
+                            for t in row['UBERONTerm'].split(';') if t.strip()]
+            biosample_names = [
+                t.strip() for t in row['BiosampleTermName'].split(';') if t.strip()]
 
             # OntologyTerm column provides per-row phenotype (e.g. EFO_0006340 or EFO:0006340)
             ontology_term_raw = row.get('OntologyTerm', '').strip()
             phenotype = ('ontology_terms/' + ontology_term_raw.replace(':',
                          '_')) if ontology_term_raw else None
 
-            for biosample_term in biosample_terms:
-                biosample_term_id = biosample_term.replace(':', '_')
+            for i, uberon_term in enumerate(uberon_terms):
+                biosample_term_id = uberon_term.replace(':', '_')
                 biosample_ref = 'ontology_terms/' + biosample_term_id
+                biological_context = biosample_names[i] if i < len(
+                    biosample_names) else None
                 edge_key = _id + '_' + biosample_term_id + '_' + self.file_accession
 
                 edge_props = {
@@ -129,6 +134,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     '_from': 'variants/' + _id,
                     '_to': biosample_ref,
                     'biosample_term': biosample_ref,
+                    'biological_context': biological_context,
                     'phenotype': phenotype,
                     'vcp': float(row['VCP']),
                     'gene_ensembl': row.get('GeneEnsembl') or None,
