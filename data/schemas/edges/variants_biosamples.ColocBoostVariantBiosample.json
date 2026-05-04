@@ -10,17 +10,16 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to biosample edge"
+          "description": "Unique identifier for the variants to biosamples edge",
+          "example": "NC_000001.11:112503772:T:C_UBERON_0001323_IGVFFI7493PNOA"
         },
         "_from": {
-          "example": "variants/NC_000001.11:100:G:A",
           "pattern": "^variants/",
           "collections": [
             "variants"
           ]
         },
         "_to": {
-          "example": "ontology_terms/UBERON_0001323",
           "pattern": "^ontology_terms/",
           "collections": [
             "ontology_terms"
@@ -28,31 +27,37 @@
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term reference for the biosample",
+          "description": "Biosample term for the variants to biosamples edge",
+          "example": "ontology_terms/UBERON_0001323",
           "pattern": "^ontology_terms/"
         },
         "biological_context": {
           "type": "string",
-          "description": "Biosample name from GTEx(e.g. tibial nerve)"
+          "description": "Biological context for the variants to biosamples edge",
+          "example": "tibial nerve"
         },
         "phenotype": {
           "type": "string",
-          "description": "Ontology term reference for the associated phenotype or disease trait from GWAS",
+          "description": "Phenotype for the variants to biosamples edge",
+          "example": "ontology_terms/EFO_0006340",
           "pattern": "^ontology_terms/"
         },
         "vcp": {
           "type": "number",
-          "description": "Variant Colocalization Probability (0–1)"
+          "description": "Variant Colocalization Probability for the variants to biosamples edge",
+          "minimum": 0,
+          "maximum": 1
         },
         "gene": {
           "type": "string",
-          "description": "ArangoDB reference to the gene associated with the colocalization",
+          "description": "Gene associated with the variants to biosamples edge",
+          "example": "genes/ENSG00000134245",
           "pattern": "^genes/",
           "collections": ["genes"]
         },
         "trait_name": {
           "type": "string",
-          "description": "Name of the associated disease or trait"
+          "description": "Trait name for the variants to biosamples edge"
         },
         "label": {
           "enum": [
@@ -85,12 +90,13 @@
           ]
         },
         "source_url": {
-          "type": "string",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI7493PNOA/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Fileset reference for this colocalization result",
+          "description": "Filesets for the variants to biosamples edge",
+          "example": "files_filesets/IGVFFI7493PNOA",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"
