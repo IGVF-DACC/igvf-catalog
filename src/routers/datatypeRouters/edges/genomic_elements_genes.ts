@@ -32,9 +32,16 @@ const edgeQueryFormat = z.object({
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const gnrGeneQueryFormat = z.object({
-  regulation_type: z.enum(['Regulator', 'Response']),
+  regulator_gene_id: z.string().optional(),
+  regulator_hgnc_id: z.string().optional(),
+  regulator_gene_name: z.string().optional(),
+  regulator_alias: z.string().optional(),
+  response_gene_id: z.string().optional(),
+  response_hgnc_id: z.string().optional(),
+  response_gene_name: z.string().optional(),
+  response_alias: z.string().optional(),
   p_value: z.string().optional()
-}).merge(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true}))
+}).merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true})
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -83,6 +90,7 @@ const grnOutputFormat = z.object({
     end: z.number(),
     response_gene: z.string(),
   }),
+  crispr_modality: z.string().nullish(),
   class: z.string(),
   method: z.string(),
   source: z.string(),
@@ -312,6 +320,18 @@ function geneQueryValidation (input: paramsFormatType): void {
   }
 }
 
+function grnQueryValidation (input: paramsFormatType): void {
+  const isInvalidRegulatorFilter = Object.keys(input).every(item => !['regulator_gene_id', 'regulator_hgnc_id', 'regulator_gene_name', 'regulator_alias'].includes(item))
+  const isInvalidResponseFilter = Object.keys(input).every(item => !['response_gene_id', 'response_hgnc_id', 'response_gene_name', 'response_alias'].includes(item))
+
+  if (isInvalidRegulatorFilter && isInvalidResponseFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of gene must be defined.'
+    })
+  }
+}
+
 function elementQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['region', 'files_fileset', 'method'].includes(item))
   if (isInvalidFilter) {
@@ -404,16 +424,15 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   })
 }
 
-async function gnrSearch (input: paramsFormatType): Promise<any> {
-  geneQueryValidation(input)
+async function grnSearch (input: paramsFormatType): Promise<any> {
+  grnQueryValidation(input)
   const limit = applyLimit(input)
 
-  const geneInput: paramsFormatType = { _key: input.gene_id, hgnc: input.hgnc_id, name: input.gene_name, synonyms: input.alias, organism: 'Homo sapiens', page: 0 }
-  delete input.gene_id
-  delete input.hgnc_id
-  delete input.alias
-  delete input.gene_name
-  delete input.organism
+  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id, name: input.regulator_gene_name, synonyms: input.regulator_alias, organism: 'Homo sapiens', page: 0 }
+  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id, name: input.response_gene_name, synonyms: input.response_alias, organism: 'Homo sapiens', page: 0 }
+
+  const hasRegulatorInput = Object.keys(regulatorGeneInput).some(key => !['organism', 'page'].includes(key) && regulatorGeneInput[key] !== undefined)
+  const hasResponseInput = Object.keys(responseGeneInput).some(key => !['organism', 'page'].includes(key) && responseGeneInput[key] !== undefined)
 
   let pvalueFilter = ''
   if (input.p_value !== undefined) {
@@ -422,7 +441,7 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
 
   const regulatorQuery = `
     FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
           FILTER record._to == gene._id AND record.method == \'Perturb-seq\'
@@ -436,6 +455,7 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
           RETURN {
           'regulator_gene': gene.name,
           'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': DOCUMENT(ge.promoter_of).name },
+          'crispr_modality': record.crispr_modality,
           'class': record.class,
           'method': record.method,
           'source': record.source,
@@ -448,7 +468,7 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
 
   const responseQuery = `
     FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(geneInput)).replaceAll('record', 'gene')}
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
         FOR ge in genomic_elements
           FILTER ge.promoter_of == gene._id
@@ -462,6 +482,7 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
             RETURN {
             'regulator_gene': DOCUMENT(record._to).name,
             'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': gene.name },
+            'crispr_modality': record.crispr_modality,
             'class': record.class,
             'method': record.method,
             'source': record.source,
@@ -472,9 +493,43 @@ async function gnrSearch (input: paramsFormatType): Promise<any> {
           }
   `
 
-  let query = regulatorQuery
-  if (input.regulation_type == 'Response') {
-    query = responseQuery
+  const regulatorResponseQuery = `
+    FOR regulator_gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}
+
+        FOR response_gene IN genes
+            FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
+
+            FOR record in genomic_elements_genes
+              FILTER record._to == regulator_gene._id AND record.method == \'Perturb-seq\'
+              ${pvalueFilter}
+
+              FOR ge IN genomic_elements
+                FILTER ge._id == record._from AND ge.promoter_of == response_gene._id
+                SORT record._key
+                LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+                RETURN {
+                  'regulator_gene': regulator_gene.name,
+                  'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': response_gene.name },
+                  'crispr_modality': record.crispr_modality,
+                  'class': record.class,
+                  'method': record.method,
+                  'source': record.source,
+                  'files_filesets': record.files_filesets,
+                  'biological_context': record.biological_context,
+                  'score': record.score || record.effect_size || record.log2FC,
+                  'p_value': record.p_value_adj
+              }
+  `
+
+  let query = ''
+  if (hasRegulatorInput && hasResponseInput) {
+    query = regulatorResponseQuery
+  } else if (hasRegulatorInput) {
+     query = regulatorQuery
+  } else if (hasResponseInput) {
+     query = responseQuery
   }
 
   const objs = (await db.query(query)).all()
@@ -586,7 +641,7 @@ const grn = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn } })
   .input(gnrGeneQueryFormat)
   .output(z.array(grnOutputFormat))
-  .query(async ({ input }) => await gnrSearch(input))
+  .query(async ({ input }) => await grnSearch(input))
 
 export const genomicElementsGenesRouters = {
   genomicElementsFromGenes,
