@@ -8,6 +8,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { descriptions } from '../descriptions'
 import { commonComplexQueryFormat, commonHumanEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
 import { getSchema } from '../schema'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 50
 
@@ -51,6 +52,13 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
     delete input.uniprot_full_name
     delete input.protein_name
 
+    if (input.name === undefined && input.uniprot_names === undefined && input.uniprot_full_names === undefined) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'At least one of the following parameters must be defined: protein_id, name, uniprot_name or uniprot_full_name.'
+      })
+    }
+
     targets = `
       LET targets = (
         FOR record IN ${proteinCollectionName}
@@ -64,13 +72,14 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
     FOR record IN ${complextToProteinCollectionName}
       FILTER record._to IN targets
       SORT record.chr
-      LIMIT ${input.page as number * limit}, ${limit}
+      LIMIT ${(input.page as number || 0) * limit}, ${limit}
       RETURN {
         'complex': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(complextToProteinSchema)},
         'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
+  console.log(query)
   return await (await db.query(query)).all()
 }
 
