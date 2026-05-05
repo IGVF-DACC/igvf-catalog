@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/diseases_genes.GenccDiseasesGenes.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the disease to gene edge",
+      "example": "SGC_100001"
+    },
+    "_from": {
+      "type": "string",
+      "description": "Source ontology term for the disease to gene edge",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target gene for the disease to gene edge",
+      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "genes"
+      ]
+    },
+    "sgc_id": {
+      "type": "string",
+      "description": "Submission identifier and version from GenCC",
+      "example": "SGC-100001.1"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the disease to gene edge",
+      "enum": [
+        "associated_with"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the disease to gene edge",
+      "enum": [
+        "associated_with"
+      ]
+    },
+    "hgnc": {
+      "type": "string",
+      "description": "HGNC ID used to resolve the gene",
+      "pattern": "^HGNC:[0-9]+$",
+      "example": "HGNC:10896"
+    },
+    "gene_symbol": {
+      "type": "string",
+      "description": "Gene symbol from GenCC submission",
+      "example": "SKI"
+    },
+    "term_name": {
+      "type": "string",
+      "description": "Disease title from GenCC submission",
+      "example": "Shprintzen-Goldberg syndrome"
+    },
+    "classification": {
+      "type": "string",
+      "description": "GenCC classification title",
+      "enum": [
+        "Definitive",
+        "Disputed Evidence",
+        "Limited",
+        "Moderate",
+        "No Known Disease Relationship",
+        "Refuted Evidence",
+        "Strong",
+        "Supportive"
+      ],
+      "example": "Definitive"
+    },
+    "moi_id": {
+      "type": "string",
+      "description": "Mode of inheritance HPO CURIE from GenCC",
+      "enum": [
+        "HP:0000005",
+        "HP:0000006",
+        "HP:0000007",
+        "HP:0001417",
+        "HP:0001419",
+        "HP:0001427",
+        "HP:0001450",
+        "HP:0032113"
+      ]
+    },
+    "moi_name": {
+      "type": "string",
+      "description": "Mode of inheritance label from GenCC",
+      "enum": [
+        "Autosomal dominant",
+        "Autosomal recessive",
+        "Mitochondrial",
+        "Semidominant",
+        "Unknown",
+        "X-linked",
+        "X-linked recessive",
+        "Y-linked inheritance"
+      ]
+    },
+    "submitter": {
+      "type": "string",
+      "description": "Submitter display name from GenCC (submitter_title)",
+      "enum": [
+        "Ambry Genetics",
+        "Baylor College of Medicine Research Center",
+        "Broad Center for Mendelian Genomics",
+        "ClinGen",
+        "Franklin by Genoox",
+        "G2P",
+        "Genomics England PanelApp",
+        "Illumina",
+        "King Faisal Specialist Hospital and Research Center",
+        "Labcorp Genetics (formerly Invitae)",
+        "Laboratory for Molecular Medicine",
+        "LiferaOmics",
+        "Myriad Women's Health",
+        "Orphanet",
+        "PanelApp Australia",
+        "Stanford Center for Undiagnosed Diseases",
+        "University of Washington Center for Rare Disease Research (UW-CRDR)"
+      ]
+    },
+    "pmid": {
+      "type": "array",
+      "description": "PMIDs parsed from submitted_as_pmids",
+      "items": {
+        "type": "string"
+      },
+      "example": [
+        "28106320"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the disease to gene edge",
+      "enum": [
+        "GenCC"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the disease to gene edge",
+      "pattern": "^https://thegencc\\.org/submissions/"
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "sgc_id",
+    "name",
+    "inverse_name",
+    "hgnc",
+    "gene_symbol",
+    "term_name",
+    "classification",
+    "moi_id",
+    "moi_name",
+    "submitter",
+    "pmid",
+    "source",
+    "source_url"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmid, source, source_url"
+  },
+  "db_collection_name": "diseases_genes"
+}
