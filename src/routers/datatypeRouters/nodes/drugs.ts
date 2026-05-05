@@ -40,16 +40,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
       FILTER record._key == '${decodeURIComponent(input.drug_id as string)}'
       RETURN { ${getDBReturnStatements(drugSchema)} }
     `
-    const record = (await (await db.query(query)).all())[0]
-
-    if (record === undefined) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `Record ${input.drug_id as string} not found.`
-      })
-    }
-
-    return record
+    return (await (await db.query(query)).all())
   }
 
   let limit = QUERY_LIMIT
@@ -90,7 +81,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
 const drugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs', description: descriptions.drugs } })
   .input(drugsQueryFormat.merge(z.object({ limit: z.number().optional() })))
-  .output(z.array(drugFormat).or(drugFormat))
+  .output(z.array(drugFormat))
   .query(async ({ input }) => await drugSearch(input))
 
 export const drugsRouters = {
