@@ -143,7 +143,7 @@ export const descriptions = {
 
   genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
   The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Example: organism = Homo sapiens or Mus musculus, <br> \
+    Example: organism = Homo sapiens, <br> \
     source = COXPRESdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
@@ -208,7 +208,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
-  variants_genes: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by internal variant ids.<br> \
+  variants_genes: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by internal variant ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: spdi* = NC_000001.11:630556:T:C, <br> \
@@ -245,7 +245,7 @@ export const descriptions = {
     biological_context = lymphoblastoid cell line, <br> \
     method = Variant-EFFECTS, <br> \
     files_fileset = IGVFFI9602ILPC, <br> \
-    name = \'modulates expression of\' or \'modulates splicing of\'. <br> \
+    name = \'modulates expression of\'. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
@@ -334,7 +334,7 @@ export const descriptions = {
   method = SGE, <br> \
   class = observed data, <br> \
   label = protein variant effect, <br> \
-  organism = Homo sapiens (or Mus musculus). <br> \
+  organism = Homo sapiens <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -390,9 +390,9 @@ export const descriptions = {
   ca_id = CA14813418, <br> \
   region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
-  label = pQTL (or allele-specific binding), <br> \
-  name = \'modulates binding of\' or \'associated with levels of\',<br> \
-  inverse_name = \'binding modulated by\' or \'level associated with\',<br> \
+  label = pQTL, <br> \
+  name = \'modulates binding of\',<br> \
+  inverse_name = \'binding modulated by\',<br> \
   method = SEMVAR, <br> \
   files_fileset = IGVFFI0183ELIK, <br> \
   source = UKB. <br> \
@@ -401,8 +401,9 @@ export const descriptions = {
 
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying proteins, and predicted allele specific binding from SEMpl.<br> \
+   Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and the ontology terms of the cell types.<br> \
-  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  Example: protein_id = ENSP00000384707.1, <br> \
   protein_name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
@@ -410,7 +411,7 @@ export const descriptions = {
   label = pQTL, <br> \
   source = IGVF, <br> \
   method = SEMVAR, <br> \
-  name = \'modulates binding of\' or \'associated with levels of\',<br> \
+  name = \'modulates binding of\',<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
