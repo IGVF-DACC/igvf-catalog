@@ -44,7 +44,7 @@ export const descriptions = {
   transcript_id = ENST00000443707 (Ensembl ids), <br> \
   type = exon, <br> \
   protein_id = ENSP00000305769, <br> \
-  protein_name = SMAD1_HUMAN. <br> \
+  protein_name = SMAD1. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -124,10 +124,10 @@ export const descriptions = {
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
     Example: <br> \
-    variant_id = NC_000001.11:920568:G:A,<br> \
-    spdi = NC_000001.11:920568:G:A,<br> \
-    hgvs = NC_000001.11:g.920569G>A,<br> \
-    ca_id = CA10655131,<br> \
+    variant_id = NC_000001.11:40242002:G:A,<br> \
+    spdi = NC_000001.11:40242002:G:A,<br> \
+    hgvs = NC_000001.11:g.40242003G>A,<br> \
+    ca_id = CA16051554,<br> \
     files_fileset = IGVFFI9602ILPC.',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
@@ -230,7 +230,7 @@ export const descriptions = {
     Pagination is 0-based. <br> \
     [*] At least one of the variant identifiers (spdi, hgvs, rsid, ca_id, variant_id, region) is required.',
 
-  genes_variants: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by Ensembl gene ids.<br> \
+  genes_variants: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by Ensembl gene ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: source = AFGR, <br> \
@@ -483,8 +483,7 @@ export const descriptions = {
   hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, <br> \
   rsid = rs1317845941, <br> \
-  ca_id = CA10655131,<br> \
-  files_fileset = ENCFF705MLV.<br> \
+  ca_id = CA10655131.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -503,12 +502,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
-  Example: region = chr5:1779339-1779683, <br> \
+  Example: region = chr1:976210-976314, <br> \
   region_type = accessible dna elements, <br> \
   biosample_term = EFO_0002067, <br> \
   biological_context = K562, <br> \
-  method = caQTL, <br> \
-  files_fileset = IGVFFI1663LKVQ. <br> \
+  method = caQTL. <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -612,7 +610,7 @@ export const descriptions = {
   rsid = rs62514891, <br> \
   ca_id = CA114360, <br> \
   chr = chr12, <br> \
-  region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
+  region = chr12:102866500-102866700 (maximum length: 10kb), <br> \
   assertion = Pathogenic, <br> \
   pmid = 2574002. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -726,12 +724,12 @@ export const descriptions = {
   Example: variant_id = NC_000001.11:14772:C:T,<br> \
   spdi = NC_000001.11:14772:C:T, <br> \
   hgvs = NC_000001.11:g.14773C>T, <br> \
-  rsid = rs1234567890, <br> \
+  rsid = rs878915777, <br> \
   ca_id = CA10655131, <br> \
   region = chr1:15563-15567 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
   files_fileset = IGVFFI1323RCIE, <br> \
-  element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
+  element_id = MPRA_chr1_1000079_1000279_GRCh38_IGVFFI7321WGMD, <br> \
   significant = true, <br> \
   method = STARR-seq. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -741,8 +739,8 @@ export const descriptions = {
   Example: biosample_id = EFO_0002067, <br> \
   biosample_name = k562, <br> \
   method = STARR-seq, <br> \
-  files_fileset = IGVFFI0099XJHU, <br> \
-  element_id = candidate_cis_regulatory_element_chr5_1778763_1779094_GRCh38_ENCFF420VPZ, <br> \
+  files_fileset = IGVFFI7903VFKP, <br> \
+  element_id = MPRA_chr1_1000079_1000279_GRCh38_IGVFFI7321WGMD, <br> \
   significant = true, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
