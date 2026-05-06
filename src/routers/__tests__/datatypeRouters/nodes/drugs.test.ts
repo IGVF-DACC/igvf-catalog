@@ -14,7 +14,7 @@ describe('drugsRouters.drugs', () => {
   it('returns a drug by ID', async () => {
     const mockRecord = [{ _id: '1', name: 'DrugA', source: 'src', source_url: 'url' }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([mockRecord])
+      all: jest.fn().mockResolvedValue(mockRecord)
     } as any)
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, source, source_url')
 

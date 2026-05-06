@@ -14,7 +14,7 @@ describe('complexesRouters.complexes', () => {
   it('returns a complex by ID', async () => {
     const mockRecord = [{ _id: '1', name: 'ComplexA', source: 'src', source_url: 'url', alias: null, molecules: null, evidence_code: null, experimental_evidence: null, description: null, complex_assembly: null, complex_source: null, reactome_xref: [] }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([mockRecord])
+      all: jest.fn().mockResolvedValue(mockRecord)
     } as any)
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, source, source_url')
 

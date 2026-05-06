@@ -26,7 +26,7 @@ describe('transcriptsRouters.transcripts', () => {
       source_url: 'url'
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([mockRecord])
+      all: jest.fn().mockResolvedValue(mockRecord)
     } as any)
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, transcript_type, chr, start, end, name, gene_name, source, version, source_url')
 
@@ -57,7 +57,7 @@ describe('transcriptsRouters.transcripts', () => {
       source_url: 'url2'
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([mockRecord])
+      all: jest.fn().mockResolvedValue(mockRecord)
     } as any)
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, transcript_type, chr, start, end, name, gene_name, source, version, source_url')
 
