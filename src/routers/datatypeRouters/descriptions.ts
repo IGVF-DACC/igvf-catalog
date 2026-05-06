@@ -718,14 +718,14 @@ export const descriptions = {
   Pagination is 0-based.',
 
   grn: 'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
-  Example: regulator_gene_id = ENSG00000152284, <br> \
-  regulator_gene_name = TCF7L1, <br> \
-  regulator_hgnc = HGNC:11640, <br> \
-  regulator_alias = TCF3, <br> \
-  response_gene_id = ENSG00000143190, <br> \
-  response_gene_name = POU2F1, <br> \
-  response_hgnc = HGNC:9212, <br> \
-  response_alias = OCT1, <br> \
+  Example: regulator_gene_id = ENSG00000143190, <br> \
+  regulator_gene_name = POU2F1, <br> \
+  regulator_hgnc = HGNC:9212, <br> \
+  regulator_alias = OCT1, <br> \
+  response_gene_id = ENSG00000152284, <br> \
+  response_gene_name = TCF7L1, <br> \
+  response_hgnc = HGNC:11640, <br> \
+  response_alias = TCF3, <br> \
   p_value = gte:0, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',

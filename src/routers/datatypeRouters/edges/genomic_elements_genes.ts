@@ -83,12 +83,12 @@ const outputFormat = z.array(z.object({
 }))
 
 const grnOutputFormat = z.object({
-  regulator_gene: z.string(),
+  response_gene: z.string(),
   genomic_element: z.object({
     chr: z.string(),
     start: z.number(),
     end: z.number(),
-    response_gene: z.string(),
+    regulator_gene: z.string(),
   }),
   crispr_modality: z.string().nullish(),
   class: z.string(),
@@ -439,9 +439,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
   }
 
-  const regulatorQuery = `
+  const responseQuery = `
     FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
           FILTER record._to == gene._id AND record.method == \'Perturb-seq\'
@@ -453,8 +453,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           LET ge = DOCUMENT(record._from)
 
           RETURN {
-          'regulator_gene': gene.name,
-          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': DOCUMENT(ge.promoter_of).name },
+          'response_gene': gene.name,
+          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': DOCUMENT(ge.promoter_of).name },
           'crispr_modality': record.crispr_modality,
           'class': record.class,
           'method': record.method,
@@ -466,9 +466,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         }
   `
 
-  const responseQuery = `
+  const regulatorQuery = `
     FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
 
         FOR ge in genomic_elements
           FILTER ge.promoter_of == gene._id
@@ -480,8 +480,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
             RETURN {
-            'regulator_gene': DOCUMENT(record._to).name,
-            'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': gene.name },
+            'response_gene': DOCUMENT(record._to).name,
+            'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': gene.name },
             'crispr_modality': record.crispr_modality,
             'class': record.class,
             'method': record.method,
@@ -510,8 +510,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                 LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
                 RETURN {
-                  'regulator_gene': regulator_gene.name,
-                  'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'response_gene': response_gene.name },
+                  'response_gene': response_gene.name,
+                  'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': regulator_gene.name },
                   'crispr_modality': record.crispr_modality,
                   'class': record.class,
                   'method': record.method,
