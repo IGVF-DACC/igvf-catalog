@@ -92,6 +92,7 @@ const genomicBiosamplesQuery = genomicElementCommonQueryFormat
     biosample_term: z.string().optional(),
     biological_context: z.string().optional(),
     method: z.enum(METHODS).optional(),
+    files_fileset: z.string().optional(),
     source: z.enum(SOURCES).optional()
   })).merge(commonHumanEdgeParamsFormat)
   .omit({
@@ -110,7 +111,8 @@ const variantsQueryFormat = variantsCommonQueryFormat
     region: z.string().optional(),
     biosample_term: z.string().optional(),
     biological_context: z.string().optional(),
-    method: z.enum(METHODS).optional()
+    method: z.enum(METHODS).optional(),
+    files_fileset: z.string().optional()
   }))
   .merge(commonHumanEdgeParamsFormat)
   .omit({ organism: true, verbose: true })

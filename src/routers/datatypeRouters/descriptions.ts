@@ -479,25 +479,26 @@ export const descriptions = {
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: <br> \
-  variant_id = NC_000001.11:1628997:GGG:GG, <br> \
-  hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, <br> \
-  rsid = rs1317845941, <br> \
-  ca_id = CA10655131.<br> \
+  variant_id = NC_000001.11:976214:A:G, <br> \
+  hgvs = NC_000001.11:g.976215A>G,<br> \
+  spdi = NC_000001.11:976214:A:G, <br> \
+  rsid = rs7417106, <br> \
+  ca_id = CA507079, <br> \
+  files_filesets = ENCFF103XRK. <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
-  Example: variant_id = NC_000005.10:1779621:C:G, <br> \
-  spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, <br> \
-  rsid = rs1735214522, <br> \
-  ca_id = CA1522823495, <br> \
-  region = chr5:1779619-1779629, <br> \
+  Example: variant_id = NC_000001.11:976214:A:G, <br> \
+  hgvs = NC_000001.11:g.976215A>G,<br> \
+  spdi = NC_000001.11:976214:A:G, <br> \
+  rsid = rs7417106, <br> \
+  ca_id = CA507079, <br> \
+  region = chr1:766254-766554, <br> \
   biosample_term = EFO_0002067, <br> \
   biological_context = K562, <br> \
   method = caQTL, <br> \
-  files_fileset = IGVFFI1663LKVQ, <br> \
+  files_fileset = ENCFF103XRK, <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
