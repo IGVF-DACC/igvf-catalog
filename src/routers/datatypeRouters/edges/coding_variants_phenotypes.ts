@@ -69,7 +69,7 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneCollectionName = 'genes'
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id', 'method', 'files_fileset'] as const
+  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'transcript_id', 'method', 'files_fileset'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length

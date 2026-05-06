@@ -15,7 +15,7 @@ describe('proteinsRouters.proteins', () => {
   })
 
   it('returns protein by protein_id', async () => {
-    const mockRecord = {
+    const mockRecord = [{
       _id: 'P1',
       name: 'ProteinA',
       uniprot_names: ['ProteinA'],
@@ -24,7 +24,7 @@ describe('proteinsRouters.proteins', () => {
       organism: 'Homo sapiens',
       source: 'UniProt',
       source_url: 'url'
-    }
+    }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([mockRecord])
     } as any)

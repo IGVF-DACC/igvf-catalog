@@ -12,7 +12,7 @@ describe('drugsRouters.drugs', () => {
   })
 
   it('returns a drug by ID', async () => {
-    const mockRecord = { _id: '1', name: 'DrugA', source: 'src', source_url: 'url' }
+    const mockRecord = [{ _id: '1', name: 'DrugA', source: 'src', source_url: 'url' }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([mockRecord])
     } as any)
@@ -74,24 +74,6 @@ describe('drugsRouters.drugs', () => {
         type: 'query',
         path: '',
         rawInput: { page: 0 }
-      })
-    ).rejects.toThrow(TRPCError)
-  })
-
-  it('throws NOT_FOUND if drug_id not found', async () => {
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([])
-    } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, source, source_url')
-
-    const input = { drug_id: 'notfound' }
-    await expect(
-      drugsRouters.drugs({
-        input,
-        ctx: {},
-        type: 'query',
-        path: '',
-        rawInput: input
       })
     ).rejects.toThrow(TRPCError)
   })

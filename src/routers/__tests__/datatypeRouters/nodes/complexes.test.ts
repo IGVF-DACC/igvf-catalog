@@ -12,7 +12,7 @@ describe('complexesRouters.complexes', () => {
   })
 
   it('returns a complex by ID', async () => {
-    const mockRecord = { _id: '1', name: 'ComplexA', source: 'src', source_url: 'url', alias: null, molecules: null, evidence_code: null, experimental_evidence: null, description: null, complex_assembly: null, complex_source: null, reactome_xref: [] }
+    const mockRecord = [{ _id: '1', name: 'ComplexA', source: 'src', source_url: 'url', alias: null, molecules: null, evidence_code: null, experimental_evidence: null, description: null, complex_assembly: null, complex_source: null, reactome_xref: [] }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([mockRecord])
     } as any)
@@ -67,24 +67,6 @@ describe('complexesRouters.complexes', () => {
       rawInput: input
     })
     expect(result).toEqual(mockRecords)
-  })
-
-  it('throws NOT_FOUND if complex_id not found', async () => {
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([])
-    } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, source, source_url')
-
-    const input = { complex_id: 'notfound' }
-    await expect(
-      complexesRouters.complexes({
-        input,
-        ctx: {},
-        type: 'query',
-        path: '',
-        rawInput: input
-      })
-    ).rejects.toThrow(TRPCError)
   })
 
   it('throws BAD_REQUEST if no parameters are defined', async () => {

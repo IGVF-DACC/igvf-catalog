@@ -12,7 +12,7 @@ describe('transcriptsRouters.transcripts', () => {
   })
 
   it('returns transcript by transcript_id (human)', async () => {
-    const mockRecord = {
+    const mockRecord = [{
       _id: 'T1',
       transcript_type: 'protein_coding',
       chr: 'chr1',
@@ -24,7 +24,7 @@ describe('transcriptsRouters.transcripts', () => {
       source: 'GENCODE',
       version: 'v1',
       source_url: 'url'
-    }
+    }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([mockRecord])
     } as any)
@@ -43,7 +43,7 @@ describe('transcriptsRouters.transcripts', () => {
   })
 
   it('returns transcript by transcript_id (mouse)', async () => {
-    const mockRecord = {
+    const mockRecord = [{
       _id: 'MT1',
       transcript_type: 'protein_coding',
       chr: 'chr2',
@@ -55,7 +55,7 @@ describe('transcriptsRouters.transcripts', () => {
       source: 'GENCODE',
       version: 'v2',
       source_url: 'url2'
-    }
+    }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([mockRecord])
     } as any)
