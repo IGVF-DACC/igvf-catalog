@@ -18,6 +18,7 @@ from aws_cdk.aws_cloudfront_origins import LoadBalancerV2Origin
 from aws_cdk.aws_route53 import ARecord
 from aws_cdk.aws_route53 import RecordTarget
 from aws_cdk.aws_route53_targets import CloudFrontTarget
+from aws_cdk.aws_ec2 import ISecurityGroup
 from aws_cdk.aws_ecs import AwsLogDriverMode
 from aws_cdk.aws_ecs import CfnService
 from aws_cdk.aws_ecs import ContainerImage
@@ -54,6 +55,7 @@ class FrontendProps:
     memory_limit_mib: int
     desired_count: int
     max_capacity: int
+    shared_security_group: ISecurityGroup
 
 
 class Frontend(Construct):
@@ -118,6 +120,7 @@ class Frontend(Construct):
             vpc=self.props.existing_resources.network.vpc,
             cpu=self.props.cpu,
             desired_count=self.props.desired_count,
+            security_groups=[self.props.shared_security_group],
             circuit_breaker=DeploymentCircuitBreaker(
                 rollback=True,
             ),
