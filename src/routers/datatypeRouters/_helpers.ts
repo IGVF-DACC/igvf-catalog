@@ -92,12 +92,17 @@ export async function verboseItems (ids: string[], schema: configType): Promise<
 // Example:
 // for return statement based on schema: "return: _id, pos, name"
 // outputs: "{ id: record._key, pos: record.pos, name: record.name }"
+//
+// Optional `returnKeyByField`: maps each field name from the schema return list to the JSON key
+// in the response (DB attribute stays the same). Example: { log10pvalue: 'neg_log10_pvalue' }.
+// Does not apply to `_id` (same as before: `_id: record._key` when `changeId` is true, else `'_id': record['_id']`).
 export function getDBReturnStatements (
   schema: configType,
   simplified: boolean = false,
   extraReturn: string = '',
   skipFields: string[] = [],
-  changeId: boolean = true
+  changeId: boolean = true,
+  returnKeyByField?: Record<string, string>
 ): string {
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
   if (simplified && (schema.accessible_via as Record<string, string>).simplified_return) {
@@ -110,8 +115,11 @@ export function getDBReturnStatements (
   filteredReturnFields.forEach((field: string) => {
     if (field === '_id' && changeId) {
       returns.push('_id: record._key')
-    } else {
+    } else if (field === '_id') {
       returns.push(`'${field}': record['${field}']`)
+    } else {
+      const jsonKey = returnKeyByField?.[field] ?? field
+      returns.push(`'${jsonKey}': record['${field}']`)
     }
   })
 
