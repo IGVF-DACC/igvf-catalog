@@ -260,6 +260,7 @@ class MPRAAdapter(BaseAdapter):
     def load_mpra_design_mapping(self, mpra_design_file):
         # IGVF designs TSV: per-row `allele` / `SPDI` / `variant_pos` drive the maps in the
         # class docstring. Alt-only rows only contribute to allele *sets*, not to catalog keys.
+        pending_alt_spdi_mappings = []
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
@@ -302,18 +303,19 @@ class MPRAAdapter(BaseAdapter):
                             self.design_name_alleles[normalized_name].add(
                                 normalized)
 
-                if row.get('SPDI') in (None, '', 'NA', 'NaN') or not self._design_row_defines_catalog_element(
-                        name_role):
+                if row.get('SPDI') in (None, '', 'NA', 'NaN'):
                     continue
                 try:
                     spdi_list = ast.literal_eval(row['SPDI'])
                 except (ValueError, SyntaxError) as e:
                     raise ValueError(
                         f"Malformed SPDI at row {i}: {row['SPDI']!r}") from e
+                if not isinstance(spdi_list, list):
+                    raise ValueError(
+                        f'Malformed SPDI at row {i}: expected list, got {type(spdi_list).__name__}'
+                    )
 
-                for spdi in spdi_list:
-                    self.variant_to_element[spdi].add(key)
-
+                variant_pos_list = None
                 variant_pos_raw = row.get('variant_pos')
                 if variant_pos_raw not in (None, '', 'NA', 'NaN'):
                     try:
@@ -325,10 +327,39 @@ class MPRAAdapter(BaseAdapter):
                         raise ValueError(
                             f'Malformed variant_pos at row {i}: expected list, got {type(variant_pos_list).__name__}'
                         )
+
+                if self._design_row_defines_catalog_element(name_role):
+                    target_key = key
+                elif name_role == 'alt':
+                    # Some IGVF design files provide SPDI/variant_pos only on ALT rows.
+                    # Defer until we know whether this coordinate key has a ref/none tile.
+                    pending_alt_spdi_mappings.append(
+                        (key, spdi_list, variant_pos_list)
+                    )
+                    continue
+                else:
+                    continue
+
+                for spdi in spdi_list:
+                    self.variant_to_element[spdi].add(target_key)
+
+                if variant_pos_list is not None:
                     for spdi, variant_pos in zip(spdi_list, variant_pos_list):
                         pos = self.safe_int(variant_pos)
                         if pos is not None:
-                            self.variant_pos_to_element[(spdi, pos)].add(key)
+                            self.variant_pos_to_element[(
+                                spdi, pos)].add(target_key)
+
+        for key, spdi_list, variant_pos_list in pending_alt_spdi_mappings:
+            if key not in self.design_elements:
+                continue
+            for spdi in spdi_list:
+                self.variant_to_element[spdi].add(key)
+            if variant_pos_list is not None:
+                for spdi, variant_pos in zip(spdi_list, variant_pos_list):
+                    pos = self.safe_int(variant_pos)
+                    if pos is not None:
+                        self.variant_pos_to_element[(spdi, pos)].add(key)
 
     def _load_excluded_effect_names(self):
         accession = (self.reference_file_accession or '').strip()

@@ -304,6 +304,42 @@ def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_v
     assert by_score[918]['strand'] == '+'
 
 
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347485:CGCGC:TTGGG'})
+@patch('adapters.mpra_adapter.load_variant')
+def test_variant_biosample_maps_alt_spdi_when_ref_row_has_no_spdi(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000010.11:79347485:CGCGC:TTGGG',
+    }, None)
+
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'name\tsequence\tcategory\tclass\tsource\tref\tchr\tstart\tend\tstrand\tvariant_class\tvariant_pos\tSPDI\tallele\tinfo\n'
+        'PPIF_promoter_WT\tN\telement\tvariant negative control\tunc\tGRCh38\tchr10\t79347211\t79347779\t.\tNA\tNA\tNA\t["ref"]\tNA\n'
+        'PPIF_promoter_MUT\tN\tvariant\ttest\tunc\tGRCh38\tchr10\t79347211\t79347779\t.\t["indel"]\t[274]\t["NC_000010.11:79347485:CGCGC:TTGGG"]\t["alt"]\tNA\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        'chr10\t79347485\t79347490\tNC_000010.11:79347485:CGCGC:TTGGG\t11\t.\t0.42\t1\t2\t3\t4\t5.89\t3.49\t0.9\t0.1\t1.2\t274\tCGCGC\tTTGGG\n'
+    )
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label='variant_biosample',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000TEST/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+
+    parsed = [json.loads(x) for x in writer.contents]
+    assert len(parsed) == 1
+    assert parsed[0]['genomic_element'] == 'genomic_elements/MPRA_chr10_79347211_79347779_GRCh38_na_IGVFFI9852HQHD'
+    assert parsed[0]['strand'] == '.'
+
+
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000006.12:52763752:A:G'})
 @patch('adapters.mpra_adapter.load_variant')
 def test_variant_biosample_uses_strand_for_reverse_complement_designs(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
