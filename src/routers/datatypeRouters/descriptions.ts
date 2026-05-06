@@ -57,7 +57,8 @@ export const descriptions = {
   Pagination is 0-based.',
 
   proteins: 'Retrieve proteins.<br> \
-  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
+  Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
+  Example: protein_id = ENSP00000384707, <br> \
   name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
@@ -96,7 +97,8 @@ export const descriptions = {
 
   proteins_genes: 'Retrieve genes from proteins.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
-  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
+  Example: protein_id = ENSP00000384707, <br> \
   protein_name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
@@ -132,11 +134,12 @@ export const descriptions = {
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
+    Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
     Example: protein_name = CTCF, <br> \
     uniprot_name = CTCF_HUMAN, <br> \
     uniprot_full_name = Transcriptional repressor CTCF, <br> \
     dbxrefs = P49711, <br> \
-    protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+    protein_id = ENSP00000384707, <br> \
     organism = Homo sapiens. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
@@ -295,7 +298,8 @@ export const descriptions = {
 
   proteins_motifs: 'Retrieve motifs for proteins.<br> \
   Set verbose = true to retrieve full info on the motifs.<br> \
-  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
+  Example: protein_id = ENSP00000384707, <br> \
   protein_name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
@@ -435,7 +439,8 @@ export const descriptions = {
 
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
   Set verbose = true to retrieve full info on the complexes.<br> \
-  Example: protein_id = ENSP00000411322.1 or ENSP00000411322 (Ensembl IDs) or P67870 (Uniprot ids), <br> \
+  Protein IDs support the following formats: ENSP00000411322.1 or ENSP00000411322 (Ensembl IDs) or P67870 (Uniprot ids)<br> \
+  Example: protein_id = ENSP00000411322.1, <br> \
   protein_name = CSNK2B, <br> \
   uniprot_name = CSK2B_HUMAN, <br> \
   uniprot_full_name = Casein kinase II subunit beta, <br> \
@@ -520,7 +525,8 @@ export const descriptions = {
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
+  Example: protein_id = ENSP00000384707.1, <br> \
   protein_name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
@@ -564,7 +570,7 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
   Example: biosample_name = hepg2, <br> \
   method = MPRA, <br> \
-  source = IGVF or ENCODE, <br> \
+  source = IGVF, <br> \
   files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
