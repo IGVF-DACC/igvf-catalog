@@ -12,6 +12,7 @@ Cross-cutting patterns and rationale for the ClickHouse port.
 6. [Lean projections and the two-step query strategy](06-lean-projections.md)
 7. [Materialized view lookup table for `rsid`](07-rsid-materialized-view.md)
 8. [Region queries — pushed down as subquery for edges](08-region-queries.md)
+9. [Symmetrize edge tables when the access pattern is bidirectional](09-symmetrize-edge-tables.md)
 
 ## `genes_coding_variants` router specifics
 

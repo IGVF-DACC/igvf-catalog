@@ -1,6 +1,6 @@
 # `GET /variants/variant-ld/summary`
 
-**Status:** ❌ AQL-only
+**Status:** 🚧 Mixed
 
 **Router file:** [`src/routers/datatypeRouters/edges/variants_variants.ts`](../../src/routers/datatypeRouters/edges/variants_variants.ts)
 
@@ -277,4 +277,4 @@ Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br>     E
 
 ## Implementation notes
 
-_(none yet)_
+Still AQL — `findVariantLDSummary` in [`src/routers/datatypeRouters/edges/variants_variants.ts`](../../src/routers/datatypeRouters/edges/variants_variants.ts). The file is detected as Mixed because the sibling endpoint `/variants/variant-ld` is now ClickHouse-ported. This endpoint depends on QTL aggregations from `variants_genes` and TF-binding aggregations from `variants_proteins`, both still AQL — port deferred until those edge tables are migrated.

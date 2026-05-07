@@ -7,6 +7,7 @@ One file per ported router with its end-to-end flow, key design choices, and a p
 | [`variants`](variants.md) | `src/routers/datatypeRouters/nodes/variants.ts` | `GET /variants`, `GET /variants/summary` |
 | [`genes`](genes.md) | `src/routers/datatypeRouters/nodes/genes.ts` | `GET /genes` (+ `nearestGeneSearch` used by `/variants/summary`) |
 | [`variants_phenotypes`](variants_phenotypes.md) | `src/routers/datatypeRouters/edges/variants_phenotypes.ts` | `GET /phenotypes/variants`, `GET /variants/phenotypes` |
+| [`variants_variants`](variants_variants.md) | `src/routers/datatypeRouters/edges/variants_variants.ts` | `GET /variants/variant-ld` (`/variants/variant-ld/summary` still AQL) |
 | [`genes_coding_variants`](genes_coding_variants.md) | `src/routers/datatypeRouters/edges/genes_coding_variants.ts` | `GET /genes/coding-variants/scores`, `GET /genes/coding-variants/all-scores` |
 
 For the full status of every endpoint, see [`endpoints/README.md`](../endpoints/README.md).

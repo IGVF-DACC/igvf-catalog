@@ -30,6 +30,12 @@ OUT_DIR = REPO_ROOT / 'clickhouserewrite' / 'endpoints'
 # See clickhouserewrite/limitations.md.
 BROKEN_ENDPOINTS: set[tuple[str, str]] = set()
 
+# Endpoints that are fully ClickHouse-ported even though their backing file is
+# detected as 'Mixed' (because some other endpoint in the same file is still AQL).
+EXPLICITLY_PORTED: set[tuple[str, str]] = {
+    ('get', '/variants/variant-ld'),
+}
+
 STATUS_PORTED = '✅ ClickHouse-ported'
 STATUS_AQL = '❌ AQL-only'
 STATUS_MIXED = '🚧 Mixed'
@@ -88,6 +94,8 @@ def scan_routers() -> dict[tuple[str, str], dict]:
 def status_for(method: str, path: str, router_info: dict | None) -> str:
     if (method, path) in BROKEN_ENDPOINTS:
         return STATUS_BROKEN
+    if (method, path) in EXPLICITLY_PORTED:
+        return STATUS_PORTED
     if router_info is None:
         return STATUS_UNMAPPED
     ch = router_info['uses_clickhouse']

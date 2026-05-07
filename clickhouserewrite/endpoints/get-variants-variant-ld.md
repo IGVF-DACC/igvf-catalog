@@ -1,6 +1,6 @@
 # `GET /variants/variant-ld`
 
-**Status:** ❌ AQL-only
+**Status:** ✅ ClickHouse-ported
 
 **Router file:** [`src/routers/datatypeRouters/edges/variants_variants.ts`](../../src/routers/datatypeRouters/edges/variants_variants.ts)
 
@@ -465,4 +465,15 @@ Retrieve genetic variants in linkage disequilibrium (LD).<br>    The following p
 
 ## Implementation notes
 
-_(none yet)_
+Single ClickHouse query against the symmetrized 12B-row `variants_variants` table, plus a follow-up batch lookup on `variants` for the pos/spdi/hgvs enrichment.
+
+Backed by [`src/routers/datatypeRouters/edges/variants_variants.ts`](../../src/routers/datatypeRouters/edges/variants_variants.ts) → `findVariantLDs`. Architecture writeup: [`routers/variants_variants.md`](../routers/variants_variants.md). Symmetrization rationale: [`design-decisions/09-symmetrize-edge-tables.md`](../design-decisions/09-symmetrize-edge-tables.md).
+
+Behaviour deltas vs. the AQL original:
+
+- **Symmetrized table** — every LD pair is stored twice at import time, so every router query is a single-column equality on `variants_1_id` (the PK prefix). No OR-on-two-columns, no projections needed.
+- **Region inputs** push down as a subquery on the `variants` table instead of materializing IDs in TS, matching the pattern from `/variants/phenotypes?region=...`. 10kb cap preserved.
+- **r2 / d_prime range filters** parameterized as Float32, matching the table's column types.
+- **Verbose mode** runs a second `SELECT VARIANT_FULL_SELECT FROM variants WHERE id IN (...)` to populate `sequence_variant` as a single-element array of full variant objects; non-verbose mode returns the FK string `variants/<id>`.
+
+Performance (warm): ~100ms point lookups, ~190ms verbose, ~85ms region 1kb.
