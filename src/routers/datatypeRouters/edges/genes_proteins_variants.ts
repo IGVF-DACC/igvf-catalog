@@ -44,13 +44,15 @@ const relatedGeneFormat = z.object({
   gene_id: z.string(),
   hgnc: z.string().nullish(),
   name: z.string(),
-  organism: z.string()
+  organism: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const relatedProteinFormat = z.object({
   _id: z.string(),
   name: z.string(),
-  uniprot_names: z.array(z.string())
+  uniprot_names: z.array(z.string()),
+  files_filesets: z.string().nullish()
 })
 
 const relatedQTLFormat = z.object({
@@ -58,13 +60,15 @@ const relatedQTLFormat = z.object({
   source: z.string(),
   log10pvalue: z.number().nullish(),
   biological_context: z.string(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const relatedMotifFormat = z.object({
   motif: z.string().nullable(),
   source: z.string(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const geneProteinRelatedFormat = z.object({
@@ -141,9 +145,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     LET A = (
       FOR record in ${variantToGeneCollectionName}
       FILTER record._to IN ['${genes.join('\',\'')}']
-      SORT record._from
-      // endpoint is opposite to ArangoDB collection name
-      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, ${getDBReturnStatements(variantToGeneSchema, true)}}
+      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToGeneSchema, true)}}
       RETURN {
         'sequence_variant': from,
         'related': { 'gene': to, 'sources': sources }
@@ -155,9 +157,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     LET B = (
       FOR record in ${variantToProteinCollectionName}
       FILTER record._to IN ['${proteins.join('\',\'')}']
-      SORT record._from
-      // endpoint is opposite to ArangoDB collection name
-      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, ${getDBReturnStatements(variantToProteinSchema, true)}}
+      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToProteinSchema, true)}}
       RETURN {
         'sequence_variant': from,
         'related': { 'protein': to, 'sources': sources }
@@ -168,17 +168,23 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     ${variantsFromGenesQuery}
     ${variantsFromProteinsQuery}
 
-    FOR record in UNION(A, B)
-    COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN {
-      'related': relatedObjs,
-      'sequence_variant': (
-        FOR otherRecord in ${variantCollectionName}
-        FILTER otherRecord._id == source
-        RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
-      )[0]
-    }
+    LET combined = (
+      FOR record IN UNION(A, B)
+      COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN { source, relatedObjs }
+    )
+
+    FOR item in combined
+      LET variant = FIRST(
+        FOR v IN variants
+        FILTER v._id == item.source
+        RETURN KEEP(v, '_key', 'chr', 'pos', 'rsid', 'ref', 'alt', 'spdi', 'hgvs', 'ca_id')
+      )
+      RETURN {
+        'related': item.relatedObjs,
+        'sequence_variant': MERGE({ '_id': variant._key }, UNSET(variant, '_key'))
+      }
   `
 
   const objs = await (await db.query(query)).all()

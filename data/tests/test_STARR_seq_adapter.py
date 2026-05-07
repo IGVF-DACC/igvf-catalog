@@ -51,7 +51,6 @@ def mock_load_variant():
             'organism': 'Homo sapiens',
             'rsid': [],
             'qual': '100',
-            'filter': 'PASS',
             'annotations': {},
             'vrs_digest': 'test_digest',
             'ca_id': 'CA1234567890'

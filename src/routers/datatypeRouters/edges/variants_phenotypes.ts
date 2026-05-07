@@ -86,6 +86,17 @@ const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.GWAS.json')
 const variantsPhenotypeNonGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.cV2F.json')
 
+function valueValidation (input: paramsFormatType): void {
+  if (input.log10pvalue !== undefined) {
+    if (isNaN(Number(input.log10pvalue)) && !(input.log10pvalue as string).includes(':')) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'log10pvalue must be a number or a string in the format of "operator:value", where operator can be one of "gt", "gte", "lt" or "lte".'
+      })
+    }
+  }
+}
+
 export function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'files_fileset', 'method'].includes(item))
 
@@ -95,6 +106,8 @@ export function variantQueryValidation (input: paramsFormatType): void {
       message: 'At least one variant property, or method, or files_filesets must be defined.'
     })
   }
+
+  valueValidation(input)
 }
 
 function phenotypeQueryValidation (input: paramsFormatType): void {
@@ -106,13 +119,14 @@ function phenotypeQueryValidation (input: paramsFormatType): void {
       message: 'At least one phenotype property, or method, or files_filesets must be defined.'
     })
   }
+
+  valueValidation(input)
 }
 
 function buildCombinedFilter (phenotypeFilter: string, nonGWASFilter: string, GWASFilter: string): string {
   return [phenotypeFilter, nonGWASFilter, GWASFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
 }
 
-// Query for endpoint phenotypes/variants/, by phenotype query (allow fuzzy search), (AND p-value filter)
 async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promise<any[]> {
   phenotypeQueryValidation(input)
   delete input.organism
@@ -140,10 +154,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
 
-  let isPhenotypeQuery = false
   let phenotypeIds = []
   if (input.phenotype_id !== undefined || input.phenotype_name !== undefined) {
-    isPhenotypeQuery = true
     if (input.phenotype_id !== undefined) {
       phenotypeIds.push(`ontology_terms/${input.phenotype_id as string}`)
     } else {
@@ -155,31 +167,55 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       phenotypeIds = await (await db.query(phenotypeQuery)).all()
     }
   }
-  const phenotypeFilter = isPhenotypeQuery ? 'record._to IN @phenotypeIds' : ''
-  const combinedFilter = buildCombinedFilter(phenotypeFilter, nonGWASFilter, GWASFilter)
+  const phenotypeFilter = phenotypeIds.length > 0 ? 'record._to IN @phenotypeIds' : ''
+
   const query = `
-    FOR record IN ${variantToPhenotypeCollectionName}
-    FILTER ${combinedFilter}
+  FOR record IN ${variantToPhenotypeCollectionName}
+    FILTER ${buildCombinedFilter(phenotypeFilter, nonGWASFilter, GWASFilter)}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
-    ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
-    RETURN MERGE(
-      {
-        variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'},
-        phenotype_id: record._to,
-      },
 
-        (record.source == 'OpenTargets' ? {
-          study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
-          ${getDBReturnStatements(variantPhenotypeGwasSchema).replaceAll('record', 'record')}
-        } : {
-          ${getDBReturnStatements(variantsPhenotypeNonGwasSchema).replaceAll('record', 'record')},
-          phenotype_term: DOCUMENT(record._to).name
-        })
-    )
+    ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
+    LET phenotype_name = DOCUMENT(record._to).name
+    RETURN {
+      variant:      ${input.verbose === 'true' ? variantVerboseFields : 'record._from'},
+      phenotype_id: record._to,
+      name:         record.name,
+      source:       record.source,
+      source_url:   record.source_url,
+      class:        record.class,
+      method:       record.method,
+      label:        record.label,
+      phenotype_term: phenotype_name,
+
+      // OpenTargets-specific
+      version:        record.source == 'OpenTargets' ? record.version        : null,
+      lead_chrom:     record.source == 'OpenTargets' ? record.lead_chrom     : null,
+      lead_pos:       record.source == 'OpenTargets' ? record.lead_pos       : null,
+      lead_ref:       record.source == 'OpenTargets' ? record.lead_ref       : null,
+      lead_alt:       record.source == 'OpenTargets' ? record.lead_alt       : null,
+      direction:      record.source == 'OpenTargets' ? record.direction      : null,
+      beta:           record.source == 'OpenTargets' ? record.beta           : null,
+      beta_ci_lower:  record.source == 'OpenTargets' ? record.beta_ci_lower  : null,
+      beta_ci_upper:  record.source == 'OpenTargets' ? record.beta_ci_upper  : null,
+      p_val_mantissa: record.source == 'OpenTargets' ? record.p_val_mantissa : null,
+      p_val_exponent: record.source == 'OpenTargets' ? record.p_val_exponent : null,
+      p_val:          record.source == 'OpenTargets' ? record.p_val          : null,
+      log10pvalue:    record.source == 'OpenTargets' ? record.log10pvalue    : null,
+      oddsr_ci_lower: record.source == 'OpenTargets' ? record.oddsr_ci_lower : null,
+      oddsr_ci_upper: record.source == 'OpenTargets' ? record.oddsr_ci_upper : null,
+      study:          record.source == 'OpenTargets' ? ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'} : null,
+
+      // non-OpenTargets specific
+      score:              record.source != 'OpenTargets' ? record.score              : null,
+      files_filesets:     record.source != 'OpenTargets' ? record.files_filesets     : null,
+      biosample_term:     record.source != 'OpenTargets' ? record.biosample_term     : null,
+      biological_context: record.source != 'OpenTargets' ? record.biological_context : null
+    }
   `
+
   let result = []
-  if (isPhenotypeQuery) {
+  if (phenotypeIds.length > 0) {
     result = await ((await db.query(query, { phenotypeIds })).all())
   } else {
     result = await ((await db.query(query)).all())
@@ -253,7 +289,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         })
     )
   `
-  console.log(query)
+
   let result = []
   if (hasVariantQuery) {
     result = await ((await db.query(query, { variantIDs })).all())

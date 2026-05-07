@@ -30,6 +30,20 @@ from adapters.writer import Writer
 # genes.tsv: map gene symbols to Ensembl IDs
 
 
+def _normalize_phenotype_categories(cell) -> list:
+    """
+    PharmGKB column 'Phenotype Category' is comma-separated; blanks and
+    stray commas (e.g. 'Dosage, ') produce '' after split — strip and drop those.
+    """
+    if cell is None or not str(cell).strip():
+        return []
+    parts = [p.strip() for p in str(cell).split(', ')]
+    # drop empty part, sort and return
+    parts = [p for p in parts if p]
+    parts.sort()
+    return parts
+
+
 class PharmGKB(BaseAdapter):
     SOURCE = 'pharmGKB'
     SOURCE_URL_PREFIX = 'https://www.pharmgkb.org/'
@@ -122,7 +136,14 @@ class PharmGKB(BaseAdapter):
                                 continue
                             # variant info
                             variant_anno_id = variant_drug_row[0]
-                            variant_name = variant_drug_row[1]
+                            # study info
+                            study_info = self.study_paramters_mapping.get(
+                                variant_anno_id)
+                            if study_info is None:
+                                self.logger.warning(variant_anno_id +
+                                                    ' has no matched study info.')
+                                continue
+
                             variant_hgvs_ids = self.variant_id_mapping.get(
                                 variant_name)
                             if variant_hgvs_ids is None:
@@ -156,13 +177,6 @@ class PharmGKB(BaseAdapter):
                                                         ' failed converting hgvs id.')
                                     continue
 
-                            # study info
-                            study_info = self.study_paramters_mapping.get(
-                                variant_anno_id)
-                            if study_info is None:
-                                self.logger.warning(variant_anno_id +
-                                                    ' has no matched study info.')
-                                continue
                             # gene info
                             # can be multiple genes split by ', ', or empty str for NA cases
                             gene_symbols = variant_drug_row[2].split(', ')
@@ -236,7 +250,7 @@ class PharmGKB(BaseAdapter):
                                             'gene_symbol': gene_symbols,
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
-                                            'phenotype_categories': variant_drug_row[5].split(', '),
+                                            'phenotype_categories': _normalize_phenotype_categories(variant_drug_row[5]),
                                             'name': 'associated with',
                                             'inverse_name': 'associated with',
                                             'source': PharmGKB.SOURCE,

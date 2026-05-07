@@ -250,7 +250,6 @@ class Favor(BaseAdapter):
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
-                    'filter': None if data_line[6] == 'NA' else data_line[6],
                     'variation_type': variation_type,
                     'annotations': annotations,
                     'spdi': spdi,

@@ -26,13 +26,14 @@ describe('filesFilesetsRouters.filesFilesets', () => {
       donors: ['donors/D1'],
       source: 'IGVF',
       source_url: 'https://data.igvf.org/signal-files/IGVFFI8400FXRX/',
-      download_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig'
+      download_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig',
+      genome_browser_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig'
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('lab == "jesse-engreitz"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, file_set_id, lab, preferred_assay_titles, method, class, software, samples, donors, source, source_url, download_link')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, file_set_id, lab, preferred_assay_titles, method, class, software, samples, donors, source, source_url, download_link, genome_browser_link')
 
     const input = {
       lab: 'jesse-engreitz',

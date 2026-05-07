@@ -125,6 +125,7 @@ class ENCODE2GCRISPR(BaseAdapter):
                         'log10pvalue': log10pvalue,
                         'significant': significant == 'TRUE',
                         'method': file_fileset.get('method'),
+                        'crispr_modality': file_fileset.get('crispr_modality'),
                         'class': file_fileset.get('class'),
                         'label': self.COLLECTION_LABEL,
                         'source': self.SOURCE,

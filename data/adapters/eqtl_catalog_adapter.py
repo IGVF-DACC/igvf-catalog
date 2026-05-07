@@ -47,6 +47,18 @@ class EQTLCatalog(BaseAdapter):
     STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
+    @staticmethod
+    def metadata_rows(filepath):
+        with open(filepath, 'r') as f:
+            metadata_reader = csv.reader(f, delimiter='\t')
+            # we added comment in metadata file. Need to skip the comment row when reading the file.
+            for row in metadata_reader:
+                if row and row[0].startswith('#'):
+                    continue
+                break  # first non-comment row is the header
+            for row in metadata_reader:
+                yield row
+
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label == 'qtl':
             self.file_accession = os.path.basename(filepath).split('.')[0]
@@ -96,18 +108,15 @@ class EQTLCatalog(BaseAdapter):
         alias = file_metadata['aliases'][0]
         dataset_id = alias.split('_')[-1]
         found_dataset = False
-        with open(self.METADATA_PATH, 'r') as f:
-            metadata_reader = csv.reader(f, delimiter='\t')
-            next(metadata_reader)
-            for row in metadata_reader:
-                if row[1] == dataset_id:
-                    biosample_term = f'ontology_terms/{row[4]}'
-                    study = f'studies/{row[0]}'
-                    biological_context = row[5]
-                    # example: ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz
-                    source_url = row[10]
-                    found_dataset = True
-                    break
+        for row in self.metadata_rows(self.METADATA_PATH):
+            if row[1] == dataset_id:
+                biosample_term = f'ontology_terms/{row[4]}'
+                study = f'studies/{row[0]}'
+                biological_context = row[5]
+                # example: ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz
+                source_url = row[10]
+                found_dataset = True
+                break
         if not found_dataset:
             raise ValueError(f'No metadata found for dataset {dataset_id}')
 
@@ -180,13 +189,10 @@ class EQTLCatalog(BaseAdapter):
 
     def process_study(self):
         study_list = []
-        with open(self.METADATA_PATH, 'r') as f:
-            metadata_reader = csv.reader(f, delimiter='\t')
-            next(metadata_reader)
-            for row in metadata_reader:
-                if row[8] in ['ge', 'leafcutter'] and row[6] == 'naive':
-                    if row[0] not in study_list:
-                        study_list.append(row[0])
+        for row in self.metadata_rows(self.METADATA_PATH):
+            if row[8] in ['ge', 'leafcutter'] and row[6] == 'naive':
+                if row[0] not in study_list:
+                    study_list.append(row[0])
         visited_study_ids = []
         with open(self.filepath, 'r') as f:
             self.writer.open()

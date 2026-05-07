@@ -5,6 +5,7 @@ import { paramsFormatType, getFilterStatements, getDBReturnStatements } from '..
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { getSchema } from '../schema'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 25
 
@@ -69,6 +70,13 @@ export const codingVariantsFormat = z.object({
 }))
 
 async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
+  if (input.aapos && isNaN(Number(input.aapos))) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Invalid amino_acid_position. It should be a number.'
+    })
+  }
+
   if (input.id !== undefined) {
     input._key = input.id
     delete input.id

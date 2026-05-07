@@ -14,6 +14,7 @@ def mock_file_fileset_perturb_seq():
         mock_get_file_fileset.return_value = {
             'method': 'Perturb-seq',
             'class': 'observed data',
+            'crispr_modality': 'interference',
             'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
             'samples': ['ontology_terms/CL_0000909'],
             'treatments_term_ids': None
@@ -23,11 +24,12 @@ def mock_file_fileset_perturb_seq():
 
 @pytest.fixture
 def mock_file_fileset_facs_screen():
-    """Fixture to mock get_file_fileset_by_accession_in_arangodb function for CRISPR FACS screen method."""
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function for CRISPR screen method."""
     with patch('adapters.igvf_E2G_CRISPR_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
-            'method': 'CRISPR FACS screen',
+            'method': 'CRISPR screen',
             'class': 'observed data',
+            'crispr_modality': 'activation',
             'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
             'samples': ['ontology_terms/CL_0000909'],
             'treatments_term_ids': None
@@ -79,6 +81,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['pct_2'] == 0.282
         assert first_item['p_value_adj'] == 0.0
         assert first_item['method'] == 'Perturb-seq'
+        assert first_item['crispr_modality'] == 'interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None
@@ -301,7 +304,7 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements(mock_file_fileset_
         assert first_item['start'] == 998962
         assert first_item['end'] == 999432
         assert first_item['type'] == 'tested elements'
-        assert first_item['method'] == 'CRISPR FACS screen'
+        assert first_item['method'] == 'CRISPR screen'
         assert first_item['promoter_of'] == 'genes/ENSG00000188290'
         assert first_item['source_annotation'] == 'promoter'
         assert first_item['source'] == 'IGVF'
@@ -325,7 +328,8 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['p_value'] == 0.7264835
         assert first_item['p_value_adj'] == 0.9994257067617868
         assert first_item['effect_size'] == 0.2254047296279381
-        assert first_item['method'] == 'CRISPR FACS screen'
+        assert first_item['method'] == 'CRISPR screen'
+        assert first_item['crispr_modality'] == 'activation'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None

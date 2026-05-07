@@ -78,6 +78,15 @@ function validateInput (input: paramsFormatType): void {
       message: 'At least one gene property must be defined.'
     })
   }
+
+  if (input.z_score !== undefined) {
+    if (isNaN(Number(input.z_score)) && !(input.z_score as string).includes(':')) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'z_score must be a number or a string in the format of "operator:value", where operator can be one of "gt", "gte", "lt" or "lte".'
+      })
+    }
+  }
 }
 
 async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
@@ -136,6 +145,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
         'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
         (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
     `
+
   return await (await db.query(query)).all()
 }
 

@@ -1,4 +1,5 @@
 import hashlib
+import sys
 
 from inspect import getfullargspec
 from math import log10, floor, isinf
@@ -19,6 +20,34 @@ from functools import lru_cache
 
 
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
+
+# UTA connects via psycopg2/libpq. On some macOS setups, disabling GSS
+# negotiation avoids connect-time crashes; only libpq 12+ accepts gssencmode.
+_psycopg2_gss_workaround_installed = False
+
+
+def _ensure_psycopg2_macos_gss_workaround():
+    global _psycopg2_gss_workaround_installed
+    if _psycopg2_gss_workaround_installed:
+        return
+    _psycopg2_gss_workaround_installed = True
+    if sys.platform != 'darwin':
+        return
+
+    import psycopg2
+
+    libpq_v = getattr(psycopg2, '__libpq_version__', 0)
+    if (libpq_v // 10000) < 12:
+        return
+
+    original_connect = psycopg2.connect
+
+    def _connect(*args, **kwargs):
+        kwargs.setdefault('gssencmode', 'disable')
+        return original_connect(*args, **kwargs)
+
+    psycopg2.connect = _connect
+
 
 CHR_MAP = {
     'GRCh38': {
@@ -341,6 +370,7 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
     # translate hgvs naming to vcf format e.g. NC_000003.12:g.183917980C>T -> 3_183917980_C_T
     if validate:  # use tools from hgvs, which corrects ref allele if it's wrong
         # got connection timed out error occasionally, could add a retry function
+        _ensure_psycopg2_macos_gss_workaround()
         hdp = hgvs.dataproviders.uta.connect()
         babelfish38 = Babelfish(hdp, assembly_name=assembly)
         p = parser.Parser()
@@ -350,7 +380,6 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
         except Exception as e:
             print(e)
             return None
-
         if type == 'sub' or type == 'delins':
             return build_variant_id(chr, pos_start+1, ref[1:], alt[1:])
         else:

@@ -21,3 +21,4 @@ py2bit==0.3.3
 jsonschema==4.25.1
 jsonref==1.1.0
 setuptools==81.0.0
+psycopg2-binary>=2.9.9

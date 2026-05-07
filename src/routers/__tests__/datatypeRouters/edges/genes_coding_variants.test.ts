@@ -13,7 +13,6 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
     const mockResult = [
       {
         protein_change: {
-          coding_variant_id: 'OR4F5_ENST00000641515_p.Cys203Glu_c.607_609delinsGAA',
           protein_id: 'ENSP00000493376',
           protein_name: 'A0A2U3U0J3_HUMAN',
           transcript_id: 'ENST00000641515',
@@ -35,8 +34,8 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
             ca_id: null
           },
           scores: [
-            { method: 'SGE', score: 1.2 },
-            { method: 'VAMP-seq', score: 0.8 }
+            { method: 'SGE', score: 1.2, files_filesets: 'files_filesets/FILESET1', source_url: 'http://example.com/sge_score' },
+            { method: 'VAMP-seq', score: 0.8, files_filesets: 'files_filesets/FILESET2', source_url: 'http://example.com/vamp_seq_score' }
           ]
         }]
       }
@@ -62,7 +61,6 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
     const cachedResult = [
       {
         protein_change: {
-          coding_variant_id: 'OR4F5_ENST00000641515_p.Cys203Glu_c.607_609delinsGAA',
           protein_id: 'ENSP00000493376',
           protein_name: 'A0A2U3U0J3_HUMAN',
           transcript_id: 'ENST00000641515',
@@ -84,8 +82,8 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
             ca_id: null
           },
           scores: [
-            { method: 'SGE', score: 1.2 },
-            { method: 'VAMP-seq', score: 0.8 }
+            { method: 'SGE', score: 1.2, files_filesets: 'files_filesets/FILESET1', source_url: 'http://example.com/sge_score' },
+            { method: 'VAMP-seq', score: 0.8, files_filesets: 'files_filesets/FILESET2', source_url: 'http://example.com/vamp_seq_score' }
           ]
         }]
       }

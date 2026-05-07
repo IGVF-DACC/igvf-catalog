@@ -19,7 +19,7 @@ https://api.catalogkg.igvf.org/api/variants/diseases?hgvs=NC_000012.12%3Ag.10291
 https://api.catalogkg.igvf.org/api/variants/variant-ld?variant_id=NC_000011.10%3A9083634%3AA%3AT&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalogkg.igvf.org/api/variants/variant-ld?variant_id=NC_000011.10%3A9083634%3AA%3AT&r2=gte%3A0.8&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalogkg.igvf.org/api/variants/phenotypes?variant_id=NC_000015.10%3A77510448%3AG%3AC&organism=Homo%20sapiens&verbose=false&page=0
-https://api.catalogkg.igvf.org/api/variants/phenotypes?phenotype_id=EFO_0004339&log10pvalue=gte%3A5&organism=Homo%20sapiens&verbose=false&page=0
+https://api.catalogkg.igvf.org/api/variants/phenotypes?method=GWAS&phenotype_id=EFO_0004339&log10pvalue=gte%3A5&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalogkg.igvf.org/api/variants/phenotypes?variant_id=NC_000010.11%3A79286695%3AG%3AA&organism=Homo+sapiens&verbose=true&page=0&limit=500
 https://api.catalogkg.igvf.org/api/variants/predictions?spdi=NC_000001.11%3A1628997%3AGGG%3AGG&organism=Homo%20sapiens&page=0
 https://api.catalogkg.igvf.org/api/variants/predictions?variant_id=NC_000001.11%3A1628997%3AGGG%3AGG&organism=Homo%20sapiens&page=0
@@ -110,7 +110,7 @@ https://api.catalogkg.igvf.org/api/variants/genes?method=Variant-EFFECTS
 https://api.catalogkg.igvf.org/api/variants/proteins?method=SEMVAR
 https://api.catalogkg.igvf.org/api/variants/phenotypes?method=cV2F
 https://api.catalogkg.igvf.org/api/variants/biosamples?method=STARR-seq
-https://api.catalogkg.igvf.org/api/variants/genomic-elements?method=MPRA
+https://api.catalogkg.igvf.org/api/variants/genomic-elements?method=caQTL
 https://api.catalogkg.igvf.org/api/coding-variants/phenotypes?method=VAMP-seq
 https://api.catalogkg.igvf.org/api/genes/variants?method=Variant-EFFECTS
 https://api.catalogkg.igvf.org/api/genes/genomic-elements?method=ENCODE-rE2G
