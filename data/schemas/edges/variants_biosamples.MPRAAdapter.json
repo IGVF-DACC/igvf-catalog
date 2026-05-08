@@ -35,6 +35,11 @@
             "genomic_elements"
           ]
         },
+        "strand": {
+          "type": "string",
+          "description": "Strand of the MPRA tile in the reference sequence design (e.g. +, -, or . when unknown). Distinguishes same coordinates on opposite strands.",
+          "enum": ["+", "-", "."]
+        },
         "bed_score": {
           "type": "number",
           "description": "Bed score for the edge"
@@ -154,10 +159,14 @@
         "biosample_term",
         "biological_context",
         "treatments_term_ids",
-        "genomic_element"
+        "genomic_element",
+        "strand"
       ],
       "additionalProperties": false
     }
   ],
+  "accessible_via": {
+    "return": "strand, log2FC, bed_score, DNA_count_ref, RNA_count_ref, DNA_count_alt, RNA_count_alt, minusLog10PValue, minusLog10QValue, significant, postProbEffect, source, source_url, genomic_element"
+  },
   "db_collection_name": "variants_biosamples"
 }

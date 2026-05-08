@@ -81,7 +81,7 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
         assert 'RNA_count' in first_item
         assert first_item['method'] == 'MPRA'
         assert first_item['class'] == 'observed data'
-        assert first_item['label'] == 'regulatory element activity'
+        assert first_item['label'] == 'regulatory reference element activity'
         assert first_item['source'] == 'ENCODE'
         assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF802FUV/'
         assert first_item.get('minusLog10PValue') is None
