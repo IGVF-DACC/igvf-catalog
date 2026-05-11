@@ -79,7 +79,6 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
         'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
