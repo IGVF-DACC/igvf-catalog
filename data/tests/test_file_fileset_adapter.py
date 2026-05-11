@@ -65,7 +65,7 @@ def test_none_if_empty():
 def test_get_batch_objects():
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect) as mock_get:
         objects = FileFileSet.get_batch_objects(
-            ids=['IGVFFI9721OCVW', 'IGVFFI8400FXRX'],
+            ids=['IGVFFI9100GKNS', 'IGVFFI8400FXRX'],
             fields=['@id', 'accession', 'href', 'dataset', 'analysis_step_version',
                     'derived_manually', 'derived_from', 'catalog_class', 'file_set',
                     'catalog_collections'],
@@ -75,11 +75,11 @@ def test_get_batch_objects():
 
     assert mock_get.call_args_list
     accessions = sorted(obj['accession'] for obj in objects)
-    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9721OCVW']
+    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9100GKNS']
 
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect) as mock_get:
         objects = FileFileSet.get_batch_objects(
-            ids={'IGVFFI9721OCVW', 'IGVFFI8400FXRX'},
+            ids={'IGVFFI9100GKNS', 'IGVFFI8400FXRX'},
             fields=['@id', 'accession', 'href', 'dataset', 'analysis_step_version',
                     'derived_manually', 'derived_from', 'catalog_class', 'file_set',
                     'catalog_collections'],
@@ -89,7 +89,7 @@ def test_get_batch_objects():
 
     assert mock_get.call_args_list
     accessions = sorted(obj['accession'] for obj in objects)
-    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9721OCVW']
+    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9100GKNS']
 
     objects = FileFileSet.get_batch_objects(
         ids=[],
@@ -101,7 +101,7 @@ def test_get_batch_objects():
 
     with pytest.raises(ValueError, match='id_type must be'):
         FileFileSet.get_batch_objects(
-            ids=['IGVFFI9721OCVW', 'IGVFFI8400FXRX'],
+            ids=['IGVFFI9100GKNS', 'IGVFFI8400FXRX'],
             fields=['accession'],
             id_type='wrong_type',
             api_url='https://api.data.igvf.org/'

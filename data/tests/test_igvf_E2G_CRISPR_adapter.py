@@ -44,12 +44,12 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements(mock_file_fileset_
         mock_validator_instance.validate.return_value = True
 
         adapter = IGVFE2GCRISPR(
-            filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element', writer=writer, validate=True)
+            filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/', label='genomic_element', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
-        assert first_item['_key'] == 'CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK'
-        assert first_item['name'] == 'CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK'
+        assert first_item['_key'] == 'CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA'
+        assert first_item['name'] == 'CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA'
         assert first_item['chr'] == 'chr1'
         assert first_item['start'] == 212699339
         assert first_item['end'] == 212700840
@@ -58,8 +58,8 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements(mock_file_fileset_
         assert first_item['promoter_of'] == 'genes/ENSG00000123685'
         assert first_item['source_annotation'] == 'promoter'
         assert first_item['source'] == 'IGVF'
-        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/'
-        assert first_item['files_filesets'] == 'files_filesets/IGVFFI6830YLEK'
+        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI3069QCRA'
 
 
 def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fileset_perturb_seq, mocker):
@@ -69,11 +69,11 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         mock_validator_instance.validate.return_value = True
 
         adapter = IGVFE2GCRISPR(
-            filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element_gene', writer=writer, validate=True)
+            filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/', label='genomic_element_gene', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
-        assert first_item['_key'] == 'CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI6830YLEK'
-        assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK'
+        assert first_item['_key'] == 'CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA'
+        assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA'
         assert first_item['_to'] == 'genes/ENSG00000123685'
         assert first_item['p_value'] == 0.0
         assert first_item['log2FC'] == 3.608562048
@@ -90,8 +90,8 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['name'] == 'modulates expression of'
         assert first_item['inverse_name'] == 'expression modulated by'
         assert first_item['source'] == 'IGVF'
-        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/'
-        assert first_item['files_filesets'] == 'files_filesets/IGVFFI6830YLEK'
+        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI3069QCRA'
 
 
 def test_igvf_e2g_crispr_adapter_perturb_seq_enhancer_only_genomic_elements(mock_file_fileset_perturb_seq, tmp_path):
@@ -117,7 +117,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_enhancer_only_genomic_elements(mock
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
             label='genomic_element',
             writer=writer,
             validate=True
@@ -127,7 +127,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_enhancer_only_genomic_elements(mock
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     assert len(parsed) == 1
     first_item = parsed[0]
-    assert first_item['_key'] == 'CRISPR_chr22_36387779_36388133_GRCh38_IGVFFI1215LWLH'
+    assert first_item['_key'] == 'CRISPR_chr22_36387779_36388133_GRCh38_IGVFFI6296RCJK'
     assert first_item['source_annotation'] == 'enhancer'
     assert 'promoter_of' not in first_item
 
@@ -155,7 +155,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_uses_ensembl_id_column(mock_file_fi
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
             label='genomic_element_gene',
             writer=writer,
             validate=True
@@ -191,7 +191,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_strips_ensembl_version(mock_file_fi
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
             label='genomic_element_gene',
             writer=writer,
             validate=True
@@ -230,7 +230,7 @@ def test_igvf_e2g_crispr_adapter_tap_seq_direct_targeting_genomic_element(mock_f
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
             label='genomic_element',
             writer=writer,
             validate=True
@@ -270,7 +270,7 @@ def test_igvf_e2g_crispr_adapter_tap_seq_sceptre_fields_genomic_element_gene(moc
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1215LWLH/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
             label='genomic_element_gene',
             writer=writer,
             validate=True
@@ -294,12 +294,12 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements(mock_file_fileset_
         mock_validator_instance.validate.return_value = True
 
         adapter = IGVFE2GCRISPR(
-            filepath='./samples/igvf_E2G_CRISPR_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/', label='genomic_element', writer=writer, validate=True)
+            filepath='./samples/igvf_E2G_CRISPR_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9100GKNS/', label='genomic_element', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
-        assert first_item['_key'] == 'CRISPR_chr1_998962_999432_GRCh38_IGVFFI9721OCVW'
-        assert first_item['name'] == 'CRISPR_chr1_998962_999432_GRCh38_IGVFFI9721OCVW'
+        assert first_item['_key'] == 'CRISPR_chr1_998962_999432_GRCh38_IGVFFI9100GKNS'
+        assert first_item['name'] == 'CRISPR_chr1_998962_999432_GRCh38_IGVFFI9100GKNS'
         assert first_item['chr'] == 'chr1'
         assert first_item['start'] == 998962
         assert first_item['end'] == 999432
@@ -308,8 +308,8 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements(mock_file_fileset_
         assert first_item['promoter_of'] == 'genes/ENSG00000188290'
         assert first_item['source_annotation'] == 'promoter'
         assert first_item['source'] == 'IGVF'
-        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/'
-        assert first_item['files_filesets'] == 'files_filesets/IGVFFI9721OCVW'
+        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI9100GKNS/'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI9100GKNS'
 
 
 def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fileset_facs_screen, mocker):
@@ -319,11 +319,11 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         mock_validator_instance.validate.return_value = True
 
         adapter = IGVFE2GCRISPR(
-            filepath='./samples/igvf_E2G_CRISPR_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/', label='genomic_element_gene', writer=writer, validate=True)
+            filepath='./samples/igvf_E2G_CRISPR_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9100GKNS/', label='genomic_element_gene', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
-        assert first_item['_key'] == 'CRISPR_chr1_998962_999432_GRCh38_ENSG00000126353_IGVFFI9721OCVW'
-        assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_998962_999432_GRCh38_IGVFFI9721OCVW'
+        assert first_item['_key'] == 'CRISPR_chr1_998962_999432_GRCh38_ENSG00000126353_IGVFFI9100GKNS'
+        assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_998962_999432_GRCh38_IGVFFI9100GKNS'
         assert first_item['_to'] == 'genes/ENSG00000126353'
         assert first_item['p_value'] == 0.7264835
         assert first_item['p_value_adj'] == 0.9994257067617868
@@ -338,21 +338,21 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['name'] == 'modulates expression of'
         assert first_item['inverse_name'] == 'expression modulated by'
         assert first_item['source'] == 'IGVF'
-        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/'
-        assert first_item['files_filesets'] == 'files_filesets/IGVFFI9721OCVW'
+        assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI9100GKNS/'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI9100GKNS'
 
 
 def test_igvf_e2g_crispr_adapter_invalid_label(mock_file_fileset_perturb_seq):
     writer = SpyWriter()
     with pytest.raises(ValueError):
         adapter = IGVFE2GCRISPR(
-            filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='invalid_label', writer=writer, validate=True)
+            filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/', label='invalid_label', writer=writer, validate=True)
 
 
 def test_igvf_e2g_crispr_adapter_validate_doc_invalid(mock_file_fileset_perturb_seq):
     writer = SpyWriter()
     adapter = IGVFE2GCRISPR(
-        filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element', writer=writer, validate=True)
+        filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/', label='genomic_element', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123
