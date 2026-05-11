@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS motifs_proteins (
-	name String,
-	inverse_name String,
+	name LowCardinality(String),
+	inverse_name LowCardinality(String),
 	biological_process String,
-	source String,
-	source_url String,
+	source LowCardinality(String),
+	source_url LowCardinality(String),
 	id String PRIMARY KEY,
 	motifs_id String,
 	proteins_id String

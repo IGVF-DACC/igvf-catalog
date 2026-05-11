@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS pathways (
 	name String,
-	source String,
-	source_url String,
-	organism String,
+	source LowCardinality(String),
+	source_url LowCardinality(String),
+	organism LowCardinality(String),
 	id_version String,
 	is_in_disease Bool,
 	name_aliases Array(String),
