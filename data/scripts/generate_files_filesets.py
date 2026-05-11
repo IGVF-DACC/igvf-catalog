@@ -18,7 +18,7 @@ Usage:
   python3 data/scripts/generate_files_filesets.py
   python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset
   python3 data/scripts/generate_files_filesets.py --label encode_donor
-  python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI1663LKVQ,IGVFFI9721OCVW
+  python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI1663LKVQ,IGVFFI9100GKNS
 """
 
 import argparse

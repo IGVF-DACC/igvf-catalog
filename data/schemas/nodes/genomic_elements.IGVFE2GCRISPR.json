@@ -12,10 +12,10 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK"
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "name": {
-          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK"
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "promoter_of": {
           "type": "string",
@@ -43,7 +43,7 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "type": {
           "enum": [
@@ -53,7 +53,7 @@
         "files_filesets": {
           "type": "string",
           "description": "Filesets for the genomic element",
-          "example": "files_filesets/IGVFFI6830YLEK",
+          "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         }
       },

@@ -12,10 +12,10 @@
         "_key": {
           "type": "string",
           "description": "Unique identifier for the genomic element to gene edge",
-          "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI6830YLEK"
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
         "_from": {
-          "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK",
+          "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
           "pattern": "^genomic_elements/",
           "collections": [
             "genomic_elements"
@@ -34,12 +34,12 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "files_filesets": {
           "type": "string",
           "description": "The filesets of the genomic element to gene edge",
-          "example": "files_filesets/IGVFFI6830YLEK",
+          "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         },
         "label": {
