@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { geneFormat, geneSearch } from '../nodes/genes'
+import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
@@ -42,6 +42,10 @@ const methodsEnum = methods as [string, ...string[]]
 
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
+    associated_gene_id: z.string().trim().optional(),
+    associated_hgnc_id: z.string().trim().optional(),
+    associated_gene_name: z.string().trim().optional(),
+    associated_alias: z.string().trim().optional(),
     z_score: z.string().trim().optional(),
     interaction_type: interactionTypes.optional(),
     label: z.enum(labels).optional(),
@@ -52,8 +56,9 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
 ).merge(commonEdgeParamsFormat)
 
 const genesGenesRelativeFormat = z.object({
-  'gene 1': z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
-  'gene 2': z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
+  _id: z.string(),
+  gene_1: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
+  gene_2: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   z_score: z.number().optional(),
   detection_method: z.string().optional(),
   detection_method_code: z.string().optional(),
@@ -71,11 +76,13 @@ const genesGenesRelativeFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
-  if (isInvalidFilter) {
+  const isInvalidGeneFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isInvalidAssociatedGeneFilter = Object.keys(input).every(item => !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_alias'].includes(item))
+
+  if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one gene property must be defined.'
+      message: 'At least one gene must be defined.'
     })
   }
 
@@ -92,36 +99,61 @@ function validateInput (input: paramsFormatType): void {
 async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   validateInput(input)
 
-  let genesSchema = HumangenesSchema
-  let genesGenesSchema = HumangenesGenesSchema
-  if (input.organism === 'Mus musculus') {
-    genesSchema = MousegenesSchema
-    genesGenesSchema = MousegenesGenesSchema
-  }
-  const genesCollectionName = genesSchema.db_collection_name as string
-  const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
-  delete input.gene_id
-  delete input.hgnc_id
-  delete input.gene_name
-  delete input.alias
-  delete input.organism
-  const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${genesCollectionName}/${gene._id as string}`)
-
-  const verbose = input.verbose === 'true'
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
 
+  let genesSchema = HumangenesSchema
+  let genesGenesSchema = HumangenesGenesSchema
+  if (input.organism === 'Mus musculus') {
+    genesSchema = MousegenesSchema
+    genesGenesSchema = MousegenesGenesSchema
+  }
+  delete input.organism
+
+  const genesCollectionName = genesSchema.db_collection_name as string
+  const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { gene_id, hgnc_id, gene_name: name, alias } = input
+  const geneInput: paramsFormatType = { _key: gene_id, hgnc_id, name, alias, page: 0 }
+  delete input.gene_id
+  delete input.hgnc_id
+  delete input.gene_name
+  delete input.alias
+
+  const associatedGeneInput: paramsFormatType = {
+    _key: input.associated_gene_id,
+    hgnc_id: input.associated_hgnc_id,
+    name: input.associated_gene_name,
+    alias: input.associated_alias,
+    page: 0
+  }
+  delete input.associated_gene_id
+  delete input.associated_hgnc_id
+  delete input.associated_gene_name
+  delete input.associated_alias
+
+  const filters = []
+  const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
+  const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
   const edgeFilters = getFilterStatements(genesGenesSchema, input)
-  const geneFilter = `(record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}'])`
-  const combinedFilter = [geneFilter, edgeFilters].filter((filter) => filter !== '').join(' AND ') || 'true'
+
+  if (gene) {
+    filters.push('(record._from == gene._id OR record._to == gene._id)')
+  }
+
+  if (associatedGene) {
+    filters.push('(record._from == associatedGene._id OR record._to == associatedGene._id)')
+  }
+
+  if (edgeFilters) {
+    filters.push(edgeFilters)
+  }
+
+  const combinedFilter = filters.filter((filter) => filter !== '').join(' AND ')
 
   const sourceVerboseQuery = `
   FOR otherRecord IN ${genesCollectionName}
@@ -135,16 +167,27 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   `
 
   const query = `
-      FOR record IN ${genesGenesCollectionName}
-      FILTER ${combinedFilter}
-      SORT record._key
-      LIMIT ${Number(input.page) * limit}, ${limit}
-      RETURN MERGE({
-        'name': record.name,
-        'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
-        'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
-        (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
-    `
+    ${(gene)
+      ? `FOR gene IN ${genesCollectionName}
+        FILTER ${gene}`
+    : ''}
+
+    ${(associatedGene)
+      ? `FOR associatedGene IN ${genesCollectionName}
+        FILTER ${associatedGene}`
+      : ''}
+
+    FOR record IN ${genesGenesCollectionName}
+    FILTER ${combinedFilter}
+    SORT record._key
+    LIMIT ${Number(input.page) * limit}, ${limit}
+    RETURN DISTINCT(MERGE({
+      '_id': record._id,
+      'name': record.name,
+      'gene_1': ${input.verbose === 'true' ? `(${sourceVerboseQuery})` : 'record._from'},
+      'gene_2': ${input.verbose === 'true' ? `(${targetVerboseQuery})` : 'record._to'}},
+      (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}})))
+  `
 
   return await (await db.query(query)).all()
 }
