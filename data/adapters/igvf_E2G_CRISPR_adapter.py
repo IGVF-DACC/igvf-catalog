@@ -46,27 +46,33 @@ from adapters.writer import Writer
 # coordinates or non-gene intended target -> enhancer; valid ENSG intended target -> promoter.
 CRISPR_E2G_TARGETED_ELEMENT_TYPES = {
     # promoter Perturb-seq
-    'IGVFFI3069QCRA': 'promoter',
-    'IGVFFI5749WPVK': 'promoter',
-    'IGVFFI6376HTIF': 'promoter',
-    'IGVFFI0206LUDV': 'promoter',
+    'IGVFFI3069QCRA': 'promoter',  # T-cell CRISPRa
+    'IGVFFI5749WPVK': 'promoter',  # T-cell CRISPRi
+    'IGVFFI6376HTIF': 'promoter',  # HCASMC Pilot Perturb-seq
+    'IGVFFI0206LUDV': 'promoter',  # HCASMC 971-gene Perturb-seq
     # Mixed promoter and enhancer Perturb-seq
-    'IGVFFI4544JMWL': 'both',
-    'IGVFFI0830FXFI': 'both',
+    'IGVFFI4544JMWL': 'both',  # Scaled screen
+    'IGVFFI0830FXFI': 'both',  # WTC-11 CM TF-Perturb-seq
     # enhancer Perturb-seq
-    'IGVFFI6296RCJK': 'enhancer',
-    'IGVFFI6600VCYY': 'enhancer',
-    'IGVFFI7195XKBC': 'enhancer',
-    'IGVFFI9246AJEK': 'enhancer',
-    'IGVFFI3434YAPX': 'enhancer',
-    'IGVFFI1168JUYR': 'enhancer',
-    'IGVFFI5903QAWP': 'enhancer',
+    'IGVFFI6296RCJK': 'enhancer',  # Mechanoenhancer
+    'IGVFFI6600VCYY': 'enhancer',  # EC-TAP-seq D0
+    'IGVFFI7195XKBC': 'enhancer',  # EC-TAP-seq D2
+    'IGVFFI9246AJEK': 'enhancer',  # EC-TAP-seq D4
+    'IGVFFI3434YAPX': 'enhancer',  # 9p21 DC-TAP-seq
+    'IGVFFI1168JUYR': 'enhancer',  # HCASMC DC-TAP-seq
+    'IGVFFI5903QAWP': 'enhancer',  # CRUDO TAP-seq
     # promoter CRISPR FACS screens
     'IGVFFI9100GKNS': 'promoter',
     'IGVFFI6268OASM': 'promoter',
     'IGVFFI1336XWXJ': 'promoter',
     'IGVFFI3089UGHM': 'promoter',
 }
+
+
+# I keys that map row columns but are not numeric edge metrics.
+_IGVF_E2G_LAYOUT_KEYS = frozenset({
+    'readout_gene', 'promoter_gene', 'chr', 'start', 'end',
+})
 
 
 class IGVFE2GCRISPR(BaseAdapter):
@@ -213,11 +219,11 @@ class IGVFE2GCRISPR(BaseAdapter):
 
             if method == 'Perturb-seq':
                 I = {
-                    'p_val': get_column_index('p_val', 'sceptre_p_value'),
-                    'log2_fc': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
+                    'p_value': get_column_index('p_val', 'sceptre_p_value'),
+                    'log2FC': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
                     'pct_1': get_optional_column_index('pct.1'),
                     'pct_2': get_optional_column_index('pct.2'),
-                    'p_val_adj': get_column_index('p_val_adj', 'sceptre_adj_p_value'),
+                    'p_value_adj': get_column_index('p_val_adj', 'sceptre_adj_p_value'),
                     'readout_gene': get_column_index('target_gene', 'ensembl_id', 'gene_id'),
                     'promoter_gene': get_column_index('intended_target_name'),
                     'significant': get_optional_column_index('significant'),
@@ -227,8 +233,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                 }
             elif method == 'CRISPR screen':
                 I = {
-                    'p_val': name_to_idx['FRACTEL_pval'],
-                    'p_val_adj': name_to_idx['FRACTEL_pval_fdr_corr'],
+                    'p_value': name_to_idx['FRACTEL_pval'],
+                    'p_value_adj': name_to_idx['FRACTEL_pval_fdr_corr'],
                     'effect_size': name_to_idx['FRACTEL_effect_size'],
                     'readout_gene': name_to_idx['readout_gene'],
                     'promoter_gene': name_to_idx['intended_target_name'],
@@ -274,26 +280,16 @@ class IGVFE2GCRISPR(BaseAdapter):
                 else:
                     element_id = genomic_coordinates_to_element_id[element_coordinates]
 
-                if method == 'Perturb-seq':
-                    metrics = {
-                        'p_value': float(row[I['p_val']]),
-                        'log2FC': float(row[I['log2_fc']]),
-                        'p_value_adj': float(row[I['p_val_adj']]),
-                    }
-                    if I.get('significant') is not None:
-                        significant = self._parse_bool(row[I['significant']])
+                metrics = {}
+                for key, col_idx in I.items():
+                    if key in _IGVF_E2G_LAYOUT_KEYS or col_idx is None:
+                        continue
+                    if key == 'significant':
+                        significant = self._parse_bool(row[col_idx])
                         if significant is not None:
-                            metrics['significant'] = significant
-                    if I['pct_1'] is not None:
-                        metrics['pct_1'] = float(row[I['pct_1']])
-                    if I['pct_2'] is not None:
-                        metrics['pct_2'] = float(row[I['pct_2']])
-                elif method == 'CRISPR screen':
-                    metrics = {
-                        'p_value': float(row[I['p_val']]),
-                        'p_value_adj': float(row[I['p_val_adj']]),
-                        'effect_size': float(row[I['effect_size']])
-                    }
+                            metrics[key] = significant
+                    else:
+                        metrics[key] = float(row[col_idx])
 
                 if self.label == 'genomic_element_gene':
                     _id = '_'.join(
