@@ -12,9 +12,9 @@ $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bas
 Then in new terminal:
 
 ```bash
-# Install and use node 20.
-$ nvm install 20
-$ nvm use 20
+# Install and use node 22.
+$ nvm install 22
+$ nvm use 22
 # Check version.
 $ node --version
 ```
