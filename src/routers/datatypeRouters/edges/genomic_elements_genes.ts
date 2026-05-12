@@ -444,7 +444,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
-          FILTER record._to == gene._id AND record.method == \'Perturb-seq\'
+          FILTER record._to == gene._id AND record.method IN [\'Perturb-seq\', \'CRISPR Screen\']
           ${pvalueFilter}
           SORT record._key
 
@@ -501,7 +501,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
             FOR record in genomic_elements_genes
-              FILTER record._to == regulator_gene._id AND record.method == \'Perturb-seq\'
+              FILTER record._to == regulator_gene._id AND record.method IN [\'Perturb-seq\', \'CRISPR Screen\']
               ${pvalueFilter}
 
               FOR ge IN genomic_elements
