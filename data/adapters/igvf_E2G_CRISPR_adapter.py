@@ -2,7 +2,7 @@ import csv
 import gzip
 import json
 import re
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
@@ -53,6 +53,7 @@ CRISPR_E2G_TARGETED_ELEMENT_TYPES = {
     # Mixed promoter and enhancer Perturb-seq
     'IGVFFI4544JMWL': 'both',  # Scaled screen
     'IGVFFI0830FXFI': 'both',  # WTC-11 CM TF-Perturb-seq
+    'IGVFFI5903QAWP': 'both',  # CRUDO TAP-seq
     # enhancer Perturb-seq
     'IGVFFI6296RCJK': 'enhancer',  # Mechanoenhancer
     'IGVFFI6600VCYY': 'enhancer',  # EC-TAP-seq D0
@@ -60,7 +61,6 @@ CRISPR_E2G_TARGETED_ELEMENT_TYPES = {
     'IGVFFI9246AJEK': 'enhancer',  # EC-TAP-seq D4
     'IGVFFI3434YAPX': 'enhancer',  # 9p21 DC-TAP-seq
     'IGVFFI1168JUYR': 'enhancer',  # HCASMC DC-TAP-seq
-    'IGVFFI5903QAWP': 'enhancer',  # CRUDO TAP-seq
     # promoter CRISPR FACS screens
     'IGVFFI9100GKNS': 'promoter',
     'IGVFFI6268OASM': 'promoter',
@@ -69,9 +69,30 @@ CRISPR_E2G_TARGETED_ELEMENT_TYPES = {
 }
 
 
+# CRUDO TAP-seq (IGVFFI5903QAWP): name_hg38 (duplex chr:start-chr:end or simple chr:start-end),
+# type, TargetGeneID; metrics from EnhancerEffect.noAux / pval.EnhancerEffect.noAux / adj.pval.* (or EnhancerEff.*).
+# TSS rows: promoter Ensembl id is not in the file — see CRUDO_TSS_PROMOTER_GENE.
+CRUDO_TSS_PROMOTER_GENE = {
+    'CCND1_TSS': 'ENSG00000110092',
+    'KITLG_TSS': 'ENSG00000049130',
+    'SSFA2_TSS': 'ENSG00000138434',
+    'FAM3C_TSS': 'ENSG00000196937',
+    'MYC_TSS': 'ENSG00000136997',
+}
+
+
+# name_hg38 / name-style intervals: either chr:start-chr:end (duplex) or chr:start-end (simple).
+_HG38_DUPLEX_INTERVAL_RE = re.compile(
+    r'^(?P<c1>chr[^:]+):(?P<s1>\d+)-(?P<c2>chr[^:]+):(?P<s2>\d+)$'
+)
+_HG38_SIMPLE_INTERVAL_RE = re.compile(
+    r'^(?P<c>chr[^:]+):(?P<s1>\d+)-(?P<s2>\d+)$'
+)
+
 # I keys that map row columns but are not numeric edge metrics.
 _IGVF_E2G_LAYOUT_KEYS = frozenset({
     'readout_gene', 'promoter_gene', 'chr', 'start', 'end',
+    'name_hg38', 'element_type',
 })
 
 
@@ -170,6 +191,175 @@ class IGVFE2GCRISPR(BaseAdapter):
                 return None
         return (promoter_gene, source_annotation)
 
+    @staticmethod
+    def _parse_element_coordinates_hg38(name_hg38: str) -> Tuple[str, str, str]:
+        s = (name_hg38 or '').strip()
+        m = _HG38_DUPLEX_INTERVAL_RE.match(s)
+        if m:
+            c1, s1, c2, s2 = m['c1'], m['s1'], m['c2'], m['s2']
+            if c1 != c2:
+                raise ValueError(
+                    f'name_hg38 spans two chromosomes: {name_hg38!r}')
+            i1, i2 = int(s1), int(s2)
+            if i1 <= i2:
+                return c1, s1, s2
+            return c1, s2, s1
+        m = _HG38_SIMPLE_INTERVAL_RE.match(s)
+        if m:
+            c, s1, s2 = m['c'], m['s1'], m['s2']
+            i1, i2 = int(s1), int(s2)
+            if i1 <= i2:
+                return c, s1, s2
+            return c, s2, s1
+        raise ValueError(f'Unrecognized name_hg38 interval: {name_hg38!r}')
+
+    def _gene_raw_from_name_hg38_row(
+        self,
+        row,
+        name_idx: int,
+        type_idx: Optional[int],
+    ) -> Tuple[str, str, str, str]:
+        name_cell = row[name_idx]
+        chr_, start, end = self._parse_element_coordinates_hg38(name_cell)
+        row_type = (
+            row[type_idx].strip()
+            if type_idx is not None and type_idx < len(row)
+            else ''
+        )
+        if row_type in CRUDO_TSS_PROMOTER_GENE:
+            gene_raw = CRUDO_TSS_PROMOTER_GENE[row_type]
+        else:
+            gene_raw = name_cell
+        return chr_, start, end, gene_raw
+
+    @staticmethod
+    def _perturb_seq_negative_control(row: list, type_col: Optional[int]) -> bool:
+        if type_col is None or type_col >= len(row):
+            return False
+        return row[type_col].strip() == 'negative_control'
+
+    def _resolve_explicit_interval(
+        self,
+        row: list,
+        col: Dict[str, Optional[int]],
+    ) -> Optional[Tuple[str, str, str, str]]:
+        ci, si, ei, pi = col['chr'], col['start'], col['end'], col['promoter_gene']
+        if ci is None or si is None or ei is None:
+            return None
+        if ci >= len(row) or si >= len(row) or ei >= len(row):
+            return None
+        c_raw, s_raw, e_raw = row[ci].strip(), row[si].strip(), row[ei].strip()
+        if not (c_raw and s_raw and e_raw):
+            return None
+        if pi is None or pi >= len(row):
+            self.logger.warning(
+                'Skipping row in %s: explicit coordinates require '
+                'intended_target_name column.',
+                self.file_accession,
+            )
+            return None
+        return (c_raw, s_raw, e_raw, row[pi])
+
+    def _resolve_name_hg38_interval(
+        self,
+        row: list,
+        col: Dict[str, Optional[int]],
+    ) -> Optional[Tuple[str, str, str, str]]:
+        ni = col['name_hg38']
+        if ni is None or ni >= len(row) or not row[ni].strip():
+            return None
+        try:
+            return self._gene_raw_from_name_hg38_row(
+                row, ni, col['element_type'])
+        except ValueError as err:
+            self.logger.warning(
+                'Skipping row in %s: %s',
+                self.file_accession,
+                err,
+            )
+            return None
+
+    def _resolve_perturb_seq_element(
+        self,
+        row: list,
+        col: Dict[str, Optional[int]],
+    ) -> Optional[Tuple[str, str, str, str]]:
+        explicit = self._resolve_explicit_interval(row, col)
+        if explicit is not None:
+            return explicit
+        from_name = self._resolve_name_hg38_interval(row, col)
+        if from_name is not None:
+            return from_name
+        self.logger.warning(
+            'Skipping row in %s: missing coordinates (chr/start/end or name_hg38).',
+            self.file_accession,
+        )
+        return None
+
+    @staticmethod
+    def _perturb_seq_columns(name_to_idx: Dict[str, int]) -> Dict[str, Optional[int]]:
+        def pick(*candidates: str) -> Optional[int]:
+            for name in candidates:
+                if name in name_to_idx:
+                    return name_to_idx[name]
+            return None
+
+        return {
+            'p_value': pick(
+                'EnhancerEff.pval',
+                'p_val',
+                'sceptre_p_value',
+                'pval.EnhancerEffect.noAux',
+            ),
+            'p_value_adj': pick(
+                'EnhancerEff.pval.adj',
+                'p_val_adj',
+                'sceptre_adj_p_value',
+                'adj.pval.EnhancerEffect.noAux',
+            ),
+            'effect_size': pick('EnhancerEff', 'EnhancerEffect.noAux'),
+            'log2FC': pick('avg_log2FC', 'sceptre_log2_fc'),
+            'pct_1': pick('pct.1'),
+            'pct_2': pick('pct.2'),
+            'readout_gene': pick(
+                'TargetGeneID', 'target_gene', 'ensembl_id', 'gene_id'),
+            'promoter_gene': pick('intended_target_name'),
+            'significant': pick('significant', 'Significant'),
+            'name_hg38': pick('name_hg38'),
+            'element_type': pick('type'),
+            'chr': pick('intended_target_chr', 'targeting_chr'),
+            'start': pick('intended_target_start', 'targeting_start'),
+            'end': pick('intended_target_end', 'targeting_end'),
+        }
+
+    def _metrics_from_row(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+    ) -> dict:
+        metrics = {}
+        for key, col_idx in colmap.items():
+            if key in _IGVF_E2G_LAYOUT_KEYS or col_idx is None:
+                continue
+            if col_idx >= len(row):
+                continue
+            cell = row[col_idx].strip()
+            if key == 'significant':
+                significant = self._parse_bool(row[col_idx])
+                if significant is not None:
+                    metrics[key] = significant
+            elif cell:
+                try:
+                    metrics[key] = float(cell)
+                except ValueError:
+                    self.logger.warning(
+                        'Skipping metric %s in %s: not a float (%r).',
+                        key,
+                        self.file_accession,
+                        row[col_idx],
+                    )
+        return metrics
+
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
@@ -202,38 +392,12 @@ class IGVFE2GCRISPR(BaseAdapter):
         with gzip.open(self.filepath, 'rt') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
             header = next(reader)
-
             name_to_idx = {h.strip(): i for i, h in enumerate(header)}
 
-            def get_column_index(*column_names):
-                for column_name in column_names:
-                    if column_name in name_to_idx:
-                        return name_to_idx[column_name]
-                raise KeyError(
-                    f"Missing expected column. Tried: {', '.join(column_names)}")
-
-            def get_optional_column_index(*column_names):
-                for column_name in column_names:
-                    if column_name in name_to_idx:
-                        return name_to_idx[column_name]
-                return None
-
             if method == 'Perturb-seq':
-                I = {
-                    'p_value': get_column_index('p_val', 'sceptre_p_value'),
-                    'log2FC': get_column_index('avg_log2FC', 'sceptre_log2_fc'),
-                    'pct_1': get_optional_column_index('pct.1'),
-                    'pct_2': get_optional_column_index('pct.2'),
-                    'p_value_adj': get_column_index('p_val_adj', 'sceptre_adj_p_value'),
-                    'readout_gene': get_column_index('target_gene', 'ensembl_id', 'gene_id'),
-                    'promoter_gene': get_column_index('intended_target_name'),
-                    'significant': get_optional_column_index('significant'),
-                    'chr': get_column_index('intended_target_chr', 'targeting_chr'),
-                    'start': get_column_index('intended_target_start', 'targeting_start'),
-                    'end': get_column_index('intended_target_end', 'targeting_end'),
-                }
+                colmap = self._perturb_seq_columns(name_to_idx)
             elif method == 'CRISPR screen':
-                I = {
+                colmap = {
                     'p_value': name_to_idx['FRACTEL_pval'],
                     'p_value_adj': name_to_idx['FRACTEL_pval_fdr_corr'],
                     'effect_size': name_to_idx['FRACTEL_effect_size'],
@@ -250,18 +414,44 @@ class IGVFE2GCRISPR(BaseAdapter):
                 if not row:
                     continue
 
-                intended_target_chr = row[I['chr']]
-                intended_target_start = row[I['start']]
-                intended_target_end = row[I['end']]
-                intended_target_gene_raw = row[I['promoter_gene']]
+                if method == 'Perturb-seq':
+                    if self._perturb_seq_negative_control(row, colmap['element_type']):
+                        continue
+                    interval = self._resolve_perturb_seq_element(row, colmap)
+                    if interval is None:
+                        continue
+                    (
+                        intended_target_chr,
+                        intended_target_start,
+                        intended_target_end,
+                        intended_target_gene_raw,
+                    ) = interval
+                    read_idx = colmap['readout_gene']
+                    if read_idx is None or read_idx >= len(row):
+                        self.logger.warning(
+                            'Skipping row in %s: missing readout gene column.',
+                            self.file_accession,
+                        )
+                        continue
+                    readout_gene_raw = row[read_idx]
+                else:
+                    intended_target_chr = row[colmap['chr']]
+                    intended_target_start = row[colmap['start']]
+                    intended_target_end = row[colmap['end']]
+                    intended_target_gene_raw = row[colmap['promoter_gene']]
+                    readout_gene_raw = row[colmap['readout_gene']]
+
                 intended_target_name = self._normalize_ensembl_gene_id(
                     intended_target_gene_raw)
-                readout_gene_raw = row[I['readout_gene']]
                 readout_gene = self._normalize_ensembl_gene_id(
                     readout_gene_raw)
                 if not self.gene_validator.validate(readout_gene):
                     self.logger.warning(
-                        f'Skipping row: readout gene "{readout_gene_raw}" is not a valid gene after normalization ("{readout_gene}").')
+                        'Skipping row: readout gene "%s" is not a valid gene after '
+                        'normalization ("%s").',
+                        readout_gene_raw,
+                        readout_gene,
+                    )
                     continue
                 resolved = self._promoter_gene_and_source_annotation(
                     targeted_element_mode,
@@ -273,29 +463,32 @@ class IGVFE2GCRISPR(BaseAdapter):
                 promoter_gene, source_annotation = resolved
 
                 element_coordinates = (
-                    intended_target_chr, intended_target_start, intended_target_end, promoter_gene, source_annotation)
+                    intended_target_chr,
+                    intended_target_start,
+                    intended_target_end,
+                    promoter_gene,
+                    source_annotation,
+                )
                 if element_coordinates not in genomic_coordinates_to_element_id:
                     element_id = build_regulatory_region_id(
-                        intended_target_chr, intended_target_start, intended_target_end, 'CRISPR')
+                        intended_target_chr,
+                        intended_target_start,
+                        intended_target_end,
+                        'CRISPR',
+                    )
                     genomic_coordinates_to_element_id[element_coordinates] = element_id
                 else:
-                    element_id = genomic_coordinates_to_element_id[element_coordinates]
+                    element_id = genomic_coordinates_to_element_id[
+                        element_coordinates]
 
-                metrics = {}
-                for key, col_idx in I.items():
-                    if key in _IGVF_E2G_LAYOUT_KEYS or col_idx is None:
-                        continue
-                    if key == 'significant':
-                        significant = self._parse_bool(row[col_idx])
-                        if significant is not None:
-                            metrics[key] = significant
-                    else:
-                        metrics[key] = float(row[col_idx])
+                metrics = self._metrics_from_row(row, colmap)
 
                 if self.label == 'genomic_element_gene':
                     _id = '_'.join(
                         [element_id, readout_gene, self.file_accession])
-                    _source = 'genomic_elements/' + element_id + '_' + self.file_accession
+                    _source = (
+                        'genomic_elements/' + element_id + '_' + self.file_accession
+                    )
                     _props = {
                         '_key': _id,
                         '_from': _source,
