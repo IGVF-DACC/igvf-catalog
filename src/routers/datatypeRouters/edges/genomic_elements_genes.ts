@@ -40,7 +40,8 @@ const gnrGeneQueryFormat = z.object({
   response_hgnc_id: z.string().optional(),
   response_gene_name: z.string().optional(),
   response_alias: z.string().optional(),
-  p_value: z.string().optional()
+  p_value: z.string().optional(),
+  method: z.enum(['CRISPR screen', 'Perturb-seq']).optional()
 }).merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true})
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
@@ -88,7 +89,7 @@ const grnOutputFormat = z.object({
     chr: z.string(),
     start: z.number(),
     end: z.number(),
-    regulator_gene: z.string(),
+    regulator_gene: z.string()
   }),
   crispr_modality: z.string().nullish(),
   class: z.string(),
@@ -439,12 +440,17 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
   }
 
+  let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
+  if (input.method !== undefined) {
+    methodFilter = `['${input.method}']`
+  }
+
   const responseQuery = `
     FOR gene IN genes
         FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
-          FILTER record._to == gene._id AND record.method IN [\'Perturb-seq\', \'CRISPR Screen\']
+          FILTER record._to == gene._id AND record.method IN ${methodFilter}
           ${pvalueFilter}
           SORT record._key
 
@@ -501,11 +507,11 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
             FOR record in genomic_elements_genes
-              FILTER record._to == regulator_gene._id AND record.method IN [\'Perturb-seq\', \'CRISPR Screen\']
+              FILTER record._to == response_gene._id AND record.method IN ${methodFilter}
               ${pvalueFilter}
 
               FOR ge IN genomic_elements
-                FILTER ge._id == record._from AND ge.promoter_of == response_gene._id
+                FILTER ge._id == record._from AND ge.promoter_of == regulator_gene._id
                 SORT record._key
                 LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
