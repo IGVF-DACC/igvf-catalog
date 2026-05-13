@@ -331,8 +331,6 @@ async function qtlsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT @offset, @limit
     RETURN record
   `
-  console.log(query)
-  console.log(baseBindVars)
   return await (await db.query(query, baseBindVars)).all()
 }
 
