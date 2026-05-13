@@ -91,7 +91,9 @@
             "elements",
             "ENCODE-rE2G",
             "ESM-1v",
+            "GRCh38 elements",
             "Homo sapiens elements",
+            "Homo sapiens GRCh38 hg19 elements",
             "MPRA",
             "MutPred2",
             "Perturb-seq",
@@ -102,7 +104,8 @@
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
-            "scATAC-seq"
+            "scATAC-seq",
+            "TLand-predict"
           ]
         },
         "class": {
@@ -147,7 +150,8 @@
               "SEMVAR",
               "Sceptre",
               "Seurat",
-              "SGE Pipeline"
+              "SGE Pipeline",
+              "TLand-predict"
             ]
           }
         },

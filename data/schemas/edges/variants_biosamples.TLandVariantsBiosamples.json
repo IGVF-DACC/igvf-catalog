@@ -1,0 +1,202 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_biosamplesVariantsBiosamples.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to biosample edge"
+        },
+        "_from": {
+          "example": "variants/NC_000005.10:1779518:G:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/c003f2e98a5817b37ce38ee6d199b560bdcc497f30973e8689b16ba75944465c",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "score": {
+          "type": "number",
+          "description": "score of the variant to biosample edge"
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted allele-specific binding"
+          ]
+        },
+        "method": {
+          "enum": [
+            "TLand-predict"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context of the variant to biosample edge",
+          "enum": [
+            "adipose tissue",
+            "adrenal gland",
+            "arterial blood vessel",
+            "blood",
+            "blood vessel",
+            "bone element",
+            "bone marrow",
+            "brain",
+            "breast",
+            "colon",
+            "connective tissue",
+            "ear",
+            "embryo",
+            "endocrine gland",
+            "epithelium",
+            "esophagus",
+            "exocrine gland",
+            "extraembryonic componenteye",
+            "gonad",
+            "heart",
+            "immune organ",
+            "intestine",
+            "kidney",
+            "large intestine",
+            "limb",
+            "liver",
+            "lung",
+            "lymph node",
+            "lymphoid tissue",
+            "mammary gland",
+            "mouth",
+            "musculature of body",
+            "nerve",
+            "ovary",
+            "pancreas",
+            "penis",
+            "placenta",
+            "prostate gland",
+            "skin of body",
+            "skin of prepuce of penis",
+            "small intestine",
+            "spinal cord",
+            "spleen",
+            "stomach",
+            "testis",
+            "thymus",
+            "thyroid gland",
+            "uterus",
+            "vagina",
+            "vasculature"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term of the variant to biosample edge",
+          "enum": [
+            "ontology_terms/UBERON_0001013",
+            "ontology_terms/UBERON_0002369",
+            "ontology_terms/UBERON_0003509",
+            "ontology_terms/UBERON_0000178",
+            "ontology_terms/UBERON_0001981",
+            "ontology_terms/UBERON_0001474",
+            "ontology_terms/UBERON_0002371",
+            "ontology_terms/UBERON_0000955",
+            "ontology_terms/UBERON_0000310",
+            "ontology_terms/UBERON_0001155",
+            "ontology_terms/UBERON_0002384",
+            "ontology_terms/UBERON_0001690",
+            "ontology_terms/UBERON_0000922",
+            "ontology_terms/UBERON_0002368",
+            "ontology_terms/UBERON_0000483",
+            "ontology_terms/UBERON_0001043",
+            "ontology_terms/UBERON_0002365",
+            "ontology_terms/UBERON_0016887",
+            "ontology_terms/UBERON_0000970",
+            "ontology_terms/UBERON_0000991",
+            "ontology_terms/UBERON_0000948",
+            "ontology_terms/UBERON_0005057",
+            "ontology_terms/UBERON_0000160",
+            "ontology_terms/UBERON_0002113",
+            "ontology_terms/UBERON_0000059",
+            "ontology_terms/UBERON_0002101",
+            "ontology_terms/UBERON_0002107",
+            "ontology_terms/UBERON_0002048",
+            "ontology_terms/UBERON_0000029",
+            "ontology_terms/UBERON_0001744",
+            "ontology_terms/UBERON_0001911",
+            "ontology_terms/UBERON_0000165",
+            "ontology_terms/UBERON_0000383",
+            "ontology_terms/UBERON_0001021",
+            "ontology_terms/UBERON_0000992",
+            "ontology_terms/UBERON_0001264",
+            "ontology_terms/UBERON_0000989",
+            "ontology_terms/UBERON_0001987",
+            "ontology_terms/UBERON_0002367",
+            "ontology_terms/UBERON_0002097",
+            "ontology_terms/UBERON_0001471",
+            "ontology_terms/UBERON_0002108",
+            "ontology_terms/UBERON_0002240",
+            "ontology_terms/UBERON_0002106",
+            "ontology_terms/UBERON_0000945",
+            "ontology_terms/UBERON_0000473",
+            "ontology_terms/UBERON_0002370",
+            "ontology_terms/UBERON_0002046",
+            "ontology_terms/UBERON_0000995",
+            "ontology_terms/UBERON_0000996",
+            "ontology_terms/UBERON_0002049"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates regulatory activity of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "regulatory activity modulated by"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI9483AUPF/"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets of the variant to biosample edge",
+          "example": "files_filesets/IGVFFI9483AUPF",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "score",
+        "biological_context",
+        "biosample_term",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants_biosamples"
+}
