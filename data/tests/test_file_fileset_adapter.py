@@ -227,7 +227,7 @@ def test_parse_sample_donor_treatment_igvf():
 
 def test_parse_sample_donor_treatment_igvf_crispr_modality():
     samples = [{'accession': 'IGVFSM0001AAAA'}]
-    method = 'CRISPR FACS screen'
+    method = 'CRISPR screen'
     sample_objects = [{
         'accession': 'IGVFSM0001AAAA',
         'donors': [{'accession': 'IGVFDO0001AAAA'}],
@@ -258,7 +258,7 @@ def test_parse_sample_donor_treatment_igvf_crispr_modality():
 def test_parse_sample_donor_treatment_igvf_multiple_crispr_modalities_error():
     samples = [{'accession': 'IGVFSM0001AAAA'},
                {'accession': 'IGVFSM0002BBBB'}]
-    method = 'CRISPR FACS screen'
+    method = 'CRISPR screen'
     sample_objects = [
         {
             'accession': 'IGVFSM0001AAAA',

@@ -163,7 +163,7 @@ function buildQuery (params: {
     FOR record IN edgeRecords
       LET gene = ${verbose ? 'geneMap[record._to]' : 'record._to'}
       LET element = ${verbose ? 'elementMap[record._from]' : 'record._from'}
-      LET p_value = record.method IN ['CRISPR FACS screen', 'Perturb-seq', 'TAP-seq'] ? record.p_value_adj : record.p_value
+      LET p_value = record.method IN ['CRISPR screen', 'Perturb-seq'] ? (record.p_value_adj != null ? record.p_value_adj : record.p_value) : record.p_value
       RETURN {
         'gene': gene,
         'genomic_element': element,

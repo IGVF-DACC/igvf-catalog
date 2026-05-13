@@ -113,7 +113,10 @@
           "description": "The percentage of the genomic element to gene edge"
         },
         "p_value_adj": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "The adjusted p-value of the genomic element to gene edge"
         },
         "significant": {
@@ -122,7 +125,7 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "The effect size of the genomic element to gene edge. This is used as score in APIs for data with method 'CRISPR FACS screen'."
+          "description": "The effect size of the genomic element to gene edge. This is used as score in APIs for data with method 'CRISPR screen'."
         }
       },
       "required": [
@@ -132,8 +135,7 @@
         "biosample_term",
         "biological_context",
         "treatments_term_ids",
-        "p_value",
-        "p_value_adj"
+        "p_value"
       ],
       "additionalProperties": false,
       "accessible_via": {

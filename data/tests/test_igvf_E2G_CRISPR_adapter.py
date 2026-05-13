@@ -101,7 +101,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_enhancer_only_genomic_elements(mock
     test_file = tmp_path / 'igvf_E2G_CRISPR_enhancer_only_perturb_seq.txt.gz'
     header = (
         'p_val\tavg_log2FC\tpct.1\tpct.2\tp_val_adj\tgene_symbol\t'
-        'target_gene\tintended_target_name\tintended_target_chr\t'
+        'ensembl_id\tintended_target_name\tintended_target_chr\t'
         'intended_target_start\tintended_target_end\n'
     )
     row = (
@@ -206,12 +206,51 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_strips_ensembl_version(mock_file_fi
     assert first_item['_to'] == 'genes/ENSG00000174038'
 
 
+def test_igvf_e2g_crispr_adapter_promoter_file_uses_intended_target_gene_id(
+        mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_promoter_intended_target_gene_id.txt.gz'
+    header = (
+        'intended_target_name\tIntended_target_gene_id\tguide_id(s)\t'
+        'targeting_chr\ttargeting_start\ttargeting_end\tgene_id\tgene_symbol\t'
+        'sceptre_log2_fc\tsceptre_p_value\tsceptre_adj_p_value\tsignificant\ttype\n'
+    )
+    row = (
+        'MAFB\tENSG00000204103\tMAFB_1,MAFB_2\tchr20\t40688724\t40689213\t'
+        'ENSG00000000003\tTSPAN6\t-0.170553946585609\t0.152\t'
+        '0.856726931297333\tFALSE\tIndirect_targeting\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(row)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6376HTIF/',
+            label='genomic_element',
+            writer=writer,
+            validate=True
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    assert len(parsed) == 1
+    first_item = parsed[0]
+    assert first_item['source_annotation'] == 'promoter'
+    assert first_item['promoter_of'] == 'genes/ENSG00000204103'
+
+
 def test_igvf_e2g_crispr_adapter_tap_seq_direct_targeting_genomic_element(mock_file_fileset_perturb_seq, tmp_path):
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_tap_seq_direct_targeting.txt.gz'
     header = (
-        'intended_target_name\tguide_id(s)\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\ttype\tgene_id\t'
+        'intended_target_name\tguide_id(s)\ttargeting_chr\t'
+        'targeting_start\ttargeting_end\ttype\tgene_id\t'
         'gene_symbol\tsceptre_log2_fc\tsceptre_p_value\tsceptre_adj_p_value\t'
         'significant\tsample_term_name\tsample_term_id\tsample_summary_short\t'
         'power_at_effect_size_15\tnotes\n'
@@ -233,7 +272,7 @@ def test_igvf_e2g_crispr_adapter_tap_seq_direct_targeting_genomic_element(mock_f
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6600VCYY/',
             label='genomic_element',
             writer=writer,
             validate=True
@@ -251,8 +290,8 @@ def test_igvf_e2g_crispr_adapter_tap_seq_sceptre_fields_genomic_element_gene(moc
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_tap_seq_sceptre_metrics.txt.gz'
     header = (
-        'intended_target_name\tguide_id(s)\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\ttype\tgene_id\t'
+        'intended_target_name\tguide_id(s)\ttargeting_chr\t'
+        'targeting_start\ttargeting_end\ttype\tgene_id\t'
         'gene_symbol\tsceptre_log2_fc\tsceptre_p_value\tsceptre_adj_p_value\t'
         'significant\tsample_term_name\tsample_term_id\tsample_summary_short\t'
         'power_at_effect_size_15\tnotes\n'
@@ -274,7 +313,7 @@ def test_igvf_e2g_crispr_adapter_tap_seq_sceptre_fields_genomic_element_gene(moc
 
         adapter = IGVFE2GCRISPR(
             filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6600VCYY/',
             label='genomic_element_gene',
             writer=writer,
             validate=True
@@ -346,6 +385,56 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['files_filesets'] == 'files_filesets/IGVFFI9100GKNS'
 
 
+def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
+        mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_scaled_screen.txt.gz'
+    header = (
+        'guide_id\tspacer_g_start\tprotospacer\ttargeting\ttype\tguide_chr\t'
+        'guide_start\tguide_end\tstrand\tpam\tgenomic_element\t'
+        'intended_target_chr\tintended_target_start\tintended_target_end\t'
+        'response_id\thgnc_symbol\tn_nonzero_trt\tn_nonzero_cntrl\tpass_qc\t'
+        'p_value\tlog_2_fold_change\tfull_piggyflex_oligo\tputative_target_genes\t'
+        'putative_target_genes_hgnc\n'
+    )
+    rows = (
+        'guide-1\tG\tAAA\tTRUE\ttargeting\tchr10\t1\t20\t+\tNGG\tenhancer\t'
+        'chr10\t102117347\t102118205\tENSG00000171206\tTRIM8\t41\t91619\t'
+        'TRUE\t0.05\t-0.2\toligo\t["ENSG00000171206"]\t["TRIM8"]\n'
+        'guide-2\tG\tCCC\tTRUE\ttargeting\tchr10\t21\t40\t+\tNGG\tenhancer\t'
+        'chr10\t102117347\t102118205\tENSG00000171206\tTRIM8\t41\t91619\t'
+        'TRUE\t0.01\t-0.7\toligo\t["ENSG00000171206"]\t["TRIM8"]\n'
+        'guide-3\tG\tGGG\tTRUE\ttargeting\tchr10\t41\t60\t+\tNGG\tenhancer\t'
+        'chr10\t102117347\t102118205\tENSG00000171206\tTRIM8\t41\t91619\t'
+        'FALSE\t0.001\t-1.1\toligo\t["ENSG00000171206"]\t["TRIM8"]\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI4544JMWL/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    assert len(parsed) == 1
+    first_item = parsed[0]
+    assert first_item['_to'] == 'genes/ENSG00000171206'
+    assert first_item['p_value'] == 0.01
+    assert 'p_value_adj' not in first_item
+    assert first_item['log2FC'] == -0.7
+
+
 def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_tss(
         mock_file_fileset_perturb_seq, tmp_path):
     """IGVFFI5903QAWP (CRUDO): aggregated metrics only; skip negative_control; TSS -> hardcoded promoter."""
@@ -357,13 +446,13 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     )
     rows = (
         # negative_control — skipped entirely
-        'chr1:1-chr1:2\tnegative_control\t10\tnegative_control\tENSG00000000000\t'
+        'chr1:1-2\tnegative_control\t10\tnegative_control\tENSG00000000000\t'
         '0\t0.99\t0.5\t0.5\tFALSE\n'
         # putative enhancer
-        'chr22:36387779-chr22:36388133\tputative_enhancer\t10\tMYH9\tENSG00000100345\t'
+        'chr22:36387779-36388133\tputative_enhancer\t10\tMYH9\tENSG00000100345\t'
         '0.25\t0.1\t0.01\t0.02\tFALSE\n'
         # TSS — promoter from CRUDO_TSS_PROMOTER_GENE
-        'chr11:694042-chr11:694160\tCCND1_TSS\t10\tCCND1\tENSG00000110092\t'
+        'chr11:694042-694160\tCCND1_TSS\t10\tCCND1\tENSG00000110092\t'
         '-0.1\t0.2\t0.03\t0.04\tTRUE\n'
     )
     with gzip.open(test_file, 'wt') as out:
