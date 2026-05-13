@@ -7,7 +7,7 @@ import { paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat } from '../params'
-import { variantSearch } from '../nodes/variants'
+import { variantIDSearch } from '../nodes/variants'
 
 const MAX_PAGE_SIZE = 100
 
@@ -15,7 +15,8 @@ const variantReturnFormat = z.object({
   chr: z.string(),
   pos: z.number(),
   spdi: z.string().nullish(),
-  rsid: z.union([z.string(), z.array(z.string())]).nullish()
+  rsid: z.union([z.string(), z.array(z.string())]).nullish(),
+  ca_id: z.string().nullish()
 })
 
 const outputFormat = z.object({
@@ -42,7 +43,10 @@ const outputFormat = z.object({
   intron_chr: z.string().nullish(), // spliceQTL only
   intron_start: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
   intron_end: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
-  study: z.string().nullish(), // EBI eQTL and spliceQTL only
+  study: z.object({
+    id: z.string(),
+    pmid: z.string().nullish()
+  }).nullish(), // EBI eQTL and spliceQTL only
   files_filesets: z.string().nullish()
 })
 
@@ -114,7 +118,7 @@ function getFilterClauseAndBindVars (input: paramsFormatType): { filterClause: s
 function qtlReturnObject (geneExpr: string, genomicElementExpr: string): string {
   return `{
     _key: record._key,
-    variant: { chr: variant.chr, pos: variant.pos, spdi: variant.spdi, rsid: variant.rsid },
+    variant: { chr: variant.chr, pos: variant.pos, spdi: variant.spdi, rsid: variant.rsid, ca_id: variant.ca_id },
     gene: ${geneExpr},
     genomic_element: ${genomicElementExpr},
     source: record.source,
@@ -128,7 +132,9 @@ function qtlReturnObject (geneExpr: string, genomicElementExpr: string): string 
     intron_chr: record.intron_chr,
     intron_start: record.intron_start,
     intron_end: record.intron_end,
-    study: record.study,
+    study: HAS(record, 'study') && record.study != null
+      ? { id: DOCUMENT(record.study)._key, pmid: DOCUMENT(record.study).pmid }
+      : null,
     files_filesets: record.files_filesets
   }`
 }
@@ -267,8 +273,7 @@ async function qtlsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   delete input.ca_id
   delete input.region
   delete input.organism
-  const variants = await variantSearch(variantInput)
-  const variantIDs = variants.map(variant => `variants/${variant._id as string}`)
+  const variantIDs = await variantIDSearch(variantInput)
   if (variantIDs.length === 0) {
     return []
   }
@@ -326,6 +331,8 @@ async function qtlsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT @offset, @limit
     RETURN record
   `
+  console.log(query)
+  console.log(baseBindVars)
   return await (await db.query(query, baseBindVars)).all()
 }
 
