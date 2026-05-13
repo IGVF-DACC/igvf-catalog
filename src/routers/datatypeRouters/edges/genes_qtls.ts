@@ -46,7 +46,7 @@ const outputFormat = z.object({
   files_filesets: z.string().nullish()
 })
 
-const SOURCES = z.enum(['AFGRS', 'EBI', 'IGVF', 'ENCODE', 'UKB'])
+const SOURCES = z.enum(['AFGR', 'EBI', 'IGVF', 'ENCODE', 'UKB'])
 const METHODS = z.enum(['eQTL', 'pQTL', 'spliceQTL', 'caQTL'])
 
 const geneQuery = z.object({
