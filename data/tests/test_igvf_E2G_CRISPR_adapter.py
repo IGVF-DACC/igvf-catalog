@@ -96,6 +96,39 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['files_filesets'] == 'files_filesets/IGVFFI3069QCRA'
 
 
+def test_igvf_e2g_crispr_adapter_rejects_duplicate_element_gene_edges(
+        mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_duplicate_edges.txt.gz'
+    header = (
+        'p_val\tavg_log2FC\tpct.1\tpct.2\tp_val_adj\tguide_id\t'
+        'target_gene\tintended_target_name\tintended_target_chr\t'
+        'intended_target_start\tintended_target_end\n'
+    )
+    row = (
+        '0\t3.608562048\t0.918\t0.282\t0\tBATF3-2\t'
+        'ENSG00000123685\tENSG00000123685\tchr1\t212699339\t212700840\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(row)
+        out.write(row)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+
+        with pytest.raises(ValueError, match='Duplicate element_gene edge'):
+            adapter.process_file()
+
+
 def test_igvf_e2g_crispr_adapter_perturb_seq_enhancer_only_genomic_elements(mock_file_fileset_perturb_seq, tmp_path):
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_enhancer_only_perturb_seq.txt.gz'

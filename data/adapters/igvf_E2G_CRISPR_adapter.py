@@ -826,6 +826,17 @@ class IGVFE2GCRISPR(BaseAdapter):
             return True
         return candidate_p < current_p
 
+    def _check_unique_element_gene(
+        self,
+        element_gene_id: str,
+        seen_element_gene_ids: set,
+    ) -> None:
+        if element_gene_id in seen_element_gene_ids:
+            raise ValueError(
+                f'Duplicate element_gene edge in {self.file_accession}: {element_gene_id}'
+            )
+        seen_element_gene_ids.add(element_gene_id)
+
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
@@ -857,6 +868,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         is_scaled_screen = self.file_accession == 'IGVFFI4544JMWL'
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
+        seen_element_gene_ids = set()
         with gzip.open(self.filepath, 'rt') as data_file:
             reader = csv.reader(
                 data_file, delimiter=layout.get('delimiter', '\t'))
@@ -998,6 +1010,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                         if self._better_scaled_screen_hit(current, _props):
                             scaled_screen_best_edges[_id] = _props
                     else:
+                        self._check_unique_element_gene(
+                            _id, seen_element_gene_ids)
                         if self.validate:
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
@@ -1005,6 +1019,8 @@ class IGVFE2GCRISPR(BaseAdapter):
 
             if self.label == 'genomic_element_gene' and is_scaled_screen:
                 for _props in scaled_screen_best_edges.values():
+                    self._check_unique_element_gene(
+                        _props['_key'], seen_element_gene_ids)
                     if self.validate:
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
