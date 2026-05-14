@@ -67,7 +67,7 @@ class GenccDiseasesGenes(BaseAdapter):
                         'moi_id': moi_id,
                         'moi_name': moi_name,
                         'submitter': submitter,
-                        'pmid': pmids,
+                        'pmids': pmids,
                         'source': self.SOURCE,
                         'source_url': f'https://thegencc.org/submissions/{sgc_id}',
                     }

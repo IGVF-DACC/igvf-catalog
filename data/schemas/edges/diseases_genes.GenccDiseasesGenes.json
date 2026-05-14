@@ -125,7 +125,7 @@
         "University of Washington Center for Rare Disease Research (UW-CRDR)"
       ]
     },
-    "pmid": {
+    "pmids": {
       "type": "array",
       "description": "PMIDs parsed from submitted_as_pmids",
       "items": {
@@ -162,13 +162,13 @@
     "moi_id",
     "moi_name",
     "submitter",
-    "pmid",
+    "pmids",
     "source",
     "source_url"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmid, source, source_url"
+    "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmids, source, source_url"
   },
   "db_collection_name": "diseases_genes"
 }

@@ -49,7 +49,7 @@ def test_gencc_process_file_writes_edge(mock_gene_map):
     assert doc['moi_id'] == 'HP:0000006'
     assert doc['moi_name'] == 'Autosomal dominant'
     assert doc['submitter'] == 'Ambry Genetics'
-    assert doc['pmid'] == ['28106320', '12345678']
+    assert doc['pmids'] == ['28106320', '12345678']
     assert doc['source'] == GenccDiseasesGenes.SOURCE
     assert doc['source_url'] == 'https://thegencc.org/submissions/SGC-TEST001.1'
 
