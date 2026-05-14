@@ -2,36 +2,12 @@ import csv
 import gzip
 import json
 import re
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
-
-# Example rows from Gersbach's Perturb-seq data
-# p_val	avg_log2FC	pct.1	pct.2	p_val_adj	guide_id	target_gene	intended_target_name	intended_target_chr	intended_target_start	intended_target_end
-# 0	3.608562048	0.918	0.282	0	BATF3-2	ENSG00000123685	ENSG00000123685	chr1	212699339	212700840
-# 0	3.020205154	0.961	0.724	0	KLF2-11	ENSG00000132965	ENSG00000127528	chr19	16323826	16325327
-# 0	2.778382681	0.923	0.476	0	KLF2-11	ENSG00000113552	ENSG00000127528	chr19	16323826	16325327
-# 0	4.552805504	0.944	0.349	0	KLF2-11	ENSG00000137731	ENSG00000127528	chr19	16323826	16325327
-# 0	1.562300285	0.965	0.822	0	MYB-8	ENSG00000197971	ENSG00000118513	chr6	135180514	135182015
-
-# Example rows from Gersbach's CRISPR FACS data
-# FRACTEL_pval	FRACTEL_pval_fdr_corr	FRACTEL_effect_size	intended_target_name	intended_target_chr	intended_target_start	intended_target_end	readout_gene	readout_gene_symbol
-# 0.7264835	0.9994257067617868	0.2254047296279381	ENSG00000188290	chr1	998962	999432	ENSG00000168685	IL7R
-# 0.6353328	0.9994257067617868	0.4499883534060434	ENSG00000157933	chr1	2228695	2229735	ENSG00000168685	IL7R
-# 0.8264444	0.9994257067617868	0.2234036501031779	ENSG00000197921	chr1	2528745	2529749	ENSG00000168685	IL7R
-# 0.0375612	0.7776272999999999	-0.902286973451608	ENSG00000142611	chr1	3385152	3385286	ENSG00000168685	IL7R
-# 0.4863262	0.9994257067617868	0.4703859734914864	ENSG00000078900	chr1	3707549	3707791	ENSG00000168685	IL7R
-
-# Example rows from Quertermous's TAP-seq data
-# intended_target_name	guide_id(s)	targeting_chr	targeting_start	targeting_end	type	gene_id	gene_symbol	sceptre_log2_fc	sceptre_p_value	sceptre_adj_p_value	significant	sample_term_name	sample_term_idsample_summary_short	power_at_effect_size_15	notes
-# chr4:55181617-55182218	221204_EC_Enhancer_Screen_84, 221204_EC_Enhancer_Screen_85, 221204_EC_Enhancer_Screen_86, 221204_EC_Enhancer_Screen_87, 221204_EC_Enhancer_Screen_88, 221204_EC_Enhancer_Screen_89, 221204_EC_Enhancer_Screen_90, 221204_EC_Enhancer_Screen_91, 221204_EC_Enhancer_Screen_92, 221204_EC_Enhancer_Screen_93, 221204_EC_Enhancer_Screen_94, 221204_EC_Enhancer_Screen_95, 221204_EC_Enhancer_Screen_96, 221204_EC_Enhancer_Screen_97, 221204_EC_Enhancer_Screen_98	chr4	55181617	55182218	targeting	ENSG00000145681	HAPLN1	1.60726510888607	7.25503908439717e-29	3.51143891684823e-26	TRUE	wtc11_d4_ec	NA	ipsc_ec	NA	NA
-# chr4:55181617-55182218	221204_EC_Enhancer_Screen_84, 221204_EC_Enhancer_Screen_85, 221204_EC_Enhancer_Screen_86, 221204_EC_Enhancer_Screen_87, 221204_EC_Enhancer_Screen_88, 221204_EC_Enhancer_Screen_89, 221204_EC_Enhancer_Screen_90, 221204_EC_Enhancer_Screen_91, 221204_EC_Enhancer_Screen_92, 221204_EC_Enhancer_Screen_93, 221204_EC_Enhancer_Screen_94, 221204_EC_Enhancer_Screen_95, 221204_EC_Enhancer_Screen_96, 221204_EC_Enhancer_Screen_97, 221204_EC_Enhancer_Screen_98	chr4	55181617	55182218	targeting	ENSG00000128917	DLL4	-0.576747067613555	2.13033821184895e-25	5.15541847267446e-23	TRUE	wtc11_d4_ec	NA	ipsc_ec	NA	NA
-# chr4:55181617-55182218	221204_EC_Enhancer_Screen_84, 221204_EC_Enhancer_Screen_85, 221204_EC_Enhancer_Screen_86, 221204_EC_Enhancer_Screen_87, 221204_EC_Enhancer_Screen_88, 221204_EC_Enhancer_Screen_89, 221204_EC_Enhancer_Screen_90, 221204_EC_Enhancer_Screen_91, 221204_EC_Enhancer_Screen_92, 221204_EC_Enhancer_Screen_93, 221204_EC_Enhancer_Screen_94, 221204_EC_Enhancer_Screen_95, 221204_EC_Enhancer_Screen_96, 221204_EC_Enhancer_Screen_97, 221204_EC_Enhancer_Screen_98	chr4	55181617	55182218	targeting	ENSG00000261371	PECAM1	-0.520774246394608	2.01505844276112e-24	3.25096095432128e-22	TRUE	wtc11_d4_ec	NA	ipsc_ec	NA	NA
-# chr4:55181617-55182218	221204_EC_Enhancer_Screen_84, 221204_EC_Enhancer_Screen_85, 221204_EC_Enhancer_Screen_86, 221204_EC_Enhancer_Screen_87, 221204_EC_Enhancer_Screen_88, 221204_EC_Enhancer_Screen_89, 221204_EC_Enhancer_Screen_90, 221204_EC_Enhancer_Screen_91, 221204_EC_Enhancer_Screen_92, 221204_EC_Enhancer_Screen_93, 221204_EC_Enhancer_Screen_94, 221204_EC_Enhancer_Screen_95, 221204_EC_Enhancer_Screen_96, 221204_EC_Enhancer_Screen_97, 221204_EC_Enhancer_Screen_98	chr4	55181617	55182218	targeting	ENSG00000125534	PPDPF	0.481123964239175	8.25144540545184e-19	9.98424894059672e-17	TRUE	wtc11_d4_ec	NA	ipsc_ec	NA	NA
-# chr4:55181617-55182218	221204_EC_Enhancer_Screen_84, 221204_EC_Enhancer_Screen_85, 221204_EC_Enhancer_Screen_86, 221204_EC_Enhancer_Screen_87, 221204_EC_Enhancer_Screen_88, 221204_EC_Enhancer_Screen_89, 221204_EC_Enhancer_Screen_90, 221204_EC_Enhancer_Screen_91, 221204_EC_Enhancer_Screen_92, 221204_EC_Enhancer_Screen_93, 221204_EC_Enhancer_Screen_94, 221204_EC_Enhancer_Screen_95, 221204_EC_Enhancer_Screen_96, 221204_EC_Enhancer_Screen_97, 221204_EC_Enhancer_Screen_98	chr4	55181617	55182218	targeting	ENSG00000179776	CDH5	-0.365934663367468	1.05516601247984e-18	1.02140070008049e-16	TRUE	wtc11_d4_ec	NA	ipsc_ec	NA	NA
 
 # CRUDO TAP-seq (IGVFFI5903QAWP): TSS rows do not carry promoter Ensembl IDs
 # directly, so map the row type to the promoter gene here.
@@ -41,6 +17,11 @@ CRUDO_TSS_PROMOTER_GENE = {
     'SSFA2_TSS': 'ENSG00000138434',
     'FAM3C_TSS': 'ENSG00000196937',
     'MYC_TSS': 'ENSG00000136997',
+}
+
+CRUDO_SOURCE_ANNOTATION = {
+    'putative_enhancer': 'enhancer',
+    **{row_type: 'promoter' for row_type in CRUDO_TSS_PROMOTER_GENE},
 }
 
 
@@ -55,7 +36,7 @@ CRISPR_E2G_LAYOUTS = {
             'intended_target_chr', 'intended_target_start', 'intended_target_end',
         ),
         'semantic_columns': {
-            'intended_target_gene': 'intended_target_name',
+            'target_gene': 'intended_target_name',
             'readout_gene': 'target_gene',
             'element_coordinates': (
                 'intended_target_chr', 'intended_target_start', 'intended_target_end',
@@ -71,7 +52,7 @@ CRISPR_E2G_LAYOUTS = {
             'sceptre_adj_p_value', 'significant', 'type',
         ),
         'semantic_columns': {
-            'intended_target_gene': 'Intended_target_gene_id',
+            'target_gene': 'Intended_target_gene_id',
             'intended_target_label': 'intended_target_name',
             'readout_gene': 'gene_id',
             'element_coordinates': ('targeting_chr', 'targeting_start', 'targeting_end'),
@@ -92,8 +73,9 @@ CRISPR_E2G_LAYOUTS = {
             'putative_target_genes_hgnc',
         ),
         'semantic_columns': {
-            'intended_target_gene': 'putative_target_genes',
+            'target_gene': 'putative_target_genes',
             'readout_gene': 'response_id',
+            'source_annotation': 'genomic_element',
             'element_coordinates': (
                 'intended_target_chr', 'intended_target_start', 'intended_target_end',
             ),
@@ -105,16 +87,17 @@ CRISPR_E2G_LAYOUTS = {
         'delimiter': ',',
         'columns': (
             'idx', 'gene_names', 'gene_name_ensembl', 'chromosome',
-            'pos', 'strand', 'color_idx', 'chr_idx', 'region',
+            'pos', 'strand', 'color_idx', 'chr_idx', 'genomic_element', 'region',
             'intended_target_name', 'intended_target_name_ensmbl', 'num_cell',
             'bin', 'log(pval)-hypergeom', 'fc', 'Significance_score',
             'fc_by_rand_dist_cpm', 'pval-empirical', 'cpm_perturb', 'cpm_bg',
             'log2fc',
         ),
         'semantic_columns': {
-            'intended_target_gene': 'intended_target_name_ensmbl',
+            'target_gene': 'intended_target_name_ensmbl',
             'intended_target_label': 'intended_target_name',
             'readout_gene': 'gene_name_ensembl',
+            'source_annotation': 'genomic_element',
             'element_coordinates': 'region',
             'metrics': (
                 'pval-empirical', 'fc', 'log2fc', 'log(pval)-hypergeom',
@@ -130,7 +113,6 @@ CRISPR_E2G_LAYOUTS = {
             'intended_target_chr', 'intended_target_start', 'intended_target_end',
         ),
         'semantic_columns': {
-            'intended_target_element': 'intended_target_name',
             'readout_gene': 'ensembl_id',
             'element_coordinates': ('intended_target_chr', 'intended_target_start', 'intended_target_end'),
             'metrics': ('p_val', 'p_val_adj', 'avg_log2FC', 'pct.1', 'pct.2'),
@@ -145,7 +127,6 @@ CRISPR_E2G_LAYOUTS = {
             'sample_summary_short', 'power_at_effect_size_15', 'notes',
         ),
         'semantic_columns': {
-            'intended_target_element': 'intended_target_name',
             'readout_gene': 'gene_id',
             'element_coordinates': ('targeting_chr', 'targeting_start', 'targeting_end'),
             'metrics': (
@@ -163,7 +144,6 @@ CRISPR_E2G_LAYOUTS = {
             'sample_summary_short', 'power_at_effect_size_XX', 'notes',
         ),
         'semantic_columns': {
-            'intended_target_element': 'intended_target_name',
             'readout_gene': 'gene_id',
             'element_coordinates': ('targeting_chr', 'targeting_start', 'targeting_end'),
             'metrics': (
@@ -184,9 +164,10 @@ CRISPR_E2G_LAYOUTS = {
             'Significant',
         ),
         'semantic_columns': {
-            'intended_target_element': 'name_hg38',
             'promoter_gene_map': CRUDO_TSS_PROMOTER_GENE,
             'readout_gene': 'TargetGeneID',
+            'source_annotation': 'type',
+            'source_annotation_map': CRUDO_SOURCE_ANNOTATION,
             'element_coordinates': 'name_hg38',
             'metrics': (
                 'pval.EnhancerEffect.noAux', 'EnhancerEff.pval',
@@ -202,7 +183,7 @@ CRISPR_E2G_LAYOUTS = {
             'intended_target_end', 'readout_gene', 'readout_gene_symbol',
         ),
         'semantic_columns': {
-            'intended_target_gene': 'intended_target_name',
+            'target_gene': 'intended_target_name',
             'readout_gene': 'readout_gene',
             'element_coordinates': (
                 'intended_target_chr', 'intended_target_start', 'intended_target_end',
@@ -215,9 +196,9 @@ CRISPR_E2G_LAYOUTS = {
 }
 
 
-# Per-file parser expectations. When both promoter and enhancer are listed, the
-# current per-row rule is valid ENSG intended target -> promoter, otherwise
-# enhancer. crispr_modality is still emitted from files_filesets;
+# Per-file parser expectations. Mixed promoter/enhancer layouts should declare
+# a source_annotation column, with source_annotation_map when file-native values
+# need normalization. crispr_modality is still emitted from files_filesets;
 # expected_crispr_modality is a drift check against released IGVF metadata.
 # title is an unused shorthand name for the dataset.
 CRISPR_E2G_FILE_CONFIG = {
@@ -257,6 +238,12 @@ CRISPR_E2G_FILE_CONFIG = {
         'layout': 'wtc11_cm_tf_perturb_seq',
         'expected_crispr_modality': 'interference',
     },
+    'IGVFFI5903QAWP': {
+        'title': 'CRUDO TAP-seq',
+        'targeted_element_types': ['promoter', 'enhancer'],
+        'layout': 'crudo_tap_seq',
+        'expected_crispr_modality': 'interference',
+    },
     'IGVFFI6296RCJK': {
         'title': 'Mechanoenhancer Perturb-seq',
         'targeted_element_types': ['enhancer'],
@@ -291,12 +278,6 @@ CRISPR_E2G_FILE_CONFIG = {
         'title': 'HCASMC DC-TAP-seq',
         'targeted_element_types': ['enhancer'],
         'layout': 'tap_seq_sceptre_power_xx',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI5903QAWP': {
-        'title': 'CRUDO TAP-seq',
-        'targeted_element_types': ['promoter', 'enhancer'],
-        'layout': 'crudo_tap_seq',
         'expected_crispr_modality': 'interference',
     },
     'IGVFFI9100GKNS': {
@@ -334,7 +315,8 @@ _HG38_INTERVAL_RE = re.compile(
 # I keys that map row columns but are not numeric edge metrics.
 _IGVF_E2G_LAYOUT_KEYS = frozenset({
     'readout_gene', 'promoter_gene', 'chr', 'start', 'end',
-    'name_hg38', 'element_type', 'promoter_gene_map',
+    'name_hg38', 'element_type', 'promoter_gene_map', 'source_annotation',
+    'source_annotation_map',
 })
 
 
@@ -495,6 +477,57 @@ class IGVFE2GCRISPR(BaseAdapter):
                 return None
         return (promoter_gene, source_annotation)
 
+    def _source_annotation_column_promoter_gene_and_source_annotation(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        intended_target_name: str,
+        intended_target_gene_raw: str,
+    ) -> Optional[Tuple[Optional[str], str]]:
+        source_idx = colmap.get('source_annotation')
+        if source_idx is None or source_idx >= len(row):
+            self.logger.warning(
+                'Skipping row in %s: missing source annotation column.',
+                self.file_accession,
+            )
+            return None
+        source_annotation_raw = row[source_idx].strip()
+        source_annotation_map = colmap.get('source_annotation_map') or {}
+        if source_annotation_map:
+            source_annotation = source_annotation_map.get(
+                source_annotation_raw,
+                source_annotation_map.get(source_annotation_raw.lower()),
+            )
+        else:
+            source_annotation = source_annotation_raw.lower()
+        if source_annotation == 'enhancer':
+            return None, 'enhancer'
+        if source_annotation != 'promoter':
+            self.logger.warning(
+                'Skipping row in %s: unsupported source annotation value %r.',
+                self.file_accession,
+                source_annotation_raw,
+            )
+            return None
+        if not isinstance(intended_target_name, str) or not re.match(
+            r'^ENSG[0-9]{11}(?:_PAR_Y)?$', intended_target_name
+        ):
+            self.logger.warning(
+                'Skipping promoter row in %s: target gene "%s" is not a valid '
+                'Ensembl gene id pattern.',
+                self.file_accession,
+                intended_target_gene_raw,
+            )
+            return None
+        if not self.gene_validator.validate(intended_target_name):
+            self.logger.warning(
+                'Skipping promoter row in %s: target gene "%s" is not valid.',
+                self.file_accession,
+                intended_target_name,
+            )
+            return None
+        return intended_target_name, 'promoter'
+
     @staticmethod
     def _parse_element_coordinates_hg38(name_hg38: str) -> Tuple[str, str, str]:
         s = (name_hg38 or '').strip()
@@ -546,14 +579,8 @@ class IGVFE2GCRISPR(BaseAdapter):
         c_raw, s_raw, e_raw = row[ci].strip(), row[si].strip(), row[ei].strip()
         if not (c_raw and s_raw and e_raw):
             return None
-        if pi is None or pi >= len(row):
-            self.logger.warning(
-                'Skipping row in %s: explicit coordinates require '
-                'intended_target_name column.',
-                self.file_accession,
-            )
-            return None
-        return (c_raw, s_raw, e_raw, row[pi])
+        gene_raw = row[pi] if pi is not None and pi < len(row) else ''
+        return (c_raw, s_raw, e_raw, gene_raw)
 
     def _resolve_name_hg38_interval(
         self,
@@ -620,13 +647,15 @@ class IGVFE2GCRISPR(BaseAdapter):
                 name_to_idx, semantic_columns.get('readout_gene')),
             'promoter_gene': self._pick_column(
                 name_to_idx,
-                semantic_columns.get('intended_target_gene'),
-                semantic_columns.get('intended_target_element'),
+                semantic_columns.get('target_gene'),
             ),
             'significant': None,
             'name_hg38': None,
             'element_type': self._pick_column(name_to_idx, 'type'),
             'promoter_gene_map': semantic_columns.get('promoter_gene_map'),
+            'source_annotation': self._pick_column(
+                name_to_idx, semantic_columns.get('source_annotation')),
+            'source_annotation_map': semantic_columns.get('source_annotation_map'),
             'chr': None,
             'start': None,
             'end': None,
@@ -642,16 +671,9 @@ class IGVFE2GCRISPR(BaseAdapter):
         else:
             colmap['name_hg38'] = self._pick_column(
                 name_to_idx, element_coordinates)
-        promoter_gene_candidates = (
-            semantic_columns.get('intended_target_gene'),)
-        if isinstance(element_coordinates, (tuple, list)):
-            promoter_gene_candidates = (
-                semantic_columns.get('intended_target_gene'),
-                semantic_columns.get('intended_target_element'),
-            )
         colmap['promoter_gene'] = self._pick_column(
             name_to_idx,
-            *promoter_gene_candidates,
+            semantic_columns.get('target_gene'),
         )
         for metric_column in semantic_columns.get('metrics', ()):
             metric_key = _IGVF_E2G_METRIC_COLUMN_TO_KEY.get(metric_column)
@@ -703,6 +725,91 @@ class IGVFE2GCRISPR(BaseAdapter):
             )
             return False
         return self._parse_bool(row[pass_qc_idx]) is True
+
+    def _scaled_screen_has_targeted_element(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+    ) -> bool:
+        type_idx = colmap.get('element_type')
+        if type_idx is not None and type_idx < len(row):
+            if row[type_idx].strip().lower() == 'non-targeting':
+                return False
+        for col_name in ('chr', 'start', 'end'):
+            col_idx = colmap.get(col_name)
+            if col_idx is None or col_idx >= len(row):
+                return False
+            value = row[col_idx].strip()
+            if not value or value.lower() in {'nan', 'na', 'none'}:
+                return False
+        return True
+
+    def _scaled_screen_row_should_load(
+        self,
+        row: list,
+        name_to_idx: Dict[str, int],
+        colmap: Dict[str, Optional[int]],
+    ) -> bool:
+        return (
+            self._scaled_screen_passes_qc(row, name_to_idx)
+            and self._scaled_screen_has_targeted_element(row, colmap)
+        )
+
+    @staticmethod
+    def _scaled_screen_target_genes(value: str) -> List[str]:
+        cell = (value or '').strip()
+        if not cell:
+            return []
+        try:
+            parsed = json.loads(cell)
+            if isinstance(parsed, str):
+                return [parsed]
+            if isinstance(parsed, list):
+                return [str(item) for item in parsed]
+        except json.JSONDecodeError:
+            pass
+        return re.findall(r'ENSG[0-9]{11}(?:_PAR_Y)?(?:\.[0-9]+)?', cell)
+
+    def _scaled_screen_promoter_gene_and_source_annotation(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        target_gene_raw: str,
+    ) -> Optional[Tuple[Optional[str], str]]:
+        source_idx = colmap.get('source_annotation')
+        if source_idx is None or source_idx >= len(row):
+            self.logger.warning(
+                'Skipping row in %s: missing genomic_element column for scaled screen.',
+                self.file_accession,
+            )
+            return None
+        source_annotation = row[source_idx].strip().lower()
+        if source_annotation == 'enhancer':
+            return None, 'enhancer'
+        if source_annotation != 'promoter':
+            self.logger.warning(
+                'Skipping row in %s: unsupported genomic_element value %r.',
+                self.file_accession,
+                row[source_idx],
+            )
+            return None
+
+        target_genes = self._scaled_screen_target_genes(target_gene_raw)
+        if not target_genes:
+            self.logger.warning(
+                'Skipping promoter row in %s: missing target gene in putative_target_genes.',
+                self.file_accession,
+            )
+            return None
+        promoter_gene = self._normalize_ensembl_gene_id(target_genes[0])
+        if not self.gene_validator.validate(promoter_gene):
+            self.logger.warning(
+                'Skipping promoter row in %s: target gene "%s" is not valid.',
+                self.file_accession,
+                target_genes[0],
+            )
+            return None
+        return promoter_gene, 'promoter'
 
     @staticmethod
     def _better_scaled_screen_hit(
@@ -776,8 +883,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             for row in reader:
                 if not row:
                     continue
-                if is_scaled_screen and not self._scaled_screen_passes_qc(
-                        row, name_to_idx):
+                if is_scaled_screen and not self._scaled_screen_row_should_load(
+                        row, name_to_idx, colmap):
                     continue
 
                 if method == 'Perturb-seq':
@@ -819,11 +926,25 @@ class IGVFE2GCRISPR(BaseAdapter):
                         readout_gene,
                     )
                     continue
-                resolved = self._promoter_gene_and_source_annotation(
-                    targeted_element_types,
-                    intended_target_name,
-                    intended_target_gene_raw,
-                )
+                if is_scaled_screen:
+                    resolved = self._scaled_screen_promoter_gene_and_source_annotation(
+                        row,
+                        colmap,
+                        intended_target_gene_raw,
+                    )
+                elif colmap.get('source_annotation') is not None:
+                    resolved = self._source_annotation_column_promoter_gene_and_source_annotation(
+                        row,
+                        colmap,
+                        intended_target_name,
+                        intended_target_gene_raw,
+                    )
+                else:
+                    resolved = self._promoter_gene_and_source_annotation(
+                        targeted_element_types,
+                        intended_target_name,
+                        intended_target_gene_raw,
+                    )
                 if resolved is None:
                     continue
                 promoter_gene, source_annotation = resolved

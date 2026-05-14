@@ -407,6 +407,12 @@ def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
         'guide-3\tG\tGGG\tTRUE\ttargeting\tchr10\t41\t60\t+\tNGG\tenhancer\t'
         'chr10\t102117347\t102118205\tENSG00000171206\tTRIM8\t41\t91619\t'
         'FALSE\t0.001\t-1.1\toligo\t["ENSG00000171206"]\t["TRIM8"]\n'
+        'guide-4\tG\tTTT\tTRUE\ttargeting\tchr10\t61\t80\t+\tNGG\tpromoter\t'
+        'NaN\tNaN\tNaN\tENSG00000171206\tTRIM8\t41\t91619\t'
+        'TRUE\t0.0005\t-1.3\toligo\t["ENSG00000171206"]\t["TRIM8"]\n'
+        'guide-5\tG\tTTA\tFALSE\tnon-targeting\tchr10\t81\t100\t+\tNGG\t'
+        'non-targeting\tchr10\t102117347\t102118205\tENSG00000171206\tTRIM8\t'
+        '41\t91619\tTRUE\t0.0001\t-1.5\toligo\t[]\t[]\n'
     )
     with gzip.open(test_file, 'wt') as out:
         out.write(header)
@@ -433,6 +439,100 @@ def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
     assert first_item['p_value'] == 0.01
     assert 'p_value_adj' not in first_item
     assert first_item['log2FC'] == -0.7
+
+
+def test_igvf_e2g_scaled_screen_uses_genomic_element_for_source_annotation(
+        mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_scaled_screen_elements.txt.gz'
+    header = (
+        'guide_id\tspacer_g_start\tprotospacer\ttargeting\ttype\tguide_chr\t'
+        'guide_start\tguide_end\tstrand\tpam\tgenomic_element\t'
+        'intended_target_chr\tintended_target_start\tintended_target_end\t'
+        'response_id\thgnc_symbol\tn_nonzero_trt\tn_nonzero_cntrl\tpass_qc\t'
+        'p_value\tlog_2_fold_change\tfull_piggyflex_oligo\tputative_target_genes\t'
+        'putative_target_genes_hgnc\n'
+    )
+    rows = (
+        'enh-guide\tG\tAAA\tTRUE\ttargeting\tchr10\t1\t20\t+\tNGG\tenhancer\t'
+        'chr10\t102117347\t102118205\tENSG00000171206\tTRIM8\t41\t91619\t'
+        'TRUE\t0.01\t-0.7\toligo\t["ENSG00000171206"]\t["TRIM8"]\n'
+        'prom-guide\tG\tCCC\tTRUE\ttargeting\tchr9\t21\t40\t+\tNGG\tpromoter\t'
+        'chr9\t130834753\t130835253\tENSG00000097007\tABL1\t41\t91619\t'
+        'TRUE\t0.02\t-0.4\toligo\t"ENSG00000097007"\t["ABL1"]\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI4544JMWL/',
+            label='genomic_element',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    enhancer = next(item for item in parsed if item['chr'] == 'chr10')
+    promoter = next(item for item in parsed if item['chr'] == 'chr9')
+    assert enhancer['source_annotation'] == 'enhancer'
+    assert 'promoter_of' not in enhancer
+    assert promoter['source_annotation'] == 'promoter'
+    assert promoter['promoter_of'] == 'genes/ENSG00000097007'
+
+
+def test_igvf_e2g_wtc11_uses_genomic_element_for_source_annotation(
+        mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_wtc11.csv.gz'
+    header = (
+        'idx,gene_names,gene_name_ensembl,chromosome,pos,strand,color_idx,chr_idx,'
+        'genomic_element,region,intended_target_name,intended_target_name_ensmbl,'
+        'num_cell,bin,log(pval)-hypergeom,fc,Significance_score,'
+        'fc_by_rand_dist_cpm,pval-empirical,cpm_perturb,cpm_bg,log2fc\n'
+    )
+    rows = (
+        '34767,IGFBP6,ENSG00000167779,chr12,1996865109,+,1,11,'
+        'promoter,chr10:133238114-133238378,VENTX,ENSG00000151650,741,750,'
+        '-11.04346999,1.39047496,-10.84371703,1.386921525,0,85.3643997,'
+        '61.54676304,0.4755777642\n'
+        '28347,VIM,ENSG00000026025,chr10,1692111888,+,1,9,'
+        'enhancer,chr1:248558995-248559995,,,627,750,-13.6796195,'
+        '0.7971788932,-15.06310882,0.797804645,0,986.8602186,'
+        '1236.972292,-0.3270245822\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0830FXFI/',
+            label='genomic_element',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    promoter = next(item for item in parsed if item['chr'] == 'chr10')
+    enhancer = next(item for item in parsed if item['chr'] == 'chr1')
+    assert promoter['source_annotation'] == 'promoter'
+    assert promoter['promoter_of'] == 'genes/ENSG00000151650'
+    assert enhancer['source_annotation'] == 'enhancer'
+    assert 'promoter_of' not in enhancer
 
 
 def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_tss(
