@@ -130,7 +130,7 @@ class TLandVariantsBiosamples(BaseAdapter):
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:
-            spdi = self.sanitize_spdi(row[2])
+            spdi = row[2]
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
