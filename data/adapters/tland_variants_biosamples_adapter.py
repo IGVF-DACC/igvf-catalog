@@ -80,18 +80,21 @@ class TLandVariantsBiosamples(BaseAdapter):
 
         self.writer.close()
 
+    def sanitize_spdi(self, spdi_row):
+        return spdi_row.replace(':-:', '::')
+
     def process_variant_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
-            [row[2] for row in chunk])
+            [self.sanitize_spdi(row[2]) for row in chunk])
         skipped_spdis = []
 
         unloaded_chunk = []
         for row in chunk:
-            if row[2] not in loaded_spdis:
+            if self.sanitize_spdi(row[2]) not in loaded_spdis:
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:
-            spdi = row[2]
+            spdi = self.sanitize_spdi(row[2])
             variant, skipped_message = load_variant(spdi)
             if variant:
                 variant.update({
@@ -119,15 +122,15 @@ class TLandVariantsBiosamples(BaseAdapter):
 
     def process_edge_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
-            [row[2] for row in chunk])
+            [self.sanitize_spdi(row[2]) for row in chunk])
 
         unloaded_chunk = []
         for row in chunk:
-            if row[2] in loaded_spdis:
+            if self.sanitize_spdi(row[2]) in loaded_spdis:
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:
-            spdi = row[2]
+            spdi = self.sanitize_spdi(row[2])
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
