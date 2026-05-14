@@ -92,7 +92,8 @@ const geneCollectionName = geneSchema.db_collection_name as string
 const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
 
 const apiKeyToDbFieldMap = {
-  neg_log10_pvalue: 'log10pvalue'
+  log10pvalue: 'neg_log10_pvalue',
+  p_nominal_nlog10: 'neg_log10_pvalue'
 }
 
 function raiseInvalidParameters (param: string): void {
@@ -279,8 +280,9 @@ const buildVariantsGenesQuery = ({
       } : {}
     )
   `
-
 const executeVariantsGenesQuery = async (query: string, bindVars?: Record<string, unknown>): Promise<any[]> => {
+  console.log(query)
+  console.log(bindVars)
   const cursor = bindVars ? await db.query(query, bindVars) : await db.query(query)
   return await cursor.all()
 }
