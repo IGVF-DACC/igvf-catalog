@@ -29,6 +29,8 @@ igvf donor:
     --replace
 
 igvf_file_accessions:
+  TLand:
+    - IGVFFI9483AUPF
   BlueSTARR:
     - IGVFFI1663LKVQ
     - IGVFFI5288RAAV
