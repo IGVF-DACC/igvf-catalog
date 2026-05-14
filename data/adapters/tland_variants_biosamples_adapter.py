@@ -60,15 +60,11 @@ class TLandVariantsBiosamples(BaseAdapter):
 
             # #score_threshold:0.7
             self.score_threshold = float(next(reader)[0].split(':')[1])
-
-            # header is split by spaces of random sizes
-            header = next(reader)[0].split(' ')
-            self.header = [h.strip() for h in header if h.strip()]
+            self.header = next(reader)
 
             chunk = []
             for i, row in enumerate(reader, 1):
-                split_row = row[0].split(' ')
-                chunk.append([r.strip() for r in split_row if r.strip()])
+                chunk.append(row)
                 if i % chunk_size == 0:
                     if self.label == 'variant':
                         self.process_variant_chunk(chunk)
