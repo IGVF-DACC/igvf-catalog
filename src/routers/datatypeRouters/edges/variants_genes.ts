@@ -281,8 +281,6 @@ const buildVariantsGenesQuery = ({
     )
   `
 const executeVariantsGenesQuery = async (query: string, bindVars?: Record<string, unknown>): Promise<any[]> => {
-  console.log(query)
-  console.log(bindVars)
   const cursor = bindVars ? await db.query(query, bindVars) : await db.query(query)
   return await cursor.all()
 }

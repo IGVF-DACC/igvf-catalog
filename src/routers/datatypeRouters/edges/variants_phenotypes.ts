@@ -40,7 +40,7 @@ const gwasVariantPhenotypeFormat = z.object({
   phenotype_id: z.string().nullable(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
-  neg_log10_pvalue: z.number().nullable(),
+  neg_log10_pvalue: z.number().nullish(),
   p_val: z.number().nullable(),
   beta: z.number().nullable(),
   beta_ci_lower: z.number().nullable(),
@@ -85,6 +85,10 @@ const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
 const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.GWAS.json')
 const variantsPhenotypeNonGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.cV2F.json')
+
+const apiKeyToDbFieldMap = {
+  log10pvalue: 'neg_log10_pvalue'
+}
 
 function valueValidation (input: paramsFormatType): void {
   if (input.neg_log10_pvalue !== undefined) {
@@ -282,9 +286,9 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
         (record.source == 'OpenTargets' ? {
           study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
-          ${getDBReturnStatements(variantPhenotypeGwasSchema).replaceAll('record', 'record')}
+          ${getDBReturnStatements(variantPhenotypeGwasSchema, true, '', [], true, apiKeyToDbFieldMap)}
         } : {
-          ${getDBReturnStatements(variantsPhenotypeNonGwasSchema).replaceAll('record', 'record')},
+          ${getDBReturnStatements(variantsPhenotypeNonGwasSchema)},
           phenotype_term: DOCUMENT(record._to).name
         })
     )

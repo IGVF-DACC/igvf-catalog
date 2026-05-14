@@ -475,11 +475,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
-  Example: variant_id = NC_000005.10:1779621:C:G, <br> \
-  spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, <br> \
-  rsid = rs1735214522, <br> \
-  ca_id = CA1522823495, <br> \
+  Example: variant_id = NC_000001.11:903006:T:C, <br> \
+  spdi = NC_000001.11:903006:T:C,<br> \
+  hgvs = NC_000001.11:g.903007T>C, <br> \
+  rsid = rs4970384, <br> \
+  ca_id = CA10711131, <br> \
   region = chr5:1779619-1779629, <br> \
   biosample_term = EFO_0002067, <br> \
   biological_context = K562, <br> \
@@ -489,7 +489,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
-  Example: region = chr5:1779339-1779683, <br> \
+  Example: region = chr1:906596-906696, <br> \
   type = candidate cis regulatory element, <br> \
   biosample_term = EFO_0002067, <br> \
   biological_context = K562, <br> \

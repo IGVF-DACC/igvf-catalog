@@ -97,7 +97,7 @@ const sequenceVariantRelatedFormat = z.object({
 })
 
 const apiKeyToDbFieldMap = {
-  neg_log10_pvalue: 'log10pvalue'
+  log10pvalue: 'neg_log10_pvalue'
 }
 
 async function geneIds (id: string): Promise<any[]> {

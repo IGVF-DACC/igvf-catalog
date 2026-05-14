@@ -81,7 +81,7 @@ const outputFormat = z.object({
 })
 
 const apiKeyToDbFieldMap = {
-  neg_log10_pvalue: 'log10pvalue'
+  log10pvalue: 'neg_log10_pvalue'
 }
 
 const ADASTRA_SCORE_EXPR = `(
