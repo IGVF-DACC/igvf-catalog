@@ -743,18 +743,10 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
-  genes_qtls: 'Retrieve QTLs from genes.<br> \
+  qtls: 'Retrieve QTLs from gene, variant, or region. <br> \
   Example: gene_id = ENSG00000259943 <br> \
   gene_name = ZMPSTE24-DT <br> \
-  region = chr1:40256332-40256340 <br> \
-  method = eQTL <br> \
-  biological_context = CD4+ TCM cell <br> \
-  source = EBI <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
-
-  variants_qtls: 'Retrieve QTLs from variants.<br> \
-  Example: variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
+  variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
   spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
   rsid = rs79070333 <br> \
   ca_id = CA21017128 <br> \
