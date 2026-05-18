@@ -7,6 +7,7 @@ import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getEnumValuesOrThrow, getSchema } from '../schema'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 250
 const proteinProteinSchemaFile = 'data/schemas/edges/proteins_proteins.ProteinsInteraction.json'
@@ -50,7 +51,22 @@ const proteinsProteinsFormat = z.object({
   name: z.string()
 })
 
+function validateInput (input: paramsFormatType): void {
+  const validKeys = ['protein_id', 'protein_name', 'uniprot_name', 'uniprot_id', 'uniprot_full_name', 'dbxrefs', 'pmid'] as const
+
+  const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
+
+  if (definedKeysCount < 1) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one protein param is required.'
+    })
+  }
+}
+
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -134,6 +150,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         'name': record.name
       }
     `
+
   let result = []
   if (hasProteinQuery) {
     result = await (await db.query(query, { proteinIds })).all()

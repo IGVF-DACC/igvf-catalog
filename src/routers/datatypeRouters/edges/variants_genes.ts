@@ -99,10 +99,6 @@ function raiseInvalidParameters (param: string): void {
 }
 
 export async function qtlSummary (input: paramsFormatType): Promise<any> {
-  const page = input.page as number || 0
-  delete input.page
-  delete input.organism
-
   let idxHint = ''
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
@@ -124,7 +120,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     variantClause = `record._from == 'variants/${variant[0]._id as string}'`
   } else if (filesetFilter === '') {
     throw new TRPCError({
-      code: 'NOT_FOUND',
+      code: 'BAD_REQUEST',
       message: 'At least one parameter must be defined.'
     })
   }
@@ -132,7 +128,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   const searchClause = [variantClause, filesetFilter].filter(clause => clause !== '').join(' AND ')
   if (searchClause === '') {
     throw new TRPCError({
-      code: 'NOT_FOUND',
+      code: 'BAD_REQUEST',
       message: 'At least one parameter must be defined.'
     })
   }
@@ -151,7 +147,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     FOR record IN variants_genes ${idxHint}
     FILTER ${searchClause}
     SORT record._key
-    LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+    LIMIT ${(input.page as number || 0) * QUERY_LIMIT}, ${QUERY_LIMIT}
     RETURN {
       '_id': record._id,
       qtl_type: record.label,

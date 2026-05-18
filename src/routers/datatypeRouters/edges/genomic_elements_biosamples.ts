@@ -104,7 +104,7 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
 
     if (filesetFilter === '' && methodFilter === '' && sourceInputFilter === '') {
       throw new TRPCError({
-        code: 'NOT_FOUND',
+        code: 'BAD_REQUEST',
         message: 'At least one parameter must be defined.'
       })
     }

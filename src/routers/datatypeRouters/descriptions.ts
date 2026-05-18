@@ -15,7 +15,7 @@ export const descriptions = {
   gene_name = PERM1, <br> \
   hgnc_id = HGNC:28208, <br> \
   alias = CKLF, <br> \
-  method = TAP-seq, <br> \
+  method = CRISPR screen, <br> \
   files_fileset = ENCFF968BZL. <br> \
   Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
@@ -192,6 +192,7 @@ export const descriptions = {
    Region limit: 1kb pairs.',
 
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
+  Source is required. <br> \
    Example: region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
    source = bravo_af, <br> \
    GENCODE_category = coding (or noncoding), <br> \
@@ -257,7 +258,7 @@ export const descriptions = {
     biological_context = lymphoblastoid cell line, <br> \
     method = Variant-EFFECTS, <br> \
     files_fileset = IGVFFI9602ILPC, <br> \
-    name = modulates expression of. <br> \
+    name = expression modulated by. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
@@ -432,7 +433,7 @@ export const descriptions = {
   source = IGVF, <br> \
   method = SEMVAR, <br> \
   files_filesets = IGVFFI6044LKYT, <br> \
-  name = modulates binding of,<br> \
+  name = binding modulated by.<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
