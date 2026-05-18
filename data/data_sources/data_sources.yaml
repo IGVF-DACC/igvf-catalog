@@ -1616,6 +1616,15 @@ disease to gene:
     - https://api.data.igvf.org/reference-files/IGVFFI4540ZCXZ/@@download/IGVFFI4540ZCXZ.xml.gz # en_product6.xml.gz
   source: Orphanet
 
+# Example: python3 data_parser.py --adapter gencc_disease_gene --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8022JGUK.tsv --output-bucket-key diseases_genes/diseases_genes_IGVFFI8022JGUK.jsonl
+gencc disease to gene:
+  collection: diseases_genes
+  pypy3: true
+  command: python3 data_parser.py --adapter gencc_disease_gene --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key diseases_genes/diseases_genes_IGVFFI8022JGUK.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8022JGUK/@@download/IGVFFI8022JGUK.tsv.gz # gencc-submissions.tsv.gz
+  source: GenCC
+
 # Example: python3 data_parser.py --adapter variant_disease --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5852GYTT.csv --output-bucket-key variants_diseases/variants_diseases_IGVFFI5852GYTT.jsonl --label variant_disease
 variant to disease:
   collection: variants_diseases

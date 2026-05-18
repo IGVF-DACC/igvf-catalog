@@ -789,3 +789,21 @@ def get_file_fileset_by_accession_in_arangodb(accession):
     db = ArangoDB().get_igvf_connection()
     files_filesets_collection = db.collection('files_filesets')
     return files_filesets_collection.get(accession)
+
+
+def get_gene_map_from_arangodb(field):
+    db = ArangoDB().get_igvf_connection()
+    cursor = db.aql.execute(
+        f'FOR gene IN genes RETURN {{ key: gene._key, value: gene.{field} }}'
+    )
+    gene_map = {}
+    for record in cursor:
+        gkey = record['key']
+        gval = record['value']
+        if not gval:
+            continue
+        if gval not in gene_map:
+            gene_map[gval] = [gkey]
+        else:
+            gene_map[gval].append(gkey)
+    return gene_map
