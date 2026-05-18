@@ -37,15 +37,18 @@ def json_type_to_clickhouse(prop_def):
             return 'String'
         return 'String'
 
-    # Nullable union types like ["string", "null"]
+    # Per project convention, ClickHouse columns are never Nullable: the
+    # additional NULL-map column it allocates is wasteful and most downstream
+    # query code prefers default values anyway. JSON union types like
+    # ["string", "null"] collapse to the base type. Missing values become the
+    # ClickHouse intrinsic default ('' for String, 0 for numeric, false for
+    # Bool, [] for Array). Hand-edit a DEFAULT clause after generation when
+    # the desired default isn't the intrinsic one.
     if isinstance(type_spec, list):
         non_null = [t for t in type_spec if t != 'null']
         if not non_null:
             return 'String'
-        base = _simple_type(non_null[0], prop_def)
-        if base.startswith('Array('):
-            return base
-        return f'Nullable({base})'
+        return _simple_type(non_null[0], prop_def)
 
     return _simple_type(type_spec, prop_def)
 
