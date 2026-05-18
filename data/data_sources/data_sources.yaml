@@ -1700,7 +1700,7 @@ gene mouse:
   command: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes/mm_genes_IGVFFI2412FAXG.jsonl --label mm_gencode_gene --gene-alias-file-path {gene_alias_datafile}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3741KWFZ/@@download/IGVFFI3741KWFZ.tsv.gz # Mus_musculus.gene_info.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
   version: vM36
 

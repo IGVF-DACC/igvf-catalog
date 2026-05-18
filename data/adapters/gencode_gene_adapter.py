@@ -33,6 +33,13 @@ class GencodeGene(BaseAdapter):
         # output a jsonl file with the same properties as on igvfd (from gencode gtf file), also load collections and study_sets properties from igvfd portal
         'catalog'
     ]
+    manual_alias_dict = {
+        'ENSG00000249738': {'alias': ['LOC285626'], 'entrez': 'ENTREZ:285626'},
+        'ENSG00000291153': {'alias': ['stromal antigen 3-like 4 (pseudogene)', 'STAG3-like protein 4', 'stromal antigen 3 pseudogene', 'STAG3 cohesin complex component like 4 (pseudogene)', 'STAG3L4P', 'STAG3L4'], 'entrez': 'ENTREZ:64940', 'hgnc': 'HGNC:33887'}
+    }
+    manual_hgnc_id_dict = {
+        'ENSG00000291153': 'HGNC:33887'
+    }
 
     def __init__(self, filepath=None, gene_alias_file_path=None, label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, validate=False, **kwargs):
         if mode not in GencodeGene.ALLOWED_MODE:
@@ -124,7 +131,10 @@ class GencodeGene(BaseAdapter):
                         )
                         alias_dict[mgi] = alias
                     if ensembl:
-                        alias_dict[ensembl] = alias
+                        if ensembl in alias_dict:
+                            alias_dict[ensembl].append(alias)
+                        else:
+                            alias_dict[ensembl] = [alias]
         return alias_dict
 
     def get_igvfd_data(self):
@@ -142,25 +152,54 @@ class GencodeGene(BaseAdapter):
         return igvfd_dict
 
     def get_hgnc_id(self, id, info, alias_dict):
+        if id in self.manual_hgnc_id_dict:
+            return self.manual_hgnc_id_dict[id]
         hgnc_id = info.get('hgnc_id')
         if not hgnc_id:
-            alias = alias_dict.get(id)
-            if alias:
-                hgnc_id = alias.get('hgnc')
+            alias_from_ensembl_id = alias_dict.get(id)
+            if alias_from_ensembl_id:
+                hgncs = []
+                for alias in alias_from_ensembl_id:
+                    if alias.get('hgnc'):
+                        hgncs.append(alias.get('hgnc'))
+                if hgncs:
+                    if len(hgncs) == 1:
+                        hgnc_id = hgncs[0]
+                    else:
+                        self.logger.warning(
+                            f'ensembl id {id} maps to multiple hgnc ids in the gene alias file, skipping hgnc id: {hgncs}')
         return hgnc_id
 
     def get_mgi_id(self, id, info, alias_dict):
         mgi_id = info.get('mgi_id')
         if not mgi_id:
-            alias = alias_dict.get(id)
-            if alias:
-                mgi_id = alias.get('mgi')
+            alias_from_ensembl_id = alias_dict.get(id)
+            if alias_from_ensembl_id:
+                mgis = []
+                for alias in alias_from_ensembl_id:
+                    if alias.get('mgi'):
+                        mgis.append(alias.get('mgi'))
+                if mgis:
+                    if len(mgis) == 1:
+                        mgi_id = mgis[0]
+                    else:
+                        self.logger.warning(
+                            f'ensembl id {id} maps to multiple mgi ids in the gene alias file, skipping mgi id: {mgis}')
         return mgi_id
 
     def get_alias_by_id(self, id, hgnc_id, mgi_id, alias_dict):
-        for key in [id, hgnc_id, mgi_id]:
+        if id in self.manual_alias_dict:
+            return self.manual_alias_dict[id]
+        for key in [hgnc_id, mgi_id]:
             if key in alias_dict:
                 return alias_dict[key]
+        alias_from_ensembl_id = alias_dict.get(id)
+        if alias_from_ensembl_id:
+            if len(alias_from_ensembl_id) == 1:
+                return alias_from_ensembl_id[0]
+            else:
+                self.logger.warning(
+                    f'ensembl id {id} maps to multiple aliases in the gene alias file, skipping aliases: {alias_from_ensembl_id}')
         return None
 
     def load_chr_name_mapping(self):
@@ -186,8 +225,12 @@ class GencodeGene(BaseAdapter):
                     split_line[GencodeGene.INDEX['info']:])
                 gene_id = info['gene_id']
                 id = gene_id.split('.')[0]
-                hgnc_id = self.get_hgnc_id(id, info, alias_dict)
-                mgi_id = self.get_mgi_id(id, info, alias_dict)
+                hgnc_id = None
+                mgi_id = None
+                if self.organism == 'Homo sapiens':
+                    hgnc_id = self.get_hgnc_id(id, info, alias_dict)
+                if self.organism == 'Mus musculus':
+                    mgi_id = self.get_mgi_id(id, info, alias_dict)
                 alias = self.get_alias_by_id(id, hgnc_id, mgi_id, alias_dict)
                 chr = split_line[GencodeGene.INDEX['chr']]
                 if gene_id.endswith('_PAR_Y'):
