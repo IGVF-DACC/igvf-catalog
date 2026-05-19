@@ -275,6 +275,7 @@ genomic_elements:
       - source_annotation, _key
       - chr, start, end
       - source
+      - promoter_of
 
 genomic_elements_biosamples:
   persistent:
