@@ -25,6 +25,10 @@ const outputFormat = z.object({
     name: z.string(),
     id: z.string()
   }).nullable(),
+  protein_complex: z.object({
+    name: z.string(),
+    id: z.string()
+  }).nullable(),
   genomic_element: z.object({
     name: z.string(),
     chr: z.string(),
@@ -153,11 +157,12 @@ function getFilterClauseAndBindVars (input: paramsFormatType): { filterClause: s
   }
 }
 
-function qtlReturnObject (geneExpr: string, genomicElementExpr: string): string {
+function qtlReturnObject (geneExpr: string, genomicElementExpr: string, proteinComplexExpr = 'null'): string {
   return `{
     _key: record._key,
     variant: { chr: variant.chr, pos: variant.pos, spdi: variant.spdi, rsid: variant.rsid, ca_id: variant.ca_id },
     gene: ${geneExpr},
+    protein_complex: ${proteinComplexExpr},
     genomic_element: ${genomicElementExpr},
     source: record.source,
     method: record.method,
@@ -197,7 +202,8 @@ function variantsProteinsQuery (filterClause: string, withLimit: boolean): strin
   ${withLimit ? 'LIMIT @offset, @limit' : ''}
   LET variant = DOCUMENT(record._from)
   LET geneRecord = DOCUMENT(record.gene)
-  RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
+  LET targetRecord = DOCUMENT(record._to)
+  RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null', '{ name: targetRecord.name, id: targetRecord._key }')}
   `
 }
 
@@ -341,7 +347,8 @@ async function qtlsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
       FILTER variant != null
       LET geneRecord = DOCUMENT(record.gene)
       FILTER geneRecord != null
-      RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null')}
+      LET targetRecord = DOCUMENT(record._to)
+      RETURN ${qtlReturnObject('{ name: geneRecord.name, id: geneRecord._key }', 'null', '{ name: targetRecord.name, id: targetRecord._key }')}
     )
     LET variantsGenomicElements = (
       FOR record IN variants_genomic_elements
