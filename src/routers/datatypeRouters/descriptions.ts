@@ -766,5 +766,19 @@ export const descriptions = {
   source = ENCODE, <br> \
   Set verbose = true to retrieve full info on the genes, genomic element.<br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  qtls: 'Retrieve QTLs from gene, variant, or region. <br> \
+  Example: gene_id = ENSG00000259943 <br> \
+  gene_name = ZMPSTE24-DT <br> \
+  variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
+  spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
+  rsid = rs79070333 <br> \
+  ca_id = CA21017128 <br> \
+  region = chr1:40241650-40241660 <br> \
+  biological_context = artery (tibial) <br> \
+  method = spliceQTL <br> \
+  source = EBI <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'
 }
