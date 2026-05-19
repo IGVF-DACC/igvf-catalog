@@ -32,6 +32,7 @@ const filesFilesetsQueryFormat = z.object({
   sample_summary: z.string().optional(),
   software: z.enum(SOFTWARE).optional(),
   cell_annotation: z.enum(CELL_ANNOTATION).optional(),
+  has_genome_browser_link: z.enum(['true', 'false']).optional(),
   source: z.enum(SOURCE).optional(),
   class: z.enum(CLASS).optional(),
   page: z.number().default(0),
@@ -84,6 +85,13 @@ async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
     input.donors = `donors/${input.donors as string}`
   }
 
+  let hasGenomeBrowserFilter = ''
+  if (input.has_genome_browser_link !== undefined) {
+    hasGenomeBrowserFilter = 'FILTER record.genome_browser_link '
+    hasGenomeBrowserFilter += (input.has_genome_browser_link === 'true') ? '!= NULL' : '== NULL'
+    delete input.has_genome_browser_link
+  }
+
   let filterBy = ''
   const filterSts = getFilterStatements(filesFilesetsSchema, input)
   if (filterSts !== '') {
@@ -93,6 +101,7 @@ async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
   const query = `
     FOR record IN ${filesFilesetsCollectionName}
     ${filterBy}
+    ${hasGenomeBrowserFilter}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(filesFilesetsSchema)} }

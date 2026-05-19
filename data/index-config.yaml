@@ -78,6 +78,7 @@ files_filesets:
       - software[*]
       - source
       - class
+      - genome_browser_link
 
 genes:
   persistent:
