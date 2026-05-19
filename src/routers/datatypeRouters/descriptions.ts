@@ -418,16 +418,16 @@ export const descriptions = {
   description = phosphorylation. <br> \
   Pagination is 0-based.',
 
-  complexes_proteins: 'Retrieve protein participants for complexes.<br> \
-  Set verbose = true to retrieve full info on the proteins.<br> \
+  complexes_proteins: 'Retrieve protein participants for complexes. Each record includes complex and protein.<br> \
+  Set verbose = true to retrieve full info on the complex and protein.<br> \
   Example: complex_id = CPX-9, <br> \
   complex_name = SMAD2, <br> \
   description = phosphorylation.<br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
-  proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
-  Set verbose = true to retrieve full info on the complexes.<br> \
+  proteins_complexes: 'Retrieve complexes by querying from protein participants. Each record includes protein and complex.<br> \
+  Set verbose = true to retrieve full info on the protein and complex.<br> \
   Example: protein_id = ENSP00000411322.1 or ENSP00000411322 (Ensembl IDs) or P67870 (Uniprot ids), <br> \
   protein_name = CSNK2B, <br> \
   uniprot_name = CSK2B_HUMAN, <br> \
