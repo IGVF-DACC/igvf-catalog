@@ -39,7 +39,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     adapter = DUALIPAAdapter(
         'IGVFFI6224HZMG.tsv.gz',
         label='coding_variants_phenotypes',
-        phenotype_term='BAO:0040014',
+        phenotype_term='BAO_0040014',
         writer=writer,
         validate=True
     )
@@ -49,9 +49,9 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     assert len(records) == 3
 
     first = records[0]
-    assert first['_key'] == 'ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C_BAO:0040014_IGVFFI6224HZMG'
+    assert first['_key'] == 'ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C_BAO_0040014_IGVFFI6224HZMG'
     assert first['_from'] == 'coding_variants/ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C'
-    assert first['_to'] == 'ontology_terms/BAO:0040014'
+    assert first['_to'] == 'ontology_terms/BAO_0040014'
     assert first['name'] == 'mutational effect'
     assert first['inverse_name'] == 'altered due to mutation'
     assert first['source'] == 'IGVF'
@@ -85,7 +85,7 @@ def test_missing_variant_is_skipped(mock_gzip_open, mock_bulk_query, mock_file_f
     adapter = DUALIPAAdapter(
         'IGVFFI6224HZMG.tsv.gz',
         label='coding_variants_phenotypes',
-        phenotype_term='BAO:0040014',
+        phenotype_term='BAO_0040014',
         writer=writer,
         validate=True
     )
@@ -112,7 +112,7 @@ def test_validate_doc_invalid(mock_gzip_open, mock_bulk_query, mock_file_fileset
     adapter = DUALIPAAdapter(
         'IGVFFI6224HZMG.tsv.gz',
         label='coding_variants_phenotypes',
-        phenotype_term='BAO:0040014',
+        phenotype_term='BAO_0040014',
         writer=writer,
         validate=True
     )
