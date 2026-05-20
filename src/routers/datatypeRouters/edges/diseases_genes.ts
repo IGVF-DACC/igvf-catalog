@@ -35,7 +35,7 @@ const variantReturnFormat = z.object({
 })
 
 const diseasesToGenesFormat = z.object({
-  pmid: z.array(z.string()).optional(),
+  pmids: z.array(z.string()).optional(),
   term_name: z.string().optional(),
   gene_symbol: z.string().optional(),
   association_type: z.string().optional(),

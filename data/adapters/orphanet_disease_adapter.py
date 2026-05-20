@@ -96,7 +96,7 @@ class Disease(BaseAdapter):
                     '_to': 'genes/' + gene_id,
                     'name': 'associated_with',
                     'inverse_name': 'associated_with',
-                    'pmid': pmids,
+                    'pmids': pmids,
                     'term_name': term_name,
                     'gene_symbol': gene_symbol,
                     'association_type': assoc_type_name,
