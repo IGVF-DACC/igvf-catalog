@@ -214,7 +214,7 @@ export const descriptions = {
     ca_id = CA16774863, <br> \
     variant_id = NC_000001.11:630556:T:C, <br> \
     region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
-    log10pvalue = gte:2, <br> \
+    neg_log10_pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
     biosample_term = EFO_0005292, <br> \
     biological_context = lymphoblastoid cell line, <br> \
@@ -237,7 +237,7 @@ export const descriptions = {
     alias = CKLF, <br> \
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
-    log10pvalue = gte:2 <br> \
+    neg_log10_pvalue = gte:2 <br> \
     biosample_term = EFO_0005292, <br> \
     biological_context = lymphoblastoid cell line, <br> \
     method = Variant-EFFECTS, <br> \
@@ -306,7 +306,7 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: phenotype ID = EFO_0007937, <br> \
   phenotype_name = cell survival, <br> \
-  log10pvalue = gte:5, <br> \
+  neg_log10_pvalue = gte:5, <br> \
   method = SGE, <br> \
   class = observed data, <br> \
   label = protein variant effect, <br> \
@@ -325,7 +325,7 @@ export const descriptions = {
   ca_id = CA10655131, <br> \
   region = chr1:1023570-1023573 (maximum length: 10kb), <br> \
   phenotype_id = EFO_0004339, <br> \
-  log10pvalue = gte:5, <br>\
+  neg_log10_pvalue = gte:5, <br>\
   mouse_strain = CAST_EiJ, <br> \
   files_fileset = IGVFFI0332UGDD, <br> \
   method = SGE, <br> \
@@ -479,11 +479,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
-  Example: variant_id = NC_000005.10:1779621:C:G, <br> \
-  spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, <br> \
-  rsid = rs1735214522, <br> \
-  ca_id = CA1522823495, <br> \
+  Example: variant_id = NC_000001.11:903006:T:C, <br> \
+  spdi = NC_000001.11:903006:T:C,<br> \
+  hgvs = NC_000001.11:g.903007T>C, <br> \
+  rsid = rs4970384, <br> \
+  ca_id = CA10711131, <br> \
   region = chr5:1779619-1779629, <br> \
   biosample_term = EFO_0002067, <br> \
   biological_context = K562, <br> \
@@ -493,7 +493,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
-  Example: region = chr5:1779339-1779683, <br> \
+  Example: region = chr1:906596-906696, <br> \
   type = candidate cis regulatory element, <br> \
   biosample_term = EFO_0002067, <br> \
   biological_context = K562, <br> \
