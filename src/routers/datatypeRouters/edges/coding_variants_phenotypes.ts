@@ -52,6 +52,7 @@ const scoreSummaryOutputFormat = z.object({
 const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
+  // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA)
   score: z.number().nullable(),
   method: z.string().nullish().optional(),
   class: z.string().nullish(),
@@ -182,7 +183,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'variant': {
           ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
         },
-        'score': phenoEdges.score,
+        'score': phenoEdges.score OR phenoEdges.dualipa_abun_score,
         'method': phenoEdges.method,
         'class': phenoEdges.class,
         'label': phenoEdges.label,
@@ -286,7 +287,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
       'class': phenoEdges.class,
       'label': phenoEdges.label,
       'files_filesets': phenoEdges.files_filesets,
-      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score,
+      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score,
       'source_url': phenoEdges.source_url
     }
   `
@@ -379,7 +380,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
         gene_name: cv.gene_name,
         transcript_id: cv.transcript_id,
         dataType: p.method,
-        score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+        score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score,
         portalLink: p.source_url
       }
   `
