@@ -46,7 +46,7 @@
           "type": "number",
           "description": "The RNA count of the genomic element to biosample edge"
         },
-        "minusLog10PValue": {
+        "neg_log10_pvalue": {
           "type": ["number", "null"],
           "description": "The minus log10 P value (null when not available)."
         },
@@ -141,7 +141,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, strand, minusLog10PValue, minusLog10QValue, source, source_url"
+    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, neg_log10_pvalue, minusLog10QValue, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }

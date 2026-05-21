@@ -18,7 +18,7 @@ const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosam
 const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),
   strand: z.string().nullable(),
-  p_value: z.number().nullable(), // minusLog10PValue
+  neg_log10_pvalue: z.number().nullable(),
   fdr: z.number().nullable(), // minusLog10QValue
   DNA_count: z.number().nullish(),
   RNA_count: z.number().nullish(),
@@ -130,7 +130,7 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
         'fdr': record.minusLog10QValue,
-        'p_value': record.minusLog10PValue,
+        'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.inverse_name,
         'class': record.class,
         'method': record.method
@@ -210,7 +210,7 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
         'fdr': record.minusLog10QValue,
-        'p_value': record.minusLog10PValue,
+        'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.name,
         'class': record.class,
         'method': record.method,

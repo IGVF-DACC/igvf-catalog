@@ -542,7 +542,7 @@ class MPRAAdapter(BaseAdapter):
                         'bed_score': self.safe_int(row[4]),
                         'DNA_count': self.safe_float(row[7]),
                         'RNA_count': self.safe_float(row[8]),
-                        'minusLog10PValue': minus_p,
+                        'neg_log10_pvalue': minus_p,
                         'minusLog10QValue': minus_q_edge,
                         'significant': significant,
                         'class': self.collection_class,
