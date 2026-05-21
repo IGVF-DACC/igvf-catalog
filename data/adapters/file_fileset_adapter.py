@@ -785,7 +785,7 @@ class FileFileSet:
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             method = list(preferred_assay_titles)[0]
         if fileset_object_type == 'CuratedSet' and not method:
-            method = fileset_object.get('summary')
+            method = fileset_object.get('file_set_type')
 
         preferred_assay_titles = FileFileSet.none_if_empty(
             preferred_assay_titles)
