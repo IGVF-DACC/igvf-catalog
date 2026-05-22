@@ -241,7 +241,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
         'RNA_count_ref': 0.3434,
         'DNA_count_alt': 0.6516,
         'RNA_count_alt': 0.3039,
-        'minusLog10PValue': 5.9634,
+        'neg_log10_pvalue': 5.9634,
         'minusLog10QValue': 4.7221,
         'significant': True,
         'postProbEffect': 0.992,
