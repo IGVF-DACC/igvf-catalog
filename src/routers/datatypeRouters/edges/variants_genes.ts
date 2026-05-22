@@ -158,7 +158,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       '_id': record._id,
       qtl_type: record.label,
       neg_log10_pvalue: record.log10pvalue or record.p_nominal_nlog10,
-      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0] OR '${variant[0].chr as string}',
+      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
       gene: (${targetQuery})[0],
