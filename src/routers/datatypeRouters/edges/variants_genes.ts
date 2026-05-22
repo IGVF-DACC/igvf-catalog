@@ -35,7 +35,8 @@ const qtlsSummaryFormat = z.object({
     gene_start: z.number(),
     gene_end: z.number()
   }).nullish(),
-  name: z.string().nullish()
+  name: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 const variantsGenesQueryFormat = z.object({
@@ -104,19 +105,37 @@ function raiseInvalidParameters (param: string): void {
 }
 
 export async function qtlSummary (input: paramsFormatType): Promise<any> {
+  let idxHint = ''
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    filesetFilter = `record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    idxHint = 'OPTIONS { indexHint: "idx_persistent_files_filesets", forceIndexHint: true }'
     delete input.files_fileset
   }
 
-  input.page = 0
-  const variant = (await variantSearch(input))
+  let variantClause = ''
+  if (Object.keys(input).length !== 0) {
+    const variant = (await variantSearch(input))
 
-  if (variant.length === 0) {
+    if (variant.length === 0) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Variant not found.'
+      })
+    }
+    variantClause = `record._from == 'variants/${variant[0]._id as string}'`
+  } else if (filesetFilter === '') {
     throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'Variant not found.'
+      code: 'BAD_REQUEST',
+      message: 'At least one parameter must be defined.'
+    })
+  }
+
+  const searchClause = [variantClause, filesetFilter].filter(clause => clause !== '').join(' AND ')
+  if (searchClause === '') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one parameter must be defined.'
     })
   }
 
@@ -131,18 +150,23 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   `
 
   const query = `
-    FOR record IN variants_genes
-    FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
+    FOR record IN variants_genes ${idxHint}
+    FILTER ${searchClause}
+    SORT record._key
+    LIMIT ${(input.page as number || 0) * QUERY_LIMIT}, ${QUERY_LIMIT}
     RETURN {
+      '_id': record._id,
       qtl_type: record.label,
       neg_log10_pvalue: record.log10pvalue or record.p_nominal_nlog10,
-      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0] OR '${variant[0].chr as string}',
+      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
-      'gene': (${targetQuery})[0],
-      'name': record.name
+      gene: (${targetQuery})[0],
+      name: record.name,
+      files_filesets: record.files_filesets
     }
   `
+
   return await (await db.query(query)).all()
 }
 
@@ -713,7 +737,7 @@ const nearestGenes = publicProcedure
 
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().optional().default(0), limit: z.number().optional(), files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 

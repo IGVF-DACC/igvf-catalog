@@ -47,10 +47,12 @@ const GeneStructureFormat = z.object({
 
 let genesStructureSchema = getSchema('data/schemas/nodes/genes_structure.GencodeStructure.json')
 
-function validateInput (fromGene: boolean, fromTranscript: boolean, fromProtein: boolean, fromRegion: boolean): void {
-  // count the number of parameters that are defined
-  const numParams = [fromGene, fromTranscript, fromProtein, fromRegion].filter(item => item).length
-  if (numParams > 1) {
+function validateInput (input: paramsFormatType): void {
+  const validKeys = ['gene_id', 'gene_name', 'transcript_id', 'transcript_name', 'protein_id', 'protein_name', 'region'] as const
+
+  const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
+
+  if (definedKeysCount < 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'Please provide parameters from only one of the four categories: gene, transcript, protein or region'
@@ -59,6 +61,8 @@ function validateInput (fromGene: boolean, fromTranscript: boolean, fromProtein:
 }
 
 export async function geneStructureSearch (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
+
   let useIndex = ''
   if (input.region !== undefined) {
     useIndex = `OPTIONS { indexHint: "${REGION_IDX}", forceIndexHint: true }`
@@ -75,24 +79,16 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
     genesStructureSchema = getSchema('data/schemas/nodes/mm_genes_structure.GencodeStructure.json')
   }
   const genesStructureCollectionName = genesStructureSchema.db_collection_name as string
-  let fromGene = false
-  let fromTranscript = false
+
   let fromProtein = false
-  let fromRegion = false
   for (const key in input) {
     if (input[key] !== undefined) {
-      if (key === 'gene_id' || key === 'gene_name') {
-        fromGene = true
-      } else if (key === 'transcript_id' || key === 'transcript_name') {
-        fromTranscript = true
-      } else if (key === 'protein_id' || key === 'protein_name') {
+      if (key === 'protein_id' || key === 'protein_name') {
         fromProtein = true
-      } else if (key === 'region') {
-        fromRegion = true
       }
     }
   }
-  validateInput(fromGene, fromTranscript, fromProtein, fromRegion)
+
   const preProcessed = preProcessRegionParam(input)
   let filterBy = ''
   const filterSts = getFilterStatements(genesStructureSchema, preProcessed)

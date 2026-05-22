@@ -275,6 +275,7 @@ genomic_elements:
       - files_filesets
       - source_annotation, _key
       - chr, start, end
+      - source
       - promoter_of
 
 genomic_elements_biosamples:
@@ -392,6 +393,7 @@ variants_genes:
       - source, files_filesets
       - files_filesets
       - effect_size
+      - method
   inverted:
     fields: biological_context
     analyzers:

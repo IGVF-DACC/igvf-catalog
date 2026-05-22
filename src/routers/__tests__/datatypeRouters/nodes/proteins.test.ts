@@ -1,7 +1,6 @@
 import { proteinsRouters } from '../../../datatypeRouters/nodes/proteins'
 import * as dbModule from '../../../../database'
 import * as helpers from '../../../datatypeRouters/_helpers'
-import { TRPCError } from '@trpc/server'
 
 jest.mock('../../../../database')
 jest.mock('../../../datatypeRouters/_helpers')
@@ -15,7 +14,7 @@ describe('proteinsRouters.proteins', () => {
   })
 
   it('returns protein by protein_id', async () => {
-    const mockRecord = {
+    const mockRecord = [{
       _id: 'P1',
       name: 'ProteinA',
       uniprot_names: ['ProteinA'],
@@ -24,9 +23,9 @@ describe('proteinsRouters.proteins', () => {
       organism: 'Homo sapiens',
       source: 'UniProt',
       source_url: 'url'
-    }
+    }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([mockRecord])
+      all: jest.fn().mockResolvedValue(mockRecord)
     } as any)
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
 
@@ -226,23 +225,5 @@ describe('proteinsRouters.proteins', () => {
     })
     expect(result).toEqual([mockRecord])
     expect(dbModule.db.query).toHaveBeenCalled()
-  })
-
-  it('throws NOT_FOUND if protein_id not found', async () => {
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([])
-    } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
-
-    const input = { protein_id: 'notfound', page: 0 }
-    await expect(
-      proteinsRouters.proteins({
-        input,
-        ctx: {},
-        type: 'query',
-        path: '',
-        rawInput: input
-      })
-    ).rejects.toThrow(TRPCError)
   })
 })

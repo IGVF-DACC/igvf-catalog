@@ -57,7 +57,7 @@ const proteinsProteinsFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidProteinFilter = Object.keys(input).every(item => !['protein_id', 'uniprot_name', 'uniprot_full_name', 'protein_name', 'dbxrefs'].includes(item))
+  const isInvalidProteinFilter = Object.keys(input).every(item => !['protein_id', 'protein_name', 'uniprot_name', 'uniprot_id', 'uniprot_full_name', 'dbxrefs', 'pmid'].includes(item))
   const isInvalidAssociatedProteinFilter = Object.keys(input).every(item => !['associated_protein_id', 'associated_uniprot_name', 'associated_uniprot_full_name', 'associated_protein_name', 'associated_dbxrefs'].includes(item))
 
   if (isInvalidProteinFilter && isInvalidAssociatedProteinFilter) {
