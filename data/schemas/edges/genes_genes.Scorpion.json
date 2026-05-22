@@ -33,15 +33,15 @@
         },
         "p_value": {
           "type": "number",
-          "description": "The P-value of the gene gene edge",
+          "description": "The P-value of the gene gene edge"
         },
         "fdr": {
           "type": "number",
-          "description": "The FDR value of the gene gene edge",
+          "description": "The FDR value of the gene gene edge"
         },
         "beta": {
           "type": "number",
-          "description": "The beta value of the gene gene edge",
+          "description": "The beta value of the gene gene edge"
         },
         "name": {
           "enum": [
