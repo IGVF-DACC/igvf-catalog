@@ -622,7 +622,13 @@ def bulk_query_coding_variants_from_spdi_in_arangodb(spdi_protein_hgvsp_triples)
         if key not in mappings:
             mappings[key] = [r['coding_variant_key']]
         else:
-            mappings[key].append(r['coding_variant_key'])
+            if r['coding_variant_key'] not in mappings[key]:
+                mappings[key].append(r['coding_variant_key'])
+
+    for key, values in mappings.items():
+        if len(values) > 1:
+            print(
+                f'WARNING: multiple coding variants found for {key}: {values}')
 
     return mappings
 

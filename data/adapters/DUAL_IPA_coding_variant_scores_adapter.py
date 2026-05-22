@@ -24,12 +24,12 @@ class DUALIPAAdapter(BaseAdapter):
     LABEL = 'protein variant effect'
     PHENOTYPE_EDGE_NAME = 'mutational effect'
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
+    PHENOTYPE_TERM = 'BAO_0040014'
     CHUNK_SIZE = 100
 
-    def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label='coding_variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
-        self.phenotype_term = phenotype_term
         self.files_filesets = FileFileSet(self.file_accession)
 
         super().__init__(filepath, label, writer, validate)
@@ -40,15 +40,13 @@ class DUALIPAAdapter(BaseAdapter):
     def _get_collection_name(self):
         return 'coding_variants_phenotypes'
 
-    def process_coding_variant_phenotype_chunk(self, chunk):
+    def process_coding_variant_phenotype_chunk(self, chunk, file_fileset_obj):
         skipped_coding_variants = []
         # col 0 = spdi, col 6 = hgvs_protein e.g. ENSP00000320646.4:p.Ala17Pro
         mapped_coding_variants = bulk_query_coding_variants_from_spdi_in_arangodb(
             [(row[0], row[6].split(':')[0].split('.')[0],
               row[6].split(':')[1].strip()) for row in chunk]
         )
-
-        file_fileset_obj = self._file_fileset_obj
 
         for row in chunk:
             query_pair = (row[0], row[6].split(':')[0].split(
@@ -61,11 +59,11 @@ class DUALIPAAdapter(BaseAdapter):
                 coding_variant_ids = mapped_coding_variants[query_pair]
                 for coding_variant_id in coding_variant_ids:
                     edge_key = coding_variant_id + '_' + \
-                        self.phenotype_term + '_' + self.file_accession
+                        self.PHENOTYPE_TERM + '_' + self.file_accession
                     _props = {
                         '_key': edge_key,
                         '_from': 'coding_variants/' + coding_variant_id,
-                        '_to': 'ontology_terms/' + self.phenotype_term,
+                        '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
                         'source': self.SOURCE,
                         'source_url': self.source_url,
                         'name': self.PHENOTYPE_EDGE_NAME,
@@ -98,9 +96,9 @@ class DUALIPAAdapter(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        self._file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        if self._file_fileset_obj is None:
+        if file_fileset_obj is None:
             self.logger.warning(
                 f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
         with gzip.open(self.filepath, 'rt') as dual_ipa_file:
@@ -108,15 +106,17 @@ class DUALIPAAdapter(BaseAdapter):
             self.header = next(dual_ipa_csv)
             chunk = []
 
-            for i, row in enumerate(dual_ipa_csv, 1):
+            for row in dual_ipa_csv:
                 chunk.append(row)
                 if len(chunk) % self.CHUNK_SIZE == 0:
                     if self.label == 'coding_variants_phenotypes':
-                        self.process_coding_variant_phenotype_chunk(chunk)
+                        self.process_coding_variant_phenotype_chunk(
+                            chunk, file_fileset_obj)
                     chunk = []
 
             if chunk:
                 if self.label == 'coding_variants_phenotypes':
-                    self.process_coding_variant_phenotype_chunk(chunk)
+                    self.process_coding_variant_phenotype_chunk(
+                        chunk, file_fileset_obj)
 
         self.writer.close()

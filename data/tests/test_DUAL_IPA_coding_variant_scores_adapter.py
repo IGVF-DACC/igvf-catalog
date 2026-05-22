@@ -39,7 +39,6 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     adapter = DUALIPAAdapter(
         'IGVFFI6224HZMG.tsv.gz',
         label='coding_variants_phenotypes',
-        phenotype_term='BAO_0040014',
         writer=writer,
         validate=True
     )
@@ -85,7 +84,6 @@ def test_missing_variant_is_skipped(mock_gzip_open, mock_bulk_query, mock_file_f
     adapter = DUALIPAAdapter(
         'IGVFFI6224HZMG.tsv.gz',
         label='coding_variants_phenotypes',
-        phenotype_term='BAO_0040014',
         writer=writer,
         validate=True
     )
@@ -112,7 +110,6 @@ def test_validate_doc_invalid(mock_gzip_open, mock_bulk_query, mock_file_fileset
     adapter = DUALIPAAdapter(
         'IGVFFI6224HZMG.tsv.gz',
         label='coding_variants_phenotypes',
-        phenotype_term='BAO_0040014',
         writer=writer,
         validate=True
     )
