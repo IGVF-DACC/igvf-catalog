@@ -335,7 +335,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
+  diseases_genes: 'Retrieve disease-gene pairs from Orphanet and GenCC by diseases.<br> \
     Set verbose = true to retrieve full info on the genes and diseases. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
@@ -344,7 +344,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
-  genes_diseases: 'Retrieve disease-gene pairs from Orphanet and ClinGen by genes.<br> \
+  genes_diseases: 'Retrieve disease-gene pairs from Orphanet, GenCC and ClinGen by genes.<br> \
     Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
     Example: gene_id = ENSG00000171759, <br> \
     gene_name = PAH, <br> \
