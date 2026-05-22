@@ -160,6 +160,10 @@ export const descriptions = {
     hgnc_id = HGNC:5, <br> \
     gene_name = A1BG, <br> \
     alias = HYST2477, <br> \
+    associated_gene_id = ENSG00000269293, <br> \
+    associated_hgnc_id = HGNC:48982, <br> \
+    associated_gene_name = ZSCAN16-AS1, <br> \
+    associated_alias = ZSCAN16 antisense RNA 1, <br> \
     z_score = gt:4, <br> \
     label = genetic interference, <br> \
     method = COXPRESdb, <br> \
@@ -230,7 +234,7 @@ export const descriptions = {
     ca_id = CA16774863, <br> \
     variant_id = NC_000001.11:630556:T:C, <br> \
     region = chr1:630456-630558 (maximum length: 10kb), <br> \
-    log10pvalue = gte:2, <br> \
+    neg_log10_pvalue = gte:2, <br> \
     effect_size = gte:1.5, <br> \
     biosample_term = EFO_0005292, <br> \
     biological_context = lymphoblastoid cell line, <br> \
@@ -253,7 +257,7 @@ export const descriptions = {
     alias = CKLF, <br> \
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
-    log10pvalue = gte:2 <br> \
+    neg_log10_pvalue = gte:2 <br> \
     biosample_term = EFO_0005292, <br> \
     biological_context = lymphoblastoid cell line, <br> \
     method = Variant-EFFECTS, <br> \
@@ -326,7 +330,7 @@ export const descriptions = {
   At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
   Example: phenotype_id = EFO_0007937, <br> \
   phenotype_name = cell survival, <br> \
-  log10pvalue = gte:5, <br> \
+  neg_log10_pvalue = gte:5, <br> \
   method = SGE, <br> \
   class = observed data, <br> \
   source = IGVF, <br> \
@@ -347,7 +351,7 @@ export const descriptions = {
   ca_id = CA10655131, <br> \
   region = chr1:1023570-1023573 (maximum length: 10kb), <br> \
   phenotype_id = EFO_0004339, <br> \
-  log10pvalue = gte:5, <br>\
+  neg_log10_pvalue = gte:5, <br>\
   files_fileset = IGVFFI0332UGDD, <br> \
   method = SGE, <br> \
   class = observed data, <br> \
@@ -356,7 +360,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
+  diseases_genes: 'Retrieve disease-gene pairs from Orphanet and GenCC by diseases.<br> \
     Set verbose = true to retrieve full info on the genes and diseases. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
@@ -365,7 +369,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
-  genes_diseases: 'Retrieve disease-gene pairs from Orphanet and ClinGen by genes.<br> \
+  genes_diseases: 'Retrieve disease-gene pairs from Orphanet, GenCC and ClinGen by genes.<br> \
     Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
     At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
     Example: gene_id = ENSG00000171759, <br> \
@@ -447,15 +451,15 @@ export const descriptions = {
   description = phosphorylation. <br> \
   Pagination is 0-based.',
 
-  complexes_proteins: 'Retrieve protein participants for complexes.<br> \
-  Set verbose = true to retrieve full info on the proteins.<br> \
+  complexes_proteins: 'Retrieve protein participants for complexes. Each record includes complex and protein.<br> \
+  Set verbose = true to retrieve full info on the complex and protein.<br> \
   Example: complex_id = CPX-9, <br> \
   complex_name = SMAD2, <br> \
   description = phosphorylation.<br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
-  proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
+  proteins_complexes: 'Retrieve complexes by querying from protein participants. Each record includes protein and complex.<br> \
   Set verbose = true to retrieve full info on the complexes.<br> \
   Protein IDs support the following formats: ENSP00000411322.1 or ENSP00000411322 (Ensembl IDs) or P67870 (Uniprot ids)<br> \
   Example: protein_id = ENSP00000411322.1, <br> \
@@ -554,6 +558,11 @@ export const descriptions = {
   detection_method = affinity chromatography technology, <br> \
   interaction_type = physical association, <br> \
   pmid = 28514442, <br> \
+  associated_protein_id = ENSP00000428899, <br> \
+  associated_protein_name = TNPO1, <br> \
+  associated_uniprot_name = TNPO1_HUMAN, <br> \
+  associated_uniprot_full_name = Transportin-1, <br> \
+  associated_dbxrefs = DIP-29335N, <br> \
   label = affinity chromatography technology, <br> \
   method = physical association, <br> \
   source = BioGRID, <br> \
@@ -819,5 +828,19 @@ export const descriptions = {
   source = ENCODE. <br> \
   Set verbose = true to retrieve full info on the genes, genomic element.<br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  qtls: 'Retrieve QTLs from gene, variant, or region. <br> \
+  Example: gene_id = ENSG00000259943 <br> \
+  gene_name = ZMPSTE24-DT <br> \
+  variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
+  spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
+  rsid = rs79070333 <br> \
+  ca_id = CA21017128 <br> \
+  region = chr1:40241650-40241660 <br> \
+  biological_context = artery (tibial) <br> \
+  method = spliceQTL <br> \
+  source = EBI <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'
 }

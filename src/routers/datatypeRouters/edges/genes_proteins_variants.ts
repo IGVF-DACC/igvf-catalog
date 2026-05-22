@@ -96,6 +96,10 @@ const sequenceVariantRelatedFormat = z.object({
   }))
 })
 
+const apiKeyToDbFieldMap = {
+  log10pvalue: 'neg_log10_pvalue'
+}
+
 async function geneIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
   input.name = id
@@ -145,7 +149,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     LET A = (
       FOR record in ${variantToGeneCollectionName}
       FILTER record._to IN ['${genes.join('\',\'')}']
-      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToGeneSchema, true)}}
+      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToGeneSchema, true, '', [], true, apiKeyToDbFieldMap)}}
       RETURN {
         'sequence_variant': from,
         'related': { 'gene': to, 'sources': sources }
@@ -157,7 +161,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     LET B = (
       FOR record in ${variantToProteinCollectionName}
       FILTER record._to IN ['${proteins.join('\',\'')}']
-      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToProteinSchema, true)}}
+      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToProteinSchema, true, '', [], true, apiKeyToDbFieldMap)}}
       RETURN {
         'sequence_variant': from,
         'related': { 'protein': to, 'sources': sources }
@@ -242,7 +246,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     FOR record in ${variantToGeneCollectionName}
     FILTER record._from == '${id}'
     SORT record._to
-    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToGeneSchema, true)}}
+    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToGeneSchema, true, '', [], true, apiKeyToDbFieldMap)}}
     RETURN {
       'sequence_variant': from,
       'related': { 'gene': to, 'sources': sources }
@@ -253,7 +257,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     FOR record in ${variantToProteinCollectionName}
     FILTER record._from == '${id}' and STARTS_WITH(record._to, 'proteins/')
     SORT record._to
-    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToProteinSchema, true)}}
+    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToProteinSchema, true, '', [], true, apiKeyToDbFieldMap)}}
     RETURN {
       'sequence_variant': from,
       'related': { 'protein': to, 'sources': sources }

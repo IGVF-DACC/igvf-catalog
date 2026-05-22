@@ -68,7 +68,7 @@ const outputFormat = z.object({
   se: z.number().nullish(),
   gene: z.string().nullish(),
   gene_consequence: z.string().nullish(),
-  log10pvalue: z.number().nullish(),
+  neg_log10_pvalue: z.number().nullish(),
   p_value: z.number().nullish(),
   fdr: z.number().nullish(),
   variant_effect_score: z.number().nullish(),
@@ -79,6 +79,10 @@ const outputFormat = z.object({
   relative_binding_affinity: z.number().nullish(),
   effect_on_binding: z.string().nullish()
 })
+
+const apiKeyToDbFieldMap = {
+  log10pvalue: 'neg_log10_pvalue'
+}
 
 const ADASTRA_SCORE_EXPR = `(
   TO_NUMBER(record.fdrp_bh_ref) < 0.05 && TO_NUMBER(record.fdrp_bh_alt) < 0.05
@@ -214,19 +218,19 @@ const buildQuery = ({
         'biosample_term': bioTerm,
         'score': ${ADASTRA_SCORE_EXPR},
         'method': record.method,
-        ${getDBReturnStatements(asbSchema)}
+        ${getDBReturnStatements(asbSchema, true, '', [], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'GVATdb' ? {
         'method': record.method,
-        ${getDBReturnStatements(gvatdbSchema)}
+        ${getDBReturnStatements(gvatdbSchema, true, '', [], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'UKB' ? {
         'method': record.method,
-        ${getDBReturnStatements(ukbSchema)}
+        ${getDBReturnStatements(ukbSchema, true, '', [], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'IGVF' ? {
         'biosample_term': bioTerm,
-        ${getDBReturnStatements(semplSchema)}
+        ${getDBReturnStatements(semplSchema, true, '', [], true, apiKeyToDbFieldMap)}
       } : {}
     )
 `

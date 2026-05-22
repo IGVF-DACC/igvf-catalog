@@ -23,6 +23,11 @@ const labels = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'label'))
 const INTERACTION_TYPES = getCollectionEnumValuesOrThrow('edges', 'proteins_proteins', 'interaction_type')
 
 const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
+  associated_protein_id: z.string().trim().optional(),
+  associated_protein_name: z.string().trim().optional(),
+  associated_uniprot_name: z.string().trim().optional(),
+  associated_uniprot_full_name: z.string().trim().optional(),
+  associated_dbxrefs: z.string().trim().optional(),
   pmid: z.string().trim().optional(),
   detection_method: detectionMethods.optional(),
   interaction_type: z.enum(INTERACTION_TYPES).optional(),
@@ -32,9 +37,9 @@ const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
 })).merge(commonEdgeParamsFormat)
 
 const proteinsProteinsFormat = z.object({
-  // ignore dbxrefs field to avoid long output
-  'protein 1': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
-  'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
+  _id: z.string(),
+  protein_1: z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
+  protein_2: z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
   detection_method: z.string(),
   detection_method_code: z.string(),
   interaction_type: z.array(z.enum(INTERACTION_TYPES)),
@@ -52,14 +57,13 @@ const proteinsProteinsFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  const validKeys = ['protein_id', 'protein_name', 'uniprot_name', 'uniprot_id', 'uniprot_full_name', 'dbxrefs', 'pmid'] as const
+  const isInvalidProteinFilter = Object.keys(input).every(item => !['protein_id', 'protein_name', 'uniprot_name', 'uniprot_id', 'uniprot_full_name', 'dbxrefs', 'pmid'].includes(item))
+  const isInvalidAssociatedProteinFilter = Object.keys(input).every(item => !['associated_protein_id', 'associated_uniprot_name', 'associated_uniprot_full_name', 'associated_protein_name', 'associated_dbxrefs'].includes(item))
 
-  const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
-
-  if (definedKeysCount < 1) {
+  if (isInvalidProteinFilter && isInvalidAssociatedProteinFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one protein param is required.'
+      message: 'At least one protein must be defined.'
     })
   }
 }
@@ -95,69 +99,76 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
-  const hasProteinQuery = input.protein_id !== undefined ||
-    input.protein_name !== undefined ||
-    input.uniprot_name !== undefined ||
-    input.uniprot_full_name !== undefined ||
-    input.dbxrefs !== undefined
+  const proteinInput: paramsFormatType = {
+    _key: input.protein_id,
+    name: input.protein_name,
+    uniprot_names: input.uniprot_name,
+    uniprot_full_names: input.uniprot_full_name,
+    dbxrefs: input.dbxrefs
+  }
+  delete input.protein_id
+  delete input.protein_name
+  delete input.uniprot_name
+  delete input.uniprot_full_name
+  delete input.dbxrefs
 
-  let proteinIdsQuery = ''
-  let proteinIds: string[] = []
-  if (hasProteinQuery) {
-    if (input.protein_id !== undefined) {
-      proteinIdsQuery = `
-        FOR protein IN ${proteinCollectionName}
-        FILTER protein._key == '${decodeURIComponent(input.protein_id as string)}' OR
-                protein.protein_id == '${decodeURIComponent(input.protein_id as string)}' OR
-                '${decodeURIComponent(input.protein_id as string)}' IN protein.uniprot_ids
-        RETURN protein._id
-      `
-    } else {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const proteinInput: paramsFormatType = (({ protein_name, uniprot_name, uniprot_full_name, dbxrefs }) => ({ name: protein_name, uniprot_names: uniprot_name, uniprot_full_names: uniprot_full_name, dbxrefs }))(input)
-      const proteinFilters = getFilterStatements(proteinSchema, proteinInput)
-      proteinIdsQuery = `
-        FOR record IN ${proteinCollectionName}
-        FILTER ${proteinFilters}
-        RETURN record._id
-      `
-    }
-    delete input.protein_id
-    delete input.protein_name
-    delete input.uniprot_name
-    delete input.uniprot_full_name
-    delete input.dbxrefs
+  const associatedProteinInput: paramsFormatType = {
+    _key: input.associated_protein_id,
+    name: input.associated_protein_name,
+    uniprot_names: input.associated_uniprot_name,
+    uniprot_full_names: input.associated_uniprot_full_name,
+    dbxrefs: input.associated_dbxrefs
+  }
+  delete input.associated_protein_id
+  delete input.associated_protein_name
+  delete input.associated_uniprot_name
+  delete input.associated_uniprot_full_name
+  delete input.associated_dbxrefs
 
-    proteinIds = await (await db.query(proteinIdsQuery)).all()
-    if (proteinIds.length === 0) {
-      return []
-    }
+  const filters = []
+  const protein = getFilterStatements(proteinSchema, proteinInput).replaceAll('record', 'protein')
+  const associatedProtein = getFilterStatements(proteinSchema, associatedProteinInput).replaceAll('record', 'associatedProtein')
+  const edgeFilters = getFilterStatements(proteinProteinSchema, input)
+
+  if (protein) {
+    filters.push('(record._from == protein._id OR record._to == protein._id)')
   }
 
-  const edgeFilters = getFilterStatements(proteinProteinSchema, input)
-  const proteinFilter = hasProteinQuery ? '(record._from IN @proteinIds OR record._to IN @proteinIds)' : ''
-  const combinedFilter = [proteinFilter, edgeFilters].filter((filter) => filter !== '').join(' AND ') || 'true'
-  const filters = `FILTER ${combinedFilter}`
+  if (associatedProtein) {
+    filters.push('(record._from == associatedProtein._id OR record._to == associatedProtein._id)')
+  }
+
+  if (edgeFilters) {
+    filters.push(edgeFilters)
+  }
+
+  const combinedFilter = filters.filter((filter) => filter !== '').join(' AND ')
+
   const query = `
+    ${(protein)
+      ? `FOR protein IN ${proteinCollectionName}
+        FILTER ${protein}`
+    : ''}
+
+    ${(associatedProtein)
+      ? `FOR associatedProtein IN ${proteinCollectionName}
+        FILTER ${associatedProtein}`
+      : ''}
+
     FOR record IN proteins_proteins
-      ${filters}
+      FILTER ${combinedFilter}
       SORT record._key
       LIMIT ${page * limit}, ${limit}
       RETURN {
-        'protein 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
-        'protein 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
+        '_id': record._id,
+        'protein_1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
+        'protein_2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(proteinProteinSchema)},
         'name': record.name
       }
     `
 
-  let result = []
-  if (hasProteinQuery) {
-    result = await (await db.query(query, { proteinIds })).all()
-  } else {
-    result = await (await db.query(query)).all()
-  }
-  return result
+  return await (await db.query(query)).all()
 }
 
 const proteinsProteins = publicProcedure

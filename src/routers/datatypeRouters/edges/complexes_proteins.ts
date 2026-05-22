@@ -12,12 +12,23 @@ import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 50
 
+const linkedFeatureFormat = z.object({
+  participantId: z.string(),
+  ranges: z.array(z.string())
+})
+
+/** Edge fields from complexes_proteins.EBIComplex accessible_via.return; only present on EBI source edges. */
 const proteinComplexFormat = z.object({
-  source: z.string().optional(),
-  source_url: z.string().optional(),
-  protein: z.string().or(z.array(proteinFormat)).optional(),
+  protein: z.string().or(proteinFormat).optional(),
   complex: z.string().or(complexFormat).optional(),
-  name: z.string()
+  name: z.string(),
+  stoichiometry: z.number().nullish(),
+  chain_id: z.string().nullish(),
+  isoform_id: z.string().nullish(),
+  number_of_paralogs: z.number().nullish(),
+  linked_features: z.array(linkedFeatureFormat).nullish(),
+  source: z.string().optional(),
+  source_url: z.string().optional()
 })
 
 const complextToProteinSchema = getSchema('data/schemas/edges/complexes_proteins.EBIComplex.json')
@@ -27,6 +38,18 @@ const complexCollectionName = complexSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
 const proteinCollectionName = proteinSchema.db_collection_name as string
 
+const proteinVerboseQuery = `
+  FOR otherRecord IN ${proteinCollectionName}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+  RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+`
+
+const complexVerboseQuery = `
+  FOR otherRecord IN ${complexCollectionName}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+  RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
+`
+
 async function complexesFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   let limit = QUERY_LIMIT
@@ -35,11 +58,7 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
     delete input.limit
   }
 
-  const verboseQuery = `
-      FOR otherRecord IN ${complexCollectionName}
-      FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-      RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
-    `
+  const verbose = input.verbose === 'true'
 
   let targets
   if (input.protein_id !== undefined) {
@@ -71,10 +90,11 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
     ${targets}
     FOR record IN ${complextToProteinCollectionName}
       FILTER record._to IN targets
-      SORT record.chr
+      SORT record._key
       LIMIT ${(input.page as number || 0) * limit}, ${limit}
       RETURN {
-        'complex': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+        'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
+        'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(complextToProteinSchema)},
         'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
@@ -90,11 +110,7 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
     delete input.limit
   }
 
-  const proteinVerboseQuery = `
-    FOR otherRecord IN ${proteinCollectionName}
-      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-      RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
-  `
+  const verbose = input.verbose === 'true'
 
   let complexIDs
   if (input.complex_id !== undefined) {
@@ -110,7 +126,8 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
+        'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._from'},
+        'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(complextToProteinSchema)},
         'name': record.name
       }
