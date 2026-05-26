@@ -543,7 +543,7 @@ class MPRAAdapter(BaseAdapter):
                         'DNA_count': self.safe_float(row[7]),
                         'RNA_count': self.safe_float(row[8]),
                         'neg_log10_pvalue': minus_p,
-                        'minusLog10QValue': minus_q_edge,
+                        'neg_log10_qvalue': minus_q_edge,
                         'significant': significant,
                         'class': self.collection_class,
                         'label': self.collection_label_elements_biosamples,
