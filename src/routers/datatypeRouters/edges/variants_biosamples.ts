@@ -51,7 +51,7 @@ const returnFormat = z.object({
   CI_upper_95: z.number().nullish(),
   significant: z.boolean().nullish(),
   neg_log10_pvalue: z.number().nullish(),
-  fdr: z.number().nullish(), // minusLog10QValue
+  fdr: z.number().nullish(), // neg_log10_qvalue
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
@@ -181,7 +181,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'CI_upper_95': record.CI_upper_95,
       'significant': record.significant,
       'neg_log10_pvalue': record.neg_log10_pvalue,
-      'fdr': record.minusLog10QValue,
+      'fdr': record.neg_log10_qvalue,
       'label': record.label,
       'method': record.method,
       'class': record.class,

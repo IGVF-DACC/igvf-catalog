@@ -700,7 +700,7 @@ class MPRAAdapter(BaseAdapter):
                     'DNA_count_alt': self.safe_float(row[9]),
                     'RNA_count_alt': self.safe_float(row[10]),
                     'neg_log10_pvalue': self.safe_float(row[11]),
-                    'minusLog10QValue': minus_q,
+                    'neg_log10_qvalue': minus_q,
                     'significant': minus_q is not None and minus_q >= self.THRESHOLD,
                     'postProbEffect': self.safe_float(row[13]),
                     'CI_lower_95': self.safe_float(row[14]),
