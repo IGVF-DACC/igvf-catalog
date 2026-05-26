@@ -90,7 +90,7 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "neg_log10_pvalue for the variant to phenotype edge",
+          "description": "Negative log10 of the p-value for the variant to phenotype edge",
           "example": 1
         },
         "tagged_variants": {
