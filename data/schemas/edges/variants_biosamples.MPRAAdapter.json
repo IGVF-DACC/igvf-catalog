@@ -74,7 +74,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "True if this edge met the significance threshold (e.g. minusLog10QValue >= 1)."
+          "description": "True if this edge met the significance threshold (e.g. neg_log10_qvalue >= 1)."
         },
         "postProbEffect": {
           "type": "number",
