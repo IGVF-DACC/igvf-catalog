@@ -86,10 +86,6 @@ const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.GWAS.json')
 const variantsPhenotypeNonGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.cV2F.json')
 
-const apiKeyToDbFieldMap = {
-  log10pvalue: 'neg_log10_pvalue'
-}
-
 function valueValidation (input: paramsFormatType): void {
   if (input.neg_log10_pvalue !== undefined) {
     if (isNaN(Number(input.neg_log10_pvalue)) && !(input.neg_log10_pvalue as string).includes(':')) {
@@ -149,7 +145,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   const nonGWASFilter = getFilterStatements(variantsPhenotypeNonGwasSchema, nonGwasFilterInput)
   let GWASFilter = ''
   if (input.neg_log10_pvalue !== undefined) {
-    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { log10pvalue: input.neg_log10_pvalue })}`
+    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })}`
   }
 
   const studyVerboseQuery = `
@@ -205,7 +201,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       p_val_mantissa: record.source == 'OpenTargets' ? record.p_val_mantissa : null,
       p_val_exponent: record.source == 'OpenTargets' ? record.p_val_exponent : null,
       p_val:          record.source == 'OpenTargets' ? record.p_val          : null,
-      neg_log10_pvalue:    record.source == 'OpenTargets' ? record.log10pvalue    : null,
+      neg_log10_pvalue:    record.source == 'OpenTargets' ? record.neg_log10_pvalue    : null,
       oddsr_ci_lower: record.source == 'OpenTargets' ? record.oddsr_ci_lower : null,
       oddsr_ci_upper: record.source == 'OpenTargets' ? record.oddsr_ci_upper : null,
       study:          record.source == 'OpenTargets' ? ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'} : null,
@@ -249,7 +245,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   const nonGWASFilter = getFilterStatements(variantsPhenotypeNonGwasSchema, nonGwasFilterInput)
   let GWASFilter = ''
   if (input.neg_log10_pvalue !== undefined) {
-    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { log10pvalue: input.neg_log10_pvalue })}`
+    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })}`
   }
 
   const studyVerboseQuery = `
@@ -286,7 +282,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
         (record.source == 'OpenTargets' ? {
           study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
-          ${getDBReturnStatements(variantPhenotypeGwasSchema, true, '', [], true, apiKeyToDbFieldMap)}
+          ${getDBReturnStatements(variantPhenotypeGwasSchema)}
         } : {
           ${getDBReturnStatements(variantsPhenotypeNonGwasSchema)},
           phenotype_term: DOCUMENT(record._to).name

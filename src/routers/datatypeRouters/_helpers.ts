@@ -94,7 +94,7 @@ export async function verboseItems (ids: string[], schema: configType): Promise<
 // outputs: "{ id: record._key, pos: record.pos, name: record.name }"
 //
 // Optional `returnKeyByField`: maps each field name from the schema return list to the JSON key
-// in the response (DB attribute stays the same). Example: { log10pvalue: 'neg_log10_pvalue' }.
+// in the response (DB attribute stays the same). Example: { db_field: 'api_field' }.
 // Does not apply to `_id` (same as before: `_id: record._key` when `changeId` is true, else `'_id': record['_id']`).
 export function getDBReturnStatements (
   schema: configType,
