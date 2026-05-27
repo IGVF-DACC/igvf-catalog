@@ -97,7 +97,7 @@ class AFGRCAQtl(BaseAdapter):
                         '_from': _source,
                         '_to': _target,
                         'label': 'caQTL',
-                        'log10pvalue': log_pvalue,
+                        'neg_log10_pvalue': log_pvalue,
                         'p_value': pvalue,
                         'beta': float(row[-2]),
                         'source': AFGRCAQtl.SOURCE,
