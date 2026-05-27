@@ -182,7 +182,7 @@ class GWAS(BaseAdapter):
             'p_val_mantissa': float(row[15] or 0),
             'p_val_exponent': float(row[16] or 0),
             'p_val': pvalue,
-            'log10pvalue': log_pvalue,
+            'neg_log10_pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
             'source': self.SOURCE,
             'source_url': self.SOURCE_URL,
