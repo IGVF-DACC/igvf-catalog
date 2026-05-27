@@ -34,7 +34,7 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "neg_log10_pvalue of the variant to genomic element edge"
+          "description": "Negative log10 of the p-value for the variant to genomic element edge"
         },
         "p_value": {
           "type": "number",
