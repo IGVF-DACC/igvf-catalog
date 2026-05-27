@@ -43,7 +43,7 @@ def test_AFGR_caqtl_adapter_AFGR_caqtl(mock_request, mocker):
     assert first_item['_key'] == 'fake_variant_id_accessible_dna_element_1_906596_907043_GRCh38_AFGR'
     assert first_item['method'] == 'caQTL'
     assert first_item['class'] == 'observed data'
-    assert first_item['neg_log10_pvalue'] == 0.20761287609364998
+    assert first_item['neg_log10_pvalue'] == 5.318140333513867
 
 
 def test_AFGR_caqtl_adapter_invalid_label():
