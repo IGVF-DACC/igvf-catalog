@@ -72,7 +72,7 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo, mock_re
         assert 'z_score' in first_item
         assert 'credible_set_min_r2' in first_item
         assert 'region' in first_item
-        assert 'log10pvalue' in first_item
+        assert 'neg_log10_pvalue' in first_item
         assert 'source' in first_item
         assert first_item['source'] == adapter.source
     finally:
@@ -225,7 +225,7 @@ def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo,
 
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
-        assert first_item['log10pvalue'] == EQTLCatalog.MAX_LOG10_PVALUE
+        assert first_item['neg_log10_pvalue'] == EQTLCatalog.MAX_LOG10_PVALUE
     finally:
         os.unlink(temp_file_path)
 

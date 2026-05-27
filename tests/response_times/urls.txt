@@ -5,8 +5,8 @@ https://api.catalogkg.igvf.org/api/variants?mouse_strain=A_J&organism=Mus%20musc
 https://api.catalogkg.igvf.org/api/variants/freq?source=bravo_af&minimum_af=0&maximum_af=1&organism=Homo%20sapiens&page=0
 https://api.catalogkg.igvf.org/api/variants/freq?source=bravo_af&region=chr3%3A186741137-186742238&minimum_af=0&maximum_af=1&organism=Homo%20sapiens&page=0
 https://api.catalogkg.igvf.org/api/variants/freq?source=bravo_af&region=chr3%3A186741137-186742238&minimum_af=0&maximum_af=1&organism=Homo%20sapiens&page=0
-https://api.catalogkg.igvf.org/api/variants/genes?variant_id=NC_000001.11%3A981168%3AA%3AG&log10pvalue=gte%3A2&organism=Homo%20sapiens&verbose=true&page=0
-https://api.catalogkg.igvf.org/api/variants/genes?variant_id=NC_000001.11%3A630556%3AT%3AC&log10pvalue=gte%3A6&effect_size=gte%3A1&label=eQTL&organism=Homo%20sapiens&verbose=false&page=0
+https://api.catalogkg.igvf.org/api/variants/genes?variant_id=NC_000001.11%3A981168%3AA%3AG&neg_log10_pvalue=gte%3A2&organism=Homo%20sapiens&verbose=true&page=0
+https://api.catalogkg.igvf.org/api/variants/genes?variant_id=NC_000001.11%3A630556%3AT%3AC&neg_log10_pvalue=gte%3A6&effect_size=gte%3A1&label=eQTL&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalogkg.igvf.org/api/variants/drugs?spdi=NC_000001.11%3A230714139%3AT%3AG&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalogkg.igvf.org/api/variants/drugs?spdi=NC_000001.11%3A230714139%3AT%3AG&pmid=20824505&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalogkg.igvf.org/api/variants/drugs?spdi=NC_000001.11%3A230714139%3AT%3AG&phenotype_categories=Efficacy&organism=Homo%20sapiens&verbose=false&page=0

@@ -123,9 +123,9 @@
           "type": "number",
           "description": "Pvalue for the variant to gene edge"
         },
-        "log10pvalue": {
+        "neg_log10_pvalue": {
           "type": "number",
-          "description": "Log10pvalue for the variant to gene edge"
+          "description": "Negative log10 of the p-value for the variant to gene edge"
         },
         "effect_size": {
           "type": "number",
@@ -176,7 +176,7 @@
         "credible_set_size",
         "posterior_inclusion_probability",
         "p_value",
-        "log10pvalue",
+        "neg_log10_pvalue",
         "effect_size",
         "standard_error",
         "z_score",
@@ -188,8 +188,8 @@
   ],
   "db_collection_name": "variants_genes",
   "accessible_via": {
-    "filter_by_range": "log10pvalue",
-    "simplified_return": "class, method, label, source, log10pvalue, biological_context",
-    "return": "log10pvalue, p_value, posterior_inclusion_probability, effect_size, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term"
+    "filter_by_range": "neg_log10_pvalue",
+    "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
+    "return": "neg_log10_pvalue, p_value, posterior_inclusion_probability, effect_size, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term"
   }
 }
