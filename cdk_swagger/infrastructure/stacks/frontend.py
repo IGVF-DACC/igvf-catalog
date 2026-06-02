@@ -28,8 +28,8 @@ class FrontendStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         shared_sg = SecurityGroup.from_security_group_id(
             self,
-            'igvf-catalog-fargate-demos',
-            security_group_id='sg-0eb97aa23e3597bad',
+            config.security_group_name,
+            security_group_id=config.security_group_id,
             mutable=False,
         )
         self.existing_resources = existing_resources_class(
