@@ -42,7 +42,7 @@ class ScorpionAdapter(BaseAdapter):
 
             for row in data_csv:
                 props = {
-                    '_key': row['tf_ensembl'] + '_' + row['target_ensembl'] + '_' + self.LABEL,
+                    '_key': row['tf_ensembl'] + '_' + row['target_ensembl'] + '_' + self.LABEL.replace(' ', '_'),
                     '_from': 'genes/' + row['tf_ensembl'],
                     '_to': 'genes/' + row['target_ensembl'],
                     'beta': row['beta'],
