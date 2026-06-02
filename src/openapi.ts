@@ -9,7 +9,19 @@ if (envData.host.port === 80 || envData.host.port === 443 || envData.environment
 }
 
 export const swaggerConfig = {
-  customCss: '.swagger-ui .opblock-description-wrapper p {font-size: 18px; line-height: 1.5em} .swagger-ui .auth-wrapper {display: none}',
+  customCss: [
+    '.swagger-ui .opblock-description-wrapper p,',
+    '.swagger-ui .opblock-description-wrapper ul,',
+    '.swagger-ui .opblock-description-wrapper li,',
+    '.swagger-ui .opblock-description-wrapper strong {',
+    'font-size: 18px; line-height: 1.5em;',
+    '}',
+    '.swagger-ui .opblock-description-wrapper p { margin: 0.35em 0; }',
+    '.swagger-ui .opblock-description-wrapper ul { margin: 0.25em 0 0.75em 1.25em; padding-left: 1.25em; }',
+    '.swagger-ui .opblock-description-wrapper li { margin: 0.35em 0; }',
+    '.swagger-ui .opblock-description-wrapper p + ul { margin-top: 0.25em; }',
+    '.swagger-ui .auth-wrapper { display: none; }'
+  ].join(' '),
   swaggerOptions: {
     tryItOutEnabled: true
   }
