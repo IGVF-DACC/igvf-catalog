@@ -68,7 +68,7 @@ class ScorpionAdapter(BaseAdapter):
                     '_key': row['tf_ensembl'] + '_' + row['target_ensembl'] + '_' + self.LABEL.replace(' ', '_'),
                     '_from': 'genes/' + row['tf_ensembl'],
                     '_to': 'genes/' + row['target_ensembl'],
-                    'beta': float(row['beta']),
+                    'effect_size': float(row['beta']),
                     'p_value': float(row['P']),
                     'p_value_adj': float(row['FDR']),
                     'nlog10_p_value': -math.log10(float(row['P'])),
