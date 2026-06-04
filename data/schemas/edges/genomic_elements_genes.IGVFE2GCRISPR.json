@@ -100,7 +100,7 @@
           "type": "number",
           "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
         },
-        "p_value_adj": {
+        "adj_p_value": {
           "type": [
             "number",
             "null"
@@ -191,7 +191,7 @@
       ],
       "additionalProperties": false,
       "accessible_via": {
-        "filter_by_range": "score, p_value_adj",
+        "filter_by_range": "score, adj_p_value",
         "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
       }
     }

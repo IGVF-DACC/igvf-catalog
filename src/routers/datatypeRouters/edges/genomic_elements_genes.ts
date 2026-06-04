@@ -163,7 +163,7 @@ function buildQuery (params: {
     FOR record IN edgeRecords
       LET gene = ${verbose ? 'geneMap[record._to]' : 'record._to'}
       LET element = ${verbose ? 'elementMap[record._from]' : 'record._from'}
-      LET p_value = record.method IN ['CRISPR screen', 'Perturb-seq'] ? (record.p_value_adj != null ? record.p_value_adj : record.p_value) : record.p_value
+      LET p_value = record.method IN ['CRISPR screen', 'Perturb-seq'] ? (record.adj_p_value != null ? record.adj_p_value : record.p_value) : record.p_value
       RETURN {
         'gene': gene,
         'genomic_element': element,
@@ -437,7 +437,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
 
   let pvalueFilter = ''
   if (input.p_value !== undefined) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {adj_p_value: input.p_value})}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
@@ -468,7 +468,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'files_filesets': record.files_filesets,
           'biological_context': record.biological_context,
           'score': record.score || record.effect_size || record.log2FC,
-          'p_value': record.p_value_adj
+          'p_value': record.adj_p_value
         }
   `
 
@@ -495,7 +495,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'files_filesets': record.files_filesets,
             'biological_context': record.biological_context,
             'score': record.score || record.effect_size || record.log2FC,
-            'p_value': record.p_value_adj
+            'p_value': record.adj_p_value
           }
   `
 
@@ -525,7 +525,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'files_filesets': record.files_filesets,
                   'biological_context': record.biological_context,
                   'score': record.score || record.effect_size || record.log2FC,
-                  'p_value': record.p_value_adj
+                  'p_value': record.adj_p_value
               }
   `
 
