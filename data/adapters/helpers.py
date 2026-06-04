@@ -810,6 +810,12 @@ def get_gene_map_from_arangodb(field):
 
 
 def gene_synonym_to_ensembl_id(identifier):
+    # special edge cases where ENSG00000147996 has both in the synonyms list
+    if identifier == 'CBWD5':
+        return 'ENSG00000147996'
+    if identifier == 'CBWD3':
+        return 'ENSG00000196873'
+
     db = ArangoDB().get_igvf_connection()
 
     if identifier.startswith('HGNC'):
