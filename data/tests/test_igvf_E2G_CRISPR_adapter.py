@@ -691,9 +691,9 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
         # putative enhancer
         'chr22:36387779-36388133\tputative_enhancer\t10\tMYH9\tENSG00000100345\t'
         '0.25\t0.05\t0.01\t0.02\tFALSE\n'
-        # TSS — promoter from CRUDO_TSS_PROMOTER_GENE
+        # TSS positive control — Significant=FALSE in file, still loaded as significant
         'chr11:694042-694160\tCCND1_TSS\t10\tCCND1\tENSG00000110092\t'
-        '-0.1\t0.2\t0.03\t0.04\tTRUE\n'
+        '-0.1\t0.2\t0.03\t0.04\tFALSE\n'
     )
     with gzip.open(test_file, 'wt') as out:
         out.write(header)
