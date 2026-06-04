@@ -225,7 +225,7 @@
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
       },
-      "notes": "Differs from the file format specifications: `name_hg19` is renamed `name`. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above."
+      "notes": "Differs from the file format specifications: `name_hg19` is renamed `name`. TSS rows ({gene}_TSS in promoter_gene_map) are positive controls: adapter sets significant=true. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above."
     }
   },
   "crudo_flowfish": {

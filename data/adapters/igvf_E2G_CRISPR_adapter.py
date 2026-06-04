@@ -459,6 +459,23 @@ class IGVFE2GCRISPR(BaseAdapter):
 
         return metrics
 
+    def _apply_crudo_tap_seq_positive_control_significant(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        metrics: dict,
+    ) -> dict:
+        """CRUDO TAP-seq TSS rows are positive controls; always significant."""
+        if self._file_config().get('layout') != 'crudo_tap_seq':
+            return metrics
+        type_idx = colmap.get('element_type')
+        promoter_gene_map = colmap.get('promoter_gene_map') or {}
+        if type_idx is None or type_idx >= len(row):
+            return metrics
+        if row[type_idx].strip() in promoter_gene_map:
+            metrics['significant'] = True
+        return metrics
+
     @staticmethod
     def _genomic_element_gene_edge(
         *,
@@ -793,6 +810,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                         element_coordinates]
 
                 metrics = self._metrics_from_row(row, colmap)
+                metrics = self._apply_crudo_tap_seq_positive_control_significant(
+                    row, colmap, metrics)
                 if self._file_config().get('layout') in (
                         'crudo_tap_seq', 'crudo_flowfish'):
                     metrics = self._crudo_derived_metrics(metrics)
