@@ -62,6 +62,7 @@ class ScorpionAdapter(BaseAdapter):
                 if skip:
                     print('Row is invalid or gene name resolution failed, skipping:')
                     print(row)
+                    skip = False
                     continue
 
                 props = {
