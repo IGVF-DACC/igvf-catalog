@@ -1,5 +1,7 @@
 import json
 import gzip
+import logging
+import math
 from unittest.mock import patch
 
 import pytest
@@ -603,13 +605,14 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
 
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     edge = parsed[0]
+    assert edge['ln_p_value'] == pytest.approx(-10.84371703)
     assert edge['p_value'] == 0
-    assert edge['significance_score'] == pytest.approx(-10.84371703)
+    assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
     assert edge['fold_change'] == pytest.approx(1.39047496)
     assert edge['background_corrected_fold_change'] == pytest.approx(
         1.386921525)
-    assert edge['hypergeometric_log_p_value'] == pytest.approx(-11.04346999)
+    assert edge['hypergeometric_ln_p_value'] == pytest.approx(-11.04346999)
     assert edge['cpm_perturb'] == pytest.approx(85.3643997)
     assert edge['cpm_bg'] == pytest.approx(61.54676304)
     assert edge['num_cells'] == 741
@@ -622,16 +625,17 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_crudo_example.tsv.gz'
     header = (
-        'name_hg38\ttype\tn\tTargetGene\tTargetGeneID\tEnhancerEff\t'
-        'EnhancerEff.r1\tEnhancerEff.pval\tEnhancerEff.pval.adj\tSignificant\n'
+        'name_hg38\ttype\tn\tTargetGene\tTargetGeneID\tEnhancerEffect.noAux\t'
+        'ci95.EnhancerEffect.noAux\tpval.EnhancerEffect.noAux\t'
+        'adj.pval.EnhancerEffect.noAux\tSignificant\n'
     )
     rows = (
         # negative_control — skipped entirely
         'chr1:1-2\tnegative_control\t10\tnegative_control\tENSG00000000000\t'
-        '0\t0.99\t0.5\t0.5\tFALSE\n'
+        '0\t0.05\t0.5\t0.5\tFALSE\n'
         # putative enhancer
         'chr22:36387779-36388133\tputative_enhancer\t10\tMYH9\tENSG00000100345\t'
-        '0.25\t0.1\t0.01\t0.02\tFALSE\n'
+        '0.25\t0.05\t0.01\t0.02\tFALSE\n'
         # TSS — promoter from CRUDO_TSS_PROMOTER_GENE
         'chr11:694042-694160\tCCND1_TSS\t10\tCCND1\tENSG00000110092\t'
         '-0.1\t0.2\t0.03\t0.04\tTRUE\n'
@@ -657,11 +661,19 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     assert len(parsed) == 2
     enh = next(e for e in parsed if e['_to'] == 'genes/ENSG00000100345')
     assert enh['effect_size'] == 0.25
+    assert enh['effect_size_ci_95'] == 0.05
+    assert enh['n_guides'] == 10
     assert enh['p_value'] == 0.01
     assert enh['p_value_adj'] == 0.02
+    assert enh['neg_log10_p_value'] == pytest.approx(2.0)
+    assert enh['neg_log10_adj_p_value'] == pytest.approx(-math.log10(0.02))
+    assert enh['log2FC'] == pytest.approx(math.log2(0.75))
+    assert enh['log2FC_ci95_lower'] == pytest.approx(math.log2(0.7))
+    assert enh['log2FC_ci95_upper'] == pytest.approx(math.log2(0.8))
     assert enh['significant'] is False
     tss = next(e for e in parsed if e['effect_size'] == -0.1)
     assert tss['_to'] == 'genes/ENSG00000110092'
+    assert tss['log2FC'] == pytest.approx(math.log2(1.1))
     assert tss['significant'] is True
 
 
@@ -708,6 +720,105 @@ def test_igvf_e2g_crudo_real_sample_ccnd1_tss_element_is_promoter_with_hardcoded
     assert tss_node['promoter_of'] == 'genes/ENSG00000110092'
 
 
+def test_igvf_e2g_crudo_flowfish_missing_name_hg38_warns_and_skips(
+        mock_file_fileset_facs_screen, tmp_path, caplog):
+    """Rows with empty name_hg38 are skipped with an explicit warning."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_missing_hg38.tsv.gz'
+    header = (
+        'name\tname_hg38\tn\tTargetGene\tTargetGeneID\ttype\t'
+        'EnhancerEffect.noAux\tci95.EnhancerEffect.noAux\t'
+        'pval.EnhancerEffect.noAux\tadj.pval.EnhancerEffect.noAux\tSignificant\n'
+    )
+    rows = (
+        'chr11:68691700-68692200\tchr11:68691700-68692200\t58\t'
+        'CCND1\tENSG00000110092\tTSS\t0.39\t0.07\t1e-10\t1e-8\tTRUE\n'
+        'chr11:69088621-69089984\t\t68\t'
+        'CCND1\tENSG00000110092\tputative_enhancer\t0.1\t0.05\t0.5\t0.5\tFALSE\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        with caplog.at_level(logging.WARNING):
+            adapter.process_file()
+
+    assert any(
+        'missing or empty name_hg38' in record.message
+        for record in caplog.records
+    )
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
+    assert parsed[0]['_to'] == 'genes/ENSG00000110092'
+
+
+def test_igvf_e2g_crudo_flowfish_tss_row_is_promoter_self_effect(
+        mock_file_fileset_perturb_seq, tmp_path):
+    """FlowFISH CRUDO: type=TSS uses TargetGeneID as promoter_of (self-effect)."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_tss.tsv.gz'
+    header = (
+        'name\tname_hg38\tn\tTargetGene\tTargetGeneID\ttype\t'
+        'EnhancerEffect.noAux\tci95.EnhancerEffect.noAux\t'
+        'pval.EnhancerEffect.noAux\tadj.pval.EnhancerEffect.noAux\tSignificant\n'
+    )
+    rows = (
+        'chr11:68459168-68459668\tchr11:68691700-68692200\t58\t'
+        'CCND1\tENSG00000110092\tTSS\t0.393699860\t0.073123734\t'
+        '4.166164917131192e-49\t3.1067686953464027e-47\tTRUE\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
+    edge = parsed[0]
+    assert edge['_to'] == 'genes/ENSG00000110092'
+    assert edge['log2FC'] == pytest.approx(math.log2(1 - 0.393699860))
+    assert edge['significant'] is True
+
+    writer2 = SpyWriter()
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/',
+            label='genomic_element',
+            writer=writer2,
+            validate=True,
+        ).process_file()
+
+    node = json.loads(writer2.contents[0])
+    assert node['source_annotation'] == 'promoter'
+    assert node['promoter_of'] == 'genes/ENSG00000110092'
+    assert node['chr'] == 'chr11'
+    assert node['start'] == 68691700
+    assert node['end'] == 68692200
+
+
 def test_igvf_e2g_crudo_real_sample_putative_enhancer_edge_uses_no_aux_columns(
         mock_file_fileset_perturb_seq):
     """First significant putative_enhancer for CCND1: pval.EnhancerEffect.noAux / EnhancerEffect.noAux."""
@@ -734,6 +845,10 @@ def test_igvf_e2g_crudo_real_sample_putative_enhancer_edge_uses_no_aux_columns(
     assert len(matches) == 1
     edge = matches[0]
     assert edge['p_value_adj'] == pytest.approx(0.001870874)
+    assert edge['neg_log10_p_value'] == pytest.approx(-math.log10(0.000134325))
+    assert edge['neg_log10_adj_p_value'] == pytest.approx(
+        -math.log10(0.001870874))
+    assert edge['log2FC'] == pytest.approx(math.log2(1 - 0.165227554))
     assert edge['_from'].startswith(
         'genomic_elements/CRISPR_chr11_69637976_69639354_GRCh38_'
     )

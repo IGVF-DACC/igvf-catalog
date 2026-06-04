@@ -1184,7 +1184,12 @@ genomic element IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI9246AJEK/@@download/IGVFFI9246AJEK.tsv.gz # enhancer Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI3434YAPX/@@download/IGVFFI3434YAPX.tsv.gz # enhancer Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI1168JUYR/@@download/IGVFFI1168JUYR.tsv.gz # enhancer Perturb-seq
-    - https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/@@download/IGVFFI5903QAWP.tsv.gz # enhancer Perturb-seq
+    - https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/@@download/IGVFFI5903QAWP.tsv.gz # promoter/enhancer Perturb-seq
+    - https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/@@download/IGVFFI7280ZZFA.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI5288BRAZ/@@download/IGVFFI5288BRAZ.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI7810AFPF/@@download/IGVFFI7810AFPF.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI3340LKKZ/@@download/IGVFFI3340LKKZ.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI6120DUWX/@@download/IGVFFI6120DUWX.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
     - https://api.data.igvf.org/tabular-files/IGVFFI9100GKNS/@@download/IGVFFI9100GKNS.tsv.gz # promoter CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI6268OASM/@@download/IGVFFI6268OASM.tsv.gz # promoter CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz # promoter CRISPR FACS screen
@@ -1211,7 +1216,12 @@ genomic element to gene IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI9246AJEK/@@download/IGVFFI9246AJEK.tsv.gz # enhancer Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI3434YAPX/@@download/IGVFFI3434YAPX.tsv.gz # enhancer Perturb-seq
     - https://api.data.igvf.org/tabular-files/IGVFFI1168JUYR/@@download/IGVFFI1168JUYR.tsv.gz # enhancer Perturb-seq
-    - https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/@@download/IGVFFI5903QAWP.tsv.gz # enhancer Perturb-seq
+    - https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/@@download/IGVFFI5903QAWP.tsv.gz # promoter/enhancer Perturb-seq
+    - https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/@@download/IGVFFI7280ZZFA.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI5288BRAZ/@@download/IGVFFI5288BRAZ.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI7810AFPF/@@download/IGVFFI7810AFPF.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI3340LKKZ/@@download/IGVFFI3340LKKZ.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
+    - https://api.data.igvf.org/tabular-files/IGVFFI6120DUWX/@@download/IGVFFI6120DUWX.tsv.gz # promoter/enhancer CRISPR FlowFISH screen
     - https://api.data.igvf.org/tabular-files/IGVFFI9100GKNS/@@download/IGVFFI9100GKNS.tsv.gz # promoter CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI6268OASM/@@download/IGVFFI6268OASM.tsv.gz # promoter CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz # promoter CRISPR FACS screen
