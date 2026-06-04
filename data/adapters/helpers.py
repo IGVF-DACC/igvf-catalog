@@ -807,3 +807,22 @@ def get_gene_map_from_arangodb(field):
         else:
             gene_map[gval].append(gkey)
     return gene_map
+
+
+def gene_synonym_to_ensembl_id(identifier):
+    db = ArangoDB().get_igvf_connection()
+
+    if identifier.startswith('HGNC'):
+        cursor = db.aql.execute(
+            f'FOR gene IN genes FILTER gene.hgnc == "{identifier}" RETURN {{ key: gene._key }}'
+        )
+        for gene in cursor:
+            return gene['key']
+
+    cursor = db.aql.execute(
+        f'FOR gene IN genes FILTER "{identifier}" in gene.synonyms[*] RETURN {{ key: gene._key }}'
+    )
+    for gene in cursor:
+        return gene['key']
+
+    return None

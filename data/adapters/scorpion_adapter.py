@@ -4,7 +4,7 @@ import gzip
 import json
 from typing import Optional
 
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb, gene_synonym_to_ensembl_id
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
@@ -31,16 +31,38 @@ class ScorpionAdapter(BaseAdapter):
         super().__init__(filepath, '', writer, validate)
 
     def process_file(self) -> Optional[dict]:
+        self.writer.open()
         file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.method = file_fileset_obj['method']
         self.collection_class = file_fileset_obj['class']
 
         with gzip.open(self.filepath, 'rt') as data_file:
-            data_csv = csv.DictReader(
-                data_file, delimiter='\t', fieldnames=self.filepath)
+            data_csv = csv.DictReader(data_file)
 
+            skip = False
             for row in data_csv:
+                if row['tf_ensembl'] == '':
+                    if row['tf'] != '':
+                        tf_ensembl = gene_synonym_to_ensembl_id(row['tf'])
+                        if tf_ensembl is not None:
+                            row['tf_ensembl'] = tf_ensembl
+                        else:
+                            skip = True
+                if row['target_ensembl'] == '':
+                    if row['target'] != '':
+                        target_ensembl = gene_synonym_to_ensembl_id(
+                            row['target'])
+                        if target_ensembl is not None:
+                            row['target_ensembl'] = target_ensembl
+                        else:
+                            skip = True
+
+                if skip:
+                    print('Row is invalid or gene name resolution failed, skipping:')
+                    print(row)
+                    continue
+
                 props = {
                     '_key': row['tf_ensembl'] + '_' + row['target_ensembl'] + '_' + self.LABEL.replace(' ', '_'),
                     '_from': 'genes/' + row['tf_ensembl'],
