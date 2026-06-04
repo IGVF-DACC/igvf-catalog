@@ -26,7 +26,7 @@
       ],
       "metrics": {
         "p_val": "p_value",
-        "p_val_adj": "p_value_adj",
+        "p_val_adj": "adj_p_value",
         "avg_log2FC": "log2FC",
         "pct.1": "pct_1",
         "pct.2": "pct_2"
@@ -59,7 +59,7 @@
       ],
       "metrics": {
         "p_val": "p_value",
-        "p_val_adj": "p_value_adj",
+        "p_val_adj": "adj_p_value",
         "avg_log2FC": "log2FC",
         "pct.1": "pct_1",
         "pct.2": "pct_2"
@@ -92,7 +92,7 @@
       ],
       "metrics": {
         "FRACTEL_pval": "p_value",
-        "FRACTEL_pval_fdr_corr": "p_value_adj",
+        "FRACTEL_pval_fdr_corr": "adj_p_value",
         "FRACTEL_effect_size": "effect_size"
       }
     }
@@ -127,7 +127,7 @@
       ],
       "metrics": {
         "sceptre_p_value": "p_value",
-        "sceptre_adj_p_value": "p_value_adj",
+        "sceptre_adj_p_value": "adj_p_value",
         "sceptre_log2_fc": "log2FC",
         "significant": "significant"
       }
@@ -166,7 +166,7 @@
       ],
       "metrics": {
         "sceptre_p_value": "p_value",
-        "sceptre_adj_p_value": "p_value_adj",
+        "sceptre_adj_p_value": "adj_p_value",
         "sceptre_log2_fc": "log2FC",
         "significant": "significant"
       }
@@ -221,7 +221,7 @@
         "n": "n_guides",
         "pval.EnhancerEffect.noAux": "p_value",
         "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
-        "adj.pval.EnhancerEffect.noAux": "p_value_adj",
+        "adj.pval.EnhancerEffect.noAux": "adj_p_value",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
       },
@@ -265,7 +265,7 @@
         "n": "n_guides",
         "pval.EnhancerEffect.noAux": "p_value",
         "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
-        "adj.pval.EnhancerEffect.noAux": "p_value_adj",
+        "adj.pval.EnhancerEffect.noAux": "adj_p_value",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
       },
@@ -300,7 +300,7 @@
       "metrics": {
         "log2_fc": "log2FC",
         "p_value": "p_value",
-        "adj_p_value": "p_value_adj",
+        "adj_p_value": "adj_p_value",
         "significant": "significant"
       },
       "notes": "Data files have `sample_summary_shor` not `sample_summary_short` as specified in the file format specification document."

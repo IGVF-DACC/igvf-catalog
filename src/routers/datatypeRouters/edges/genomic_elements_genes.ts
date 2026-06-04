@@ -442,7 +442,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
 
   let pvalueFilter = ''
   if (input.p_value !== undefined) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {adj_p_value: input.p_value})}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
@@ -473,7 +473,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'files_filesets': record.files_filesets,
           'biological_context': record.biological_context,
           'score': record.score || record.effect_size || record.log2FC,
-          'p_value': record.p_value_adj
+          'p_value': record.adj_p_value
         }
   `
 
@@ -500,7 +500,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'files_filesets': record.files_filesets,
             'biological_context': record.biological_context,
             'score': record.score || record.effect_size || record.log2FC,
-            'p_value': record.p_value_adj
+            'p_value': record.adj_p_value
           }
   `
 
@@ -530,7 +530,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'files_filesets': record.files_filesets,
                   'biological_context': record.biological_context,
                   'score': record.score || record.effect_size || record.log2FC,
-                  'p_value': record.p_value_adj
+                  'p_value': record.adj_p_value
               }
   `
 

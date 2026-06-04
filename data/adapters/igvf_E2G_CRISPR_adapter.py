@@ -437,9 +437,9 @@ class IGVFE2GCRISPR(BaseAdapter):
             if neg_log10 is not None:
                 metrics['neg_log10_p_value'] = neg_log10
 
-        p_value_adj = metrics.get('p_value_adj')
-        if p_value_adj is not None:
-            neg_log10_adj = self._neg_log10_p_value(p_value_adj)
+        adj_p_value = metrics.get('adj_p_value')
+        if adj_p_value is not None:
+            neg_log10_adj = self._neg_log10_p_value(adj_p_value)
             if neg_log10_adj is not None:
                 metrics['neg_log10_adj_p_value'] = neg_log10_adj
 
@@ -492,8 +492,8 @@ class IGVFE2GCRISPR(BaseAdapter):
         }
         if 'p_value' in metrics:
             edge['p_value'] = metrics['p_value']
-        if 'p_value_adj' in metrics:
-            edge['p_value_adj'] = metrics['p_value_adj']
+        if 'adj_p_value' in metrics:
+            edge['adj_p_value'] = metrics['adj_p_value']
         if 'neg_log10_p_value' in metrics:
             edge['neg_log10_p_value'] = metrics['neg_log10_p_value']
         if 'neg_log10_adj_p_value' in metrics:
