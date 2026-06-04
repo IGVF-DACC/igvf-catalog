@@ -4,6 +4,7 @@ import gzip
 import json
 from typing import Optional
 
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
@@ -22,7 +23,6 @@ from adapters.writer import Writer
 class ScorpionAdapter(BaseAdapter):
     SOURCE = 'IGVF'
     LABEL = 'predicted gene regulatory networks'
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
@@ -31,10 +31,10 @@ class ScorpionAdapter(BaseAdapter):
         super().__init__(filepath, '', writer, validate)
 
     def process_file(self) -> Optional[dict]:
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.method = file_fileset_obj['method']
+        self.collection_class = file_fileset_obj['class']
 
         with gzip.open(self.filepath, 'rt') as data_file:
             data_csv = csv.DictReader(
