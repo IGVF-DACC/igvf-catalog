@@ -568,6 +568,54 @@ def test_igvf_e2g_wtc11_uses_genomic_element_for_source_annotation(
     assert 'promoter_of' not in enhancer
 
 
+def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
+        mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_wtc11_metrics.csv.gz'
+    header = (
+        'idx,gene_names,gene_name_ensembl,chromosome,pos,strand,color_idx,chr_idx,'
+        'genomic_element,region,intended_target_name,intended_target_name_ensmbl,'
+        'num_cell,bin,log(pval)-hypergeom,fc,Significance_score,'
+        'fc_by_rand_dist_cpm,pval-empirical,cpm_perturb,cpm_bg,log2fc\n'
+    )
+    row = (
+        '34767,IGFBP6,ENSG00000167779,chr12,1996865109,+,1,11,'
+        'promoter,chr10:133238114-133238378,VENTX,ENSG00000151650,741,750,'
+        '-11.04346999,1.39047496,-10.84371703,1.386921525,0,85.3643997,'
+        '61.54676304,0.4755777642\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(row)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0830FXFI/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    edge = parsed[0]
+    assert edge['p_value'] == 0
+    assert edge['significance_score'] == pytest.approx(-10.84371703)
+    assert edge['log2FC'] == pytest.approx(0.4755777642)
+    assert edge['fold_change'] == pytest.approx(1.39047496)
+    assert edge['background_corrected_fold_change'] == pytest.approx(
+        1.386921525)
+    assert edge['hypergeometric_log_p_value'] == pytest.approx(-11.04346999)
+    assert edge['cpm_perturb'] == pytest.approx(85.3643997)
+    assert edge['cpm_bg'] == pytest.approx(61.54676304)
+    assert edge['num_cells'] == 741
+    assert 'effect_size' not in edge
+
+
 def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_tss(
         mock_file_fileset_perturb_seq, tmp_path):
     """IGVFFI5903QAWP (CRUDO): aggregated metrics only; skip negative_control; TSS -> hardcoded promoter."""

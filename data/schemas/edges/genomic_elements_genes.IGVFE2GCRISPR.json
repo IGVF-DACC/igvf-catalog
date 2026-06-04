@@ -126,6 +126,34 @@
         "effect_size": {
           "type": "number",
           "description": "The effect size of the genomic element to gene edge. This is used as score in APIs for data with method 'CRISPR screen'."
+        },
+        "fold_change": {
+          "type": "number",
+          "description": "The fold change of perturbation cells versus background cells."
+        },
+        "background_corrected_fold_change": {
+          "type": "number",
+          "description": "The fold change of perturbation cells versus selected background cells."
+        },
+        "significance_score": {
+          "type": "number",
+          "description": "The pySpade significance score from the source file."
+        },
+        "hypergeometric_log_p_value": {
+          "type": "number",
+          "description": "The natural log p-value from the initial hypergeometric test."
+        },
+        "cpm_perturb": {
+          "type": "number",
+          "description": "Counts per million reads for the gene in cells with perturbation."
+        },
+        "cpm_bg": {
+          "type": "number",
+          "description": "Counts per million reads for the gene in background cells."
+        },
+        "num_cells": {
+          "type": "number",
+          "description": "The number of cells with perturbation sgRNAs."
         }
       },
       "required": [
