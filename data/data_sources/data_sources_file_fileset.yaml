@@ -53,14 +53,14 @@ igvf_file_accessions:
     - IGVFFI7810AFPF # promoter/enhancer CRISPR FlowFISH screen
     - IGVFFI3340LKKZ # promoter/enhancer CRISPR FlowFISH screen
     - IGVFFI6120DUWX # promoter/enhancer CRISPR FlowFISH screen
-    - IGVFFI8719HCYX # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI5749FOUE # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI4404SMPQ # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI1068KEUM # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI9134FSCT # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI0629LUWT # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI9298BISV # enhancer CRISPR FlowFISH screen (teloHAEC)
-    - IGVFFI6843QWSB # enhancer CRISPR FlowFISH screen (teloHAEC)
+    - IGVFFI8719HCYX # enhancer CRISPR FlowFISH screen
+    - IGVFFI5749FOUE # enhancer CRISPR FlowFISH screen
+    - IGVFFI4404SMPQ # enhancer CRISPR FlowFISH screen
+    - IGVFFI1068KEUM # enhancer CRISPR FlowFISH screen
+    - IGVFFI9134FSCT # enhancer CRISPR FlowFISH screen
+    - IGVFFI0629LUWT # enhancer CRISPR FlowFISH screen
+    - IGVFFI9298BISV # enhancer CRISPR FlowFISH screen
+    - IGVFFI6843QWSB # enhancer CRISPR FlowFISH screen
     - IGVFFI9100GKNS # promoter CRISPR FACS screen
     - IGVFFI6268OASM # promoter CRISPR FACS screen
     - IGVFFI1336XWXJ # promoter CRISPR FACS screen
