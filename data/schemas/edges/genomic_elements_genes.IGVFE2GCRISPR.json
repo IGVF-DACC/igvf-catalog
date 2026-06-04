@@ -98,62 +98,86 @@
         },
         "p_value": {
           "type": "number",
-          "description": "The p-value of the genomic element to gene edge"
-        },
-        "log2FC": {
-          "type": "number",
-          "description": "The log2 fold change of the genomic element to gene edge. This is used as score in APIs for data with method 'Perturb-seq'."
-        },
-        "pct_1": {
-          "type": "number",
-          "description": "The percentage of the genomic element to gene edge"
-        },
-        "pct_2": {
-          "type": "number",
-          "description": "The percentage of the genomic element to gene edge"
+          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
         },
         "p_value_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The adjusted p-value of the genomic element to gene edge"
+          "description": "Multiple-testing-adjusted p-value when reported by the source."
+        },
+        "neg_log10_p_value": {
+          "type": "number",
+          "description": "Negative log10 of p-value."
+        },
+        "neg_log10_adj_p_value": {
+          "type": "number",
+          "description": "Negative log10 of adjusted p-value."
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "Log2 fold change of readout gene expression for the perturbation."
+        },
+        "log2FC_ci95_lower": {
+          "type": "number",
+          "description": "Lower bound of a 95% confidence interval for log2FC."
+        },
+        "log2FC_ci95_upper": {
+          "type": "number",
+          "description": "Upper bound of a 95% confidence interval for log2FC."
+        },
+        "pct_1": {
+          "type": "number",
+          "description": "Fraction of cells in the first comparison group expressing the readout gene."
+        },
+        "pct_2": {
+          "type": "number",
+          "description": "Fraction of cells in the second comparison group expressing the readout gene."
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the tested element-gene pair is significant."
+          "description": "Whether the source analysis calls the element-gene pair significant."
         },
         "effect_size": {
           "type": "number",
-          "description": "The effect size of the genomic element to gene edge. This is used as score in APIs for data with method 'CRISPR screen'."
+          "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
+        },
+        "effect_size_ci_95": {
+          "type": "number",
+          "description": "Half-width of the 95% confidence interval on effect_size."
+        },
+        "n_guides": {
+          "type": "number",
+          "description": "Number of guides targeting the perturbed element."
         },
         "fold_change": {
           "type": "number",
-          "description": "The fold change of perturbation cells versus background cells."
+          "description": "Fold change of readout expression in perturbed versus background cells."
         },
         "background_corrected_fold_change": {
           "type": "number",
-          "description": "The fold change of perturbation cells versus selected background cells."
+          "description": "Fold change of readout expression in perturbed versus a matched or selected background."
         },
-        "significance_score": {
+        "ln_p_value": {
           "type": "number",
-          "description": "The pySpade significance score from the source file."
+          "description": "Natural log (ln) of a p-value after background correction."
         },
-        "hypergeometric_log_p_value": {
+        "hypergeometric_ln_p_value": {
           "type": "number",
-          "description": "The natural log p-value from the initial hypergeometric test."
+          "description": "Natural log (ln) of a p-value from an initial hypergeometric test."
         },
         "cpm_perturb": {
           "type": "number",
-          "description": "Counts per million reads for the gene in cells with perturbation."
+          "description": "Counts per million reads for the readout gene in perturbed cells."
         },
         "cpm_bg": {
           "type": "number",
-          "description": "Counts per million reads for the gene in background cells."
+          "description": "Counts per million reads for the readout gene in background cells."
         },
         "num_cells": {
           "type": "number",
-          "description": "The number of cells with perturbation sgRNAs."
+          "description": "Number of cells with perturbation guides at the element."
         }
       },
       "required": [

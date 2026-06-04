@@ -47,11 +47,16 @@ igvf_file_accessions:
     - IGVFFI9246AJEK # enhancer Perturb-seq
     - IGVFFI3434YAPX # enhancer Perturb-seq
     - IGVFFI1168JUYR # enhancer Perturb-seq
-    - IGVFFI5903QAWP # enhancer Perturb-seq
-    - IGVFFI9100GKNS # CRISPR FACS screen
-    - IGVFFI6268OASM # CRISPR FACS screen
-    - IGVFFI1336XWXJ # CRISPR FACS screen
-    - IGVFFI3089UGHM # CRISPR FACS screen
+    - IGVFFI5903QAWP # promoter/enhancer Perturb-seq
+    - IGVFFI7280ZZFA # promoter/enhancer CRISPR FlowFISH screen
+    - IGVFFI5288BRAZ # promoter/enhancer CRISPR FlowFISH screen
+    - IGVFFI7810AFPF # promoter/enhancer CRISPR FlowFISH screen
+    - IGVFFI3340LKKZ # promoter/enhancer CRISPR FlowFISH screen
+    - IGVFFI6120DUWX # promoter/enhancer CRISPR FlowFISH screen
+    - IGVFFI9100GKNS # promoter CRISPR FACS screen
+    - IGVFFI6268OASM # promoter CRISPR FACS screen
+    - IGVFFI1336XWXJ # promoter CRISPR FACS screen
+    - IGVFFI3089UGHM # promoter CRISPR FACS screen
   Variant-EFFECTS:
     - IGVFFI9602ILPC
     - IGVFFI4333XLOF

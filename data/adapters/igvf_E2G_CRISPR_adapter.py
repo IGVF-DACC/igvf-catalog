@@ -1,7 +1,9 @@
 import csv
 import gzip
 import json
+import math
 import re
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from adapters.base import BaseAdapter
@@ -9,307 +11,24 @@ from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_acc
 from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
 
-# CRUDO TAP-seq (IGVFFI5903QAWP): TSS rows do not carry promoter Ensembl IDs
-# directly, so map the row type to the promoter gene here.
-CRUDO_TSS_PROMOTER_GENE = {
-    'CCND1_TSS': 'ENSG00000110092',
-    'KITLG_TSS': 'ENSG00000049130',
-    'SSFA2_TSS': 'ENSG00000138434',
-    'FAM3C_TSS': 'ENSG00000196937',
-    'MYC_TSS': 'ENSG00000136997',
-}
-
-CRUDO_SOURCE_ANNOTATION = {
-    'putative_enhancer': 'enhancer',
-    **{row_type: 'promoter' for row_type in CRUDO_TSS_PROMOTER_GENE},
-}
+_CRISPR_E2G_DEFINITIONS_PATH = (
+    Path(__file__).resolve().parents[1] /
+    'data_loading_support_files' /
+    'IGVF_E2G_CRISPR_definitions' /
+    'igvf_e2g_crispr_definitions.json'
+)
 
 
-# Header inventory for IGVF CRISPR E2G files. Layouts are grouped by exact
-# header overlap so incoming files can be assigned to an existing layout when
-# possible; accession notes only keep dataset-specific context.
-CRISPR_E2G_LAYOUTS = {
-    't_cell_perturb_seq': {
-        'columns': (
-            'p_val', 'avg_log2FC', 'pct.1', 'pct.2', 'p_val_adj',
-            'guide_id', 'target_gene', 'intended_target_name',
-            'intended_target_chr', 'intended_target_start', 'intended_target_end',
-        ),
-        'semantic_columns': {
-            'target_gene': 'intended_target_name',
-            'readout_gene': 'target_gene',
-            'element_coordinates': (
-                'intended_target_chr', 'intended_target_start', 'intended_target_end',
-            ),
-            'metrics': ('p_val', 'p_val_adj', 'avg_log2FC', 'pct.1', 'pct.2'),
-        },
-    },
-    'hcasmc_promoter_sceptre': {
-        'columns': (
-            'intended_target_name', 'Intended_target_gene_id', 'guide_id(s)',
-            'targeting_chr', 'targeting_start', 'targeting_end', 'gene_id',
-            'gene_symbol', 'sceptre_log2_fc', 'sceptre_p_value',
-            'sceptre_adj_p_value', 'significant', 'type',
-        ),
-        'semantic_columns': {
-            'target_gene': 'Intended_target_gene_id',
-            'intended_target_label': 'intended_target_name',
-            'readout_gene': 'gene_id',
-            'element_coordinates': ('targeting_chr', 'targeting_start', 'targeting_end'),
-            'metrics': (
-                'sceptre_p_value', 'sceptre_adj_p_value',
-                'sceptre_log2_fc', 'significant',
-            ),
-        },
-    },
-    'scaled_screen': {
-        'columns': (
-            'guide_id', 'spacer_g_start', 'protospacer', 'targeting', 'type',
-            'guide_chr', 'guide_start', 'guide_end', 'strand', 'pam',
-            'genomic_element', 'intended_target_chr', 'intended_target_start',
-            'intended_target_end', 'response_id', 'hgnc_symbol',
-            'n_nonzero_trt', 'n_nonzero_cntrl', 'pass_qc', 'p_value',
-            'log_2_fold_change', 'full_piggyflex_oligo', 'putative_target_genes',
-            'putative_target_genes_hgnc',
-        ),
-        'semantic_columns': {
-            'target_gene': 'putative_target_genes',
-            'readout_gene': 'response_id',
-            'source_annotation': 'genomic_element',
-            'element_coordinates': (
-                'intended_target_chr', 'intended_target_start', 'intended_target_end',
-            ),
-            'metrics': ('p_value', 'log_2_fold_change', 'pass_qc'),
-            'notes': 'Distinct layout; not covered by the generic Perturb-seq mapper.',
-        },
-    },
-    'wtc11_cm_tf_perturb_seq': {
-        'delimiter': ',',
-        'columns': (
-            'idx', 'gene_names', 'gene_name_ensembl', 'chromosome',
-            'pos', 'strand', 'color_idx', 'chr_idx', 'genomic_element', 'region',
-            'intended_target_name', 'intended_target_name_ensmbl', 'num_cell',
-            'bin', 'log(pval)-hypergeom', 'fc', 'Significance_score',
-            'fc_by_rand_dist_cpm', 'pval-empirical', 'cpm_perturb', 'cpm_bg',
-            'log2fc',
-        ),
-        'semantic_columns': {
-            'target_gene': 'intended_target_name_ensmbl',
-            'intended_target_label': 'intended_target_name',
-            'readout_gene': 'gene_name_ensembl',
-            'source_annotation': 'genomic_element',
-            'element_coordinates': 'region',
-            'metrics': (
-                'Significance_score', 'log2fc', 'fc',
-                'log(pval)-hypergeom', 'fc_by_rand_dist_cpm',
-                'pval-empirical', 'cpm_perturb', 'cpm_bg', 'num_cell',
-            ),
-            'notes': (
-                'pySpade CSV layout. Significance_score is natural log p-value '
-                'after background correction; log2fc is emitted as log2FC for '
-                'Perturb-seq scoring, with fold-change ratios retained separately.'
-            ),
-        },
-    },
-    'mechanoenhancer': {
-        'columns': (
-            'p_val', 'avg_log2FC', 'pct.1', 'pct.2', 'p_val_adj',
-            'gene_symbol', 'ensembl_id', 'intended_target_name',
-            'intended_target_chr', 'intended_target_start', 'intended_target_end',
-        ),
-        'semantic_columns': {
-            'readout_gene': 'ensembl_id',
-            'element_coordinates': ('intended_target_chr', 'intended_target_start', 'intended_target_end'),
-            'metrics': ('p_val', 'p_val_adj', 'avg_log2FC', 'pct.1', 'pct.2'),
-        },
-    },
-    'tap_seq_sceptre_power_15': {
-        'columns': (
-            'intended_target_name', 'guide_id(s)', 'targeting_chr',
-            'targeting_start', 'targeting_end', 'type', 'gene_id', 'gene_symbol',
-            'sceptre_log2_fc', 'sceptre_p_value', 'sceptre_adj_p_value',
-            'significant', 'sample_term_name', 'sample_term_id',
-            'sample_summary_short', 'power_at_effect_size_15', 'notes',
-        ),
-        'semantic_columns': {
-            'readout_gene': 'gene_id',
-            'element_coordinates': ('targeting_chr', 'targeting_start', 'targeting_end'),
-            'metrics': (
-                'sceptre_p_value', 'sceptre_adj_p_value',
-                'sceptre_log2_fc', 'significant',
-            ),
-        },
-    },
-    'tap_seq_sceptre_power_xx': {
-        'columns': (
-            'intended_target_name', 'guide_id(s)', 'targeting_chr',
-            'targeting_start', 'targeting_end', 'type', 'gene_id', 'gene_symbol',
-            'sceptre_log2_fc', 'sceptre_p_value', 'sceptre_adj_p_value',
-            'significant', 'sample_term_name', 'sample_term_id',
-            'sample_summary_short', 'power_at_effect_size_XX', 'notes',
-        ),
-        'semantic_columns': {
-            'readout_gene': 'gene_id',
-            'element_coordinates': ('targeting_chr', 'targeting_start', 'targeting_end'),
-            'metrics': (
-                'sceptre_p_value', 'sceptre_adj_p_value',
-                'sceptre_log2_fc', 'significant',
-            ),
-        },
-    },
-    'crudo_tap_seq': {
-        'columns': (
-            'name_hg19', 'name_hg38', 'type', 'n', 'TargetGene', 'TargetGeneID',
-            'EnhancerEffect.noAux.Rep1', 'EnhancerEffect.noAux.Rep2',
-            'EnhancerEffect.noAux', 'ci95.EnhancerEffect.noAux.Rep1',
-            'ci95.EnhancerEffect.noAux.Rep2', 'ci95.EnhancerEffect.noAux',
-            'pval.EnhancerEffect.noAux.Rep1', 'pval.EnhancerEffect.noAux.Rep2',
-            'pval.EnhancerEffect.noAux', 'adj.pval.EnhancerEffect.noAux.Rep1',
-            'adj.pval.EnhancerEffect.noAux.Rep2', 'adj.pval.EnhancerEffect.noAux',
-            'Significant',
-        ),
-        'semantic_columns': {
-            'promoter_gene_map': CRUDO_TSS_PROMOTER_GENE,
-            'readout_gene': 'TargetGeneID',
-            'source_annotation': 'type',
-            'source_annotation_map': CRUDO_SOURCE_ANNOTATION,
-            'element_coordinates': 'name_hg38',
-            'metrics': (
-                'pval.EnhancerEffect.noAux', 'EnhancerEff.pval',
-                'adj.pval.EnhancerEffect.noAux', 'EnhancerEff.pval.adj',
-                'EnhancerEffect.noAux', 'EnhancerEff', 'Significant',
-            ),
-        },
-    },
-    'facs_screen': {
-        'columns': (
-            'FRACTEL_pval', 'FRACTEL_pval_fdr_corr', 'FRACTEL_effect_size',
-            'intended_target_name', 'intended_target_chr', 'intended_target_start',
-            'intended_target_end', 'readout_gene', 'readout_gene_symbol',
-        ),
-        'semantic_columns': {
-            'target_gene': 'intended_target_name',
-            'readout_gene': 'readout_gene',
-            'element_coordinates': (
-                'intended_target_chr', 'intended_target_start', 'intended_target_end',
-            ),
-            'metrics': (
-                'FRACTEL_pval', 'FRACTEL_pval_fdr_corr', 'FRACTEL_effect_size',
-            ),
-        },
-    },
-}
+def _load_crispr_e2g_definitions() -> Tuple[dict, dict]:
+    with open(_CRISPR_E2G_DEFINITIONS_PATH, encoding='utf-8') as definitions_file:
+        raw_definitions = json.load(definitions_file)
+    file_config = raw_definitions.pop('files', {})
+    layouts = dict(raw_definitions)
+    return layouts, file_config
 
 
-# Per-file parser expectations. Mixed promoter/enhancer layouts should declare
-# a source_annotation column, with source_annotation_map when file-native values
-# need normalization. crispr_modality is still emitted from files_filesets;
-# expected_crispr_modality is a drift check against released IGVF metadata.
-# title is an unused shorthand name for the dataset.
-CRISPR_E2G_FILE_CONFIG = {
-    'IGVFFI3069QCRA': {
-        'title': 'T-cell CRISPRa Perturb-seq',
-        'targeted_element_types': ['promoter'],
-        'layout': 't_cell_perturb_seq',
-        'expected_crispr_modality': 'activation',
-    },
-    'IGVFFI5749WPVK': {
-        'title': 'T-cell CRISPRi Perturb-seq',
-        'targeted_element_types': ['promoter'],
-        'layout': 't_cell_perturb_seq',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI6376HTIF': {
-        'title': 'HCASMC Pilot Parse Perturb-seq',
-        'targeted_element_types': ['promoter'],
-        'layout': 'hcasmc_promoter_sceptre',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI0206LUDV': {
-        'title': 'HCASMC 971-gene Parse Perturb-seq',
-        'targeted_element_types': ['promoter'],
-        'layout': 'hcasmc_promoter_sceptre',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI4544JMWL': {
-        'title': 'Scaled scCRISPRa screen',
-        'targeted_element_types': ['promoter', 'enhancer'],
-        'layout': 'scaled_screen',
-        'expected_crispr_modality': 'activation',
-    },
-    'IGVFFI0830FXFI': {
-        'title': 'WTC-11 CM TF-Perturb-seq',
-        'targeted_element_types': ['promoter', 'enhancer'],
-        'layout': 'wtc11_cm_tf_perturb_seq',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI5903QAWP': {
-        'title': 'CRUDO TAP-seq',
-        'targeted_element_types': ['promoter', 'enhancer'],
-        'layout': 'crudo_tap_seq',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI6296RCJK': {
-        'title': 'Mechanoenhancer Perturb-seq',
-        'targeted_element_types': ['enhancer'],
-        'layout': 'mechanoenhancer',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI6600VCYY': {
-        'title': 'EC-TAP-seq D0',
-        'targeted_element_types': ['enhancer'],
-        'layout': 'tap_seq_sceptre_power_15',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI7195XKBC': {
-        'title': 'EC-TAP-seq D2',
-        'targeted_element_types': ['enhancer'],
-        'layout': 'tap_seq_sceptre_power_15',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI9246AJEK': {
-        'title': 'EC-TAP-seq D4',
-        'targeted_element_types': ['enhancer'],
-        'layout': 'tap_seq_sceptre_power_15',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI3434YAPX': {
-        'title': '9p21 DC-TAP-seq',
-        'targeted_element_types': ['enhancer'],
-        'layout': 'tap_seq_sceptre_power_xx',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI1168JUYR': {
-        'title': 'HCASMC DC-TAP-seq',
-        'targeted_element_types': ['enhancer'],
-        'layout': 'tap_seq_sceptre_power_xx',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI9100GKNS': {
-        'title': 'T-cell CRISPRko IL7R FACS screen, BATF3 OE',
-        'targeted_element_types': ['promoter'],
-        'layout': 'facs_screen',
-        'expected_crispr_modality': 'knockout',
-    },
-    'IGVFFI6268OASM': {
-        'title': 'T-cell CRISPRko IL7R FACS screen',
-        'targeted_element_types': ['promoter'],
-        'layout': 'facs_screen',
-        'expected_crispr_modality': 'knockout',
-    },
-    'IGVFFI1336XWXJ': {
-        'title': 'T-cell CRISPRi CCR7 FACS screen',
-        'targeted_element_types': ['promoter'],
-        'layout': 'facs_screen',
-        'expected_crispr_modality': 'interference',
-    },
-    'IGVFFI3089UGHM': {
-        'title': 'T-cell CRISPRa CCR7 FACS screen',
-        'targeted_element_types': ['promoter'],
-        'layout': 'facs_screen',
-        'expected_crispr_modality': 'activation',
-    },
-}
+# Layout specs and per-accession parser config live in igvf_e2g_crispr_definitions.json.
+CRISPR_E2G_LAYOUTS, CRISPR_E2G_FILE_CONFIG = _load_crispr_e2g_definitions()
 
 
 # name_hg38 / name-style intervals: chr:start-end.
@@ -317,46 +36,12 @@ _HG38_INTERVAL_RE = re.compile(
     r'^(?P<c>chr[^:]+):(?P<s1>\d+)-(?P<s2>\d+)$'
 )
 
-# I keys that map row columns but are not numeric edge metrics.
+# Colmap keys that map row columns but are not edge metric properties.
 _IGVF_E2G_LAYOUT_KEYS = frozenset({
     'readout_gene', 'promoter_gene', 'chr', 'start', 'end',
     'name_hg38', 'element_type', 'promoter_gene_map', 'source_annotation',
     'source_annotation_map',
 })
-
-
-_IGVF_E2G_METRIC_COLUMN_TO_KEY = {
-    'EnhancerEff.pval': 'p_value',
-    'p_val': 'p_value',
-    'sceptre_p_value': 'p_value',
-    'pval.EnhancerEffect.noAux': 'p_value',
-    'FRACTEL_pval': 'p_value',
-    'p_value': 'p_value',
-    'pval-empirical': 'p_value',
-    'Significance_score': 'significance_score',
-    'log(pval)-hypergeom': 'hypergeometric_log_p_value',
-    'EnhancerEff.pval.adj': 'p_value_adj',
-    'p_val_adj': 'p_value_adj',
-    'sceptre_adj_p_value': 'p_value_adj',
-    'adj.pval.EnhancerEffect.noAux': 'p_value_adj',
-    'FRACTEL_pval_fdr_corr': 'p_value_adj',
-    'EnhancerEff': 'effect_size',
-    'EnhancerEffect.noAux': 'effect_size',
-    'FRACTEL_effect_size': 'effect_size',
-    'fc': 'fold_change',
-    'fc_by_rand_dist_cpm': 'background_corrected_fold_change',
-    'avg_log2FC': 'log2FC',
-    'sceptre_log2_fc': 'log2FC',
-    'log_2_fold_change': 'log2FC',
-    'log2fc': 'log2FC',
-    'pct.1': 'pct_1',
-    'pct.2': 'pct_2',
-    'cpm_perturb': 'cpm_perturb',
-    'cpm_bg': 'cpm_bg',
-    'num_cell': 'num_cells',
-    'significant': 'significant',
-    'Significant': 'significant',
-}
 
 
 class IGVFE2GCRISPR(BaseAdapter):
@@ -396,9 +81,9 @@ class IGVFE2GCRISPR(BaseAdapter):
         config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
         if not config:
             self.logger.warning(
-                'No CRISPR_E2G_FILE_CONFIG entry for accession %s; '
-                'using promoter/enhancer per-row heuristic. Add this file to the map in '
-                'igvf_E2G_CRISPR_adapter.py.',
+                'No CRISPR E2G file config for accession %s; '
+                'using promoter/enhancer per-row heuristic. Add this file under '
+                '"files" in igvf_e2g_crispr_definitions.json.',
                 self.file_accession,
             )
         return config
@@ -422,19 +107,6 @@ class IGVFE2GCRISPR(BaseAdapter):
         if not targeted_element_types:
             return ['promoter', 'enhancer']
         return targeted_element_types
-
-    def _resolve_crispr_modality(self, file_fileset: dict) -> Optional[str]:
-        crispr_modality = file_fileset.get('crispr_modality')
-        expected = self._file_config().get('expected_crispr_modality')
-        if expected and crispr_modality and expected != crispr_modality:
-            self.logger.warning(
-                'File %s has crispr_modality %s in files_filesets, but '
-                'CRISPR_E2G_FILE_CONFIG expects %s.',
-                self.file_accession,
-                crispr_modality,
-                expected,
-            )
-        return crispr_modality or expected
 
     def _promoter_gene_and_source_annotation(
         self,
@@ -494,6 +166,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         colmap: Dict[str, Optional[int]],
         intended_target_name: str,
         intended_target_gene_raw: str,
+        readout_gene: str,
     ) -> Optional[Tuple[Optional[str], str]]:
         source_idx = colmap.get('source_annotation')
         if source_idx is None or source_idx >= len(row):
@@ -520,8 +193,18 @@ class IGVFE2GCRISPR(BaseAdapter):
                 source_annotation_raw,
             )
             return None
-        if not isinstance(intended_target_name, str) or not re.match(
-            r'^ENSG[0-9]{11}(?:_PAR_Y)?$', intended_target_name
+        type_idx = colmap.get('element_type')
+        row_type = (
+            row[type_idx].strip()
+            if type_idx is not None and type_idx < len(row)
+            else ''
+        )
+        if row_type == 'TSS':
+            promoter_gene = readout_gene
+        else:
+            promoter_gene = intended_target_name
+        if not isinstance(promoter_gene, str) or not re.match(
+            r'^ENSG[0-9]{11}(?:_PAR_Y)?$', promoter_gene
         ):
             self.logger.warning(
                 'Skipping promoter row in %s: target gene "%s" is not a valid '
@@ -530,14 +213,14 @@ class IGVFE2GCRISPR(BaseAdapter):
                 intended_target_gene_raw,
             )
             return None
-        if not self.gene_validator.validate(intended_target_name):
+        if not self.gene_validator.validate(promoter_gene):
             self.logger.warning(
                 'Skipping promoter row in %s: target gene "%s" is not valid.',
                 self.file_accession,
-                intended_target_name,
+                promoter_gene,
             )
             return None
-        return intended_target_name, 'promoter'
+        return promoter_gene, 'promoter'
 
     @staticmethod
     def _parse_element_coordinates_hg38(name_hg38: str) -> Tuple[str, str, str]:
@@ -599,7 +282,20 @@ class IGVFE2GCRISPR(BaseAdapter):
         col: Dict[str, Optional[int]],
     ) -> Optional[Tuple[str, str, str, str]]:
         ni = col['name_hg38']
-        if ni is None or ni >= len(row) or not row[ni].strip():
+        if ni is None:
+            return None
+        if ni >= len(row):
+            self.logger.warning(
+                'Skipping row in %s: missing name_hg38 (row has %d columns).',
+                self.file_accession,
+                len(row),
+            )
+            return None
+        if not row[ni].strip():
+            self.logger.warning(
+                'Skipping row in %s: missing or empty name_hg38.',
+                self.file_accession,
+            )
             return None
         try:
             chr_, start, end, gene_raw = self._gene_raw_from_name_hg38_row(
@@ -627,6 +323,8 @@ class IGVFE2GCRISPR(BaseAdapter):
         from_name = self._resolve_name_hg38_interval(row, col)
         if from_name is not None:
             return from_name
+        if col.get('name_hg38') is not None:
+            return None
         self.logger.warning(
             'Skipping row in %s: missing coordinates (chr/start/end or name_hg38).',
             self.file_accession,
@@ -686,13 +384,14 @@ class IGVFE2GCRISPR(BaseAdapter):
             name_to_idx,
             semantic_columns.get('target_gene'),
         )
-        for metric_column in semantic_columns.get('metrics', ()):
-            metric_key = _IGVF_E2G_METRIC_COLUMN_TO_KEY.get(metric_column)
-            if not metric_key or colmap.get(metric_key) is not None:
+        for source_column, catalog_field in semantic_columns.get(
+            'metrics', {}
+        ).items():
+            if colmap.get(catalog_field) is not None:
                 continue
-            metric_idx = self._pick_column(name_to_idx, metric_column)
+            metric_idx = self._pick_column(name_to_idx, source_column)
             if metric_idx is not None:
-                colmap[metric_key] = metric_idx
+                colmap[catalog_field] = metric_idx
         return colmap
 
     def _metrics_from_row(
@@ -723,6 +422,115 @@ class IGVFE2GCRISPR(BaseAdapter):
                         row[col_idx],
                     )
         return metrics
+
+    @staticmethod
+    def _neg_log10_p_value(p_value: float) -> Optional[float]:
+        if p_value <= 0:
+            return None
+        return -math.log10(p_value)
+
+    def _crudo_derived_metrics(self, metrics: dict) -> dict:
+        """Add neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above for CRUDO datasets."""
+        p_value = metrics.get('p_value')
+        if p_value is not None:
+            neg_log10 = self._neg_log10_p_value(p_value)
+            if neg_log10 is not None:
+                metrics['neg_log10_p_value'] = neg_log10
+
+        p_value_adj = metrics.get('p_value_adj')
+        if p_value_adj is not None:
+            neg_log10_adj = self._neg_log10_p_value(p_value_adj)
+            if neg_log10_adj is not None:
+                metrics['neg_log10_adj_p_value'] = neg_log10_adj
+
+        effect_size = metrics.get('effect_size')
+        if effect_size is not None:
+            ci95 = metrics.get('effect_size_ci_95')
+            log2fc_fields = [('log2FC', effect_size)]
+            if ci95 is not None:
+                log2fc_fields.extend([
+                    ('log2FC_ci95_lower', effect_size + ci95),
+                    ('log2FC_ci95_upper', effect_size - ci95),
+                ])
+            for field, depletion in log2fc_fields:
+                complement = 1.0 - depletion
+                if complement > 0:
+                    metrics[field] = math.log2(complement)
+
+        return metrics
+
+    @staticmethod
+    def _genomic_element_gene_edge(
+        *,
+        _key: str,
+        _from: str,
+        readout_gene: str,
+        source_url: str,
+        file_accession: str,
+        file_fileset: dict,
+        method: str,
+        crispr_modality: str,
+        metrics: dict,
+    ) -> dict:
+        """Build a genomic_elements_genes edge (see IGVFE2GCRISPR schema)."""
+        edge = {
+            '_key': _key,
+            '_from': _from,
+            '_to': f'genes/{readout_gene}',
+            'source': IGVFE2GCRISPR.SOURCE,
+            'source_url': source_url,
+            'files_filesets': f'files_filesets/{file_accession}',
+            'label': IGVFE2GCRISPR.COLLECTION_LABEL,
+            'class': file_fileset['class'],
+            'name': 'modulates expression of',
+            'inverse_name': 'expression modulated by',
+            'method': method,
+            'crispr_modality': crispr_modality,
+            'biological_context': file_fileset['simple_sample_summaries'][0],
+            'biosample_term': file_fileset['samples'][0],
+            'treatments_term_ids': file_fileset['treatments_term_ids'],
+        }
+        if 'p_value' in metrics:
+            edge['p_value'] = metrics['p_value']
+        if 'p_value_adj' in metrics:
+            edge['p_value_adj'] = metrics['p_value_adj']
+        if 'neg_log10_p_value' in metrics:
+            edge['neg_log10_p_value'] = metrics['neg_log10_p_value']
+        if 'neg_log10_adj_p_value' in metrics:
+            edge['neg_log10_adj_p_value'] = metrics['neg_log10_adj_p_value']
+        if 'log2FC' in metrics:
+            edge['log2FC'] = metrics['log2FC']
+        if 'log2FC_ci95_lower' in metrics:
+            edge['log2FC_ci95_lower'] = metrics['log2FC_ci95_lower']
+        if 'log2FC_ci95_upper' in metrics:
+            edge['log2FC_ci95_upper'] = metrics['log2FC_ci95_upper']
+        if 'pct_1' in metrics:
+            edge['pct_1'] = metrics['pct_1']
+        if 'pct_2' in metrics:
+            edge['pct_2'] = metrics['pct_2']
+        if 'significant' in metrics:
+            edge['significant'] = metrics['significant']
+        if 'effect_size' in metrics:
+            edge['effect_size'] = metrics['effect_size']
+        if 'effect_size_ci_95' in metrics:
+            edge['effect_size_ci_95'] = metrics['effect_size_ci_95']
+        if 'n_guides' in metrics:
+            edge['n_guides'] = metrics['n_guides']
+        if 'fold_change' in metrics:
+            edge['fold_change'] = metrics['fold_change']
+        if 'background_corrected_fold_change' in metrics:
+            edge['background_corrected_fold_change'] = metrics['background_corrected_fold_change']
+        if 'ln_p_value' in metrics:
+            edge['ln_p_value'] = metrics['ln_p_value']
+        if 'hypergeometric_ln_p_value' in metrics:
+            edge['hypergeometric_ln_p_value'] = metrics['hypergeometric_ln_p_value']
+        if 'cpm_perturb' in metrics:
+            edge['cpm_perturb'] = metrics['cpm_perturb']
+        if 'cpm_bg' in metrics:
+            edge['cpm_bg'] = metrics['cpm_bg']
+        if 'num_cells' in metrics:
+            edge['num_cells'] = metrics['num_cells']
+        return edge
 
     def _scaled_screen_passes_qc(
         self,
@@ -875,10 +683,10 @@ class IGVFE2GCRISPR(BaseAdapter):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         method = file_fileset['method']
-        crispr_modality = self._resolve_crispr_modality(file_fileset)
+        crispr_modality = file_fileset.get('crispr_modality')
         targeted_element_types = self._targeted_element_types()
         layout = self._layout()
-        is_scaled_screen = self.file_accession == 'IGVFFI4544JMWL'
+        is_scaled_screen = self._file_config().get('layout') == 'scaled_screen'
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
         seen_element_gene_ids = set()
@@ -888,21 +696,13 @@ class IGVFE2GCRISPR(BaseAdapter):
             header = next(reader)
             name_to_idx = {h.strip(): i for i, h in enumerate(header)}
 
-            if layout:
-                colmap = self._columns_from_layout(name_to_idx)
-            elif method == 'CRISPR screen':
-                colmap = {
-                    'p_value': name_to_idx['FRACTEL_pval'],
-                    'p_value_adj': name_to_idx['FRACTEL_pval_fdr_corr'],
-                    'effect_size': name_to_idx['FRACTEL_effect_size'],
-                    'readout_gene': name_to_idx['readout_gene'],
-                    'promoter_gene': name_to_idx['intended_target_name'],
-                    'chr': name_to_idx['intended_target_chr'],
-                    'start': name_to_idx['intended_target_start'],
-                    'end': name_to_idx['intended_target_end'],
-                }
-            else:
-                raise ValueError(f'Method: {method} is unsupported.')
+            if not layout:
+                raise ValueError(
+                    f'File {self.file_accession} has no CRISPR E2G layout; add it under '
+                    f'"files" in igvf_e2g_crispr_definitions.json.'
+                )
+            colmap = self._columns_from_layout(name_to_idx)
+            uses_name_hg38 = colmap['name_hg38'] is not None
 
             for row in reader:
                 if not row:
@@ -911,7 +711,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         row, name_to_idx, colmap):
                     continue
 
-                if method == 'Perturb-seq':
+                if uses_name_hg38 or method == 'Perturb-seq':
                     if self._perturb_seq_negative_control(row, colmap['element_type']):
                         continue
                     interval = self._resolve_perturb_seq_element(row, colmap)
@@ -962,6 +762,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         colmap,
                         intended_target_name,
                         intended_target_gene_raw,
+                        readout_gene,
                     )
                 else:
                     resolved = self._promoter_gene_and_source_annotation(
@@ -993,31 +794,27 @@ class IGVFE2GCRISPR(BaseAdapter):
                         element_coordinates]
 
                 metrics = self._metrics_from_row(row, colmap)
+                if self._file_config().get('layout') in (
+                        'crudo_tap_seq', 'crudo_flowfish'):
+                    metrics = self._crudo_derived_metrics(metrics)
 
                 if self.label == 'genomic_element_gene':
                     _id = '_'.join(
                         [element_id, readout_gene, self.file_accession])
-                    _source = (
-                        'genomic_elements/' + element_id + '_' + self.file_accession
+                    _props = self._genomic_element_gene_edge(
+                        _key=_id,
+                        _from=(
+                            'genomic_elements/' + element_id + '_'
+                            + self.file_accession
+                        ),
+                        readout_gene=readout_gene,
+                        source_url=self.source_url,
+                        file_accession=self.file_accession,
+                        file_fileset=file_fileset,
+                        method=method,
+                        crispr_modality=crispr_modality,
+                        metrics=metrics,
                     )
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': 'genes/' + readout_gene,
-                        'source': IGVFE2GCRISPR.SOURCE,
-                        'source_url': self.source_url,
-                        'files_filesets': 'files_filesets/' + self.file_accession,
-                        'label': self.COLLECTION_LABEL,
-                        'class': file_fileset['class'],
-                        'name': 'modulates expression of',
-                        'inverse_name': 'expression modulated by',
-                        'method': method,
-                        'crispr_modality': crispr_modality,
-                        'biological_context': file_fileset['simple_sample_summaries'][0],
-                        'biosample_term': file_fileset['samples'][0],
-                        'treatments_term_ids': file_fileset['treatments_term_ids'],
-                    }
-                    _props.update(metrics)
                     if is_scaled_screen:
                         current = scaled_screen_best_edges.get(_id)
                         if self._better_scaled_screen_hit(current, _props):
