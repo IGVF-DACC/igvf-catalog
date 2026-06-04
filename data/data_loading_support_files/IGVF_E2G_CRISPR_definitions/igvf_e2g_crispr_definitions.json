@@ -272,6 +272,40 @@
       "notes": "FlowFISH files use type=TSS (not {gene}_TSS) like crudo_tap_seq. TSS rows are promoter self-effects: promoter_of = TargetGeneID. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper."
     }
   },
+  "teloHAEC_flowfish": {
+    "uuid": "bb3038df-261d-453c-ab59-bdfe9cd3fdd3",
+    "title": "CRISPRi FlowFISH Full Enhancer Score Analysis Submission Format",
+    "lab": "jesse-engreitz",
+    "columns": {
+      "intended_target_name": "Name of the target element, formatted as {chr}:{start}-{end}.",
+      "guide_id(s)": "Comma-separated list of guide IDs targeting this element (must match guide metadata).",
+      "targeting_chr": "Chromosome of the targeted element",
+      "targeting_start": "Start coordinate of the targeted element",
+      "targeting_end": "End coordinate of the targeted element",
+      "type": "Type of the perturbation target",
+      "gene_id": "Ensembl gene ID",
+      "gene_symbol": "Gene symbol (Ensembl)",
+      "log2_fc": "Log2 fold change effect size compared to negative control guides",
+      "p_value": "Uncorrected p-value from t-test (range: 0–1)",
+      "adj_p_value": " FDR-adjusted p-value (range: 0–1)",
+      "significant": "Indicates whether the tested enhancer-gene pair is significant (TRUE or FALSE)",
+      "sample_term_name": "Name of the cell type or biosample (useful for multi-experiment aggregation)",
+      "sample_term_id": "UBERON or CL ID for the biosample or cell type",
+      "sample_summary_short": "Short description of the sample, including treatments",
+      "notes": "(optional) Field for notes, such as reference, source, or annotation details"
+    },
+    "semantic_columns": {
+      "readout_gene": "gene_id",
+      "element_coordinates": "intended_target_name",
+      "metrics": {
+        "log2_fc": "log2FC",
+        "p_value": "p_value",
+        "adj_p_value": "p_value_adj",
+        "significant": "significant"
+      },
+      "notes": "Data files have `sample_summary_shor` not `sample_summary_short` as specified in the file format specification document."
+    }
+  },
   "scaled_screen": {
     "uuid": "69c4aefb-5c5d-489c-84fe-89dbb852538b",
     "title": "File Format Specifications for CRISPRa Scaled Screen Table S4",
@@ -451,6 +485,54 @@
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI8719HCYX": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI5749FOUE": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4404SMPQ": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI1068KEUM": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI9134FSCT": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI0629LUWT": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI9298BISV": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI6843QWSB": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
         "enhancer"
       ]
     },

@@ -365,6 +365,61 @@ def test_igvf_e2g_crispr_adapter_tap_seq_sceptre_fields_genomic_element_gene(moc
     assert first_item['significant'] is True
 
 
+def test_igvf_e2g_teloHAEC_flowfish_enhancer_edge_uses_intended_target_name_interval(
+        mock_file_fileset_facs_screen, tmp_path):
+    """teloHAEC FlowFISH: intended_target_name interval + log2_fc/p_value (CRISPR screen)."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_teloHAEC_flowfish.tsv.gz'
+    header = (
+        'intended_target_name\tguide_id(s)\ttype\tgene_id\t'
+        'gene_symbol\tlog2_fc\tp_value\tadj_p_value\tsignificant\t'
+        'sample_term_name\tsample_term_id\tsample_summary_shor\tnotes\n'
+    )
+    row = (
+        'chr1:1000-2000\tguide-1\ttargeting\tENSG00000139618\t'
+        'BRCA2\t0.42\t0.01\t0.05\tTRUE\t'
+        'teloHAEC\tCL:0002145\tsummary\t\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(row)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI8719HCYX/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        ).process_file()
+
+    edge = json.loads(writer.contents[0])
+    assert edge['_to'] == 'genes/ENSG00000139618'
+    assert edge['log2FC'] == 0.42
+    assert edge['p_value'] == 0.01
+    assert edge['p_value_adj'] == 0.05
+    assert edge['significant'] is True
+
+    writer2 = SpyWriter()
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI8719HCYX/',
+            label='genomic_element',
+            writer=writer2,
+            validate=True,
+        ).process_file()
+
+    node = json.loads(writer2.contents[0])
+    assert node['source_annotation'] == 'enhancer'
+    assert 'promoter_of' not in node
+    assert node['chr'] == 'chr1'
+    assert node['start'] == 1000
+    assert node['end'] == 2000
+
+
 def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements(mock_file_fileset_facs_screen, mocker):
     writer = SpyWriter()
     with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
