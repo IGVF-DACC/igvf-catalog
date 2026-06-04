@@ -35,13 +35,17 @@
           "type": "number",
           "description": "The P-value of the gene gene edge"
         },
-        "fdr": {
+        "p_value_adj": {
           "type": "number",
-          "description": "The FDR value of the gene gene edge"
+          "description": "The FDR (p-value adjacent) value of the gene gene edge"
         },
-        "beta": {
+        "nlog10_p_value": {
           "type": "number",
-          "description": "The beta value of the gene gene edge"
+          "description": "The -log10 P-value of the gene gene edge"
+        },
+        "effect_size": {
+          "type": "number",
+          "description": "The beta (effect size) value of the gene gene edge"
         },
         "name": {
           "enum": [
@@ -85,8 +89,8 @@
         "_to",
         "source",
         "p_value",
-        "fdr",
-        "beta",
+        "p_value_adj",
+        "effect_size",
         "name",
         "files_filesets",
         "inverse_name",
