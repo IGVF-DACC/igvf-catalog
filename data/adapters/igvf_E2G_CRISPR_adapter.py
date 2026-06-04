@@ -100,10 +100,15 @@ CRISPR_E2G_LAYOUTS = {
             'source_annotation': 'genomic_element',
             'element_coordinates': 'region',
             'metrics': (
-                'pval-empirical', 'fc', 'log2fc', 'log(pval)-hypergeom',
-                'Significance_score', 'fc_by_rand_dist_cpm',
+                'Significance_score', 'log2fc', 'fc',
+                'log(pval)-hypergeom', 'fc_by_rand_dist_cpm',
+                'pval-empirical', 'cpm_perturb', 'cpm_bg', 'num_cell',
             ),
-            'notes': 'CSV layout; not covered by the generic tab-delimited mapper.',
+            'notes': (
+                'pySpade CSV layout. Significance_score is natural log p-value '
+                'after background correction; log2fc is emitted as log2FC for '
+                'Perturb-seq scoring, with fold-change ratios retained separately.'
+            ),
         },
     },
     'mechanoenhancer': {
@@ -328,6 +333,8 @@ _IGVF_E2G_METRIC_COLUMN_TO_KEY = {
     'FRACTEL_pval': 'p_value',
     'p_value': 'p_value',
     'pval-empirical': 'p_value',
+    'Significance_score': 'significance_score',
+    'log(pval)-hypergeom': 'hypergeometric_log_p_value',
     'EnhancerEff.pval.adj': 'p_value_adj',
     'p_val_adj': 'p_value_adj',
     'sceptre_adj_p_value': 'p_value_adj',
@@ -336,13 +343,17 @@ _IGVF_E2G_METRIC_COLUMN_TO_KEY = {
     'EnhancerEff': 'effect_size',
     'EnhancerEffect.noAux': 'effect_size',
     'FRACTEL_effect_size': 'effect_size',
-    'fc': 'effect_size',
+    'fc': 'fold_change',
+    'fc_by_rand_dist_cpm': 'background_corrected_fold_change',
     'avg_log2FC': 'log2FC',
     'sceptre_log2_fc': 'log2FC',
     'log_2_fold_change': 'log2FC',
     'log2fc': 'log2FC',
     'pct.1': 'pct_1',
     'pct.2': 'pct_2',
+    'cpm_perturb': 'cpm_perturb',
+    'cpm_bg': 'cpm_bg',
+    'num_cell': 'num_cells',
     'significant': 'significant',
     'Significant': 'significant',
 }
@@ -702,7 +713,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                     metrics[key] = significant
             elif cell:
                 try:
-                    metrics[key] = float(cell)
+                    value = float(cell)
+                    metrics[key] = value
                 except ValueError:
                     self.logger.warning(
                         'Skipping metric %s in %s: not a float (%r).',
