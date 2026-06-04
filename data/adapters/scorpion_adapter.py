@@ -2,6 +2,7 @@ import csv
 import requests
 import gzip
 import json
+import math
 from typing import Optional
 
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb, gene_synonym_to_ensembl_id
@@ -69,7 +70,8 @@ class ScorpionAdapter(BaseAdapter):
                     '_to': 'genes/' + row['target_ensembl'],
                     'beta': row['beta'],
                     'p_value': row['P'],
-                    'fdr': row['FDR'],
+                    'p_value_adj': row['FDR'],
+                    'nlog10_p_value': -math.log10(row['P']),
                     'name': 'regulates',
                     'inverse_name': 'is regulated by',
                     'files_filesets': 'files_filesets/' + self.file_accession,
