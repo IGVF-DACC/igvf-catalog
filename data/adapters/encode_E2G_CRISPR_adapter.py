@@ -123,7 +123,7 @@ class ENCODE2GCRISPR(BaseAdapter):
                         'score': float(score),
                         'p_value': float(p_value) if p_value != 'NA' else p_value,
                         'p_value_adj': float(row[20]) if row[20] != 'NA' else row[20],
-                        'neg_log10_p_value': log10pvalue,
+                        'neg_log10_p_value': neglog10pvalue,
                         'significant': significant == 'TRUE',
                         'method': file_fileset.get('method'),
                         'crispr_modality': file_fileset.get('crispr_modality'),
