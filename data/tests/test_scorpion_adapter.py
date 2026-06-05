@@ -69,7 +69,7 @@ def test_process_file_writes_json(mock_get_file_fileset, mock_dictreader_cls, mo
         assert 'effect_size' in doc
         assert 'p_value' in doc
         assert 'p_value_adj' in doc
-        assert 'nlog10_p_value' in doc
+        assert 'neg_log10_p_value' in doc
         assert 'files_filesets' in doc
         assert doc['label'] == ScorpionAdapter.LABEL
         assert doc['source'] == ScorpionAdapter.SOURCE
