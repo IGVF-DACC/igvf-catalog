@@ -775,11 +775,54 @@ def test_igvf_e2g_crudo_real_sample_ccnd1_tss_element_is_promoter_with_hardcoded
     assert tss_node['promoter_of'] == 'genes/ENSG00000110092'
 
 
-def test_igvf_e2g_crudo_flowfish_missing_name_hg38_warns_and_skips(
-        mock_file_fileset_facs_screen, tmp_path, caplog):
-    """Rows with empty name_hg38 are skipped with an explicit warning."""
+def test_igvf_e2g_6296_configured_skip_row_omits_invalid_readout_gene(
+        mock_file_fileset_perturb_seq, tmp_path, caplog):
+    """IGVFFI6296RCJK: ENSG00000232196 (line 1331) is listed in skip_rows."""
     writer = SpyWriter()
-    test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_missing_hg38.tsv.gz'
+    test_file = tmp_path / 'igvf_E2G_CRISPR_6296_skip.tsv.gz'
+    header = (
+        'p_val\tavg_log2FC\tpct.1\tpct.2\tp_val_adj\tgene_symbol\t'
+        'ensembl_id\tintended_target_name\tintended_target_chr\t'
+        'intended_target_start\tintended_target_end\n'
+    )
+    rows = (
+        '0\t-0.612084335\t0.744\t0.994\t0\tMYH9\tENSG00000100345\t'
+        'chr22:36387779-36388133\tchr22\t36387779\t36388133\n'
+        '0.11574015\t0.001369348\t0.01\t0.004\t1\tMTRNR2L4\t'
+        'ENSG00000232196\tchr16:3171499-3172694\tchr16\t3171499\t3172694\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = (
+            lambda gene_id: gene_id != 'ENSG00000232196'
+        )
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6296RCJK/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        with caplog.at_level(logging.WARNING):
+            adapter.process_file()
+
+    assert not any(
+        'readout gene' in record.message
+        for record in caplog.records
+    )
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
+    assert parsed[0]['_to'] == 'genes/ENSG00000100345'
+
+
+def test_igvf_e2g_crudo_flowfish_7280_configured_skip_row_omits_missing_name_hg38(
+        mock_file_fileset_facs_screen, tmp_path, caplog):
+    """IGVFFI7280ZZFA: one known row without name_hg38 is listed in skip_rows."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_7280_skip.tsv.gz'
     header = (
         'name\tname_hg38\tn\tTargetGene\tTargetGeneID\ttype\t'
         'EnhancerEffect.noAux\tci95.EnhancerEffect.noAux\t'
@@ -807,13 +850,53 @@ def test_igvf_e2g_crudo_flowfish_missing_name_hg38_warns_and_skips(
         with caplog.at_level(logging.WARNING):
             adapter.process_file()
 
-    assert any(
+    assert not any(
         'missing or empty name_hg38' in record.message
         for record in caplog.records
     )
     parsed = [json.loads(line) for line in writer.contents if line.strip()]
     assert len(parsed) == 1
     assert parsed[0]['_to'] == 'genes/ENSG00000110092'
+
+
+def test_igvf_e2g_crudo_flowfish_missing_name_hg38_warns_when_not_in_skip_rows(
+        mock_file_fileset_facs_screen, tmp_path, caplog):
+    """Empty name_hg38 on other files still logs a warning."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_missing_hg38.tsv.gz'
+    header = (
+        'name\tname_hg38\tn\tTargetGene\tTargetGeneID\ttype\t'
+        'EnhancerEffect.noAux\tci95.EnhancerEffect.noAux\t'
+        'pval.EnhancerEffect.noAux\tadj.pval.EnhancerEffect.noAux\tSignificant\n'
+    )
+    rows = (
+        'chr11:68691700-68692200\tchr11:68691700-68692200\t58\t'
+        'CCND1\tENSG00000110092\tTSS\t0.39\t0.07\t1e-10\t1e-8\tTRUE\n'
+        'chr11:69088621-69089984\t\t68\t'
+        'CCND1\tENSG00000110092\tputative_enhancer\t0.1\t0.05\t0.5\t0.5\tFALSE\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI5288BRAZ/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        with caplog.at_level(logging.WARNING):
+            adapter.process_file()
+
+    assert any(
+        'missing or empty name_hg38' in record.message
+        for record in caplog.records
+    )
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
 
 
 def test_igvf_e2g_crudo_flowfish_tss_row_is_promoter_self_effect(
