@@ -39,7 +39,7 @@
           "type": "number",
           "description": "The FDR (p-value adjacent) value of the gene gene edge"
         },
-        "nlog10_p_value": {
+        "neg_log10_p_value": {
           "type": "number",
           "description": "The -log10 P-value of the gene gene edge"
         },
@@ -90,6 +90,7 @@
         "source",
         "p_value",
         "p_value_adj",
+        "neg_log10_p_value",
         "effect_size",
         "name",
         "files_filesets",

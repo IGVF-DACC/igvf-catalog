@@ -72,7 +72,7 @@ class ScorpionAdapter(BaseAdapter):
                     'effect_size': float(row['beta']) if row['beta'] != '' else None,
                     'p_value': float(row['P']) if row['P'] != '' else None,
                     'p_value_adj': float(row['FDR']) if row['FDR'] != '' else None,
-                    'nlog10_p_value': -math.log10(float(row['P'])) if row['P'] != '' else None,
+                    'neg_log10_p_value': -math.log10(float(row['P'])) if row['P'] != '' else None,
                     'name': 'regulates',
                     'inverse_name': 'is regulated by',
                     'files_filesets': 'files_filesets/' + self.file_accession,
