@@ -108,6 +108,46 @@ class IGVFE2GCRISPR(BaseAdapter):
             return ['promoter', 'enhancer']
         return targeted_element_types
 
+    def _skip_column_value_matches(
+        self,
+        column: str,
+        cell: str,
+        expected: str,
+    ) -> bool:
+        if column in ('ensembl_id', 'TargetGeneID', 'gene_id', 'target_gene'):
+            return (
+                self._normalize_ensembl_gene_id(cell)
+                == self._normalize_ensembl_gene_id(expected)
+            )
+        return cell.strip() == expected
+
+    def _matches_configured_skip_row(
+        self,
+        row: list,
+        name_to_idx: Dict[str, int],
+        skip_spec: dict,
+    ) -> bool:
+        for column, expected in skip_spec.items():
+            if column in ('notes', 'catalog_notes'):
+                continue
+            idx = name_to_idx.get(column)
+            if idx is None or idx >= len(row):
+                return False
+            if not self._skip_column_value_matches(
+                    column, row[idx], expected):
+                return False
+        return True
+
+    def _is_explicitly_skipped_row(
+        self,
+        row: list,
+        name_to_idx: Dict[str, int],
+    ) -> bool:
+        for skip_spec in self._file_config().get('skip_rows', []):
+            if self._matches_configured_skip_row(row, name_to_idx, skip_spec):
+                return True
+        return False
+
     def _promoter_gene_and_source_annotation(
         self,
         targeted_element_types: list,
@@ -280,6 +320,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         self,
         row: list,
         col: Dict[str, Optional[int]],
+        name_to_idx: Optional[Dict[str, int]] = None,
     ) -> Optional[Tuple[str, str, str, str]]:
         ni = col['name_hg38']
         if ni is None:
@@ -316,11 +357,12 @@ class IGVFE2GCRISPR(BaseAdapter):
         self,
         row: list,
         col: Dict[str, Optional[int]],
+        name_to_idx: Optional[Dict[str, int]] = None,
     ) -> Optional[Tuple[str, str, str, str]]:
         explicit = self._resolve_explicit_interval(row, col)
         if explicit is not None:
             return explicit
-        from_name = self._resolve_name_hg38_interval(row, col)
+        from_name = self._resolve_name_hg38_interval(row, col, name_to_idx)
         if from_name is not None:
             return from_name
         if col.get('name_hg38') is not None:
@@ -724,6 +766,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             for row in reader:
                 if not row:
                     continue
+                if self._is_explicitly_skipped_row(row, name_to_idx):
+                    continue
                 if is_scaled_screen and not self._scaled_screen_row_should_load(
                         row, name_to_idx, colmap):
                     continue
@@ -731,7 +775,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                 if uses_name_hg38 or method == 'Perturb-seq':
                     if self._perturb_seq_negative_control(row, colmap['element_type']):
                         continue
-                    interval = self._resolve_perturb_seq_element(row, colmap)
+                    interval = self._resolve_perturb_seq_element(
+                        row, colmap, name_to_idx)
                     if interval is None:
                         continue
                     (

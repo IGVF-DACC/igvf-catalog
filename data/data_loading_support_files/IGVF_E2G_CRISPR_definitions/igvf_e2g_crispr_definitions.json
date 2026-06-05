@@ -415,11 +415,19 @@
       ]
     },
     "IGVFFI6296RCJK": {
-        "layout": "mechanoenhancer",
-        "targeted_element_types": [
-          "enhancer"
-        ]
-      },
+      "layout": "mechanoenhancer",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "catalog_notes": "ENSG00000232196 on line 1331 is not valid ENSEMBL for GENCODE v43. It is a pseudogene.",
+      "skip_rows": [
+        {
+          "ensembl_id": "ENSG00000232196",
+          "intended_target_name": "chr16:3171499-3172694",
+          "notes": "Not in GENCODE v43; pseudogene."
+        }
+      ]
+    },
     "IGVFFI6376HTIF": {
       "layout": "parse_perturb_seq",
       "targeted_element_types": [
@@ -458,6 +466,14 @@
       "targeted_element_types": [
         "promoter",
         "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "name": "chr11:69088621-69089984",
+          "TargetGeneID": "ENSG00000110092",
+          "type": "putative_enhancer",
+          "notes": "Row lacks name_hg38 in the released file; omit from catalog load."
+        }
       ]
     },
     "IGVFFI5288BRAZ": {
