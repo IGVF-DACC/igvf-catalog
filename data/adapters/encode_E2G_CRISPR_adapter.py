@@ -101,11 +101,11 @@ class ENCODE2GCRISPR(BaseAdapter):
                         score = 0  # assign 0 if unavailable
                     p_value = row[19]  # pValueAdjusted
                     if p_value == 'NA':
-                        log10pvalue = None
+                        neglog10pvalue = None
                     elif float(p_value) == 0:
-                        log10pvalue = self.MAX_LOG10_PVALUE
+                        neglog10pvalue = self.MAX_LOG10_PVALUE
                     else:
-                        log10pvalue = -1 * log10(float(p_value))
+                        neglog10pvalue = -1 * log10(float(p_value))
 
                     significant = row[17]  # TRUE or FALSE
 
@@ -122,7 +122,8 @@ class ENCODE2GCRISPR(BaseAdapter):
                         '_to': _target,
                         'score': float(score),
                         'p_value': float(p_value) if p_value != 'NA' else p_value,
-                        'log10pvalue': log10pvalue,
+                        'p_value_adj': float(row[20]) if row[20] != 'NA' else row[20],
+                        'neg_log10_p_value': log10pvalue,
                         'significant': significant == 'TRUE',
                         'method': file_fileset.get('method'),
                         'crispr_modality': file_fileset.get('crispr_modality'),
