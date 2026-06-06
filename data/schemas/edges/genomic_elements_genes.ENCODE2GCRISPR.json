@@ -32,19 +32,19 @@
           "description": "The score of the genomic element to gene edge"
         },
         "p_value": {
-          "type": "number",
+          "type": ["number", "null"],
           "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
         },
         "p_value_adj": {
-          "type": "number",
+          "type": ["number", "null"],
           "description": "The adjusted p value of the genomic element to gene edge. Can be 'NA' or a number."
         },
         "neg_log10_p_value": {
-          "type": "number",
+          "type": ["number", "null"],
           "description": "The neg_log10_p_value of the genomic element to gene edge"
         },
         "neg_log10_p_value_adj": {
-          "type": "number",
+          "type": ["number", "null"],
           "description": "The adjusted neg_log10_p_value of the genomic element to gene edge"
         },
         "significant": {
