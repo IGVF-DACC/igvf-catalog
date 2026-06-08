@@ -20,6 +20,9 @@ export const swaggerConfig = {
     '.swagger-ui .opblock-description-wrapper ul { margin: 0.25em 0 0.75em 1.25em; padding-left: 1.25em; }',
     '.swagger-ui .opblock-description-wrapper li { margin: 0.35em 0; }',
     '.swagger-ui .opblock-description-wrapper p + ul { margin-top: 0.25em; }',
+    'html.dark-mode .swagger-ui .opblock .opblock-description-wrapper {',
+    'color: #e4e6e6;',
+    '}',
     '.swagger-ui .auth-wrapper { display: none; }'
   ].join(' '),
   swaggerOptions: {
