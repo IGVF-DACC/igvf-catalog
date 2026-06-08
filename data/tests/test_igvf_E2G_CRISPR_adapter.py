@@ -460,7 +460,7 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['_to'] == 'genes/ENSG00000126353'
         assert first_item['p_value'] == 0.7264835
         assert first_item['adj_p_value'] == 0.9994257067617868
-        assert first_item['effect_size'] == 0.2254047296279381
+        assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
         assert first_item['crispr_modality'] == 'activation'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
