@@ -126,15 +126,39 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.associated_dbxrefs
 
   const filters = []
-  const protein = getFilterStatements(proteinSchema, proteinInput).replaceAll('record', 'protein')
-  const associatedProtein = getFilterStatements(proteinSchema, associatedProteinInput).replaceAll('record', 'associatedProtein')
+
+  if (input.source !== undefined) {
+    if (input.source === 'IntAct' || input.source === 'BioGRID') {
+      filters.push(`(record.source == "${input.source as string}" OR record.source == "BioGRID; IntAct")`)
+    } else {
+      filters.push(`record.source == "${input.source as string}"`)
+    }
+    delete input.source
+  }
+
+  let protein = getFilterStatements(proteinSchema, proteinInput).replaceAll('record', 'protein')
+  let associatedProtein = getFilterStatements(proteinSchema, associatedProteinInput).replaceAll('record', 'associatedProtein')
   const edgeFilters = getFilterStatements(proteinProteinSchema, input)
 
   if (protein) {
+    if (proteinInput._key !== undefined) {
+      const proteinId = decodeURIComponent(proteinInput._key as string)
+      protein = `protein._key == '${proteinId}' OR
+            protein.protein_id == '${proteinId}' OR
+            '${proteinId}' IN protein.uniprot_ids`
+    }
+
     filters.push('(record._from == protein._id OR record._to == protein._id)')
   }
 
   if (associatedProtein) {
+    if (associatedProteinInput._key !== undefined) {
+      const associatedProteinId = decodeURIComponent(associatedProteinInput._key as string)
+      associatedProtein = `associatedProtein._key == '${associatedProteinId}' OR
+            associatedProtein.protein_id == '${associatedProteinId}' OR
+            '${associatedProteinId}' IN associatedProtein.uniprot_ids`
+    }
+
     filters.push('(record._from == associatedProtein._id OR record._to == associatedProtein._id)')
   }
 

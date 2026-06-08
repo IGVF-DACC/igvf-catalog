@@ -94,6 +94,9 @@ class ProteinsInteraction(BaseAdapter):
                         # collection method should be a string of interaction type separated by ', '
                         collection_method = ', '.join(interaction_type)
                         detection_method = self.MI_code_mapping.get(row[4])
+                        source = row[-1]
+                        if source == 'IntAct; BioGRID':
+                            source = 'BioGRID; IntAct'
 
                         props = {
                             '_key': _key,
@@ -105,8 +108,7 @@ class ProteinsInteraction(BaseAdapter):
                             'interaction_type_code': interaction_type_code,
                             'confidence_value_biogrid': float(row[7]) if row[7] else None,
                             'confidence_value_intact': float(row[-2]) if row[-2] else None,
-                            # BioGRID or IntAct or BioGRID; IntAct
-                            'source': row[-1],
+                            'source': source,
                             'pmids': [pmid_url + pmid for pmid in pmids],
                             'organism': self.organism,
                             'name': 'physically interacts with',
