@@ -74,7 +74,7 @@
     "columns": {
       "FRACTEL_pval": "Element-level p-values for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (https://github.com/GersbachlabBioinformatics/FRACTEL)",
       "FRACTEL_pval_fdr_corr": "Corrected FRACTEL_pval after applying the Benjamini-Hochberg procedure",
-      "FRACTEL_effect_size": "Element-level effect-size for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
+      "FRACTEL_effect_size": "Element-level log2 fold change for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
       "intended_target_name": "ID of the targeted element (grouping singleton measurements, like gRNA-gene p-values). In promoter screens, this column will contain the ENSEMBL ID of the targeted gene.",
       "intended_target_chr": "Chromosome of the target element",
       "intended_target_start": "Start coordinate of the target element",
@@ -93,7 +93,7 @@
       "metrics": {
         "FRACTEL_pval": "p_value",
         "FRACTEL_pval_fdr_corr": "adj_p_value",
-        "FRACTEL_effect_size": "effect_size"
+        "FRACTEL_effect_size": "log2FC"
       }
     }
   },
