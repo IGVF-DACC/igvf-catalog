@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_genes.scE2G.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the genomic element to gene edge, including the cell type ontology term ID suffix",
+          "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX_ENSG00000000457_CL_0000336"
+        },
+        "_from": {
+          "example": "genomic_elements/promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000000457",
+          "pattern": "^genes/",
+          "collections": [
+            "genes"
+          ]
+        },
+        "method": {
+          "enum": [
+            "scE2G"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted regulatory element effect on gene expression"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "score": {
+          "type": "number",
+          "description": "scE2G prediction score for the element-gene link"
+        },
+        "transcription_start_site": {
+          "type": "integer",
+          "description": "Transcription start site of the target gene (GeneTSS)"
+        },
+        "RNA_pseudobulk_tpm": {
+          "type": "number",
+          "description": "RNA pseudobulk TPM of the target gene in the cell type"
+        },
+        "cell_type": {
+          "type": "string",
+          "description": "Cell type for the genomic element to gene edge",
+          "example": "adrenal medulla chromaffin cell"
+        },
+        "cell_type_term": {
+          "type": "string",
+          "description": "Ontology term for the cell type",
+          "example": "ontology_terms/CL_0000336",
+          "pattern": "^ontology_terms/"
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the genomic element to gene edge",
+          "example": "files_filesets/IGVFFI5648GWQX",
+          "pattern": "^files_filesets/"
+        },
+        "name": {
+          "enum": [
+            "regulates"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "regulated by"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "score",
+        "transcription_start_site",
+        "RNA_pseudobulk_tpm",
+        "cell_type",
+        "cell_type_term",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "score",
+    "return": "class, label, method, source, source_url, files_filesets, cell_type, cell_type_term, score, transcription_start_site, RNA_pseudobulk_tpm"
+  },
+  "db_collection_name": "genomic_elements_genes"
+}

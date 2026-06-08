@@ -51,6 +51,7 @@ from adapters.cV2F_variant_phenotype_adapter import cV2F
 from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 from adapters.gencc_diseases_genes_adapter import GenccDiseasesGenes
+from adapters.scE2G_adapter import scE2G
 
 KEY_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -139,7 +140,8 @@ KEY_TO_ADAPTER = {
     'cv2f_variant_phenotype': cV2F,
     'mutpred2_coding_variant': Mutpred2CodingVariantsScores,
     'ESM_coding_variant': ESM1vCodingVariantsScores,
-    'gencc_disease_gene': GenccDiseasesGenes
+    'gencc_disease_gene': GenccDiseasesGenes,
+    'scE2G': scE2G
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
