@@ -96,7 +96,7 @@ class scE2G(BaseAdapter):
                         continue
                     transcription_start_site = int(row[7])  # GeneTSS
                     score = float(row[-2])
-                    RNA_pseudobulk_tpm = float(row[-1])  # RNA_pseudobulkTPM
+                    rna_pseudobulk_tpm = float(row[-1])  # RNA_pseudobulkTPM
                     key = f'{regulatory_element_id}_{gene_id}_{cell_type_term_id}'
                     props = {
                         '_key': key,
@@ -104,7 +104,7 @@ class scE2G(BaseAdapter):
                         '_to': f'genes/{gene_id}',
                         'transcription_start_site': transcription_start_site,
                         'score': score,
-                        'RNA_pseudobulk_tpm': RNA_pseudobulk_tpm,
+                        'rna_pseudobulk_tpm': rna_pseudobulk_tpm,
                         'cell_type': cell_type,
                         'cell_type_term': cell_type_term_endpoint,
                         'files_filesets': 'files_filesets/' + self.file_accession,

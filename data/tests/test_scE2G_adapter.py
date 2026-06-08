@@ -149,7 +149,7 @@ def test_scE2G_adapter_genomic_element_gene(mock_file_fileset, sce2g_filepath):
         assert first_item['_to'] == f'genes/{GENE_ID}'
         assert first_item['transcription_start_site'] == 169893959
         assert first_item['score'] == pytest.approx(0.996889932534048)
-        assert first_item['RNA_pseudobulk_tpm'] == pytest.approx(
+        assert first_item['rna_pseudobulk_tpm'] == pytest.approx(
             22.8574991753656)
         assert first_item['cell_type'] == 'adrenal medulla chromaffin cell'
         assert first_item['cell_type_term'] == 'ontology_terms/CL_0000336'
