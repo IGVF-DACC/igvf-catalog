@@ -89,8 +89,8 @@ class ProteinsInteraction(BaseAdapter):
                         _key = hashlib.sha256('_'.join(
                             [protein_from_ensembl, protein_to_ensembl, row[4].replace(':', '_')] + pmids).encode()).hexdigest()
                         interaction_type_code = row[6].split('; ')
-                        interaction_type = [self.MI_code_mapping.get(
-                            code) for code in interaction_type_code]
+                        interaction_type = sorted([self.MI_code_mapping.get(
+                            code) for code in interaction_type_code])
                         # collection method should be a string of interaction type separated by ', '
                         collection_method = ', '.join(interaction_type)
                         detection_method = self.MI_code_mapping.get(row[4])
