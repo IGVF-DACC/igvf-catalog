@@ -14,7 +14,7 @@ from adapters.writer import Writer
 _CRISPR_E2G_DEFINITIONS_PATH = (
     Path(__file__).resolve().parents[1] /
     'data_loading_support_files' /
-    'IGVF_E2G_CRISPR_definitions' /
+    'IGVF_E2G_CRISPR' /
     'igvf_e2g_crispr_definitions.json'
 )
 
