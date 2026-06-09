@@ -574,6 +574,12 @@
         "enhancer"
       ]
     },
+    "IGVFFI9298BISV": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
     "IGVFFI9134FSCT": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
@@ -620,12 +626,6 @@
           "intended_target_name": "chr7:150993445-150994053",
           "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
         }
-      ]
-    },
-    "IGVFFI9298BISV": {
-      "layout": "teloHAEC_flowfish",
-      "targeted_element_types": [
-        "enhancer"
       ]
     },
     "IGVFFI6600VCYY": {
