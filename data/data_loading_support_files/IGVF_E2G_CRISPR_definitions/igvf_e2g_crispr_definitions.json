@@ -65,7 +65,7 @@
         "pct.2": "pct_2"
       }
     },
-    "notes": "File format specification reused from t_cell_perturb_seq, data file does not match fields defined in file format specifications precisely, i.e. ensembl_id instead of target_gene."
+    "notes": "File format specification document reused from t_cell_perturb_seq. Data file format does not actually match the fields defined in file format specification document precisely, i.e. ensembl_id instead of target_gene."
   },
   "bulk_t_cell": {
     "uuid": "919d1d76-72f2-494b-9c86-372e0d26a229",
@@ -171,7 +171,7 @@
         "significant": "significant"
       }
     },
-    "notes": "power_at_effect_size_XX is a variable field name that only sometimes actually gets renamed ex. power_at_effect_size_15."
+    "notes": "power_at_effect_size_XX is a variable field name that only sometimes actually gets renamed depending on the effect size value ex. power_at_effect_size_15."
   },
   "crudo_tap_seq": {
     "uuid": "962440ae-91c6-4d7e-b27c-cbf7b73fafd9",
@@ -225,7 +225,7 @@
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
       },
-      "notes": "Differs from the file format specifications: `name_hg19` is renamed `name`. TSS rows ({gene}_TSS in promoter_gene_map) are positive controls: adapter sets significant=true. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above."
+      "notes": "Differs from the file format specification document: `name` is renamed `name_hg19`. TSS rows ({gene}_TSS in promoter_gene_map) are positive controls: adapter sets significant=true. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above."
     }
   },
   "crudo_flowfish": {
@@ -292,7 +292,7 @@
       "significant": "Indicates whether the tested enhancer-gene pair is significant (TRUE or FALSE)",
       "sample_term_name": "Name of the cell type or biosample (useful for multi-experiment aggregation)",
       "sample_term_id": "UBERON or CL ID for the biosample or cell type",
-      "sample_summary_short": "Short description of the sample, including treatments",
+      "sample_summary_shor": "Short description of the sample, including treatments",
       "notes": "(optional) Field for notes, such as reference, source, or annotation details"
     },
     "semantic_columns": {
@@ -351,7 +351,7 @@
         "log_2_fold_change": "log2FC"
       }
     },
-    "notes": "Title derived from portal metadata, as no title is provided in the file format specification document."
+    "notes": "Title derived from portal metadata description property, as no title is provided in the file format specification document."
   },
   "pySpade": {
     "uuid": "868ce311-328b-4bbb-9baf-84470df45dd1",
