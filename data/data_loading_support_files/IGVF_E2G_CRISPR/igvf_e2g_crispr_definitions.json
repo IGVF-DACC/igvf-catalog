@@ -562,12 +562,6 @@
         "enhancer"
       ]
     },
-    "IGVFFI5749FOUE": {
-      "layout": "teloHAEC_flowfish",
-      "targeted_element_types": [
-        "enhancer"
-      ]
-    },
     "IGVFFI4404SMPQ": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
@@ -584,21 +578,51 @@
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
         "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
       ]
     },
     "IGVFFI0629LUWT": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
         "enhancer"
-      ]
-    },
-    "IGVFFI9298BISV": {
-      "layout": "teloHAEC_flowfish",
-      "targeted_element_types": [
-        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
       ]
     },
     "IGVFFI6843QWSB": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
+      ]
+    },
+    "IGVFFI5749FOUE": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
+      ]
+    },
+    "IGVFFI9298BISV": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
         "enhancer"
