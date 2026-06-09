@@ -368,6 +368,50 @@ def test_query_fileset_files_props_igvf_with_crispr_modality():
     assert sample_term_ids == ['EFO_0002067']
 
 
+def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_screen():
+    file_object = {
+        '@id': '/tabular-files/IGVFFI0000FLOW/',
+        'accession': 'IGVFFI0000FLOW',
+        'catalog_class': 'observed data',
+        'catalog_collections': ['genomic_elements'],
+        'file_set': {
+            '@id': '/analysis-sets/IGVFDS0000FLOW/'
+        },
+        'href': '/tabular-files/IGVFFI0000FLOW/@@download/IGVFFI0000FLOW.tsv.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS0000FLOW',
+        '@type': ['AnalysisSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/jesse-engreitz/'},
+        'samples': [{'accession': 'IGVFSM0000TEST'}],
+        'publications': [],
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000FLOW/'}]
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        with patch.object(FileFileSet, 'get_software_igvf', return_value={'pandas'}):
+            with patch.object(
+                    FileFileSet,
+                    'parse_analysis_set_igvf',
+                    return_value=({'CRISPR FlowFISH screen'}, {'OBI:0003661'})):
+                with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
+                    with patch.object(
+                        FileFileSet,
+                        'parse_sample_donor_treatment_igvf',
+                        return_value=(
+                            {'IGVFSM0000TEST'},
+                            {'IGVFDO0000TEST'},
+                            {'EFO:0002824'},
+                            {'HCT116'},
+                            set(),
+                            'interference'
+                        )
+                    ):
+                        props, _, _ = FileFileSet.query_fileset_files_props_igvf(
+                            file_object)
+    assert props['preferred_assay_titles'] == ['CRISPR FlowFISH screen']
+    assert props['method'] == 'CRISPR screen'
+
+
 def test_get_donor_props():
     api_url = 'https://api.data.igvf.org/'
     source_url = 'https://data.igvf.org/'

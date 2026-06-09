@@ -287,7 +287,7 @@
       "gene_symbol": "Gene symbol (Ensembl)",
       "log2_fc": "Log2 fold change effect size compared to negative control guides",
       "p_value": "Uncorrected p-value from t-test (range: 0–1)",
-      "adj_p_value": " FDR-adjusted p-value (range: 0–1)",
+      "adj_p_value": "FDR-adjusted p-value (range: 0–1)",
       "significant": "Indicates whether the tested enhancer-gene pair is significant (TRUE or FALSE)",
       "sample_term_name": "Name of the cell type or biosample (useful for multi-experiment aggregation)",
       "sample_term_id": "UBERON or CL ID for the biosample or cell type",
@@ -296,7 +296,11 @@
     },
     "semantic_columns": {
       "readout_gene": "gene_id",
-      "element_coordinates": "intended_target_name",
+      "element_coordinates": [
+        "targeting_chr",
+        "targeting_start",
+        "targeting_end"
+      ],
       "metrics": {
         "log2_fc": "log2FC",
         "p_value": "p_value",
