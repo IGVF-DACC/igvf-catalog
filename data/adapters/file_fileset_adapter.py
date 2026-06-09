@@ -796,9 +796,9 @@ class FileFileSet:
             method = 'MPRA'
 
         if preferred_assay_titles:
-            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq'}):
+            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq', 'Parse Perturb-seq', 'scCRISPR screen'}):
                 method = 'Perturb-seq'
-            elif set(preferred_assay_titles) == {'CRISPR FACS screen'}:
+            elif set(preferred_assay_titles).issubset({'CRISPR FACS screen', 'CRISPR FlowFISH screen'}):
                 method = 'CRISPR screen'
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
