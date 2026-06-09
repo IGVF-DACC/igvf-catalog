@@ -805,7 +805,6 @@ class IGVFE2GCRISPR(BaseAdapter):
                             intended_target_gene_raw,
                         )
                     )
-
                 element_coordinates = (
                     intended_target_chr,
                     intended_target_start,
