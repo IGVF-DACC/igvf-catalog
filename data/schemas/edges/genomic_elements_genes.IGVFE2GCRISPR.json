@@ -147,7 +147,7 @@
           "type": "number",
           "description": "Half-width of the 95% confidence interval on effect_size."
         },
-        "n_guides": {
+        "num_guides": {
           "type": "number",
           "description": "Number of guides targeting the perturbed element."
         },
