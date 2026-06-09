@@ -524,7 +524,7 @@
           "name": "chr11:69088621-69089984",
           "TargetGeneID": "ENSG00000110092",
           "type": "putative_enhancer",
-          "notes": "Row lacks name_hg38 in the released file; omit from catalog load."
+          "notes": "Row lacks name_hg38 in the released file."
         }
       ]
     },
