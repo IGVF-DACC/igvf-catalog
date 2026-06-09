@@ -370,7 +370,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                 name_to_idx, semantic_columns.get('readout_gene')),
             'promoter_gene': self._pick_column(
                 name_to_idx,
-                semantic_columns.get('target_gene'),
+                semantic_columns.get('perturbed_gene'),
             ),
             'significant': None,
             'name_hg38': None,
@@ -396,7 +396,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                 name_to_idx, element_coordinates)
         colmap['promoter_gene'] = self._pick_column(
             name_to_idx,
-            semantic_columns.get('target_gene'),
+            semantic_columns.get('perturbed_gene'),
         )
         for source_column, catalog_field in semantic_columns.get(
             'metrics', {}
@@ -602,7 +602,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         )
 
     @staticmethod
-    def _scaled_screen_target_genes(value: str) -> List[str]:
+    def _scaled_screen_perturbed_genes(value: str) -> List[str]:
         cell = (value or '').strip()
         if not cell:
             return []
@@ -620,7 +620,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         self,
         row: list,
         colmap: Dict[str, Optional[int]],
-        target_gene_raw: str,
+        perturbed_gene_raw: str,
     ) -> Tuple[Optional[str], str]:
         source_idx = colmap.get('source_annotation')
         if source_idx is None or source_idx >= len(row):
@@ -634,15 +634,16 @@ class IGVFE2GCRISPR(BaseAdapter):
                 f'unsupported genomic_element value {row[source_idx]!r}.'
             )
 
-        target_genes = self._scaled_screen_target_genes(target_gene_raw)
-        if not target_genes:
+        perturbed_genes = self._scaled_screen_perturbed_genes(
+            perturbed_gene_raw)
+        if not perturbed_genes:
             self._row_load_error(
-                'missing target gene in putative_target_genes.'
+                'missing perturbed gene in putative_target_genes.'
             )
-        promoter_gene = self._normalize_ensembl_gene_id(target_genes[0])
+        promoter_gene = self._normalize_ensembl_gene_id(perturbed_genes[0])
         if not self.gene_validator.validate(promoter_gene):
             self._row_load_error(
-                f'target gene {target_genes[0]!r} is not valid.'
+                f'perturbed gene {perturbed_genes[0]!r} is not valid.'
             )
         return promoter_gene, 'promoter'
 

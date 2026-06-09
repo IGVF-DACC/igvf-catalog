@@ -23,7 +23,7 @@
         "intended_target_end"
       ],
       "readout_gene": "target_gene",
-      "target_gene": "intended_target_name",
+      "perturbed_gene": "intended_target_name",
       "metrics": {
         "p_val": "p_value",
         "p_val_adj": "adj_p_value",
@@ -89,7 +89,7 @@
         "intended_target_end"
       ],
       "readout_gene": "readout_gene",
-      "target_gene": "intended_target_name",
+      "perturbed_gene": "intended_target_name",
       "metrics": {
         "FRACTEL_pval": "p_value",
         "FRACTEL_pval_fdr_corr": "adj_p_value",
@@ -123,7 +123,7 @@
         "targeting_end"
       ],
       "readout_gene": "gene_id",
-      "target_gene": "Intended_target_gene_id",
+      "perturbed_gene": "Intended_target_gene_id",
       "metrics": {
         "sceptre_p_value": "p_value",
         "sceptre_adj_p_value": "adj_p_value",
@@ -347,7 +347,7 @@
         "intended_target_end"
       ],
       "readout_gene": "response_id",
-      "target_gene": "putative_target_genes",
+      "perturbed_gene": "putative_target_genes",
       "source_annotation": "genomic_element",
       "metrics": {
         "p_value": "p_value",
@@ -388,7 +388,7 @@
     "semantic_columns": {
       "element_coordinates": "region",
       "readout_gene": "gene_name_ensembl",
-      "target_gene": "intended_target_name_ensmbl",
+      "perturbed_gene": "intended_target_name_ensmbl",
       "source_annotation": "genomic_element",
       "metrics": {
         "Significance_score": "ln_p_value",
