@@ -137,7 +137,7 @@ class VariantEFFECTSAdapter(BaseAdapter):
                         'effect_size': float(row[9]),
                         'log2_fold_change': float(row[10]),
                         'neg_log10_pvalue': float(row[11]),
-                        'fdr_nlog10': float(row[12]),
+                        'neg_log10_pvalue_adj': float(row[12]),
                         'power': float(row[14]) if row[14] else None,
                         'class': 'observed data',
                         'label': 'variant effect on gene expression',
