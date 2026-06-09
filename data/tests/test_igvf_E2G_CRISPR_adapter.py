@@ -758,7 +758,7 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     enh = next(e for e in parsed if e['_to'] == 'genes/ENSG00000100345')
     assert enh['effect_size'] == 0.25
     assert enh['effect_size_ci_95'] == 0.05
-    assert enh['n_guides'] == 10
+    assert enh['num_guides'] == 10
     assert enh['p_value'] == 0.01
     assert enh['adj_p_value'] == 0.02
     assert enh['neg_log10_p_value'] == pytest.approx(2.0)

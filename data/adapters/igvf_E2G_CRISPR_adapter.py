@@ -542,8 +542,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             edge['effect_size'] = metrics['effect_size']
         if 'effect_size_ci_95' in metrics:
             edge['effect_size_ci_95'] = metrics['effect_size_ci_95']
-        if 'n_guides' in metrics:
-            edge['n_guides'] = metrics['n_guides']
+        if 'num_guides' in metrics:
+            edge['num_guides'] = metrics['num_guides']
         if 'fold_change' in metrics:
             edge['fold_change'] = metrics['fold_change']
         if 'background_corrected_fold_change' in metrics:

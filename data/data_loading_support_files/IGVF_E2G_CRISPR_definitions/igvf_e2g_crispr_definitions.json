@@ -217,7 +217,7 @@
       },
       "element_coordinates": "name_hg38",
       "metrics": {
-        "n": "n_guides",
+        "n": "num_guides",
         "pval.EnhancerEffect.noAux": "p_value",
         "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
         "adj.pval.EnhancerEffect.noAux": "adj_p_value",
@@ -261,7 +261,7 @@
       },
       "element_coordinates": "name_hg38",
       "metrics": {
-        "n": "n_guides",
+        "n": "num_guides",
         "pval.EnhancerEffect.noAux": "p_value",
         "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
         "adj.pval.EnhancerEffect.noAux": "adj_p_value",
