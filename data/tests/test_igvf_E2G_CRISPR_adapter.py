@@ -369,16 +369,15 @@ def test_igvf_e2g_teloHAEC_flowfish_enhancer_edge_uses_intended_target_name_inte
         mock_file_fileset_facs_screen, tmp_path):
     """teloHAEC FlowFISH: intended_target_name interval + log2_fc/p_value (CRISPR screen)."""
     writer = SpyWriter()
-    test_file = tmp_path / 'igvf_E2G_CRISPR_teloHAEC_flowfish.tsv.gz'
+    test_file = tmp_path / 'igvf_E2G_CRISPR_teloHAEC_flowfish.csv.gz'
     header = (
-        'intended_target_name\tguide_id(s)\ttype\tgene_id\t'
-        'gene_symbol\tlog2_fc\tp_value\tadj_p_value\tsignificant\t'
-        'sample_term_name\tsample_term_id\tsample_summary_shor\tnotes\n'
+        'intended_target_name,guide_id,targeting_chr,targeting_start,targeting_end,'
+        'type,gene_id,gene_symbol,log2_fc,p_value,adj_p_value,significant,'
+        'sample_term_name,sample_term_id,sample_summary_shor,notes\n'
     )
     row = (
-        'chr1:1000-2000\tguide-1\ttargeting\tENSG00000139618\t'
-        'BRCA2\t0.42\t0.01\t0.05\tTRUE\t'
-        'teloHAEC\tCL:0002145\tsummary\t\n'
+        'chr1:1000-2000,guide-1,chr1,1000,2000,targeting,ENSG00000139618,'
+        'BRCA2,0.42,0.01,0.05,TRUE,teloHAEC,CL:0002145,summary,\n'
     )
     with gzip.open(test_file, 'wt') as out:
         out.write(header)
