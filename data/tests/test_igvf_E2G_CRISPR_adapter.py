@@ -774,8 +774,45 @@ def test_igvf_e2g_crudo_real_sample_ccnd1_tss_element_is_promoter_with_hardcoded
     assert tss_node['promoter_of'] == 'genes/ENSG00000110092'
 
 
+def test_igvf_e2g_0206_configured_skip_row_omits_missing_intended_target_gene_id(
+        mock_file_fileset_perturb_seq, tmp_path):
+    """IGVFFI0206LUDV: promoter targets without Intended_target_gene_id are in skip_rows."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_0206_skip.tsv.gz'
+    header = (
+        'intended_target_name\tIntended_target_gene_id\tguide_id(s)\t'
+        'targeting_chr\ttargeting_start\ttargeting_end\tgene_id\tgene_symbol\t'
+        'sceptre_log2_fc\tsceptre_p_value\tsceptre_adj_p_value\tsignificant\ttype\n'
+    )
+    rows = (
+        'MAFB\tENSG00000204103\tMAFB_1,MAFB_2\tchr20\t40688724\t40689213\t'
+        'ENSG00000000003\tTSPAN6\t-0.17\t0.152\t0.857\tFALSE\tIndirect_targeting\n'
+        'SKIV2L\t\tSKIV2L_1,SKIV2L_2,SKIV2L_3\tchr6\t31958456\t31959343\t'
+        'ENSG00000000005\tTNMD\t0\t1\t1\tFALSE\tIndirect_targeting\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0206LUDV/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
+    assert parsed[0]['_to'] == 'genes/ENSG00000000003'
+
+
 def test_igvf_e2g_6296_configured_skip_row_omits_invalid_readout_gene(
-        mock_file_fileset_perturb_seq, tmp_path, caplog):
+        mock_file_fileset_perturb_seq, tmp_path):
     """IGVFFI6296RCJK: ENSG00000232196 (line 1331) is listed in skip_rows."""
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_6296_skip.tsv.gz'
@@ -805,20 +842,15 @@ def test_igvf_e2g_6296_configured_skip_row_omits_invalid_readout_gene(
             writer=writer,
             validate=True,
         )
-        with caplog.at_level(logging.WARNING):
-            adapter.process_file()
+        adapter.process_file()
 
-    assert not any(
-        'readout gene' in record.message
-        for record in caplog.records
-    )
     parsed = [json.loads(line) for line in writer.contents if line.strip()]
     assert len(parsed) == 1
     assert parsed[0]['_to'] == 'genes/ENSG00000100345'
 
 
 def test_igvf_e2g_crudo_flowfish_7280_configured_skip_row_omits_missing_name_hg38(
-        mock_file_fileset_facs_screen, tmp_path, caplog):
+        mock_file_fileset_facs_screen, tmp_path):
     """IGVFFI7280ZZFA: one known row without name_hg38 is listed in skip_rows."""
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_7280_skip.tsv.gz'
@@ -846,21 +878,16 @@ def test_igvf_e2g_crudo_flowfish_7280_configured_skip_row_omits_missing_name_hg3
             writer=writer,
             validate=True,
         )
-        with caplog.at_level(logging.WARNING):
-            adapter.process_file()
+        adapter.process_file()
 
-    assert not any(
-        'missing or empty name_hg38' in record.message
-        for record in caplog.records
-    )
     parsed = [json.loads(line) for line in writer.contents if line.strip()]
     assert len(parsed) == 1
     assert parsed[0]['_to'] == 'genes/ENSG00000110092'
 
 
-def test_igvf_e2g_crudo_flowfish_missing_name_hg38_warns_when_not_in_skip_rows(
-        mock_file_fileset_facs_screen, tmp_path, caplog):
-    """Empty name_hg38 on other files still logs a warning."""
+def test_igvf_e2g_crudo_flowfish_missing_name_hg38_raises_when_not_in_skip_rows(
+        mock_file_fileset_facs_screen, tmp_path):
+    """Empty name_hg38 on other files raises instead of warning."""
     writer = SpyWriter()
     test_file = tmp_path / 'igvf_E2G_CRISPR_flowfish_missing_hg38.tsv.gz'
     header = (
@@ -887,15 +914,8 @@ def test_igvf_e2g_crudo_flowfish_missing_name_hg38_warns_when_not_in_skip_rows(
             writer=writer,
             validate=True,
         )
-        with caplog.at_level(logging.WARNING):
+        with pytest.raises(ValueError, match='missing or empty name_hg38'):
             adapter.process_file()
-
-    assert any(
-        'missing or empty name_hg38' in record.message
-        for record in caplog.records
-    )
-    parsed = [json.loads(line) for line in writer.contents if line.strip()]
-    assert len(parsed) == 1
 
 
 def test_igvf_e2g_crudo_flowfish_tss_row_is_promoter_self_effect(
