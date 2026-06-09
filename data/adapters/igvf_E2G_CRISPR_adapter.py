@@ -282,6 +282,12 @@ class IGVFE2GCRISPR(BaseAdapter):
             return False
         return row[type_col].strip() == 'negative_control'
 
+    @staticmethod
+    def _non_targeting_control(row: list, source_annotation_col: Optional[int]) -> bool:
+        if source_annotation_col is None or source_annotation_col >= len(row):
+            return False
+        return row[source_annotation_col].strip().lower() == 'non-targeting'
+
     def _resolve_explicit_interval(
         self,
         row: list,
@@ -694,7 +700,9 @@ class IGVFE2GCRISPR(BaseAdapter):
         crispr_modality = file_fileset.get('crispr_modality')
         targeted_element_types = self._targeted_element_types()
         layout = self._layout()
-        is_scaled_screen = self._file_config().get('layout') == 'scaled_screen'
+        layout_name = self._file_config().get('layout')
+        is_scaled_screen = layout_name == 'scaled_screen'
+        is_pyspade = layout_name == 'pySpade'
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
         seen_element_gene_ids = set()
@@ -724,6 +732,9 @@ class IGVFE2GCRISPR(BaseAdapter):
                     continue
                 if is_scaled_screen and not self._scaled_screen_row_should_load(
                         row, name_to_idx, colmap):
+                    continue
+                if is_pyspade and self._non_targeting_control(
+                        row, colmap.get('source_annotation')):
                     continue
 
                 if uses_explicit_coordinates:

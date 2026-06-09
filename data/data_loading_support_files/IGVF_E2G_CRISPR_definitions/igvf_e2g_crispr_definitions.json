@@ -470,6 +470,36 @@
       "targeted_element_types": [
         "promoter",
         "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "gene_name_ensembl": "ENSG00000112096",
+          "notes": "ENSG00000112096 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000215271",
+          "notes": "ENSG00000215271 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000285106",
+          "notes": "ENSG00000285106 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000273888",
+          "notes": "ENSG00000273888 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+            "gene_name_ensembl": "ENSG00000285447",
+            "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+            "gene_name_ensembl":"ENSG00000130723",
+            "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+            "gene_name_ensembl":"ENSG00000182230",
+            "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
+        }
       ]
     },
     "IGVFFI5903QAWP": {
