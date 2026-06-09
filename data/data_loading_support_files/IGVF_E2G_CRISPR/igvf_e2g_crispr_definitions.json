@@ -17,13 +17,13 @@
       "intended_target_end": "End coordinate of the element / TF promoter"
     },
     "semantic_columns": {
-      "target_gene": "intended_target_name",
-      "readout_gene": "target_gene",
       "element_coordinates": [
         "intended_target_chr",
         "intended_target_start",
         "intended_target_end"
       ],
+      "readout_gene": "target_gene",
+      "target_gene": "intended_target_name",
       "metrics": {
         "p_val": "p_value",
         "p_val_adj": "adj_p_value",
@@ -51,12 +51,12 @@
       "intended_target_end": "End coordinate of the element"
     },
     "semantic_columns": {
-      "readout_gene": "ensembl_id",
       "element_coordinates": [
         "intended_target_chr",
         "intended_target_start",
         "intended_target_end"
       ],
+      "readout_gene": "ensembl_id",
       "metrics": {
         "p_val": "p_value",
         "p_val_adj": "adj_p_value",
@@ -83,13 +83,13 @@
       "readout_gene_symbol": "Gene symbol associated with `readout_gene`"
     },
     "semantic_columns": {
-      "target_gene": "intended_target_name",
-      "readout_gene": "readout_gene",
       "element_coordinates": [
         "intended_target_chr",
         "intended_target_start",
         "intended_target_end"
       ],
+      "readout_gene": "readout_gene",
+      "target_gene": "intended_target_name",
       "metrics": {
         "FRACTEL_pval": "p_value",
         "FRACTEL_pval_fdr_corr": "adj_p_value",
@@ -117,13 +117,13 @@
       "type": "Type of the perturbation target, direct or indirect"
     },
     "semantic_columns": {
-      "target_gene": "Intended_target_gene_id",
-      "readout_gene": "gene_id",
       "element_coordinates": [
         "targeting_chr",
         "targeting_start",
         "targeting_end"
       ],
+      "readout_gene": "gene_id",
+      "target_gene": "Intended_target_gene_id",
       "metrics": {
         "sceptre_p_value": "p_value",
         "sceptre_adj_p_value": "adj_p_value",
@@ -157,12 +157,12 @@
       "power_at_effect_size_XX": "(optional) Estimated statistical power to detect a perturbation effect of effect size XX"
     },
     "semantic_columns": {
-      "readout_gene": "gene_id",
       "element_coordinates": [
         "targeting_chr",
         "targeting_start",
         "targeting_end"
       ],
+      "readout_gene": "gene_id",
       "metrics": {
         "sceptre_p_value": "p_value",
         "sceptre_adj_p_value": "adj_p_value",
@@ -198,6 +198,7 @@
       "Significant": "Specifying whether tested E-G pair is significant: TRUE or FALSE"
     },
     "semantic_columns": {
+      "element_coordinates": "name_hg38",
       "readout_gene": "TargetGeneID",
       "source_annotation": "type",
       "source_annotation_map": {
@@ -208,7 +209,13 @@
         "FAM3C_TSS": "promoter",
         "MYC_TSS": "promoter"
       },
-      "element_coordinates": "name_hg38",
+      "promoter_gene_map": {
+        "CCND1_TSS": "ENSG00000110092",
+        "KITLG_TSS": "ENSG00000049130",
+        "SSFA2_TSS": "ENSG00000138434",
+        "FAM3C_TSS": "ENSG00000196937",
+        "MYC_TSS": "ENSG00000136997"
+      },
       "metrics": {
         "n": "num_guides",
         "pval.EnhancerEffect.noAux": "p_value",
@@ -216,13 +223,6 @@
         "adj.pval.EnhancerEffect.noAux": "adj_p_value",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
-      },
-      "promoter_gene_map": {
-        "CCND1_TSS": "ENSG00000110092",
-        "KITLG_TSS": "ENSG00000049130",
-        "SSFA2_TSS": "ENSG00000138434",
-        "FAM3C_TSS": "ENSG00000196937",
-        "MYC_TSS": "ENSG00000136997"
       },
       "notes": "Differs from the file format specification document: `name` is renamed `name_hg19`. TSS rows ({gene}_TSS in promoter_gene_map) are positive controls: adapter sets significant=true. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above."
     }
@@ -253,13 +253,13 @@
       "Significant": "Specifying whether tested E-G pair is significant: TRUE or FALSE"
     },
     "semantic_columns": {
+      "element_coordinates": "name_hg38",
       "readout_gene": "TargetGeneID",
       "source_annotation": "type",
       "source_annotation_map": {
         "putative_enhancer": "enhancer",
         "TSS": "promoter"
       },
-      "element_coordinates": "name_hg38",
       "metrics": {
         "n": "num_guides",
         "pval.EnhancerEffect.noAux": "p_value",
@@ -295,12 +295,12 @@
       "notes": "(optional) Field for notes, such as reference, source, or annotation details"
     },
     "semantic_columns": {
-      "readout_gene": "gene_id",
       "element_coordinates": [
         "targeting_chr",
         "targeting_start",
         "targeting_end"
       ],
+      "readout_gene": "gene_id",
       "metrics": {
         "log2_fc": "log2FC",
         "p_value": "p_value",
@@ -341,14 +341,14 @@
       "putative_target_genes_hgnc": "All putative target genes of gRNA HGNC symbol format."
     },
     "semantic_columns": {
-      "target_gene": "putative_target_genes",
-      "readout_gene": "response_id",
-      "source_annotation": "genomic_element",
       "element_coordinates": [
         "intended_target_chr",
         "intended_target_start",
         "intended_target_end"
       ],
+      "readout_gene": "response_id",
+      "target_gene": "putative_target_genes",
+      "source_annotation": "genomic_element",
       "metrics": {
         "p_value": "p_value",
         "log_2_fold_change": "log2FC"
@@ -386,10 +386,10 @@
       "log2fc": "The Log2 of the fc (Fold Change) field."
     },
     "semantic_columns": {
-      "target_gene": "intended_target_name_ensmbl",
-      "readout_gene": "gene_name_ensembl",
-      "source_annotation": "genomic_element",
       "element_coordinates": "region",
+      "readout_gene": "gene_name_ensembl",
+      "target_gene": "intended_target_name_ensmbl",
+      "source_annotation": "genomic_element",
       "metrics": {
         "Significance_score": "ln_p_value",
         "log2fc": "log2FC",
