@@ -497,11 +497,11 @@
             "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
         },
         {
-            "gene_name_ensembl":"ENSG00000130723",
+            "gene_name_ensembl": "ENSG00000130723",
             "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
         },
         {
-            "gene_name_ensembl":"ENSG00000182230",
+            "gene_name_ensembl": "ENSG00000182230",
             "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
         }
       ]
