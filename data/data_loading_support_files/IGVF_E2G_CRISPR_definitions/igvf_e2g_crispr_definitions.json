@@ -74,7 +74,7 @@
     "columns": {
       "FRACTEL_pval": "Element-level p-values for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (https://github.com/GersbachlabBioinformatics/FRACTEL)",
       "FRACTEL_pval_fdr_corr": "Corrected FRACTEL_pval after applying the Benjamini-Hochberg procedure",
-      "FRACTEL_effect_size": "Element-level log2 fold change for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
+      "FRACTEL_effect_size": "Element-level effect-size for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
       "intended_target_name": "ID of the targeted element (grouping singleton measurements, like gRNA-gene p-values). In promoter screens, this column will contain the ENSEMBL ID of the targeted gene.",
       "intended_target_chr": "Chromosome of the target element",
       "intended_target_start": "Start coordinate of the target element",
@@ -276,6 +276,7 @@
     "uuid": "bb3038df-261d-453c-ab59-bdfe9cd3fdd3",
     "title": "CRISPRi FlowFISH Full Enhancer Score Analysis Submission Format",
     "lab": "jesse-engreitz",
+    "delimiter": ",",
     "columns": {
       "intended_target_name": "Name of the target element, formatted as {chr}:{start}-{end}.",
       "guide_id(s)": "Comma-separated list of guide IDs targeting this element (must match guide metadata).",
