@@ -577,6 +577,48 @@ def test_igvf_e2g_scaled_screen_uses_genomic_element_for_source_annotation(
     assert promoter['promoter_of'] == 'genes/ENSG00000097007'
 
 
+def test_igvf_e2g_pyspade_skips_non_targeting_control_rows(
+        mock_file_fileset_perturb_seq, tmp_path):
+    """pySpade: non-targeting control rows are omitted by the adapter."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_0830_skip.csv.gz'
+    header = (
+        'idx,gene_names,gene_name_ensembl,chromosome,pos,strand,color_idx,chr_idx,'
+        'genomic_element,region,intended_target_name,intended_target_name_ensmbl,'
+        'num_cell,bin,log(pval)-hypergeom,fc,Significance_score,'
+        'fc_by_rand_dist_cpm,pval-empirical,cpm_perturb,cpm_bg,log2fc\n'
+    )
+    rows = (
+        '34767,IGFBP6,ENSG00000167779,chr12,1996865109,+,1,11,'
+        'promoter,chr10:133238114-133238378,VENTX,ENSG00000151650,741,750,'
+        '-11.04346999,1.39047496,-10.84371703,1.386921525,0,85.3643997,'
+        '61.54676304,0.4755777642\n'
+        '22115,GNGT1,ENSG00000127928,chr7,1325595876,+,0,6,'
+        'non-targeting,NonTarget,non-targeting,NonTarget,43076,1250,'
+        '-14.36947833,0.7532983101,-12.44537565,0.7600830354,0,3.947776751,'
+        '5.197032083,-0.408706802\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = lambda x: x.startswith(
+            'ENSG')
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0830FXFI/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
+    assert parsed[0]['_to'] == 'genes/ENSG00000167779'
+
+
 def test_igvf_e2g_wtc11_uses_genomic_element_for_source_annotation(
         mock_file_fileset_perturb_seq, tmp_path):
     writer = SpyWriter()
