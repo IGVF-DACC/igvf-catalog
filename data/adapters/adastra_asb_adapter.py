@@ -136,8 +136,10 @@ class ASB(BaseAdapter):
                                 'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
                                 'es_mean_ref': row[10],
                                 'es_mean_alt': row[11],
-                                'fdrp_bh_ref': row[13],
-                                'fdrp_bh_alt': row[15],
+                                # old fdrp_bh_ref field
+                                'neg_log10_pvalue_adj_ref': row[13],
+                                # old fdrp_bh_alt field
+                                'neg_log10_pvalue_adj_alt': row[15],
                                 'biological_context': cell_gtrd_name,
                                 'biosample_term': 'ontology_terms/' + cell_ontology_id,
                                 'source': ASB.SOURCE,
