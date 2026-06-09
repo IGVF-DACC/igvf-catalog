@@ -97,6 +97,14 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.pathogenicity_score
     `
+  } else if (input.dataset === 'DUAL-IPA') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
+        FILTER p._from IN codingVariantsIds && p.method == "DUAL-IPA"
+        SORT p.dualipa_abun_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN p.dualipa_abun_score
+    `
   }
 
   const query = `
@@ -117,7 +125,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined, page: number): Promise<any> {
   if (method !== undefined) {
     const query = `
-      LET doc = DOCUMENT(genes_coding_variants_scores_grp, "${input.gene_id as string}")
+      LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
 
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
@@ -152,7 +160,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
   }
 
   const query = `
-    FOR doc IN genes_coding_variants_scores_grp
+    FOR doc IN genes_coding_variants_scores
       FILTER doc._key == "${input.gene_id as string}"
       RETURN (
         FOR v IN doc.variant_scores
@@ -257,7 +265,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         RETURN {
           codingVariant: p._from,
           variant: variantByCodingVariant[p._from],
-          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+          score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score,
           method: p.method,
           source_url: p.source_url,
           files_filesets: p.files_filesets

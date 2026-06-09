@@ -1811,6 +1811,18 @@ coding variant to phenotype VAMP:
     - https://api.data.igvf.org/tabular-files/IGVFFI8987JRZH/@@download/IGVFFI8987JRZH.tsv.gz # F9
   source: IGVF
 
+# Example: python3 data_parser.py --adapter dual_ipa_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6224HZMG.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_DUAL_IPA_IGVFFI6224HZMG.jsonl --label coding_variants_phenotypes --phenotype_term BAO_0040014
+coding variant to phenotype DUAL-IPA:
+  collection: coding_variants_phenotypes
+  params:
+    - label
+    - phenotype_term
+  pypy3: false
+  command: python3 data_parser.py --adapter dual_ipa_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_DUAL_IPA_{datafile}.jsonl --label coding_variants_phenotypes --phenotype_term BAO_0040014
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI6224HZMG/@@download/IGVFFI6224HZMG.tsv.gz
+  source: IGVF
+
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants
 variants SGE:
   collection: variants
