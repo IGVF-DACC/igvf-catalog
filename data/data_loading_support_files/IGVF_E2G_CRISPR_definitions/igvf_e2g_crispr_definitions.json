@@ -118,7 +118,6 @@
     },
     "semantic_columns": {
       "target_gene": "Intended_target_gene_id",
-      "intended_target_label": "intended_target_name",
       "readout_gene": "gene_id",
       "element_coordinates": [
         "targeting_chr",
@@ -384,7 +383,6 @@
     },
     "semantic_columns": {
       "target_gene": "intended_target_name_ensmbl",
-      "intended_target_label": "intended_target_name",
       "readout_gene": "gene_name_ensembl",
       "source_annotation": "genomic_element",
       "element_coordinates": "region",
@@ -422,9 +420,15 @@
       ],
       "skip_rows": [
         {
-          "ensembl_id": "ENSG00000232196",
-          "intended_target_name": "chr16:3171499-3172694",
-          "notes": "ENSG00000232196 on line 1331 is not valid ENSEMBL for GENCODE v43. It is a pseudogene."
+            "ensembl_id": "ENSG00000232196",
+            "intended_target_name": "chr16:3171499-3172694",
+            "notes": "ENSG00000232196 on line 1331 is not valid ENSEMBL for GENCODE v43. It is a pseudogene."
+        },
+        {
+            "ensembl_id": "ENSG00000239569",
+            "intended_target_name": "chr7:105439040-105439994",
+            "gene_symbol": "LHFPL3-AS2",
+            "notes": "ENSG00000239569 is KMT2E-AS1, not LHFPL3-AS2. ENSG00000239569-chr7:105439040-105439994 pair exists elsewhere in the data file with the correct gene symbol (KMT2E-AS1)."
         }
       ]
     },
@@ -438,6 +442,20 @@
       "layout": "parse_perturb_seq",
       "targeted_element_types": [
         "promoter"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "SKIV2L",
+          "notes": "Missing Intended_target_gene_id."
+        },
+        {
+          "intended_target_name": "C16orf91",
+          "notes": "Missing Intended_target_gene_id."
+        },
+        {
+          "intended_target_name": "WDR61",
+          "notes": "Missing Intended_target_gene_id."
+        }
       ]
     },
     "IGVFFI4544JMWL": {
