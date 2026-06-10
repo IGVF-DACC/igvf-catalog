@@ -52,6 +52,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     ]
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
+    SIGNIFICANCE_THRESHOLD = 0.05
 
     @staticmethod
     def _normalize_ensembl_gene_id(gene_id: str) -> str:
@@ -432,6 +433,18 @@ class IGVFE2GCRISPR(BaseAdapter):
                     self._row_load_error(
                         f'metric {key!r} is not a float ({row[col_idx]!r}): {err}'
                     )
+        return metrics
+
+    @classmethod
+    def _infer_significant_from_p_value(cls, metrics: dict) -> dict:
+        """Set significant when the source file has no significant column."""
+        if 'significant' in metrics:
+            return metrics
+        p_value = metrics.get('p_value_adj')
+        if p_value is None:
+            p_value = metrics.get('p_value')
+        if p_value is not None:
+            metrics['significant'] = p_value < cls.SIGNIFICANCE_THRESHOLD
         return metrics
 
     @staticmethod
@@ -825,6 +838,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         element_coordinates]
 
                 metrics = self._metrics_from_row(row, colmap)
+                metrics = self._infer_significant_from_p_value(metrics)
                 metrics = self._apply_crudo_tap_seq_positive_control_significant(
                     row, colmap, metrics)
                 if self._file_config().get('layout') in (

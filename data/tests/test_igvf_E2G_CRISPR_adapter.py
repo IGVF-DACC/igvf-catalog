@@ -84,6 +84,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['pct_1'] == 0.918
         assert first_item['pct_2'] == 0.282
         assert first_item['p_value_adj'] == 0.0
+        assert first_item['significant'] is True
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['crispr_modality'] == 'interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
@@ -459,6 +460,7 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['_to'] == 'genes/ENSG00000126353'
         assert first_item['p_value'] == 0.7264835
         assert first_item['p_value_adj'] == 0.9994257067617868
+        assert first_item['significant'] is False
         assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
         assert first_item['crispr_modality'] == 'activation'
@@ -527,6 +529,7 @@ def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
     assert first_item['_to'] == 'genes/ENSG00000171206'
     assert first_item['p_value'] == 0.01
     assert 'p_value_adj' not in first_item
+    assert first_item['significant'] is True
     assert first_item['log2FC'] == -0.7
 
 
@@ -703,6 +706,7 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
     edge = parsed[0]
     assert edge['ln_p_value'] == pytest.approx(-10.84371703)
     assert edge['p_value'] == 0
+    assert edge['significant'] is True
     assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
     assert edge['fold_change'] == pytest.approx(1.39047496)
