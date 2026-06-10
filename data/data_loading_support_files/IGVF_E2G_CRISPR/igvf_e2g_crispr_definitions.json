@@ -26,7 +26,7 @@
       "perturbed_gene": "intended_target_name",
       "metrics": {
         "p_val": "p_value",
-        "p_val_adj": "adj_p_value",
+        "p_val_adj": "p_value_adj",
         "avg_log2FC": "log2FC",
         "pct.1": "pct_1",
         "pct.2": "pct_2"
@@ -59,7 +59,7 @@
       "readout_gene": "ensembl_id",
       "metrics": {
         "p_val": "p_value",
-        "p_val_adj": "adj_p_value",
+        "p_val_adj": "p_value_adj",
         "avg_log2FC": "log2FC",
         "pct.1": "pct_1",
         "pct.2": "pct_2"
@@ -92,7 +92,7 @@
       "perturbed_gene": "intended_target_name",
       "metrics": {
         "FRACTEL_pval": "p_value",
-        "FRACTEL_pval_fdr_corr": "adj_p_value",
+        "FRACTEL_pval_fdr_corr": "p_value_adj",
         "FRACTEL_effect_size": "log2FC"
       }
     }
@@ -126,7 +126,7 @@
       "perturbed_gene": "Intended_target_gene_id",
       "metrics": {
         "sceptre_p_value": "p_value",
-        "sceptre_adj_p_value": "adj_p_value",
+        "sceptre_adj_p_value": "p_value_adj",
         "sceptre_log2_fc": "log2FC",
         "significant": "significant"
       }
@@ -165,7 +165,7 @@
       "readout_gene": "gene_id",
       "metrics": {
         "sceptre_p_value": "p_value",
-        "sceptre_adj_p_value": "adj_p_value",
+        "sceptre_adj_p_value": "p_value_adj",
         "sceptre_log2_fc": "log2FC",
         "significant": "significant"
       }
@@ -220,7 +220,7 @@
         "n": "num_guides",
         "pval.EnhancerEffect.noAux": "p_value",
         "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
-        "adj.pval.EnhancerEffect.noAux": "adj_p_value",
+        "adj.pval.EnhancerEffect.noAux": "p_value_adj",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
       },
@@ -264,7 +264,7 @@
         "n": "num_guides",
         "pval.EnhancerEffect.noAux": "p_value",
         "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
-        "adj.pval.EnhancerEffect.noAux": "adj_p_value",
+        "adj.pval.EnhancerEffect.noAux": "p_value_adj",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
       },
@@ -304,7 +304,7 @@
       "metrics": {
         "log2_fc": "log2FC",
         "p_value": "p_value",
-        "adj_p_value": "adj_p_value",
+        "adj_p_value": "p_value_adj",
         "significant": "significant"
       },
       "notes": "Data files have `sample_summary_shor` not `sample_summary_short` as specified in the file format specification document."
