@@ -85,7 +85,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['pct_2'] == 0.282
         assert first_item['p_value_adj'] == 0.0
         assert first_item['significant'] is True
-        assert first_item['neg_log10_p_value'] > 0
+        assert first_item['neg_log10_p_value'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['crispr_modality'] == 'interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
@@ -713,7 +713,7 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
     edge = parsed[0]
     assert edge['ln_p_value'] == pytest.approx(-10.84371703)
     assert edge['p_value'] == 0
-    assert edge['neg_log10_p_value'] == IGVFE2GCRISPR.DEFAULT_MAX_LOG10_PVALUE
+    assert edge['neg_log10_p_value'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
     assert edge['significant'] is True
     assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
@@ -1079,8 +1079,6 @@ def test_apply_standard_neg_log10_fields():
         label='genomic_element_gene',
         validate=False,
     )
-    adapter._max_neg_log10_p_value_cap = 2.0
-    adapter._max_neg_log10_p_value_adj_cap = 3.0
     metrics = {'p_value': 0.01, 'p_value_adj': 0.02}
     adapter._apply_standard_neg_log10_fields(metrics)
     assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
@@ -1088,46 +1086,12 @@ def test_apply_standard_neg_log10_fields():
 
     metrics = {'p_value': 0.0, 'p_value_adj': 0.02}
     adapter._apply_standard_neg_log10_fields(metrics)
-    assert metrics['neg_log10_p_value'] == 2.0
+    assert metrics['neg_log10_p_value'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
     assert metrics['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
 
     metrics = {'neg_log10_p_value': 99.0, 'p_value': 0.01}
     adapter._apply_standard_neg_log10_fields(metrics)
     assert metrics['neg_log10_p_value'] == 99.0
-
-
-def test_compute_neg_log10_caps_uses_file_max(mock_file_fileset_perturb_seq, tmp_path):
-    writer = SpyWriter()
-    test_file = tmp_path / 'igvf_E2G_CRISPR_neg_log10_cap.tsv.gz'
-    header = (
-        'p_val\tavg_log2FC\tpct.1\tpct.2\tp_val_adj\tguide_id\t'
-        'target_gene\tintended_target_name\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\n'
-    )
-    rows = (
-        '0.01\t1.0\t0.5\t0.5\t0.02\tg1\t'
-        'ENSG00000123685\tENSG00000123685\tchr1\t100\t200\n'
-        '0\t2.0\t0.5\t0.5\t0\tg2\t'
-        'ENSG00000123685\tENSG00000123685\tchr1\t300\t400\n'
-    )
-    with gzip.open(test_file, 'wt') as out:
-        out.write(header)
-        out.write(rows)
-
-    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
-        MockGeneValidator.return_value.validate.return_value = True
-        adapter = IGVFE2GCRISPR(
-            filepath=str(test_file),
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/',
-            label='genomic_element_gene',
-            writer=writer,
-            validate=True,
-        )
-        adapter.process_file()
-
-    parsed = [json.loads(line) for line in writer.contents if line.strip()]
-    zero_p = next(e for e in parsed if e['p_value'] == 0)
-    assert zero_p['neg_log10_p_value'] == pytest.approx(2.0)
 
 
 def test_apply_standard_significant_field():

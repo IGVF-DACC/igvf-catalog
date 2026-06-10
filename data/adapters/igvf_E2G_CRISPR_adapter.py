@@ -53,7 +53,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
-    DEFAULT_MAX_LOG10_PVALUE = 240  # encode_E2G_CRISPR_adapter fallback
+    MAX_LOG10_PVALUE = 240  # encode_E2G_CRISPR_adapter; max log10pvalue from file is 235
 
     @staticmethod
     def _normalize_ensembl_gene_id(gene_id: str) -> str:
@@ -436,44 +436,11 @@ class IGVFE2GCRISPR(BaseAdapter):
                     )
         return metrics
 
-    @staticmethod
-    def _p_values_from_row(
-        row: list,
-        colmap: Dict[str, Optional[int]],
-    ) -> Tuple[Optional[float], Optional[float]]:
-        p_value = None
-        p_value_adj = None
-        for key, target in (
-            ('p_value', 'p_value'),
-            ('p_value_adj', 'p_value_adj'),
-        ):
-            col_idx = colmap.get(key)
-            if col_idx is None or col_idx >= len(row):
-                continue
-            cell = row[col_idx].strip()
-            if not cell:
-                continue
-            try:
-                value = float(cell)
-            except ValueError:
-                continue
-            if target == 'p_value':
-                p_value = value
-            else:
-                p_value_adj = value
-        return p_value, p_value_adj
-
-    @staticmethod
-    def _update_neg_log10_cap(
-        current_max: Optional[float],
-        p_value: Optional[float],
-    ) -> Optional[float]:
-        if p_value is None or p_value <= 0:
-            return current_max
-        neg_log10 = -math.log10(p_value)
-        if current_max is None or neg_log10 > current_max:
-            return neg_log10
-        return current_max
+    @classmethod
+    def _neg_log10_p_value(cls, p_value: float) -> float:
+        if p_value <= 0:
+            return cls.MAX_LOG10_PVALUE
+        return -math.log10(p_value)
 
     def _passes_row_prefilters(
         self,
@@ -501,43 +468,6 @@ class IGVFE2GCRISPR(BaseAdapter):
                 return False
         return True
 
-    def _compute_neg_log10_caps(
-        self,
-        reader,
-        name_to_idx: Dict[str, int],
-        colmap: Dict[str, Optional[int]],
-        *,
-        is_scaled_screen: bool,
-        is_pyspade: bool,
-        method: str,
-        uses_name_hg38: bool,
-    ) -> Tuple[float, float]:
-        max_p: Optional[float] = None
-        max_p_adj: Optional[float] = None
-        for row in reader:
-            if not self._passes_row_prefilters(
-                row,
-                name_to_idx,
-                colmap,
-                is_scaled_screen=is_scaled_screen,
-                is_pyspade=is_pyspade,
-                method=method,
-                uses_name_hg38=uses_name_hg38,
-            ):
-                continue
-            p_value, p_value_adj = self._p_values_from_row(row, colmap)
-            max_p = self._update_neg_log10_cap(max_p, p_value)
-            max_p_adj = self._update_neg_log10_cap(max_p_adj, p_value_adj)
-        return (
-            max_p if max_p is not None else self.DEFAULT_MAX_LOG10_PVALUE,
-            max_p_adj if max_p_adj is not None else self.DEFAULT_MAX_LOG10_PVALUE,
-        )
-
-    def _neg_log10_p_value(self, p_value: float, cap: float) -> float:
-        if p_value <= 0:
-            return cap
-        return -math.log10(p_value)
-
     @staticmethod
     def _log2_one_minus_depletion(depletion: float) -> Optional[float]:
         complement = 1.0 - depletion
@@ -549,10 +479,10 @@ class IGVFE2GCRISPR(BaseAdapter):
         """Derive neg_log10_p_value and neg_log10_p_value_adj from p-values when present."""
         if 'p_value' in metrics and 'neg_log10_p_value' not in metrics:
             metrics['neg_log10_p_value'] = self._neg_log10_p_value(
-                metrics['p_value'], self._max_neg_log10_p_value_cap)
+                metrics['p_value'])
         if 'p_value_adj' in metrics and 'neg_log10_p_value_adj' not in metrics:
             metrics['neg_log10_p_value_adj'] = self._neg_log10_p_value(
-                metrics['p_value_adj'], self._max_neg_log10_p_value_adj_cap)
+                metrics['p_value_adj'])
 
     def _apply_standard_significant_field(self, metrics: dict) -> None:
         """Set significant from p_value_adj or p_value when not provided by the source file."""
@@ -609,12 +539,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         source_value = metrics.get(rule['from'])
         if source_value is None:
             return
-        metrics[rule['field']] = self._neg_log10_p_value(
-            source_value,
-            self._max_neg_log10_p_value_cap
-            if rule['from'] == 'p_value'
-            else self._max_neg_log10_p_value_adj_cap,
-        )
+        metrics[rule['field']] = self._neg_log10_p_value(source_value)
 
     def _apply_log2_one_minus_rule(self, rule: dict, metrics: dict) -> None:
         base = metrics.get(rule['from'])
@@ -824,8 +749,6 @@ class IGVFE2GCRISPR(BaseAdapter):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.gene_validator = GeneValidator()
-        self._max_neg_log10_p_value_cap = self.DEFAULT_MAX_LOG10_PVALUE
-        self._max_neg_log10_p_value_adj_cap = self.DEFAULT_MAX_LOG10_PVALUE
 
         super().__init__(filepath, label, writer, validate)
 
@@ -843,17 +766,6 @@ class IGVFE2GCRISPR(BaseAdapter):
         else:
             return 'genomic_elements_genes'
 
-    def _open_data_reader(
-        self,
-        layout: dict,
-    ) -> Tuple[object, csv.reader, Dict[str, int]]:
-        data_file = gzip.open(self.filepath, 'rt')
-        reader = csv.reader(
-            data_file, delimiter=layout.get('delimiter', '\t'))
-        header = next(reader)
-        name_to_idx = {h.strip(): i for i, h in enumerate(header)}
-        return data_file, reader, name_to_idx
-
     def process_file(self):
         self.writer.open()
         file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -865,37 +777,20 @@ class IGVFE2GCRISPR(BaseAdapter):
         layout_name = self._file_config().get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
-
-        if not layout:
-            raise ValueError(
-                f'File {self.file_accession} has no CRISPR E2G layout; add it under '
-                f'"files" in igvf_e2g_crispr_definitions.json.'
-            )
-
-        scan_file, scan_reader, scan_name_to_idx = self._open_data_reader(
-            layout)
-        try:
-            scan_colmap = self._columns_from_layout(scan_name_to_idx)
-            uses_name_hg38 = scan_colmap['name_hg38'] is not None
-            self._max_neg_log10_p_value_cap, self._max_neg_log10_p_value_adj_cap = (
-                self._compute_neg_log10_caps(
-                    scan_reader,
-                    scan_name_to_idx,
-                    scan_colmap,
-                    is_scaled_screen=is_scaled_screen,
-                    is_pyspade=is_pyspade,
-                    method=method,
-                    uses_name_hg38=uses_name_hg38,
-                )
-            )
-        finally:
-            scan_file.close()
-
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
         seen_element_gene_ids = set()
-        data_file, reader, name_to_idx = self._open_data_reader(layout)
-        try:
+        with gzip.open(self.filepath, 'rt') as data_file:
+            reader = csv.reader(
+                data_file, delimiter=layout.get('delimiter', '\t'))
+            header = next(reader)
+            name_to_idx = {h.strip(): i for i, h in enumerate(header)}
+
+            if not layout:
+                raise ValueError(
+                    f'File {self.file_accession} has no CRISPR E2G layout; add it under '
+                    f'"files" in igvf_e2g_crispr_definitions.json.'
+                )
             colmap = self._columns_from_layout(name_to_idx)
             uses_name_hg38 = colmap['name_hg38'] is not None
             uses_explicit_coordinates = (
@@ -1069,6 +964,4 @@ class IGVFE2GCRISPR(BaseAdapter):
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-        finally:
-            data_file.close()
         self.writer.close()
