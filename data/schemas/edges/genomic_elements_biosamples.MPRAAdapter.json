@@ -50,13 +50,13 @@
           "type": ["number", "null"],
           "description": "The minus log10 P value (null when not available)."
         },
-        "neg_log10_qvalue": {
+        "neg_log10_pvalue_adj": {
           "type": ["number", "null"],
-          "description": "The minus log10 Q value (null when not available)."
+          "description": "The minus log10 adjusted P value (null when not available)."
         },
         "significant": {
           "type": "boolean",
-          "description": "True if this edge met the significance threshold (e.g. neg_log10_qvalue >= 1)."
+          "description": "True if this edge met the significance threshold (e.g. neg_log10_pvalue_adj >= 1)."
         },
         "label": {
           "description": "Reference-tile (REF) MPRA activity; not alternate-allele–specific element effects.",
@@ -141,7 +141,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, neg_log10_pvalue, neg_log10_qvalue, source, source_url"
+    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }
