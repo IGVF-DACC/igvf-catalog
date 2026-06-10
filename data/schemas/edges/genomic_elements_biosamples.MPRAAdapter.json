@@ -132,6 +132,8 @@
         "DNA_count",
         "RNA_count",
         "significant",
+        "neg_log10_pvalue",
+        "neg_log10_pvalue_adj",
         "files_filesets",
         "biosample_term",
         "biological_context",
