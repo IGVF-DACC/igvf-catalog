@@ -31,7 +31,15 @@
         "pct.1": "pct_1",
         "pct.2": "pct_2"
       }
-    }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "significant",
+        "rule": "threshold",
+        "from": ["p_value_adj", "p_value"],
+        "when_missing_only": true
+      }
+    ]
   },
   "mechanoenhancer": {
     "uuid": "5e3aac5c-2f44-4586-9ea0-237889e32e49",
@@ -65,6 +73,14 @@
         "pct.2": "pct_2"
       }
     },
+    "adapter_calculated_fields": [
+      {
+        "field": "significant",
+        "rule": "threshold",
+        "from": ["p_value_adj", "p_value"],
+        "when_missing_only": true
+      }
+    ],
     "notes": "File format specification document reused from `t_cell` layout. Data file format does not actually match the fields defined in file format specification document precisely, i.e. ensembl_id instead of target_gene."
   },
   "bulk_t_cell": {
@@ -95,7 +111,15 @@
         "FRACTEL_pval_fdr_corr": "p_value_adj",
         "FRACTEL_effect_size": "log2FC"
       }
-    }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "significant",
+        "rule": "threshold",
+        "from": ["p_value_adj", "p_value"],
+        "when_missing_only": true
+      }
+    ]
   },
   "parse_perturb_seq": {
     "uuid": "0447d492-9a9c-4ac9-8299-ac6f0e785920",
@@ -223,9 +247,42 @@
         "adj.pval.EnhancerEffect.noAux": "p_value_adj",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
+      }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "neg_log10_p_value",
+        "rule": "neg_log10",
+        "from": "p_value"
       },
-      "notes": "Differs from the file format specification document: `name` is renamed `name_hg19`. TSS rows ({gene}_TSS in promoter_gene_map) are positive controls: adapter sets significant=true. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above."
-    }
+      {
+        "field": "neg_log10_adj_p_value",
+        "rule": "neg_log10",
+        "from": "p_value_adj"
+      },
+      {
+        "field": "log2FC",
+        "rule": "log2_one_minus",
+        "from": "effect_size"
+      },
+      {
+        "field": "log2FC_ci95_lower",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "add": "effect_size_ci_95"
+      },
+      {
+        "field": "log2FC_ci95_upper",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "subtract": "effect_size_ci_95"
+      },
+      {
+        "field": "significant",
+        "rule": "true_when_type_in_promoter_gene_map"
+      }
+    ],
+    "notes": "Differs from the file format specification document: `name` is renamed `name_hg19`."
   },
   "crudo_flowfish": {
     "uuid": "962440ae-91c6-4d7e-b27c-cbf7b73fafd9",
@@ -267,9 +324,38 @@
         "adj.pval.EnhancerEffect.noAux": "p_value_adj",
         "EnhancerEffect.noAux": "effect_size",
         "Significant": "significant"
+      }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "neg_log10_p_value",
+        "rule": "neg_log10",
+        "from": "p_value"
       },
-      "notes": "FlowFISH files use type=TSS (not {gene}_TSS) like crudo_tap_seq. TSS rows are promoter self-effects: promoter_of = TargetGeneID. Adapter adds neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper."
-    }
+      {
+        "field": "neg_log10_adj_p_value",
+        "rule": "neg_log10",
+        "from": "p_value_adj"
+      },
+      {
+        "field": "log2FC",
+        "rule": "log2_one_minus",
+        "from": "effect_size"
+      },
+      {
+        "field": "log2FC_ci95_lower",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "add": "effect_size_ci_95"
+      },
+      {
+        "field": "log2FC_ci95_upper",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "subtract": "effect_size_ci_95"
+      }
+    ],
+    "notes": "FlowFISH files use type=TSS (not {gene}_TSS) like crudo_tap_seq. TSS rows are promoter self-effects: promoter_of = TargetGeneID."
   },
   "teloHAEC_flowfish": {
     "uuid": "bb3038df-261d-453c-ab59-bdfe9cd3fdd3",
@@ -354,6 +440,14 @@
         "log_2_fold_change": "log2FC"
       }
     },
+    "adapter_calculated_fields": [
+      {
+        "field": "significant",
+        "rule": "threshold",
+        "from": ["p_value_adj", "p_value"],
+        "when_missing_only": true
+      }
+    ],
     "notes": "Title derived from portal metadata description property, as no title is provided in the file format specification document."
   },
   "pySpade": {
@@ -400,9 +494,17 @@
         "cpm_perturb": "cpm_perturb",
         "cpm_bg": "cpm_bg",
         "num_cell": "num_cells"
-      },
-      "notes": "Most fields from the data file are undefined in the file format specification document."
-    }
+      }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "significant",
+        "rule": "threshold",
+        "from": ["p_value_adj", "p_value"],
+        "when_missing_only": true
+      }
+    ],
+    "notes": "Most fields from the data file are undefined in the file format specification document."
   },
   "files": {
     "IGVFFI3069QCRA": {

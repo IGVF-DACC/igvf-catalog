@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from adapters.igvf_E2G_CRISPR_adapter import IGVFE2GCRISPR
+from adapters.igvf_E2G_CRISPR_adapter import CRISPR_E2G_LAYOUTS, IGVFE2GCRISPR
 from adapters.writer import SpyWriter
 
 
@@ -1062,6 +1062,73 @@ def test_igvf_e2g_crispr_adapter_invalid_label(mock_file_fileset_perturb_seq):
     with pytest.raises(ValueError):
         adapter = IGVFE2GCRISPR(
             filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/', label='invalid_label', writer=writer, validate=True)
+
+
+def test_apply_adapter_calculated_fields_threshold():
+    adapter = IGVFE2GCRISPR(
+        filepath='unused',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI4544JMWL/',
+        label='genomic_element_gene',
+        validate=False,
+    )
+    layout = {
+        'adapter_calculated_fields': [{
+            'field': 'significant',
+            'rule': 'threshold',
+            'from': ['p_value_adj', 'p_value'],
+            'when_missing_only': True,
+        }],
+    }
+    with patch.object(adapter, '_layout', return_value=layout):
+        metrics = adapter._apply_adapter_calculated_fields(
+            row=[], colmap={}, metrics={'p_value_adj': 0.01})
+        assert metrics['significant'] is True
+
+        metrics = adapter._apply_adapter_calculated_fields(
+            row=[], colmap={}, metrics={'p_value': 0.1})
+        assert metrics['significant'] is False
+
+        metrics = adapter._apply_adapter_calculated_fields(
+            row=[], colmap={}, metrics={'significant': True, 'p_value_adj': 0.01})
+        assert metrics['significant'] is True
+
+
+def test_apply_adapter_calculated_fields_crudo_rules():
+    adapter = IGVFE2GCRISPR(
+        filepath='unused',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/',
+        label='genomic_element_gene',
+        validate=False,
+    )
+    layout = CRISPR_E2G_LAYOUTS['crudo_tap_seq']
+    colmap = {
+        'element_type': 0,
+        'promoter_gene_map': {'CCND1_TSS': 'ENSG00000110092'},
+    }
+    with patch.object(adapter, '_layout', return_value=layout):
+        metrics = adapter._apply_adapter_calculated_fields(
+            row=['putative_enhancer'],
+            colmap=colmap,
+            metrics={
+                'p_value': 0.01,
+                'p_value_adj': 0.02,
+                'effect_size': 0.25,
+                'effect_size_ci_95': 0.05,
+                'significant': False,
+            },
+        )
+        assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
+        assert metrics['neg_log10_adj_p_value'] == pytest.approx(
+            -math.log10(0.02))
+        assert metrics['log2FC'] == pytest.approx(math.log2(0.75))
+        assert metrics['significant'] is False
+
+        metrics = adapter._apply_adapter_calculated_fields(
+            row=['CCND1_TSS'],
+            colmap=colmap,
+            metrics={'significant': False},
+        )
+        assert metrics['significant'] is True
 
 
 def test_igvf_e2g_crispr_adapter_validate_doc_invalid(mock_file_fileset_perturb_seq):
