@@ -53,6 +53,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
+    DEFAULT_MAX_LOG10_PVALUE = 240  # encode_E2G_CRISPR_adapter fallback
 
     @staticmethod
     def _normalize_ensembl_gene_id(gene_id: str) -> str:
@@ -436,9 +437,105 @@ class IGVFE2GCRISPR(BaseAdapter):
         return metrics
 
     @staticmethod
-    def _neg_log10_p_value(p_value: float) -> Optional[float]:
+    def _p_values_from_row(
+        row: list,
+        colmap: Dict[str, Optional[int]],
+    ) -> Tuple[Optional[float], Optional[float]]:
+        p_value = None
+        p_value_adj = None
+        for key, target in (
+            ('p_value', 'p_value'),
+            ('p_value_adj', 'p_value_adj'),
+        ):
+            col_idx = colmap.get(key)
+            if col_idx is None or col_idx >= len(row):
+                continue
+            cell = row[col_idx].strip()
+            if not cell:
+                continue
+            try:
+                value = float(cell)
+            except ValueError:
+                continue
+            if target == 'p_value':
+                p_value = value
+            else:
+                p_value_adj = value
+        return p_value, p_value_adj
+
+    @staticmethod
+    def _update_neg_log10_cap(
+        current_max: Optional[float],
+        p_value: Optional[float],
+    ) -> Optional[float]:
+        if p_value is None or p_value <= 0:
+            return current_max
+        neg_log10 = -math.log10(p_value)
+        if current_max is None or neg_log10 > current_max:
+            return neg_log10
+        return current_max
+
+    def _passes_row_prefilters(
+        self,
+        row: list,
+        name_to_idx: Dict[str, int],
+        colmap: Dict[str, Optional[int]],
+        *,
+        is_scaled_screen: bool,
+        is_pyspade: bool,
+        method: str,
+        uses_name_hg38: bool,
+    ) -> bool:
+        if not row:
+            return False
+        if self._is_explicitly_skipped_row(row, name_to_idx):
+            return False
+        if is_scaled_screen and not self._scaled_screen_row_should_load(
+                row, name_to_idx, colmap):
+            return False
+        if is_pyspade and self._non_targeting_control(
+                row, colmap.get('source_annotation')):
+            return False
+        if uses_name_hg38 or method == 'Perturb-seq':
+            if self._perturb_seq_negative_control(row, colmap.get('element_type')):
+                return False
+        return True
+
+    def _compute_neg_log10_caps(
+        self,
+        reader,
+        name_to_idx: Dict[str, int],
+        colmap: Dict[str, Optional[int]],
+        *,
+        is_scaled_screen: bool,
+        is_pyspade: bool,
+        method: str,
+        uses_name_hg38: bool,
+    ) -> Tuple[float, float]:
+        max_p: Optional[float] = None
+        max_p_adj: Optional[float] = None
+        for row in reader:
+            if not self._passes_row_prefilters(
+                row,
+                name_to_idx,
+                colmap,
+                is_scaled_screen=is_scaled_screen,
+                is_pyspade=is_pyspade,
+                method=method,
+                uses_name_hg38=uses_name_hg38,
+            ):
+                continue
+            p_value, p_value_adj = self._p_values_from_row(row, colmap)
+            max_p = self._update_neg_log10_cap(max_p, p_value)
+            max_p_adj = self._update_neg_log10_cap(max_p_adj, p_value_adj)
+        return (
+            max_p if max_p is not None else self.DEFAULT_MAX_LOG10_PVALUE,
+            max_p_adj if max_p_adj is not None else self.DEFAULT_MAX_LOG10_PVALUE,
+        )
+
+    def _neg_log10_p_value(self, p_value: float, cap: float) -> float:
         if p_value <= 0:
-            return None
+            return cap
         return -math.log10(p_value)
 
     @staticmethod
@@ -448,26 +545,76 @@ class IGVFE2GCRISPR(BaseAdapter):
             return math.log2(complement)
         return None
 
-    def _apply_threshold_rule(self, rule: dict, metrics: dict) -> None:
-        field = rule['field']
-        if rule.get('when_missing_only') and field in metrics:
+    def _apply_standard_neg_log10_fields(self, metrics: dict) -> None:
+        """Derive neg_log10_p_value and neg_log10_p_value_adj from p-values when present."""
+        if 'p_value' in metrics and 'neg_log10_p_value' not in metrics:
+            metrics['neg_log10_p_value'] = self._neg_log10_p_value(
+                metrics['p_value'], self._max_neg_log10_p_value_cap)
+        if 'p_value_adj' in metrics and 'neg_log10_p_value_adj' not in metrics:
+            metrics['neg_log10_p_value_adj'] = self._neg_log10_p_value(
+                metrics['p_value_adj'], self._max_neg_log10_p_value_adj_cap)
+
+    def _apply_standard_significant_field(self, metrics: dict) -> None:
+        """Set significant from p_value_adj or p_value when not provided by the source file."""
+        if 'significant' in metrics:
             return
-        value = None
-        for source_field in rule['from']:
-            if source_field in metrics:
-                value = metrics[source_field]
-                break
-        if value is not None:
-            metrics[field] = value < rule.get(
-                'threshold', self.SIGNIFICANCE_THRESHOLD)
+        p_value = metrics.get('p_value_adj')
+        if p_value is None:
+            p_value = metrics.get('p_value')
+        if p_value is not None:
+            metrics['significant'] = p_value < self.SIGNIFICANCE_THRESHOLD
+        else:
+            metrics['significant'] = False
+
+    def _apply_crudo_tap_seq_positive_control_significant(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        metrics: dict,
+    ) -> None:
+        """CRUDO TAP-seq TSS rows are positive controls; always significant."""
+        if self._file_config().get('layout') != 'crudo_tap_seq':
+            return
+        type_idx = colmap.get('element_type')
+        promoter_gene_map = colmap.get('promoter_gene_map') or {}
+        if type_idx is None or type_idx >= len(row):
+            return
+        if row[type_idx].strip() in promoter_gene_map:
+            metrics['significant'] = True
+
+    def _apply_adapter_calculated_fields(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        metrics: dict,
+    ) -> dict:
+        for rule in self._layout().get('adapter_calculated_fields', []):
+            rule_type = rule['rule']
+            if rule_type == 'neg_log10':
+                self._apply_neg_log10_rule(rule, metrics)
+            elif rule_type == 'log2_one_minus':
+                self._apply_log2_one_minus_rule(rule, metrics)
+            else:
+                raise ValueError(
+                    f'File {self.file_accession} uses unknown adapter calculated '
+                    f'field rule: {rule_type!r}'
+                )
+        self._apply_standard_neg_log10_fields(metrics)
+        self._apply_standard_significant_field(metrics)
+        self._apply_crudo_tap_seq_positive_control_significant(
+            row, colmap, metrics)
+        return metrics
 
     def _apply_neg_log10_rule(self, rule: dict, metrics: dict) -> None:
         source_value = metrics.get(rule['from'])
         if source_value is None:
             return
-        neg_log10 = self._neg_log10_p_value(source_value)
-        if neg_log10 is not None:
-            metrics[rule['field']] = neg_log10
+        metrics[rule['field']] = self._neg_log10_p_value(
+            source_value,
+            self._max_neg_log10_p_value_cap
+            if rule['from'] == 'p_value'
+            else self._max_neg_log10_p_value_adj_cap,
+        )
 
     def _apply_log2_one_minus_rule(self, rule: dict, metrics: dict) -> None:
         base = metrics.get(rule['from'])
@@ -489,44 +636,6 @@ class IGVFE2GCRISPR(BaseAdapter):
         log2fc = self._log2_one_minus_depletion(depletion)
         if log2fc is not None:
             metrics[rule['field']] = log2fc
-
-    def _apply_true_when_type_in_promoter_gene_map_rule(
-        self,
-        row: list,
-        colmap: Dict[str, Optional[int]],
-        rule: dict,
-        metrics: dict,
-    ) -> None:
-        type_idx = colmap.get('element_type')
-        promoter_gene_map = colmap.get('promoter_gene_map') or {}
-        if type_idx is None or type_idx >= len(row):
-            return
-        if row[type_idx].strip() in promoter_gene_map:
-            metrics[rule['field']] = True
-
-    def _apply_adapter_calculated_fields(
-        self,
-        row: list,
-        colmap: Dict[str, Optional[int]],
-        metrics: dict,
-    ) -> dict:
-        for rule in self._layout().get('adapter_calculated_fields', []):
-            rule_type = rule['rule']
-            if rule_type == 'threshold':
-                self._apply_threshold_rule(rule, metrics)
-            elif rule_type == 'neg_log10':
-                self._apply_neg_log10_rule(rule, metrics)
-            elif rule_type == 'log2_one_minus':
-                self._apply_log2_one_minus_rule(rule, metrics)
-            elif rule_type == 'true_when_type_in_promoter_gene_map':
-                self._apply_true_when_type_in_promoter_gene_map_rule(
-                    row, colmap, rule, metrics)
-            else:
-                raise ValueError(
-                    f'File {self.file_accession} uses unknown adapter calculated '
-                    f'field rule: {rule_type!r}'
-                )
-        return metrics
 
     @staticmethod
     def _genomic_element_gene_edge(
@@ -563,12 +672,10 @@ class IGVFE2GCRISPR(BaseAdapter):
             edge['p_value'] = metrics['p_value']
         if 'p_value_adj' in metrics:
             edge['p_value_adj'] = metrics['p_value_adj']
-        if 'neg_log10_p_value' in metrics:
-            edge['neg_log10_p_value'] = metrics['neg_log10_p_value']
+        edge['neg_log10_p_value'] = metrics['neg_log10_p_value']
         if 'neg_log10_p_value_adj' in metrics:
             edge['neg_log10_p_value_adj'] = metrics['neg_log10_p_value_adj']
-        if 'log2FC' in metrics:
-            edge['log2FC'] = metrics['log2FC']
+        edge['log2FC'] = metrics['log2FC']
         if 'log2FC_ci95_lower' in metrics:
             edge['log2FC_ci95_lower'] = metrics['log2FC_ci95_lower']
         if 'log2FC_ci95_upper' in metrics:
@@ -577,8 +684,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             edge['pct_1'] = metrics['pct_1']
         if 'pct_2' in metrics:
             edge['pct_2'] = metrics['pct_2']
-        if 'significant' in metrics:
-            edge['significant'] = metrics['significant']
+        edge['significant'] = metrics['significant']
         if 'effect_size' in metrics:
             edge['effect_size'] = metrics['effect_size']
         if 'effect_size_ci_95' in metrics:
@@ -718,6 +824,8 @@ class IGVFE2GCRISPR(BaseAdapter):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.gene_validator = GeneValidator()
+        self._max_neg_log10_p_value_cap = self.DEFAULT_MAX_LOG10_PVALUE
+        self._max_neg_log10_p_value_adj_cap = self.DEFAULT_MAX_LOG10_PVALUE
 
         super().__init__(filepath, label, writer, validate)
 
@@ -735,6 +843,17 @@ class IGVFE2GCRISPR(BaseAdapter):
         else:
             return 'genomic_elements_genes'
 
+    def _open_data_reader(
+        self,
+        layout: dict,
+    ) -> Tuple[object, csv.reader, Dict[str, int]]:
+        data_file = gzip.open(self.filepath, 'rt')
+        reader = csv.reader(
+            data_file, delimiter=layout.get('delimiter', '\t'))
+        header = next(reader)
+        name_to_idx = {h.strip(): i for i, h in enumerate(header)}
+        return data_file, reader, name_to_idx
+
     def process_file(self):
         self.writer.open()
         file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -746,20 +865,37 @@ class IGVFE2GCRISPR(BaseAdapter):
         layout_name = self._file_config().get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
+
+        if not layout:
+            raise ValueError(
+                f'File {self.file_accession} has no CRISPR E2G layout; add it under '
+                f'"files" in igvf_e2g_crispr_definitions.json.'
+            )
+
+        scan_file, scan_reader, scan_name_to_idx = self._open_data_reader(
+            layout)
+        try:
+            scan_colmap = self._columns_from_layout(scan_name_to_idx)
+            uses_name_hg38 = scan_colmap['name_hg38'] is not None
+            self._max_neg_log10_p_value_cap, self._max_neg_log10_p_value_adj_cap = (
+                self._compute_neg_log10_caps(
+                    scan_reader,
+                    scan_name_to_idx,
+                    scan_colmap,
+                    is_scaled_screen=is_scaled_screen,
+                    is_pyspade=is_pyspade,
+                    method=method,
+                    uses_name_hg38=uses_name_hg38,
+                )
+            )
+        finally:
+            scan_file.close()
+
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
         seen_element_gene_ids = set()
-        with gzip.open(self.filepath, 'rt') as data_file:
-            reader = csv.reader(
-                data_file, delimiter=layout.get('delimiter', '\t'))
-            header = next(reader)
-            name_to_idx = {h.strip(): i for i, h in enumerate(header)}
-
-            if not layout:
-                raise ValueError(
-                    f'File {self.file_accession} has no CRISPR E2G layout; add it under '
-                    f'"files" in igvf_e2g_crispr_definitions.json.'
-                )
+        data_file, reader, name_to_idx = self._open_data_reader(layout)
+        try:
             colmap = self._columns_from_layout(name_to_idx)
             uses_name_hg38 = colmap['name_hg38'] is not None
             uses_explicit_coordinates = (
@@ -769,15 +905,15 @@ class IGVFE2GCRISPR(BaseAdapter):
             )
 
             for row in reader:
-                if not row:
-                    continue
-                if self._is_explicitly_skipped_row(row, name_to_idx):
-                    continue
-                if is_scaled_screen and not self._scaled_screen_row_should_load(
-                        row, name_to_idx, colmap):
-                    continue
-                if is_pyspade and self._non_targeting_control(
-                        row, colmap.get('source_annotation')):
+                if not self._passes_row_prefilters(
+                    row,
+                    name_to_idx,
+                    colmap,
+                    is_scaled_screen=is_scaled_screen,
+                    is_pyspade=is_pyspade,
+                    method=method,
+                    uses_name_hg38=uses_name_hg38,
+                ):
                     continue
 
                 if uses_explicit_coordinates:
@@ -794,8 +930,6 @@ class IGVFE2GCRISPR(BaseAdapter):
                         self._row_load_error('missing readout gene column.')
                     readout_gene_raw = row[read_idx]
                 elif uses_name_hg38 or method == 'Perturb-seq':
-                    if self._perturb_seq_negative_control(row, colmap['element_type']):
-                        continue
                     (
                         intended_target_chr,
                         intended_target_start,
@@ -935,4 +1069,6 @@ class IGVFE2GCRISPR(BaseAdapter):
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
+        finally:
+            data_file.close()
         self.writer.close()

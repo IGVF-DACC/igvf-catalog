@@ -85,6 +85,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['pct_2'] == 0.282
         assert first_item['p_value_adj'] == 0.0
         assert first_item['significant'] is True
+        assert first_item['neg_log10_p_value'] > 0
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['crispr_modality'] == 'interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
@@ -461,6 +462,10 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['p_value'] == 0.7264835
         assert first_item['p_value_adj'] == 0.9994257067617868
         assert first_item['significant'] is False
+        assert first_item['neg_log10_p_value'] == pytest.approx(
+            -math.log10(0.7264835))
+        assert first_item['neg_log10_p_value_adj'] == pytest.approx(
+            -math.log10(0.9994257067617868))
         assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
         assert first_item['crispr_modality'] == 'activation'
@@ -530,6 +535,8 @@ def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
     assert first_item['p_value'] == 0.01
     assert 'p_value_adj' not in first_item
     assert first_item['significant'] is True
+    assert first_item['neg_log10_p_value'] == pytest.approx(-math.log10(0.01))
+    assert 'neg_log10_p_value_adj' not in first_item
     assert first_item['log2FC'] == -0.7
 
 
@@ -706,6 +713,7 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
     edge = parsed[0]
     assert edge['ln_p_value'] == pytest.approx(-10.84371703)
     assert edge['p_value'] == 0
+    assert edge['neg_log10_p_value'] == IGVFE2GCRISPR.DEFAULT_MAX_LOG10_PVALUE
     assert edge['significant'] is True
     assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
@@ -1064,33 +1072,86 @@ def test_igvf_e2g_crispr_adapter_invalid_label(mock_file_fileset_perturb_seq):
             filepath='./samples/igvf_E2G_CRISPR_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/', label='invalid_label', writer=writer, validate=True)
 
 
-def test_apply_adapter_calculated_fields_threshold():
+def test_apply_standard_neg_log10_fields():
     adapter = IGVFE2GCRISPR(
         filepath='unused',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI4544JMWL/',
         label='genomic_element_gene',
         validate=False,
     )
-    layout = {
-        'adapter_calculated_fields': [{
-            'field': 'significant',
-            'rule': 'threshold',
-            'from': ['p_value_adj', 'p_value'],
-            'when_missing_only': True,
-        }],
-    }
-    with patch.object(adapter, '_layout', return_value=layout):
-        metrics = adapter._apply_adapter_calculated_fields(
-            row=[], colmap={}, metrics={'p_value_adj': 0.01})
-        assert metrics['significant'] is True
+    adapter._max_neg_log10_p_value_cap = 2.0
+    adapter._max_neg_log10_p_value_adj_cap = 3.0
+    metrics = {'p_value': 0.01, 'p_value_adj': 0.02}
+    adapter._apply_standard_neg_log10_fields(metrics)
+    assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
+    assert metrics['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
 
-        metrics = adapter._apply_adapter_calculated_fields(
-            row=[], colmap={}, metrics={'p_value': 0.1})
-        assert metrics['significant'] is False
+    metrics = {'p_value': 0.0, 'p_value_adj': 0.02}
+    adapter._apply_standard_neg_log10_fields(metrics)
+    assert metrics['neg_log10_p_value'] == 2.0
+    assert metrics['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
 
-        metrics = adapter._apply_adapter_calculated_fields(
-            row=[], colmap={}, metrics={'significant': True, 'p_value_adj': 0.01})
-        assert metrics['significant'] is True
+    metrics = {'neg_log10_p_value': 99.0, 'p_value': 0.01}
+    adapter._apply_standard_neg_log10_fields(metrics)
+    assert metrics['neg_log10_p_value'] == 99.0
+
+
+def test_compute_neg_log10_caps_uses_file_max(mock_file_fileset_perturb_seq, tmp_path):
+    writer = SpyWriter()
+    test_file = tmp_path / 'igvf_E2G_CRISPR_neg_log10_cap.tsv.gz'
+    header = (
+        'p_val\tavg_log2FC\tpct.1\tpct.2\tp_val_adj\tguide_id\t'
+        'target_gene\tintended_target_name\tintended_target_chr\t'
+        'intended_target_start\tintended_target_end\n'
+    )
+    rows = (
+        '0.01\t1.0\t0.5\t0.5\t0.02\tg1\t'
+        'ENSG00000123685\tENSG00000123685\tchr1\t100\t200\n'
+        '0\t2.0\t0.5\t0.5\t0\tg2\t'
+        'ENSG00000123685\tENSG00000123685\tchr1\t300\t400\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter = IGVFE2GCRISPR(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    zero_p = next(e for e in parsed if e['p_value'] == 0)
+    assert zero_p['neg_log10_p_value'] == pytest.approx(2.0)
+
+
+def test_apply_standard_significant_field():
+    adapter = IGVFE2GCRISPR(
+        filepath='unused',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI4544JMWL/',
+        label='genomic_element_gene',
+        validate=False,
+    )
+    metrics = {'p_value_adj': 0.01}
+    adapter._apply_standard_significant_field(metrics)
+    assert metrics['significant'] is True
+
+    metrics = {'p_value': 0.1}
+    adapter._apply_standard_significant_field(metrics)
+    assert metrics['significant'] is False
+
+    metrics = {'significant': True, 'p_value_adj': 0.01}
+    adapter._apply_standard_significant_field(metrics)
+    assert metrics['significant'] is True
+
+    metrics = {}
+    adapter._apply_standard_significant_field(metrics)
+    assert metrics['significant'] is False
 
 
 def test_apply_adapter_calculated_fields_crudo_rules():
