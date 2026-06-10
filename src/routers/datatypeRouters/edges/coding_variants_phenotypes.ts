@@ -31,7 +31,7 @@ const codingVariantsPhenotypeAggregationFormat = z.object({
 const fromCodingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
-  protein_name: z.string().optional(),
+  uniprot_name: z.string().optional(),
   gene_name: z.string().optional(),
   amino_acid_position: z.number().optional(),
   transcript_id: z.string().optional(),
@@ -69,7 +69,7 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneCollectionName = 'genes'
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'transcript_id', 'method', 'files_fileset'] as const
+  const validKeys = ['coding_variant_name', 'hgvsp', 'uniprot_name', 'gene_name', 'transcript_id', 'method', 'files_fileset'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
@@ -77,7 +77,7 @@ function variantQueryValidation (input: paramsFormatType): void {
   if (definedKeysCount < 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one coding variant property is required.'
+      message: 'At least one of the following properties is required: coding_variant_name, hgvsp, uniprot_name, gene_name, transcript_id, method, files_fileset.'
     })
   }
 }
@@ -91,7 +91,7 @@ function phenotypeQueryValidation (input: paramsFormatType): void {
   if (definedKeysCount < 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one coding variant property is required.'
+      message: 'At least one of the following properties is required: phenotype_id, phenotype_name, method, files_fileset.'
     })
   }
 }
@@ -207,6 +207,11 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     // all name properties are copies of the _key property
     input._key = input.coding_variant_name as string
     delete input.coding_variant_name
+  }
+  if (input.uniprot_name !== undefined) {
+    // in collection coding_variants, protein uniprot name is stored in protein_name field, not uniprot_name
+    input.protein_name = input.uniprot_name
+    delete input.uniprot_name
   }
 
   let limit = QUERY_LIMIT
