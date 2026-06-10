@@ -33,7 +33,7 @@ def test_pQTL_adapter(mock_request, mocker):
         assert first_item['label'] == 'pQTL'
         assert first_item['method'] == 'pQTL'
         assert first_item['class'] == 'observed data'
-        assert first_item['neg_log10_pvalue'] == -79.2
+        assert first_item['neg_log10_pvalue'] == 79.2
 
 
 def test_validate_doc_invalid(mocker):

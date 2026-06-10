@@ -86,7 +86,7 @@ class pQTL(BaseAdapter):
                             'label': 'pQTL',
                             'class': self.collection_class,
                             'method': self.method,
-                            'neg_log10_pvalue': -1 * float(row[14]),
+                            'neg_log10_pvalue': float(row[14]),
                             'beta': float(row[12]),  # i.e. effect size
                             'se': float(row[13]),
                             'regulatory_type': row[19],  # cis/trans

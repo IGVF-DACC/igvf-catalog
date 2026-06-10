@@ -83,7 +83,7 @@ class ASB_GVATDB(BaseAdapter):
                         '_from': _source,
                         '_to': _target,
                         'p_value': pvalue,
-                        'neg_log10_pvalue': -1 * log10pvalue,
+                        'neg_log10_pvalue': log10pvalue,
                         'experiment': experiment,
                         'hg19_coordinate': row[8],
                         'oligo_auc': float(row[9]),
