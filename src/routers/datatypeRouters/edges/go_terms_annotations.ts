@@ -161,7 +161,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
       RETURN DISTINCT {
         'name': record.inverse_name,
         'gene_product_id': sourceReturn._id OR dbxrefTargetReturn._id,
-        'gene_product_name': sourceReturn.name
+        'gene_product_name': sourceReturn.name,
         'go_term_name': targetReturn.name,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }

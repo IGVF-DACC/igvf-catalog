@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS variants (
 	ref String,
 	alt String,
  	qual String,
-	filter String,
 	variation_type String,
 	annotations JSON,
 	spdi String,
@@ -732,7 +731,7 @@ CREATE TABLE IF NOT EXISTS mm_genomic_elements (
 
 CREATE TABLE IF NOT EXISTS variants_genomic_elements (
 	label String,
-	log10pvalue Float64,
+	neg_log10_pvalue Float64,
 	p_value Float64,
 	beta Float64,
 	source String,

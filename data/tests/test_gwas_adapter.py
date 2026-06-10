@@ -163,7 +163,7 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker):
     result = gwas.process_variants_phenotypes(mock_row, tagged_variants)
 
     # Should use MAX_LOG10_PVALUE when pvalue is 0
-    assert result['log10pvalue'] == gwas.MAX_LOG10_PVALUE
+    assert result['neg_log10_pvalue'] == gwas.MAX_LOG10_PVALUE
 
 
 def test_gwas_empty_ontology_term_handling(gwas_files, mocker):

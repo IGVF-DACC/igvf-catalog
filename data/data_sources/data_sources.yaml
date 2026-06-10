@@ -1282,7 +1282,7 @@ genomic element to biosample igvf mpra:
 
   source: IGVF
   threshold: 1
-  label: regulatory element activity
+  label: regulatory reference element activity
 
 # Example: python3 data_parser.py --adapter mpra --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_from_variant --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element from variants igvf mpra:
@@ -1616,6 +1616,15 @@ disease to gene:
     - https://api.data.igvf.org/reference-files/IGVFFI4540ZCXZ/@@download/IGVFFI4540ZCXZ.xml.gz # en_product6.xml.gz
   source: Orphanet
 
+# Example: python3 data_parser.py --adapter gencc_disease_gene --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8022JGUK.tsv --output-bucket-key diseases_genes/diseases_genes_IGVFFI8022JGUK.jsonl
+gencc disease to gene:
+  collection: diseases_genes
+  pypy3: true
+  command: python3 data_parser.py --adapter gencc_disease_gene --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key diseases_genes/diseases_genes_IGVFFI8022JGUK.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8022JGUK/@@download/IGVFFI8022JGUK.tsv.gz # gencc-submissions.tsv.gz
+  source: GenCC
+
 # Example: python3 data_parser.py --adapter variant_disease --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5852GYTT.csv --output-bucket-key variants_diseases/variants_diseases_IGVFFI5852GYTT.jsonl --label variant_disease
 variant to disease:
   collection: variants_diseases
@@ -1691,7 +1700,7 @@ gene mouse:
   command: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes/mm_genes_IGVFFI2412FAXG.jsonl --label mm_gencode_gene --gene-alias-file-path {gene_alias_datafile}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3741KWFZ/@@download/IGVFFI3741KWFZ.tsv.gz # Mus_musculus.gene_info.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
   version: vM36
 
@@ -1800,6 +1809,18 @@ coding variant to phenotype VAMP:
     - https://api.data.igvf.org/tabular-files/IGVFFI6920DGHF/@@download/IGVFFI6920DGHF.tsv.gz # F9
     - https://api.data.igvf.org/tabular-files/IGVFFI0455SCQH/@@download/IGVFFI0455SCQH.tsv.gz # F9
     - https://api.data.igvf.org/tabular-files/IGVFFI8987JRZH/@@download/IGVFFI8987JRZH.tsv.gz # F9
+  source: IGVF
+
+# Example: python3 data_parser.py --adapter dual_ipa_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6224HZMG.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_DUAL_IPA_IGVFFI6224HZMG.jsonl --label coding_variants_phenotypes --phenotype_term BAO_0040014
+coding variant to phenotype DUAL-IPA:
+  collection: coding_variants_phenotypes
+  params:
+    - label
+    - phenotype_term
+  pypy3: false
+  command: python3 data_parser.py --adapter dual_ipa_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_DUAL_IPA_{datafile}.jsonl --label coding_variants_phenotypes --phenotype_term BAO_0040014
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI6224HZMG/@@download/IGVFFI6224HZMG.tsv.gz
   source: IGVF
 
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants

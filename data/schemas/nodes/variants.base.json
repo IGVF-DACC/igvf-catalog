@@ -27,13 +27,6 @@
       "type": "string",
       "description": "Quality of the variant"
     },
-    "filter": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "Filter of the variant"
-    },
     "variation_type": {
       "type": "string",
       "description": "Variation type of the variant"

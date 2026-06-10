@@ -32,7 +32,7 @@ def test_coxpresdb_adapter(mock_request):
     assert first_item['source_url'] == 'https://coxpresdb.jp/'
     assert first_item['name'] == 'coexpressed with'
     assert first_item['inverse_name'] == 'coexpressed with'
-    assert first_item['associated process'] == 'ontology_terms/GO_0010467'
+    assert first_item['associated_process'] == 'ontology_terms/GO_0010467'
     assert first_item['class'] == 'observed data'
     assert first_item['method'] == 'COXPRESdb'
     assert first_item['label'] == adapter.collection_label

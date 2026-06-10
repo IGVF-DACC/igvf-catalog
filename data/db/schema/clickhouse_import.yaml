@@ -8,23 +8,23 @@ variants_variants: |
 #   clickhouse-client --database igvf --user <USERNAME> --password <PASSWORD> --query "
 #     SET allow_experimental_json_type = 1;
 #     INSERT INTO variants
-#     (name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations,
+#     (name, chr, pos, rsid, ref, alt, qual, variation_type, annotations,
 #      spdi, hgvs, organism, source, source_url, ca_id, id)
-#     SELECT name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations,
+#     SELECT name, chr, pos, rsid, ref, alt, qual, variation_type, annotations,
 #            spdi, hgvs, organism, source, source_url, ca_id, _key as id
 #     FROM s3('s3://igvf-catalog-parsed-collections/variants/$file', 'JSONEachRow',
-#            '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');"
+#            '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');"
 # done
 
 variants: |
-  INSERT INTO variants (name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations, spdi, hgvs, organism, source, source_url, ca_id, id)
-  SELECT name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations, spdi, hgvs, organism, source, source_url, ca_id, _key as id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants/*spdi*.jsonl', 'JSONEachRow', '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');
+  INSERT INTO variants (name, chr, pos, rsid, ref, alt, qual, variation_type, annotations, spdi, hgvs, organism, source, source_url, ca_id, id)
+  SELECT name, chr, pos, rsid, ref, alt, qual, variation_type, annotations, spdi, hgvs, organism, source, source_url, ca_id, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants/*spdi*.jsonl', 'JSONEachRow', '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');
   INSERT INTO variants
-  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, source, organism, source_url, annotations, _key as id
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, source, organism, source_url, annotations, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/variants/variants_IGVFFI5890AHYL.jsonl');
   INSERT INTO variants
-  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, source, organism, source_url, annotations, _key as id
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, source, organism, source_url, annotations, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/variants/bluestarr_IGVFFI1663LKVQ.jsonl');
 
 coding_variants: |
@@ -299,7 +299,7 @@ mm_genomic_elements: |
 
 variants_genomic_elements: |
   INSERT INTO variants_genomic_elements
-  SELECT label, log10pvalue, p_value, beta, source, source_url, biological_context, biosample_term, name, method, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as genomic_elements_id
+  SELECT label, neg_log10_pvalue, p_value, beta, source, source_url, biological_context, biosample_term, name, method, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as genomic_elements_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_genomic_elements/*.jsonl', 'JSONEachRow')
 
 genomic_elements_genes: |

@@ -586,6 +586,53 @@ def bulk_query_coding_variants_from_hgvsc_in_arangodb(transcript_hgvsc):
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 
 
+def bulk_query_coding_variants_from_spdi_in_arangodb(spdi_protein_hgvsp_triples):
+    # given (spdi, protein_id, hgvsp) triples, look up variants_coding_variants by
+    # _from == 'variants/<spdi>', then filter on the coding_variant's protein_id and hgvsp
+    # to get the exact coding variant for that specific nucleotide change and protein isoform
+    db = ArangoDB().get_igvf_connection()
+    valid_triples = [
+        {'spdi': spdi, 'protein_id': protein_id, 'hgvsp': hgvsp}
+        for spdi, protein_id, hgvsp in spdi_protein_hgvsp_triples
+    ]
+
+    query = '''
+    FOR triple IN @triples
+        FOR vc IN variants_coding_variants
+        FILTER vc._from == CONCAT('variants/', triple.spdi)
+        LET cv = DOCUMENT(vc._to)
+        FILTER cv.protein_id == triple.protein_id AND cv.hgvsp == triple.hgvsp
+        RETURN {
+            spdi: triple.spdi,
+            protein_id: triple.protein_id,
+            hgvsp: triple.hgvsp,
+            coding_variant_key: PARSE_IDENTIFIER(vc._to).key
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'triples': valid_triples}
+    )
+
+    results = list(cursor)
+    mappings = {}
+    for r in results:
+        key = (r['spdi'], r['protein_id'], r['hgvsp'])
+        if key not in mappings:
+            mappings[key] = [r['coding_variant_key']]
+        else:
+            if r['coding_variant_key'] not in mappings[key]:
+                mappings[key].append(r['coding_variant_key'])
+
+    for key, values in mappings.items():
+        if len(values) > 1:
+            print(
+                f'WARNING: multiple coding variants found for {key}: {values}')
+
+    return mappings
+
+
 def build_coding_variant_id(variant_id, protein_id, transcript_id, gene_id):
     key = variant_id + '_' + protein_id + '_' + transcript_id + '_' + gene_id
     return hashlib.sha256(key.encode()).hexdigest()
@@ -728,12 +775,13 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if error is not None:
         return variant_json, error
 
+    pos_from_spdi = int(spdi.split(':')[1])
+
     variant_json = {
         '_key': _id,
         'name': spdi,
         'chr': f'chr{chr}' if not chr.startswith('chr') else chr,
-        'pos': int(pos_start) - 1,  # 0-indexed
-        'pos': pos_start,
+        'pos': pos_from_spdi,
         'ref': ref,
         'alt': alt,
         'variation_type': variation_type,
@@ -788,3 +836,21 @@ def get_file_fileset_by_accession_in_arangodb(accession):
     db = ArangoDB().get_igvf_connection()
     files_filesets_collection = db.collection('files_filesets')
     return files_filesets_collection.get(accession)
+
+
+def get_gene_map_from_arangodb(field):
+    db = ArangoDB().get_igvf_connection()
+    cursor = db.aql.execute(
+        f'FOR gene IN genes RETURN {{ key: gene._key, value: gene.{field} }}'
+    )
+    gene_map = {}
+    for record in cursor:
+        gkey = record['key']
+        gval = record['value']
+        if not gval:
+            continue
+        if gval not in gene_map:
+            gene_map[gval] = [gkey]
+        else:
+            gene_map[gval].append(gkey)
+    return gene_map

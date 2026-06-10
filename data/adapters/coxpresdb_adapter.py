@@ -70,7 +70,7 @@ class Coxpresdb(BaseAdapter):
                                     'source_url': self.source_url,
                                     'name': 'coexpressed with',
                                     'inverse_name': 'coexpressed with',
-                                    'associated process': 'ontology_terms/GO_0010467',
+                                    'associated_process': 'ontology_terms/GO_0010467',
                                     'class': self.collection_class,
                                     'method': self.method,
                                     'label': self.collection_label,

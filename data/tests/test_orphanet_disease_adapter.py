@@ -29,7 +29,8 @@ def test_process_file(sample_filepath, spy_writer):
         assert '_to' in data
         assert 'name' in data
         assert 'inverse_name' in data
-        assert 'pmid' in data
+        assert 'pmids' in data
+        assert data['pmids'] == ['22587682']
         assert 'term_name' in data
         assert 'gene_symbol' in data
         assert 'association_type' in data

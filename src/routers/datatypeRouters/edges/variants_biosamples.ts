@@ -40,6 +40,7 @@ const returnFormat = z.object({
   variant: z.string().or(variantFormat).optional(),
   biosample: z.string().or(ontologyFormat).optional(),
   genomic_element: z.string().or(genomicElementFormat).nullish(),
+  strand: z.string().nullish(),
   log2FoldChange: z.number().nullish(),
   DNA_count_ref: z.number().nullish(),
   DNA_count_alt: z.number().nullish(),
@@ -49,14 +50,15 @@ const returnFormat = z.object({
   CI_lower_95: z.number().nullish(),
   CI_upper_95: z.number().nullish(),
   significant: z.boolean().nullish(),
-  p_value: z.number().nullish(), // minusLog10PValue
-  fdr: z.number().nullish(), // minusLog10QValue
+  neg_log10_pvalue: z.number().nullish(),
+  fdr: z.number().nullish(), // neg_log10_qvalue
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 const variantToBiosamplesCollecionName = 'variants_biosamples'
@@ -168,6 +170,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
       'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
       'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record.genomic_element'},
+      'strand': record.strand,
       'log2FoldChange': record.log2FoldChange OR record.log2FC,
       'DNA_count_ref': record.DNA_count_ref or record.inputCountRef,
       'DNA_count_alt': record.DNA_count_alt or record.inputCountAlt,
@@ -177,14 +180,15 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'CI_lower_95': record.CI_lower_95,
       'CI_upper_95': record.CI_upper_95,
       'significant': record.significant,
-      'p_value': record.minusLog10PValue,
-      'fdr': record.minusLog10QValue,
+      'neg_log10_pvalue': record.neg_log10_pvalue,
+      'fdr': record.neg_log10_qvalue,
       'label': record.label,
       'method': record.method,
       'class': record.class,
       'source': record.source,
       'source_url': record.source_url,
-      'name': record.name
+      'name': record.name,
+      'files_filesets': record.files_filesets
     }
   `
 

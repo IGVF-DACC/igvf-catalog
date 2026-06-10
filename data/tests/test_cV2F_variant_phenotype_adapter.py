@@ -32,7 +32,6 @@ def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mocker):
         'ref': 'C',
         'alt': 'A',
         'qual': '60',
-        'filter': None,
         'variation_type': 'SNP',
         'annotations': {},
         'spdi': 'NC_000001.11:10202:C:A',

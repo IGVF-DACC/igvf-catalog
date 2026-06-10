@@ -14,7 +14,8 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'simple_sample_summaries': ['donor:human'],
             'samples': ['ontology_terms/EFO_0001253'],
-            'treatments_term_ids': []
+            'treatments_term_ids': [],
+            'crispr_modality': 'prime editing'
         }
         yield mock_get_file_fileset
 
@@ -44,7 +45,6 @@ mock_tsv_data = (
         'organism': 'Homo sapiens',
         'rsid': [],
         'qual': '100',
-        'filter': 'PASS',
         'annotations': {},
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
@@ -95,7 +95,6 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
         'organism': 'Homo sapiens',
         'rsid': [],
         'qual': '100',
-        'filter': 'PASS',
         'annotations': {},
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
@@ -123,6 +122,7 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert first_item['label'] == 'variant effect on gene expression'
     assert first_item['source_url'] == adapter.source_url
     assert first_item['method'] == 'Variant-EFFECTS'
+    assert first_item['crispr_modality'] == 'prime editing'
     assert first_item['class'] == 'observed data'
     assert first_item['biological_context'] == 'donor:human'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'

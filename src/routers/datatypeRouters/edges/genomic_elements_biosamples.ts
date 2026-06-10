@@ -18,8 +18,8 @@ const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosam
 const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),
   strand: z.string().nullable(),
-  p_value: z.number().nullable(), // minusLog10PValue
-  fdr: z.number().nullable(), // minusLog10QValue
+  neg_log10_pvalue: z.number().nullable(),
+  fdr: z.number().nullable(), // neg_log10_qvalue
   DNA_count: z.number().nullish(),
   RNA_count: z.number().nullish(),
   significant: z.boolean().nullish(),
@@ -29,7 +29,8 @@ const genomicElementsToBiosampleFormat = z.object({
   biosample: z.string().or(ontologyFormat).optional(),
   name: z.string(),
   class: z.string().optional(),
-  method: z.string().optional()
+  method: z.string().optional(),
+  files_filesets: z.string().nullish()
 })
 
 const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.MPRAAdapter.json')
@@ -103,7 +104,7 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
 
     if (filesetFilter === '' && methodFilter === '' && sourceInputFilter === '') {
       throw new TRPCError({
-        code: 'NOT_FOUND',
+        code: 'BAD_REQUEST',
         message: 'At least one parameter must be defined.'
       })
     }
@@ -128,8 +129,8 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-        'fdr': record.minusLog10QValue,
-        'p_value': record.minusLog10PValue,
+        'fdr': record.neg_log10_qvalue,
+        'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.inverse_name,
         'class': record.class,
         'method': record.method
@@ -183,7 +184,7 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
 
     if (filesetFilter === '' && methodFilter === '' && sourceInputFilter === '') {
       throw new TRPCError({
-        code: 'NOT_FOUND',
+        code: 'BAD_REQUEST',
         message: 'At least one parameter must be defined.'
       })
     }
@@ -208,11 +209,12 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-        'fdr': record.minusLog10QValue,
-        'p_value': record.minusLog10PValue,
+        'fdr': record.neg_log10_qvalue,
+        'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.name,
         'class': record.class,
-        'method': record.method
+        'method': record.method,
+        'files_filesets': record.files_filesets
       }
   `
 

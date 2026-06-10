@@ -71,12 +71,14 @@ files_filesets:
       - lab
       - preferred_assay_titles[*]
       - method
+      - crispr_modality
       - donors[*]
       - samples[*]
       - simple_sample_summaries[*]
       - software[*]
       - source
       - class
+      - genome_browser_link
 
 genes:
   persistent:
@@ -273,6 +275,8 @@ genomic_elements:
       - files_filesets
       - source_annotation, _key
       - chr, start, end
+      - source
+      - promoter_of
 
 genomic_elements_biosamples:
   persistent:
@@ -389,6 +393,7 @@ variants_genes:
       - source, files_filesets
       - files_filesets
       - effect_size
+      - method
   inverted:
     fields: biological_context
     analyzers:
@@ -439,11 +444,12 @@ variants_proteins:
       - method, label, source, files_filesets, name
       - label, source, files_filesets, name
       - source, files_filesets, name
-      - effect_on_binding, files_filesets HEAD
+      - effect_on_binding, files_filesets
       - files_filesets, name
       - name
       - files_filesets
       - method
+      - gene, method, source, biological_context, _key
 
 variants_variants:
   persistent:

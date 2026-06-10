@@ -33,6 +33,7 @@
             "karen-mohlke",
             "kushal-dey",
             "lea-starita",
+            "marc-vidal",
             "mark-craven",
             "nadav-ahituv",
             "predrag-radivojac",
@@ -52,6 +53,7 @@
             "enum": [
               "CRISPR FACS screen",
               "DNase-seq",
+              "DUAL-IPA",
               "electroporated MPRA",
               "lentiMPRA",
               "MPRA",
@@ -86,20 +88,18 @@
             "BlueSTARR",
             "candidate Cis-Regulatory Elements",
             "caQTL",
-            "CRISPR enhancer perturbation screen",
-            "CRISPR FACS screen",
+            "CRISPR screen",
             "cV2F",
+            "DUAL-IPA",
             "elements",
             "ENCODE-rE2G",
             "ESM-1v",
-            "Homo sapiens elements",
             "MPRA",
             "MutPred2",
             "Perturb-seq",
             "SEMVAR",
             "SGE",
             "STARR-seq",
-            "TAP-seq",
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
@@ -135,6 +135,7 @@
               "cyp2c19_2c9",
               "DESeq2",
               "Distal regulation ENCODE-rE2G",
+              "DUAL-IPA analysis scripts",
               "DistalRegulationCRISPRdata",
               "Engreitz Variant-EFFECTS scripts",
               "ESM-1v",
@@ -269,6 +270,20 @@
           "type": ["string", "null"],
           "description": "The genome browser link of the file set",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
+        },
+        "crispr_modality": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The CRISPR modality of the file set",
+          "enum": [
+            null,
+            "interference",
+            "activation",
+            "prime editing",
+            "knockout"
+          ]
         }
       },
       "required": [
@@ -286,13 +301,14 @@
         "treatments_term_ids",
         "publication",
         "download_link",
-        "cell_annotation"
+        "cell_annotation",
+        "crispr_modality"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, crispr_modality"
   },
   "db_collection_name": "files_filesets"
 }

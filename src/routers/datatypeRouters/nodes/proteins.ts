@@ -4,7 +4,6 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat } from '../params'
 import { getSchema } from '../schema'
 
@@ -57,16 +56,7 @@ async function findProteinByID (proteinId: string): Promise<any[]> {
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
 
-  const record = (await (await db.query(query)).all())[0]
-
-  if (record === undefined) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Record ${proteinId} not found.`
-    })
-  }
-
-  return record
+  return (await (await db.query(query)).all())
 }
 
 async function findProteins (input: paramsFormatType): Promise<any[]> {
@@ -214,7 +204,7 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
 const proteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins', description: descriptions.proteins } })
   .input(proteinsQueryFormat)
-  .output(z.array(proteinFormat).or(proteinFormat))
+  .output(z.array(proteinFormat))
   .query(async ({ input }) => await proteinSearch(input))
 
 export const proteinsRouters = {

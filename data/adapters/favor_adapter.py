@@ -2,12 +2,11 @@ import json
 import pickle
 from typing import Optional
 from ga4gh.vrs.extras.translator import AlleleTranslator
-from ga4gh.vrs.dataproxy import create_dataproxy
-from biocommons.seqrepo import SeqRepo
+from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from rocksdict import Rdict
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_spdi, build_hgvs_from_spdi
+from adapters.helpers import get_seqrepo, load_variant
 from adapters.writer import Writer
 from adapters.deduplication import get_container
 from adapters.caidprovider import get_caid_provider
@@ -184,11 +183,8 @@ class Favor(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        # Install instructions: https://github.com/biocommons/biocommons.seqrepo
-        dp = create_dataproxy(
-            'seqrepo+file:///usr/local/share/seqrepo/2024-12-20')
-        seq_repo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
-        translator = AlleleTranslator(data_proxy=dp)
+        seq_repo = get_seqrepo('human')
+        translator = AlleleTranslator(data_proxy=SeqRepoDataProxy(seq_repo))
 
         reading_data = False
         for line in open(self.filepath, 'r'):
@@ -196,77 +192,63 @@ class Favor(BaseAdapter):
                 reading_data = True
                 continue
 
-            if reading_data:
-                data_line = line.strip().split()
+            if not reading_data:
+                continue
 
-                # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
-                chrm = data_line[0].replace('chr', '')
+            data_line = line.strip().split()
 
-                ref = data_line[3]
-                alt = data_line[4]
+            # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
+            chrm = data_line[0].replace('chr', '')
+            ref = data_line[3]
+            alt = data_line[4]
 
-                annotations = self.parse_metadata(
-                    data_line[7]) | self.parse_metadata(data_line[8])
+            variant_id = f'{chrm}-{data_line[1]}-{ref}-{alt}'
+            variant_json, skipped_message = load_variant(
+                variant_id,
+                validate_SNV=False,
+                correct_ref_allele=True,
+                translator=translator,
+                seq_repo=seq_repo,
+            )
+            if skipped_message is not None:
+                self.logger.warning(
+                    'Skipping variant %s: %s', variant_id, skipped_message['reason'])
+                continue
 
-                rsid = [data_line[2]]
+            try:
+                allele = translator.translate_from(
+                    variant_json['spdi'], 'spdi')
+                allele_vrs_digest = allele.digest
+            except Exception as e:
+                self.logger.warning(
+                    'Failed to derive VRS digest for %s', variant_id)
+                self.logger.warning(repr(e))
+                continue
 
-                try:
-                    spdi = build_spdi(
-                        chrm,
-                        data_line[1],
-                        ref,
-                        alt,
-                        translator,
-                        seq_repo
-                    )
-                    allele = translator.translate_from(spdi, 'spdi')
-                    allele_vrs_digest = allele.digest
-                    allele_vrs_digest_byte = allele_vrs_digest.encode('utf-8')
-                    if self.container.contains(allele_vrs_digest_byte):
-                        rsid = self.container.get(
-                            allele_vrs_digest_byte) + rsid
-                    self.container.set(allele_vrs_digest_byte, rsid)
-                except Exception as e:
-                    self.logger.warning('Failed to generate SPDI for chr' + chrm + ', pos: ' +
-                                        data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
-                    self.logger.warning(repr(e))
-                    continue
+            allele_vrs_digest_byte = allele_vrs_digest.encode('utf-8')
+            rsid = [data_line[2]]
+            if self.container.contains(allele_vrs_digest_byte):
+                rsid = self.container.get(allele_vrs_digest_byte) + rsid
+            self.container.set(allele_vrs_digest_byte, rsid)
 
-                variation_type = 'SNP'
-                if len(ref) < len(alt):
-                    variation_type = 'insertion'
-                elif len(ref) > len(alt):
-                    variation_type = 'deletion'
+            annotations = self.parse_metadata(
+                data_line[7]) | self.parse_metadata(data_line[8])
 
-                hgvs = build_hgvs_from_spdi(spdi)
+            variant_json.update({
+                'rsid': rsid,
+                'qual': data_line[5],
+                'annotations': annotations,
+                'vrs_digest': allele_vrs_digest,
+                'ca_id': self.ca_ids.get(variant_json['hgvs']),
+                'source': 'FAVOR',
+                'source_url': 'http://favor.genohub.org/',
+            })
 
-                ca_id = self.ca_ids.get(hgvs)
-                to_json = {
-                    '_key': spdi if len(spdi) < 254 else allele_vrs_digest,
-                    'name': spdi,
-                    'chr': 'chr' + chrm,
-                    'pos': int(data_line[1]) - 1,
-                    'rsid': rsid,
-                    'ref': data_line[3],
-                    'alt': data_line[4],
-                    'qual': data_line[5],
-                    'filter': None if data_line[6] == 'NA' else data_line[6],
-                    'variation_type': variation_type,
-                    'annotations': annotations,
-                    'spdi': spdi,
-                    'hgvs': hgvs,
-                    'vrs_digest': allele_vrs_digest,
-                    'ca_id': ca_id,
-                    'organism': 'Homo sapiens',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                }
+            if self.validate:
+                self.validate_doc(variant_json)
 
-                if self.validate:
-                    self.validate_doc(to_json)
-
-                self.writer.write(json.dumps(to_json))
-                self.writer.write('\n')
+            self.writer.write(json.dumps(variant_json))
+            self.writer.write('\n')
 
         self.writer.close()
         self.ca_ids.close()

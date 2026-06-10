@@ -5,6 +5,7 @@ import { paramsFormatType, getFilterStatements, getDBReturnStatements } from '..
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { getSchema } from '../schema'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 25
 
@@ -48,7 +49,6 @@ export const codingVariantsFormat = z.object({
   Polyphen2_HDIV_score: z.number().nullable(),
   Polyphen2_HVAR_score: z.number().nullable(),
   VEST4_score: z.number().nullable(),
-  Mcap_score: z.number().nullable(),
   REVEL_score: z.number().nullable(),
   MutPred_score: z.number().nullable(),
   BayesDel_addAF_score: z.number().nullable(),
@@ -58,7 +58,6 @@ export const codingVariantsFormat = z.object({
   VARITY_R_LOO_score: z.number().nullable(),
   VARITY_ER_LOO_score: z.number().nullable(),
   ESM1b_score: z.number().nullable(),
-  EVE_score: z.number().nullable(),
   AlphaMissense_score: z.number().nullable(),
   CADD_raw_score: z.number().nullable(),
   source: z.string(),
@@ -69,6 +68,13 @@ export const codingVariantsFormat = z.object({
 }))
 
 async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
+  if (input.aapos && isNaN(Number(input.aapos))) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Invalid amino_acid_position. It should be a number.'
+    })
+  }
+
   if (input.id !== undefined) {
     input._key = input.id
     delete input.id
