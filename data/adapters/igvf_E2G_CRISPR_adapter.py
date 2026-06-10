@@ -435,69 +435,97 @@ class IGVFE2GCRISPR(BaseAdapter):
                     )
         return metrics
 
-    @classmethod
-    def _infer_significant_from_p_value(cls, metrics: dict) -> dict:
-        """Set significant when the source file has no significant column."""
-        if 'significant' in metrics:
-            return metrics
-        p_value = metrics.get('p_value_adj')
-        if p_value is None:
-            p_value = metrics.get('p_value')
-        if p_value is not None:
-            metrics['significant'] = p_value < cls.SIGNIFICANCE_THRESHOLD
-        return metrics
-
     @staticmethod
     def _neg_log10_p_value(p_value: float) -> Optional[float]:
         if p_value <= 0:
             return None
         return -math.log10(p_value)
 
-    def _crudo_derived_metrics(self, metrics: dict) -> dict:
-        """Add neg_log10_p_value, neg_log10_adj_p_value, log2FC, log2FC_ci95_lower, and log2FC_ci95_upper from the base metrics above for CRUDO datasets."""
-        p_value = metrics.get('p_value')
-        if p_value is not None:
-            neg_log10 = self._neg_log10_p_value(p_value)
-            if neg_log10 is not None:
-                metrics['neg_log10_p_value'] = neg_log10
+    @staticmethod
+    def _log2_one_minus_depletion(depletion: float) -> Optional[float]:
+        complement = 1.0 - depletion
+        if complement > 0:
+            return math.log2(complement)
+        return None
 
-        p_value_adj = metrics.get('p_value_adj')
-        if p_value_adj is not None:
-            neg_log10_adj = self._neg_log10_p_value(p_value_adj)
-            if neg_log10_adj is not None:
-                metrics['neg_log10_adj_p_value'] = neg_log10_adj
+    def _apply_threshold_rule(self, rule: dict, metrics: dict) -> None:
+        field = rule['field']
+        if rule.get('when_missing_only') and field in metrics:
+            return
+        value = None
+        for source_field in rule['from']:
+            if source_field in metrics:
+                value = metrics[source_field]
+                break
+        if value is not None:
+            metrics[field] = value < rule.get(
+                'threshold', self.SIGNIFICANCE_THRESHOLD)
 
-        effect_size = metrics.get('effect_size')
-        if effect_size is not None:
-            ci95 = metrics.get('effect_size_ci_95')
-            log2fc_fields = [('log2FC', effect_size)]
-            if ci95 is not None:
-                log2fc_fields.extend([
-                    ('log2FC_ci95_lower', effect_size + ci95),
-                    ('log2FC_ci95_upper', effect_size - ci95),
-                ])
-            for field, depletion in log2fc_fields:
-                complement = 1.0 - depletion
-                if complement > 0:
-                    metrics[field] = math.log2(complement)
+    def _apply_neg_log10_rule(self, rule: dict, metrics: dict) -> None:
+        source_value = metrics.get(rule['from'])
+        if source_value is None:
+            return
+        neg_log10 = self._neg_log10_p_value(source_value)
+        if neg_log10 is not None:
+            metrics[rule['field']] = neg_log10
 
-        return metrics
+    def _apply_log2_one_minus_rule(self, rule: dict, metrics: dict) -> None:
+        base = metrics.get(rule['from'])
+        if base is None:
+            return
+        depletion = base
+        add_field = rule.get('add')
+        if add_field is not None:
+            offset = metrics.get(add_field)
+            if offset is None:
+                return
+            depletion = base + offset
+        subtract_field = rule.get('subtract')
+        if subtract_field is not None:
+            offset = metrics.get(subtract_field)
+            if offset is None:
+                return
+            depletion = base - offset
+        log2fc = self._log2_one_minus_depletion(depletion)
+        if log2fc is not None:
+            metrics[rule['field']] = log2fc
 
-    def _apply_crudo_tap_seq_positive_control_significant(
+    def _apply_true_when_type_in_promoter_gene_map_rule(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        rule: dict,
+        metrics: dict,
+    ) -> None:
+        type_idx = colmap.get('element_type')
+        promoter_gene_map = colmap.get('promoter_gene_map') or {}
+        if type_idx is None or type_idx >= len(row):
+            return
+        if row[type_idx].strip() in promoter_gene_map:
+            metrics[rule['field']] = True
+
+    def _apply_adapter_calculated_fields(
         self,
         row: list,
         colmap: Dict[str, Optional[int]],
         metrics: dict,
     ) -> dict:
-        """CRUDO TAP-seq TSS rows are positive controls; always significant."""
-        if self._file_config().get('layout') != 'crudo_tap_seq':
-            return metrics
-        type_idx = colmap.get('element_type')
-        promoter_gene_map = colmap.get('promoter_gene_map') or {}
-        if type_idx is None or type_idx >= len(row):
-            return metrics
-        if row[type_idx].strip() in promoter_gene_map:
-            metrics['significant'] = True
+        for rule in self._layout().get('adapter_calculated_fields', []):
+            rule_type = rule['rule']
+            if rule_type == 'threshold':
+                self._apply_threshold_rule(rule, metrics)
+            elif rule_type == 'neg_log10':
+                self._apply_neg_log10_rule(rule, metrics)
+            elif rule_type == 'log2_one_minus':
+                self._apply_log2_one_minus_rule(rule, metrics)
+            elif rule_type == 'true_when_type_in_promoter_gene_map':
+                self._apply_true_when_type_in_promoter_gene_map_rule(
+                    row, colmap, rule, metrics)
+            else:
+                raise ValueError(
+                    f'File {self.file_accession} uses unknown adapter calculated '
+                    f'field rule: {rule_type!r}'
+                )
         return metrics
 
     @staticmethod
@@ -838,12 +866,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                         element_coordinates]
 
                 metrics = self._metrics_from_row(row, colmap)
-                metrics = self._infer_significant_from_p_value(metrics)
-                metrics = self._apply_crudo_tap_seq_positive_control_significant(
+                metrics = self._apply_adapter_calculated_fields(
                     row, colmap, metrics)
-                if self._file_config().get('layout') in (
-                        'crudo_tap_seq', 'crudo_flowfish'):
-                    metrics = self._crudo_derived_metrics(metrics)
 
                 if self.label == 'genomic_element_gene':
                     _id = '_'.join(
