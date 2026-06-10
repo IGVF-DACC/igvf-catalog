@@ -565,8 +565,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             edge['p_value_adj'] = metrics['p_value_adj']
         if 'neg_log10_p_value' in metrics:
             edge['neg_log10_p_value'] = metrics['neg_log10_p_value']
-        if 'neg_log10_adj_p_value' in metrics:
-            edge['neg_log10_adj_p_value'] = metrics['neg_log10_adj_p_value']
+        if 'neg_log10_p_value_adj' in metrics:
+            edge['neg_log10_p_value_adj'] = metrics['neg_log10_p_value_adj']
         if 'log2FC' in metrics:
             edge['log2FC'] = metrics['log2FC']
         if 'log2FC_ci95_lower' in metrics:

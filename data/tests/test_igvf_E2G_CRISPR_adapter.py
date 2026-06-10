@@ -766,7 +766,7 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     assert enh['p_value'] == 0.01
     assert enh['p_value_adj'] == 0.02
     assert enh['neg_log10_p_value'] == pytest.approx(2.0)
-    assert enh['neg_log10_adj_p_value'] == pytest.approx(-math.log10(0.02))
+    assert enh['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
     assert enh['log2FC'] == pytest.approx(math.log2(0.75))
     assert enh['log2FC_ci95_lower'] == pytest.approx(math.log2(0.7))
     assert enh['log2FC_ci95_upper'] == pytest.approx(math.log2(0.8))
@@ -1049,7 +1049,7 @@ def test_igvf_e2g_crudo_real_sample_putative_enhancer_edge_uses_no_aux_columns(
     edge = matches[0]
     assert edge['p_value_adj'] == pytest.approx(0.001870874)
     assert edge['neg_log10_p_value'] == pytest.approx(-math.log10(0.000134325))
-    assert edge['neg_log10_adj_p_value'] == pytest.approx(
+    assert edge['neg_log10_p_value_adj'] == pytest.approx(
         -math.log10(0.001870874))
     assert edge['log2FC'] == pytest.approx(math.log2(1 - 0.165227554))
     assert edge['_from'].startswith(
@@ -1118,7 +1118,7 @@ def test_apply_adapter_calculated_fields_crudo_rules():
             },
         )
         assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
-        assert metrics['neg_log10_adj_p_value'] == pytest.approx(
+        assert metrics['neg_log10_p_value_adj'] == pytest.approx(
             -math.log10(0.02))
         assert metrics['log2FC'] == pytest.approx(math.log2(0.75))
         assert metrics['significant'] is False

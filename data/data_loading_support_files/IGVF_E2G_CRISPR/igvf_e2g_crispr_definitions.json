@@ -256,7 +256,7 @@
         "from": "p_value"
       },
       {
-        "field": "neg_log10_adj_p_value",
+        "field": "neg_log10_p_value_adj",
         "rule": "neg_log10",
         "from": "p_value_adj"
       },
@@ -333,7 +333,7 @@
         "from": "p_value"
       },
       {
-        "field": "neg_log10_adj_p_value",
+        "field": "neg_log10_p_value_adj",
         "rule": "neg_log10",
         "from": "p_value_adj"
       },
