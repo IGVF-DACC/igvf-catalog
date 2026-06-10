@@ -83,7 +83,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['log2FC'] == 3.608562048
         assert first_item['pct_1'] == 0.918
         assert first_item['pct_2'] == 0.282
-        assert first_item['adj_p_value'] == 0.0
+        assert first_item['p_value_adj'] == 0.0
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['crispr_modality'] == 'interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
@@ -361,7 +361,7 @@ def test_igvf_e2g_crispr_adapter_tap_seq_sceptre_fields_genomic_element_gene(moc
     assert first_item['_to'] == 'genes/ENSG00000128917'
     assert first_item['log2FC'] == -0.576747067613555
     assert first_item['p_value'] == 2.13033821184895e-25
-    assert first_item['adj_p_value'] == 5.15541847267446e-23
+    assert first_item['p_value_adj'] == 5.15541847267446e-23
     assert first_item['significant'] is True
 
 
@@ -397,7 +397,7 @@ def test_igvf_e2g_teloHAEC_flowfish_enhancer_edge_uses_intended_target_name_inte
     assert edge['_to'] == 'genes/ENSG00000139618'
     assert edge['log2FC'] == 0.42
     assert edge['p_value'] == 0.01
-    assert edge['adj_p_value'] == 0.05
+    assert edge['p_value_adj'] == 0.05
     assert edge['significant'] is True
 
     writer2 = SpyWriter()
@@ -458,7 +458,7 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_998962_999432_GRCh38_IGVFFI9100GKNS'
         assert first_item['_to'] == 'genes/ENSG00000126353'
         assert first_item['p_value'] == 0.7264835
-        assert first_item['adj_p_value'] == 0.9994257067617868
+        assert first_item['p_value_adj'] == 0.9994257067617868
         assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
         assert first_item['crispr_modality'] == 'activation'
@@ -526,7 +526,7 @@ def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
     first_item = parsed[0]
     assert first_item['_to'] == 'genes/ENSG00000171206'
     assert first_item['p_value'] == 0.01
-    assert 'adj_p_value' not in first_item
+    assert 'p_value_adj' not in first_item
     assert first_item['log2FC'] == -0.7
 
 
@@ -760,7 +760,7 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     assert enh['effect_size_ci_95'] == 0.05
     assert enh['num_guides'] == 10
     assert enh['p_value'] == 0.01
-    assert enh['adj_p_value'] == 0.02
+    assert enh['p_value_adj'] == 0.02
     assert enh['neg_log10_p_value'] == pytest.approx(2.0)
     assert enh['neg_log10_adj_p_value'] == pytest.approx(-math.log10(0.02))
     assert enh['log2FC'] == pytest.approx(math.log2(0.75))
@@ -1043,7 +1043,7 @@ def test_igvf_e2g_crudo_real_sample_putative_enhancer_edge_uses_no_aux_columns(
     ]
     assert len(matches) == 1
     edge = matches[0]
-    assert edge['adj_p_value'] == pytest.approx(0.001870874)
+    assert edge['p_value_adj'] == pytest.approx(0.001870874)
     assert edge['neg_log10_p_value'] == pytest.approx(-math.log10(0.000134325))
     assert edge['neg_log10_adj_p_value'] == pytest.approx(
         -math.log10(0.001870874))
