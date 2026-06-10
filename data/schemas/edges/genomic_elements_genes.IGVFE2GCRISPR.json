@@ -111,7 +111,7 @@
           "type": "number",
           "description": "Negative log10 of p-value."
         },
-        "neg_log10_adj_p_value": {
+        "neg_log10_p_value_adj": {
           "type": "number",
           "description": "Negative log10 of adjusted p-value."
         },
