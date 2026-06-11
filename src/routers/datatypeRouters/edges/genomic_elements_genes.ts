@@ -12,6 +12,10 @@ import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
+// genomic_elements_genes holds CRISPR E2G, Perturb-seq, ENCODE-rE2G, etc.
+// Resolve API p_value from whichever significance field the edge record stores.
+const RESOLVED_P_VALUE_AQL = '(record.neg_log10_p_value_adj != null ? record.neg_log10_p_value_adj : (record.neg_log10_p_value != null ? record.neg_log10_p_value : (record.log10pvalue != null ? record.log10pvalue : record.p_value)))'
+const RESOLVED_SCORE_AQL = '(record.log2FC != null ? record.log2FC : (record.score != null ? record.score : record.effect_size))'
 
 const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
 const genomicElementsIGVF2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
@@ -472,8 +476,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'source': record.source,
           'files_filesets': record.files_filesets,
           'biological_context': record.biological_context,
-          'score': record.score || record.effect_size || record.log2FC,
-          'p_value': record.p_value_adj
+          'score': ${RESOLVED_SCORE_AQL},
+          'p_value': ${RESOLVED_P_VALUE_AQL}
         }
   `
 
@@ -499,8 +503,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'source': record.source,
             'files_filesets': record.files_filesets,
             'biological_context': record.biological_context,
-            'score': record.score || record.effect_size || record.log2FC,
-            'p_value': record.p_value_adj
+            'score': ${RESOLVED_SCORE_AQL},
+            'p_value': ${RESOLVED_P_VALUE_AQL}
           }
   `
 
@@ -529,8 +533,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'source': record.source,
                   'files_filesets': record.files_filesets,
                   'biological_context': record.biological_context,
-                  'score': record.score || record.effect_size || record.log2FC,
-                  'p_value': record.p_value_adj
+                  'score': ${RESOLVED_SCORE_AQL},
+                  'p_value': ${RESOLVED_P_VALUE_AQL}
               }
   `
 
