@@ -35,36 +35,36 @@ igvf_file_accessions:
     - IGVFFI0818FMCC
     - IGVFFI3351LASN
   IGVF CRISPR E2G:
-    - IGVFFI3069QCRA # promoter Perturb-seq
-    - IGVFFI5749WPVK # promoter Perturb-seq
-    - IGVFFI6376HTIF # promoter Perturb-seq
-    - IGVFFI0206LUDV # promoter Perturb-seq
-    - IGVFFI4544JMWL # promoter/enhancer Perturb-seq
-    - IGVFFI0830FXFI # promoter/enhancer Perturb-seq
-    - IGVFFI6296RCJK # enhancer Perturb-seq
-    - IGVFFI6600VCYY # enhancer Perturb-seq
-    - IGVFFI7195XKBC # enhancer Perturb-seq
-    - IGVFFI9246AJEK # enhancer Perturb-seq
-    - IGVFFI3434YAPX # enhancer Perturb-seq
-    - IGVFFI1168JUYR # enhancer Perturb-seq
-    - IGVFFI5903QAWP # promoter/enhancer Perturb-seq
-    - IGVFFI7280ZZFA # promoter/enhancer CRISPR FlowFISH screen
-    - IGVFFI5288BRAZ # promoter/enhancer CRISPR FlowFISH screen
-    - IGVFFI7810AFPF # promoter/enhancer CRISPR FlowFISH screen
-    - IGVFFI3340LKKZ # promoter/enhancer CRISPR FlowFISH screen
-    - IGVFFI6120DUWX # promoter/enhancer CRISPR FlowFISH screen
-    - IGVFFI8719HCYX # enhancer CRISPR FlowFISH screen
-    - IGVFFI5749FOUE # enhancer CRISPR FlowFISH screen
-    - IGVFFI4404SMPQ # enhancer CRISPR FlowFISH screen
-    - IGVFFI1068KEUM # enhancer CRISPR FlowFISH screen
-    - IGVFFI9134FSCT # enhancer CRISPR FlowFISH screen
-    - IGVFFI0629LUWT # enhancer CRISPR FlowFISH screen
-    - IGVFFI9298BISV # enhancer CRISPR FlowFISH screen
-    - IGVFFI6843QWSB # enhancer CRISPR FlowFISH screen
-    - IGVFFI9100GKNS # promoter CRISPR FACS screen
-    - IGVFFI6268OASM # promoter CRISPR FACS screen
-    - IGVFFI1336XWXJ # promoter CRISPR FACS screen
-    - IGVFFI3089UGHM # promoter CRISPR FACS screen
+    - IGVFFI3069QCRA
+    - IGVFFI5749WPVK
+    - IGVFFI6376HTIF
+    - IGVFFI0206LUDV
+    - IGVFFI4544JMWL
+    - IGVFFI0830FXFI
+    - IGVFFI6296RCJK
+    - IGVFFI6600VCYY
+    - IGVFFI7195XKBC
+    - IGVFFI9246AJEK
+    - IGVFFI3434YAPX
+    - IGVFFI1168JUYR
+    - IGVFFI5903QAWP
+    - IGVFFI7280ZZFA
+    - IGVFFI5288BRAZ
+    - IGVFFI7810AFPF
+    - IGVFFI3340LKKZ
+    - IGVFFI6120DUWX
+    - IGVFFI8719HCYX
+    - IGVFFI5749FOUE
+    - IGVFFI4404SMPQ
+    - IGVFFI1068KEUM
+    - IGVFFI9134FSCT
+    - IGVFFI0629LUWT
+    - IGVFFI9298BISV
+    - IGVFFI6843QWSB
+    - IGVFFI9100GKNS
+    - IGVFFI6268OASM
+    - IGVFFI1336XWXJ
+    - IGVFFI3089UGHM
   Variant-EFFECTS:
     - IGVFFI9602ILPC
     - IGVFFI4333XLOF
