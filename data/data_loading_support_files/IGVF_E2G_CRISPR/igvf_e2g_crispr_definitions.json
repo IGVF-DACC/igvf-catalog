@@ -434,13 +434,28 @@
         "fc": "fold_change",
         "log(pval)-hypergeom": "hypergeometric_ln_p_value",
         "fc_by_rand_dist_cpm": "background_corrected_fold_change",
-        "pval-empirical": "p_value",
+        "pval-empirical": "empirical_p_value",
         "cpm_perturb": "cpm_perturb",
         "cpm_bg": "cpm_bg",
         "num_cell": "num_cells"
       }
     },
-    "notes": "Most fields from the data file are undefined in the file format specification document."
+    "adapter_calculated_fields": [
+      {
+        "field": "p_value",
+        "rule": "exp_ln_p",
+        "from": "hypergeometric_ln_p_value"
+      },
+      {
+        "field": "p_value_adj",
+        "rule": "exp_ln_p",
+        "from": "ln_p_value"
+      }
+    ],
+    "notes": "Most fields from the data file are undefined in the file format specification document.",
+    "column_catalog_notes": {
+      "pval-empirical": "Mapped to catalog empirical_p_value (not p_value). Empirical p-value from pySpade global random-background sampling; FDR filtering is applied on this column before export, so surviving rows often show 0. Catalog p_value is derived from log(pval)-hypergeom (exp); catalog p_value_adj from Significance_score (exp), pySpade's background-corrected significance."
+    }
   },
   "files": {
     "IGVFFI3069QCRA": {

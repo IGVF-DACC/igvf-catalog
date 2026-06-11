@@ -167,6 +167,10 @@
           "type": "number",
           "description": "Natural log (ln) of a p-value from an initial hypergeometric test."
         },
+        "empirical_p_value": {
+          "type": "number",
+          "description": "Empirical p-value from random background sampling (pySpade pval-empirical)."
+        },
         "cpm_perturb": {
           "type": "number",
           "description": "Counts per million reads for the readout gene in perturbed cells."

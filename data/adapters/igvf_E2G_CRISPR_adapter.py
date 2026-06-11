@@ -524,6 +524,8 @@ class IGVFE2GCRISPR(BaseAdapter):
                 self._apply_neg_log10_rule(rule, metrics)
             elif rule_type == 'log2_one_minus':
                 self._apply_log2_one_minus_rule(rule, metrics)
+            elif rule_type == 'exp_ln_p':
+                self._apply_exp_ln_p_rule(rule, metrics)
             else:
                 raise ValueError(
                     f'File {self.file_accession} uses unknown adapter calculated '
@@ -540,6 +542,15 @@ class IGVFE2GCRISPR(BaseAdapter):
         if source_value is None:
             return
         metrics[rule['field']] = self._neg_log10_p_value(source_value)
+
+    def _apply_exp_ln_p_rule(self, rule: dict, metrics: dict) -> None:
+        """Derive a p-value from a natural-log p-value field (p = exp(ln_p))."""
+        if rule['field'] in metrics:
+            return
+        ln_p_value = metrics.get(rule['from'])
+        if ln_p_value is None:
+            return
+        metrics[rule['field']] = math.exp(ln_p_value)
 
     def _apply_log2_one_minus_rule(self, rule: dict, metrics: dict) -> None:
         base = metrics.get(rule['from'])
@@ -624,6 +635,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             edge['ln_p_value'] = metrics['ln_p_value']
         if 'hypergeometric_ln_p_value' in metrics:
             edge['hypergeometric_ln_p_value'] = metrics['hypergeometric_ln_p_value']
+        if 'empirical_p_value' in metrics:
+            edge['empirical_p_value'] = metrics['empirical_p_value']
         if 'cpm_perturb' in metrics:
             edge['cpm_perturb'] = metrics['cpm_perturb']
         if 'cpm_bg' in metrics:

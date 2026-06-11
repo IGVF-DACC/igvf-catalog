@@ -711,9 +711,17 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
 
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     edge = parsed[0]
-    assert edge['ln_p_value'] == pytest.approx(-10.84371703)
-    assert edge['p_value'] == 0
-    assert edge['neg_log10_p_value'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+    hypergeometric_ln_p_value = -11.04346999
+    ln_p_value = -10.84371703
+    assert edge['ln_p_value'] == pytest.approx(ln_p_value)
+    assert edge['p_value'] == pytest.approx(
+        math.exp(hypergeometric_ln_p_value))
+    assert edge['p_value_adj'] == pytest.approx(math.exp(ln_p_value))
+    assert edge['neg_log10_p_value'] == pytest.approx(
+        -math.log10(math.exp(hypergeometric_ln_p_value)))
+    assert edge['neg_log10_p_value_adj'] == pytest.approx(
+        -math.log10(math.exp(ln_p_value)))
+    assert edge['empirical_p_value'] == 0
     assert edge['significant'] is True
     assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
@@ -1116,6 +1124,33 @@ def test_apply_standard_significant_field():
     metrics = {}
     adapter._apply_standard_significant_field(metrics)
     assert metrics['significant'] is False
+
+
+def test_apply_adapter_calculated_fields_pyspade_exp_ln_p_rules():
+    adapter = IGVFE2GCRISPR(
+        filepath='unused',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI0830FXFI/',
+        label='genomic_element_gene',
+        validate=False,
+    )
+    layout = CRISPR_E2G_LAYOUTS['pySpade']
+    with patch.object(adapter, '_layout', return_value=layout):
+        metrics = adapter._apply_adapter_calculated_fields(
+            row=[],
+            colmap={},
+            metrics={
+                'hypergeometric_ln_p_value': -11.04346999,
+                'ln_p_value': -10.84371703,
+                'empirical_p_value': 0.0,
+            },
+        )
+    assert metrics['p_value'] == pytest.approx(math.exp(-11.04346999))
+    assert metrics['p_value_adj'] == pytest.approx(math.exp(-10.84371703))
+    assert metrics['neg_log10_p_value'] == pytest.approx(
+        -math.log10(math.exp(-11.04346999)))
+    assert metrics['neg_log10_p_value_adj'] == pytest.approx(
+        -math.log10(math.exp(-10.84371703)))
+    assert metrics['significant'] is True
 
 
 def test_apply_adapter_calculated_fields_crudo_rules():
