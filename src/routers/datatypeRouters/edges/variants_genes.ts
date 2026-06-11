@@ -61,9 +61,8 @@ const completeQtlsFormat = z.object({
   intron_end: z.string().nullish(),
   effect_size: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
-  fdr_nlog10: z.number().nullish(),
+  neg_log10_pvalue_adj: z.number().nullish(),
   log2_fold_change: z.number().nullish(),
-  p_nominal_nlog10: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(),
   standard_error: z.number().nullish(),
   z_score: z.number().nullish(),
@@ -91,11 +90,6 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneCollectionName = geneSchema.db_collection_name as string
 const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
-
-const apiKeyToDbFieldMap = {
-  log10pvalue: 'neg_log10_pvalue',
-  p_nominal_nlog10: 'neg_log10_pvalue'
-}
 
 function raiseInvalidParameters (param: string): void {
   throw new TRPCError({
@@ -157,7 +151,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     RETURN {
       '_id': record._id,
       qtl_type: record.label,
-      neg_log10_pvalue: record.log10pvalue or record.p_nominal_nlog10,
+      neg_log10_pvalue: record.neg_log10_pvalue,
       chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
@@ -202,7 +196,7 @@ const getQueryLimit = (input: paramsFormatType): number => {
 const getRestrictiveFiltersArray = (input: paramsFormatType): string[] => {
   const restrictiveFiltersArray: string[] = []
   if ('neg_log10_pvalue' in input) {
-    restrictiveFiltersArray.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
+    restrictiveFiltersArray.push(`record.neg_log10_pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.neg_log10_pvalue as string).includes(':')) {
       raiseInvalidParameters('neg_log10_pvalue')
     }
@@ -293,14 +287,14 @@ const buildVariantsGenesQuery = ({
     }
     RETURN MERGE(base,
       record.source == 'IGVF' ? {
-        ${getDBReturnStatements(variantsGenesVariantEFFECTSAdapter, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(variantsGenesVariantEFFECTSAdapter)}
       } : record.source == 'AFGR' && record.label == 'spliceQTL' ? {
-        ${getDBReturnStatements(variantsGenesAFGSRQtl, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
-        ${getDBReturnStatements(variantsGenesAFGREQtl, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(variantsGenesAFGREQtl)}
       } : record.source == 'EBI' ? {
         study: study,
-        ${getDBReturnStatements(variantsGenesEQTLCatalog, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(variantsGenesEQTLCatalog)}
       } : {}
     )
   `
@@ -485,10 +479,6 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
-  if (input.neg_log10_pvalue !== undefined) {
-    input.log10pvalue = input.neg_log10_pvalue
-    delete input.neg_log10_pvalue
-  }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
   if (!isGeneQuery) {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
@@ -589,10 +579,6 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   const variantFilter = isVariantQuery ? 'record._from IN @variantIDs' : ''
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
-  }
-  if (input.neg_log10_pvalue !== undefined) {
-    input.log10pvalue = input.neg_log10_pvalue
-    delete input.neg_log10_pvalue
   }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
   let useIndex = ''

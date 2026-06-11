@@ -93,7 +93,7 @@ class AFGRSQtl(BaseAdapter):
                         '_to': _target,
                         'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
                         'chr': 'chr' + chr,
-                        'log10pvalue': log_pvalue,
+                        'neg_log10_pvalue': log_pvalue,
                         'p_value': pvalue,
                         'effect_size': float(row[6]),
                         'class': self.collection_class,
