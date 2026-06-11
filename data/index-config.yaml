@@ -264,6 +264,7 @@ proteins_proteins:
       - pmids[*], source, organism
       - source, organism, _key
       - organism
+      - method
 
 genomic_elements:
   persistent:
