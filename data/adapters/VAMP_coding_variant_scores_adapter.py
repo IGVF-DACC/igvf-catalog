@@ -107,8 +107,7 @@ class VAMPAdapter(BaseAdapter):
                 for skipped in skipped_coding_variants:
                     skipped_list.write(skipped + '\n')
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         # process those rows all together at the end (arango query is different from hgvsp rows)
         hgvsc_rows = []
         met1_rows = []
@@ -140,5 +139,3 @@ class VAMPAdapter(BaseAdapter):
                 hgvsc_rows, type='hgvsc')
 
             self.process_coding_variant_phenotype_chunk(met1_rows, type='Met1')
-
-        self.writer.close()

@@ -50,8 +50,7 @@ class Disease(BaseAdapter):
         """Get collection name."""
         return 'diseases_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
 
         # the xml file is relatively small, just parse at once here
         # or could return an iterator with ET.iterparse(xmlfile)
@@ -111,5 +110,4 @@ class Disease(BaseAdapter):
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
 
-        self.writer.close()
         self.gene_validator.log()

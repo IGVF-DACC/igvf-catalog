@@ -159,7 +159,10 @@ class FileFileSet:
         return objects
 
     def process_file(self):
-        self.writer.open()
+        with self.writer:
+            self.parse()
+
+    def parse(self):
         visited_donors = set()
         visited_sample_terms = set()
         file_objects = self.get_batch_objects(
@@ -209,7 +212,6 @@ class FileFileSet:
                 if self.validate:
                     self.validate_doc(props)
                 self.write_jsonl(props)
-        self.writer.close()
 
     @staticmethod
     def get_software_encode(file_object):

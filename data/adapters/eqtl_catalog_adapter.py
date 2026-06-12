@@ -81,7 +81,7 @@ class EQTLCatalog(BaseAdapter):
         else:
             return 'studies'
 
-    def process_file(self):
+    def parse(self):
         if self.label == 'qtl':
             self.process_qtl()
         elif self.label == 'study':
@@ -121,7 +121,6 @@ class EQTLCatalog(BaseAdapter):
             raise ValueError(f'No metadata found for dataset {dataset_id}')
 
         with gzip.open(self.filepath, 'rt') as f:
-            self.writer.open()
             qtl_reader = csv.reader(f, delimiter='\t')
             next(qtl_reader)
             for row in qtl_reader:
@@ -184,7 +183,6 @@ class EQTLCatalog(BaseAdapter):
                     self.validate_doc(_props)
                 self.writer.write(json.dumps(_props) + '\n')
 
-            self.writer.close()
             self.gene_validator.log()
 
     def process_study(self):
@@ -195,7 +193,6 @@ class EQTLCatalog(BaseAdapter):
                     study_list.append(row[0])
         visited_study_ids = []
         with open(self.filepath, 'r') as f:
-            self.writer.open()
             study_reader = csv.reader(f, delimiter='\t')
             next(study_reader)
             for row in study_reader:
@@ -214,4 +211,3 @@ class EQTLCatalog(BaseAdapter):
                     if self.validate:
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props) + '\n')
-            self.writer.close()

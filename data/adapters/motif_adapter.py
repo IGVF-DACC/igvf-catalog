@@ -74,8 +74,7 @@ class Motif(BaseAdapter):
                     import pdb
                     pdb.set_trace()
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         for filename in os.listdir(self.filepath):
             if filename.endswith('.pwm'):
                 self.logger.info(filename)
@@ -133,5 +132,3 @@ class Motif(BaseAdapter):
 
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
-
-        self.writer.close()

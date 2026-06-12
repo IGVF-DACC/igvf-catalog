@@ -152,8 +152,7 @@ class GencodeProtein(BaseAdapter):
                 mapping_line = row.strip().split('\t')
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         # first get ENSP -> uniprot id mapping pregenerated from uniprot dat files
         if self.label == 'gencode_protein':
             ensp_to_sprot_mapping = {}
@@ -273,4 +272,3 @@ class GencodeProtein(BaseAdapter):
 
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
-        self.writer.close()

@@ -19,13 +19,24 @@ class Writer(ABC):
         pass
 
     @abstractmethod
-    def close(self):
+    def close(self, success: bool = True):
         pass
 
     @property
     @abstractmethod
     def destination(self):
         pass
+
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        # Only finalize (e.g. version-tag) the output when the body completed
+        # without raising; on failure we still release the handle but leave the
+        # partial output untagged. Returning False propagates any exception.
+        self.close(success=exc_type is None)
+        return False
 
 
 class S3Writer(Writer):
@@ -51,9 +62,10 @@ class S3Writer(Writer):
     def write(self, content):
         self.s3_file.write(content)
 
-    def close(self):
+    def close(self, success: bool = True):
         self.s3_file.close()
-        self.add_version_tag(value=self.version_tag)
+        if success:
+            self.add_version_tag(value=self.version_tag)
 
     def _create_s3_uri(self):
         return f's3://{self.bucket}/{self.key}'
@@ -79,7 +91,7 @@ class LocalWriter(Writer):
     def write(self, content):
         self.file.write(content)
 
-    def close(self):
+    def close(self, success: bool = True):
         self.file.close()
 
     @property
@@ -98,7 +110,7 @@ class SpyWriter(Writer):
     def write(self, content):
         self.container.append(content)
 
-    def close(self):
+    def close(self, success: bool = True):
         pass
 
     @property

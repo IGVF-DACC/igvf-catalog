@@ -38,12 +38,11 @@ class pQTL(BaseAdapter):
         """Get collection name."""
         return 'variants_proteins'
 
-    def process_file(self):
+    def parse(self):
         file_metadata = requests.get(
             pQTL.IGVF_API + self.file_accession).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
-        self.writer.open()
         self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
 
@@ -104,5 +103,4 @@ class pQTL(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
         self.gene_validator.log()

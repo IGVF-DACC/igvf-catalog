@@ -54,8 +54,7 @@ class VariantEFFECTSAdapter(BaseAdapter):
         else:
             return 'variants_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
 
         with open(self.filepath, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
@@ -69,8 +68,6 @@ class VariantEFFECTSAdapter(BaseAdapter):
 
             if chunk != []:
                 self.process_chunk(chunk)
-
-        self.writer.close()
 
     def process_chunk(self, chunk):
         spdi_to_variant = {}

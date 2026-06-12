@@ -20,8 +20,7 @@ class GenccDiseasesGenes(BaseAdapter):
     def _get_collection_name(self):
         return 'diseases_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.gene_map = get_gene_map_from_arangodb('hgnc')
         if 'HGNC:32925' not in self.gene_map:
             self.gene_map['HGNC:32925'] = ['ENSG00000288330']
@@ -75,5 +74,3 @@ class GenccDiseasesGenes(BaseAdapter):
                         self.validate_doc(props)
                     self.writer.write(json.dumps(props, ensure_ascii=False))
                     self.writer.write('\n')
-
-        self.writer.close()

@@ -40,12 +40,11 @@ class ASB_GVATDB(BaseAdapter):
         """Get collection name."""
         return 'variants_proteins'
 
-    def process_file(self):
+    def parse(self):
         file_metadata = requests.get(
             ASB_GVATDB.IGVF_API + self.file_accession).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
-        self.writer.open()
         self.load_tf_uniprot_id_mapping()
         self.ensembls = pickle.load(open(ASB_GVATDB.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
@@ -112,8 +111,6 @@ class ASB_GVATDB(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.warning(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()
 
     def load_tf_uniprot_id_mapping(self):
         # map tf names to uniprot ids

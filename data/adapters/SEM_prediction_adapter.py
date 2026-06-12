@@ -63,8 +63,7 @@ class SEMPred(BaseAdapter):
                     # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.load_tf_id_mapping()
         self.ensembls = pickle.load(open(self.ENSEMBL_MAPPING, 'rb'))
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -135,5 +134,3 @@ class SEMPred(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-
-        self.writer.close()
