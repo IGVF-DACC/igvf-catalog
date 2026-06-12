@@ -28,11 +28,13 @@ class ASB(BaseAdapter):
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
+    DEFAULT_ACCESSION = 'IGVFFI5943XCOS'
 
     def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = os.path.basename(filepath).split('.')[
+            0] or ASB.DEFAULT_ACCESSION
 
     def _get_schema_type(self):
         """This adapter creates edges."""
