@@ -631,12 +631,11 @@ class IGVFE2GCRISPR(BaseAdapter):
             edge['fold_change'] = metrics['fold_change']
         if 'background_corrected_fold_change' in metrics:
             edge['background_corrected_fold_change'] = metrics['background_corrected_fold_change']
-        if 'ln_p_value' in metrics:
-            edge['ln_p_value'] = metrics['ln_p_value']
+        if 'gamma_approximation_ln_p_value' in metrics:
+            edge['gamma_approximation_ln_p_value'] = metrics[
+                'gamma_approximation_ln_p_value']
         if 'hypergeometric_ln_p_value' in metrics:
             edge['hypergeometric_ln_p_value'] = metrics['hypergeometric_ln_p_value']
-        if 'empirical_p_value' in metrics:
-            edge['empirical_p_value'] = metrics['empirical_p_value']
         if 'cpm_perturb' in metrics:
             edge['cpm_perturb'] = metrics['cpm_perturb']
         if 'cpm_bg' in metrics:

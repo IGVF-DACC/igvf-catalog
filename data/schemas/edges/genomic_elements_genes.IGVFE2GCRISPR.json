@@ -159,17 +159,13 @@
           "type": "number",
           "description": "Fold change of readout expression in perturbed versus a matched or selected background."
         },
-        "ln_p_value": {
+        "gamma_approximation_ln_p_value": {
           "type": "number",
-          "description": "Natural log (ln) of a p-value after background correction."
+          "description": "Natural log (ln) of pySpade gamma-approximation significance score (Significance_score)."
         },
         "hypergeometric_ln_p_value": {
           "type": "number",
           "description": "Natural log (ln) of a p-value from an initial hypergeometric test."
-        },
-        "empirical_p_value": {
-          "type": "number",
-          "description": "Empirical p-value from random background sampling (pySpade pval-empirical)."
         },
         "cpm_perturb": {
           "type": "number",

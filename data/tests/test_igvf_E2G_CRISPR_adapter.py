@@ -712,17 +712,18 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     edge = parsed[0]
     hypergeometric_ln_p_value = -11.04346999
-    ln_p_value = -10.84371703
-    assert edge['ln_p_value'] == pytest.approx(ln_p_value)
+    gamma_approximation_ln_p_value = -10.84371703
+    assert edge['gamma_approximation_ln_p_value'] == pytest.approx(
+        gamma_approximation_ln_p_value)
     assert edge['p_value'] == pytest.approx(
         math.exp(hypergeometric_ln_p_value))
-    assert edge['p_value_adj'] == pytest.approx(math.exp(ln_p_value))
+    assert edge['p_value_adj'] == 0
     assert edge['neg_log10_p_value'] == pytest.approx(
         -math.log10(math.exp(hypergeometric_ln_p_value)))
-    assert edge['neg_log10_p_value_adj'] == pytest.approx(
-        -math.log10(math.exp(ln_p_value)))
-    assert edge['empirical_p_value'] == 0
+    assert edge['neg_log10_p_value_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
     assert edge['significant'] is True
+    assert 'ln_p_value' not in edge
+    assert 'empirical_p_value' not in edge
     assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
     assert edge['fold_change'] == pytest.approx(1.39047496)
@@ -1140,16 +1141,15 @@ def test_apply_adapter_calculated_fields_pyspade_exp_ln_p_rules():
             colmap={},
             metrics={
                 'hypergeometric_ln_p_value': -11.04346999,
-                'ln_p_value': -10.84371703,
-                'empirical_p_value': 0.0,
+                'gamma_approximation_ln_p_value': -10.84371703,
+                'p_value_adj': 0.0,
             },
         )
     assert metrics['p_value'] == pytest.approx(math.exp(-11.04346999))
-    assert metrics['p_value_adj'] == pytest.approx(math.exp(-10.84371703))
+    assert metrics['p_value_adj'] == 0.0
     assert metrics['neg_log10_p_value'] == pytest.approx(
         -math.log10(math.exp(-11.04346999)))
-    assert metrics['neg_log10_p_value_adj'] == pytest.approx(
-        -math.log10(math.exp(-10.84371703)))
+    assert metrics['neg_log10_p_value_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
     assert metrics['significant'] is True
 
 

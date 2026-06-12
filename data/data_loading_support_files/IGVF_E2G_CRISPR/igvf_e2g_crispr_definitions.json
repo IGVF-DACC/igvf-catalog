@@ -429,12 +429,12 @@
       "perturbed_gene": "intended_target_name_ensmbl",
       "source_annotation": "genomic_element",
       "metrics": {
-        "Significance_score": "ln_p_value",
+        "Significance_score": "gamma_approximation_ln_p_value",
         "log2fc": "log2FC",
         "fc": "fold_change",
         "log(pval)-hypergeom": "hypergeometric_ln_p_value",
         "fc_by_rand_dist_cpm": "background_corrected_fold_change",
-        "pval-empirical": "empirical_p_value",
+        "pval-empirical": "p_value_adj",
         "cpm_perturb": "cpm_perturb",
         "cpm_bg": "cpm_bg",
         "num_cell": "num_cells"
@@ -445,16 +445,13 @@
         "field": "p_value",
         "rule": "exp_ln_p",
         "from": "hypergeometric_ln_p_value"
-      },
-      {
-        "field": "p_value_adj",
-        "rule": "exp_ln_p",
-        "from": "ln_p_value"
       }
     ],
     "notes": "Most fields from the data file are undefined in the file format specification document.",
     "column_catalog_notes": {
-      "pval-empirical": "Mapped to catalog empirical_p_value (not p_value). Empirical p-value from pySpade global random-background sampling; FDR filtering is applied on this column before export, so surviving rows often show 0. Catalog p_value is derived from log(pval)-hypergeom (exp); catalog p_value_adj from Significance_score (exp), pySpade's background-corrected significance."
+      "log(pval)-hypergeom": "Catalog raw p-value source. Stored natively as hypergeometric_ln_p_value; catalog p_value = exp(column). Initial hypergeometric test (perturbed vs all other cells) with no random-background correction.",
+      "pval-empirical": "Catalog adjusted p-value source (per Hon lab). Empirical p-value from pySpade gamma-distribution approximation on the hypergeometric p-value vs random background draws; stored as p_value_adj. Original file-format text describes a background-selection count; the exported column is treated as a p-value on 0–1 scale. FDR filtering is applied on this column before export, so surviving rows in filtered DE tables often show 0.",
+      "Significance_score": "Catalog field gamma_approximation_ln_p_value (ln scale). Separate from raw and adjusted p-values: gamma-approximation significance score derived from the observed hypergeometric p-value and random-background p-values (per pySpade documentation). Not mapped to catalog p_value_adj."
     }
   },
   "files": {
