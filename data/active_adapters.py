@@ -52,6 +52,7 @@ from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScor
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 from adapters.gencc_diseases_genes_adapter import GenccDiseasesGenes
 from adapters.scE2G_adapter import scE2G
+from adapters.DUAL_IPA_coding_variant_scores_adapter import DUALIPAAdapter
 
 KEY_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -142,6 +143,7 @@ KEY_TO_ADAPTER = {
     'ESM_coding_variant': ESM1vCodingVariantsScores,
     'gencc_disease_gene': GenccDiseasesGenes,
     'scE2G': scE2G
+    'dual_ipa_coding_variant_phenotype': DUALIPAAdapter,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

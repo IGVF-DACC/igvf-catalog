@@ -458,7 +458,7 @@ CREATE TABLE IF NOT EXISTS variants_proteins_terms (
 CREATE TABLE IF NOT EXISTS variants_genes (
 	chr String,
 	p_value Float64,
-	log10pvalue Float64,
+	neg_log10_pvalue Float64,
 	effect_size Float64,
 	sqrt_maf Float64,
 	pval_nominal_threshold Float64,
@@ -731,7 +731,7 @@ CREATE TABLE IF NOT EXISTS mm_genomic_elements (
 
 CREATE TABLE IF NOT EXISTS variants_genomic_elements (
 	label String,
-	log10pvalue Float64,
+	neg_log10_pvalue Float64,
 	p_value Float64,
 	beta Float64,
 	source String,

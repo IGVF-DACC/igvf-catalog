@@ -169,7 +169,7 @@ function qtlReturnObject (geneExpr: string, genomicElementExpr: string, proteinC
     regulatory_type: record.regulatory_type,
     gene_consequence: record.gene_consequence,
     biological_context: record.biological_context,
-    neg_log10_pvalue: record.log10pvalue,
+    neg_log10_pvalue: record.neg_log10_pvalue or record.log10pvalue,
     effect_size: HAS(record, 'effect_size') ? record.effect_size : record.beta,
     posterior_inclusion_probability: record.posterior_inclusion_probability,
     intron_chr: record.intron_chr,

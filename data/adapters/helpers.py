@@ -586,6 +586,53 @@ def bulk_query_coding_variants_from_hgvsc_in_arangodb(transcript_hgvsc):
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 
 
+def bulk_query_coding_variants_from_spdi_in_arangodb(spdi_protein_hgvsp_triples):
+    # given (spdi, protein_id, hgvsp) triples, look up variants_coding_variants by
+    # _from == 'variants/<spdi>', then filter on the coding_variant's protein_id and hgvsp
+    # to get the exact coding variant for that specific nucleotide change and protein isoform
+    db = ArangoDB().get_igvf_connection()
+    valid_triples = [
+        {'spdi': spdi, 'protein_id': protein_id, 'hgvsp': hgvsp}
+        for spdi, protein_id, hgvsp in spdi_protein_hgvsp_triples
+    ]
+
+    query = '''
+    FOR triple IN @triples
+        FOR vc IN variants_coding_variants
+        FILTER vc._from == CONCAT('variants/', triple.spdi)
+        LET cv = DOCUMENT(vc._to)
+        FILTER cv.protein_id == triple.protein_id AND cv.hgvsp == triple.hgvsp
+        RETURN {
+            spdi: triple.spdi,
+            protein_id: triple.protein_id,
+            hgvsp: triple.hgvsp,
+            coding_variant_key: PARSE_IDENTIFIER(vc._to).key
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'triples': valid_triples}
+    )
+
+    results = list(cursor)
+    mappings = {}
+    for r in results:
+        key = (r['spdi'], r['protein_id'], r['hgvsp'])
+        if key not in mappings:
+            mappings[key] = [r['coding_variant_key']]
+        else:
+            if r['coding_variant_key'] not in mappings[key]:
+                mappings[key].append(r['coding_variant_key'])
+
+    for key, values in mappings.items():
+        if len(values) > 1:
+            print(
+                f'WARNING: multiple coding variants found for {key}: {values}')
+
+    return mappings
+
+
 def build_coding_variant_id(variant_id, protein_id, transcript_id, gene_id):
     key = variant_id + '_' + protein_id + '_' + transcript_id + '_' + gene_id
     return hashlib.sha256(key.encode()).hexdigest()

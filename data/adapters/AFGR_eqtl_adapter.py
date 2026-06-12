@@ -77,7 +77,7 @@ class AFGREQtl(BaseAdapter):
                     'chr': 'chr' + chr,
                     # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
                     # Manually changed data type from double to long in header file before importing into Arangodb
-                    'log10pvalue': float(row[8]),  # MAX=616
+                    'neg_log10_pvalue': float(row[8]),  # MAX=616
                     'p_value': float(row[9]),
                     'effect_size': float(row[10]),
                     'class': self.collection_class,

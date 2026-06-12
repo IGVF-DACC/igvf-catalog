@@ -126,6 +126,7 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert first_item['class'] == 'observed data'
     assert first_item['biological_context'] == 'donor:human'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'
+    assert first_item['neg_log10_pvalue'] == 1.86
 
 
 def test_invalid_label(mock_file_fileset):

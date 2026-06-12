@@ -191,7 +191,7 @@ const buildReturnObject = (): string => `{
   'method': record.method,
   'class': record.class,
   'log2FC': record.log2FC,
-  'neg_log10_pvalue': record.log10pvalue,
+  'neg_log10_pvalue': record.neg_log10_pvalue,
   'beta': record.beta,
   'files_filesets': record.files_filesets,
   'biological_context': record.biological_context,

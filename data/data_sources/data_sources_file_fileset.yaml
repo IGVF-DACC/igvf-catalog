@@ -359,6 +359,8 @@ igvf_file_accessions:
     - IGVFFI6920DGHF
     - IGVFFI0455SCQH
     - IGVFFI8987JRZH
+  DUAL-IPA:
+    - IGVFFI6224HZMG
   Pseudobulk:
     - IGVFFI8400FXRX
     - IGVFFI4871DVXE

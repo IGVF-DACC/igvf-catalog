@@ -715,9 +715,10 @@ export const descriptions = {
   Pagination is 0-based.',
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
+  At least one of these fields is required: coding_variant_name, hgvsp, uniprot_name, gene_name, amino_acid_position, transcript_id, method, files_fileset. <br> \
   Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \
   hgvsp = p.Ala103Cys, <br> \
-  protein_name = XRCC2_HUMAN, <br> \
+  uniprot_name = XRCC2_HUMAN, <br> \
   gene_name = XRCC2, <br> \
   amino_acid_position = -1, <br> \
   transcript_id = ENST00000359321, <br> \

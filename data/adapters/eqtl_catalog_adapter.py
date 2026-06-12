@@ -168,7 +168,7 @@ class EQTLCatalog(BaseAdapter):
                     'credible_set_size': int(row[5]),
                     'posterior_inclusion_probability': float(row[6]),
                     'p_value': p_value,
-                    'log10pvalue': log_pvalue,
+                    'neg_log10_pvalue': log_pvalue,
                     'effect_size': to_float(row[8]),
                     'standard_error': float(row[9]),
                     'z_score': float(row[10]),

@@ -1,5 +1,6 @@
 from aws_cdk import CfnOutput
 from aws_cdk import Stack
+from aws_cdk.aws_ec2 import SecurityGroup
 
 from constructs import Construct
 
@@ -25,6 +26,12 @@ class FrontendStack(Stack):
             **kwargs: Any
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
+        shared_sg = SecurityGroup.from_security_group_id(
+            self,
+            config.security_group_name,
+            security_group_id=config.security_group_id,
+            mutable=False,
+        )
         self.existing_resources = existing_resources_class(
             self,
             'ExistingResources',
@@ -36,6 +43,7 @@ class FrontendStack(Stack):
                 **config.frontend,
                 config=config,
                 existing_resources=self.existing_resources,
+                shared_security_group=shared_sg
             )
         )
         CfnOutput(

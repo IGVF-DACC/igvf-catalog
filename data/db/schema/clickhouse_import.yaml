@@ -199,20 +199,20 @@ variants_proteins_terms: |
 # After importing JSONLS, run on Clickhouse: DELETE from variants_genes where isNaN(p_value)
 variants_genes: |
   INSERT INTO variants_genes
-  SELECT chr, p_value, log10pvalue, effect_size, NULL, NULL, NULL, NULL, NULL, intron_chr, intron_start, intron_end, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/afgr_sqtls.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, p_value Float64, log10pvalue Float64, effect_size Float64, intron_chr String, intron_start String, intron_end String, label String, source String, source_url String, name String, inverse_name String, biological_process String');
+  SELECT chr, p_value, neg_log10_pvalue, effect_size, NULL, NULL, NULL, NULL, NULL, intron_chr, intron_start, intron_end, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/afgr_sqtls.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, p_value Float64, neg_log10_pvalue Float64, effect_size Float64, intron_chr String, intron_start String, intron_end String, label String, source String, source_url String, name String, inverse_name String, biological_process String');
 
   INSERT INTO variants_genes
-  SELECT chr, p_value, log10pvalue, effect_size, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/afgr_eqtls.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, p_value Float64, log10pvalue Float64, effect_size Float64, label String, source String, source_url String, name String, inverse_name String, biological_process String');
+  SELECT chr, p_value, neg_log10_pvalue, effect_size, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/afgr_eqtls.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, p_value Float64, neg_log10_pvalue Float64, effect_size Float64, label String, source String, source_url String, name String, inverse_name String, biological_process String');
 
   INSERT INTO variants_genes
-  SELECT chr, p_value, log10pvalue, effect_size, NULL, NULL, NULL, NULL, pval_beta, NULL, NULL, NULL, label, name, inverse_name, NULL, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/gtex_eqtls.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, p_value Float64, log10pvalue Float64, effect_size Float64, pval_beta Float64, label String, source String, source_url String, name String, inverse_name String');
+  SELECT chr, p_value, neg_log10_pvalue, effect_size, NULL, NULL, NULL, NULL, pval_beta, NULL, NULL, NULL, label, name, inverse_name, NULL, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/gtex_eqtls.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, p_value Float64, neg_log10_pvalue Float64, effect_size Float64, pval_beta Float64, label String, source String, source_url String, name String, inverse_name String');
 
   INSERT INTO variants_genes
-  SELECT chr, p_value, log10pvalue, effect_size, sqrt_maf, pval_nominal_threshold, min_pval_nominal, effect_size_se, pval_beta, intron_chr, intron_start, intron_end, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/gtex_sqtls_uniq.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, sqrt_maf Float64, p_value Float64, log10pvalue Float64, pval_nominal_threshold Float64, min_pval_nominal Float64, effect_size Float64, effect_size_se Float64, pval_beta Float64, intron_chr String, intron_start String, intron_end String, label String, source String, source_url String, name String, inverse_name String, biological_process String');
+  SELECT chr, p_value, neg_log10_pvalue, effect_size, sqrt_maf, pval_nominal_threshold, min_pval_nominal, effect_size_se, pval_beta, intron_chr, intron_start, intron_end, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_genes/gtex_sqtls_uniq.jsonl', 'JSONEachRow', '_key String, _from String, _to String, chr String, biological_context String, sqrt_maf Float64, p_value Float64, neg_log10_pvalue Float64, pval_nominal_threshold Float64, min_pval_nominal Float64, effect_size Float64, effect_size_se Float64, pval_beta Float64, intron_chr String, intron_start String, intron_end String, label String, source String, source_url String, name String, inverse_name String, biological_process String');
 
 variants_genes_terms: |
   INSERT INTO variants_genes_terms
@@ -299,7 +299,7 @@ mm_genomic_elements: |
 
 variants_genomic_elements: |
   INSERT INTO variants_genomic_elements
-  SELECT label, log10pvalue, p_value, beta, source, source_url, biological_context, biosample_term, name, method, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as genomic_elements_id
+  SELECT label, neg_log10_pvalue, p_value, beta, source, source_url, biological_context, biosample_term, name, method, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as genomic_elements_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_genomic_elements/*.jsonl', 'JSONEachRow')
 
 genomic_elements_genes: |

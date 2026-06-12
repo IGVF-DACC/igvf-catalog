@@ -218,19 +218,19 @@ const buildQuery = ({
         'biosample_term': bioTerm,
         'score': ${ADASTRA_SCORE_EXPR},
         'method': record.method,
-        ${getDBReturnStatements(asbSchema, true, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(asbSchema, false, '', [], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'GVATdb' ? {
         'method': record.method,
-        ${getDBReturnStatements(gvatdbSchema, true, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(gvatdbSchema, false, '', [], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'UKB' ? {
         'method': record.method,
-        ${getDBReturnStatements(ukbSchema, true, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(ukbSchema, false, '', [], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'IGVF' ? {
         'biosample_term': bioTerm,
-        ${getDBReturnStatements(semplSchema, true, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(semplSchema, false, '', [], true, apiKeyToDbFieldMap)}
       } : {}
     )
 `
