@@ -83,7 +83,7 @@
           "description": "P value exponent for the variant to phenotype edge",
           "example": 10
         },
-        "p_val": {
+        "p_value": {
           "type": "number",
           "description": "P value for the variant to phenotype edge",
           "example": 0.01
@@ -181,7 +181,7 @@
         "oddsr_ci_upper",
         "p_val_mantissa",
         "p_val_exponent",
-        "p_val",
+        "p_value",
         "neg_log10_pvalue",
         "tagged_variants",
         "version",
@@ -193,6 +193,6 @@
   "additionalProperties": false,
   "accessible_via": {
     "filter_by_range": "neg_log10_pvalue",
-    "return": "name, study, source, source_url, class, method, label, version, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, neg_log10_pvalue, oddsr_ci_lower, oddsr_ci_upper"
+    "return": "name, study, source, source_url, class, method, label, version, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_value, neg_log10_pvalue, oddsr_ci_lower, oddsr_ci_upper"
   }
 }

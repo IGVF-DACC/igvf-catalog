@@ -47,13 +47,11 @@ class AFGRCAQtl(BaseAdapter):
         else:
             return 'variants_genomic_elements'
 
-    def process_file(self):
+    def parse(self):
         file_metadata = requests.get(
             self.IGVF_API + self.file_accession).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
-
-        self.writer.open()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
@@ -115,5 +113,3 @@ class AFGRCAQtl(BaseAdapter):
 
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
-
-        self.writer.close()

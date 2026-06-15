@@ -61,8 +61,7 @@ class ESM1vCodingVariantsScores(BaseAdapter):
         elif self.label == 'coding_variants_phenotypes':
             return 'coding_variants_phenotypes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         if self.label == 'coding_variants_phenotypes':
             self.igvf_metadata_props = get_file_fileset_by_accession_in_arangodb(
                 self.FILE_ACCESSION)
@@ -184,4 +183,3 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-        self.writer.close()

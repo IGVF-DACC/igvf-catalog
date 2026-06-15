@@ -181,8 +181,7 @@ class Favor(BaseAdapter):
 
         return info_obj
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         seq_repo = get_seqrepo('human')
         translator = AlleleTranslator(data_proxy=SeqRepoDataProxy(seq_repo))
 
@@ -250,5 +249,4 @@ class Favor(BaseAdapter):
             self.writer.write(json.dumps(variant_json))
             self.writer.write('\n')
 
-        self.writer.close()
         self.ca_ids.close()

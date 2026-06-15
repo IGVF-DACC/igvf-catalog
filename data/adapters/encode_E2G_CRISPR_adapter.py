@@ -46,8 +46,7 @@ class ENCODE2GCRISPR(BaseAdapter):
         else:
             return 'genomic_elements_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.FILE_ACCESSION)
         if self.label == 'genomic_element':
@@ -140,7 +139,6 @@ class ENCODE2GCRISPR(BaseAdapter):
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-        self.writer.close()
 
     def load_genomic_element(self):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE

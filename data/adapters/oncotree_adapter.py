@@ -33,7 +33,7 @@ class Oncotree:
     ALLOWED_LABELS = ['node', 'edge']
 
     def __init__(self, label, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.label = label  # either node or edge
+        self.label = label
         self.writer = writer
         self.validate = validate
         if self.validate:
@@ -52,7 +52,10 @@ class Oncotree:
             raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
-        self.writer.open()
+        with self.writer:
+            self.parse()
+
+    def parse(self):
         oncotree_json = requests.get(Oncotree.API_URL).json()
         for node in oncotree_json:
             # reformating for one illegal term: MDS/MPN
@@ -129,4 +132,3 @@ class Oncotree:
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-        self.writer.close()

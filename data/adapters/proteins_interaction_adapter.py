@@ -52,8 +52,7 @@ class ProteinsInteraction(BaseAdapter):
         for node in graph.nodes():
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
         ensembl_unmatched = 0
@@ -127,5 +126,3 @@ class ProteinsInteraction(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.warning(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()

@@ -72,4 +72,6 @@ def test_process_file_writer_closed_on_finish(mock_get):
     writer = MagicMock()
     oncotree = Oncotree(label='node', writer=writer)
     oncotree.process_file()
-    assert writer.close.called
+    # process_file drives the writer through the context-manager protocol,
+    # so the writer is exited (closed) rather than having close() called directly.
+    assert writer.__exit__.called

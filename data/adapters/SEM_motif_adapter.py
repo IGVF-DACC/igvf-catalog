@@ -122,10 +122,8 @@ class SEMMotif(BaseAdapter):
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
-        self.writer.close()
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         if self.label in ['complex', 'complex_protein']:
             self.load_complexes()
             return
@@ -195,5 +193,3 @@ class SEMMotif(BaseAdapter):
                         self.validate_doc(props)
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
-
-        self.writer.close()

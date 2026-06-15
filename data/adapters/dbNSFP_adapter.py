@@ -77,8 +77,7 @@ class DbNSFP(BaseAdapter):
 
         return data_lines
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
@@ -216,4 +215,3 @@ class DbNSFP(BaseAdapter):
                     self.validate_doc(to_json)
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')
-        self.writer.close()

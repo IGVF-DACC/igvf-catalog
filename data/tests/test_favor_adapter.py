@@ -57,10 +57,11 @@ def test_process_file_writes_json(
                       ca_ids_path='dummy.rdict', writer=mock_writer)
         favor.process_file()
 
-    # Writer should be opened, written to, and closed
-    assert mock_writer.open.called
+    # Writer should be entered (opened), written to, and exited (closed)
+    # via the context-manager protocol that BaseAdapter.process_file uses.
+    assert mock_writer.__enter__.called
     assert mock_writer.write.call_count > 0
-    assert mock_writer.close.called
+    assert mock_writer.__exit__.called
 
     # Check that the output JSON contains expected keys
     written_json = None

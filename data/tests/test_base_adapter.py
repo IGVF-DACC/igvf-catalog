@@ -28,14 +28,12 @@ class TestAdapter(BaseAdapter):
         else:
             return 'test_edge_collection'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         doc = {'_key': 'test1', 'name': 'Test',
                'source': self.source, 'source_url': 'http://test'}
         if self.validate:
             self.validate_doc(doc)
         self.writer.write(json.dumps(doc))
-        self.writer.close()
 
 
 # Basic tests
@@ -252,7 +250,7 @@ def test_adapter_without_collection_name():
     class IncompleteAdapter(BaseAdapter):
         ALLOWED_LABELS = ['test']
 
-        def process_file(self):
+        def parse(self):
             pass
 
     writer = SpyWriter()

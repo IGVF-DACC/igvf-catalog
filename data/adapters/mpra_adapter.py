@@ -387,7 +387,7 @@ class MPRAAdapter(BaseAdapter):
     def _is_blacklisted_effect_name(self, effect_name):
         return (effect_name or '').strip() in self.excluded_effect_names
 
-    def process_file(self):
+    def parse(self):
         # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
@@ -409,7 +409,6 @@ class MPRAAdapter(BaseAdapter):
             self._process_element_effects_file()
             return
 
-        self.writer.open()
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
@@ -420,7 +419,6 @@ class MPRAAdapter(BaseAdapter):
                     chunk = []
             if chunk:
                 self._process_chunk_igvf(chunk)
-        self.writer.close()
 
     def _process_element_effects_file(self):
         """Element-activity BED/TSV: one row per tile × strand in the MPRA output.
@@ -432,7 +430,6 @@ class MPRAAdapter(BaseAdapter):
         Writes ``genomic_element`` nodes and/or ``genomic_element_biosample`` edges depending on
         ``self.label`` (both branches are in the same loop; only one label per run is active).
         """
-        self.writer.open()
         seen_element_ids = set()
         biosample_term_key = (self.biosample_term or '').split('/')[-1]
         # Element id suffix: design file accession when we have sequence designs (IGVF), else effect file accession (ENCODE)
@@ -566,8 +563,6 @@ class MPRAAdapter(BaseAdapter):
                     'Missing allele annotations for regions with multiple element effects '
                     f'(examples: {missing_allele_multi_effect[:5]})'
                 )
-
-        self.writer.close()
 
     def _process_chunk_igvf(self, chunk):
         if self.label == 'variant':
