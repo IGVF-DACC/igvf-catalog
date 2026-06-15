@@ -17,10 +17,11 @@ from adapters.gene_validator import GeneValidator
 # # ScoreThreshold: 0.177
 # ElementChr	ElementStart	ElementEnd	ElementName	ElementClass	GeneSymbol	GeneEnsemblID	GeneTSS	CellType	CellTypeOntologyTerm	CellTypeOntologyTermName	Score	RNA_pseudobulkTPM
 # chr1	169893055	169894554	chr1:169893055-169894554	promoter	SCYL3	ENSG00000000457	169893959	Adrenal medulla chromaffin cell	CL:0000336	Adrenal medulla chromaffin cell	0.996889932534048	22.8574991753656
-# chr1	169794253	169795248	chr1:169794253-169795248	promoter	C1orf112	ENSG00000000460	169794998	Adrenal medulla chromaffin cell	CL:0000336	Adrenal medulla chromaffin cell	0.994049708290924	12.2932540190006
-# chr1	24321501	24322805	chr1:24321501-24322805	genic	STPG1	ENSG00000001460	24413772	Adrenal medulla chromaffin cell	CL:0000336	Adrenal medulla chromaffin cell	0.510427225480237	13.2358832214525
-
-# Most scE2G files have 13 columns; IGVFFI4048DVFE has 16 (extra SampleOntologyTerm, SampleOntologyTermName, Qualifier).
+#
+# Three header formats are supported:
+# 1. Standard (13 columns): includes ElementClass, Score, RNA_pseudobulkTPM
+# 2. Extended (16 columns): standard plus SampleOntologyTerm, SampleOntologyTermName, Qualifier
+# 3. Alternate (12 columns): no ElementClass or RNA_pseudobulkTPM; uses SampleSummaryShort
 
 
 class scE2G(BaseAdapter):
@@ -31,6 +32,7 @@ class scE2G(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'predicted regulatory element effect on gene expression'
     TYPE = 'accessible dna elements'
+    DEFAULT_ELEMENT_CLASS = 'enhancer'
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = filepath.split('/')[-1].split('.')[0]
@@ -53,6 +55,33 @@ class scE2G(BaseAdapter):
         else:
             return 'genomic_elements_genes'
 
+    def _read_header_map(self, reader):
+        for row in reader:
+            if row and row[0].startswith('#'):
+                continue
+            if not row:
+                continue
+            return {column: index for index, column in enumerate(row)}
+        raise ValueError(f'No header found in {self.filepath}')
+
+    def _get_column_value(self, row, header_map, column_name):
+        index = header_map.get(column_name)
+        if index is None:
+            return None
+        return row[index]
+
+    def _get_element_class(self, row, header_map):
+        element_class = self._get_column_value(row, header_map, 'ElementClass')
+        if element_class:
+            return element_class
+        return self.DEFAULT_ELEMENT_CLASS
+
+    def _get_rna_pseudobulk_tpm(self, row, header_map):
+        value = self._get_column_value(row, header_map, 'RNA_pseudobulkTPM')
+        if value in (None, ''):
+            return None
+        return float(value)
+
     def process_file(self):
         self.writer.open()
         file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -61,18 +90,14 @@ class scE2G(BaseAdapter):
         collection_class = file_fileset.get('class')
         with gzip.open(self.filepath, 'rt') as f:
             reader = csv.reader(f, delimiter='\t')
+            header_map = self._read_header_map(reader)
             for row in reader:
-                if row and row[0].startswith('#'):
-                    continue
-                break  # first non-comment row is the header
-            for row in reader:
-                # skip blank rows
                 if not row:
                     continue
-                chr = row[0]
-                start = row[1]
-                end = row[2]
-                element_class_name = row[4]
+                chr = row[header_map['ElementChr']]
+                start = row[header_map['ElementStart']]
+                end = row[header_map['ElementEnd']]
+                element_class_name = self._get_element_class(row, header_map)
                 regulatory_element_id = build_regulatory_region_id(
                     chr, start, end, class_name=element_class_name) + '_' + self.file_accession
 
@@ -88,15 +113,16 @@ class scE2G(BaseAdapter):
                             0]
                         cell_type_term_id = cell_type_term_endpoint.split(
                             '/')[-1]
-                    gene_id = row[6]
+                    gene_id = row[header_map['GeneEnsemblID']]
                     is_valid_gene_id = self.gene_validator.validate(gene_id)
                     if not is_valid_gene_id:
                         self.logger.warning(
                             f'Skipping row: gene "{gene_id}" is not a valid gene.')
                         continue
-                    transcription_start_site = int(row[7])  # GeneTSS
-                    score = float(row[-2])
-                    rna_pseudobulk_tpm = float(row[-1])  # RNA_pseudobulkTPM
+                    transcription_start_site = int(row[header_map['GeneTSS']])
+                    score = float(row[header_map['Score']])
+                    rna_pseudobulk_tpm = self._get_rna_pseudobulk_tpm(
+                        row, header_map)
                     key = f'{regulatory_element_id}_{gene_id}_{cell_type_term_id}'
                     props = {
                         '_key': key,

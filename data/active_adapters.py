@@ -142,7 +142,7 @@ KEY_TO_ADAPTER = {
     'mutpred2_coding_variant': Mutpred2CodingVariantsScores,
     'ESM_coding_variant': ESM1vCodingVariantsScores,
     'gencc_disease_gene': GenccDiseasesGenes,
-    'scE2G': scE2G
+    'scE2G': scE2G,
     'dual_ipa_coding_variant_phenotype': DUALIPAAdapter,
 }
 

@@ -51,7 +51,10 @@
           "description": "Transcription start site of the target gene (GeneTSS)"
         },
         "rna_pseudobulk_tpm": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "RNA pseudobulk TPM of the target gene in the cell type"
         },
         "cell_type": {

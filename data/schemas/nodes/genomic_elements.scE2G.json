@@ -33,7 +33,8 @@
           "enum": [
             "genic",
             "intergenic",
-            "promoter"
+            "promoter",
+            "enhancer"
           ]
         },
         "source": {

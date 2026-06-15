@@ -40,6 +40,38 @@ SCE2G_ROW_GENIC = (
     '13.2358832214525\n'
 )
 
+SCE2G_EXTENDED_HEADER = (
+    'ElementChr\tElementStart\tElementEnd\tElementName\tElementClass\t'
+    'GeneSymbol\tGeneEnsemblID\tGeneTSS\tCellType\tCellTypeOntologyTerm\t'
+    'CellTypeOntologyTermName\tSampleOntologyTerm\tSampleOntologyTermName\t'
+    'Qualifier\tScore\tRNA_pseudobulkTPM\n'
+)
+SCE2G_EXTENDED_ROW = (
+    'chr1\t169893055\t169894554\tchr1:169893055-169894554\tpromoter\t'
+    'SCYL3\tENSG00000000457\t169893959\tAdrenal medulla chromaffin cell\t'
+    'CL:0000336\tAdrenal medulla chromaffin cell\tEFO:0002067\t'
+    'K562\tCRISPRi\t0.996889932534048\t22.8574991753656\n'
+)
+
+SCE2G_ALTERNATE_HEADER = (
+    'ElementChr\tElementStart\tElementEnd\tGeneSymbol\tGeneEnsemblID\t'
+    'GeneTSS\tABC.Score\tARC.E2G.Score\tScore.ignoreTPM\tScore\t'
+    'ElementName\tSampleSummaryShort\n'
+)
+SCE2G_ALTERNATE_ROW = (
+    'chr1\t778173\t779428\tLINC01128\tENSG00000228794\t827590\t'
+    '0.071691\t0.0851271937191741\t0.20658503871143\t0.20658503871143\t'
+    'chr1:778173-779428\tK562-CRISPRi\n'
+)
+ALTERNATE_FILE_ACCESSION = 'IGVFFI0793NWFM'
+ALTERNATE_REGULATORY_ELEMENT_ID = (
+    'enhancer_chr1_778173_779428_GRCh38_IGVFFI0793NWFM'
+)
+ALTERNATE_GENE_ID = 'ENSG00000228794'
+ALTERNATE_EDGE_KEY = (
+    f'{ALTERNATE_REGULATORY_ELEMENT_ID}_{ALTERNATE_GENE_ID}_{CELL_TYPE_TERM_ID}'
+)
+
 
 @pytest.fixture
 def mock_file_fileset():
@@ -59,6 +91,7 @@ def sce2g_filepath(tmp_path):
         include_comments=True,
         include_blank_row=False,
         filename=f'{FILE_ACCESSION}.tsv.gz',
+        header=SCE2G_HEADER,
     ):
         path = str(tmp_path / filename)
         rows = rows if rows is not None else [SCE2G_ROW]
@@ -66,7 +99,7 @@ def sce2g_filepath(tmp_path):
             if include_comments:
                 out.write('# Source: scE2G\n')
                 out.write('# Version: v1.2.0\n')
-            out.write(SCE2G_HEADER)
+            out.write(header)
             for index, row in enumerate(rows):
                 if include_blank_row and index == 1:
                     out.write('\n')
@@ -265,6 +298,92 @@ def test_scE2G_adapter_skips_invalid_gene_id(
         assert len(writer.contents) == 0
         assert 'Skipping row: gene "ENSG00000000457" is not a valid gene.' in caplog.text
         mock_validator_instance.log.assert_called_once()
+
+
+def test_scE2G_adapter_genomic_element_gene_extended_header(
+    mock_file_fileset, sce2g_filepath
+):
+    writer = SpyWriter()
+    with patch('adapters.scE2G_adapter.GeneValidator') as mock_gene_validator:
+        mock_validator_instance = MagicMock()
+        mock_validator_instance.validate.return_value = True
+        mock_gene_validator.return_value = mock_validator_instance
+
+        adapter = scE2G(
+            filepath=sce2g_filepath(
+                rows=[SCE2G_EXTENDED_ROW],
+                header=SCE2G_EXTENDED_HEADER,
+            ),
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+        parsed = [json.loads(item) for item in writer.contents if item.strip()]
+        assert len(parsed) == 1
+        first_item = parsed[0]
+        assert first_item['_key'] == EDGE_KEY
+        assert first_item['score'] == pytest.approx(0.996889932534048)
+        assert first_item['rna_pseudobulk_tpm'] == pytest.approx(
+            22.8574991753656)
+
+
+def test_scE2G_adapter_genomic_element_gene_alternate_header(
+    mock_file_fileset, sce2g_filepath
+):
+    writer = SpyWriter()
+    with patch('adapters.scE2G_adapter.GeneValidator') as mock_gene_validator:
+        mock_validator_instance = MagicMock()
+        mock_validator_instance.validate.return_value = True
+        mock_gene_validator.return_value = mock_validator_instance
+
+        adapter = scE2G(
+            filepath=sce2g_filepath(
+                rows=[SCE2G_ALTERNATE_ROW],
+                filename=f'{ALTERNATE_FILE_ACCESSION}.tsv.gz',
+                header=SCE2G_ALTERNATE_HEADER,
+            ),
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+        parsed = [json.loads(item) for item in writer.contents if item.strip()]
+        assert len(parsed) == 1
+        first_item = parsed[0]
+        assert first_item['_key'] == ALTERNATE_EDGE_KEY
+        assert first_item['_from'] == (
+            f'genomic_elements/{ALTERNATE_REGULATORY_ELEMENT_ID}'
+        )
+        assert first_item['_to'] == f'genes/{ALTERNATE_GENE_ID}'
+        assert first_item['score'] == pytest.approx(0.20658503871143)
+        assert first_item['rna_pseudobulk_tpm'] is None
+        assert first_item['cell_type'] == 'adrenal medulla chromaffin cell'
+
+
+def test_scE2G_adapter_genomic_element_alternate_header(
+    mock_file_fileset, sce2g_filepath
+):
+    writer = SpyWriter()
+    adapter = scE2G(
+        filepath=sce2g_filepath(
+            rows=[SCE2G_ALTERNATE_ROW],
+            filename=f'{ALTERNATE_FILE_ACCESSION}.tsv.gz',
+            header=SCE2G_ALTERNATE_HEADER,
+        ),
+        label='genomic_element',
+        writer=writer,
+        validate=True,
+    )
+    adapter.process_file()
+
+    parsed = [json.loads(item) for item in writer.contents if item.strip()]
+    assert len(parsed) == 1
+    first_item = parsed[0]
+    assert first_item['_key'] == ALTERNATE_REGULATORY_ELEMENT_ID
+    assert first_item['source_annotation'] == 'enhancer'
 
 
 def test_scE2G_adapter_invalid_label():

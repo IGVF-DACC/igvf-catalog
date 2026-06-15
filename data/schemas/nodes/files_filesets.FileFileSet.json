@@ -60,6 +60,7 @@
               "Perturb-seq",
               "scATAC-seq",
               "SGE",
+              "snATAC-seq",
               "STARR-seq",
               "TAP-seq",
               "VAMP-seq",
@@ -104,7 +105,8 @@
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
             "scATAC-seq",
-            "scE2G"
+            "scE2G",
+            "snATAC-seq"
           ]
         },
         "class": {
