@@ -31,12 +31,12 @@ class Oncotree:
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
     SOURCE_URL = 'https://oncotree.mskcc.org/api/tumorTypes'
 
-    def __init__(self, type, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.type = type
+    def __init__(self, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.label = label  # either node or edge
         self.writer = writer
         self.validate = validate
         if self.validate:
-            if self.type == 'node':
+            if self.label == 'node':
                 self.schema = get_schema(
                     'nodes', 'ontology_terms', self.__class__.__name__)
             else:
@@ -57,7 +57,7 @@ class Oncotree:
             # reformating for one illegal term: MDS/MPN
             key = node['code'].replace('/', '_')
 
-            if self.type == 'node':
+            if self.label == 'node':
                 _id = 'Oncotree_' + key
                 _props = {
                     '_key': _id,
