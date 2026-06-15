@@ -30,6 +30,7 @@ class Oncotree:
     URI = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
     SOURCE_URL = 'https://oncotree.mskcc.org/api/tumorTypes'
+    ALLOWED_LABELS = ['node', 'edge']
 
     def __init__(self, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.label = label
