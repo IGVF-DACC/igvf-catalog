@@ -194,8 +194,7 @@ class GWAS(BaseAdapter):
             'label': self.method
         }
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
@@ -242,8 +241,6 @@ class GWAS(BaseAdapter):
                 self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
-
-        self.writer.close()
 
     def get_tagged_variants(self):
         header = None

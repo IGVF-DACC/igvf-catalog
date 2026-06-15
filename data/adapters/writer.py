@@ -19,13 +19,25 @@ class Writer(ABC):
         pass
 
     @abstractmethod
-    def close(self):
+    def close(self, success: bool = True):
         pass
 
     @property
     @abstractmethod
     def destination(self):
         pass
+
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        # Only finalize (e.g. version-tag) the output when the body completed
+        # without raising. Writers open lazily on the first write(), so if the
+        # body fails (or produces nothing) before writing, no output file is
+        # created at all. Returning False propagates any exception.
+        self.close(success=exc_type is None)
+        return False
 
 
 class S3Writer(Writer):
@@ -45,15 +57,24 @@ class S3Writer(Writer):
         })
 
     def open(self):
-        self.s3_file = smart_open.open(self.destination, mode='w', transport_params={
-                                       'client': self.session.client('s3')})
+        # Defer creating the S3 object until the first write so a run that fails
+        # (or writes nothing) before producing output leaves no file behind.
+        self.s3_file = None
 
     def write(self, content):
+        if self.s3_file is None:
+            self.s3_file = smart_open.open(self.destination, mode='w', transport_params={
+                                           'client': self.session.client('s3')})
         self.s3_file.write(content)
 
-    def close(self):
+    def close(self, success: bool = True):
+        if self.s3_file is None:
+            # Nothing was written, so no object was created: nothing to
+            # finalize or tag.
+            return
         self.s3_file.close()
-        self.add_version_tag(value=self.version_tag)
+        if success:
+            self.add_version_tag(value=self.version_tag)
 
     def _create_s3_uri(self):
         return f's3://{self.bucket}/{self.key}'
@@ -74,12 +95,19 @@ class LocalWriter(Writer):
         self.file = None
 
     def open(self):
-        self.file = open(self.filepath, mode='w')
+        # Defer creating the file until the first write so a run that fails
+        # (or writes nothing) before producing output leaves no file behind.
+        self.file = None
 
     def write(self, content):
+        if self.file is None:
+            self.file = open(self.filepath, mode='w')
         self.file.write(content)
 
-    def close(self):
+    def close(self, success: bool = True):
+        if self.file is None:
+            # Nothing was written, so no file was created: nothing to close.
+            return
         self.file.close()
 
     @property
@@ -98,7 +126,7 @@ class SpyWriter(Writer):
     def write(self, content):
         self.container.append(content)
 
-    def close(self):
+    def close(self, success: bool = True):
         pass
 
     @property

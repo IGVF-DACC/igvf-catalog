@@ -51,8 +51,7 @@ class EBIComplex(BaseAdapter):
         elif self.label == 'complex_term':
             return 'complexes_terms'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.load_subontologies()
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
@@ -259,8 +258,6 @@ class EBIComplex(BaseAdapter):
 
             self.logger.info('Ignored complexes with no Ensembl match: ' +
                              str(ignored_ensembl_rows))
-
-        self.writer.close()
 
     def get_chain_id(self, protein):
         if len(protein.split('-')) > 1:

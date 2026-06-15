@@ -1,4 +1,5 @@
 import json
+from contextlib import ExitStack
 from typing import Optional
 from rdflib import RDF, BNode, Literal, URIRef
 from rdflib.collection import Collection
@@ -125,30 +126,29 @@ class Ontology:
             raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
-        self.node_primary_writer.open()
-        self.node_secondary_writer.open()
-        self.edge_primary_writer.open()
-        self.edge_secondary_writer.open()
-
         # primary: for example, Go ontology defining a Go term
         # secondary: for example, HPO ontology defining a Go term
         # primary data will replace secondary data when loading into DB
-        self.outputs = {
-            'node': {
-                'primary': self.node_primary_writer,
-                'secondary': self.node_secondary_writer
-            },
-            'edge': {
-                'primary': self.edge_primary_writer,
-                'secondary': self.edge_secondary_writer
+        # ExitStack guarantees every writer is closed (and tagged on success)
+        # even if process_ontology raises or returns early.
+        with ExitStack() as stack:
+            stack.enter_context(self.node_primary_writer)
+            stack.enter_context(self.node_secondary_writer)
+            stack.enter_context(self.edge_primary_writer)
+            stack.enter_context(self.edge_secondary_writer)
+
+            self.outputs = {
+                'node': {
+                    'primary': self.node_primary_writer,
+                    'secondary': self.node_secondary_writer
+                },
+                'edge': {
+                    'primary': self.edge_primary_writer,
+                    'secondary': self.edge_secondary_writer
+                }
             }
-        }
 
-        self.process_ontology()
-
-        for t in self.outputs.keys():
-            self.outputs[t]['primary'].close()
-            self.outputs[t]['secondary'].close()
+            self.process_ontology()
 
     def process_ontology(self):
         onto = get_ontology(self.filepath).load()

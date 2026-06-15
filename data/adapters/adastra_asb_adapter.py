@@ -64,12 +64,11 @@ class ASB(BaseAdapter):
                 self.cell_ontology_id_mapping[cell_name] = [
                     cell_ontology_id, cell_gtrd_id, cell_gtrd_name]
 
-    def process_file(self):
+    def parse(self):
         file_metadata = requests.get(
             ASB.IGVF_API + self.file_accession).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
-        self.writer.open()
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
         self.ensembls = pickle.load(open(ASB.ENSEMBL_MAPPING, 'rb'))
@@ -160,5 +159,3 @@ class ASB(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.warning(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()

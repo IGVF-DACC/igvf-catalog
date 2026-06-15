@@ -38,8 +38,7 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
             data_line = line.strip().split('\t')
             self.mm_gene_mapping[data_line[0]] = data_line[5]
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.load_mgi_ensembl_mapping()
         self.load_entrz_ensembl_mapping()
 
@@ -112,4 +111,3 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
                             self.validate_doc(props)
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
-        self.writer.close()

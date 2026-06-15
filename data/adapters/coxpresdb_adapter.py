@@ -31,13 +31,12 @@ class Coxpresdb(BaseAdapter):
         """Get collection name."""
         return 'genes_genes'
 
-    def process_file(self):
+    def parse(self):
         file_metadata = requests.get(
             self.IGVF_API + self.FILE_ACCESSION).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
 
-        self.writer.open()
         # entrez_to_ensembl.pkl is generated using those two files:
         # gencode file: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz
         # Homo_sapiens.gene_info.gz file: https://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
@@ -79,4 +78,3 @@ class Coxpresdb(BaseAdapter):
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
-        self.writer.close()

@@ -211,11 +211,10 @@ class GencodeGene(BaseAdapter):
                 mapping_line = row.strip().split('\t')
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
-    def process_file(self):
+    def parse(self):
         alias_dict = self.get_collection_alias()
         self.load_chr_name_mapping()
         igvfd_dict = self.get_igvfd_data()
-        self.writer.open()
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -327,4 +326,3 @@ class GencodeGene(BaseAdapter):
                         )
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
-        self.writer.close()

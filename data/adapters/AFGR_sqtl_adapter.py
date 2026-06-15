@@ -43,12 +43,11 @@ class AFGRSQtl(BaseAdapter):
     def _get_collection_name(self):
         return 'variants_genes'
 
-    def process_file(self):
+    def parse(self):
         file_metadata = requests.get(
             self.IGVF_API + self.file_accession).json()
         self.collection_class = file_metadata['catalog_class']
         self.method = file_metadata['catalog_method']
-        self.writer.open()
         self.load_intron_gene_mapping()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
@@ -114,7 +113,6 @@ class AFGRSQtl(BaseAdapter):
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-            self.writer.close()
             self.gene_validator.log()
 
     def load_intron_gene_mapping(self):

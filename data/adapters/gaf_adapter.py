@@ -82,8 +82,7 @@ class GAF(BaseAdapter):
         self.mouse_mgi_mapping = pickle.load(
             open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rb'))
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         ensembl_unmatched = 0
 
         if self.label == 'rna':
@@ -175,5 +174,3 @@ class GAF(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.info(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()

@@ -55,8 +55,7 @@ class CCRE(BaseAdapter):
         else:
             return 'genomic_elements'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         encode_metadata_props = get_file_fileset_by_accession_in_arangodb(
             self.filename)
         with gzip.open(self.filepath, 'rt') as input_file:
@@ -81,4 +80,3 @@ class CCRE(BaseAdapter):
                     self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
-        self.writer.close()

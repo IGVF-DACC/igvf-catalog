@@ -35,8 +35,7 @@ class ClinGen(BaseAdapter):
         elif self.label == 'variant_disease_gene':
             return 'variants_diseases_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.load_variant_id_mapping()
 
         with open(self.filepath, 'r') as clingen_file:
@@ -99,7 +98,6 @@ class ClinGen(BaseAdapter):
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
 
-        self.writer.close()
         self.gene_validator.log()
 
     def load_variant_id_mapping(self):
