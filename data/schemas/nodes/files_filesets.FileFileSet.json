@@ -60,6 +60,7 @@
               "Perturb-seq",
               "scATAC-seq",
               "SGE",
+              "snATAC-seq",
               "STARR-seq",
               "TAP-seq",
               "VAMP-seq",
@@ -103,7 +104,9 @@
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
-            "scATAC-seq"
+            "scATAC-seq",
+            "scE2G",
+            "snATAC-seq"
           ]
         },
         "class": {
@@ -147,6 +150,7 @@
               "Samtools",
               "scATAC-seq processing scripts",
               "SEMVAR",
+              "scE2G",
               "Sceptre",
               "Seurat",
               "SGE Pipeline"
@@ -271,6 +275,14 @@
           "description": "The genome browser link of the file set",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
+        "browser_index_file": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Download link for the genome browser index file (.tbi). Null for ENCODE files; for IGVF files, the tabix index file when present in the file set.",
+          "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
+        },
         "crispr_modality": {
           "type": [
             "string",
@@ -302,13 +314,14 @@
         "publication",
         "download_link",
         "cell_annotation",
+        "browser_index_file",
         "crispr_modality"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, crispr_modality"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, browser_index_file, crispr_modality"
   },
   "db_collection_name": "files_filesets"
 }

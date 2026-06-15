@@ -269,6 +269,7 @@ proteins_proteins:
 genomic_elements:
   persistent:
     fields:
+      - method, source, chr, type, source_annotation, files_filesets
       - source, chr, type, source_annotation, files_filesets
       - chr, type, source_annotation, files_filesets
       - type, source_annotation, files_filesets
