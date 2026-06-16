@@ -849,19 +849,6 @@ class IGVFE2GCRISPR(BaseAdapter):
             return 'genomic_elements_genes'
 
     def parse(self):
-    def _open_data_reader(
-        self,
-        layout: dict,
-    ) -> Tuple[object, csv.reader, Dict[str, int]]:
-        data_file = gzip.open(self.filepath, 'rt')
-        reader = csv.reader(
-            data_file, delimiter=layout.get('delimiter', '\t'))
-        header = next(reader)
-        name_to_idx = {h.strip(): i for i, h in enumerate(header)}
-        return data_file, reader, name_to_idx
-
-    def process_file(self):
-        self.writer.open()
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         method = file_fileset['method']
@@ -1018,20 +1005,4 @@ class IGVFE2GCRISPR(BaseAdapter):
                             raise ValueError(
                                 f'Promoter element {_id} is missing promoter_gene.')
                         _props['promoter_of'] = f'genes/{promoter_gene}'
-<<<<<<< HEAD
-                    if self.validate:
-                        self.validate_doc(_props)
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        finally:
-            data_file.close()
-=======
->>>>>>> ec87131a (stuff)
-=======
                     self._write_doc(_props)
->>>>>>> fd74b9dd (context + prompted cleanup of adapter)
-        self.writer.close()
->>>>>>> 2b7d7f71 (neg_log10_p_value and neg_log10_p_value_adj)
