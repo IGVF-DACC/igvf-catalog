@@ -59,6 +59,7 @@
               "MPRA",
               "Perturb-seq",
               "scATAC-seq",
+              "snATAC-seq",
               "SGE",
               "STARR-seq",
               "TAP-seq",
@@ -103,7 +104,8 @@
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
-            "scATAC-seq"
+            "scATAC-seq",
+            "snATAC-seq"
           ]
         },
         "class": {
