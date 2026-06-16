@@ -481,6 +481,19 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['files_filesets'] == 'files_filesets/IGVFFI9100GKNS'
 
 
+def test_better_scaled_screen_hit():
+    assert IGVFE2GCRISPR._better_scaled_screen_hit(
+        None, {'p_value': 0.1}) is True
+    assert IGVFE2GCRISPR._better_scaled_screen_hit(
+        {'p_value': 0.05}, {'p_value': 0.01}) is True
+    assert IGVFE2GCRISPR._better_scaled_screen_hit(
+        {'p_value': 0.01}, {'p_value': 0.05}) is False
+    assert IGVFE2GCRISPR._better_scaled_screen_hit(
+        {'p_value': 0.01}, {}) is False
+    assert IGVFE2GCRISPR._better_scaled_screen_hit(
+        {}, {'p_value': 0.5}) is True
+
+
 def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
         mock_file_fileset_perturb_seq, tmp_path):
     writer = SpyWriter()
@@ -1135,16 +1148,16 @@ def test_apply_adapter_calculated_fields_pyspade_exp_ln_p_rules():
         validate=False,
     )
     layout = CRISPR_E2G_LAYOUTS['pySpade']
-    with patch.object(adapter, '_layout', return_value=layout):
-        metrics = adapter._apply_adapter_calculated_fields(
-            row=[],
-            colmap={},
-            metrics={
-                'hypergeometric_ln_p_value': -11.04346999,
-                'gamma_approximation_ln_p_value': -10.84371703,
-                'p_value_adj': 0.0,
-            },
-        )
+    adapter.layout = layout
+    metrics = adapter._apply_adapter_calculated_fields(
+        row=[],
+        colmap={},
+        metrics={
+            'hypergeometric_ln_p_value': -11.04346999,
+            'gamma_approximation_ln_p_value': -10.84371703,
+            'p_value_adj': 0.0,
+        },
+    )
     assert metrics['p_value'] == pytest.approx(math.exp(-11.04346999))
     assert metrics['p_value_adj'] == 0.0
     assert metrics['neg_log10_p_value'] == pytest.approx(
@@ -1165,30 +1178,30 @@ def test_apply_adapter_calculated_fields_crudo_rules():
         'element_type': 0,
         'promoter_gene_map': {'CCND1_TSS': 'ENSG00000110092'},
     }
-    with patch.object(adapter, '_layout', return_value=layout):
-        metrics = adapter._apply_adapter_calculated_fields(
-            row=['putative_enhancer'],
-            colmap=colmap,
-            metrics={
-                'p_value': 0.01,
-                'p_value_adj': 0.02,
-                'effect_size': 0.25,
-                'effect_size_ci_95': 0.05,
-                'significant': False,
-            },
-        )
-        assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
-        assert metrics['neg_log10_p_value_adj'] == pytest.approx(
-            -math.log10(0.02))
-        assert metrics['log2FC'] == pytest.approx(math.log2(0.75))
-        assert metrics['significant'] is False
+    adapter.layout = layout
+    metrics = adapter._apply_adapter_calculated_fields(
+        row=['putative_enhancer'],
+        colmap=colmap,
+        metrics={
+            'p_value': 0.01,
+            'p_value_adj': 0.02,
+            'effect_size': 0.25,
+            'effect_size_ci_95': 0.05,
+            'significant': False,
+        },
+    )
+    assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
+    assert metrics['neg_log10_p_value_adj'] == pytest.approx(
+        -math.log10(0.02))
+    assert metrics['log2FC'] == pytest.approx(math.log2(0.75))
+    assert metrics['significant'] is False
 
-        metrics = adapter._apply_adapter_calculated_fields(
-            row=['CCND1_TSS'],
-            colmap=colmap,
-            metrics={'significant': False},
-        )
-        assert metrics['significant'] is True
+    metrics = adapter._apply_adapter_calculated_fields(
+        row=['CCND1_TSS'],
+        colmap=colmap,
+        metrics={'significant': False},
+    )
+    assert metrics['significant'] is True
 
 
 def test_igvf_e2g_crispr_adapter_validate_doc_invalid(mock_file_fileset_perturb_seq):
