@@ -24,7 +24,6 @@ parser.add_argument('--aws-profile', type=str, default=None,
 parser.add_argument('--version-tag', type=str, default=None,
                     help='The version tag to use, for example "IGVF_catalog_beta_v0.4".')
 
-
 # arguments that are in at least one adapter signature
 parser.add_argument('--gene-alias-file-path', type=str,
                     help='Gene alias file path for GencodeGene.')
