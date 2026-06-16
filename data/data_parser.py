@@ -97,7 +97,6 @@ non_adapter_signature_args = [
     'adapter',
     'aws_profile',
     'version_tag',
-    'other_tags',
 ]
 
 non_adapter_signature_namespace = argparse.Namespace()
