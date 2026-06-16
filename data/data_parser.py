@@ -125,6 +125,9 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         version_tag=non_adapter_signature_namespace.version_tag
     )
 
+    for key, value in non_adapter_signature_namespace.other_tags.items():
+        writer_primary.add_tag(key, value)
+
     writer_secondary = get_writer(
         filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
@@ -133,6 +136,8 @@ if non_adapter_signature_namespace.adapter == 'ontology':
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
+    for key, value in non_adapter_signature_namespace.other_tags.items():
+        writer_secondary.add_tag(key, value)
 
     writer_edge_primary = get_writer(
         filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-primary.jsonl',
@@ -142,6 +147,8 @@ if non_adapter_signature_namespace.adapter == 'ontology':
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
+    for key, value in non_adapter_signature_namespace.other_tags.items():
+        writer_edge_primary.add_tag(key, value)
 
     writer_edge_secondary = get_writer(
         filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-secondary.jsonl',
@@ -151,6 +158,8 @@ if non_adapter_signature_namespace.adapter == 'ontology':
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
+    for key, value in non_adapter_signature_namespace.other_tags.items():
+        writer_edge_secondary.add_tag(key, value)
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
         adapter_signature_namespace.filepath,
@@ -169,6 +178,9 @@ else:
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
+
+    for key, value in non_adapter_signature_namespace.other_tags.items():
+        writer.add_tag(key, value)
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
         **vars(adapter_signature_namespace), writer=writer)
