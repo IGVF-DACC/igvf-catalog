@@ -22,6 +22,7 @@ _CRISPR_E2G_DEFINITIONS_PATH = (
 def _load_crispr_e2g_definitions() -> Tuple[dict, dict]:
     with open(_CRISPR_E2G_DEFINITIONS_PATH, encoding='utf-8') as definitions_file:
         raw_definitions = json.load(definitions_file)
+    raw_definitions.pop('_context', None)
     file_config = raw_definitions.pop('files', {})
     layouts = dict(raw_definitions)
     return layouts, file_config
@@ -35,6 +36,7 @@ CRISPR_E2G_LAYOUTS, CRISPR_E2G_FILE_CONFIG = _load_crispr_e2g_definitions()
 _HG38_INTERVAL_RE = re.compile(
     r'^(?P<c>chr[^:]+):(?P<s1>\d+)-(?P<s2>\d+)$'
 )
+_ENSEMBL_GENE_ID_RE = re.compile(r'^ENSG[0-9]{11}(?:_PAR_Y)?$')
 
 # Colmap keys that map row columns but are not edge metric properties.
 _IGVF_E2G_LAYOUT_KEYS = frozenset({
@@ -101,6 +103,70 @@ class IGVFE2GCRISPR(BaseAdapter):
     def _row_load_error(self, message: str) -> None:
         raise ValueError(f'{self.file_accession}: {message}')
 
+    @staticmethod
+    def _cell(row: list, idx: Optional[int], default: str = '') -> str:
+        if idx is None or idx >= len(row):
+            return default
+        return row[idx].strip()
+
+    @classmethod
+    def _is_ensembl_gene_id(cls, gene) -> bool:
+        return isinstance(gene, str) and bool(_ENSEMBL_GENE_ID_RE.match(gene))
+
+    @staticmethod
+    def _uses_perturb_seq_coordinates(
+        uses_name_hg38: bool,
+        method: str,
+    ) -> bool:
+        return uses_name_hg38 or method == 'Perturb-seq'
+
+    def _write_doc(self, props: dict) -> None:
+        if self.validate:
+            self.validate_doc(props)
+        self.writer.write(json.dumps(props))
+        self.writer.write('\n')
+
+    def _require_valid_promoter_gene(
+        self,
+        promoter_gene: str,
+        raw_for_error: str,
+        *,
+        pattern_error: Optional[str] = None,
+        validate_error: Optional[str] = None,
+    ) -> None:
+        if not self._is_ensembl_gene_id(promoter_gene):
+            self._row_load_error(
+                pattern_error
+                or (
+                    f'promoter row target gene {raw_for_error!r} is not a valid '
+                    f'Ensembl gene id pattern.'
+                )
+            )
+        if not self.gene_validator.validate(promoter_gene):
+            self._row_load_error(
+                validate_error
+                or f'promoter row target gene {promoter_gene!r} is not valid.'
+            )
+
+    def _source_annotation_from_row(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        *,
+        missing_column_error: str,
+    ) -> str:
+        source_idx = colmap.get('source_annotation')
+        if source_idx is None or source_idx >= len(row):
+            self._row_load_error(missing_column_error)
+        source_annotation_raw = row[source_idx].strip()
+        source_annotation_map = colmap.get('source_annotation_map') or {}
+        if source_annotation_map:
+            return source_annotation_map.get(
+                source_annotation_raw,
+                source_annotation_map.get(source_annotation_raw.lower()),
+            )
+        return source_annotation_raw.lower()
+
     def _skip_column_value_matches(
         self,
         column: str,
@@ -156,25 +222,22 @@ class IGVFE2GCRISPR(BaseAdapter):
         if not supports_promoter:
             return (None, 'enhancer')
         if not supports_enhancer:
-            if not isinstance(intended_target_name, str) or not re.match(
-                r'^ENSG[0-9]{11}(?:_PAR_Y)?$', intended_target_name
-            ):
-                self._row_load_error(
+            self._require_valid_promoter_gene(
+                intended_target_name,
+                intended_target_gene_raw,
+                pattern_error=(
                     f'promoter-targeted file but target gene id '
                     f'{intended_target_gene_raw!r} is not a valid Ensembl gene id pattern.'
-                )
-            if not self.gene_validator.validate(intended_target_name):
-                self._row_load_error(
+                ),
+                validate_error=(
                     f'intended promoter gene {intended_target_gene_raw!r} is not a valid '
                     f'gene after normalization ({intended_target_name!r}).'
-                )
+                ),
+            )
             return (intended_target_name, 'promoter')
-        # Mixed promoter/enhancer files use the row value to determine source annotation.
         promoter_gene = None
         source_annotation = 'enhancer'
-        if isinstance(intended_target_name, str) and re.match(
-            r'^ENSG[0-9]{11}(?:_PAR_Y)?$', intended_target_name
-        ):
+        if self._is_ensembl_gene_id(intended_target_name):
             if self.gene_validator.validate(intended_target_name):
                 promoter_gene = intended_target_name
                 source_annotation = 'promoter'
@@ -193,45 +256,24 @@ class IGVFE2GCRISPR(BaseAdapter):
         intended_target_gene_raw: str,
         readout_gene: str,
     ) -> Tuple[Optional[str], str]:
-        source_idx = colmap.get('source_annotation')
-        if source_idx is None or source_idx >= len(row):
-            self._row_load_error('missing source annotation column.')
-        source_annotation_raw = row[source_idx].strip()
-        source_annotation_map = colmap.get('source_annotation_map') or {}
-        if source_annotation_map:
-            source_annotation = source_annotation_map.get(
-                source_annotation_raw,
-                source_annotation_map.get(source_annotation_raw.lower()),
-            )
-        else:
-            source_annotation = source_annotation_raw.lower()
+        source_annotation = self._source_annotation_from_row(
+            row,
+            colmap,
+            missing_column_error='missing source annotation column.',
+        )
         if source_annotation == 'enhancer':
             return None, 'enhancer'
         if source_annotation != 'promoter':
+            source_idx = colmap['source_annotation']
             self._row_load_error(
-                f'unsupported source annotation value {source_annotation_raw!r}.'
+                f'unsupported source annotation value {row[source_idx].strip()!r}.'
             )
-        type_idx = colmap.get('element_type')
-        row_type = (
-            row[type_idx].strip()
-            if type_idx is not None and type_idx < len(row)
-            else ''
+        row_type = self._cell(row, colmap.get('element_type'))
+        promoter_gene = (
+            readout_gene if row_type == 'TSS' else intended_target_name
         )
-        if row_type == 'TSS':
-            promoter_gene = readout_gene
-        else:
-            promoter_gene = intended_target_name
-        if not isinstance(promoter_gene, str) or not re.match(
-            r'^ENSG[0-9]{11}(?:_PAR_Y)?$', promoter_gene
-        ):
-            self._row_load_error(
-                f'promoter row target gene {intended_target_gene_raw!r} is not a valid '
-                f'Ensembl gene id pattern.'
-            )
-        if not self.gene_validator.validate(promoter_gene):
-            self._row_load_error(
-                f'promoter row target gene {promoter_gene!r} is not valid.'
-            )
+        self._require_valid_promoter_gene(
+            promoter_gene, intended_target_gene_raw)
         return promoter_gene, 'promoter'
 
     @staticmethod
@@ -255,11 +297,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     ) -> Tuple[str, str, str, str]:
         name_cell = row[name_idx]
         chr_, start, end = self._parse_element_coordinates_hg38(name_cell)
-        row_type = (
-            row[type_idx].strip()
-            if type_idx is not None and type_idx < len(row)
-            else ''
-        )
+        row_type = self._cell(row, type_idx)
         if promoter_gene_map and row_type in promoter_gene_map:
             gene_raw = promoter_gene_map[row_type]
         else:
@@ -268,15 +306,11 @@ class IGVFE2GCRISPR(BaseAdapter):
 
     @staticmethod
     def _perturb_seq_negative_control(row: list, type_col: Optional[int]) -> bool:
-        if type_col is None or type_col >= len(row):
-            return False
-        return row[type_col].strip() == 'negative_control'
+        return IGVFE2GCRISPR._cell(row, type_col) == 'negative_control'
 
     @staticmethod
     def _non_targeting_control(row: list, source_annotation_col: Optional[int]) -> bool:
-        if source_annotation_col is None or source_annotation_col >= len(row):
-            return False
-        return row[source_annotation_col].strip().lower() == 'non-targeting'
+        return IGVFE2GCRISPR._cell(row, source_annotation_col).lower() == 'non-targeting'
 
     def _resolve_explicit_interval(
         self,
@@ -381,10 +415,6 @@ class IGVFE2GCRISPR(BaseAdapter):
         else:
             colmap['name_hg38'] = self._pick_column(
                 name_to_idx, element_coordinates)
-        colmap['promoter_gene'] = self._pick_column(
-            name_to_idx,
-            semantic_columns.get('perturbed_gene'),
-        )
         for catalog_field, source_column in semantic_columns.get(
             'metrics', {}
         ).items():
@@ -448,7 +478,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         if is_pyspade and self._non_targeting_control(
                 row, colmap.get('source_annotation')):
             return False
-        if uses_name_hg38 or method == 'Perturb-seq':
+        if self._uses_perturb_seq_coordinates(uses_name_hg38, method):
             if self._perturb_seq_negative_control(row, colmap.get('element_type')):
                 return False
         return True
@@ -492,9 +522,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             return
         type_idx = colmap.get('element_type')
         promoter_gene_map = colmap.get('promoter_gene_map') or {}
-        if type_idx is None or type_idx >= len(row):
-            return
-        if row[type_idx].strip() in promoter_gene_map:
+        if self._cell(row, type_idx) in promoter_gene_map:
             metrics['significant'] = True
 
     def _apply_adapter_calculated_fields(
@@ -547,13 +575,13 @@ class IGVFE2GCRISPR(BaseAdapter):
             offset = metrics.get(add_field)
             if offset is None:
                 return
-            depletion = base + offset
+            depletion += offset
         subtract_field = rule.get('subtract')
         if subtract_field is not None:
             offset = metrics.get(subtract_field)
             if offset is None:
                 return
-            depletion = base - offset
+            depletion -= offset
         log2fc = self._log2_one_minus_depletion(depletion)
         if log2fc is not None:
             metrics[rule['field']] = log2fc
@@ -615,14 +643,10 @@ class IGVFE2GCRISPR(BaseAdapter):
         colmap: Dict[str, Optional[int]],
     ) -> bool:
         type_idx = colmap.get('element_type')
-        if type_idx is not None and type_idx < len(row):
-            if row[type_idx].strip().lower() == 'non-targeting':
-                return False
+        if self._cell(row, type_idx).lower() == 'non-targeting':
+            return False
         for col_name in ('chr', 'start', 'end'):
-            col_idx = colmap.get(col_name)
-            if col_idx is None or col_idx >= len(row):
-                return False
-            value = row[col_idx].strip()
+            value = self._cell(row, colmap.get(col_name))
             if not value or value.lower() in {'nan', 'na', 'none'}:
                 return False
         return True
@@ -659,14 +683,17 @@ class IGVFE2GCRISPR(BaseAdapter):
         colmap: Dict[str, Optional[int]],
         perturbed_gene_raw: str,
     ) -> Tuple[Optional[str], str]:
-        source_idx = colmap.get('source_annotation')
-        if source_idx is None or source_idx >= len(row):
-            self._row_load_error(
-                'missing genomic_element column for scaled screen.')
-        source_annotation = row[source_idx].strip().lower()
+        source_annotation = self._source_annotation_from_row(
+            row,
+            colmap,
+            missing_column_error=(
+                'missing genomic_element column for scaled screen.'
+            ),
+        )
         if source_annotation == 'enhancer':
             return None, 'enhancer'
         if source_annotation != 'promoter':
+            source_idx = colmap['source_annotation']
             self._row_load_error(
                 f'unsupported genomic_element value {row[source_idx]!r}.'
             )
@@ -678,10 +705,13 @@ class IGVFE2GCRISPR(BaseAdapter):
                 'missing perturbed gene in putative_target_genes.'
             )
         promoter_gene = self._normalize_ensembl_gene_id(perturbed_genes[0])
-        if not self.gene_validator.validate(promoter_gene):
-            self._row_load_error(
+        self._require_valid_promoter_gene(
+            promoter_gene,
+            perturbed_genes[0],
+            validate_error=(
                 f'perturbed gene {perturbed_genes[0]!r} is not valid.'
-            )
+            ),
+        )
         return promoter_gene, 'promoter'
 
     @staticmethod
@@ -705,6 +735,62 @@ class IGVFE2GCRISPR(BaseAdapter):
         if current_p is None:
             return True
         return candidate_p < current_p
+
+    def _resolve_intended_target_from_row(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        method: str,
+        *,
+        uses_explicit_coordinates: bool,
+        uses_name_hg38: bool,
+    ) -> Tuple[str, str, str, str]:
+        if uses_explicit_coordinates:
+            promoter_idx = colmap.get('promoter_gene')
+            return (
+                row[colmap['chr']],
+                row[colmap['start']],
+                row[colmap['end']],
+                row[promoter_idx] if promoter_idx is not None and promoter_idx < len(
+                    row) else '',
+            )
+        if self._uses_perturb_seq_coordinates(uses_name_hg38, method):
+            resolved = self._resolve_perturb_seq_element(row, colmap)
+            if resolved is not None:
+                return resolved
+        self._row_load_error(
+            'missing coordinates (chr/start/end or name_hg38).'
+        )
+
+    def _promoter_gene_and_source_annotation_for_row(
+        self,
+        row: list,
+        colmap: Dict[str, Optional[int]],
+        *,
+        is_scaled_screen: bool,
+        intended_target_name: str,
+        intended_target_gene_raw: str,
+        readout_gene: str,
+    ) -> Tuple[Optional[str], str]:
+        if is_scaled_screen:
+            return self._scaled_screen_promoter_gene_and_source_annotation(
+                row,
+                colmap,
+                intended_target_gene_raw,
+            )
+        if colmap.get('source_annotation') is not None:
+            return self._source_annotation_column_promoter_gene_and_source_annotation(
+                row,
+                colmap,
+                intended_target_name,
+                intended_target_gene_raw,
+                readout_gene,
+            )
+        return self._promoter_gene_and_source_annotation(
+            self.targeted_element_types,
+            intended_target_name,
+            intended_target_gene_raw,
+        )
 
     def _check_unique_element_gene(
         self,
@@ -817,26 +903,18 @@ class IGVFE2GCRISPR(BaseAdapter):
                 ):
                     continue
 
-                if uses_explicit_coordinates:
-                    intended_target_chr = row[colmap['chr']]
-                    intended_target_start = row[colmap['start']]
-                    intended_target_end = row[colmap['end']]
-                    promoter_idx = colmap.get('promoter_gene')
-                    if promoter_idx is not None and promoter_idx < len(row):
-                        intended_target_gene_raw = row[promoter_idx]
-                    else:
-                        intended_target_gene_raw = ''
-                elif uses_name_hg38 or method == 'Perturb-seq':
-                    (
-                        intended_target_chr,
-                        intended_target_start,
-                        intended_target_end,
-                        intended_target_gene_raw,
-                    ) = self._resolve_perturb_seq_element(row, colmap)
-                else:
-                    self._row_load_error(
-                        'missing coordinates (chr/start/end or name_hg38).'
-                    )
+                (
+                    intended_target_chr,
+                    intended_target_start,
+                    intended_target_end,
+                    intended_target_gene_raw,
+                ) = self._resolve_intended_target_from_row(
+                    row,
+                    colmap,
+                    method,
+                    uses_explicit_coordinates=uses_explicit_coordinates,
+                    uses_name_hg38=uses_name_hg38,
+                )
 
                 read_idx = colmap['readout_gene']
                 if read_idx is None or read_idx >= len(row):
@@ -852,32 +930,16 @@ class IGVFE2GCRISPR(BaseAdapter):
                         f'readout gene {readout_gene_raw!r} is not a valid gene after '
                         f'normalization ({readout_gene!r}).'
                     )
-                if is_scaled_screen:
-                    promoter_gene, source_annotation = (
-                        self._scaled_screen_promoter_gene_and_source_annotation(
-                            row,
-                            colmap,
-                            intended_target_gene_raw,
-                        )
+                promoter_gene, source_annotation = (
+                    self._promoter_gene_and_source_annotation_for_row(
+                        row,
+                        colmap,
+                        is_scaled_screen=is_scaled_screen,
+                        intended_target_name=intended_target_name,
+                        intended_target_gene_raw=intended_target_gene_raw,
+                        readout_gene=readout_gene,
                     )
-                elif colmap.get('source_annotation') is not None:
-                    promoter_gene, source_annotation = (
-                        self._source_annotation_column_promoter_gene_and_source_annotation(
-                            row,
-                            colmap,
-                            intended_target_name,
-                            intended_target_gene_raw,
-                            readout_gene,
-                        )
-                    )
-                else:
-                    promoter_gene, source_annotation = (
-                        self._promoter_gene_and_source_annotation(
-                            self.targeted_element_types,
-                            intended_target_name,
-                            intended_target_gene_raw,
-                        )
-                    )
+                )
                 element_coordinates = (
                     intended_target_chr,
                     intended_target_start,
@@ -925,19 +987,13 @@ class IGVFE2GCRISPR(BaseAdapter):
                     else:
                         self._check_unique_element_gene(
                             _id, seen_element_gene_ids)
-                        if self.validate:
-                            self.validate_doc(_props)
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                        self._write_doc(_props)
 
             if self.label == 'genomic_element_gene' and is_scaled_screen:
                 for _props in scaled_screen_best_edges.values():
                     self._check_unique_element_gene(
                         _props['_key'], seen_element_gene_ids)
-                    if self.validate:
-                        self.validate_doc(_props)
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    self._write_doc(_props)
 
             if self.label == 'genomic_element':
                 for genomic_element, element_id in genomic_coordinates_to_element_id.items():
@@ -962,6 +1018,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                             raise ValueError(
                                 f'Promoter element {_id} is missing promoter_gene.')
                         _props['promoter_of'] = f'genes/{promoter_gene}'
+<<<<<<< HEAD
                     if self.validate:
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
@@ -973,5 +1030,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             data_file.close()
 =======
 >>>>>>> ec87131a (stuff)
+=======
+                    self._write_doc(_props)
+>>>>>>> fd74b9dd (context + prompted cleanup of adapter)
         self.writer.close()
 >>>>>>> 2b7d7f71 (neg_log10_p_value and neg_log10_p_value_adj)
