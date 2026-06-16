@@ -400,7 +400,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             name_to_idx,
             semantic_columns.get('perturbed_gene'),
         )
-        for source_column, catalog_field in semantic_columns.get(
+        for catalog_field, source_column in semantic_columns.get(
             'metrics', {}
         ).items():
             if colmap.get(catalog_field) is not None:

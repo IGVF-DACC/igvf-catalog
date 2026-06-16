@@ -25,11 +25,11 @@
       "readout_gene": "target_gene",
       "perturbed_gene": "intended_target_name",
       "metrics": {
-        "p_val": "p_value",
-        "p_val_adj": "p_value_adj",
-        "avg_log2FC": "log2FC",
-        "pct.1": "pct_1",
-        "pct.2": "pct_2"
+        "p_value": "p_val",
+        "p_value_adj": "p_val_adj",
+        "log2FC": "avg_log2FC",
+        "pct_1": "pct.1",
+        "pct_2": "pct.2"
       }
     }
   },
@@ -58,11 +58,11 @@
       ],
       "readout_gene": "ensembl_id",
       "metrics": {
-        "p_val": "p_value",
-        "p_val_adj": "p_value_adj",
-        "avg_log2FC": "log2FC",
-        "pct.1": "pct_1",
-        "pct.2": "pct_2"
+        "p_value": "p_val",
+        "p_value_adj": "p_val_adj",
+        "log2FC": "avg_log2FC",
+        "pct_1": "pct.1",
+        "pct_2": "pct.2"
       }
     },
     "notes": "File format specification document reused from `t_cell` layout. Data file format does not actually match the fields defined in file format specification document precisely, i.e. ensembl_id instead of target_gene."
@@ -91,9 +91,9 @@
       "readout_gene": "readout_gene",
       "perturbed_gene": "intended_target_name",
       "metrics": {
-        "FRACTEL_pval": "p_value",
-        "FRACTEL_pval_fdr_corr": "p_value_adj",
-        "FRACTEL_effect_size": "log2FC"
+        "p_value": "FRACTEL_pval",
+        "p_value_adj": "FRACTEL_pval_fdr_corr",
+        "log2FC": "FRACTEL_effect_size"
       }
     }
   },
@@ -125,9 +125,9 @@
       "readout_gene": "gene_id",
       "perturbed_gene": "Intended_target_gene_id",
       "metrics": {
-        "sceptre_p_value": "p_value",
-        "sceptre_adj_p_value": "p_value_adj",
-        "sceptre_log2_fc": "log2FC",
+        "p_value": "sceptre_p_value",
+        "p_value_adj": "sceptre_adj_p_value",
+        "log2FC": "sceptre_log2_fc",
         "significant": "significant"
       }
     }
@@ -164,9 +164,9 @@
       ],
       "readout_gene": "gene_id",
       "metrics": {
-        "sceptre_p_value": "p_value",
-        "sceptre_adj_p_value": "p_value_adj",
-        "sceptre_log2_fc": "log2FC",
+        "p_value": "sceptre_p_value",
+        "p_value_adj": "sceptre_adj_p_value",
+        "log2FC": "sceptre_log2_fc",
         "significant": "significant"
       }
     },
@@ -217,12 +217,12 @@
         "MYC_TSS": "ENSG00000136997"
       },
       "metrics": {
-        "n": "num_guides",
-        "pval.EnhancerEffect.noAux": "p_value",
-        "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
-        "adj.pval.EnhancerEffect.noAux": "p_value_adj",
-        "EnhancerEffect.noAux": "effect_size",
-        "Significant": "significant"
+        "num_guides": "n",
+        "p_value": "pval.EnhancerEffect.noAux",
+        "effect_size_ci_95": "ci95.EnhancerEffect.noAux",
+        "p_value_adj": "adj.pval.EnhancerEffect.noAux",
+        "effect_size": "EnhancerEffect.noAux",
+        "significant": "Significant"
       }
     },
     "adapter_calculated_fields": [
@@ -280,12 +280,12 @@
         "TSS": "promoter"
       },
       "metrics": {
-        "n": "num_guides",
-        "pval.EnhancerEffect.noAux": "p_value",
-        "ci95.EnhancerEffect.noAux": "effect_size_ci_95",
-        "adj.pval.EnhancerEffect.noAux": "p_value_adj",
-        "EnhancerEffect.noAux": "effect_size",
-        "Significant": "significant"
+        "num_guides": "n",
+        "p_value": "pval.EnhancerEffect.noAux",
+        "effect_size_ci_95": "ci95.EnhancerEffect.noAux",
+        "p_value_adj": "adj.pval.EnhancerEffect.noAux",
+        "effect_size": "EnhancerEffect.noAux",
+        "significant": "Significant"
       }
     },
     "adapter_calculated_fields": [
@@ -324,8 +324,8 @@
       "gene_id": "Ensembl gene ID",
       "gene_symbol": "Gene symbol (Ensembl)",
       "log2_fc": "Log2 fold change effect size compared to negative control guides",
-      "p_value": "Uncorrected p-value from t-test (range: 0–1)",
-      "adj_p_value": "FDR-adjusted p-value (range: 0–1)",
+      "p_value": "Uncorrected p-value from t-test (range: 0\u20131)",
+      "adj_p_value": "FDR-adjusted p-value (range: 0\u20131)",
       "significant": "Indicates whether the tested enhancer-gene pair is significant (TRUE or FALSE)",
       "sample_term_name": "Name of the cell type or biosample (useful for multi-experiment aggregation)",
       "sample_term_id": "UBERON or CL ID for the biosample or cell type",
@@ -340,9 +340,9 @@
       ],
       "readout_gene": "gene_id",
       "metrics": {
-        "log2_fc": "log2FC",
+        "log2FC": "log2_fc",
         "p_value": "p_value",
-        "adj_p_value": "p_value_adj",
+        "p_value_adj": "adj_p_value",
         "significant": "significant"
       },
       "notes": "Data files have `sample_summary_shor` not `sample_summary_short` as specified in the file format specification document."
@@ -389,7 +389,7 @@
       "source_annotation": "genomic_element",
       "metrics": {
         "p_value": "p_value",
-        "log_2_fold_change": "log2FC"
+        "log2FC": "log_2_fold_change"
       }
     },
     "notes": "Title derived from portal metadata description property, as no title is provided in the file format specification document."
@@ -429,15 +429,15 @@
       "perturbed_gene": "intended_target_name_ensmbl",
       "source_annotation": "genomic_element",
       "metrics": {
-        "Significance_score": "gamma_approximation_ln_p_value",
-        "log2fc": "log2FC",
-        "fc": "fold_change",
-        "log(pval)-hypergeom": "hypergeometric_ln_p_value",
-        "fc_by_rand_dist_cpm": "background_corrected_fold_change",
-        "pval-empirical": "p_value_adj",
+        "gamma_approximation_ln_p_value": "Significance_score",
+        "log2FC": "log2fc",
+        "fold_change": "fc",
+        "hypergeometric_ln_p_value": "log(pval)-hypergeom",
+        "background_corrected_fold_change": "fc_by_rand_dist_cpm",
+        "p_value_adj": "pval-empirical",
         "cpm_perturb": "cpm_perturb",
         "cpm_bg": "cpm_bg",
-        "num_cell": "num_cells"
+        "num_cells": "num_cell"
       }
     },
     "adapter_calculated_fields": [
@@ -450,7 +450,7 @@
     "notes": "Most fields from the data file are undefined in the file format specification document.",
     "column_catalog_notes": {
       "log(pval)-hypergeom": "Catalog raw p-value source. Stored natively as hypergeometric_ln_p_value; catalog p_value = exp(column). Initial hypergeometric test (perturbed vs all other cells) with no random-background correction.",
-      "pval-empirical": "Catalog adjusted p-value source (per Hon lab). Empirical p-value from pySpade gamma-distribution approximation on the hypergeometric p-value vs random background draws; stored as p_value_adj. Original file-format text describes a background-selection count; the exported column is treated as a p-value on 0–1 scale. FDR filtering is applied on this column before export, so surviving rows in filtered DE tables often show 0.",
+      "pval-empirical": "Catalog adjusted p-value source (per Hon lab). Empirical p-value from pySpade gamma-distribution approximation on the hypergeometric p-value vs random background draws; stored as p_value_adj. Original file-format text describes a background-selection count; the exported column is treated as a p-value on 0\u20131 scale. FDR filtering is applied on this column before export, so surviving rows in filtered DE tables often show 0.",
       "Significance_score": "Catalog field gamma_approximation_ln_p_value (ln scale). Separate from raw and adjusted p-values: gamma-approximation significance score derived from the observed hypergeometric p-value and random-background p-values (per pySpade documentation). Not mapped to catalog p_value_adj."
     }
   },
@@ -474,15 +474,15 @@
       ],
       "skip_rows": [
         {
-            "ensembl_id": "ENSG00000232196",
-            "intended_target_name": "chr16:3171499-3172694",
-            "notes": "ENSG00000232196 on line 1331 is not valid ENSEMBL for GENCODE v43. It is a pseudogene."
+          "ensembl_id": "ENSG00000232196",
+          "intended_target_name": "chr16:3171499-3172694",
+          "notes": "ENSG00000232196 on line 1331 is not valid ENSEMBL for GENCODE v43. It is a pseudogene."
         },
         {
-            "ensembl_id": "ENSG00000239569",
-            "intended_target_name": "chr7:105439040-105439994",
-            "gene_symbol": "LHFPL3-AS2",
-            "notes": "ENSG00000239569 is KMT2E-AS1, not LHFPL3-AS2. ENSG00000239569-chr7:105439040-105439994 pair exists elsewhere in the data file with the correct gene symbol (KMT2E-AS1)."
+          "ensembl_id": "ENSG00000239569",
+          "intended_target_name": "chr7:105439040-105439994",
+          "gene_symbol": "LHFPL3-AS2",
+          "notes": "ENSG00000239569 is KMT2E-AS1, not LHFPL3-AS2. ENSG00000239569-chr7:105439040-105439994 pair exists elsewhere in the data file with the correct gene symbol (KMT2E-AS1)."
         }
       ]
     },
@@ -543,16 +543,16 @@
           "notes": "ENSG00000273888 is not valid ENSEMBL for GENCODE v43."
         },
         {
-            "gene_name_ensembl": "ENSG00000285447",
-            "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
+          "gene_name_ensembl": "ENSG00000285447",
+          "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
         },
         {
-            "gene_name_ensembl": "ENSG00000130723",
-            "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
+          "gene_name_ensembl": "ENSG00000130723",
+          "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
         },
         {
-            "gene_name_ensembl": "ENSG00000182230",
-            "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
+          "gene_name_ensembl": "ENSG00000182230",
+          "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
         }
       ]
     },
