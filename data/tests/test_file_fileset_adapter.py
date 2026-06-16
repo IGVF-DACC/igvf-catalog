@@ -341,7 +341,8 @@ def test_query_fileset_files_props_igvf_with_crispr_modality():
         'lab': {'@id': '/labs/tim-reddy/'},
         'samples': [{'accession': 'IGVFSM0000TEST'}],
         'publications': [],
-        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000TEST/'}]
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000TEST/'}],
+        'sample_summary': 'K562 cell line treated with drug a, drug b'
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
         with patch.object(FileFileSet, 'get_software_igvf', return_value={'Sceptre'}):
@@ -737,7 +738,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'IGVFFI5688VHRS', 'name': 'IGVFFI5688VHRS', 'file_set_id': 'IGVFDS2175LLDQ', 'lab': 'tim-reddy', 'preferred_assay_titles': ['STARR-seq'], 'assay_term_ids': ['OBI:0002041'], 'method': 'STARR-seq', 'class': 'observed data', 'software': ['BIRD', 'Samtools', 'pandas'], 'samples': ['ontology_terms/EFO_0002067'], 'sample_ids': ['IGVFSM3422QUYJ'], 'simple_sample_summaries': [
-        'K562 with variants from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None, 'crispr_modality': None}
+        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None, 'crispr_modality': None}
 
     write = SpyWriter()
     adapter = FileFileSet(
