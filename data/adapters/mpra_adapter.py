@@ -51,10 +51,12 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
 import csv
 import gzip
 import json
+import hashlib
 from typing import Optional
 from collections import defaultdict
 import ast
 from pathlib import Path
+
 
 from adapters.base import BaseAdapter
 from adapters.helpers import (
@@ -680,6 +682,9 @@ class MPRAAdapter(BaseAdapter):
                     biosample_term_key,
                     self.file_accession,
                 ])
+
+                if len(edge_key) > 255:
+                    edge_key = hashlib.sha256(edge_key.encode()).hexdigest()
 
                 minus_q = self.safe_float(row[12])
                 edge_props = {
