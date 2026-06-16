@@ -82,8 +82,7 @@ class scE2G(BaseAdapter):
             return None
         return float(value)
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         method = file_fileset.get('method')
@@ -161,6 +160,5 @@ class scE2G(BaseAdapter):
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
 
-        self.writer.close()
         if self.label == 'genomic_element_gene':
             self.gene_validator.log()
