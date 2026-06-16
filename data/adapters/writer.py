@@ -59,8 +59,27 @@ class S3Writer(Writer):
         if not self.s3_tags:
             return
         client = self.session.client('s3')
+        try:
+            existing = client.get_object_tagging(
+                Bucket=self.bucket, Key=self.key)
+            existing_tags = {t['Key']: t['Value']
+                             for t in existing.get('TagSet', [])}
+        except client.exceptions.NoSuchKey:
+            existing_tags = {}
+
+        for tag in self.s3_tags:
+            key, value = tag['Key'], tag['Value']
+            if key in existing_tags:
+                current_values = existing_tags[key].split(' ')
+                if value not in current_values:
+                    current_values.append(value)
+                    existing_tags[key] = ' '.join(sorted(current_values))
+            else:
+                existing_tags[key] = value
+
+        merged = [{'Key': k, 'Value': v} for k, v in existing_tags.items()]
         client.put_object_tagging(Bucket=self.bucket, Key=self.key, Tagging={
-            'TagSet': self.s3_tags
+            'TagSet': merged
         })
 
     def open(self):

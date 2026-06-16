@@ -57,6 +57,8 @@ def test_s3_writer_close(mocker):
 def test_s3_writer_close_with_tagging(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.get_object_tagging.return_value = {'TagSet': []}
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=mock_session, version_tag='v123')
@@ -64,7 +66,7 @@ def test_s3_writer_close_with_tagging(mocker):
     writer.write('content')
     writer.close()
     mock_file.close.assert_called_once()
-    mock_session.client('s3').put_object_tagging.assert_called_once_with(
+    mock_s3_client.put_object_tagging.assert_called_once_with(
         Bucket='test-bucket', Key='test-key',
         Tagging={'TagSet': [{'Key': 'version', 'Value': 'v123'}]}
     )
@@ -100,6 +102,8 @@ def test_s3_writer_context_manager_no_file_on_early_failure(mocker):
 def test_s3_writer_close_with_multiple_tags(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.get_object_tagging.return_value = {'TagSet': []}
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=mock_session, version_tag='v123')
@@ -108,13 +112,69 @@ def test_s3_writer_close_with_multiple_tags(mocker):
     writer.open()
     writer.write('content')
     writer.close()
-    mock_session.client('s3').put_object_tagging.assert_called_once_with(
+    mock_s3_client.put_object_tagging.assert_called_once_with(
         Bucket='test-bucket', Key='test-key',
         Tagging={'TagSet': [
             {'Key': 'version', 'Value': 'v123'},
             {'Key': 'source', 'Value': 'oncotree'},
             {'Key': 'format', 'Value': 'jsonl'},
         ]}
+    )
+
+
+def test_s3_writer_appends_to_existing_tag_value(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.get_object_tagging.return_value = {
+        'TagSet': [{'Key': 'version', 'Value': 'v101 v100'}]
+    }
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v123')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [{'Key': 'version', 'Value': 'v100 v101 v123'}]}
+    )
+
+
+def test_s3_writer_skips_duplicate_tag_value(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.get_object_tagging.return_value = {
+        'TagSet': [{'Key': 'version', 'Value': 'v123'}]
+    }
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v123')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [{'Key': 'version', 'Value': 'v123'}]}
+    )
+
+
+def test_s3_writer_handles_no_such_key_on_get_tags(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.exceptions.NoSuchKey = type('NoSuchKey', (Exception,), {})
+    mock_s3_client.get_object_tagging.side_effect = mock_s3_client.exceptions.NoSuchKey()
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v123')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [{'Key': 'version', 'Value': 'v123'}]}
     )
 
 
