@@ -5,8 +5,11 @@ interface ExampleGroup {
   examples: Array<{
     label: string
     items: string[]
+    note?: string
   }>
 }
+
+const FILES_FILESET_METHOD_NOTE = 'Each files_fileset maps to at most one method, so a <code>method</code> filter is usually not necessary.'
 
 function examples (
   exampleGroups: ExampleGroup[],
@@ -22,7 +25,8 @@ function examples (
     const activeClass = index === 0 ? ' is-active' : ''
     const exampleBlocks = example.examples.map((queryExample) => {
       const items = queryExample.items.map(item => `<li>${item}</li>`).join(' ')
-      return `<div class="method-query-example"> <strong>${queryExample.label}</strong> <ul> ${items} </ul> </div>`
+      const note = queryExample.note ? `<p class="method-query-example-note">${queryExample.note}</p>` : ''
+      return `<div class="method-query-example"> <strong>${queryExample.label}</strong> ${note} <ul> ${items} </ul> </div>`
     }).join(' ')
     return `<div class="method-example-panel${activeClass}" data-method-example-panel="${example.id}"> <strong>${example.label}:</strong> ${exampleBlocks} </div>`
   }).join(' ')
@@ -431,8 +435,8 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'gene_id = ENSG00000188976',
-              'neg_log10_pvalue = lt:4.97',
-              'effect_size = gt:-0.7',
+              'neg_log10_pvalue = gt:45',
+              'effect_size = gt:0.5',
               'method = spliceQTL'
 
             ]
@@ -568,6 +572,7 @@ export const descriptions = {
           },
           {
             label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI3125FMNW',
               'method = SGE'
@@ -588,6 +593,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI3063JRLI',
               'method = cV2F'
@@ -621,7 +627,7 @@ export const descriptions = {
           {
             label: 'query by region',
             items: [
-              'region = chr1:5277208-5277214',
+              'region = chr1:5270008-5277214',
               'method = GWAS'
             ]
           }
@@ -641,7 +647,7 @@ export const descriptions = {
           {
             label: 'query by region',
             items: [
-              'region = chr1:5270208-5279214',
+              'region = chr7:152655654-152664654',
               'method = SGE'
             ]
           }
@@ -850,6 +856,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI0005WRQP',
               'method = SEMVAR'
@@ -1154,6 +1161,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI6224HZMG',
               'method = DUAL-IPA'
@@ -1174,6 +1182,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI8105TNNO',
               'method = ESM-1v'
@@ -1194,6 +1203,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI6893ZOAA',
               'method = MutPred2'
@@ -1214,6 +1224,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI2810SLAX',
               'method = SGE'
@@ -1234,6 +1245,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI0629IIQU',
               'method = VAMP-seq'
@@ -1685,6 +1697,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = ENCFF425TLX',
               'method = ENCODE-rE2G'
@@ -1705,6 +1718,7 @@ export const descriptions = {
           },
           {
             label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI3069QCRA',
               'method = Perturb-seq'
@@ -1775,6 +1789,7 @@ export const descriptions = {
           },
           {
             label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
             items: [
               'files_fileset = IGVFFI3069QCRA',
               'method = Perturb-seq'
