@@ -80,7 +80,7 @@ function variantQueryValidation (input: paramsFormatType): void {
 }
 
 function biosampleQueryValidation (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['biosample_id', 'biosample_name'].includes(item)).length === 0) {
+  if (input.biosample_id === undefined && input.biosample_name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one biosample property must be defined.'

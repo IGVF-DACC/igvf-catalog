@@ -49,14 +49,10 @@ export const descriptions = {
         label: 'CRISPR screen',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000055950',
-              'gene_name = MRPL43',
-              'hgnc_id = HGNC:14517',
-              'alias = MRPL43',
-              'method = CRISPR screen',
-              'files_fileset = ENCFF968BZL'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -66,14 +62,10 @@ export const descriptions = {
         label: 'ENCODE-rE2G',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000055950',
-              'gene_name = MRPL43',
-              'hgnc_id = HGNC:14517',
-              'alias = MRPL43',
-              'method = ENCODE-rE2G',
-              'files_fileset = ENCFF797EVP'
+              'method = ENCODE-rE2G'
             ]
           }
         ]
@@ -83,14 +75,10 @@ export const descriptions = {
         label: 'Perturb-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000055950',
-              'gene_name = MRPL43',
-              'hgnc_id = HGNC:14517',
-              'alias = MRPL43',
-              'method = Perturb-seq',
-              'files_fileset = IGVFFI3069QCRA'
+              'method = Perturb-seq'
             ]
           }
         ]
@@ -230,21 +218,6 @@ export const descriptions = {
     'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
     The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
     At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
-    Example: organism = Homo sapiens, <br> \
-    source = COXPRESdb, <br> \
-    interaction_type = dosage growth defect (sensu BioGRID), <br> \
-    gene_id = ENSG00000121410, <br> \
-    hgnc_id = HGNC:5, <br> \
-    gene_name = A1BG, <br> \
-    alias = HYST2477, <br> \
-    associated_gene_id = ENSG00000269293, <br> \
-    associated_hgnc_id = HGNC:48982, <br> \
-    associated_gene_name = ZSCAN16-AS1, <br> \
-    associated_alias = ZSCAN16 antisense RNA 1, <br> \
-    z_score = gt:4, <br> \
-    label = genetic interference, <br> \
-    method = COXPRESdb, <br> \
-    name = interacts with. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -257,21 +230,14 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000112592',
               'associated_gene_id = ENSG00000163132',
-              'z_score = gte:0',
-              'interaction_type = phenotypic suppression (sensu BioGRID)',
-              'method = phenotypic suppression (sensu BioGRID)',
-              'source = BioGRID',
-              'name = interacts with',
-              'organism = Homo sapiens'
+              'source = BioGRID'
             ]
           },
           {
             label: 'Group results',
             items: [
               'gene_id = ENSG00000112592',
-              'source = BioGRID',
-              'name = interacts with',
-              'organism = Homo sapiens'
+              'source = BioGRID'
             ]
           }
         ]
@@ -285,18 +251,14 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000153048',
               'associated_gene_id = ENSG00000233369',
-              'z_score = lte:4',
-              'method = COXPRESdb',
-              'organism = Homo sapiens'
+              'source = COXPRESdb'
             ]
           },
           {
             label: 'Group results',
             items: [
               'gene_id = ENSG00000153048',
-              'method = COXPRESdb',
-              'name = coexpressed with',
-              'organism = Homo sapiens'
+              'source = COXPRESdb'
             ]
           }
         ]
@@ -448,26 +410,15 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'gene_id = ENSG00000187642',
-              'hgnc_id = HGNC:28208',
-              'gene_name = PERM1',
-              'alias = PERM1',
-              'method = eQTL, source = EBI, label = eQTL',
-              'neg_log10_pvalue = gte:2, effect_size = lte:0.001',
-              'biosample_term = UBERON_0001134, biological_context = muscle',
-              'name = expression modulated by'
+              'neg_log10_pvalue = gte:24.5',
+              'method = eQTL'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'gene_id = ENSG00000187642',
-              'hgnc_id = HGNC:28208',
-              'gene_name = PERM1',
               'alias = PERM1',
-              'method = eQTL, source = EBI, label = eQTL',
-              'neg_log10_pvalue = gte:2, effect_size = lte:0.001',
-              'biosample_term = UBERON_0001134, biological_context = muscle',
-              'name = expression modulated by'
+              'method = eQTL'
             ]
           }
         ]
@@ -480,26 +431,17 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'gene_id = ENSG00000188976',
-              'hgnc_id = HGNC:24517',
-              'gene_name = NOC2L',
-              'alias = NOC2L',
-              'method = spliceQTL, source = EBI, label = spliceQTL',
-              'neg_log10_pvalue = gte:2, effect_size = lte:0.001',
-              'biosample_term = UBERON_0008367, biological_context = breast',
-              'name = splicing modulated by'
+              'neg_log10_pvalue = lt:4.97',
+              'effect_size = gt:-0.7',
+              'method = spliceQTL'
+
             ]
           },
           {
             label: 'Group results',
             items: [
-              'gene_id = ENSG00000188976',
-              'hgnc_id = HGNC:24517',
-              'gene_name = NOC2L',
               'alias = NOC2L',
-              'method = spliceQTL, source = EBI, label = spliceQTL',
-              'neg_log10_pvalue = gte:2, effect_size = lte:0.001',
-              'biosample_term = UBERON_0008367, biological_context = breast',
-              'name = splicing modulated by'
+              'method = spliceQTL'
             ]
           }
         ]
@@ -512,24 +454,15 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'gene_id = ENSG00000108179',
-              'hgnc_id = HGNC:9259',
-              'gene_name = PPIF',
-              'alias = PPIF',
-              'method = Variant-EFFECTS, source = IGVF, label = variant effect on gene expression',
-              'files_fileset = IGVFFI4333XLOF',
-              'name = expression modulated by'
+              'neg_log10_pvalue = gt:13.1',
+              'method = Variant-EFFECTS'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'gene_id = ENSG00000108179',
-              'hgnc_id = HGNC:9259',
-              'gene_name = PPIF',
               'alias = PPIF',
-              'method = Variant-EFFECTS, source = IGVF, label = variant effect on gene expression',
-              'files_fileset = IGVFFI4333XLOF',
-              'name = expression modulated by'
+              'method = Variant-EFFECTS'
             ]
           }
         ]
@@ -610,18 +543,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'phenotype_id = EFO_0010325',
-              'phenotype_name = obsolete_precentral gyrus volume measurement',
-              'method = GWAS, source = OpenTargets, label = GWAS, class = observed data',
-              'neg_log10_pvalue = gte:5'
+              'method = GWAS'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'phenotype_id = EFO_0010325',
-              'phenotype_name = obsolete_precentral gyrus volume measurement',
-              'method = GWAS, source = OpenTargets, label = GWAS, class = observed data',
-              'neg_log10_pvalue = gte:5'
+              'neg_log10_pvalue = gte:5',
+              'method = GWAS'
             ]
           }
         ]
@@ -631,21 +560,17 @@ export const descriptions = {
         label: 'SGE',
         examples: [
           {
-            label: 'Single result',
+            label: 'Query by phenotype identifier',
             items: [
               'phenotype_id = NCIT_C16407',
-              'phenotype_name = cell survival',
-              'method = SGE, source = IGVF, label = protein variant effect, class = observed data',
-              'files_fileset = IGVFFI3125FMNW'
+              'method = SGE'
             ]
           },
           {
-            label: 'Group results',
+            label: 'Query by files_fileset',
             items: [
-              'phenotype_id = NCIT_C16407',
-              'phenotype_name = cell survival',
-              'method = SGE, source = IGVF, label = protein variant effect, class = observed data',
-              'files_fileset = IGVFFI3125FMNW'
+              'files_fileset = IGVFFI3125FMNW',
+              'method = SGE'
             ]
           }
         ]
@@ -655,21 +580,17 @@ export const descriptions = {
         label: 'cV2F',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by phenotype identifier',
             items: [
               'phenotype_id = GO_0003674',
-              'phenotype_name = molecular_function',
-              'method = cV2F, source = IGVF, label = predicted variant effect on phenotype, class = prediction',
-              'files_fileset = IGVFFI3063JRLI'
+              'method = cV2F'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'phenotype_id = GO_0003674',
-              'phenotype_name = molecular_function',
-              'method = cV2F, source = IGVF, label = predicted variant effect on phenotype, class = prediction',
-              'files_fileset = IGVFFI3063JRLI'
+              'files_fileset = IGVFFI3063JRLI',
+              'method = cV2F'
             ]
           }
         ]
@@ -690,7 +611,7 @@ export const descriptions = {
         label: 'GWAS',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
               'spdi = NC_000001.11:5277210:G:A',
               'neg_log10_pvalue = gte:5',
@@ -698,11 +619,10 @@ export const descriptions = {
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
               'region = chr1:5277208-5277214',
-              'neg_log10_pvalue = gte:5',
-              'method = GWAS, source = OpenTargets, label = GWAS, class = observed data'
+              'method = GWAS'
             ]
           }
         ]
@@ -712,27 +632,17 @@ export const descriptions = {
         label: 'SGE',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
-              'variant_id = NC_000007.14:152660654:T:A',
               'spdi = NC_000007.14:152660654:T:A',
-              'hgvs = NC_000007.14:g.152660655T>A',
-              'region = chr7:152660650-152660658',
-              'phenotype_id = NCIT_C16407',
-              'method = SGE, source = IGVF, label = protein variant effect, class = observed data',
-              'files_fileset = IGVFFI1361XVSO'
+              'method = SGE'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
-              'variant_id = NC_000007.14:152660654:T:A',
-              'spdi = NC_000007.14:152660654:T:A',
-              'hgvs = NC_000007.14:g.152660655T>A',
-              'region = chr7:152660650-152660658',
-              'phenotype_id = NCIT_C16407',
-              'method = SGE, source = IGVF, label = protein variant effect, class = observed data',
-              'files_fileset = IGVFFI1361XVSO'
+              'region = chr1:5270208-5279214',
+              'method = SGE'
             ]
           }
         ]
@@ -742,31 +652,17 @@ export const descriptions = {
         label: 'cV2F',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
-              'variant_id = NC_000001.11:91420:T:C',
               'spdi = NC_000001.11:91420:T:C',
-              'hgvs = NC_000001.11:g.91421T>C',
-              'rsid = rs28619159',
-              'ca_id = CA16735455',
-              'region = chr1:91418-91424',
-              'phenotype_id = GO_0003674',
-              'method = cV2F, source = IGVF, label = predicted variant effect on phenotype, class = prediction',
-              'files_fileset = IGVFFI0332UGDD'
+              'method = cV2F'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
-              'variant_id = NC_000001.11:91420:T:C',
-              'spdi = NC_000001.11:91420:T:C',
-              'hgvs = NC_000001.11:g.91421T>C',
-              'rsid = rs28619159',
-              'ca_id = CA16735455',
               'region = chr1:91418-91424',
-              'phenotype_id = GO_0003674',
-              'method = cV2F, source = IGVF, label = predicted variant effect on phenotype, class = prediction',
-              'files_fileset = IGVFFI0332UGDD'
+              'method = cV2F'
             ]
           }
         ]
@@ -920,27 +816,10 @@ export const descriptions = {
         label: 'ADASTRA',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by protein identifier',
             items: [
               'protein_id = ENSP00000281043',
-              'protein_name = MYCN',
-              'uniprot_name = MYCN_HUMAN',
-              'uniprot_full_name = N-myc proto-oncogene protein',
-              'dbxrefs = MYCN',
-              'method = ADASTRA, source = ADASTRA, label = allele-specific binding',
-              'name = binding modulated by'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'protein_id = ENSP00000281043',
-              'protein_name = MYCN',
-              'uniprot_name = MYCN_HUMAN',
-              'uniprot_full_name = N-myc proto-oncogene protein',
-              'dbxrefs = MYCN',
-              'method = ADASTRA, source = ADASTRA, label = allele-specific binding',
-              'name = binding modulated by'
+              'method = ADASTRA'
             ]
           }
         ]
@@ -950,27 +829,10 @@ export const descriptions = {
         label: 'GVATdb',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by protein identifier',
             items: [
               'protein_id = ENSP00000315417',
-              'protein_name = ALX1',
-              'uniprot_name = ALX1_HUMAN',
-              'uniprot_full_name = ALX homeobox protein 1',
-              'dbxrefs = ALX1',
-              'method = GVATdb, source = GVATdb, label = allele-specific binding',
-              'name = binding modulated by'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'protein_id = ENSP00000315417',
-              'protein_name = ALX1',
-              'uniprot_name = ALX1_HUMAN',
-              'uniprot_full_name = ALX homeobox protein 1',
-              'dbxrefs = ALX1',
-              'method = GVATdb, source = GVATdb, label = allele-specific binding',
-              'name = binding modulated by'
+              'method = GVATdb'
             ]
           }
         ]
@@ -980,29 +842,17 @@ export const descriptions = {
         label: 'SEMVAR',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by protein identifier',
             items: [
               'protein_id = ENSP00000351458',
-              'protein_name = ELF2',
-              'uniprot_name = ELF2_HUMAN',
-              'uniprot_full_name = TS-related transcription factor Elf-2',
-              'dbxrefs = ELF2',
-              'method = SEMVAR, source = IGVF, label = predicted allele-specific binding',
-              'files_fileset = IGVFFI0005WRQP',
-              'name = binding modulated by'
+              'method = SEMVAR'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'protein_id = ENSP00000351458',
-              'protein_name = ELF2',
-              'uniprot_name = ELF2_HUMAN',
-              'uniprot_full_name = TS-related transcription factor Elf-2',
-              'dbxrefs = ELF2',
-              'method = SEMVAR, source = IGVF, label = predicted allele-specific binding',
               'files_fileset = IGVFFI0005WRQP',
-              'name = binding modulated by'
+              'method = SEMVAR'
             ]
           }
         ]
@@ -1012,27 +862,10 @@ export const descriptions = {
         label: 'pQTL',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by protein identifier',
             items: [
               'protein_id = ENSP00000263100',
-              'protein_name = A1BG',
-              'uniprot_name = A1BG_HUMAN',
-              'uniprot_full_name = Alpha-1B-glycoprotein',
-              'dbxrefs = A1BG',
-              'method = pQTL, source = UKB, label = pQTL',
-              'name = level associated with'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'protein_id = ENSP00000263100',
-              'protein_name = A1BG',
-              'uniprot_name = A1BG_HUMAN',
-              'uniprot_full_name = Alpha-1B-glycoprotein',
-              'dbxrefs = A1BG',
-              'method = pQTL, source = UKB, label = pQTL',
-              'name = level associated with'
+              'method = pQTL'
             ]
           }
         ]
@@ -1309,25 +1142,41 @@ export const descriptions = {
     Pagination is 0-based. <br> <br> \
     ' + examples([
       {
+        id: 'dual-ipa',
+        label: 'DUAL-IPA',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = BAO_0040014',
+              'method = DUAL-IPA'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            items: [
+              'files_fileset = IGVFFI6224HZMG',
+              'method = DUAL-IPA'
+            ]
+          }
+        ]
+      },
+      {
         id: 'esm-1v',
         label: 'ESM-1v',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by phenotype identifier',
             items: [
               'phenotype_id = GO_0003674',
-              'phenotype_name = molecular_function',
-              'method = ESM-1v',
-              'files_fileset = IGVFFI8105TNNO'
+              'method = ESM-1v'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'phenotype_id = GO_0003674',
-              'phenotype_name = molecular_function',
-              'method = ESM-1v',
-              'files_fileset = IGVFFI8105TNNO'
+              'files_fileset = IGVFFI8105TNNO',
+              'method = ESM-1v'
             ]
           }
         ]
@@ -1337,21 +1186,17 @@ export const descriptions = {
         label: 'MutPred2',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by phenotype identifier',
             items: [
               'phenotype_id = GO_0003674',
-              'phenotype_name = molecular_function',
-              'method = MutPred2',
-              'files_fileset = IGVFFI6893ZOAA'
+              'method = MutPred2'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'phenotype_id = GO_0003674',
-              'phenotype_name = molecular_function',
-              'method = MutPred2',
-              'files_fileset = IGVFFI6893ZOAA'
+              'files_fileset = IGVFFI6893ZOAA',
+              'method = MutPred2'
             ]
           }
         ]
@@ -1361,21 +1206,17 @@ export const descriptions = {
         label: 'SGE',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by phenotype identifier',
             items: [
               'phenotype_id = NCIT_C16407',
-              'phenotype_name = cell survival',
-              'method = SGE',
-              'files_fileset = IGVFFI2810SLAX'
+              'method = SGE'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'phenotype_id = NCIT_C16407',
-              'phenotype_name = cell survival',
-              'method = SGE',
-              'files_fileset = IGVFFI2810SLAX'
+              'files_fileset = IGVFFI2810SLAX',
+              'method = SGE'
             ]
           }
         ]
@@ -1385,21 +1226,17 @@ export const descriptions = {
         label: 'VAMP-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by phenotype identifier',
             items: [
               'phenotype_id = OBA_0000128',
-              'phenotype_name = protein stability',
-              'method = VAMP-seq',
-              'files_fileset = IGVFFI0629IIQU'
+              'method = VAMP-seq'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'phenotype_id = OBA_0000128',
-              'phenotype_name = protein stability',
-              'method = VAMP-seq',
-              'files_fileset = IGVFFI0629IIQU'
+              'files_fileset = IGVFFI0629IIQU',
+              'method = VAMP-seq'
             ]
           }
         ]
@@ -1413,6 +1250,26 @@ export const descriptions = {
     Pagination is 0-based. <br> <br> \
     ' + examples([
       {
+        id: 'dual-ipa',
+        label: 'DUAL-IPA',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C',
+              'method = DUAL-IPA'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = ACSF3',
+              'method = DUAL-IPA'
+            ]
+          }
+        ]
+      },
+      {
         id: 'esm-1v',
         label: 'ESM-1v',
         examples: [
@@ -1420,26 +1277,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'coding_variant_name = A1BG_ENST00000263100_p.Ala118Asn_c.352_353delinsAA',
-              'hgvsp = p.Ala118Asn',
-              'uniprot_name = A1BG_HUMAN',
-              'gene_name = A1BG',
-              'amino_acid_position = 118',
-              'transcript_id = ENST00000263100',
-              'method = ESM-1v',
-              'files_fileset = IGVFFI8105TNNO'
+              'method = ESM-1v'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'coding_variant_name = A1BG_ENST00000263100_p.Ala118Asn_c.352_353delinsAA',
-              'hgvsp = p.Ala118Asn',
-              'uniprot_name = A1BG_HUMAN',
               'gene_name = A1BG',
-              'amino_acid_position = 118',
-              'transcript_id = ENST00000263100',
-              'method = ESM-1v',
-              'files_fileset = IGVFFI8105TNNO'
+              'method = ESM-1v'
             ]
           }
         ]
@@ -1452,26 +1297,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'coding_variant_name = A1BG_ENST00000263100_p.Ala118Arg_c.352_353delinsCG',
-              'hgvsp = p.Ala118Arg',
-              'uniprot_name = A1BG_HUMAN',
-              'gene_name = A1BG',
-              'amino_acid_position = 118',
-              'transcript_id = ENST00000263100',
-              'method = MutPred2',
-              'files_fileset = IGVFFI6893ZOAA'
+              'method = MutPred2'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'coding_variant_name = A1BG_ENST00000263100_p.Ala118Arg_c.352_353delinsCG',
-              'hgvsp = p.Ala118Arg',
-              'uniprot_name = A1BG_HUMAN',
               'gene_name = A1BG',
-              'amino_acid_position = 118',
-              'transcript_id = ENST00000263100',
-              'method = MutPred2',
-              'files_fileset = IGVFFI6893ZOAA'
+              'method = MutPred2'
             ]
           }
         ]
@@ -1484,24 +1317,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'coding_variant_name = BRCA2_ENST00000380152__NC_000013.11:g.32319075A-C_splicing',
-              'uniprot_name = BRCA2_HUMAN',
-              'gene_name = BRCA2',
-              'amino_acid_position = -1',
-              'transcript_id = ENST00000380152',
-              'method = SGE',
-              'files_fileset = IGVFFI2810SLAX'
+              'method = SGE'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'coding_variant_name = BRCA2_ENST00000380152__NC_000013.11:g.32319075A-C_splicing',
-              'uniprot_name = BRCA2_HUMAN',
               'gene_name = BRCA2',
-              'amino_acid_position = -1',
-              'transcript_id = ENST00000380152',
-              'method = SGE',
-              'files_fileset = IGVFFI2810SLAX'
+              'method = SGE'
             ]
           }
         ]
@@ -1514,26 +1337,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'coding_variant_name = CYP2C19_ENST00000371321_p.Ala103=_c.309T-G',
-              'hgvsp = p.Ala103=',
-              'uniprot_name = CP2CJ_HUMAN',
-              'gene_name = CYP2C19',
-              'amino_acid_position = 103',
-              'transcript_id = ENST00000371321',
-              'method = VAMP-seq',
-              'files_fileset = IGVFFI0629IIQU'
+              'method = VAMP-seq'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'coding_variant_name = CYP2C19_ENST00000371321_p.Ala103=_c.309T-G',
-              'hgvsp = p.Ala103=',
-              'uniprot_name = CP2CJ_HUMAN',
               'gene_name = CYP2C19',
-              'amino_acid_position = 103',
-              'transcript_id = ENST00000371321',
-              'method = VAMP-seq',
-              'files_fileset = IGVFFI0629IIQU'
+              'method = VAMP-seq'
             ]
           }
         ]
@@ -1567,29 +1378,27 @@ export const descriptions = {
     Pagination is 0-based. <br> <br> \
     ' + examples([
       {
+        id: 'dual-ipa',
+        label: 'DUAL-IPA',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_name = ACSF3',
+              'method = DUAL-IPA'
+            ]
+          }
+        ]
+      },
+      {
         id: 'esm-1v',
         label: 'ESM-1v',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000121410',
-              'gene_name = A1BG',
-              'hgnc_id = HGNC:5',
-              'alias = A1BG',
-              'method = ESM-1v',
-              'files_fileset = IGVFFI8105TNNO'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'gene_id = ENSG00000121410',
-              'gene_name = A1BG',
-              'hgnc_id = HGNC:5',
-              'alias = A1BG',
-              'method = ESM-1v',
-              'files_fileset = IGVFFI8105TNNO'
+              'method = ESM-1v'
             ]
           }
         ]
@@ -1599,25 +1408,10 @@ export const descriptions = {
         label: 'MutPred2',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000196584',
-              'gene_name = XRCC2',
-              'hgnc_id = HGNC:12829',
-              'alias = FANCU',
-              'method = MutPred2',
-              'files_fileset = IGVFFI6893ZOAA'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'gene_id = ENSG00000196584',
-              'gene_name = XRCC2',
-              'hgnc_id = HGNC:12829',
-              'alias = FANCU',
-              'method = MutPred2',
-              'files_fileset = IGVFFI6893ZOAA'
+              'method = MutPred2'
             ]
           }
         ]
@@ -1627,25 +1421,10 @@ export const descriptions = {
         label: 'SGE',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000139618',
-              'gene_name = BRCA2',
-              'hgnc_id = HGNC:1101',
-              'alias = BRCA2',
-              'method = SGE',
-              'files_fileset = IGVFFI2810SLAX'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'gene_id = ENSG00000139618',
-              'gene_name = BRCA2',
-              'hgnc_id = HGNC:1101',
-              'alias = BRCA2',
-              'method = SGE',
-              'files_fileset = IGVFFI2810SLAX'
+              'method = SGE'
             ]
           }
         ]
@@ -1655,22 +1434,9 @@ export const descriptions = {
         label: 'VAMP-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000165841',
-              'gene_name = CYP2C19',
-              'hgnc_id = HGNC:2621',
-              'alias = CYP2C19',
-              'method = VAMP-seq'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'gene_id = ENSG00000165841',
-              'gene_name = CYP2C19',
-              'hgnc_id = HGNC:2621',
-              'alias = CYP2C19',
               'method = VAMP-seq'
             ]
           }
@@ -1693,29 +1459,17 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
-              'variant_id = NC_000001.11:1000161:C:A',
               'spdi = NC_000001.11:1000161:C:A',
-              'hgvs = NC_000001.11:g.1000162C>A',
-              'region = chr1:1000160-1000163 (maximum length: 10kb)',
-              'method = MPRA',
-              'files_fileset = IGVFFI4378PZYI',
-              'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
-              'significant = false'
+              'method = MPRA'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
-              'variant_id = NC_000001.11:1000161:C:A',
-              'spdi = NC_000001.11:1000161:C:A',
-              'hgvs = NC_000001.11:g.1000162C>A',
               'region = chr1:1000160-1000163 (maximum length: 10kb)',
-              'method = MPRA',
-              'files_fileset = IGVFFI4378PZYI',
-              'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
-              'significant = false'
+              'method = MPRA'
             ]
           }
         ]
@@ -1725,29 +1479,17 @@ export const descriptions = {
         label: 'STARR-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
-              'variant_id = NC_000001.11:14772:C:T',
               'spdi = NC_000001.11:14772:C:T',
-              'hgvs = NC_000001.11:g.14773C>T',
-              'rsid = rs878915777',
-              'ca_id = CA16718507',
-              'region = chr1:14771-14775 (maximum length: 10kb)',
-              'method = STARR-seq',
-              'files_fileset = IGVFFI4012FKNC'
+              'method = STARR-seq'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
-              'variant_id = NC_000001.11:14772:C:T',
-              'spdi = NC_000001.11:14772:C:T',
-              'hgvs = NC_000001.11:g.14773C>T',
-              'rsid = rs878915777',
-              'ca_id = CA16718507',
               'region = chr1:14771-14775 (maximum length: 10kb)',
-              'method = STARR-seq',
-              'files_fileset = IGVFFI4012FKNC'
+              'method = STARR-seq'
             ]
           }
         ]
@@ -1757,29 +1499,17 @@ export const descriptions = {
         label: 'BlueSTARR',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
-              'variant_id = NC_000001.11:100003415:C:A',
               'spdi = NC_000001.11:100003415:C:A',
-              'hgvs = NC_000001.11:g.100003416C>A',
-              'rsid = rs1360128702',
-              'ca_id = CA884414298',
-              'region = chr1:100003414-100003418 (maximum length: 10kb)',
-              'method = BlueSTARR',
-              'files_fileset = IGVFFI0818FMCC'
+              'method = BlueSTARR'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
-              'variant_id = NC_000001.11:100003415:C:A',
-              'spdi = NC_000001.11:100003415:C:A',
-              'hgvs = NC_000001.11:g.100003416C>A',
-              'rsid = rs1360128702',
-              'ca_id = CA884414298',
               'region = chr1:100003414-100003418 (maximum length: 10kb)',
-              'method = BlueSTARR',
-              'files_fileset = IGVFFI0818FMCC'
+              'method = BlueSTARR'
             ]
           }
         ]
@@ -1797,23 +1527,10 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by biosample identifier',
             items: [
               'biosample_id = EFO_0001182',
-              'biosample_name = hek293',
               'method = MPRA',
-              'files_fileset = IGVFFI4378PZYI',
-              'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
-              'significant = true'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'biosample_id = EFO_0001182',
-              'biosample_name = hek293',
-              'method = MPRA',
-              'files_fileset = IGVFFI4378PZYI',
               'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
               'significant = true'
             ]
@@ -1825,21 +1542,10 @@ export const descriptions = {
         label: 'STARR-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by biosample identifier',
             items: [
               'biosample_id = EFO_0002067',
-              'biosample_name = k562',
-              'method = STARR-seq',
-              'files_fileset = IGVFFI7903VFKP'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'biosample_id = EFO_0002067',
-              'biosample_name = k562',
-              'method = STARR-seq',
-              'files_fileset = IGVFFI7903VFKP'
+              'method = STARR-seq'
             ]
           }
         ]
@@ -1849,23 +1555,10 @@ export const descriptions = {
         label: 'BlueSTARR',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by biosample identifier',
             items: [
               'biosample_id = EFO_0002067',
-              'biosample_name = k562',
-              'method = BlueSTARR',
-              'files_fileset = IGVFFI1663LKVQ',
-              'element_id = candidate_cis_regulatory_element_chr1_100004290_100004635_GRCh38_ENCFF420VPZ'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'biosample_id = EFO_0002067',
-              'biosample_name = k562',
-              'method = BlueSTARR',
-              'files_fileset = IGVFFI1663LKVQ',
-              'element_id = candidate_cis_regulatory_element_chr1_100004290_100004635_GRCh38_ENCFF420VPZ'
+              'method = BlueSTARR'
             ]
           }
         ]
@@ -1966,24 +1659,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'gene_id = ENSG00000116198',
-              'gene_name = CEP104',
-              'hgnc_id = HGNC:24866',
-              'alias = CEP104',
-              'method = CRISPR screen, source = ENCODE',
-              'files_fileset = ENCFF968BZL',
-              'biosample_term = EFO_0002067, biological_context = K562'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'gene_id = ENSG00000116198',
-              'gene_name = CEP104',
-              'hgnc_id = HGNC:24866',
-              'alias = CEP104',
-              'method = CRISPR screen, source = ENCODE',
-              'files_fileset = ENCFF968BZL',
-              'biosample_term = EFO_0002067, biological_context = K562'
+              'method = CRISPR screen',
+              'files_fileset = ENCFF968BZL'
             ]
           }
         ]
@@ -1993,27 +1676,18 @@ export const descriptions = {
         label: 'ENCODE-rE2G',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000225880',
-              'gene_name = LINC00115',
-              'hgnc_id = HGNC:26211',
-              'alias = LINC00115',
-              'method = ENCODE-rE2G, source = ENCODE',
-              'files_fileset = ENCFF425TLX',
-              'biosample_term = EFO_0002330, biological_context = SJSA1'
+              'biosample_term = EFO_0002330',
+              'method = ENCODE-rE2G'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'gene_id = ENSG00000225880',
-              'gene_name = LINC00115',
-              'hgnc_id = HGNC:26211',
-              'alias = LINC00115',
-              'method = ENCODE-rE2G, source = ENCODE',
               'files_fileset = ENCFF425TLX',
-              'biosample_term = EFO_0002330, biological_context = SJSA1'
+              'method = ENCODE-rE2G'
             ]
           }
         ]
@@ -2023,27 +1697,17 @@ export const descriptions = {
         label: 'Perturb-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000123685',
-              'gene_name = BATF3',
-              'hgnc_id = HGNC:28915',
-              'alias = BATF3',
-              'method = Perturb-seq, source = IGVF',
-              'files_fileset = IGVFFI3069QCRA',
-              'biosample_term = CL_0000909, biological_context = CD8-positive, alpha-beta memory T cell'
+              'method = Perturb-seq'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by files_fileset',
             items: [
-              'gene_id = ENSG00000123685',
-              'gene_name = BATF3',
-              'hgnc_id = HGNC:28915',
-              'alias = BATF3',
-              'method = Perturb-seq, source = IGVF',
               'files_fileset = IGVFFI3069QCRA',
-              'biosample_term = CL_0000909, biological_context = CD8-positive, alpha-beta memory T cell'
+              'method = Perturb-seq'
             ]
           }
         ]
@@ -2064,23 +1728,15 @@ export const descriptions = {
           {
             label: 'Single result',
             items: [
-              'region = chr1:3774714-3775214 (maximum length: 10kb)',
-              'source_annotation = enhancer',
-              'region_type = tested elements',
-              'method = CRISPR screen, source = ENCODE',
-              'files_fileset = ENCFF968BZL',
-              'biosample_term = EFO_0002067, biological_context = K562'
+              'region = chr1:4126791-4126792 (maximum length: 10kb)',
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'region = chr1:3774714-3775214 (maximum length: 10kb)',
-              'source_annotation = enhancer',
-              'region_type = tested elements',
-              'method = CRISPR screen, source = ENCODE',
               'files_fileset = ENCFF968BZL',
-              'biosample_term = EFO_0002067, biological_context = K562'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -2092,19 +1748,16 @@ export const descriptions = {
           {
             label: 'Single result',
             items: [
-              'region = chr1:778465-778965 (maximum length: 10kb)',
-              'method = ENCODE-rE2G, source = ENCODE',
-              'files_fileset = ENCFF003BKC',
-              'biosample_term = UBERON_0004539, biological_context = right kidney from ENCDO453STB'
+              'region = chr1:920016-920017 (maximum length: 10kb)',
+              'method = ENCODE-rE2G',
+              'files_fileset = ENCFF666WIM'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'region = chr1:778465-778965 (maximum length: 10kb)',
-              'method = ENCODE-rE2G, source = ENCODE',
-              'files_fileset = ENCFF003BKC',
-              'biosample_term = UBERON_0004539, biological_context = right kidney from ENCDO453STB'
+              'files_fileset = ENCFF666WIM',
+              'method = ENCODE-rE2G'
             ]
           }
         ]
@@ -2114,21 +1767,17 @@ export const descriptions = {
         label: 'Perturb-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'Query by region',
             items: [
               'region = chr1:212699339-212700840 (maximum length: 10kb)',
-              'method = Perturb-seq, source = IGVF',
-              'files_fileset = IGVFFI3069QCRA',
-              'biosample_term = CL_0000909, biological_context = CD8-positive, alpha-beta memory T cell'
+              'method = Perturb-seq'
             ]
           },
           {
-            label: 'Group results',
+            label: 'Query by files_fileset',
             items: [
-              'region = chr1:212699339-212700840 (maximum length: 10kb)',
-              'method = Perturb-seq, source = IGVF',
               'files_fileset = IGVFFI3069QCRA',
-              'biosample_term = CL_0000909, biological_context = CD8-positive, alpha-beta memory T cell'
+              'method = Perturb-seq'
             ]
           }
         ]
@@ -2148,23 +1797,15 @@ export const descriptions = {
           {
             label: 'Single result',
             items: [
-              'variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA',
               'spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA',
-              'rsid = rs79070333',
-              'ca_id = CA21017128',
-              'method = eQTL, source = AFGR',
-              'biological_context = lymphoblastoid cell line'
+              'method = eQTL'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA',
-              'spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA',
-              'rsid = rs79070333',
-              'ca_id = CA21017128',
-              'method = eQTL, source = AFGR',
-              'biological_context = lymphoblastoid cell line'
+              'gene_id = ENSG00000259943',
+              'method = eQTL'
             ]
           }
         ]
@@ -2174,21 +1815,17 @@ export const descriptions = {
         label: 'spliceQTL',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
-              'gene_id = ENSG00000131236',
-              'gene_name = CAP1',
-              'method = spliceQTL, source = EBI',
-              'biological_context = artery (tibial)'
+              'variant_id = NC_000001.11:898757:AAAAAA:AAAAAAA',
+              'method = spliceQTL'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000131236',
-              'gene_name = CAP1',
-              'method = spliceQTL, source = EBI',
-              'biological_context = artery (tibial)'
+              'method = spliceQTL'
             ]
           }
         ]
@@ -2198,25 +1835,17 @@ export const descriptions = {
         label: 'pQTL',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
               'variant_id = NC_000002.12:27508072:T:C',
-              'spdi = NC_000002.12:27508072:T:C',
-              'rsid = rs1260326',
-              'ca_id = CA119886',
-              'method = pQTL, source = UKB',
-              'biological_context = blood plasma'
+              'method = pQTL'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by gene identifier',
             items: [
-              'variant_id = NC_000002.12:27508072:T:C',
-              'spdi = NC_000002.12:27508072:T:C',
-              'rsid = rs1260326',
-              'ca_id = CA119886',
-              'method = pQTL, source = UKB',
-              'biological_context = blood plasma'
+              'gene_id = ENSG00000084734',
+              'method = pQTL'
             ]
           }
         ]
@@ -2228,17 +1857,15 @@ export const descriptions = {
           {
             label: 'Single result',
             items: [
-              'region = chr1:40241650-40241654',
-              'method = caQTL, source = AFGR',
-              'biological_context = blood plasma'
+              'variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA',
+              'method = caQTL'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'region = chr1:40241650-40241654',
-              'method = caQTL, source = AFGR',
-              'biological_context = blood plasma'
+              'region = chr1:40232650-40241654',
+              'method = caQTL'
             ]
           }
         ]
