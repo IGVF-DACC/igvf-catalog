@@ -107,11 +107,11 @@
           ],
           "description": "Multiple-testing-adjusted p-value when reported by the source."
         },
-        "neg_log10_p_value": {
+        "neg_log10_pvalue": {
           "type": "number",
           "description": "Negative log10 of p-value."
         },
-        "neg_log10_p_value_adj": {
+        "neg_log10_pvalue_adj": {
           "type": "number",
           "description": "Negative log10 of adjusted p-value."
         },
@@ -188,7 +188,7 @@
         "biological_context",
         "treatments_term_ids",
         "p_value",
-        "neg_log10_p_value",
+        "neg_log10_pvalue",
         "log2FC",
         "significant"
       ],

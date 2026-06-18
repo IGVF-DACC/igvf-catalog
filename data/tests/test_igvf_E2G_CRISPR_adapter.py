@@ -85,7 +85,7 @@ def test_igvf_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_file_fi
         assert first_item['pct_2'] == 0.282
         assert first_item['p_value_adj'] == 0.0
         assert first_item['significant'] is True
-        assert first_item['neg_log10_p_value'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+        assert first_item['neg_log10_pvalue'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['crispr_modality'] == 'interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
@@ -462,9 +462,9 @@ def test_igvf_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_file_fi
         assert first_item['p_value'] == 0.7264835
         assert first_item['p_value_adj'] == 0.9994257067617868
         assert first_item['significant'] is False
-        assert first_item['neg_log10_p_value'] == pytest.approx(
+        assert first_item['neg_log10_pvalue'] == pytest.approx(
             -math.log10(0.7264835))
-        assert first_item['neg_log10_p_value_adj'] == pytest.approx(
+        assert first_item['neg_log10_pvalue_adj'] == pytest.approx(
             -math.log10(0.9994257067617868))
         assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
@@ -548,8 +548,8 @@ def test_igvf_e2g_scaled_screen_keeps_best_passing_guide_per_element_gene(
     assert first_item['p_value'] == 0.01
     assert 'p_value_adj' not in first_item
     assert first_item['significant'] is True
-    assert first_item['neg_log10_p_value'] == pytest.approx(-math.log10(0.01))
-    assert 'neg_log10_p_value_adj' not in first_item
+    assert first_item['neg_log10_pvalue'] == pytest.approx(-math.log10(0.01))
+    assert 'neg_log10_pvalue_adj' not in first_item
     assert first_item['log2FC'] == -0.7
 
 
@@ -731,9 +731,9 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
     assert edge['p_value'] == pytest.approx(
         math.exp(hypergeometric_ln_p_value))
     assert edge['p_value_adj'] == 0
-    assert edge['neg_log10_p_value'] == pytest.approx(
+    assert edge['neg_log10_pvalue'] == pytest.approx(
         -math.log10(math.exp(hypergeometric_ln_p_value)))
-    assert edge['neg_log10_p_value_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+    assert edge['neg_log10_pvalue_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
     assert edge['significant'] is True
     assert 'ln_p_value' not in edge
     assert 'empirical_p_value' not in edge
@@ -795,8 +795,8 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     assert enh['num_guides'] == 10
     assert enh['p_value'] == 0.01
     assert enh['p_value_adj'] == 0.02
-    assert enh['neg_log10_p_value'] == pytest.approx(2.0)
-    assert enh['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
+    assert enh['neg_log10_pvalue'] == pytest.approx(2.0)
+    assert enh['neg_log10_pvalue_adj'] == pytest.approx(-math.log10(0.02))
     assert enh['log2FC'] == pytest.approx(math.log2(0.75))
     assert enh['log2FC_ci95_lower'] == pytest.approx(math.log2(0.7))
     assert enh['log2FC_ci95_upper'] == pytest.approx(math.log2(0.8))
@@ -1078,8 +1078,8 @@ def test_igvf_e2g_crudo_real_sample_putative_enhancer_edge_uses_no_aux_columns(
     assert len(matches) == 1
     edge = matches[0]
     assert edge['p_value_adj'] == pytest.approx(0.001870874)
-    assert edge['neg_log10_p_value'] == pytest.approx(-math.log10(0.000134325))
-    assert edge['neg_log10_p_value_adj'] == pytest.approx(
+    assert edge['neg_log10_pvalue'] == pytest.approx(-math.log10(0.000134325))
+    assert edge['neg_log10_pvalue_adj'] == pytest.approx(
         -math.log10(0.001870874))
     assert edge['log2FC'] == pytest.approx(math.log2(1 - 0.165227554))
     assert edge['_from'].startswith(
@@ -1103,17 +1103,17 @@ def test_apply_standard_neg_log10_fields():
     )
     metrics = {'p_value': 0.01, 'p_value_adj': 0.02}
     adapter._apply_standard_neg_log10_fields(metrics)
-    assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
-    assert metrics['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
+    assert metrics['neg_log10_pvalue'] == pytest.approx(2.0)
+    assert metrics['neg_log10_pvalue_adj'] == pytest.approx(-math.log10(0.02))
 
     metrics = {'p_value': 0.0, 'p_value_adj': 0.02}
     adapter._apply_standard_neg_log10_fields(metrics)
-    assert metrics['neg_log10_p_value'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
-    assert metrics['neg_log10_p_value_adj'] == pytest.approx(-math.log10(0.02))
+    assert metrics['neg_log10_pvalue'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+    assert metrics['neg_log10_pvalue_adj'] == pytest.approx(-math.log10(0.02))
 
-    metrics = {'neg_log10_p_value': 99.0, 'p_value': 0.01}
+    metrics = {'neg_log10_pvalue': 99.0, 'p_value': 0.01}
     adapter._apply_standard_neg_log10_fields(metrics)
-    assert metrics['neg_log10_p_value'] == 99.0
+    assert metrics['neg_log10_pvalue'] == 99.0
 
 
 def test_apply_standard_significant_field():
@@ -1160,9 +1160,9 @@ def test_apply_adapter_calculated_fields_pyspade_exp_ln_p_rules():
     )
     assert metrics['p_value'] == pytest.approx(math.exp(-11.04346999))
     assert metrics['p_value_adj'] == 0.0
-    assert metrics['neg_log10_p_value'] == pytest.approx(
+    assert metrics['neg_log10_pvalue'] == pytest.approx(
         -math.log10(math.exp(-11.04346999)))
-    assert metrics['neg_log10_p_value_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+    assert metrics['neg_log10_pvalue_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
     assert metrics['significant'] is True
 
 
@@ -1190,8 +1190,8 @@ def test_apply_adapter_calculated_fields_crudo_rules():
             'significant': False,
         },
     )
-    assert metrics['neg_log10_p_value'] == pytest.approx(2.0)
-    assert metrics['neg_log10_p_value_adj'] == pytest.approx(
+    assert metrics['neg_log10_pvalue'] == pytest.approx(2.0)
+    assert metrics['neg_log10_pvalue_adj'] == pytest.approx(
         -math.log10(0.02))
     assert metrics['log2FC'] == pytest.approx(math.log2(0.75))
     assert metrics['significant'] is False

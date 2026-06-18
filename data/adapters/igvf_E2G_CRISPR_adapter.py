@@ -59,7 +59,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
         'p_value',
         'p_value_adj',
-        'neg_log10_p_value_adj',
+        'neg_log10_pvalue_adj',
         'log2FC_ci95_lower',
         'log2FC_ci95_upper',
         'pct_1',
@@ -452,7 +452,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         return metrics
 
     @classmethod
-    def _neg_log10_p_value(cls, p_value: float) -> float:
+    def _neg_log10_pvalue(cls, p_value: float) -> float:
         if p_value <= 0:
             return cls.MAX_LOG10_PVALUE
         return -math.log10(p_value)
@@ -491,12 +491,12 @@ class IGVFE2GCRISPR(BaseAdapter):
         return None
 
     def _apply_standard_neg_log10_fields(self, metrics: dict) -> None:
-        """Derive neg_log10_p_value and neg_log10_p_value_adj from p-values when present."""
-        if 'p_value' in metrics and 'neg_log10_p_value' not in metrics:
-            metrics['neg_log10_p_value'] = self._neg_log10_p_value(
+        """Derive neg_log10_pvalue and neg_log10_pvalue_adj from p-values when present."""
+        if 'p_value' in metrics and 'neg_log10_pvalue' not in metrics:
+            metrics['neg_log10_pvalue'] = self._neg_log10_pvalue(
                 metrics['p_value'])
-        if 'p_value_adj' in metrics and 'neg_log10_p_value_adj' not in metrics:
-            metrics['neg_log10_p_value_adj'] = self._neg_log10_p_value(
+        if 'p_value_adj' in metrics and 'neg_log10_pvalue_adj' not in metrics:
+            metrics['neg_log10_pvalue_adj'] = self._neg_log10_pvalue(
                 metrics['p_value_adj'])
 
     def _apply_standard_significant_field(self, metrics: dict) -> None:
@@ -554,7 +554,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         source_value = metrics.get(rule['from'])
         if source_value is None:
             return
-        metrics[rule['field']] = self._neg_log10_p_value(source_value)
+        metrics[rule['field']] = self._neg_log10_pvalue(source_value)
 
     def _apply_exp_ln_p_rule(self, rule: dict, metrics: dict) -> None:
         """Derive a p-value from a natural-log p-value field (p = exp(ln_p))."""
@@ -617,7 +617,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             'biosample_term': file_fileset['samples'][0],
             'treatments_term_ids': file_fileset['treatments_term_ids'],
         }
-        edge['neg_log10_p_value'] = metrics['neg_log10_p_value']
+        edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
         edge['log2FC'] = metrics['log2FC']
         edge['significant'] = metrics['significant']
         for field in IGVFE2GCRISPR.OPTIONAL_EDGE_METRIC_FIELDS:
