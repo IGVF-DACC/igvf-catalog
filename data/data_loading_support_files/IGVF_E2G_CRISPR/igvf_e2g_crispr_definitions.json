@@ -434,7 +434,7 @@
         "fold_change": "fc",
         "hypergeometric_ln_p_value": "log(pval)-hypergeom",
         "background_corrected_fold_change": "fc_by_rand_dist_cpm",
-        "p_value_adj": "pval-empirical",
+        "empirical_p_value": "pval-empirical",
         "cpm_perturb": "cpm_perturb",
         "cpm_bg": "cpm_bg",
         "num_cells": "num_cell"
@@ -445,13 +445,18 @@
         "field": "p_value",
         "rule": "exp_ln_p",
         "from": "hypergeometric_ln_p_value"
+      },
+      {
+        "field": "p_value_adj",
+        "rule": "exp_ln_p",
+        "from": "gamma_approximation_ln_p_value"
       }
     ],
     "notes": "Most fields from the data file are undefined in the file format specification document.",
     "column_catalog_notes": {
       "log(pval)-hypergeom": "Catalog raw p-value source. Stored natively as hypergeometric_ln_p_value; catalog p_value = exp(column). Initial hypergeometric test (perturbed vs all other cells) with no random-background correction.",
-      "pval-empirical": "Catalog adjusted p-value source (per Hon lab). Empirical p-value from pySpade gamma-distribution approximation on the hypergeometric p-value vs random background draws; stored as p_value_adj. Original file-format text describes a background-selection count; the exported column is treated as a p-value on 0\u20131 scale. FDR filtering is applied on this column before export, so surviving rows in filtered DE tables often show 0.",
-      "Significance_score": "Catalog field gamma_approximation_ln_p_value (ln scale). Separate from raw and adjusted p-values: gamma-approximation significance score derived from the observed hypergeometric p-value and random-background p-values (per pySpade documentation). Not mapped to catalog p_value_adj."
+      "Significance_score": "Catalog adjusted p-value (q-value) source. Stored natively as gamma_approximation_ln_p_value; catalog p_value_adj = exp(column). Gamma-approximation significance score modeling background and perturbation p-values (per pySpade / Yihan Hon lab).",
+      "pval-empirical": "Catalog field empirical_p_value. Empirical p-value comparing perturbation hypergeometric p-value to random background draws. Loaded into the database but not returned by the API."
     }
   },
   "files": {

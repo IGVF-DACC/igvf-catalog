@@ -71,6 +71,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         'background_corrected_fold_change',
         'gamma_approximation_ln_p_value',
         'hypergeometric_ln_p_value',
+        'empirical_p_value',
         'cpm_perturb',
         'cpm_bg',
         'num_cells',

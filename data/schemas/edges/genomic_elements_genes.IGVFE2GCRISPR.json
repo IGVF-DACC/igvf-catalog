@@ -161,11 +161,15 @@
         },
         "gamma_approximation_ln_p_value": {
           "type": "number",
-          "description": "Natural log (ln) of pySpade gamma-approximation significance score (Significance_score)."
+          "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj."
         },
         "hypergeometric_ln_p_value": {
           "type": "number",
-          "description": "Natural log (ln) of a p-value from an initial hypergeometric test."
+          "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value."
+        },
+        "empirical_p_value": {
+          "type": "number",
+          "description": "pySpade pval-empirical: empirical p-value from random background comparison. Stored but not returned by the API."
         },
         "cpm_perturb": {
           "type": "number",

@@ -730,13 +730,15 @@ def test_igvf_e2g_wtc11_uses_pyspade_metric_definitions(
         gamma_approximation_ln_p_value)
     assert edge['p_value'] == pytest.approx(
         math.exp(hypergeometric_ln_p_value))
-    assert edge['p_value_adj'] == 0
+    assert edge['p_value_adj'] == pytest.approx(
+        math.exp(gamma_approximation_ln_p_value))
     assert edge['neg_log10_pvalue'] == pytest.approx(
         -math.log10(math.exp(hypergeometric_ln_p_value)))
-    assert edge['neg_log10_pvalue_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+    assert edge['neg_log10_pvalue_adj'] == pytest.approx(
+        -math.log10(math.exp(gamma_approximation_ln_p_value)))
     assert edge['significant'] is True
+    assert edge['empirical_p_value'] == 0
     assert 'ln_p_value' not in edge
-    assert 'empirical_p_value' not in edge
     assert 'significance_score' not in edge
     assert edge['log2FC'] == pytest.approx(0.4755777642)
     assert edge['fold_change'] == pytest.approx(1.39047496)
@@ -1159,15 +1161,17 @@ def test_apply_adapter_calculated_fields_pyspade_exp_ln_p_rules():
         metrics={
             'hypergeometric_ln_p_value': -11.04346999,
             'gamma_approximation_ln_p_value': -10.84371703,
-            'p_value_adj': 0.0,
+            'empirical_p_value': 0.0,
         },
     )
     assert metrics['p_value'] == pytest.approx(math.exp(-11.04346999))
-    assert metrics['p_value_adj'] == 0.0
+    assert metrics['p_value_adj'] == pytest.approx(math.exp(-10.84371703))
     assert metrics['neg_log10_pvalue'] == pytest.approx(
         -math.log10(math.exp(-11.04346999)))
-    assert metrics['neg_log10_pvalue_adj'] == IGVFE2GCRISPR.MAX_LOG10_PVALUE
+    assert metrics['neg_log10_pvalue_adj'] == pytest.approx(
+        -math.log10(math.exp(-10.84371703)))
     assert metrics['significant'] is True
+    assert metrics['empirical_p_value'] == 0.0
 
 
 def test_apply_adapter_calculated_fields_crudo_rules():
