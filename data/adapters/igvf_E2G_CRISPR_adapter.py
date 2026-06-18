@@ -393,7 +393,6 @@ class IGVFE2GCRISPR(BaseAdapter):
                 name_to_idx,
                 semantic_columns.get('perturbed_gene'),
             ),
-            'significant': None,
             'name_hg38': None,
             'element_type': self._pick_column(name_to_idx, 'type'),
             'promoter_gene_map': semantic_columns.get('promoter_gene_map'),
@@ -437,11 +436,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             if col_idx >= len(row):
                 continue
             cell = row[col_idx].strip()
-            if key == 'significant':
-                significant = self._parse_bool(row[col_idx])
-                if significant is not None:
-                    metrics[key] = significant
-            elif cell:
+            if cell:
                 try:
                     value = float(cell)
                     metrics[key] = value
@@ -500,9 +495,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                 metrics['p_value_adj'])
 
     def _apply_standard_significant_field(self, metrics: dict) -> None:
-        """Set significant from p_value_adj or p_value when not provided by the source file."""
-        if 'significant' in metrics:
-            return
+        """Set significant from p_value_adj or p_value using SIGNIFICANCE_THRESHOLD."""
         p_value = metrics.get('p_value_adj')
         if p_value is None:
             p_value = metrics.get('p_value')
@@ -510,20 +503,6 @@ class IGVFE2GCRISPR(BaseAdapter):
             metrics['significant'] = p_value < self.SIGNIFICANCE_THRESHOLD
         else:
             metrics['significant'] = False
-
-    def _apply_crudo_tap_seq_positive_control_significant(
-        self,
-        row: list,
-        colmap: Dict[str, Optional[int]],
-        metrics: dict,
-    ) -> None:
-        """CRUDO TAP-seq TSS rows are positive controls; always significant."""
-        if self.file_config.get('layout') != 'crudo_tap_seq':
-            return
-        type_idx = colmap.get('element_type')
-        promoter_gene_map = colmap.get('promoter_gene_map') or {}
-        if self._cell(row, type_idx) in promoter_gene_map:
-            metrics['significant'] = True
 
     def _apply_adapter_calculated_fields(
         self,
@@ -546,8 +525,6 @@ class IGVFE2GCRISPR(BaseAdapter):
                 )
         self._apply_standard_neg_log10_fields(metrics)
         self._apply_standard_significant_field(metrics)
-        self._apply_crudo_tap_seq_positive_control_significant(
-            row, colmap, metrics)
         return metrics
 
     def _apply_neg_log10_rule(self, rule: dict, metrics: dict) -> None:

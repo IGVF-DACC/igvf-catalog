@@ -132,8 +132,7 @@
       "metrics": {
         "p_value": "sceptre_p_value",
         "p_value_adj": "sceptre_adj_p_value",
-        "log2FC": "sceptre_log2_fc",
-        "significant": "significant"
+        "log2FC": "sceptre_log2_fc"
       }
     }
   },
@@ -171,8 +170,7 @@
       "metrics": {
         "p_value": "sceptre_p_value",
         "p_value_adj": "sceptre_adj_p_value",
-        "log2FC": "sceptre_log2_fc",
-        "significant": "significant"
+        "log2FC": "sceptre_log2_fc"
       }
     },
     "notes": "power_at_effect_size_XX is a variable field name that only sometimes actually gets renamed depending on the effect size value ex. power_at_effect_size_15."
@@ -226,8 +224,7 @@
         "p_value": "pval.EnhancerEffect.noAux",
         "effect_size_ci_95": "ci95.EnhancerEffect.noAux",
         "p_value_adj": "adj.pval.EnhancerEffect.noAux",
-        "effect_size": "EnhancerEffect.noAux",
-        "significant": "Significant"
+        "effect_size": "EnhancerEffect.noAux"
       }
     },
     "adapter_calculated_fields": [
@@ -289,8 +286,7 @@
         "p_value": "pval.EnhancerEffect.noAux",
         "effect_size_ci_95": "ci95.EnhancerEffect.noAux",
         "p_value_adj": "adj.pval.EnhancerEffect.noAux",
-        "effect_size": "EnhancerEffect.noAux",
-        "significant": "Significant"
+        "effect_size": "EnhancerEffect.noAux"
       }
     },
     "adapter_calculated_fields": [
@@ -347,8 +343,7 @@
       "metrics": {
         "log2FC": "log2_fc",
         "p_value": "p_value",
-        "p_value_adj": "adj_p_value",
-        "significant": "significant"
+        "p_value_adj": "adj_p_value"
       },
       "notes": "Data files have `sample_summary_shor` not `sample_summary_short` as specified in the file format specification document."
     }

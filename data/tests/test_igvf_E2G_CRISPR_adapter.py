@@ -400,7 +400,7 @@ def test_igvf_e2g_teloHAEC_flowfish_enhancer_edge_uses_intended_target_name_inte
     assert edge['log2FC'] == 0.42
     assert edge['p_value'] == 0.01
     assert edge['p_value_adj'] == 0.05
-    assert edge['significant'] is True
+    assert edge['significant'] is False
 
     writer2 = SpyWriter()
     with patch('adapters.igvf_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
@@ -763,10 +763,10 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
         # negative_control — skipped entirely
         'chr1:1-2\tnegative_control\t10\tnegative_control\tENSG00000000000\t'
         '0\t0.05\t0.5\t0.5\tFALSE\n'
-        # putative enhancer
+        # putative enhancer — Significant=FALSE in file; threshold uses p_value_adj
         'chr22:36387779-36388133\tputative_enhancer\t10\tMYH9\tENSG00000100345\t'
         '0.25\t0.05\t0.01\t0.02\tFALSE\n'
-        # TSS positive control — Significant=FALSE in file, still loaded as significant
+        # TSS — Significant=FALSE in file; threshold uses p_value_adj
         'chr11:694042-694160\tCCND1_TSS\t10\tCCND1\tENSG00000110092\t'
         '-0.1\t0.2\t0.03\t0.04\tFALSE\n'
     )
@@ -800,7 +800,7 @@ def test_igvf_e2g_crispr_adapter_crudo_tap_seq_skips_negative_control_and_maps_t
     assert enh['log2FC'] == pytest.approx(math.log2(0.75))
     assert enh['log2FC_ci95_lower'] == pytest.approx(math.log2(0.7))
     assert enh['log2FC_ci95_upper'] == pytest.approx(math.log2(0.8))
-    assert enh['significant'] is False
+    assert enh['significant'] is True
     tss = next(e for e in parsed if e['effect_size'] == -0.1)
     assert tss['_to'] == 'genes/ENSG00000110092'
     assert tss['log2FC'] == pytest.approx(math.log2(1.1))
@@ -1131,7 +1131,11 @@ def test_apply_standard_significant_field():
     adapter._apply_standard_significant_field(metrics)
     assert metrics['significant'] is False
 
-    metrics = {'significant': True, 'p_value_adj': 0.01}
+    metrics = {'significant': True, 'p_value_adj': 0.1}
+    adapter._apply_standard_significant_field(metrics)
+    assert metrics['significant'] is False
+
+    metrics = {'significant': False, 'p_value_adj': 0.01}
     adapter._apply_standard_significant_field(metrics)
     assert metrics['significant'] is True
 
@@ -1187,21 +1191,20 @@ def test_apply_adapter_calculated_fields_crudo_rules():
             'p_value_adj': 0.02,
             'effect_size': 0.25,
             'effect_size_ci_95': 0.05,
-            'significant': False,
         },
     )
     assert metrics['neg_log10_pvalue'] == pytest.approx(2.0)
     assert metrics['neg_log10_pvalue_adj'] == pytest.approx(
         -math.log10(0.02))
     assert metrics['log2FC'] == pytest.approx(math.log2(0.75))
-    assert metrics['significant'] is False
+    assert metrics['significant'] is True
 
     metrics = adapter._apply_adapter_calculated_fields(
         row=['CCND1_TSS'],
         colmap=colmap,
-        metrics={'significant': False},
+        metrics={'p_value_adj': 0.1},
     )
-    assert metrics['significant'] is True
+    assert metrics['significant'] is False
 
 
 def test_igvf_e2g_crispr_adapter_validate_doc_invalid(mock_file_fileset_perturb_seq):
