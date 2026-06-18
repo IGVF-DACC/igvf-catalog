@@ -49,23 +49,27 @@ class S3Writer(Writer):
         self._s3_uri = None
         self.s3_file = None
         self.s3_tags: list[dict[str, str]] = []
+        self._existing_tags: Optional[dict[str, str]] = None
         if version_tag is not None:
             self.add_tag('version', version_tag)
 
     def add_tag(self, key: str, value: str):
         self.s3_tags.append({'Key': key, 'Value': value})
 
+    def _fetch_existing_tags(self):
+        client = self.session.client('s3')
+        try:
+            response = client.get_object_tagging(
+                Bucket=self.bucket, Key=self.key)
+            self._existing_tags = {t['Key']: t['Value']
+                                   for t in response.get('TagSet', [])}
+        except client.exceptions.NoSuchKey:
+            self._existing_tags = {}
+
     def _put_tags(self):
         if not self.s3_tags:
             return
-        client = self.session.client('s3')
-        try:
-            existing = client.get_object_tagging(
-                Bucket=self.bucket, Key=self.key)
-            existing_tags = {t['Key']: t['Value']
-                             for t in existing.get('TagSet', [])}
-        except client.exceptions.NoSuchKey:
-            existing_tags = {}
+        existing_tags = self._existing_tags if self._existing_tags is not None else {}
 
         for tag in self.s3_tags:
             key, value = tag['Key'], tag['Value']
@@ -78,6 +82,7 @@ class S3Writer(Writer):
                 existing_tags[key] = value
 
         merged = [{'Key': k, 'Value': v} for k, v in existing_tags.items()]
+        client = self.session.client('s3')
         client.put_object_tagging(Bucket=self.bucket, Key=self.key, Tagging={
             'TagSet': merged
         })
@@ -89,6 +94,7 @@ class S3Writer(Writer):
 
     def write(self, content):
         if self.s3_file is None:
+            self._fetch_existing_tags()
             self.s3_file = smart_open.open(self.destination, mode='w', transport_params={
                                            'client': self.session.client('s3')})
         self.s3_file.write(content)

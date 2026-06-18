@@ -178,6 +178,47 @@ def test_s3_writer_handles_no_such_key_on_get_tags(mocker):
     )
 
 
+def test_s3_writer_preserves_unrelated_existing_tags(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.get_object_tagging.return_value = {
+        'TagSet': [
+            {'Key': 'owner', 'Value': 'otto'},
+            {'Key': 'version', 'Value': 'v100'},
+        ]
+    }
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v123')
+    writer.add_tag('source', 'oncotree')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    call_args = mock_s3_client.put_object_tagging.call_args
+    tag_set = call_args.kwargs['Tagging']['TagSet']
+    tags_by_key = {t['Key']: t['Value'] for t in tag_set}
+    assert tags_by_key['owner'] == 'otto'
+    assert tags_by_key['version'] == 'v100 v123'
+    assert tags_by_key['source'] == 'oncotree'
+
+
+def test_s3_writer_fetches_tags_before_overwriting_object(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mock_s3_client.get_object_tagging.return_value = {'TagSet': []}
+    mock_smart_open = mocker.patch(
+        'adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v1')
+    writer.open()
+    writer.write('content')
+    # get_object_tagging must be called before smart_open overwrites the object
+    mock_s3_client.get_object_tagging.assert_called_once()
+    assert mock_s3_client.get_object_tagging.call_args.kwargs['Key'] == 'test-key'
+
+
 def test_s3_writer_close_no_tags_skips_api_call(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
