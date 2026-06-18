@@ -5,14 +5,6 @@ from active_adapters import KEY_TO_ADAPTER
 from adapters.writer import get_writer
 
 
-class ParseOtherTagsAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, dict[(str, str)]())
-        for value in values:
-            key, value = value.split('=')
-            getattr(namespace, self.dest)[key] = value
-
-
 parser = argparse.ArgumentParser(
     prog='IGVF Catalog Sample Data Loader',
     description='Loads sample data into a local ArangoDB instance'
@@ -31,8 +23,6 @@ parser.add_argument('--aws-profile', type=str, default=None,
                     help='The AWS profile to use, for example "igvf-dev".')
 parser.add_argument('--version-tag', type=str, default=None,
                     help='The version tag to use, for example "IGVF_catalog_beta_v0.4".')
-parser.add_argument('--other-tags', nargs='*', action=ParseOtherTagsAction,
-                    help='Other tags to add to the output file.')
 
 
 # arguments that are in at least one adapter signature
@@ -100,7 +90,6 @@ non_adapter_signature_args = [
     'adapter',
     'aws_profile',
     'version_tag',
-    'other_tags',
 ]
 
 non_adapter_signature_namespace = argparse.Namespace()
@@ -125,9 +114,6 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         version_tag=non_adapter_signature_namespace.version_tag
     )
 
-    for key, value in non_adapter_signature_namespace.other_tags.items():
-        writer_primary.add_tag(key, value)
-
     writer_secondary = get_writer(
         filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
@@ -136,8 +122,6 @@ if non_adapter_signature_namespace.adapter == 'ontology':
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
-    for key, value in non_adapter_signature_namespace.other_tags.items():
-        writer_secondary.add_tag(key, value)
 
     writer_edge_primary = get_writer(
         filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-primary.jsonl',
@@ -147,8 +131,6 @@ if non_adapter_signature_namespace.adapter == 'ontology':
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
-    for key, value in non_adapter_signature_namespace.other_tags.items():
-        writer_edge_primary.add_tag(key, value)
 
     writer_edge_secondary = get_writer(
         filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-secondary.jsonl',
@@ -158,8 +140,6 @@ if non_adapter_signature_namespace.adapter == 'ontology':
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
-    for key, value in non_adapter_signature_namespace.other_tags.items():
-        writer_edge_secondary.add_tag(key, value)
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
         adapter_signature_namespace.filepath,
@@ -178,9 +158,6 @@ else:
             profile_name=non_adapter_signature_namespace.aws_profile),
         version_tag=non_adapter_signature_namespace.version_tag
     )
-
-    for key, value in non_adapter_signature_namespace.other_tags.items():
-        writer.add_tag(key, value)
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
         **vars(adapter_signature_namespace), writer=writer)
