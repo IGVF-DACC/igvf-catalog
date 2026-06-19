@@ -126,8 +126,8 @@ class ASB(BaseAdapter):
                             _from = 'variants/' + variant_id
                             _to = 'proteins/' + ensembl_id
 
-                            p_value_adj_ref = row[13]
-                            p_value_adj_alt = row[15]
+                            p_value_adj_ref = float(row[13])
+                            p_value_adj_alt = float(row[15])
                             neg_log10_pvalue_adj_ref = float('inf')
                             if p_value_adj_ref > 0:
                                 neg_log10_pvalue_adj_ref = - \
