@@ -80,8 +80,8 @@ const outputFormat = z.array(z.object({
   score: z.number().nullable(),
   p_value: z.number().or(z.string()).nullish(),
   p_value_adj: z.number().or(z.string()).nullish(),
-  neg_log10_p_value: z.number().or(z.string()).nullish(),
-  neg_log10_p_value_adj: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
@@ -182,8 +182,8 @@ function buildQuery (params: {
         'score': record.score || record.effect_size || record.log2FC,
         'p_value': record.p_value,
         'p_value_adj': record.p_value_adj,
-        'neg_log10_p_value': record.neg_log10_p_value,
-        'neg_log10_p_value_adj': record.neg_log10_p_value_adj
+        'neg_log10_pvalue': record.neg_log10_pvalue,
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
       }
   `
 }
