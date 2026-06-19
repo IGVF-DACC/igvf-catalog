@@ -722,11 +722,42 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': None,
+            'cell_annotation_term': None,
             'genome_browser_link': genome_browser_link,
             'crispr_modality': None,
             'browser_index_file': None
         }
         return props, donor_ids, all_sample_types, disease_ids
+
+    @staticmethod
+    def get_cell_annotation_fields_igvf(fileset_object):
+        fileset_object_type = fileset_object.get('@type', [None])[0]
+        if fileset_object_type not in ['PseudobulkSet', 'PredictionSet']:
+            return None, None
+
+        cell_type = fileset_object.get('cell_type')
+        if not cell_type:
+            return None, None
+
+        cell_type_term_name = cell_type.get('term_name')
+        cell_type_term_id = cell_type.get('term_id')
+        if cell_type_term_id:
+            cell_type_term_key = cell_type_term_id.replace(':', '_')
+        else:
+            cell_type_at_id = cell_type.get('@id')
+            cell_type_term_key = (
+                cell_type_at_id.split('/')[-2] if cell_type_at_id else None
+            )
+        if not cell_type_term_name or not cell_type_term_key:
+            return None, None
+
+        cell_qualifier = fileset_object.get('cell_qualifier')
+        cell_annotation = (
+            f'{cell_qualifier} {cell_type_term_name}'
+            if cell_qualifier else cell_type_term_name
+        )
+        cell_annotation_term = f'ontology_terms/{cell_type_term_key}'
+        return cell_annotation, cell_annotation_term
 
     @staticmethod
     def query_fileset_files_props_igvf(file_object):
@@ -742,17 +773,10 @@ class FileFileSet:
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
         catalog_collections = file_object.get('catalog_collections', [])
-        cell_annotation = None
+        cell_annotation, cell_annotation_term = FileFileSet.get_cell_annotation_fields_igvf(
+            fileset_object)
         if fileset_object_type == 'PseudobulkSet':
             genome_browser_link = download_link
-            cell_qualifier = fileset_object.get('cell_qualifier')
-            cell_type_term_name = fileset_object.get(
-                'cell_type').get('term_name')
-            # not all pseudobulk sets have a cell qualifier
-            if cell_qualifier:
-                cell_annotation = f'{cell_qualifier} {cell_type_term_name}'
-            else:
-                cell_annotation = cell_type_term_name
         else:
             files = fileset_object.get('files', [])
             for file in files:
@@ -844,6 +868,7 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': cell_annotation,
+            'cell_annotation_term': cell_annotation_term,
             'genome_browser_link': genome_browser_link,
             'crispr_modality': modality,
             'browser_index_file': browser_index_file

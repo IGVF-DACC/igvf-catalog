@@ -270,6 +270,15 @@
             "surface ectodermal cell"
           ]
         },
+        "cell_annotation_term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Ontology term pointer for the file set cell type annotation",
+          "example": "ontology_terms/CL_0000352",
+          "pattern": "^ontology_terms/[A-Z0-9_]+$"
+        },
         "genome_browser_link": {
           "type": ["string", "null"],
           "description": "The genome browser link of the file set",
@@ -314,6 +323,7 @@
         "publication",
         "download_link",
         "cell_annotation",
+        "cell_annotation_term",
         "browser_index_file",
         "crispr_modality"
       ],
@@ -321,7 +331,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, browser_index_file, crispr_modality"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, cell_annotation_term, genome_browser_link, browser_index_file, crispr_modality"
   },
   "db_collection_name": "files_filesets"
 }
