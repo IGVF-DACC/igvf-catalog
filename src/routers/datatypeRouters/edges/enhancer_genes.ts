@@ -1,25 +1,22 @@
 import { z } from 'zod'
 import { db } from '../../../database'
-import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
 import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonNodesParamsFormat, genesCommonQueryFormat } from '../params'
+import { genesCommonQueryFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
-const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneCollectionName = geneSchema.db_collection_name as string
 
 const genesGenomicElementsInputFormat = genesCommonQueryFormat.merge(z.object({
-  gene_id: z.string().optional(),
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional()
-}).merge(commonNodesParamsFormat).omit({ organism: true }))
+}))
 
 const elementOutputFormat = z.object({
   id: z.string(),
@@ -51,12 +48,6 @@ const genesGenomicElementsOutputFormat = z.array(z.object({
 }))
 
 async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any> {
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
-
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
     filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
@@ -110,7 +101,6 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     FOR record IN genomic_elements_genes
     FILTER ${empty ? '' : `record._to IN ['${geneIDs.join('\', \'')}']`} ${filesetFilter} ${methodFilter}
     SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
 
     LET genomicElement = DOCUMENT(record._from)
 
