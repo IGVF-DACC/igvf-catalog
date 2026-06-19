@@ -738,7 +738,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'IGVFFI5688VHRS', 'name': 'IGVFFI5688VHRS', 'file_set_id': 'IGVFDS2175LLDQ', 'lab': 'tim-reddy', 'preferred_assay_titles': ['STARR-seq'], 'assay_term_ids': ['OBI:0002041'], 'method': 'STARR-seq', 'class': 'observed data', 'software': ['BIRD', 'Samtools', 'pandas'], 'samples': ['ontology_terms/EFO_0002067'], 'sample_ids': ['IGVFSM3422QUYJ'], 'simple_sample_summaries': [
-        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None, 'crispr_modality': None}
+        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None, 'crispr_modality': None, 'browser_index_file': None}
 
     write = SpyWriter()
     adapter = FileFileSet(
