@@ -5,6 +5,7 @@ import pickle
 from typing import Optional
 import requests
 import os
+from math import log10
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
@@ -125,6 +126,18 @@ class ASB(BaseAdapter):
                             _from = 'variants/' + variant_id
                             _to = 'proteins/' + ensembl_id
 
+                            p_value_adj_ref = row[13]
+                            p_value_adj_alt = row[15]
+                            neg_log10_pvalue_adj_ref = float('inf')
+                            if p_value_adj_ref > 0:
+                                neg_log10_pvalue_adj_ref = - \
+                                    1 * log10(p_value_adj_ref)
+
+                            neg_log10_pvalue_adj_alt = float('inf')
+                            if p_value_adj_alt > 0:
+                                neg_log10_pvalue_adj_alt = - \
+                                    1 * log10(p_value_adj_alt)
+
                             props = {
                                 '_key': _key,
                                 '_from': _from,
@@ -138,10 +151,8 @@ class ASB(BaseAdapter):
                                 'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
                                 'es_mean_ref': row[10],
                                 'es_mean_alt': row[11],
-                                # old fdrp_bh_ref field
-                                'neg_log10_pvalue_adj_ref': row[13],
-                                # old fdrp_bh_alt field
-                                'neg_log10_pvalue_adj_alt': row[15],
+                                'neg_log10_pvalue_adj_ref': neg_log10_pvalue_adj_ref,
+                                'neg_log10_pvalue_adj_alt': neg_log10_pvalue_adj_alt,
                                 'biological_context': cell_gtrd_name,
                                 'biosample_term': 'ontology_terms/' + cell_ontology_id,
                                 'source': ASB.SOURCE,
