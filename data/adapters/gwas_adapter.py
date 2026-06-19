@@ -181,7 +181,7 @@ class GWAS(BaseAdapter):
             'oddsr_ci_upper': float(row[14] or 0),
             'p_val_mantissa': float(row[15] or 0),
             'p_val_exponent': float(row[16] or 0),
-            'p_val': pvalue,
+            'p_value': pvalue,
             'neg_log10_pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
             'source': self.SOURCE,
@@ -194,8 +194,7 @@ class GWAS(BaseAdapter):
             'label': self.method
         }
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
@@ -242,8 +241,6 @@ class GWAS(BaseAdapter):
                 self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
-
-        self.writer.close()
 
     def get_tagged_variants(self):
         header = None

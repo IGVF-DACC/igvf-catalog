@@ -51,10 +51,10 @@ class BaseAdapter(ABC):
         ...     def _get_schema_collection(self):
         ...         return 'nodes', 'my_collection'
         ...
-        ...     def process_file(self):
-        ...         self.writer.open()
+        ...     def parse(self):
+        ...         # Writer is already open here; just write.
         ...         # Process data...
-        ...         self.writer.close()
+        ...         self.writer.write(json.dumps(doc))
     """
 
     # Subclasses should override these class attributes
@@ -199,25 +199,37 @@ class BaseAdapter(ABC):
             self.logger.error(f'{error_msg}\nDocument: {doc}')
             raise ValueError(error_msg)
 
-    @abstractmethod
     def process_file(self) -> None:
         """
         Process the input file.
 
-        This is the main method that processes the input data file
-        and writes output using the writer.
+        This is the public entry point used by the data loader. It manages the
+        writer lifecycle so subclasses never have to: the writer is opened on
+        entry and closed on exit (including early returns and exceptions) via
+        the writer's context-manager protocol. The output is only finalized
+        (e.g. version-tagged) when parse() completes without raising.
 
-        Subclasses must implement this method with their specific
-        data processing logic.
+        Subclasses implement parse(), not this method.
+        """
+        with self.writer:
+            self.parse()
+
+    @abstractmethod
+    def parse(self) -> None:
+        """
+        Read the input file and write output documents.
+
+        Subclasses must implement this method with their specific data
+        processing logic. The writer is already open when this is called and
+        will be closed automatically afterwards, so do NOT call
+        self.writer.open() or self.writer.close() here.
 
         Typical pattern:
-            1. Open writer: self.writer.open()
-            2. Read and process input file
-            3. For each output document:
+            1. Read and process input file
+            2. For each output document:
                - Create document dict
                - Validate if needed: self.validate_doc(doc)
                - Write: self.writer.write(json.dumps(doc))
-            4. Close writer: self.writer.close()
         """
         pass
 

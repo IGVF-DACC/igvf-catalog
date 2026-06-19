@@ -451,7 +451,7 @@ mouse transcript contains mouse gene structure:
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --type node --output-bucket-key ontology_terms/cellosaurus.jsonl
-# for oncotree: python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ' ' --type node
+# for oncotree: python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ' ' --label node
 # for ENCODE NTR:
 ontology term:
   collection: ontology_terms
@@ -1207,6 +1207,183 @@ genomic element to gene IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI3089UGHM/@@download/IGVFFI3089UGHM.tsv.gz # CRISPR FACS screen
   source: IGVF
   label: str # element effect on gene expression of {target_gene}
+
+# Prerequisite: load files_filesets for scE2G accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.scE2G)
+# Example: python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI5648GWQX
+# Example: python3 data_parser.py --adapter scE2G --filepath ~/dataset/IGVFFI5648GWQX.tsv.gz --label genomic_element --output-bucket-key genomic_elements/scE2G_genomic_elements_IGVFFI5648GWQX.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element IGVF scE2G:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter scE2G --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/scE2G_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI0200HTLQ/@@download/IGVFFI0200HTLQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0367RLMG/@@download/IGVFFI0367RLMG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0443XYNP/@@download/IGVFFI0443XYNP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0793NWFM/@@download/IGVFFI0793NWFM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0856IGJA/@@download/IGVFFI0856IGJA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1307AMXL/@@download/IGVFFI1307AMXL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1666XCFE/@@download/IGVFFI1666XCFE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2324CASJ/@@download/IGVFFI2324CASJ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2411ZGRT/@@download/IGVFFI2411ZGRT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2487IQBW/@@download/IGVFFI2487IQBW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2501YSIC/@@download/IGVFFI2501YSIC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2703DHFP/@@download/IGVFFI2703DHFP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3032FHUU/@@download/IGVFFI3032FHUU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3235XAVC/@@download/IGVFFI3235XAVC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3346QVVP/@@download/IGVFFI3346QVVP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3435ZAWH/@@download/IGVFFI3435ZAWH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3448QLOO/@@download/IGVFFI3448QLOO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3509DXUA/@@download/IGVFFI3509DXUA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3678WEGM/@@download/IGVFFI3678WEGM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3881CNZT/@@download/IGVFFI3881CNZT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3957YSEK/@@download/IGVFFI3957YSEK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3960ILMI/@@download/IGVFFI3960ILMI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4018KLGK/@@download/IGVFFI4018KLGK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4027NIRR/@@download/IGVFFI4027NIRR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4048DVFE/@@download/IGVFFI4048DVFE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4092KQVW/@@download/IGVFFI4092KQVW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4229SKQR/@@download/IGVFFI4229SKQR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4235YTNW/@@download/IGVFFI4235YTNW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4707UYMM/@@download/IGVFFI4707UYMM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4766RLTQ/@@download/IGVFFI4766RLTQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4785QWIE/@@download/IGVFFI4785QWIE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4786VBEL/@@download/IGVFFI4786VBEL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4917KKFQ/@@download/IGVFFI4917KKFQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4989HIOQ/@@download/IGVFFI4989HIOQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5036OUAN/@@download/IGVFFI5036OUAN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5048YKFD/@@download/IGVFFI5048YKFD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5149XVHH/@@download/IGVFFI5149XVHH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5215DCUK/@@download/IGVFFI5215DCUK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5311MNAX/@@download/IGVFFI5311MNAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5396XRHE/@@download/IGVFFI5396XRHE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5580XJKX/@@download/IGVFFI5580XJKX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5589DESO/@@download/IGVFFI5589DESO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5648GWQX/@@download/IGVFFI5648GWQX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5661JKZN/@@download/IGVFFI5661JKZN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5830CAUU/@@download/IGVFFI5830CAUU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6190CWGF/@@download/IGVFFI6190CWGF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6362FWKG/@@download/IGVFFI6362FWKG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6365VYJR/@@download/IGVFFI6365VYJR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6853QPWT/@@download/IGVFFI6853QPWT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6897JFSF/@@download/IGVFFI6897JFSF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6947TMGB/@@download/IGVFFI6947TMGB.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6990PWPA/@@download/IGVFFI6990PWPA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7043URHX/@@download/IGVFFI7043URHX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7235ZWDV/@@download/IGVFFI7235ZWDV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7279QLIZ/@@download/IGVFFI7279QLIZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7407TMNW/@@download/IGVFFI7407TMNW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7525VBMF/@@download/IGVFFI7525VBMF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8141BFGZ/@@download/IGVFFI8141BFGZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8223XSSC/@@download/IGVFFI8223XSSC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8252JBBA/@@download/IGVFFI8252JBBA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8253BGJV/@@download/IGVFFI8253BGJV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8353RSGQ/@@download/IGVFFI8353RSGQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8640IRKW/@@download/IGVFFI8640IRKW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8813VARU/@@download/IGVFFI8813VARU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8899GSCD/@@download/IGVFFI8899GSCD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8913WCTL/@@download/IGVFFI8913WCTL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8942IQJN/@@download/IGVFFI8942IQJN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9186RNRL/@@download/IGVFFI9186RNRL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9188XAYO/@@download/IGVFFI9188XAYO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9258GLJE/@@download/IGVFFI9258GLJE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9421JHRK/@@download/IGVFFI9421JHRK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9631BSIG/@@download/IGVFFI9631BSIG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9712IJHX/@@download/IGVFFI9712IJHX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9719LGLD/@@download/IGVFFI9719LGLD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9779WEGD/@@download/IGVFFI9779WEGD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9815VYTN/@@download/IGVFFI9815VYTN.tsv.gz
+  source: IGVF
+  method: scE2G
+  type: accessible dna elements
+  source_annotation: ['genic', 'intergenic', 'promoter']
+
+# Example: python3 data_parser.py --adapter scE2G --filepath ~/dataset/IGVFFI5648GWQX.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/scE2G_genomic_elements_genes_IGVFFI5648GWQX.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element to gene IGVF scE2G:
+  collection: genomic_elements_genes
+  params:
+    - label
+  command: python3 data_parser.py --adapter scE2G --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements_genes/scE2G_genomic_elements_genes_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI0200HTLQ/@@download/IGVFFI0200HTLQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0367RLMG/@@download/IGVFFI0367RLMG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0443XYNP/@@download/IGVFFI0443XYNP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0793NWFM/@@download/IGVFFI0793NWFM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0856IGJA/@@download/IGVFFI0856IGJA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1307AMXL/@@download/IGVFFI1307AMXL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1666XCFE/@@download/IGVFFI1666XCFE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2324CASJ/@@download/IGVFFI2324CASJ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2411ZGRT/@@download/IGVFFI2411ZGRT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2487IQBW/@@download/IGVFFI2487IQBW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2501YSIC/@@download/IGVFFI2501YSIC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2703DHFP/@@download/IGVFFI2703DHFP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3032FHUU/@@download/IGVFFI3032FHUU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3235XAVC/@@download/IGVFFI3235XAVC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3346QVVP/@@download/IGVFFI3346QVVP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3435ZAWH/@@download/IGVFFI3435ZAWH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3448QLOO/@@download/IGVFFI3448QLOO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3509DXUA/@@download/IGVFFI3509DXUA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3678WEGM/@@download/IGVFFI3678WEGM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3881CNZT/@@download/IGVFFI3881CNZT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3957YSEK/@@download/IGVFFI3957YSEK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3960ILMI/@@download/IGVFFI3960ILMI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4018KLGK/@@download/IGVFFI4018KLGK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4027NIRR/@@download/IGVFFI4027NIRR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4048DVFE/@@download/IGVFFI4048DVFE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4092KQVW/@@download/IGVFFI4092KQVW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4229SKQR/@@download/IGVFFI4229SKQR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4235YTNW/@@download/IGVFFI4235YTNW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4707UYMM/@@download/IGVFFI4707UYMM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4766RLTQ/@@download/IGVFFI4766RLTQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4785QWIE/@@download/IGVFFI4785QWIE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4786VBEL/@@download/IGVFFI4786VBEL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4917KKFQ/@@download/IGVFFI4917KKFQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4989HIOQ/@@download/IGVFFI4989HIOQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5036OUAN/@@download/IGVFFI5036OUAN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5048YKFD/@@download/IGVFFI5048YKFD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5149XVHH/@@download/IGVFFI5149XVHH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5215DCUK/@@download/IGVFFI5215DCUK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5311MNAX/@@download/IGVFFI5311MNAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5396XRHE/@@download/IGVFFI5396XRHE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5580XJKX/@@download/IGVFFI5580XJKX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5589DESO/@@download/IGVFFI5589DESO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5648GWQX/@@download/IGVFFI5648GWQX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5661JKZN/@@download/IGVFFI5661JKZN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5830CAUU/@@download/IGVFFI5830CAUU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6190CWGF/@@download/IGVFFI6190CWGF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6362FWKG/@@download/IGVFFI6362FWKG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6365VYJR/@@download/IGVFFI6365VYJR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6853QPWT/@@download/IGVFFI6853QPWT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6897JFSF/@@download/IGVFFI6897JFSF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6947TMGB/@@download/IGVFFI6947TMGB.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6990PWPA/@@download/IGVFFI6990PWPA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7043URHX/@@download/IGVFFI7043URHX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7235ZWDV/@@download/IGVFFI7235ZWDV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7279QLIZ/@@download/IGVFFI7279QLIZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7407TMNW/@@download/IGVFFI7407TMNW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7525VBMF/@@download/IGVFFI7525VBMF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8141BFGZ/@@download/IGVFFI8141BFGZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8223XSSC/@@download/IGVFFI8223XSSC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8252JBBA/@@download/IGVFFI8252JBBA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8253BGJV/@@download/IGVFFI8253BGJV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8353RSGQ/@@download/IGVFFI8353RSGQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8640IRKW/@@download/IGVFFI8640IRKW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8813VARU/@@download/IGVFFI8813VARU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8899GSCD/@@download/IGVFFI8899GSCD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8913WCTL/@@download/IGVFFI8913WCTL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8942IQJN/@@download/IGVFFI8942IQJN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9186RNRL/@@download/IGVFFI9186RNRL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9188XAYO/@@download/IGVFFI9188XAYO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9258GLJE/@@download/IGVFFI9258GLJE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9421JHRK/@@download/IGVFFI9421JHRK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9631BSIG/@@download/IGVFFI9631BSIG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9712IJHX/@@download/IGVFFI9712IJHX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9719LGLD/@@download/IGVFFI9719LGLD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9779WEGD/@@download/IGVFFI9779WEGD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9815VYTN/@@download/IGVFFI9815VYTN.tsv.gz
+  source: IGVF
+  method: scE2G
+  label: predicted regulatory element effect on gene expression
 
 # Example: python3 data_parser.py --adapter mpra --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element igvf mpra:

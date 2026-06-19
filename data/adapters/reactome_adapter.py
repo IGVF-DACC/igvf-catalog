@@ -52,8 +52,7 @@ class Reactome(BaseAdapter):
         elif self.label == 'parent_pathway_of':
             return 'pathways_pathways'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         with open(self.filepath) as input:
             _props = {
                 'source': 'Reactome',
@@ -109,6 +108,5 @@ class Reactome(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
         if self.label == 'genes_pathways':
             self.gene_validator.log()

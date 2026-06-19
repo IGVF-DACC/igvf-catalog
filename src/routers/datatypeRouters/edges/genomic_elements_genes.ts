@@ -79,6 +79,9 @@ const outputFormat = z.array(z.object({
   crispr_modality: z.string().nullish(),
   score: z.number().nullable(),
   p_value: z.number().or(z.string()).nullish(),
+  p_value_adj: z.number().or(z.string()).nullish(),
+  neg_log10_p_value: z.number().or(z.string()).nullish(),
+  neg_log10_p_value_adj: z.number().or(z.string()).nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
@@ -163,7 +166,6 @@ function buildQuery (params: {
     FOR record IN edgeRecords
       LET gene = ${verbose ? 'geneMap[record._to]' : 'record._to'}
       LET element = ${verbose ? 'elementMap[record._from]' : 'record._from'}
-      LET p_value = record.method IN ['CRISPR FACS screen', 'Perturb-seq', 'TAP-seq'] ? record.p_value_adj : record.p_value
       RETURN {
         'gene': gene,
         'genomic_element': element,
@@ -178,7 +180,10 @@ function buildQuery (params: {
         'biosample_term': record.biosample_term,
         'crispr_modality': record.crispr_modality,
         'score': record.score || record.effect_size || record.log2FC,
-        'p_value': p_value
+        'p_value': record.p_value,
+        'p_value_adj': record.p_value_adj,
+        'neg_log10_p_value': record.neg_log10_p_value,
+        'neg_log10_p_value_adj': record.neg_log10_p_value_adj
       }
   `
 }

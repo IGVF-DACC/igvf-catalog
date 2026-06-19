@@ -56,12 +56,10 @@ class TopLD(BaseAdapter):
                     )
                 }
 
-    def process_file(self):
+    def parse(self):
         self.process_annotations()
 
         self.logger.info('Processing data...')
-
-        self.writer.open()
 
         for line in open(self.filepath, 'r'):
             row = line.split(',')
@@ -105,5 +103,3 @@ class TopLD(BaseAdapter):
 
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
-
-        self.writer.close()

@@ -33,8 +33,7 @@ class ReactomePathway(BaseAdapter):
         """Get collection name."""
         return 'pathways'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=1,
                         status_forcelist=[500, 502, 503, 504])
@@ -100,5 +99,3 @@ class ReactomePathway(BaseAdapter):
                         self.logger.error(
                             f'Can not query for {query}. The status code is {response.status_code}. The text is {response.text}')
                         raise
-
-        self.writer.close()

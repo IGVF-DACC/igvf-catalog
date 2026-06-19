@@ -64,9 +64,12 @@ def test_process_file_opens_and_closes_writers(mock_default_world, mock_get_onto
     )
     with patch.object(ont, 'process_ontology') as mock_process_ontology:
         ont.process_file()
+    # process_file drives the writers through the context-manager protocol
+    # (via ExitStack), so each writer is entered and exited rather than having
+    # open()/close() called directly.
     for w in mock_writers.values():
-        assert w.open.called
-        assert w.close.called
+        assert w.__enter__.called
+        assert w.__exit__.called
 
 
 def test_predicate_name_returns_expected_strings():

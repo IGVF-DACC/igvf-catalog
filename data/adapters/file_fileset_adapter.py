@@ -159,7 +159,10 @@ class FileFileSet:
         return objects
 
     def process_file(self):
-        self.writer.open()
+        with self.writer:
+            self.parse()
+
+    def parse(self):
         visited_donors = set()
         visited_sample_terms = set()
         file_objects = self.get_batch_objects(
@@ -209,7 +212,6 @@ class FileFileSet:
                 if self.validate:
                     self.validate_doc(props)
                 self.write_jsonl(props)
-        self.writer.close()
 
     @staticmethod
     def get_software_encode(file_object):
@@ -678,7 +680,8 @@ class FileFileSet:
             'download_link': download_link,
             'cell_annotation': None,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': None
+            'crispr_modality': None,
+            'browser_index_file': None
         }
         return props, donor_ids, all_sample_types, disease_ids
 
@@ -689,7 +692,7 @@ class FileFileSet:
         download_link = urljoin(FileFileSet.IGVF_API, href)
         class_type = file_object.get('catalog_class')
         genome_browser_link = None
-
+        browser_index_file = None
         fileset_object = requests.get(
             urljoin(FileFileSet.IGVF_API, file_object['file_set']['@id'] + '/@@embedded?format=json')).json()
         fileset_accession = fileset_object['accession']
@@ -711,7 +714,16 @@ class FileFileSet:
             files = fileset_object.get('files', [])
             for file in files:
                 file_format = file.get('file_format')
-                if file_format in ['bigInteract', 'bigBed', 'tbi']:
+                if file_format == 'tbi':
+                    href = file.get('href')
+                    browser_index_file = urljoin(FileFileSet.IGVF_API, href)
+                    break
+            for file in files:
+                file_format = file.get('file_format')
+                if file_format in ['bigInteract', 'bigBed', 'bigWig', 'bedpe']:
+                    # tbi file needs to be paired with bedpe file. This may change in the future.
+                    if browser_index_file and file_format != 'bedpe':
+                        continue
                     href = file.get('href')
                     genome_browser_link = urljoin(FileFileSet.IGVF_API, href)
                     break
@@ -793,7 +805,8 @@ class FileFileSet:
             'download_link': download_link,
             'cell_annotation': cell_annotation,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': modality
+            'crispr_modality': modality,
+            'browser_index_file': browser_index_file
         }
         return props, donor_ids, sample_term_ids
 

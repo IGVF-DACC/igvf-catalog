@@ -51,8 +51,7 @@ class GeneGeneBiogrid(BaseAdapter):
         else:
             return 'mm_genes_mm_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
 
@@ -120,8 +119,6 @@ class GeneGeneBiogrid(BaseAdapter):
                             self.validate_doc(props)
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
-
-        self.writer.close()
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))

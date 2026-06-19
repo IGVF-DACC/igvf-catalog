@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, mock_open
 from adapters.writer import S3Writer, LocalWriter, get_writer
 
 
-def test_s3_writer_open(mocker):
+def test_s3_writer_opens_lazily_on_first_write(mocker):
     mock_session = MagicMock()
     mock_s3_client = MagicMock()
     mocker.patch('adapters.writer.boto3.Session.client',
@@ -14,6 +14,12 @@ def test_s3_writer_open(mocker):
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=mock_session)
     writer.open()
+
+    # open() defers: no S3 object is created until something is actually written
+    mock_smart_open.assert_not_called()
+    assert writer.s3_file is None
+
+    writer.write('content')
 
     mock_smart_open.assert_called_once_with(
         's3://test-bucket/test-key',
@@ -42,6 +48,7 @@ def test_s3_writer_close(mocker):
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=MagicMock())
     writer.open()
+    writer.write('content')
     writer.close()
 
     mock_file.close.assert_called_once()
@@ -54,9 +61,37 @@ def test_s3_writer_close_with_tagging(mocker):
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=MagicMock(), version_tag='v123')
     writer.open()
+    writer.write('content')
     writer.close()
     mock_file.close.assert_called_once()
     mock_add_version_tag.assert_called_once_with(value='v123')
+
+
+def test_s3_writer_close_without_write_creates_nothing(mocker):
+    mock_add_version_tag = mocker.patch.object(S3Writer, 'add_version_tag')
+    mock_smart_open = mocker.patch(
+        'adapters.writer.smart_open.open', return_value=MagicMock())
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=MagicMock(), version_tag='v123')
+    writer.open()
+    writer.close()
+    # No write happened, so no object should be created and no tag applied.
+    mock_smart_open.assert_not_called()
+    mock_add_version_tag.assert_not_called()
+
+
+def test_s3_writer_context_manager_no_file_on_early_failure(mocker):
+    mock_add_version_tag = mocker.patch.object(S3Writer, 'add_version_tag')
+    mock_smart_open = mocker.patch(
+        'adapters.writer.smart_open.open', return_value=MagicMock())
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=MagicMock(), version_tag='v123')
+    with pytest.raises(RuntimeError):
+        with writer:
+            raise RuntimeError('setup failed before writing')
+    # A failure before any write must not create or tag an (empty) object.
+    mock_smart_open.assert_not_called()
+    mock_add_version_tag.assert_not_called()
 
 
 def test_s3_writer_destination():
@@ -65,11 +100,17 @@ def test_s3_writer_destination():
     assert writer.destination == 's3://test-bucket/test-key'
 
 
-def test_local_writer_open(mocker):
+def test_local_writer_opens_lazily_on_first_write(mocker):
     mock_open_fn = mocker.patch('builtins.open', mock_open())
 
     writer = LocalWriter(filepath='/path/to/file.txt')
     writer.open()
+
+    # open() defers: no file is created until something is actually written
+    mock_open_fn.assert_not_called()
+    assert writer.file is None
+
+    writer.write('content')
 
     mock_open_fn.assert_called_once_with('/path/to/file.txt', mode='w')
     assert writer.file is not None
@@ -92,9 +133,21 @@ def test_local_writer_close(mocker):
 
     writer = LocalWriter(filepath='/path/to/file.txt')
     writer.open()
+    writer.write('content')
     writer.close()
 
     mock_open_instance().close.assert_called_once()
+
+
+def test_local_writer_close_without_write_creates_nothing(mocker):
+    mock_open_fn = mocker.patch('builtins.open', mock_open())
+
+    writer = LocalWriter(filepath='/path/to/file.txt')
+    writer.open()
+    writer.close()
+
+    # No write happened, so no file should be created.
+    mock_open_fn.assert_not_called()
 
 
 def test_local_writer_destination():

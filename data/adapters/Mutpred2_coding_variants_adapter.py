@@ -61,8 +61,7 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
         elif self.label == 'coding_variants_phenotypes':
             return 'coding_variants_phenotypes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
         if self.label == 'coding_variants_phenotypes':
@@ -176,4 +175,3 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()

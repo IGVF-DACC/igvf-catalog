@@ -105,8 +105,7 @@ class EncodeElementGeneLink(BaseAdapter):
         else:
             return 'genomic_elements_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
 
@@ -182,6 +181,5 @@ class EncodeElementGeneLink(BaseAdapter):
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-        self.writer.close()
         if self.label == 'genomic_element_gene':
             self.gene_validator.log()

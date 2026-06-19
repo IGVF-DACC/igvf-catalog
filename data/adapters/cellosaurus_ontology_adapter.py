@@ -50,8 +50,7 @@ class Cellosaurus(BaseAdapter):
         else:
             return 'ontology_terms_ontology_terms'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         graph = obonet.read_obo(self.filepath)
         same_individual_pairs = []
 
@@ -156,8 +155,6 @@ class Cellosaurus(BaseAdapter):
                         props['inverse_name'] = inverse_name
 
                         self.save_props(props)
-
-        self.writer.close()
 
     def save_props(self, props):
         self.writer.write(json.dumps(props))

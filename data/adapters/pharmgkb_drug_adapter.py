@@ -82,8 +82,7 @@ class PharmGKB(BaseAdapter):
         elif self.label == 'variant_drug_gene':
             return 'variants_drugs_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
 
         if self.label == 'drug':
             with open(PharmGKB.DRUG_ID_MAPPING_PATH, 'r') as drug_file:
@@ -110,8 +109,6 @@ class PharmGKB(BaseAdapter):
                     if self.validate:
                         self.validate_doc(props)
                     self.save_props(props)
-
-            self.writer.close()
 
         else:
             self.load_drug_id_mapping()
@@ -291,8 +288,6 @@ class PharmGKB(BaseAdapter):
                                                         self.validate_doc(
                                                             props)
                                                     self.save_props(props)
-
-            self.writer.close()
 
     def load_drug_id_mapping(self):
         # e.g. key: '17-alpha-dihydroequilenin sulfate', value: 'PA166238901'

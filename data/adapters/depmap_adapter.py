@@ -48,8 +48,7 @@ class DepMap(BaseAdapter):
         """Get collection name."""
         return 'genes_biosamples'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         self.load_cell_ontology_id_mapping()
         self.load_gene_id_mapping()
 
@@ -110,7 +109,6 @@ class DepMap(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
