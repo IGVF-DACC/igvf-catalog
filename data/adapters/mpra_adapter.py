@@ -540,7 +540,7 @@ class MPRAAdapter(BaseAdapter):
                         'DNA_count': self.safe_float(row[7]),
                         'RNA_count': self.safe_float(row[8]),
                         'neg_log10_pvalue': minus_p,
-                        'neg_log10_qvalue': minus_q_edge,
+                        'neg_log10_pvalue_adj': minus_q_edge,
                         'significant': significant,
                         'class': self.collection_class,
                         'label': self.collection_label_elements_biosamples,
@@ -550,7 +550,7 @@ class MPRAAdapter(BaseAdapter):
                         'source': self.source,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'biological_context': (self.simple_sample_summaries or [''])[0],
+                        'biological_context': self.simple_sample_summaries[0] if self.simple_sample_summaries else None,
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
                     }

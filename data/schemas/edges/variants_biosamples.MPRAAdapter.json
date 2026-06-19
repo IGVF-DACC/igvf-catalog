@@ -70,7 +70,7 @@
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Minus log10 P value adjusted for the edge"
+          "description": "Minus log10 Q value for the edge"
         },
         "significant": {
           "type": "boolean",

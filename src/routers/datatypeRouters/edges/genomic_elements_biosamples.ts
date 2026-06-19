@@ -19,7 +19,7 @@ const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),
   strand: z.string().nullable(),
   neg_log10_pvalue: z.number().nullable(),
-  fdr: z.number().nullable(), // neg_log10_qvalue
+  neg_log10_pvalue_adj: z.number().nullable(), // neg_log10_qvalue
   DNA_count: z.number().nullish(),
   RNA_count: z.number().nullish(),
   significant: z.boolean().nullish(),
@@ -129,7 +129,7 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-        'fdr': record.neg_log10_qvalue,
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.inverse_name,
         'class': record.class,
@@ -209,7 +209,7 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-        'fdr': record.neg_log10_qvalue,
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.name,
         'class': record.class,
