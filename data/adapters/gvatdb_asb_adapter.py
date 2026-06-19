@@ -78,6 +78,11 @@ class ASB_GVATDB(BaseAdapter):
                     _source = 'variants/' + variant_id
                     _target = 'proteins/' + ensembl_id
 
+                    p_value_adj = float(row[15])
+                    neg_log10_pvalue_adj = float('inf')
+                    if p_value_adj > 0:
+                        neg_log10_pvalue_adj = -1 * log10(p_value_adj)
+
                     _props = {
                         '_key': _id,
                         '_from': _source,
@@ -91,7 +96,7 @@ class ASB_GVATDB(BaseAdapter):
                         'ref_auc': float(row[11]),
                         'alt_auc': float(row[12]),
                         'pbs': float(row[13]),
-                        'neg_log10_pvalue_adj': float(row[15]),
+                        'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,
                         'label': 'allele-specific binding',
