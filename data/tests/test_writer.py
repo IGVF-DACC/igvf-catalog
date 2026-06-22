@@ -58,7 +58,6 @@ def test_s3_writer_close_with_tagging(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
     mock_s3_client = mock_session.client('s3')
-    mock_s3_client.get_object_tagging.return_value = {'TagSet': []}
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=mock_session, version_tag='v123')
@@ -145,7 +144,6 @@ def test_s3_writer_close_with_multiple_tags(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
     mock_s3_client = mock_session.client('s3')
-    mock_s3_client.get_object_tagging.return_value = {'TagSet': []}
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=mock_session, version_tag='v123')
@@ -168,7 +166,6 @@ def test_s3_writer_add_tag_appends_value_for_same_key(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
     mock_s3_client = mock_session.client('s3')
-    mock_s3_client.get_object_tagging.return_value = {'TagSet': []}
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=mock_session)
