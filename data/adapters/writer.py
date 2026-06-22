@@ -53,6 +53,10 @@ class S3Writer(Writer):
             self.add_tag('version', version_tag)
 
     def add_tag(self, key: str, value: str):
+        for tag in self.s3_tags:
+            if tag['Key'] == key:
+                tag['Value'] = tag['Value'] + ' ' + value
+                return
         self.s3_tags.append({'Key': key, 'Value': value})
 
     def _put_tags(self):

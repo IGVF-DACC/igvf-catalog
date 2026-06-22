@@ -120,6 +120,27 @@ def test_s3_writer_close_with_multiple_tags(mocker):
     )
 
 
+def test_s3_writer_add_tag_appends_value_for_same_key(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session)
+    writer.add_tag('portal_accession', 'IGVFFI0001')
+    writer.add_tag('portal_accession', 'IGVFFI0002')
+    writer.add_tag('portal_accession', 'IGVFFI0003')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [
+            {'Key': 'portal_accession', 'Value': 'IGVFFI0001 IGVFFI0002 IGVFFI0003'},
+        ]}
+    )
+
+
 def test_s3_writer_close_no_tags_skips_api_call(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
