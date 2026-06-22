@@ -75,12 +75,12 @@
           "example": "-1.7019721868875686"
         },
         "neg_log10_pvalue_adj_ref": {
-          "type": "string",
+          "type": "number",
           "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
           "example": "0.0171981040581793"
         },
         "neg_log10_pvalue_adj_alt": {
-          "type": "string",
+          "type": "number",
           "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
           "example": "1.0"
         },
