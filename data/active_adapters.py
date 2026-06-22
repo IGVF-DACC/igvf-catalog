@@ -39,6 +39,7 @@ from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
+from adapters.scorpion_adapter import ScorpionAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
@@ -133,6 +134,7 @@ KEY_TO_ADAPTER = {
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,
+    'scorpion': ScorpionAdapter,
     'SEM_motif': SEMMotif,
     'SEM_motif_protein': SEMMotif,
     'SEM_variant_protein': SEMPred,

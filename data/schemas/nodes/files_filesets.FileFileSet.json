@@ -37,6 +37,7 @@
             "mark-craven",
             "nadav-ahituv",
             "predrag-radivojac",
+            "stephen-yi",
             "thomas-quertermous",
             "tim-reddy",
             "zhiping-weng"
@@ -99,6 +100,7 @@
             "MPRA",
             "MutPred2",
             "Perturb-seq",
+            "SCORPION",
             "SEMVAR",
             "SGE",
             "STARR-seq",
@@ -150,6 +152,7 @@
               "pandas",
               "Samtools",
               "scATAC-seq processing scripts",
+              "SCORPION",
               "SEMVAR",
               "scE2G",
               "Sceptre",

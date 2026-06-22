@@ -115,7 +115,8 @@
         },
         "genes_genes": {
             "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
-            "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
+            "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json",
+            "Scorpion": "schemas/edges/genes_genes.Scorpion.json"
         },
         "genes_mm_genes": {
             "MGIHumanMouseOrthologAdapter": "schemas/edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json"

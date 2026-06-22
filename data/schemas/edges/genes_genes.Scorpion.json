@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "The unique key of the gene gene edge"
+        },
+        "_from": {
+          "example": "genes/ENSG00000129696",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000129696",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "p_value": {
+          "type": "number",
+          "description": "The P-value of the gene gene edge"
+        },
+        "p_value_adj": {
+          "type": "number",
+          "description": "The FDR (p-value adjacent) value of the gene gene edge"
+        },
+        "neg_log10_p_value": {
+          "type": "number",
+          "description": "The -log10 P-value of the gene gene edge"
+        },
+        "effect_size": {
+          "type": "number",
+          "description": "The beta (effect size) value of the gene gene edge"
+        },
+        "name": {
+          "enum": [
+            "interacts with"
+          ]
+        },
+        "files_filesets": {
+          "enum": [
+            "files_filesets/IGVFFI3035IXUW"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "interacts with"
+          ]
+        },
+        "method": {
+          "enum": [
+            "scorpion"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted gene regulatory networks"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/reference-files/IGVFFI3035IXUW"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "source",
+        "p_value",
+        "p_value_adj",
+        "neg_log10_p_value",
+        "effect_size",
+        "name",
+        "files_filesets",
+        "inverse_name",
+        "method",
+        "label",
+        "class",
+        "source_url"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "p_value",
+    "return": "p_value, fdr, beta, label, method, class, source, source_url"
+  },
+  "db_collection_name": "genes_genes"
+}

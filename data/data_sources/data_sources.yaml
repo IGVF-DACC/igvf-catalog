@@ -1674,6 +1674,13 @@ mouse gene to gene interaction:
   source: BioGRID
   molecular_function: ontology_terms/GO_0005515
 
+# Example: pypy3 data_parser.py --adapter scorpion --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI3035IXUW.csv.gz --output-bucket-key genes_genes/genes_genes_scorpion.jsonl
+gene to gene scorpion:
+  collection: genes_genes
+  command: pypy3 data_parser.py --adapter scorpion --output-bucket igvf-catalog-parsed-collections --filepath {filepath} --output-bucket-key genes_genes/genes_genes_scorpion.jsonl
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI3035IXUW/@@download/IGVFFI3035IXUW.csv.gz
+
 # Example: pypy3 data_parser.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d/ --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
 gene to gene coexpression association:
   collection: genes_genes
