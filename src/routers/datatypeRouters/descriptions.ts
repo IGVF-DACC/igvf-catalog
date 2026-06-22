@@ -342,7 +342,7 @@ export const descriptions = {
             items: [
               'spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA',
               'effect_size = gte:0.3',
-              'method = eQTL, source = AFGR'
+              'method = eQTL'
             ]
           },
           {
@@ -1590,29 +1590,14 @@ export const descriptions = {
             label: 'Single result',
             items: [
               'regulator_gene_id = ENSG00000143190',
-              'regulator_gene_name = POU2F1',
-              'regulator_hgnc_id = HGNC:9212',
-              'regulator_alias = OCT1',
-              'response_gene_id = ENSG00000152284',
-              'response_gene_name = TCF7L1',
-              'response_hgnc_id = HGNC:11640',
-              'response_alias = TCF3',
-              'p_value = gte:0',
+              'p_value = gte:0.9',
               'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
-              'regulator_gene_id = ENSG00000143190',
               'regulator_gene_name = POU2F1',
-              'regulator_hgnc_id = HGNC:9212',
-              'regulator_alias = OCT1',
-              'response_gene_id = ENSG00000152284',
-              'response_gene_name = TCF7L1',
-              'response_hgnc_id = HGNC:11640',
-              'response_alias = TCF3',
-              'p_value = gte:0',
               'method = CRISPR screen'
             ]
           }
@@ -1623,32 +1608,16 @@ export const descriptions = {
         label: 'Perturb-seq',
         examples: [
           {
-            label: 'Single result',
+            label: 'Query by regulator gene',
             items: [
               'regulator_gene_id = ENSG00000143190',
-              'regulator_gene_name = POU2F1',
-              'regulator_hgnc_id = HGNC:9212',
-              'regulator_alias = OCT1',
-              'response_gene_id = ENSG00000123685',
-              'response_gene_name = BATF3',
-              'response_hgnc_id = HGNC:28915',
-              'response_alias = BATF3',
-              'p_value = gte:0',
               'method = Perturb-seq'
             ]
           },
           {
-            label: 'Group results',
+            label: 'Query by response gene',
             items: [
-              'regulator_gene_id = ENSG00000143190',
-              'regulator_gene_name = POU2F1',
-              'regulator_hgnc_id = HGNC:9212',
-              'regulator_alias = OCT1',
-              'response_gene_id = ENSG00000123685',
-              'response_gene_name = BATF3',
-              'response_hgnc_id = HGNC:28915',
-              'response_alias = BATF3',
-              'p_value = gte:0',
+              'response_gene_name = TSPAN6',
               'method = Perturb-seq'
             ]
           }

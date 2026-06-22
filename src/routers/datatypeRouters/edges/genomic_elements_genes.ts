@@ -480,7 +480,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           FILTER ge.promoter_of == gene._id
 
           FOR record in genomic_elements_genes
-            FILTER record._from == ge._id
+            FILTER record._from == ge._id AND record.method IN ${methodFilter}
             ${pvalueFilter}
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
