@@ -385,7 +385,8 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
         'lab': {'@id': '/labs/jesse-engreitz/'},
         'samples': [{'accession': 'IGVFSM0000TEST'}],
         'publications': [],
-        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000FLOW/'}]
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000FLOW/'}],
+        'sample_summary': 'HCT116',
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
         with patch.object(FileFileSet, 'get_software_igvf', return_value={'pandas'}):
