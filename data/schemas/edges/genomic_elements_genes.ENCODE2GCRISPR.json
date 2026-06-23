@@ -39,13 +39,13 @@
           "type": ["number", "null"],
           "description": "The adjusted p value of the genomic element to gene edge. Can be 'NA' or a number."
         },
-        "neg_log10_p_value": {
+        "neg_log10_pvalue": {
           "type": ["number", "null"],
-          "description": "The neg_log10_p_value of the genomic element to gene edge"
+          "description": "The neg_log10_pvalue of the genomic element to gene edge"
         },
-        "neg_log10_p_value_adj": {
+        "neg_log10_pvalue_adj": {
           "type": ["number", "null"],
-          "description": "The adjusted neg_log10_p_value of the genomic element to gene edge"
+          "description": "The adjusted neg_log10_pvalue of the genomic element to gene edge"
         },
         "significant": {
           "type": "boolean",
@@ -122,8 +122,8 @@
         "score",
         "p_value",
         "p_value_adj",
-        "neg_log10_p_value",
-        "neg_log10_p_value_adj",
+        "neg_log10_pvalue",
+        "neg_log10_pvalue_adj",
         "significant",
         "files_filesets",
         "crispr_modality",

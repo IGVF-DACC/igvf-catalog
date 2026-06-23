@@ -52,8 +52,8 @@ def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
     assert 'score' in first_item
     assert 'p_value' in first_item
     assert 'p_value_adj' in first_item
-    assert 'neg_log10_p_value' in first_item
-    assert 'neg_log10_p_value_adj' in first_item
+    assert 'neg_log10_pvalue' in first_item
+    assert 'neg_log10_pvalue_adj' in first_item
     assert 'significant' in first_item
     assert first_item['source'] == ENCODE2GCRISPR.SOURCE
     assert first_item['source_url'] == ENCODE2GCRISPR.SOURCE_URL
