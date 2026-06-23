@@ -270,8 +270,15 @@ export const descriptions = {
     Example: region = chr1:1157520-1158520 (maximum length: 10kb).',
 
   coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
-    Example: coding_variant_name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
-    hgvsp = p.Gly30Ser, <br> \
+    alt_amino_acid filters by the alternate amino acid at the given position (single-letter code, use * for stop codon). <br> \
+    Example: coding_variant_name = SAMD7_ENST00000335556_p.Gly253Asp_c.758_759delinsAC, <br> \
+    hgvsp = p.Gly253Asp, <br> \
+    gene_name = SAMD7, <br> \
+    protein_id = ENSP00000334668, <br> \
+    uniprot_name = SAMD7_HUMAN, <br> \
+    transcript_id = ENST00000335556, <br> \
+    amino_acid_position = 253, <br> \
+    alt_amino_acid = D, <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
@@ -625,14 +632,17 @@ export const descriptions = {
   Pagination is 0-based.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = OR4F5_ENST00000641515_p.Met1!_c.1A-C, <br> \
-  id = OR4F5_ENST00000641515_p.Met1!_c.1A-C, <br> \
-  hgvsp = p.Met1?, <br> \
-  gene_name = SAMD11, <br> \
-  protein_id = ENSP00000384707, <br> \
-  protein_name = SAM11_HUMAN, <br> \
-  amino_acid_position = 1 (range values are also available, e.g: range:0-2), <br> \
-  transcript_id = ENST00000342066.<br> \
+  At least one of these fields is required: id, name, hgvsp, protein_id, uniprot_name, gene_name, transcript_id. <br> \
+  alt_amino_acid filters by the alternate amino acid at the given position (single-letter code, use * for stop codon). <br> \
+  Example: name = SAMD7_ENST00000335556_p.Gly253Asp_c.758_759delinsAC <br> \
+  id = SAMD7_ENST00000335556_p.Gly253Asp_c.758_759delinsAC, <br> \
+  hgvsp = p.Gly253Asp, <br> \
+  gene_name = SAMD7, <br> \
+  protein_id = ENSP00000334668, <br> \
+  uniprot_name = SAMD7_HUMAN, <br> \
+  amino_acid_position = 253 (range values are also available, e.g: range:0-2), <br> \
+  alt_amino_acid = D, <br> \
+  transcript_id = ENST00000335556.<br> \
   The limit parameter controls the page size and can not exceed 25. <br> \
   Pagination is 0-based.',
 

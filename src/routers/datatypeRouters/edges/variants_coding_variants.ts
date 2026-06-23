@@ -6,7 +6,12 @@ import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { singleVariantQueryFormat, variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
-import { codingVariantsFormat } from '../nodes/coding_variants'
+import {
+  codingVariantsFormat,
+  pickCodingVariantFilters,
+  validateCodingVariantAapos,
+  ALT_AMINO_ACID_CODES
+} from '../nodes/coding_variants'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
@@ -16,12 +21,25 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
 const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
 
-const codingVariantsQueryFormat = z.object({
+const variantsFromCodingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
+  protein_id: z.string().optional(),
+  uniprot_name: z.string().optional(),
+  gene_name: z.string().optional(),
+  amino_acid_position: z.string().optional(),
+  alt_amino_acid: z.enum(ALT_AMINO_ACID_CODES).optional(),
+  transcript_id: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-})
+// eslint-disable-next-line @typescript-eslint/naming-convention
+}).transform(({ amino_acid_position, alt_amino_acid, coding_variant_name, uniprot_name, ...rest }) => ({
+  ...rest,
+  ...(amino_acid_position !== undefined ? { aapos: amino_acid_position } : {}),
+  ...(alt_amino_acid !== undefined ? { alt: alt_amino_acid } : {}),
+  ...(uniprot_name !== undefined ? { protein_name: uniprot_name } : {}),
+  ...(coding_variant_name !== undefined ? { name: coding_variant_name.replaceAll('?', '!').replaceAll('>', '-') } : {})
+}))
 
 function validateVariantInput (input: paramsFormatType): void {
   if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
@@ -32,14 +50,22 @@ function validateVariantInput (input: paramsFormatType): void {
   }
 }
 
-function validateCodingVariantInput (input: paramsFormatType): void {
-  if (input.coding_variant_name === undefined && input.hgvsp === undefined) {
+function validateVariantsFromCodingVariantsInput (input: paramsFormatType): void {
+  if (
+    input.name === undefined &&
+    input.hgvsp === undefined &&
+    input.protein_id === undefined &&
+    input.protein_name === undefined &&
+    input.gene_name === undefined &&
+    input.transcript_id === undefined
+  ) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one coding variant parameter must be defined.'
+      message: 'At least one coding variant parameter must be defined: coding_variant_name, hgvsp, protein_id, uniprot_name, gene_name, or transcript_id.'
     })
   }
 }
+
 async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   validateVariantInput(input)
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -72,20 +98,16 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
 }
 
 async function findVariantsFromCodingVariants (input: paramsFormatType): Promise<any[]> {
-  validateCodingVariantInput(input)
+  validateVariantsFromCodingVariantsInput(input)
+  validateCodingVariantAapos(input)
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-  if (input.coding_variant_name !== undefined) {
-    // replace ">" with "-" in coding_variant_name
-    input.name = (input.coding_variant_name as string).replace('>', '-')
-    delete input.coding_variant_name
-  }
-  const codingVariantInput: paramsFormatType = (({ name, hgvsp }) => ({ name, hgvsp }))(input)
-  delete input.name
-  delete input.hgvsp
+
+  const codingVariantInput = pickCodingVariantFilters(input)
   const filters = getFilterStatements(codingVariantSchema, codingVariantInput)
   const query = `
   LET codingVariants = (
@@ -116,7 +138,7 @@ const codingVariantsFromVariants = publicProcedure
 
 const variantsFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.coding_variants_variants } })
-  .input(codingVariantsQueryFormat)
+  .input(variantsFromCodingVariantsQueryFormat)
   .output(z.array(variantSimplifiedFormat.merge(z.object({ _id: z.string() }))))
   .query(async ({ input }) => await findVariantsFromCodingVariants(input))
 
