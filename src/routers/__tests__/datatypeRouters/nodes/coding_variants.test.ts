@@ -80,6 +80,7 @@ describe('codingVariantsRouters', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
 
     const input = {
+      gene_name: 'SAMD11',
       page: 0,
       limit: 1000 // above MAX_PAGE_SIZE
     }
@@ -92,7 +93,7 @@ describe('codingVariantsRouters', () => {
     })
 
     // The query should still run, but limit should be capped
-    expect(dbModule.db.query).toHaveBeenCalled()
+    expect(dbModule.db.query).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
   })
 
   it('maps alt_amino_acid to alt filter', async () => {

@@ -22,24 +22,6 @@ export const CODING_VARIANT_FILTER_FIELDS = [
   '_key', 'name', 'hgvsp', 'protein_id', 'protein_name', 'gene_name', 'aapos', 'alt', 'transcript_id'
 ] as const
 
-function mapCodingVariantFilterParams (input: {
-  amino_acid_position?: string
-  alt_amino_acid?: typeof ALT_AMINO_ACID_CODES[number]
-  name?: string
-  uniprot_name?: string
-  [key: string]: unknown
-}): paramsFormatType {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { amino_acid_position, alt_amino_acid, name, uniprot_name, ...rest } = input
-  return {
-    ...rest,
-    ...(amino_acid_position !== undefined ? { aapos: amino_acid_position } : {}),
-    ...(alt_amino_acid !== undefined ? { alt: alt_amino_acid } : {}),
-    ...(uniprot_name !== undefined ? { protein_name: uniprot_name } : {}),
-    ...(name !== undefined ? { name: name.replaceAll('?', '!').replaceAll('>', '-') } : {})
-  }
-}
-
 const codingVariantsQueryFormat = z.object({
   id: z.string().optional(),
   name: z.string().optional(),
@@ -52,7 +34,14 @@ const codingVariantsQueryFormat = z.object({
   transcript_id: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-}).transform(mapCodingVariantFilterParams)
+// eslint-disable-next-line @typescript-eslint/naming-convention
+}).transform(({ amino_acid_position, alt_amino_acid, name, uniprot_name, ...rest }) => ({
+  ...rest,
+  ...(amino_acid_position !== undefined ? { aapos: amino_acid_position } : {}),
+  ...(alt_amino_acid !== undefined ? { alt: alt_amino_acid } : {}),
+  ...(uniprot_name !== undefined ? { protein_name: uniprot_name } : {}),
+  ...(name !== undefined ? { name: name.replaceAll('?', '!').replaceAll('>', '-') } : {})
+}))
 
 export function pickCodingVariantFilters (input: paramsFormatType): paramsFormatType {
   return Object.fromEntries(
