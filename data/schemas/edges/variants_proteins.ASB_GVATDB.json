@@ -32,6 +32,10 @@
           "type": "number",
           "description": "The p-value of the variant to protein edge"
         },
+        "p_value_adj": {
+          "type": "number",
+          "description": "The adjusted p-value of the variant to protein edge"
+        },
         "neg_log10_pvalue": {
           "type": "number",
           "description": "The neg log10pvalue of the variant to protein edge"

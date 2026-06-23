@@ -96,6 +96,7 @@ class ASB_GVATDB(BaseAdapter):
                         'ref_auc': float(row[11]),
                         'alt_auc': float(row[12]),
                         'pbs': float(row[13]),
+                        'p_value_adj': p_value_adj,
                         'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,

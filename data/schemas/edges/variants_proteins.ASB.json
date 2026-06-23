@@ -74,14 +74,24 @@
           "description": "The effect size mean for the alternate allele",
           "example": "-1.7019721868875686"
         },
-        "neg_log10_pvalue_adj_ref": {
+        "p_value_adj_ref": {
           "type": "number",
           "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
           "example": 0.0171981040581793
         },
-        "neg_log10_pvalue_adj_alt": {
+        "p_value_adj_alt": {
           "type": "number",
           "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
+          "example": 1.0
+        },
+        "neg_log10_pvalue_adj_ref": {
+          "type": "number",
+          "description": "The negative log10 of the FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
+          "example": 0.0171981040581793
+        },
+        "neg_log10_pvalue_adj_alt": {
+          "type": "number",
+          "description": "The negative log10 of the FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
           "example": 1.0
         },
         "biological_context": {
