@@ -106,7 +106,7 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock
     assert first_item['_to'] == 'ontology_terms/EFO_0002067'
     assert first_item['name'] == 'modulates expression in'
     assert first_item['inverse_name'] == 'regulatory activity modulated by'
-    assert first_item['log2FoldChange'] == 0.1053361347394244
+    assert first_item['log2FC'] == 0.1053361347394244
     assert first_item['inputCountRef'] == 1.1178449514319324
     assert first_item['outputCountRef'] == 1.0921171037854174
     assert first_item['inputCountAlt'] == 0.0
