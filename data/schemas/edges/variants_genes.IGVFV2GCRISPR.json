@@ -28,14 +28,14 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "Effect size for the variant to gene edge"
+          "description": "Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
         },
         "log2_fold_change": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Log2 fold change for the variant to gene edge"
+          "description": "Estimated log2 fold-change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
         },
         "neg_log10_pvalue": {
           "type": [
@@ -57,6 +57,20 @@
             "null"
           ],
           "description": "Power for the variant to gene edge"
+        },
+        "posterior_inclusion_probability": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Posterior inclusion probability from CRISPR-Millipede fine-mapping. The probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
+        },
+        "coefficient_stddev": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Standard deviation of the CRISPR-Millipede beta coefficient estimate. Reflects uncertainty in the effect size estimate."
         },
         "class": {
           "enum": [
@@ -145,6 +159,8 @@
         "neg_log10_pvalue",
         "neg_log10_pvalue_adj",
         "power",
+        "posterior_inclusion_probability",
+        "coefficient_stddev",
         "label",
         "source_url",
         "files_filesets",
@@ -160,6 +176,6 @@
   "accessible_via": {
     "filter_by_range": "effect_size",
     "simplified_return": "label, source, effect_size, biological_context",
-    "return": "effect_size, log2_fold_change, neg_log10_pvalue, neg_log10_pvalue_adj, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
+    "return": "effect_size, log2_fold_change, neg_log10_pvalue, neg_log10_pvalue_adj, posterior_inclusion_probability, coefficient_stddev, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
   }
 }

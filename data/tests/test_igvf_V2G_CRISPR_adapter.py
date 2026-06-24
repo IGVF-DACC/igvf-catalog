@@ -153,8 +153,8 @@ def test_invalid_label(mock_file_fileset):
         )
 
 
-MILLIPEDE_SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI8101RHSC/'
-mock_millipede_data = (
+CRISPR_MILLIPEDE_SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI8101RHSC/'
+mock_crispr_millipede_data = (
     'variants,PIP,Betas,Coefficient StdDev\n'
     'NC_000016.10:28930710:G:A,0.0284163262526425,-0.0116633875205405,0.0699744682130392\n'
     'intercept_exp0_rep0,,0.00290135882130573,0.0273268245689704\n'
@@ -165,7 +165,7 @@ mock_millipede_data = (
 
 
 @pytest.fixture
-def mock_millipede_file_fileset():
+def mock_crispr_millipede_file_fileset():
     with patch('adapters.igvf_V2G_CRISPR_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
@@ -199,24 +199,24 @@ def mock_millipede_file_fileset():
         'ca_id': 'CA1234567890'
     }, None)
 )
-def test_millipede_file_uses_hardcoded_cd19_gene(
-    mock_load_variant, mock_bulk_check, mock_gene_validator, mock_millipede_file_fileset, caplog
+def test_crispr_millipede_file_uses_hardcoded_cd19_gene(
+    mock_load_variant, mock_bulk_check, mock_gene_validator, mock_crispr_millipede_file_fileset, caplog
 ):
     writer = SpyWriter()
     adapter = IGVFV2GCRISPR(
         filepath='./samples/igvf_v2g_crispr_millipede.example.csv',
-        source_url=MILLIPEDE_SOURCE_URL,
+        source_url=CRISPR_MILLIPEDE_SOURCE_URL,
         writer=writer,
         label='variant_gene',
         validate=True
     )
 
-    with patch('builtins.open', mock_open(read_data=mock_millipede_data)):
+    with patch('builtins.open', mock_open(read_data=mock_crispr_millipede_data)):
         with caplog.at_level('INFO'):
             adapter.process_file()
 
     assert (
-        'Skipping 4 Millipede intercept model term row(s) in IGVFFI8101RHSC '
+        'Skipping 4 CRISPR-Millipede intercept model term row(s) in IGVFFI8101RHSC '
         '(not variants): intercept_exp0_rep0, intercept_exp0_rep1, '
         'intercept_exp0_rep2, Intercept'
     ) in caplog.text
@@ -226,7 +226,9 @@ def test_millipede_file_uses_hardcoded_cd19_gene(
     assert first_item['_to'] == 'genes/ENSG00000177455'
     assert first_item['_key'] == 'NC_000016.10:28930710:G:A_ENSG00000177455_IGVFFI8101RHSC'
     assert first_item['effect_size'] == -0.0116633875205405
-    assert first_item['power'] == 0.0284163262526425
+    assert first_item['posterior_inclusion_probability'] == 0.0284163262526425
+    assert first_item['coefficient_stddev'] == 0.0699744682130392
+    assert first_item['power'] is None
     assert first_item['log2_fold_change'] == pytest.approx(
         math.log2(1 + first_item['effect_size']))
     assert first_item['neg_log10_pvalue'] is None

@@ -9,14 +9,14 @@ from adapters.gene_validator import GeneValidator
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
-# Millipede outputs for CD19 enhancer screens omit a gene column; readout is always CD19.
-MILLIPEDE_FILE_ACCESSIONS = frozenset({
+# CRISPR-Millipede outputs for CD19 enhancer screens omit a gene column; readout is always CD19.
+CRISPR_MILLIPEDE_FILE_ACCESSIONS = frozenset({
     'IGVFFI4769NVJT',
     'IGVFFI8101RHSC',
 })
 CD19_ENSEMBL_ID = 'ENSG00000177455'
-# Millipede regression outputs include intercept terms that are not variant effects.
-MILLIPEDE_INTERCEPT_ROW_IDS = frozenset({
+# CRISPR-Millipede regression outputs include intercept terms that are not variant effects.
+CRISPR_MILLIPEDE_INTERCEPT_ROW_IDS = frozenset({
     'intercept_exp0_rep0',
     'intercept_exp0_rep1',
     'intercept_exp0_rep2',
@@ -27,7 +27,7 @@ MILLIPEDE_INTERCEPT_ROW_IDS = frozenset({
 # variant	chr	pos	ref	alt	effect_allele	other_allele	gene	gene_symbol	effect_size	log2_fold_change	p_nominal_nlog10	fdr_nlog10	fdr_method	power	VariantID_h19
 # NC_000010.11:79347444::CCTCCTCAGG chr10   79347444        CCTCCTCAGG  CCTCCTCAGG      ENSG00000108179 PPIF    -0.022057224    -0.032178046    1.86224451  1.778299483 Benjamini-Hochberg  0.054202114 chr10:81107199:A>ACCTCCTCAGG
 
-# Example from IGVFFI8101RHSC (Millipede / CD19 enhancer screen)
+# Example from IGVFFI8101RHSC (CRISPR-Millipede / CD19 enhancer screen)
 # variants,PIP,Betas,Coefficient StdDev
 # NC_000016.10:28930710:G:A,0.0284163262526425,-0.0116633875205405,0.0699744682130392
 
@@ -40,7 +40,7 @@ class IGVFV2GCRISPR(BaseAdapter):
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.rstrip('/').split('/')[-1]
-        self.is_millipede = self.file_accession in MILLIPEDE_FILE_ACCESSIONS
+        self.is_crispr_millipede = self.file_accession in CRISPR_MILLIPEDE_FILE_ACCESSIONS
         self.gene_validator = GeneValidator()
 
         file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -70,18 +70,18 @@ class IGVFV2GCRISPR(BaseAdapter):
         return open(filepath, 'r')
 
     @staticmethod
-    def _millipede_intercept_row_id(variant_id: str) -> Optional[str]:
-        """Return the intercept row id when the row is a known Millipede model term."""
+    def _crispr_millipede_intercept_row_id(variant_id: str) -> Optional[str]:
+        """Return the intercept row id when the row is a known CRISPR-Millipede model term."""
         normalized = variant_id.strip()
-        if normalized in MILLIPEDE_INTERCEPT_ROW_IDS:
+        if normalized in CRISPR_MILLIPEDE_INTERCEPT_ROW_IDS:
             return normalized
         return None
 
-    def _log_skipped_millipede_intercept_rows(self, intercept_row_ids: list[str]) -> None:
+    def _log_skipped_crispr_millipede_intercept_rows(self, intercept_row_ids: list[str]) -> None:
         if not intercept_row_ids:
             return
         self.logger.info(
-            'Skipping %d Millipede intercept model term row(s) in %s '
+            'Skipping %d CRISPR-Millipede intercept model term row(s) in %s '
             '(not variants): %s',
             len(intercept_row_ids),
             self.file_accession,
@@ -101,8 +101,8 @@ class IGVFV2GCRISPR(BaseAdapter):
         return math.log2(ratio)
 
     def parse(self):
-        if self.is_millipede:
-            self._parse_millipede()
+        if self.is_crispr_millipede:
+            self._parse_crispr_millipede()
         else:
             self._parse_variant_effects()
 
@@ -120,7 +120,7 @@ class IGVFV2GCRISPR(BaseAdapter):
             if chunk:
                 self._process_variant_effects_chunk(chunk)
 
-    def _parse_millipede(self):
+    def _parse_crispr_millipede(self):
         with self._open_file(self.filepath) as f:
             reader = csv.reader(f, delimiter=',')
             header = next(reader)
@@ -129,11 +129,11 @@ class IGVFV2GCRISPR(BaseAdapter):
             for i, row in enumerate(reader, 1):
                 chunk.append((row, name_to_idx))
                 if i % IGVFV2GCRISPR.CHUNK_SIZE == 0:
-                    self._process_millipede_chunk(chunk)
+                    self._process_crispr_millipede_chunk(chunk)
                     chunk = []
 
             if chunk:
-                self._process_millipede_chunk(chunk)
+                self._process_crispr_millipede_chunk(chunk)
 
     def _process_variant_effects_chunk(self, chunk):
         spdi_to_variant = {}
@@ -159,7 +159,7 @@ class IGVFV2GCRISPR(BaseAdapter):
 
         self._finish_chunk(spdi_to_variant, spdi_to_row, skipped_spdis)
 
-    def _process_millipede_chunk(self, chunk):
+    def _process_crispr_millipede_chunk(self, chunk):
         if not self.gene_validator.validate(CD19_ENSEMBL_ID):
             raise ValueError(f'{CD19_ENSEMBL_ID} is not a valid gene.')
 
@@ -169,7 +169,7 @@ class IGVFV2GCRISPR(BaseAdapter):
         skipped_intercept_rows = []
         for row, name_to_idx in chunk:
             spdi = row[name_to_idx['variants']].strip()
-            intercept_row_id = self._millipede_intercept_row_id(spdi)
+            intercept_row_id = self._crispr_millipede_intercept_row_id(spdi)
             if intercept_row_id is not None:
                 skipped_intercept_rows.append(intercept_row_id)
                 continue
@@ -186,7 +186,8 @@ class IGVFV2GCRISPR(BaseAdapter):
             if skipped_message is not None:
                 skipped_spdis.append(skipped_message)
 
-        self._log_skipped_millipede_intercept_rows(skipped_intercept_rows)
+        self._log_skipped_crispr_millipede_intercept_rows(
+            skipped_intercept_rows)
         self._finish_chunk(spdi_to_variant, spdi_to_row, skipped_spdis)
 
     def _finish_chunk(self, spdi_to_variant, spdi_to_row, skipped_spdis):
@@ -205,8 +206,9 @@ class IGVFV2GCRISPR(BaseAdapter):
         if self.label == 'variant':
             self._write_variants(spdi_to_variant, loaded_variants)
         elif self.label == 'variant_gene':
-            if self.is_millipede:
-                self._write_millipede_edges(spdi_to_row, loaded_variants)
+            if self.is_crispr_millipede:
+                self._write_crispr_millipede_edges(
+                    spdi_to_row, loaded_variants)
             else:
                 self._write_variant_effects_edges(spdi_to_row, loaded_variants)
 
@@ -236,6 +238,8 @@ class IGVFV2GCRISPR(BaseAdapter):
                         'neg_log10_pvalue': float(row[11]),
                         'neg_log10_pvalue_adj': float(row[12]),
                         'power': float(row[14]) if row[14] else None,
+                        'posterior_inclusion_probability': None,
+                        'coefficient_stddev': None,
                         'class': 'observed data',
                         'label': 'variant effect on gene expression',
                         'name': 'modulates expression of',
@@ -254,7 +258,7 @@ class IGVFV2GCRISPR(BaseAdapter):
                         self.validate_doc(edge_props)
                     self.writer.write(json.dumps(edge_props) + '\n')
 
-    def _write_millipede_edges(self, spdi_to_row, loaded_variants):
+    def _write_crispr_millipede_edges(self, spdi_to_row, loaded_variants):
         for variant in spdi_to_row:
             if variant in loaded_variants:
                 for row in spdi_to_row[variant]:
@@ -268,7 +272,9 @@ class IGVFV2GCRISPR(BaseAdapter):
                             effect_size),
                         'neg_log10_pvalue': None,
                         'neg_log10_pvalue_adj': None,
-                        'power': float(row[1]),
+                        'power': None,
+                        'posterior_inclusion_probability': float(row[1]),
+                        'coefficient_stddev': float(row[3]),
                         'class': 'observed data',
                         'label': 'variant effect on gene expression',
                         'name': 'modulates expression of',
