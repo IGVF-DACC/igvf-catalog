@@ -1008,6 +1008,8 @@ variant variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4769NVJT/@@download/IGVFFI4769NVJT.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8101RHSC/@@download/IGVFFI8101RHSC.csv.gz
   source: IGVF
 
 # Example: python3 data_parser.py --adapter igvf_variant_gene_crispr --filepath ~/dataset/IGVFFI9602ILPC.bed --source-url https://data.igvf.org/tabular-files/IGVFFI9602ILPC/ --label variant_gene --output-bucket-key variants_genes/igvf_crispr_v2g_variant_genes_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1030,6 +1032,8 @@ variant to gene variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4769NVJT/@@download/IGVFFI4769NVJT.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8101RHSC/@@download/IGVFFI8101RHSC.csv.gz
   source: IGVF
   label: str # variant effect on gene expression of {row[7]}
 

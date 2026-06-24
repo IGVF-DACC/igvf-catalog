@@ -31,15 +31,24 @@
           "description": "Effect size for the variant to gene edge"
         },
         "log2_fold_change": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Log2 fold change for the variant to gene edge"
         },
         "neg_log10_pvalue": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Negative log10 of the p-value for the variant to gene edge"
         },
         "neg_log10_pvalue_adj": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "FDR nlog10 for the variant to gene edge"
         },
         "power": {
@@ -90,7 +99,8 @@
         "method": {
           "description": "Method for the variant to gene edge, from the associated files_filesets record",
           "enum": [
-            "Variant-EFFECTS"
+            "Variant-EFFECTS",
+            "CRISPR screen"
           ]
         },
         "crispr_modality": {
@@ -99,7 +109,8 @@
           ],
           "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
-            "prime editing"
+            "prime editing",
+            "base editing"
           ]
         },
         "biological_context": {
