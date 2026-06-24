@@ -1,17 +1,18 @@
 import json
 import pytest
-from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
+from adapters.igvf_V2G_CRISPR_adapter import IGVFV2GCRISPR
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
-# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI9602ILPC/'
 
 
 @pytest.fixture
 def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
-    with patch('adapters.Variant_EFFECTS_variant_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.igvf_V2G_CRISPR_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
+            'method': 'Variant-EFFECTS',
             'simple_sample_summaries': ['donor:human'],
             'samples': ['ontology_terms/EFO_0001253'],
             'treatments_term_ids': [],
@@ -28,10 +29,10 @@ mock_tsv_data = (
 )
 
 
-@patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value=set())
+@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch(
-    'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
+    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'name': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -52,8 +53,9 @@ mock_tsv_data = (
 )
 def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
-    adapter = VariantEFFECTSAdapter(
-        filepath='./samples/variant_effects_variant_gene.example.tsv',
+    adapter = IGVFV2GCRISPR(
+        filepath='./samples/igvf_v2g_crispr.example.tsv',
+        source_url=SOURCE_URL,
         writer=writer,
         label='variant',
         validate=True
@@ -78,10 +80,10 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
         adapter.validate_doc(invalid_doc)
 
 
-@patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
+@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
 @patch(
-    'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
+    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'name': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -102,8 +104,9 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
 )
 def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
-    adapter = VariantEFFECTSAdapter(
-        filepath='./samples/variant_effects_variant_gene.example.tsv',
+    adapter = IGVFV2GCRISPR(
+        filepath='./samples/igvf_v2g_crispr.example.tsv',
+        source_url=SOURCE_URL,
         writer=writer,
         label='variant_gene',
         validate=True
@@ -131,8 +134,9 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
 
 def test_invalid_label(mock_file_fileset):
     with pytest.raises(ValueError, match='Invalid label: invalid. Allowed values: variant, variant_gene'):
-        VariantEFFECTSAdapter(
-            filepath='./samples/variant_effects_variant_gene.example.tsv',
+        IGVFV2GCRISPR(
+            filepath='./samples/igvf_v2g_crispr.example.tsv',
+            source_url=SOURCE_URL,
             writer=SpyWriter(),
             label='invalid'
         )

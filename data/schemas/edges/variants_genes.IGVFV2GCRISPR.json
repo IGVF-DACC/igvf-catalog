@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json",
+  "$id": "schemas/edges/variants_genes.IGVFV2GCRISPR.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -88,7 +88,7 @@
           "pattern": "^files_filesets/"
         },
         "method": {
-          "description": "Method for the variant to gene edge",
+          "description": "Method for the variant to gene edge, from the associated files_filesets record",
           "enum": [
             "Variant-EFFECTS"
           ]
