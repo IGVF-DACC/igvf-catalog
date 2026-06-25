@@ -27,6 +27,9 @@ class Writer(ABC):
     def destination(self):
         pass
 
+    def add_tag(self, key: str, value: str):
+        pass
+
     def __enter__(self):
         self.open()
         return self
