@@ -34,6 +34,7 @@
             "karen-mohlke",
             "kushal-dey",
             "lea-starita",
+            "luca-pinello",
             "marc-vidal",
             "mark-craven",
             "nadav-ahituv",
@@ -138,6 +139,8 @@
               "bigWigAverageOverBed",
               "BIRD",
               "BlueSTARR",
+              "CRISPR-Millipede",
+              "CRISPResso2",
               "Cooler",
               "CountESS",
               "cV2F",
@@ -309,6 +312,7 @@
             null,
             "interference",
             "activation",
+            "base editing",
             "prime editing",
             "knockout"
           ]
