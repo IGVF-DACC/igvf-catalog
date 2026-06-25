@@ -27,6 +27,7 @@
             "bill-majoros",
             "charles-gersbach",
             "doug-fowler",
+            "gary-hon",
             "j-michael-cherry",
             "jay-shendure",
             "jesse-engreitz",
@@ -52,14 +53,19 @@
             "type": "string",
             "enum": [
               "CRISPR FACS screen",
+              "CRISPR FlowFISH screen",
               "DNase-seq",
               "DUAL-IPA",
               "electroporated MPRA",
               "lentiMPRA",
               "MPRA",
               "Perturb-seq",
+              "Parse Perturb-seq",
+              "scCRISPR screen",
               "scATAC-seq",
+              "snATAC-seq",
               "SGE",
+              "snATAC-seq",
               "STARR-seq",
               "TAP-seq",
               "VAMP-seq",
@@ -103,7 +109,9 @@
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
-            "scATAC-seq"
+            "scATAC-seq",
+            "scE2G",
+            "snATAC-seq"
           ]
         },
         "class": {
@@ -130,6 +138,7 @@
               "bigWigAverageOverBed",
               "BIRD",
               "BlueSTARR",
+              "Cooler",
               "CountESS",
               "cV2F",
               "cyp2c19_2c9",
@@ -140,16 +149,27 @@
               "Engreitz Variant-EFFECTS scripts",
               "ESM-1v",
               "FRACTEL",
+              "matplotlib",
               "MPRAflow tsv-to-bed",
               "mpralm",
               "MutPred2",
+              "NumPy",
               "pandas",
+              "pybedtools",
+              "Pysam",
+              "pySpade",
               "Samtools",
               "scATAC-seq processing scripts",
+              "Seaborn",
               "SEMVAR",
+              "scE2G",
               "Sceptre",
+              "SciPy",
               "Seurat",
-              "SGE Pipeline"
+              "SGE Pipeline",
+              "Snakemake",
+              "statsmodels",
+              "Straw"
             ]
           }
         },
@@ -271,6 +291,14 @@
           "description": "The genome browser link of the file set",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
+        "browser_index_file": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Download link for the genome browser index file (.tbi). Null for ENCODE files; for IGVF files, the tabix index file when present in the file set.",
+          "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
+        },
         "crispr_modality": {
           "type": [
             "string",
@@ -302,13 +330,14 @@
         "publication",
         "download_link",
         "cell_annotation",
+        "browser_index_file",
         "crispr_modality"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, crispr_modality"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, genome_browser_link, browser_index_file, crispr_modality"
   },
   "db_collection_name": "files_filesets"
 }

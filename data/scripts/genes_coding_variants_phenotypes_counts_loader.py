@@ -53,11 +53,9 @@ with open(GENES, 'r') as file:
         query = """
                 LET gene_name = DOCUMENT(@id).name
                 LET codingVariants = ( FOR record IN coding_variants FILTER record.gene_name == gene_name RETURN DISTINCT record._id )
-                LET sge = ( FOR v IN variants_phenotypes_coding_variants FILTER v._to IN codingVariants COLLECT fileset_id = v.files_filesets WITH COUNT INTO count RETURN { method: 'SGE', count: count } )
-                LET others = ( FOR phenoEdges IN coding_variants_phenotypes FILTER phenoEdges._from IN codingVariants COLLECT src = phenoEdges.method WITH COUNT INTO count RETURN { method: src, count: count } )
                 RETURN {
                   '_key': @key,
-                  'counts':  UNION(sge, others)
+                  'counts': ( FOR phenoEdges IN coding_variants_phenotypes FILTER phenoEdges._from IN codingVariants COLLECT src = phenoEdges.method WITH COUNT INTO count RETURN { method: src, count: count } )
                 }
         """
 

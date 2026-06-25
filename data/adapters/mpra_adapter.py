@@ -51,10 +51,12 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
 import csv
 import gzip
 import json
+import hashlib
 from typing import Optional
 from collections import defaultdict
 import ast
 from pathlib import Path
+
 
 from adapters.base import BaseAdapter
 from adapters.helpers import (
@@ -401,7 +403,7 @@ class MPRAAdapter(BaseAdapter):
         self.biosample_term = (raw if (raw or '').startswith(
             'ontology_terms/') else f'ontology_terms/{raw}') if raw else None
         self.simple_sample_summaries = self.files_filesets.get(
-            'simple_sample_summaries') or []
+            'simple_sample_summaries')
         self.treatments_term_ids = self.files_filesets.get(
             'treatments_term_ids')
 
@@ -540,7 +542,7 @@ class MPRAAdapter(BaseAdapter):
                         'DNA_count': self.safe_float(row[7]),
                         'RNA_count': self.safe_float(row[8]),
                         'neg_log10_pvalue': minus_p,
-                        'neg_log10_qvalue': minus_q_edge,
+                        'neg_log10_pvalue_adj': minus_q_edge,
                         'significant': significant,
                         'class': self.collection_class,
                         'label': self.collection_label_elements_biosamples,
@@ -550,7 +552,7 @@ class MPRAAdapter(BaseAdapter):
                         'source': self.source,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'biological_context': (self.simple_sample_summaries or [''])[0],
+                        'biological_context': self.simple_sample_summaries[0] if self.simple_sample_summaries else None,
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
                     }
@@ -681,6 +683,9 @@ class MPRAAdapter(BaseAdapter):
                     self.file_accession,
                 ])
 
+                if len(edge_key) > 255:
+                    edge_key = hashlib.sha256(edge_key.encode()).hexdigest()
+
                 minus_q = self.safe_float(row[12])
                 edge_props = {
                     '_key': edge_key,
@@ -695,7 +700,7 @@ class MPRAAdapter(BaseAdapter):
                     'DNA_count_alt': self.safe_float(row[9]),
                     'RNA_count_alt': self.safe_float(row[10]),
                     'neg_log10_pvalue': self.safe_float(row[11]),
-                    'neg_log10_qvalue': minus_q,
+                    'neg_log10_pvalue_adj': minus_q,
                     'significant': minus_q is not None and minus_q >= self.THRESHOLD,
                     'postProbEffect': self.safe_float(row[13]),
                     'CI_lower_95': self.safe_float(row[14]),
@@ -708,7 +713,7 @@ class MPRAAdapter(BaseAdapter):
                     'source': self.source,
                     'source_url': self.source_url,
                     'files_filesets': 'files_filesets/' + self.file_accession,
-                    'biological_context': (self.simple_sample_summaries or [''])[0],
+                    'biological_context': self.simple_sample_summaries[0] if self.simple_sample_summaries else None,
                     'biosample_term': self.biosample_term,
                     'treatments_term_ids': self.treatments_term_ids or None,
                 }

@@ -1,5 +1,5 @@
 {
-  "https://api.data.igvf.org/search/?accession=IGVFFI9721OCVW&accession=IGVFFI8400FXRX&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=file_set&field=catalog_collections&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFFI9100GKNS&accession=IGVFFI8400FXRX&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=file_set&field=catalog_collections&format=json&limit=all": [
     {
       "@id": "/signal-files/IGVFFI8400FXRX/",
       "@type": ["SignalFile", "File", "Item"],
@@ -18,9 +18,9 @@
       "href": "/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
     },
     {
-      "@id": "/tabular-files/IGVFFI9721OCVW/",
+      "@id": "/tabular-files/IGVFFI9100GKNS/",
       "@type": ["TabularFile", "File", "Item"],
-      "accession": "IGVFFI9721OCVW",
+      "accession": "IGVFFI9100GKNS",
       "analysis_step_version": {
         "summary": "7e314d3d-6cc1-40ca-9061-8992396a0be2",
         "software_versions": [
@@ -33,7 +33,7 @@
       "derived_from": ["/tabular-files/IGVFFI2629EIOZ/"],
       "derived_manually": false,
       "file_set": {"@id": "/analysis-sets/IGVFDS8364HJHL/"},
-      "href": "/tabular-files/IGVFFI9721OCVW/@@download/IGVFFI9721OCVW.tsv.gz"
+      "href": "/tabular-files/IGVFFI9100GKNS/@@download/IGVFFI9100GKNS.tsv.gz"
     }
   ],
   "https://api.data.igvf.org/search/?@id=/software-versions/scATAC-processing-v1.0.0/&field=software&format=json&limit=all": [
