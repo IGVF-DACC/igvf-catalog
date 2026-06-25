@@ -40,7 +40,8 @@ const gnrGeneQueryFormat = z.object({
   response_hgnc_id: z.string().optional(),
   response_gene_name: z.string().optional(),
   response_alias: z.string().optional(),
-  p_value: z.string().optional(),
+  neg_log10_pvalue: z.string().optional(),
+  neg_log10_pvalue_adj: z.string().optional(),
   method: z.enum(['CRISPR screen', 'Perturb-seq']).optional()
 }).merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true})
 
@@ -77,7 +78,9 @@ const outputFormat = z.array(z.object({
   biosample_term: z.string(),
   files_filesets: z.string(),
   crispr_modality: z.string().nullish(),
-  score: z.number().nullable(),
+  score: z.number().nullish(),
+  log2FC: z.number().nullish(),
+  effect_size: z.number().nullish(),
   p_value: z.number().or(z.string()).nullish(),
   p_value_adj: z.number().or(z.string()).nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
@@ -100,8 +103,9 @@ const grnOutputFormat = z.object({
   source: z.string(),
   biological_context: z.string(),
   files_filesets: z.string(),
-  score: z.number().nullish(),
-  p_value: z.number().nullish()
+  log2FC: z.number().nullish(),
+  neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
 })
 
 const buildEdgeFilter = (input: paramsFormatType): string => {
@@ -176,10 +180,12 @@ function buildQuery (params: {
         'source': record.source,
         'source_url': record.source_url,
         'files_filesets': record.files_filesets,
-        'biological_context': record.biological_context,
-        'biosample_term': record.biosample_term,
+        'biological_context': record.method == 'scE2G' ? record.cell_type : record.biological_context,
+        'biosample_term': record.method == 'scE2G' ? record.cell_type_term : record.biosample_term,
         'crispr_modality': record.crispr_modality,
-        'score': record.score || record.effect_size || record.log2FC,
+        'score': record.score,
+        'log2FC': record.log2FC,
+        'effect_size': record.effect_size,
         'p_value': record.p_value,
         'p_value_adj': record.p_value_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -441,8 +447,15 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   const hasResponseInput = Object.keys(responseGeneInput).some(key => !['organism', 'page'].includes(key) && responseGeneInput[key] !== undefined)
 
   let pvalueFilter = ''
-  if (input.p_value !== undefined) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, {p_value_adj: input.p_value})}`
+  const pvalueFilters: paramsFormatType = {}
+  if (input.neg_log10_pvalue !== undefined) {
+    pvalueFilters.neg_log10_pvalue = input.neg_log10_pvalue
+  }
+  if (input.neg_log10_pvalue_adj !== undefined) {
+    pvalueFilters.neg_log10_pvalue_adj = input.neg_log10_pvalue_adj
+  }
+  if (Object.keys(pvalueFilters).length > 0) {
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, pvalueFilters)}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
@@ -472,8 +485,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'source': record.source,
           'files_filesets': record.files_filesets,
           'biological_context': record.biological_context,
-          'score': record.score || record.effect_size || record.log2FC,
-          'p_value': record.p_value_adj
+          'log2FC': record.log2FC,
+          'neg_log10_pvalue': record.neg_log10_pvalue,
+          'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
         }
   `
 
@@ -499,8 +513,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'source': record.source,
             'files_filesets': record.files_filesets,
             'biological_context': record.biological_context,
-            'score': record.score || record.effect_size || record.log2FC,
-            'p_value': record.p_value_adj
+            'log2FC': record.log2FC,
+            'neg_log10_pvalue': record.neg_log10_pvalue,
+            'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
           }
   `
 
@@ -529,8 +544,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'source': record.source,
                   'files_filesets': record.files_filesets,
                   'biological_context': record.biological_context,
-                  'score': record.score || record.effect_size || record.log2FC,
-                  'p_value': record.p_value_adj
+                  'log2FC': record.log2FC,
+                  'neg_log10_pvalue': record.neg_log10_pvalue,
+                  'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
               }
   `
 

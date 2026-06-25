@@ -798,7 +798,7 @@ export const descriptions = {
   response_gene_name = TCF7L1, <br> \
   response_hgnc = HGNC:11640, <br> \
   response_alias = TCF3, <br> \
-  p_value = gte:0, <br> \
+  neg_log10_pvalue_adj = gte:1, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
