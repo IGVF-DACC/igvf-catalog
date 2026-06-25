@@ -1,4 +1,39 @@
 /* eslint-disable no-multi-str */
+interface ExampleGroup {
+  id: string
+  label: string
+  examples: Array<{
+    label: string
+    items: string[]
+    note?: string
+  }>
+}
+
+const FILES_FILESET_METHOD_NOTE = 'Each files_fileset maps to at most one method, so a <code>method</code> filter is usually not necessary.'
+
+function examples (
+  exampleGroups: ExampleGroup[],
+  title = 'Examples by method',
+  description = 'These examples are grouped by method; use the <code>method</code> filter to return data from a specific method.'
+): string {
+  const tabs = exampleGroups.map((example, index) => {
+    const activeClass = index === 0 ? ' is-active' : ''
+    return `<button class="method-example-tab${activeClass}" data-method-example-tab="${example.id}">${example.label}</button>`
+  }).join(' ')
+
+  const panels = exampleGroups.map((example, index) => {
+    const activeClass = index === 0 ? ' is-active' : ''
+    const exampleBlocks = example.examples.map((queryExample) => {
+      const items = queryExample.items.map(item => `<li>${item}</li>`).join(' ')
+      const note = queryExample.note ? `<p class="method-query-example-note">${queryExample.note}</p>` : ''
+      return `<div class="method-query-example"> <strong>${queryExample.label}</strong> ${note} <ul> ${items} </ul> </div>`
+    }).join(' ')
+    return `<div class="method-example-panel${activeClass}" data-method-example-panel="${example.id}"> <strong>${example.label}:</strong> ${exampleBlocks} </div>`
+  }).join(' ')
+
+  return `<div class="method-examples"> <strong>${title}</strong> <p class="method-example-description">${description}</p> <div class="method-example-tabs"> ${tabs} </div> ${panels} </div>`
+}
+
 export const descriptions = {
   genomic_elements: 'Retrieve genomic elements.<br> \
   Example: region = chr1:1157520-1158189, <br> \
@@ -9,17 +44,50 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
-  enhancer_gene_predictions: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
-  Example:<br> \
-  gene_id = ENSG00000187642 , <br> \
-  gene_name = PERM1, <br> \
-  hgnc_id = HGNC:28208, <br> \
-  alias = CKLF, <br> \
-  method = CRISPR screen, <br> \
-  files_fileset = ENCFF968BZL. <br> \
-  Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
+  enhancer_gene_predictions:
+    'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+    Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000055950',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'encode-re2g',
+        label: 'ENCODE-rE2G',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000055950',
+              'method = ENCODE-rE2G'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000055950',
+              'method = Perturb-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
   genes: 'Retrieve genes.<br> \
   Example: organism = Homo sapiens, <br> \
@@ -150,26 +218,59 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
-  genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
-  The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
-    Example: organism = Homo sapiens, <br> \
-    source = COXPRESdb, <br> \
-    interaction_type = dosage growth defect (sensu BioGRID), <br> \
-    gene_id = ENSG00000121410, <br> \
-    hgnc_id = HGNC:5, <br> \
-    gene_name = A1BG, <br> \
-    alias = HYST2477, <br> \
-    associated_gene_id = ENSG00000269293, <br> \
-    associated_hgnc_id = HGNC:48982, <br> \
-    associated_gene_name = ZSCAN16-AS1, <br> \
-    associated_alias = ZSCAN16 antisense RNA 1, <br> \
-    z_score = gt:4, <br> \
-    label = genetic interference, <br> \
-    method = COXPRESdb, <br> \
-    name = interacts with. <br> \
+  genes_genes:
+    'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
+    The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
-    Pagination is 0-based.',
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'biogrid',
+        label: 'BioGRID',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000112592',
+              'associated_gene_id = ENSG00000163132',
+              'source = BioGRID'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_id = ENSG00000112592',
+              'source = BioGRID'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'coxpresdb',
+        label: 'COXPRESdb',
+        examples: [
+          {
+            label: 'Single pair result',
+            items: [
+              'gene_id = ENSG00000153048',
+              'associated_gene_id = ENSG00000233369',
+              'source = COXPRESdb'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_id = ENSG00000153048',
+              'source = COXPRESdb'
+            ]
+          }
+        ]
+      }
+    ],
+    'Examples by source',
+    'These examples are grouped by source; use the <code>source</code> filter to return data from a specific source.'
+    ),
 
   variants: 'Retrieve genetic variants.<br> \
   Example: organism = Homo sapiens or Mus musculus.<br> \
@@ -224,47 +325,153 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
-  variants_genes: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by internal variant ids.<br> \
-  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+  variants_genes:
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by variants.<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, or files_filesets. <br> \
-    Example: spdi = NC_000001.11:630556:T:C, <br> \
-    hgvs = NC_000001.11:g.630557T>C, <br> \
-    rsid = rs1152591, <br> \
-    ca_id = CA16774863, <br> \
-    variant_id = NC_000001.11:630556:T:C, <br> \
-    region = chr1:630456-630558 (maximum length: 10kb), <br> \
-    neg_log10_pvalue = gte:2, <br> \
-    effect_size = gte:1.5, <br> \
-    biosample_term = EFO_0005292, <br> \
-    biological_context = lymphoblastoid cell line, <br> \
-    name = modulates expression of,<br> \
-    label = eQTL, <br> \
-    method = Variant-EFFECTS, <br> \
-    files_fileset = IGVFFI9602ILPC, <br> \
-    source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based. <br>',
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'eqtl',
+        label: 'eQTL',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA',
+              'effect_size = gte:0.3',
+              'method = eQTL'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'region = chr1:40241650-40241759 (maximum length: 10kb)',
+              'method = eQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'spliceqtl',
+        label: 'spliceQTL',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'spdi = NC_000001.11:898757:AAAAAA:AAAAAAA',
+              'effect_size = gte:0.3',
+              'method = spliceQTL'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'region = chr1:898750-898759 (maximum length: 10kb)',
+              'method = spliceQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'variant-effects',
+        label: 'Variant-EFFECTS',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'spdi = NC_000010.11:79347741:AGGT:TCAG',
+              'effect_size = lt:-0.6',
+              'method = Variant-EFFECTS'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'region = chr10:79347740-79347749 (maximum length: 10kb)',
+              'method = Variant-EFFECTS'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  genes_variants: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by Ensembl gene ids.<br> \
-  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+  genes_variants:
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by Ensembl gene ids.<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, files_fileset. <br> \
-    Example: source = AFGR, <br> \
-    gene_id = ENSG00000187642, <br> \
-    hgnc_id = HGNC:28208, <br> \
-    gene_name = SAMD11, <br> \
-    alias = CKLF, <br> \
-    label = eQTL, <br> \
-    effect_size = lte:0.001, <br> \
-    neg_log10_pvalue = gte:2 <br> \
-    biosample_term = EFO_0005292, <br> \
-    biological_context = lymphoblastoid cell line, <br> \
-    method = Variant-EFFECTS, <br> \
-    files_fileset = IGVFFI9602ILPC, <br> \
-    name = expression modulated by. <br> \
+    At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based.',
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'eqtl',
+        label: 'eQTL',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000187642',
+              'neg_log10_pvalue = gte:24.5',
+              'method = eQTL'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'alias = PERM1',
+              'method = eQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'spliceqtl',
+        label: 'spliceQTL',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000188976',
+              'neg_log10_pvalue = gt:45',
+              'effect_size = gt:0.5',
+              'method = spliceQTL'
+
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'alias = NOC2L',
+              'method = spliceQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'variant-effects',
+        label: 'Variant-EFFECTS',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000108179',
+              'neg_log10_pvalue = gt:13.1',
+              'method = Variant-EFFECTS'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'alias = PPIF',
+              'method = Variant-EFFECTS'
+            ]
+          }
+        ]
+      }
+    ]),
 
   variants_region_summary: 'Retrieve a summary count of all methods reporting variants in a given region.<br> \
     Example: region = chr1:1157520-1158520 (maximum length: 10kb).',
@@ -324,41 +531,149 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
-  phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> \
-  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-  Set verbose = true to retrieve full info on the studies.<br> \
-  At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
-  Example: phenotype_id = EFO_0007937, <br> \
-  phenotype_name = cell survival, <br> \
-  neg_log10_pvalue = gte:5, <br> \
-  method = SGE, <br> \
-  class = observed data, <br> \
-  source = IGVF, <br> \
-  label = protein variant effect, <br> \
-  files_fileset = IGVFFI0332UGDD. <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  phenotypes_variants:
+    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by phenotypes.<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Set verbose = true to retrieve full info on the studies.<br> \
+    At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'gwas',
+        label: 'GWAS',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'phenotype_id = EFO_0010325',
+              'method = GWAS'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'neg_log10_pvalue = gte:5',
+              'method = GWAS'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sge',
+        label: 'SGE',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = NCIT_C16407',
+              'method = SGE'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI3125FMNW',
+              'method = SGE'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'cv2f',
+        label: 'cV2F',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0003674',
+              'method = cV2F'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI3063JRLI',
+              'method = cV2F'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. <br> \
-  Filters on phenotype ontology id can be used together.<br> \
-  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-  Set verbose = true to retrieve full info on the studies.<br> \
-  At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method or files_fileset. <br> \
-  Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000007.14:152660654:T:A (igvf), <br> \
-  rsid = rs2710889, <br> \
-  spdi = NC_000001.11:1023572:A:G, <br> \
-  hgvs = NC_000001.11:g.1009731C>T, <br> \
-  ca_id = CA10655131, <br> \
-  region = chr1:1023570-1023573 (maximum length: 10kb), <br> \
-  phenotype_id = EFO_0004339, <br> \
-  neg_log10_pvalue = gte:5, <br>\
-  files_fileset = IGVFFI0332UGDD, <br> \
-  method = SGE, <br> \
-  class = observed data, <br> \
-  label = protein variant effect, <br> \
-  organism = Homo sapiens <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  variants_phenotypes:
+    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by variants.<br> \
+    Filters on phenotype ontology id can be used together.<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Set verbose = true to retrieve full info on the studies.<br> \
+    At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'gwas',
+        label: 'GWAS',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:5277210:G:A',
+              'neg_log10_pvalue = gte:5',
+              'method = GWAS'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr1:5270008-5277214',
+              'method = GWAS'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sge',
+        label: 'SGE',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000007.14:152660654:T:A',
+              'method = SGE'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr7:152655654-152664654',
+              'method = SGE'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'cv2f',
+        label: 'cV2F',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:91420:T:C',
+              'method = cV2F'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr1:91418-91424',
+              'method = cV2F'
+            ]
+          }
+        ]
+      }
+    ]),
 
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet and GenCC by diseases.<br> \
     Set verbose = true to retrieve full info on the genes and diseases. <br> \
@@ -403,43 +718,166 @@ export const descriptions = {
   Example: ontology_term_id_start = UBERON_0003663, <br> \
   ontology_term_id_end = UBERON_0014892',
 
-  variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
-   allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
-  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method or files_filesets. <br> \
-  Example: variant_id = NC_000020.11:4814342:G:A, <br> \
-  spdi = NC_000017.11:7166092:G:A, <br> \
-  hgvs = NC_000017.11:g.7166093G>A, <br> \
-  rsid = rs186021206,<br> \
-  ca_id = CA14813418, <br> \
-  region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
-  organism = Homo sapiens, <br> \
-  label = pQTL, <br> \
-  name = modulates binding of,<br> \
-  inverse_name = binding modulated by,<br> \
-  method = SEMVAR, <br> \
-  files_fileset = IGVFFI0183ELIK, <br> \
-  source = UKB. <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  variants_proteins:
+    'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
+    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
+    Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
+    At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'adastra',
+        label: 'ADASTRA',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'variant_id = NC_000005.10:59317579:G:T',
+              'method = ADASTRA'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr5:150575301-150575304',
+              'method = ADASTRA'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'gvatdb',
+        label: 'GVATdb',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'variant_id = NC_000010.11:112626979:C:T',
+              'method = GVATdb'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr10:112626978-112626982',
+              'method = GVATdb'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'semvar',
+        label: 'SEMVAR',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:100091094:A:C',
+              'method = SEMVAR'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr1:100091093-100091097',
+              'method = SEMVAR'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'pqtl',
+        label: 'pQTL',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000002.12:27508072:T:C',
+              'method = pQTL'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr2:27508070-27508074',
+              'method = pQTL'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
-   allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying proteins, and predicted allele specific binding from SEMpl.<br> \
-   Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
-  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and the ontology terms of the cell types.<br> \
-  At least one of these fields is required: protein_id, protein_name, uniprot_name, uniprot_full_name, dbxrefs, method or files_filesets. <br> \
-  Example: protein_id = ENSP00000384707.1, <br> \
-  protein_name = CTCF, <br> \
-  uniprot_name = CTCF_HUMAN, <br> \
-  uniprot_full_name = Transcriptional repressor CTCF, <br> \
-  dbxrefs = P49711,<br> \
-  label = pQTL, <br> \
-  source = IGVF, <br> \
-  method = SEMVAR, <br> \
-  files_filesets = IGVFFI6044LKYT, <br> \
-  name = binding modulated by.<br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  proteins_variants:
+    'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
+    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying proteins, and predicted allele specific binding from SEMpl.<br> \
+    Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids).<br> \
+    Set verbose = true to retrieve full info on the variant-transcription factor pairs, and the ontology terms of the cell types.<br> \
+    At least one of these fields is required: protein_id, protein_name, uniprot_name, uniprot_full_name, dbxrefs, method, or files_fileset. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'adastra',
+        label: 'ADASTRA',
+        examples: [
+          {
+            label: 'query by protein identifier',
+            items: [
+              'protein_id = ENSP00000281043',
+              'method = ADASTRA'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'gvatdb',
+        label: 'GVATdb',
+        examples: [
+          {
+            label: 'query by protein identifier',
+            items: [
+              'protein_id = ENSP00000315417',
+              'method = GVATdb'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'semvar',
+        label: 'SEMVAR',
+        examples: [
+          {
+            label: 'query by protein identifier',
+            items: [
+              'protein_id = ENSP00000351458',
+              'method = SEMVAR'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI0005WRQP',
+              'method = SEMVAR'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'pqtl',
+        label: 'pQTL',
+        examples: [
+          {
+            label: 'query by protein identifier',
+            items: [
+              'protein_id = ENSP00000263100',
+              'method = pQTL'
+            ]
+          }
+        ]
+      }
+    ]),
 
   autocomplete: 'Autocomplete names for genes and proteins based on prefix search.<br> \
   Example: term = TP53, <br> \
@@ -705,28 +1143,225 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
-  phenotypes_coding_variants: 'Retrieve coding variants associated with the query phenotype.<br> \
-  Example: phenotype ID = OBA_0000128, <br> \
-  phenotype_name = protein stability, <br> \
-  files_fileset = IGVFFI2574RDFO, <br> \
-  method = VAMP-seq, <br> \
-  organism = Homo sapiens. <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  phenotypes_coding_variants:
+    'Retrieve coding variants associated with the query phenotype.<br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'dual-ipa',
+        label: 'DUAL-IPA',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = BAO_0040014',
+              'method = DUAL-IPA'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI6224HZMG',
+              'method = DUAL-IPA'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'esm-1v',
+        label: 'ESM-1v',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0003674',
+              'method = ESM-1v'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI8105TNNO',
+              'method = ESM-1v'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'mutpred2',
+        label: 'MutPred2',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0003674',
+              'method = MutPred2'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI6893ZOAA',
+              'method = MutPred2'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sge',
+        label: 'SGE',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = NCIT_C16407',
+              'method = SGE'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2810SLAX',
+              'method = SGE'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'vamp-seq',
+        label: 'VAMP-seq',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = OBA_0000128',
+              'method = VAMP-seq'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI0629IIQU',
+              'method = VAMP-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
-  At least one of these fields is required: coding_variant_name, hgvsp, uniprot_name, gene_name, amino_acid_position, transcript_id, method, files_fileset. <br> \
-  Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \
-  hgvsp = p.Ala103Cys, <br> \
-  uniprot_name = XRCC2_HUMAN, <br> \
-  gene_name = XRCC2, <br> \
-  amino_acid_position = -1, <br> \
-  transcript_id = ENST00000359321, <br> \
-  method = ESM-1v, <br> \
-  files_fileset = IGVFFI8105TNNO, <br> \
-  organism = Homo sapiens. <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  coding_variants_phenotypes:
+    'Retrieve phenotypes associated with the query coding variant.<br> \
+    At least one of these fields is required: coding_variant_name, hgvsp, uniprot_name, gene_name, amino_acid_position, transcript_id, method, files_fileset. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'dual-ipa',
+        label: 'DUAL-IPA',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C',
+              'method = DUAL-IPA'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = ACSF3',
+              'method = DUAL-IPA'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'esm-1v',
+        label: 'ESM-1v',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = A1BG_ENST00000263100_p.Ala118Asn_c.352_353delinsAA',
+              'method = ESM-1v'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = A1BG',
+              'method = ESM-1v'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'mutpred2',
+        label: 'MutPred2',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = A1BG_ENST00000263100_p.Ala118Arg_c.352_353delinsCG',
+              'method = MutPred2'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = A1BG',
+              'method = MutPred2'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sge',
+        label: 'SGE',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = BRCA2_ENST00000380152__NC_000013.11:g.32319075A-C_splicing',
+              'method = SGE'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = BRCA2',
+              'method = SGE'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'vamp-seq',
+        label: 'VAMP-seq',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = CYP2C19_ENST00000371321_p.Ala103=_c.309T-G',
+              'method = VAMP-seq'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = CYP2C19',
+              'method = VAMP-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
   llm_query: 'Ask a question that interests you. This API is password protected.<br> \
   Set verbose = true to retrieve AQL and AQL results.<br> \
@@ -748,100 +1383,476 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
-  genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for one specific gene.<br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
-  Example: gene_id = ENSG00000196584,<br> \
-  gene_name = XRCC2,<br> \
-  alias = FANCU,<br> \
-  hgnc_id = HGNC:12829,<br> \
-  method = MutPred2,<br> \
-  files_fileset = IGVFFI6893ZOAA. <br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
+  genes_coding_variants:
+    'Retrieve scores and predictions of associated coding variants for one specific gene.<br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'dual-ipa',
+        label: 'DUAL-IPA',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_name = ACSF3',
+              'method = DUAL-IPA'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'esm-1v',
+        label: 'ESM-1v',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000121410',
+              'method = ESM-1v'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'mutpred2',
+        label: 'MutPred2',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000196584',
+              'method = MutPred2'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sge',
+        label: 'SGE',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000139618',
+              'method = SGE'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'vamp-seq',
+        label: 'VAMP-seq',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000165841',
+              'method = VAMP-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
   genes_coding_variants_all_scores: 'Retrieve a list of all numeric scores of associated coding variants for a gene and a dataset.<br> \
   Example: gene_id = ENSG00000165841, <br> \
   dataset = VAMP-seq',
 
-  variants_biosamples: 'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br> \
-  At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, files_fileset. <br> \
-  Example: variant_id = NC_000001.11:14772:C:T,<br> \
-  spdi = NC_000001.11:14772:C:T, <br> \
-  hgvs = NC_000001.11:g.14773C>T, <br> \
-  rsid = rs878915777, <br> \
-  ca_id = CA10655131, <br> \
-  region = chr1:15563-15567 (maximum length: 10kb), <br> \
-  organism = Homo sapiens, <br> \
-  files_fileset = IGVFFI1323RCIE, <br> \
-  element_id = MPRA_chr1_1000079_1000279_GRCh38_IGVFFI7321WGMD, <br> \
-  significant = true, <br> \
-  method = STARR-seq. <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  variants_biosamples:
+    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br> \
+    At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'mpra',
+        label: 'MPRA',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:1000161:C:A',
+              'method = MPRA'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr1:1000160-1000163 (maximum length: 10kb)',
+              'method = MPRA'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'starr-seq',
+        label: 'STARR-seq',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:14772:C:T',
+              'method = STARR-seq'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr1:14771-14775 (maximum length: 10kb)',
+              'method = STARR-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'bluestarr',
+        label: 'BlueSTARR',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:100003415:C:A',
+              'method = BlueSTARR'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr1:100003414-100003418 (maximum length: 10kb)',
+              'method = BlueSTARR'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  biosamples_variants: 'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br> \
-  Example: biosample_id = EFO_0002067, <br> \
-  biosample_name = k562, <br> \
-  method = STARR-seq, <br> \
-  files_fileset = IGVFFI7903VFKP, <br> \
-  element_id = MPRA_chr1_1000079_1000279_GRCh38_IGVFFI7321WGMD, <br> \
-  significant = true, <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  biosamples_variants:
+    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br> \
+    At least one of these fields is required: biosample_id or biosample_name. <br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'mpra',
+        label: 'MPRA',
+        examples: [
+          {
+            label: 'query by biosample identifier',
+            items: [
+              'biosample_id = EFO_0001182',
+              'method = MPRA',
+              'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
+              'significant = true'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'starr-seq',
+        label: 'STARR-seq',
+        examples: [
+          {
+            label: 'query by biosample identifier',
+            items: [
+              'biosample_id = EFO_0002067',
+              'method = STARR-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'bluestarr',
+        label: 'BlueSTARR',
+        examples: [
+          {
+            label: 'query by biosample identifier',
+            items: [
+              'biosample_id = EFO_0002067',
+              'method = BlueSTARR'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  grn: 'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
-  Example: regulator_gene_id = ENSG00000143190, <br> \
-  regulator_gene_name = POU2F1, <br> \
-  regulator_hgnc = HGNC:9212, <br> \
-  regulator_alias = OCT1, <br> \
-  response_gene_id = ENSG00000152284, <br> \
-  response_gene_name = TCF7L1, <br> \
-  response_hgnc = HGNC:11640, <br> \
-  response_alias = TCF3, <br> \
-  neg_log10_pvalue_adj = gte:1, <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  grn:
+    'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'regulator_gene_id = ENSG00000143190',
+              'p_value = gte:0.9',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'regulator_gene_name = POU2F1',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Query by regulator gene',
+            items: [
+              'regulator_gene_id = ENSG00000143190',
+              'method = Perturb-seq'
+            ]
+          },
+          {
+            label: 'Query by response gene',
+            items: [
+              'response_gene_name = TSPAN6',
+              'method = Perturb-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  genes_genomic_elements: 'Retrieve genomic elements and gene pairs by querying genes.<br> \
-  One of these fields is required: gene_id, hgnc_id, gene_name, alias, method, files_fileset. <br> \
-  Example: gene_id = ENSG00000187961, <br> \
-  gene_name = SARS1, <br> \
-  hgnc_id = HGNC:10537, <br> \
-  alias = SERRS, <br> \
-  method = Perturb-seq, <br> \
-  files_fileset = IGVFFI3069QCRA, <br> \
-  biosample_term = EFO_0002067, <br> \
-  biological_context = placenta from ENCDO091OEF, <br> \
-  source = IGVF. <br> \
-  Set verbose = true to retrieve full info on the genes, genomic element.<br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
+  genes_genomic_elements:
+    'Retrieve genomic elements and gene pairs by querying genes.<br> \
+    One of these fields is required: gene_id, hgnc_id, gene_name, alias, method, or files_fileset. <br> \
+    Set verbose = true to retrieve full info on the genes and genomic element.<br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000116198',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'method = CRISPR screen',
+              'files_fileset = ENCFF968BZL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'encode-re2g',
+        label: 'ENCODE-rE2G',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000225880',
+              'biosample_term = EFO_0002330',
+              'method = ENCODE-rE2G'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = ENCFF425TLX',
+              'method = ENCODE-rE2G'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000123685',
+              'method = Perturb-seq'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI3069QCRA',
+              'method = Perturb-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
-  At least one of those properties must be defined: region, files_fileset, method. <br> \
-  Example region = chr1:903900-904900, <br> \
-  source_annotation = enhancer, <br> \
-  region_type = accessible dna elements, <br> \
-  method = CRISPR screen, <br> \
-  files_fileset = ENCFF968BZL, <br> \
-  biosample_term = EFO_0002067, <br> \
-  biological_context = placenta from ENCDO091OEF, <br> \
-  source = ENCODE. <br> \
-  Set verbose = true to retrieve full info on the genes, genomic element.<br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
+  genomic_elements_genes:
+    'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+    At least one of these properties must be defined: region, files_fileset, or method. <br> \
+    Set verbose = true to retrieve full info on the genes and genomic element.<br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'region = chr1:4126791-4126792 (maximum length: 10kb)',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'files_fileset = ENCFF968BZL',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'encode-re2g',
+        label: 'ENCODE-rE2G',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'region = chr1:920016-920017 (maximum length: 10kb)',
+              'method = ENCODE-rE2G',
+              'files_fileset = ENCFF666WIM'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'files_fileset = ENCFF666WIM',
+              'method = ENCODE-rE2G'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Query by region',
+            items: [
+              'region = chr1:212699339-212700840 (maximum length: 10kb)',
+              'method = Perturb-seq'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI3069QCRA',
+              'method = Perturb-seq'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  qtls: 'Retrieve QTLs from gene, variant, or region. <br> \
-  Example: gene_id = ENSG00000259943 <br> \
-  gene_name = ZMPSTE24-DT <br> \
-  variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
-  spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA <br> \
-  rsid = rs79070333 <br> \
-  ca_id = CA21017128 <br> \
-  region = chr1:40241650-40241660 <br> \
-  biological_context = artery (tibial) <br> \
-  method = spliceQTL <br> \
-  source = EBI <br> \
-  The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.'
+  qtls:
+    'Retrieve QTLs from gene, variant, or region.<br> \
+    Define exactly one query type: gene (gene_id or gene_name), variant (variant_id, spdi, rsid, or ca_id), or region.<br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'eqtl',
+        label: 'eQTL',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'spdi = NC_000001.11:40241653:TGAA:TGAAATTGAA',
+              'method = eQTL'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_id = ENSG00000259943',
+              'method = eQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'spliceqtl',
+        label: 'spliceQTL',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'variant_id = NC_000001.11:898757:AAAAAA:AAAAAAA',
+              'method = spliceQTL'
+            ]
+          },
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000131236',
+              'method = spliceQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'pqtl',
+        label: 'pQTL',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'variant_id = NC_000002.12:27508072:T:C',
+              'method = pQTL'
+            ]
+          },
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000084734',
+              'method = pQTL'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'caqtl',
+        label: 'caQTL',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'variant_id = NC_000001.11:40241653:TGAA:TGAAATTGAA',
+              'method = caQTL'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'region = chr1:40232650-40241654',
+              'method = caQTL'
+            ]
+          }
+        ]
+      }
+    ])
 }
