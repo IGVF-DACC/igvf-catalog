@@ -34,6 +34,8 @@ class SEMPred(BaseAdapter):
 
     def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
+        self.sem_provenance_accession = os.path.basename(
+            sem_provenance_path).split('.')[0]
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
 
@@ -65,6 +67,7 @@ class SEMPred(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
+        self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
         self.load_tf_id_mapping()
         self.ensembls = pickle.load(open(self.ENSEMBL_MAPPING, 'rb'))
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
