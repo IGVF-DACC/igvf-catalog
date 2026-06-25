@@ -131,7 +131,7 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
-    assert 'log2_fold_change' in first_item
+    assert 'log2FC' in first_item
     assert 'label' in first_item
     assert first_item['label'] == 'variant effect on gene expression'
     assert first_item['source_url'] == adapter.source_url
@@ -229,7 +229,7 @@ def test_crispr_millipede_file_uses_hardcoded_cd19_gene(
     assert first_item['posterior_inclusion_probability'] == 0.0284163262526425
     assert first_item['coefficient_stddev'] == 0.0699744682130392
     assert first_item['power'] is None
-    assert first_item['log2_fold_change'] == pytest.approx(
+    assert first_item['log2FC'] == pytest.approx(
         math.log2(1 + first_item['effect_size']))
     assert first_item['neg_log10_pvalue'] is None
     assert first_item['neg_log10_pvalue_adj'] is None

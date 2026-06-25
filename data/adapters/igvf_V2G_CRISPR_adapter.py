@@ -234,7 +234,7 @@ class IGVFV2GCRISPR(BaseAdapter):
                         '_from': f'variants/{variant}',
                         '_to': f'genes/{row[7]}',
                         'effect_size': float(row[9]),
-                        'log2_fold_change': float(row[10]),
+                        'log2FC': float(row[10]),
                         'neg_log10_pvalue': float(row[11]),
                         'neg_log10_pvalue_adj': float(row[12]),
                         'power': float(row[14]) if row[14] else None,
@@ -268,7 +268,7 @@ class IGVFV2GCRISPR(BaseAdapter):
                         '_from': f'variants/{variant}',
                         '_to': f'genes/{CD19_ENSEMBL_ID}',
                         'effect_size': effect_size,
-                        'log2_fold_change': self._fractional_effect_size_to_log2_fold_change(
+                        'log2FC': self._fractional_effect_size_to_log2_fold_change(
                             effect_size),
                         'neg_log10_pvalue': None,
                         'neg_log10_pvalue_adj': None,

@@ -30,7 +30,7 @@
           "type": "number",
           "description": "Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
         },
-        "log2_fold_change": {
+        "log2FC": {
           "type": [
             "number",
             "null"
@@ -155,7 +155,7 @@
       "required": [
         "_key",
         "effect_size",
-        "log2_fold_change",
+        "log2FC",
         "neg_log10_pvalue",
         "neg_log10_pvalue_adj",
         "power",
@@ -176,6 +176,6 @@
   "accessible_via": {
     "filter_by_range": "effect_size",
     "simplified_return": "label, source, effect_size, biological_context",
-    "return": "effect_size, log2_fold_change, neg_log10_pvalue, neg_log10_pvalue_adj, posterior_inclusion_probability, coefficient_stddev, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
+    "return": "effect_size, log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, posterior_inclusion_probability, coefficient_stddev, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
   }
 }

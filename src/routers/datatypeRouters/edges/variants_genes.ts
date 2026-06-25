@@ -62,7 +62,7 @@ const completeQtlsFormat = z.object({
   effect_size: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().nullish(),
-  log2_fold_change: z.number().nullish(),
+  log2FC: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(),
   standard_error: z.number().nullish(),
   z_score: z.number().nullish(),
