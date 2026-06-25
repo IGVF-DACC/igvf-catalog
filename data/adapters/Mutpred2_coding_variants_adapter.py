@@ -64,6 +64,8 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
             return 'coding_variants_phenotypes'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.FILE_ACCESSION)
+
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
         if self.label == 'coding_variants_phenotypes':
