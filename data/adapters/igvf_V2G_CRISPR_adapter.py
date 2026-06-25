@@ -36,6 +36,8 @@ class IGVFV2GCRISPR(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_gene']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
+    P_VALUE_SIGNIFICANCE_THRESHOLD = 0.05
+    PIP_SIGNIFICANCE_THRESHOLD = 0.1
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
@@ -99,6 +101,22 @@ class IGVFV2GCRISPR(BaseAdapter):
         if ratio <= 0:
             return None
         return math.log2(ratio)
+
+    @staticmethod
+    def _neg_log10_to_pvalue(neg_log10_pvalue: float) -> float:
+        return 10 ** (-neg_log10_pvalue)
+
+    @classmethod
+    def _is_variant_effects_significant(cls, neg_log10_pvalue_adj: Optional[float]) -> bool:
+        if neg_log10_pvalue_adj is None:
+            return False
+        return cls._neg_log10_to_pvalue(neg_log10_pvalue_adj) < cls.P_VALUE_SIGNIFICANCE_THRESHOLD
+
+    @classmethod
+    def _is_millipede_significant(cls, posterior_inclusion_probability: Optional[float]) -> bool:
+        if posterior_inclusion_probability is None:
+            return False
+        return posterior_inclusion_probability > cls.PIP_SIGNIFICANCE_THRESHOLD
 
     def parse(self):
         if self.is_crispr_millipede:
@@ -235,6 +253,7 @@ class IGVFV2GCRISPR(BaseAdapter):
         for variant in spdi_to_row:
             if variant in loaded_variants:
                 for row in spdi_to_row[variant]:
+                    neg_log10_pvalue_adj = float(row[12])
                     edge_props = {
                         '_key': f'{variant}_{row[7]}_{self.file_accession}',
                         '_from': f'variants/{variant}',
@@ -242,10 +261,12 @@ class IGVFV2GCRISPR(BaseAdapter):
                         'effect_size': float(row[9]),
                         'log2FC': float(row[10]),
                         'neg_log10_pvalue': float(row[11]),
-                        'neg_log10_pvalue_adj': float(row[12]),
+                        'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'power': float(row[14]) if row[14] else None,
                         'posterior_inclusion_probability': None,
                         'coefficient_stddev': None,
+                        'significant': self._is_variant_effects_significant(
+                            neg_log10_pvalue_adj),
                         'class': 'observed data',
                         'label': 'variant effect on gene expression',
                         'name': 'modulates expression of',
@@ -269,6 +290,7 @@ class IGVFV2GCRISPR(BaseAdapter):
             if variant in loaded_variants:
                 for row in spdi_to_row[variant]:
                     effect_size = float(row[2])
+                    posterior_inclusion_probability = float(row[1])
                     edge_props = {
                         '_key': f'{variant}_{CD19_ENSEMBL_ID}_{self.file_accession}',
                         '_from': f'variants/{variant}',
@@ -279,8 +301,10 @@ class IGVFV2GCRISPR(BaseAdapter):
                         'neg_log10_pvalue': None,
                         'neg_log10_pvalue_adj': None,
                         'power': None,
-                        'posterior_inclusion_probability': float(row[1]),
+                        'posterior_inclusion_probability': posterior_inclusion_probability,
                         'coefficient_stddev': float(row[3]),
+                        'significant': self._is_millipede_significant(
+                            posterior_inclusion_probability),
                         'class': 'observed data',
                         'label': 'variant effect on gene expression',
                         'name': 'modulates expression of',

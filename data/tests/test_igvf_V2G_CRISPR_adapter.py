@@ -18,6 +18,26 @@ def test_fractional_effect_size_to_log2_fold_change(effect_size, log2_fold_chang
         effect_size) == pytest.approx(log2_fold_change)
 
 
+@pytest.mark.parametrize('neg_log10_pvalue_adj, significant', [
+    (1.77, True),
+    (1.0, False),
+    (None, False),
+])
+def test_variant_effects_significance(neg_log10_pvalue_adj, significant):
+    assert IGVFV2GCRISPR._is_variant_effects_significant(
+        neg_log10_pvalue_adj) is significant
+
+
+@pytest.mark.parametrize('pip, significant', [
+    (0.11, True),
+    (0.1, False),
+    (0.0284163262526425, False),
+    (None, False),
+])
+def test_millipede_significance(pip, significant):
+    assert IGVFV2GCRISPR._is_millipede_significant(pip) is significant
+
+
 @pytest.fixture
 def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
@@ -148,6 +168,7 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert first_item['biological_context'] == 'donor:human'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'
     assert first_item['neg_log10_pvalue'] == 1.86
+    assert first_item['significant'] is True
 
 
 @patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
@@ -291,3 +312,4 @@ def test_crispr_millipede_file_uses_hardcoded_cd19_gene(
     assert first_item['neg_log10_pvalue_adj'] is None
     assert first_item['method'] == 'CRISPR screen'
     assert first_item['crispr_modality'] == 'base editing'
+    assert first_item['significant'] is False

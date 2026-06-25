@@ -72,6 +72,10 @@
           ],
           "description": "Standard deviation of the CRISPR-Millipede beta coefficient estimate. Reflects uncertainty in the effect size estimate."
         },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the variant-gene association is statistically significant. For Variant-EFFECTS, adjusted p-value < 0.05. For CRISPR-Millipede, posterior inclusion probability (PIP) > 0.1."
+        },
         "class": {
           "enum": [
             "observed data"
@@ -161,6 +165,7 @@
         "power",
         "posterior_inclusion_probability",
         "coefficient_stddev",
+        "significant",
         "label",
         "source_url",
         "files_filesets",
@@ -176,6 +181,6 @@
   "accessible_via": {
     "filter_by_range": "effect_size",
     "simplified_return": "label, source, effect_size, biological_context",
-    "return": "effect_size, log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, power, posterior_inclusion_probability, coefficient_stddev, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
+    "return": "effect_size, log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, power, posterior_inclusion_probability, coefficient_stddev, significant, source, label, method, crispr_modality, class, source_url, biological_context, biosample_term"
   }
 }
