@@ -200,8 +200,14 @@ class IGVFV2GCRISPR(BaseAdapter):
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_variants_in_arangodb(
-            list(spdi_to_variant.keys()))
+        if self.label == 'variant':
+            loaded_variants = bulk_check_variants_in_arangodb(
+                list(spdi_to_variant.keys()),
+                excluded_files_filesets=f'files_filesets/{self.file_accession}',
+            )
+        else:
+            loaded_variants = bulk_check_variants_in_arangodb(
+                list(spdi_to_variant.keys()))
 
         if self.label == 'variant':
             self._write_variants(spdi_to_variant, loaded_variants)

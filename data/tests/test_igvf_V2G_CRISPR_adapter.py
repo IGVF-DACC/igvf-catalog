@@ -75,6 +75,10 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
     with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
         adapter.process_file()
 
+    mock_bulk_check.assert_called_once_with(
+        ['NC_000010.11:79347444::CCTCCTCAGG'],
+        excluded_files_filesets='files_filesets/IGVFFI9602ILPC',
+    )
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
     assert '_key' in first_item
@@ -126,6 +130,9 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
         adapter.process_file()
 
+    mock_bulk_check.assert_called_once_with(
+        ['NC_000010.11:79347444::CCTCCTCAGG'],
+    )
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
     assert '_key' in first_item
@@ -141,6 +148,55 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert first_item['biological_context'] == 'donor:human'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'
     assert first_item['neg_log10_pvalue'] == 1.86
+
+
+@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch(
+    'adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb',
+    return_value={'NC_000010.11:79347444::CCTCCTCAGG'},
+)
+@patch(
+    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
+    return_value=({
+        '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'name': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'chr': 'chr10',
+        'pos': 79347444,
+        'ref': '',
+        'alt': 'CCTCCTCAGG',
+        'variation_type': 'insertion',
+        'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'hgvs': 'NC_000010.11:g.79347445dupCCTCCTCAGG',
+        'organism': 'Homo sapiens',
+        'rsid': [],
+        'qual': '100',
+        'annotations': {},
+        'vrs_digest': 'test_digest',
+        'ca_id': 'CA1234567890'
+    }, None)
+)
+def test_variant_pass_re_emits_when_only_loaded_from_same_fileset(
+    mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset
+):
+    """Variants attributed to this fileset are excluded from the loaded check."""
+    mock_bulk_check.return_value = set()
+    writer = SpyWriter()
+    adapter = IGVFV2GCRISPR(
+        filepath='./samples/igvf_v2g_crispr.example.tsv',
+        source_url=SOURCE_URL,
+        writer=writer,
+        label='variant',
+        validate=True,
+    )
+
+    with patch('builtins.open', mock_open(read_data=mock_tsv_data)):
+        adapter.process_file()
+
+    mock_bulk_check.assert_called_once_with(
+        ['NC_000010.11:79347444::CCTCCTCAGG'],
+        excluded_files_filesets='files_filesets/IGVFFI9602ILPC',
+    )
+    assert len(writer.contents) == 1
 
 
 def test_invalid_label(mock_file_fileset):
