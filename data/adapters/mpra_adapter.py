@@ -412,6 +412,8 @@ class MPRAAdapter(BaseAdapter):
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
+            # in this case the file is always from IGVF so we add the tag
+            self.writer.add_tag('portal_accessions', self.file_accession)
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
                 if i % self.CHUNK_SIZE == 0:
@@ -434,6 +436,9 @@ class MPRAAdapter(BaseAdapter):
         biosample_term_key = (self.biosample_term or '').split('/')[-1]
         # Element id suffix: design file accession when we have sequence designs (IGVF), else effect file accession (ENCODE)
         element_id_suffix = self.reference_file_accession if self.has_sequence_designs else self.file_accession
+        if self.has_sequence_designs:
+            self.writer.add_tag('portal_accessions',
+                                self.reference_file_accession)
 
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
