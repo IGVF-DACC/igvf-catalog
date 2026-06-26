@@ -71,6 +71,7 @@ class ESM1vCodingVariantsScores(BaseAdapter):
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
+            self.writer.add_tag('portal_accessions', self.FILE_ACCESSION)
             for row in map_csv:
                 # trim version number in ENST
                 mutation_ids = [
