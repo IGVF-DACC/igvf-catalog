@@ -81,6 +81,7 @@ class STARRseqVariantBiosample(BaseAdapter):
         with open_file as f:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
+            self.writer.add_tag('portal_accessions', self.file_accession)
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
                 if i % STARRseqVariantBiosample.CHUNK_SIZE == 0:
