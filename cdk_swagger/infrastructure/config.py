@@ -74,7 +74,7 @@ config: Dict[str, Any] = {
                 'desired_count': 1,
                 'max_capacity': 4,
             },
-            'backend_url': 'https://db-dev.catalog.igvf.org/',
+            'backend_url': 'https://db-dev-staging.catalog.igvf.org/',
             'catalog_llm_query_service_url': 'https://catalog-llm-dev.demo.igvf.org/query',
             'security_group_name': 'igvf-catalog-fargate-demos',
             'security_group_id': 'sg-0eb97aa23e3597bad',
