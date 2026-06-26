@@ -34,6 +34,7 @@ class SEMPred(BaseAdapter):
 
     def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
+        # assumes that both sem_provenance_path and filepath have accession as prefix
         self.sem_provenance_accession = os.path.basename(
             sem_provenance_path).split('.')[0]
         self.file_accession = os.path.basename(filepath).split('.')[0]
