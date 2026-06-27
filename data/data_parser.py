@@ -158,7 +158,10 @@ else:
         version_tag=non_adapter_signature_namespace.version_tag
     )
 
+    adapter_kwargs = {
+        k: v for k, v in vars(adapter_signature_namespace).items() if v is not None
+    }
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
-        **vars(adapter_signature_namespace), writer=writer)
+        **adapter_kwargs, writer=writer)
 
 adapter.process_file()
