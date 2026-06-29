@@ -119,13 +119,13 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
 
   FOR record IN ${variantCodingVariantCollectionName}
     FILTER record._to IN codingVariants
-    SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
-
     LET otherRecord = DOCUMENT(record._from)
     FILTER otherRecord != null
+    COLLECT variant = otherRecord
+    SORT variant._key
+    LIMIT ${input.page as number * limit}, ${limit}
 
-    RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
+    RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}}
 `
   return await (await db.query(query)).all()
 }
