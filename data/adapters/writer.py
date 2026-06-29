@@ -27,6 +27,9 @@ class Writer(ABC):
     def destination(self):
         pass
 
+    def add_tag(self, key: str, value: str):
+        pass
+
     def __enter__(self):
         self.open()
         return self
@@ -48,12 +51,23 @@ class S3Writer(Writer):
         self.session = session
         self._s3_uri = None
         self.s3_file = None
-        self.version_tag = version_tag
+        self.s3_tags: list[dict[str, str]] = []
+        if version_tag is not None:
+            self.add_tag('version', version_tag)
 
-    def add_version_tag(self, key: str = None, value: str = None):
+    def add_tag(self, key: str, value: str):
+        for tag in self.s3_tags:
+            if tag['Key'] == key:
+                tag['Value'] = tag['Value'] + ' ' + value
+                return
+        self.s3_tags.append({'Key': key, 'Value': value})
+
+    def _put_tags(self):
+        if not self.s3_tags:
+            return
         client = self.session.client('s3')
         client.put_object_tagging(Bucket=self.bucket, Key=self.key, Tagging={
-            'TagSet': [{'Key': 'version', 'Value': value}]
+            'TagSet': self.s3_tags
         })
 
     def open(self):
@@ -74,7 +88,7 @@ class S3Writer(Writer):
             return
         self.s3_file.close()
         if success:
-            self.add_version_tag(value=self.version_tag)
+            self._put_tags()
 
     def _create_s3_uri(self):
         return f's3://{self.bucket}/{self.key}'

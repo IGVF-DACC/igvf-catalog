@@ -4,6 +4,7 @@ from active_adapters import KEY_TO_ADAPTER
 
 from adapters.writer import get_writer
 
+
 parser = argparse.ArgumentParser(
     prog='IGVF Catalog Sample Data Loader',
     description='Loads sample data into a local ArangoDB instance'

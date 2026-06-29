@@ -56,42 +56,101 @@ def test_s3_writer_close(mocker):
 
 def test_s3_writer_close_with_tagging(mocker):
     mock_file = MagicMock()
-    mock_add_version_tag = mocker.patch.object(S3Writer, 'add_version_tag')
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=MagicMock(), version_tag='v123')
+                      key='test-key', session=mock_session, version_tag='v123')
     writer.open()
     writer.write('content')
     writer.close()
     mock_file.close.assert_called_once()
-    mock_add_version_tag.assert_called_once_with(value='v123')
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [{'Key': 'version', 'Value': 'v123'}]}
+    )
 
 
 def test_s3_writer_close_without_write_creates_nothing(mocker):
-    mock_add_version_tag = mocker.patch.object(S3Writer, 'add_version_tag')
+    mock_session = MagicMock()
     mock_smart_open = mocker.patch(
         'adapters.writer.smart_open.open', return_value=MagicMock())
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=MagicMock(), version_tag='v123')
+                      key='test-key', session=mock_session, version_tag='v123')
     writer.open()
     writer.close()
     # No write happened, so no object should be created and no tag applied.
     mock_smart_open.assert_not_called()
-    mock_add_version_tag.assert_not_called()
+    mock_session.client('s3').put_object_tagging.assert_not_called()
 
 
 def test_s3_writer_context_manager_no_file_on_early_failure(mocker):
-    mock_add_version_tag = mocker.patch.object(S3Writer, 'add_version_tag')
+    mock_session = MagicMock()
     mock_smart_open = mocker.patch(
         'adapters.writer.smart_open.open', return_value=MagicMock())
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=MagicMock(), version_tag='v123')
+                      key='test-key', session=mock_session, version_tag='v123')
     with pytest.raises(RuntimeError):
         with writer:
             raise RuntimeError('setup failed before writing')
     # A failure before any write must not create or tag an (empty) object.
     mock_smart_open.assert_not_called()
-    mock_add_version_tag.assert_not_called()
+    mock_session.client('s3').put_object_tagging.assert_not_called()
+
+
+def test_s3_writer_close_with_multiple_tags(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v123')
+    writer.add_tag('source', 'oncotree')
+    writer.add_tag('format', 'jsonl')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [
+            {'Key': 'version', 'Value': 'v123'},
+            {'Key': 'source', 'Value': 'oncotree'},
+            {'Key': 'format', 'Value': 'jsonl'},
+        ]}
+    )
+
+
+def test_s3_writer_add_tag_appends_value_for_same_key(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session)
+    writer.add_tag('portal_accession', 'IGVFFI0001')
+    writer.add_tag('portal_accession', 'IGVFFI0002')
+    writer.add_tag('portal_accession', 'IGVFFI0003')
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_s3_client.put_object_tagging.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        Tagging={'TagSet': [
+            {'Key': 'portal_accession', 'Value': 'IGVFFI0001 IGVFFI0002 IGVFFI0003'},
+        ]}
+    )
+
+
+def test_s3_writer_close_no_tags_skips_api_call(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session)
+    writer.open()
+    writer.write('content')
+    writer.close()
+    mock_session.client('s3').put_object_tagging.assert_not_called()
 
 
 def test_s3_writer_destination():
