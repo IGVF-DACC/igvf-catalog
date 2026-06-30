@@ -182,7 +182,7 @@ class STARRseqVariantBiosample(BaseAdapter):
                         '_to': self.biosample_term[0],
                         'name': 'modulates expression in',
                         'inverse_name': 'regulatory activity modulated by',
-                        'log2FoldChange': float(row[6]),
+                        'log2FC': float(row[6]),
                         'inputCountRef': float(row[7]),
                         'outputCountRef': float(row[8]),
                         'inputCountAlt': float(row[9]),

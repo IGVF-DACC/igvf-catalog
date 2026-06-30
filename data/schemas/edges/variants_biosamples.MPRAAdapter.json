@@ -68,13 +68,13 @@
           "type": "number",
           "description": "Minus log10 P value for the edge"
         },
-        "neg_log10_qvalue": {
+        "neg_log10_pvalue_adj": {
           "type": "number",
           "description": "Minus log10 Q value for the edge"
         },
         "significant": {
           "type": "boolean",
-          "description": "True if this edge met the significance threshold (e.g. neg_log10_qvalue >= 1)."
+          "description": "True if this edge met the significance threshold (e.g. neg_log10_pvalue_adj >= 1)."
         },
         "postProbEffect": {
           "type": "number",
@@ -115,7 +115,8 @@
         },
         "source": {
           "enum": [
-            "IGVF"
+            "IGVF",
+            "ENCODE"
           ]
         },
         "source_url": {
@@ -131,7 +132,7 @@
           ]
         },
         "biological_context": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "Biological context for the edge",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
@@ -160,13 +161,24 @@
         "biological_context",
         "treatments_term_ids",
         "genomic_element",
-        "strand"
+        "strand",
+        "log2FC",
+        "bed_score",
+        "DNA_count_ref",
+        "RNA_count_ref",
+        "DNA_count_alt",
+        "RNA_count_alt",
+        "neg_log10_pvalue",
+        "neg_log10_pvalue_adj",
+        "postProbEffect",
+        "CI_lower_95",
+        "CI_upper_95"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "strand, log2FC, bed_score, DNA_count_ref, RNA_count_ref, DNA_count_alt, RNA_count_alt, neg_log10_pvalue, neg_log10_qvalue, significant, postProbEffect, source, source_url, genomic_element"
+    "return": "strand, log2FC, bed_score, DNA_count_ref, RNA_count_ref, DNA_count_alt, RNA_count_alt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
   },
   "db_collection_name": "variants_biosamples"
 }

@@ -80,6 +80,7 @@ describe('codingVariantsRouters', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
 
     const input = {
+      gene_name: 'SAMD11',
       page: 0,
       limit: 1000 // above MAX_PAGE_SIZE
     }
@@ -92,24 +93,107 @@ describe('codingVariantsRouters', () => {
     })
 
     // The query should still run, but limit should be capped
-    expect(dbModule.db.query).toHaveBeenCalled()
+    expect(dbModule.db.query).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
   })
 
-  it('handles missing optional fields', async () => {
+  it('maps alt_amino_acid to alt filter', async () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([])
     } as any)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
+    const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = {}
-    const result = await codingVariantsRouters.codingVariants({
-      input,
+    await codingVariantsRouters.codingVariants({
+      input: {
+        gene_name: 'SAMD11',
+        amino_acid_position: '42',
+        alt_amino_acid: 'L',
+        page: 0
+      },
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      rawInput: {
+        gene_name: 'SAMD11',
+        amino_acid_position: '42',
+        alt_amino_acid: 'L',
+        page: 0
+      }
     })
-    expect(Array.isArray(result)).toBe(true)
+
+    expect(getFilterStatementsSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        aapos: '42',
+        alt: 'L',
+        gene_name: 'SAMD11'
+      })
+    )
+
+    getFilterStatementsSpy.mockClear()
+
+    await codingVariantsRouters.codingVariants({
+      input: {
+        gene_name: 'SAMD11',
+        amino_acid_position: '203',
+        alt_amino_acid: '*',
+        page: 0
+      },
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: {
+        gene_name: 'SAMD11',
+        amino_acid_position: '203',
+        alt_amino_acid: '*',
+        page: 0
+      }
+    })
+
+    expect(getFilterStatementsSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        alt: '*'
+      })
+    )
+  })
+
+  it('maps uniprot_name to protein_name filter', async () => {
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([])
+    } as any)
+    const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+
+    await codingVariantsRouters.codingVariants({
+      input: {
+        uniprot_name: 'SAMD11_HUMAN',
+        page: 0
+      },
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: {
+        uniprot_name: 'SAMD11_HUMAN',
+        page: 0
+      }
+    })
+
+    expect(getFilterStatementsSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        protein_name: 'SAMD11_HUMAN'
+      })
+    )
+  })
+
+  it('rejects requests with no coding variant parameters', async () => {
+    await expect(codingVariantsRouters.codingVariants({
+      input: { page: 0 },
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: { page: 0 }
+    })).rejects.toMatchObject({
+      code: 'BAD_REQUEST'
+    })
   })
 })

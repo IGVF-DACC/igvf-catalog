@@ -98,13 +98,21 @@ class ENCODE2GCRISPR(BaseAdapter):
                     score = row[4]  # i.e. effect size from perturb experiment
                     if score == 'NA':
                         score = 0  # assign 0 if unavailable
-                    p_value = row[19]  # pValueAdjusted
+                    p_value = row[18]  # pValue
                     if p_value == 'NA':
-                        log10pvalue = None
+                        neglog10pvalue = None
                     elif float(p_value) == 0:
-                        log10pvalue = self.MAX_LOG10_PVALUE
+                        neglog10pvalue = self.MAX_LOG10_PVALUE
                     else:
-                        log10pvalue = -1 * log10(float(p_value))
+                        neglog10pvalue = -1 * log10(float(p_value))
+
+                    p_value_adj = row[19]  # pValueAdjusted
+                    if p_value_adj == 'NA':
+                        neglog10pvalue_adj = None
+                    elif float(p_value_adj) == 0:
+                        neglog10pvalue_adj = self.MAX_LOG10_PVALUE
+                    else:
+                        neglog10pvalue_adj = -1 * log10(float(p_value_adj))
 
                     significant = row[17]  # TRUE or FALSE
 
@@ -120,8 +128,10 @@ class ENCODE2GCRISPR(BaseAdapter):
                         '_from': _source,
                         '_to': _target,
                         'score': float(score),
-                        'p_value': float(p_value) if p_value != 'NA' else p_value,
-                        'log10pvalue': log10pvalue,
+                        'p_value': float(p_value) if p_value != 'NA' else None,
+                        'p_value_adj': float(p_value_adj) if p_value_adj != 'NA' else None,
+                        'neg_log10_pvalue': neglog10pvalue,
+                        'neg_log10_pvalue_adj': neglog10pvalue_adj,
                         'significant': significant == 'TRUE',
                         'method': file_fileset.get('method'),
                         'crispr_modality': file_fileset.get('crispr_modality'),

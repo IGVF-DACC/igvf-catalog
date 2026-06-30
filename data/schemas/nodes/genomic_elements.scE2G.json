@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/nodes/genomic_elements.IGVFE2GCRISPR.json",
+  "$id": "schemas/nodes/genomic_elements.scE2G.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -12,29 +12,29 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
+          "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "name": {
-          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
-        },
-        "promoter_of": {
-          "type": "string",
-          "description": "Promoter of the genomic element",
-          "example": "genes/ENSG00000123685"
+          "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "method": {
           "enum": [
-            "Perturb-seq",
-            "CRISPR screen"
+            "scE2G"
+          ]
+        },
+        "type": {
+          "enum": [
+            "accessible dna elements"
           ]
         },
         "source_annotation": {
           "type": "string",
           "description": "Source annotation for the genomic element",
-          "example": "promoter",
           "enum": [
-            "enhancer",
-            "promoter"
+            "genic",
+            "intergenic",
+            "promoter",
+            "enhancer"
           ]
         },
         "source": {
@@ -43,17 +43,13 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
-        },
-        "type": {
-          "enum": [
-            "tested elements"
-          ]
+          "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
           "description": "Filesets for the genomic element",
-          "example": "files_filesets/IGVFFI3069QCRA",
+          "example": "files_filesets/IGVFFI5648GWQX",
           "pattern": "^files_filesets/"
         }
       },

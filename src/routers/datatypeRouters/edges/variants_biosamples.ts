@@ -41,7 +41,7 @@ const returnFormat = z.object({
   biosample: z.string().or(ontologyFormat).optional(),
   genomic_element: z.string().or(genomicElementFormat).nullish(),
   strand: z.string().nullish(),
-  log2FoldChange: z.number().nullish(),
+  log2FC: z.number().nullish(),
   DNA_count_ref: z.number().nullish(),
   DNA_count_alt: z.number().nullish(),
   RNA_count_ref: z.number().nullish(),
@@ -51,7 +51,7 @@ const returnFormat = z.object({
   CI_upper_95: z.number().nullish(),
   significant: z.boolean().nullish(),
   neg_log10_pvalue: z.number().nullish(),
-  fdr: z.number().nullish(), // neg_log10_qvalue
+  neg_log10_pvalue_adj: z.number().nullish(),
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
@@ -80,7 +80,7 @@ function variantQueryValidation (input: paramsFormatType): void {
 }
 
 function biosampleQueryValidation (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['biosample_id', 'biosample_name'].includes(item)).length === 0) {
+  if (input.biosample_id === undefined && input.biosample_name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one biosample property must be defined.'
@@ -171,7 +171,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
       'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record.genomic_element'},
       'strand': record.strand,
-      'log2FoldChange': record.log2FoldChange OR record.log2FC,
+      'log2FC': record.log2FC OR record.log2FoldChange,
       'DNA_count_ref': record.DNA_count_ref or record.inputCountRef,
       'DNA_count_alt': record.DNA_count_alt or record.inputCountAlt,
       'RNA_count_ref': record.RNA_count_ref or record.outputCountRef,
@@ -181,7 +181,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'CI_upper_95': record.CI_upper_95,
       'significant': record.significant,
       'neg_log10_pvalue': record.neg_log10_pvalue,
-      'fdr': record.neg_log10_qvalue,
+      'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
       'label': record.label,
       'method': record.method,
       'class': record.class,

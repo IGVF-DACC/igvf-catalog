@@ -490,49 +490,6 @@ class FileFileSet:
                         treatment_object['treatment_term_id'])
                 # Add support for treatment vs. untreated analyses later
 
-            # special case STARR-seq for inclusion of 1000 Genomes donors in the simple sample summary
-            if method == 'STARR-seq':
-                thousand_genomes_ids = set()
-                construct_library_set_accessions = set()
-                integrated_content_files_accessions = set()
-                curated_set_accessions = set()
-                donors_accessions = set()
-
-                for construct_library_set in sample_object.get('construct_library_sets', []):
-                    construct_library_set_accessions.add(
-                        construct_library_set['accession'])
-                construct_library_set_objects = FileFileSet.get_batch_objects(
-                    list(construct_library_set_accessions), ['integrated_content_files'], api_url=FileFileSet.IGVF_API)
-
-                for construct_library_set_object in construct_library_set_objects:
-                    integrated_content_files = construct_library_set_object.get(
-                        'integrated_content_files', [])
-                    for integrated_content_file in integrated_content_files:
-                        integrated_content_files_accessions.add(
-                            integrated_content_file['accession'])
-                integrated_content_files_objects = FileFileSet.get_batch_objects(
-                    list(integrated_content_files_accessions), ['file_set'], api_url=FileFileSet.IGVF_API)
-                for integrated_content_file_object in integrated_content_files_objects:
-                    curated_set = integrated_content_file_object['file_set']
-                    curated_set_accessions.add(curated_set['accession'])
-                curated_sets_objects = FileFileSet.get_batch_objects(
-                    list(curated_set_accessions), ['donors'], api_url=FileFileSet.IGVF_API)
-                for curated_set_object in curated_sets_objects:
-                    for donor in curated_set_object.get('donors', []):
-                        donors_accessions.add(donor['accession'])
-                donors_objects = FileFileSet.get_batch_objects(
-                    list(donors_accessions), ['dbxrefs'], api_url=FileFileSet.IGVF_API)
-                for donor_object in donors_objects:
-                    dbxrefs = donor_object.get('dbxrefs', [])
-                    for dbxref in dbxrefs:
-                        if dbxref.startswith('IGSR'):
-                            thousand_genomes_id = dbxref.split(':')[1]
-                            thousand_genomes_ids.add(thousand_genomes_id)
-                if thousand_genomes_ids:
-                    thousand_genomes_ids = ', '.join(
-                        sorted(thousand_genomes_ids))
-                    simple_sample_summary = f'{simple_sample_summary} with variants from 1000 Genomes donors: {thousand_genomes_ids}'
-
             simple_sample_summaries.add(simple_sample_summary)
         if len(crispr_modalities) > 1:
             raise ValueError(
@@ -723,7 +680,8 @@ class FileFileSet:
             'download_link': download_link,
             'cell_annotation': None,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': None
+            'crispr_modality': None,
+            'browser_index_file': None
         }
         return props, donor_ids, all_sample_types, disease_ids
 
@@ -734,7 +692,7 @@ class FileFileSet:
         download_link = urljoin(FileFileSet.IGVF_API, href)
         class_type = file_object.get('catalog_class')
         genome_browser_link = None
-
+        browser_index_file = None
         fileset_object = requests.get(
             urljoin(FileFileSet.IGVF_API, file_object['file_set']['@id'] + '/@@embedded?format=json')).json()
         fileset_accession = fileset_object['accession']
@@ -756,7 +714,16 @@ class FileFileSet:
             files = fileset_object.get('files', [])
             for file in files:
                 file_format = file.get('file_format')
-                if file_format in ['bigInteract', 'bigBed', 'tbi']:
+                if file_format == 'tbi':
+                    href = file.get('href')
+                    browser_index_file = urljoin(FileFileSet.IGVF_API, href)
+                    break
+            for file in files:
+                file_format = file.get('file_format')
+                if file_format in ['bigInteract', 'bigBed', 'bigWig', 'bedpe']:
+                    # tbi file needs to be paired with bedpe file. This may change in the future.
+                    if browser_index_file and file_format != 'bedpe':
+                        continue
                     href = file.get('href')
                     genome_browser_link = urljoin(FileFileSet.IGVF_API, href)
                     break
@@ -798,9 +765,9 @@ class FileFileSet:
             method = 'MPRA'
 
         if preferred_assay_titles:
-            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq'}):
+            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq', 'Parse Perturb-seq', 'scCRISPR screen'}):
                 method = 'Perturb-seq'
-            elif set(preferred_assay_titles) == {'CRISPR FACS screen'}:
+            elif set(preferred_assay_titles).issubset({'CRISPR FACS screen', 'CRISPR FlowFISH screen'}):
                 method = 'CRISPR screen'
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
@@ -809,6 +776,9 @@ class FileFileSet:
         sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids, modality = FileFileSet.parse_sample_donor_treatment_igvf(
             samples,
             method)
+
+        if fileset_object_type == 'AnalysisSet':
+            simple_sample_summaries = [fileset_object['sample_summary']]
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
@@ -835,7 +805,8 @@ class FileFileSet:
             'download_link': download_link,
             'cell_annotation': cell_annotation,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': modality
+            'crispr_modality': modality,
+            'browser_index_file': browser_index_file
         }
         return props, donor_ids, sample_term_ids
 
