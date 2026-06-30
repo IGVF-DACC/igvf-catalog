@@ -844,10 +844,10 @@ HGNC_GENE_MAP_OVERRIDES = {
 }
 
 
-def get_gene_map_from_arangodb(field):
+def get_gene_map_from_arangodb(field, collection='genes'):
     db = ArangoDB().get_igvf_connection()
     cursor = db.aql.execute(
-        f'FOR gene IN genes RETURN {{ key: gene._key, value: gene.{field} }}'
+        f'FOR gene IN {collection} RETURN {{ key: gene._key, value: gene.{field} }}'
     )
     gene_map = {}
     for record in cursor:
@@ -859,7 +859,7 @@ def get_gene_map_from_arangodb(field):
             gene_map[gval] = [gkey]
         else:
             gene_map[gval].append(gkey)
-    if field == 'hgnc':
+    if field == 'hgnc' and collection == 'genes':
         for hgnc_id, gene_keys in HGNC_GENE_MAP_OVERRIDES.items():
             if hgnc_id not in gene_map:
                 gene_map[hgnc_id] = gene_keys
