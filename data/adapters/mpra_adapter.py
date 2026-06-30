@@ -170,7 +170,7 @@ class MPRAAdapter(BaseAdapter):
 
     def _resolve_igvf_accession_from_encode_accession(self, encode_accession, igvf_api_url='https://api.data.igvf.org'):
         response = requests.get(
-            f'{igvf_api_url}/search/?type=File&aliases=igvf:{encode_accession}&fields=accession')
+            f'{igvf_api_url}/search/?type=File&aliases=igvf:{encode_accession}&field=accession')
         response.raise_for_status()
         try:
             return response.json()['@graph'][0]['accession']

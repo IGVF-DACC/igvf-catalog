@@ -3,9 +3,20 @@ import pytest
 import tempfile
 import gzip
 import os
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from adapters.mpra_adapter import MPRAAdapter
 from adapters.writer import SpyWriter
+
+
+@pytest.fixture
+def mock_igvf_api():
+    """Mock requests.get so _resolve_igvf_accession_from_encode_accession never hits the network."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        '@graph': [{'accession': 'IGVFFI9999MOCK'}]
+    }
+    with patch('adapters.mpra_adapter.requests.get', return_value=mock_response) as mock_get:
+        yield mock_get
 
 
 # mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
@@ -22,7 +33,7 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
-def test_encode_mpra_adapter_regulatory_region(mock_file_fileset):
+def test_encode_mpra_adapter_regulatory_region(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
 
     # Create a small temporary test file
@@ -52,7 +63,7 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset):
         os.unlink(temp_file_path)
 
 
-def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
+def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
 
     # Create a small temporary test file
@@ -109,7 +120,7 @@ def test_encode_mpra_adapter_no_sequence_design_variant_label(mock_file_fileset)
                     writer=writer)
 
 
-def test_encode_mpra_adapter_initialization(mock_file_fileset):
+def test_encode_mpra_adapter_initialization(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
     for label in ['genomic_element', 'genomic_element_biosample']:
         adapter = MPRAAdapter(filepath='dummy.bed.gz',
@@ -123,7 +134,7 @@ def test_encode_mpra_adapter_initialization(mock_file_fileset):
         assert adapter.writer == writer
 
 
-def test_encode_mpra_adapter_validate_doc_invalid(mock_file_fileset):
+def test_encode_mpra_adapter_validate_doc_invalid(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
     adapter = MPRAAdapter(filepath='dummy.bed.gz',
                           label='genomic_element',
