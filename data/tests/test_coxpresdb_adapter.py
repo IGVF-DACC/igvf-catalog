@@ -1,4 +1,5 @@
 import json
+import pickle
 from unittest.mock import patch
 import pytest
 
@@ -13,8 +14,19 @@ def mock_get(mock_request):
     }
 
 
+def mock_entrez_gene_map():
+    with open('./data_loading_support_files/entrez_to_ensembl.pkl', 'rb') as f:
+        entrez_ensembl_dict = pickle.load(f)
+    return {
+        f'ENTREZ:{entrez_id}': [ensembl_id]
+        for entrez_id, ensembl_id in entrez_ensembl_dict.items()
+    }
+
+
+@patch('adapters.coxpresdb_adapter.get_gene_map_from_arangodb')
 @patch('adapters.coxpresdb_adapter.requests.get')
-def test_coxpresdb_adapter(mock_request):
+def test_coxpresdb_adapter(mock_request, mock_gene_map):
+    mock_gene_map.return_value = mock_entrez_gene_map()
     mock_get(mock_request)
     writer = SpyWriter()
     adapter = Coxpresdb(filepath='./samples/coxpresdb/',
@@ -38,8 +50,10 @@ def test_coxpresdb_adapter(mock_request):
     assert first_item['label'] == adapter.collection_label
 
 
+@patch('adapters.coxpresdb_adapter.get_gene_map_from_arangodb')
 @patch('adapters.coxpresdb_adapter.requests.get')
-def test_coxpresdb_adapter_z_score_filter(mock_request):
+def test_coxpresdb_adapter_z_score_filter(mock_request, mock_gene_map):
+    mock_gene_map.return_value = mock_entrez_gene_map()
     mock_get(mock_request)
     writer = SpyWriter()
     adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
@@ -49,6 +63,33 @@ def test_coxpresdb_adapter_z_score_filter(mock_request):
         if item.startswith('{'):
             data = json.loads(item)
             assert abs(float(data['z_score'])) >= 3
+
+
+@patch('adapters.coxpresdb_adapter.get_gene_map_from_arangodb')
+@patch('adapters.coxpresdb_adapter.requests.get')
+def test_coxpresdb_adapter_deduplicates_gene_pairs(mock_request, mock_gene_map):
+    mock_gene_map.return_value = mock_entrez_gene_map()
+    mock_get(mock_request)
+    writer = SpyWriter()
+    adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
+    adapter.process_file()
+
+    edges = [json.loads(item)
+             for item in writer.contents if item.startswith('{')]
+    entrez_pairs = set()
+    for edge in edges:
+        key_body = edge['_key'].removesuffix('_coxpresdb')
+        if key_body.startswith('ENSG'):
+            pair = tuple(sorted(
+                [key_body.split('_')[0], key_body.split('_', 1)[1]],
+                key=lambda ens: ens,
+            ))
+        else:
+            entrez_a, entrez_b = key_body.split('_', 1)
+            pair = tuple(sorted([entrez_a, entrez_b], key=int))
+        assert pair not in entrez_pairs
+        entrez_pairs.add(pair)
+        assert edge['_key'].endswith('_coxpresdb')
 
 
 def test_coxpresdb_adapter_initialization():

@@ -251,7 +251,7 @@ export const descriptions = {
         label: 'COXPRESdb',
         examples: [
           {
-            label: 'Single pair result',
+            label: 'Single result',
             items: [
               'gene_id = ENSG00000153048',
               'associated_gene_id = ENSG00000233369',

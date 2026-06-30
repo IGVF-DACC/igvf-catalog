@@ -2,7 +2,7 @@ import pytest
 import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1
 from unittest.mock import patch, MagicMock
-from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -362,3 +362,50 @@ def test_get_file_fileset_by_accession_in_arangodb_returns_document():
         assert result == expected_document
         mock_db_instance.collection.assert_called_once_with('files_filesets')
         mock_collection.get.assert_called_once_with(accession)
+
+
+def test_get_gene_map_from_arangodb_applies_hgnc_overrides():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSG00000000001', 'value': 'HGNC:1'},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_gene_map_from_arangodb('hgnc')
+
+        assert result['HGNC:1'] == ['ENSG00000000001']
+        assert result['HGNC:32925'] == ['ENSG00000288330']
+
+
+def test_get_gene_map_from_arangodb_does_not_override_existing_hgnc():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSG00000000099', 'value': 'HGNC:32925'},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_gene_map_from_arangodb('hgnc')
+
+        assert result['HGNC:32925'] == ['ENSG00000000099']
+
+
+def test_get_gene_map_from_arangodb_skips_hgnc_overrides_for_other_fields():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSG00000000001', 'value': '1234'},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_gene_map_from_arangodb('entrez_id')
+
+        assert result == {'1234': ['ENSG00000000001']}
+        assert 'HGNC:32925' not in result

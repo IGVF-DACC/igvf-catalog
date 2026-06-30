@@ -22,8 +22,6 @@ class GenccDiseasesGenes(BaseAdapter):
 
     def parse(self):
         self.gene_map = get_gene_map_from_arangodb('hgnc')
-        if 'HGNC:32925' not in self.gene_map:
-            self.gene_map['HGNC:32925'] = ['ENSG00000288330']
         # read the tsv file
         with open(self.filepath, 'r', encoding='utf-8', newline='') as f:
             reader = csv.reader(f, delimiter='\t')

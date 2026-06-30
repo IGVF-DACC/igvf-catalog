@@ -838,6 +838,12 @@ def get_file_fileset_by_accession_in_arangodb(accession):
     return files_filesets_collection.get(accession)
 
 
+# HGNC IDs missing from the genes collection at load time.
+HGNC_GENE_MAP_OVERRIDES = {
+    'HGNC:32925': ['ENSG00000288330'],
+}
+
+
 def get_gene_map_from_arangodb(field):
     db = ArangoDB().get_igvf_connection()
     cursor = db.aql.execute(
@@ -853,4 +859,8 @@ def get_gene_map_from_arangodb(field):
             gene_map[gval] = [gkey]
         else:
             gene_map[gval].append(gkey)
+    if field == 'hgnc':
+        for hgnc_id, gene_keys in HGNC_GENE_MAP_OVERRIDES.items():
+            if hgnc_id not in gene_map:
+                gene_map[hgnc_id] = gene_keys
     return gene_map
