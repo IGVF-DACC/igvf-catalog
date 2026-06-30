@@ -63,7 +63,7 @@ const outputFormat = z.object({
   fdrp_bh_ref: z.string().nullish(),
   fdrp_bh_alt: z.string().nullish(),
   motif: z.string().nullish(),
-  motif_fc: z.string().nullish(),
+  motif_log2FC: z.number().nullish(),
   beta: z.number().nullish(),
   se: z.number().nullish(),
   gene: z.string().nullish(),
@@ -83,6 +83,8 @@ const outputFormat = z.object({
 const apiKeyToDbFieldMap = {
   log10pvalue: 'neg_log10_pvalue'
 }
+
+const MOTIF_LOG2FC_RETURN = "'motif_log2FC': (record.motif_fc != null && record.motif_fc != '') ? TO_NUMBER(record.motif_fc) : null"
 
 const ADASTRA_SCORE_EXPR = `(
   TO_NUMBER(record.fdrp_bh_ref) < 0.05 && TO_NUMBER(record.fdrp_bh_alt) < 0.05
@@ -218,7 +220,7 @@ const buildQuery = ({
         'biosample_term': bioTerm,
         'score': ${ADASTRA_SCORE_EXPR},
         'method': record.method,
-        ${getDBReturnStatements(asbSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(asbSchema, false, MOTIF_LOG2FC_RETURN, ['motif_fc'], true, apiKeyToDbFieldMap)}
       } :
       record.source == 'GVATdb' ? {
         'method': record.method,
