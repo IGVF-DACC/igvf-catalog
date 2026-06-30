@@ -143,9 +143,6 @@ class MPRAAdapter(BaseAdapter):
             raise ValueError(f'Invalid source URL: {source_url}')
 
         self.has_sequence_designs = reference_filepath is not None
-        if self.has_sequence_designs:
-            self.writer.add_tag('portal_accessions',
-                                self.reference_file_accession)
 
         self.files_filesets = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -162,6 +159,8 @@ class MPRAAdapter(BaseAdapter):
             self.reference_source_url = reference_source_url or ''
             self.reference_file_accession = (
                 reference_source_url or '').rstrip('/').split('/')[-1]
+            self.writer.add_tag('portal_accessions',
+                                self.reference_file_accession)
             self.load_mpra_design_mapping(self.mpra_design_file)
         else:
             self.mpra_design_file = None
