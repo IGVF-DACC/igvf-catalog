@@ -14,6 +14,7 @@ mechanisms_json = json.dumps([{
     'Type': 'Loss'
 }])
 
+SAMPLE_FILEPATH = 'IGVFFI6893ZOAA.tsv.gz'
 SAMPLE_MAPPING_TSV = (
     f'ENST00000261590.13\tQ873T\tDSG2_ENST00000261590.13_p.Q873T_c.2617_2618delinsAC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACC\tc.2617_2618delinsAC,c.2617_2619delinsACC\tNC_000018.10:31546002:CA:AC,NC_000018.10:31546002:CAA:ACC\tNC_000018.10:g.31546003_31546004delinsAC,NC_000018.10:g.31546003_31546005delinsACC\tACA,ACC\t1,1\tCAA\tENSP00000261590.8\tDSG2_HUMAN\t0.279\t{mechanisms_json}\n'
 )
@@ -37,7 +38,7 @@ def mock_file_fileset():
 def test_load_from_mapping_file_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, label='variants', writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -56,7 +57,7 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
 def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_file_fileset):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, label='variants_coding_variants', writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='variants_coding_variants', writer=writer, validate=True)
     # Initialize igvf_metadata_props for variants_coding_variants label
     adapter.igvf_metadata_props = mock_file_fileset.return_value
     adapter.process_file()
@@ -81,7 +82,7 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_fi
 def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, label='coding_variants', writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -104,7 +105,7 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
 def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_file_fileset):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None,
+        SAMPLE_FILEPATH,
         label='coding_variants_phenotypes',
         writer=writer,
         validate=True
@@ -135,7 +136,7 @@ def test_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants, variants, variants_coding_variants, coding_variants_phenotypes'):
         Mutpred2CodingVariantsScores(
-            None,
+            SAMPLE_FILEPATH,
             label='invalid_label',
             writer=writer,
             validate=True
@@ -146,7 +147,7 @@ def test_validate_doc_invalid():
     """Test document validation with invalid data"""
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, writer=writer, validate=True)
+        SAMPLE_FILEPATH, writer=writer, validate=True)
 
     invalid_doc = {
         'invalid_field': 'invalid_value',
@@ -161,7 +162,7 @@ def test_met1_aa_change_handling():
     """Test handling of Met1 amino acid changes"""
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, writer=writer, validate=True)
+        SAMPLE_FILEPATH, writer=writer, validate=True)
 
     # Create a test row with Met1 amino acid change
     test_row = {
