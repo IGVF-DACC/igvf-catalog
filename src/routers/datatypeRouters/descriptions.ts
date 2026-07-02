@@ -1032,6 +1032,21 @@ export const descriptions = {
   ca_id = CA1522823495,<br> \
   files_fileset = ENCFF705MLV.',
 
+  variants_genomic_elements_genes:
+    'Retrieve genes whose expression is modulated by perturbing genomic elements that overlap a variant.<br> \
+    The query starts from a variant, finds overlapping Perturb-seq genomic elements, then returns element-gene associations.<br> \
+    By default (all_genes = false), only nearby genes on the same chromosome as the variant are returned, and the overlapping genomic element must be within 2 Mb of the gene TSS.<br> \
+    Set all_genes = true to return all genes linked to the overlapping elements regardless of chromosome or distance.<br> \
+    At least one variant identifier is required: variant_id, spdi, hgvs, or ca_id.<br> \
+    Example: variant_id = NC_000001.11:109426297:G:C,<br> \
+    spdi = NC_000001.11:109426297:G:C,<br> \
+    all_genes = false,<br> \
+    files_fileset = IGVFFI0206LUDV,<br> \
+    biological_context = HCASMC-hTERT,<br> \
+    biosample_term = EFO_0022614.<br> \
+    The limit parameter controls the page size and can not exceed 100.<br> \
+    Pagination is 0-based.',
+
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
