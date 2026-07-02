@@ -65,7 +65,7 @@ def test_s3_writer_close_with_tagging(mocker):
     writer.write('content')
     writer.close()
     mock_file.close.assert_called_once()
-    mock_s3_client.put_object_tagging.assert_called_once_with(
+    mock_session.client('s3').put_object_tagging.assert_called_once_with(
         Bucket='test-bucket', Key='test-key',
         Tagging={'TagSet': [{'Key': 'version', 'Value': 'v123'}]}
     )
