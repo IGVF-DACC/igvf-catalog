@@ -401,24 +401,16 @@ export const descriptions = {
         label: 'CRISPR screen',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by variant identifier',
             items: [
               'spdi = NC_000016.10:28930710:G:A',
               'method = CRISPR screen'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by region',
             items: [
               'region = chr16:28930700-28930800 (maximum length: 10kb)',
-              'method = CRISPR screen'
-            ]
-          },
-          {
-            label: 'query by files_fileset',
-            note: FILES_FILESET_METHOD_NOTE,
-            items: [
-              'files_fileset = IGVFFI8101RHSC',
               'method = CRISPR screen'
             ]
           }
@@ -504,24 +496,16 @@ export const descriptions = {
         label: 'CRISPR screen',
         examples: [
           {
-            label: 'Single result',
+            label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000177455',
               'method = CRISPR screen'
             ]
           },
           {
-            label: 'Group results',
+            label: 'query by gene name',
             items: [
               'gene_name = CD19',
-              'method = CRISPR screen'
-            ]
-          },
-          {
-            label: 'query by files_fileset',
-            note: FILES_FILESET_METHOD_NOTE,
-            items: [
-              'files_fileset = IGVFFI8101RHSC',
               'method = CRISPR screen'
             ]
           }
