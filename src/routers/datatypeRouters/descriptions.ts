@@ -326,7 +326,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by variants.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, or files_filesets. <br> \
@@ -395,11 +395,39 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'spdi = NC_000016.10:28930710:G:A',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI8101RHSC',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
       }
     ]),
 
   genes_variants:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGVF by Ensembl gene ids.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by Ensembl gene ids.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, or files_fileset. <br> \
@@ -467,6 +495,34 @@ export const descriptions = {
             items: [
               'alias = PPIF',
               'method = Variant-EFFECTS'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000177455',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = CD19',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI8101RHSC',
+              'method = CRISPR screen'
             ]
           }
         ]
