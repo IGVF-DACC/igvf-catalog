@@ -78,8 +78,9 @@ class ASB_GVATDB(BaseAdapter):
                     _source = 'variants/' + variant_id
                     _target = 'proteins/' + ensembl_id
 
+                    # if p_value_adj is 0, we will set neg_log10_pvalue_adj to 2 (max value in the dataset), otherwise we will calculate it as -log10(p_value_adj)
                     p_value_adj = float(row[15])
-                    neg_log10_pvalue_adj = float('inf')
+                    neg_log10_pvalue_adj = 2
                     if p_value_adj > 0:
                         neg_log10_pvalue_adj = -1 * log10(p_value_adj)
 
