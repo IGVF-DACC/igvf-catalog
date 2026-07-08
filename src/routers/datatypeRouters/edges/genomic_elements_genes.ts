@@ -106,9 +106,9 @@ const grnOutputFormat = z.object({
   log2FC: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
-  knockdown_efficiency_log2FC: z.number().nullish(),
-  knockdown_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
-  knockdown_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
+  perturbation_efficiency_log2FC: z.number().nullish(),
+  perturbation_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
 })
 
 const buildEdgeFilter = (input: paramsFormatType): string => {
@@ -478,7 +478,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
           LET ge = DOCUMENT(record._from)
-          LET knockdownEfficiencyEdge = FIRST(
+          LET perturbationEfficiencyEdge = FIRST(
             FOR se IN genomic_elements_genes
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
               LIMIT 1
@@ -497,9 +497,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'log2FC': record.log2FC,
           'neg_log10_pvalue': record.neg_log10_pvalue,
           'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
-          'knockdown_efficiency_log2FC': knockdownEfficiencyEdge.log2FC,
-          'knockdown_efficiency_neg_log10_pvalue': knockdownEfficiencyEdge.neg_log10_pvalue,
-          'knockdown_efficiency_neg_log10_pvalue_adj': knockdownEfficiencyEdge.neg_log10_pvalue_adj
+          'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
+          'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
+          'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
         }
   `
 
@@ -516,7 +516,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-            LET knockdownEfficiencyEdge = FIRST(
+            LET perturbationEfficiencyEdge = FIRST(
               FOR se IN genomic_elements_genes
                 FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
                 LIMIT 1
@@ -535,9 +535,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'log2FC': record.log2FC,
             'neg_log10_pvalue': record.neg_log10_pvalue,
             'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
-            'knockdown_efficiency_log2FC': knockdownEfficiencyEdge.log2FC,
-            'knockdown_efficiency_neg_log10_pvalue': knockdownEfficiencyEdge.neg_log10_pvalue,
-            'knockdown_efficiency_neg_log10_pvalue_adj': knockdownEfficiencyEdge.neg_log10_pvalue_adj
+            'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
+            'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
+            'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
           }
   `
 
@@ -557,7 +557,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                 SORT record._key
                 LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-                LET knockdownEfficiencyEdge = FIRST(
+                LET perturbationEfficiencyEdge = FIRST(
                   FOR se IN genomic_elements_genes
                     FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
                     LIMIT 1
@@ -576,9 +576,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'log2FC': record.log2FC,
                   'neg_log10_pvalue': record.neg_log10_pvalue,
                   'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
-                  'knockdown_efficiency_log2FC': knockdownEfficiencyEdge.log2FC,
-                  'knockdown_efficiency_neg_log10_pvalue': knockdownEfficiencyEdge.neg_log10_pvalue,
-                  'knockdown_efficiency_neg_log10_pvalue_adj': knockdownEfficiencyEdge.neg_log10_pvalue_adj
+                  'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
+                  'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
+                  'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
               }
   `
 
