@@ -43,7 +43,7 @@ const gnrGeneQueryFormat = z.object({
   neg_log10_pvalue: z.string().optional(),
   neg_log10_pvalue_adj: z.string().optional(),
   method: z.enum(['CRISPR screen', 'Perturb-seq']).optional()
-}).merge(commonHumanEdgeParamsFormat).omit({organism: true, verbose: true})
+}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -105,7 +105,10 @@ const grnOutputFormat = z.object({
   files_filesets: z.string(),
   log2FC: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
-  neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
+  neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  knockdown_efficiency_log2FC: z.number().nullish(),
+  knockdown_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  knockdown_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
 })
 
 const buildEdgeFilter = (input: paramsFormatType): string => {
@@ -460,7 +463,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
   if (input.method !== undefined) {
-    methodFilter = `['${input.method}']`
+    methodFilter = `['${input.method as string}']`
   }
 
   const responseQuery = `
@@ -475,6 +478,12 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
           LET ge = DOCUMENT(record._from)
+          LET knockdownEfficiencyEdge = FIRST(
+            FOR se IN genomic_elements_genes
+              FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
+              LIMIT 1
+              RETURN se
+          )
 
           RETURN {
           'response_gene': gene.name,
@@ -487,7 +496,10 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'biological_context': record.biological_context,
           'log2FC': record.log2FC,
           'neg_log10_pvalue': record.neg_log10_pvalue,
-          'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
+          'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+          'knockdown_efficiency_log2FC': knockdownEfficiencyEdge.log2FC,
+          'knockdown_efficiency_neg_log10_pvalue': knockdownEfficiencyEdge.neg_log10_pvalue,
+          'knockdown_efficiency_neg_log10_pvalue_adj': knockdownEfficiencyEdge.neg_log10_pvalue_adj
         }
   `
 
@@ -504,6 +516,13 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
+            LET knockdownEfficiencyEdge = FIRST(
+              FOR se IN genomic_elements_genes
+                FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
+                LIMIT 1
+                RETURN se
+            )
+
             RETURN {
             'response_gene': DOCUMENT(record._to).name,
             'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': gene.name },
@@ -515,7 +534,10 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'biological_context': record.biological_context,
             'log2FC': record.log2FC,
             'neg_log10_pvalue': record.neg_log10_pvalue,
-            'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
+            'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+            'knockdown_efficiency_log2FC': knockdownEfficiencyEdge.log2FC,
+            'knockdown_efficiency_neg_log10_pvalue': knockdownEfficiencyEdge.neg_log10_pvalue,
+            'knockdown_efficiency_neg_log10_pvalue_adj': knockdownEfficiencyEdge.neg_log10_pvalue_adj
           }
   `
 
@@ -535,6 +557,13 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                 SORT record._key
                 LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
+                LET knockdownEfficiencyEdge = FIRST(
+                  FOR se IN genomic_elements_genes
+                    FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
+                    LIMIT 1
+                    RETURN se
+                )
+
                 RETURN {
                   'response_gene': response_gene.name,
                   'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': regulator_gene.name },
@@ -546,7 +575,10 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'biological_context': record.biological_context,
                   'log2FC': record.log2FC,
                   'neg_log10_pvalue': record.neg_log10_pvalue,
-                  'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
+                  'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+                  'knockdown_efficiency_log2FC': knockdownEfficiencyEdge.log2FC,
+                  'knockdown_efficiency_neg_log10_pvalue': knockdownEfficiencyEdge.neg_log10_pvalue,
+                  'knockdown_efficiency_neg_log10_pvalue_adj': knockdownEfficiencyEdge.neg_log10_pvalue_adj
               }
   `
 
@@ -554,16 +586,16 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   if (hasRegulatorInput && hasResponseInput) {
     query = regulatorResponseQuery
   } else if (hasRegulatorInput) {
-     query = regulatorQuery
+    query = regulatorQuery
   } else if (hasResponseInput) {
-     query = responseQuery
+    query = responseQuery
   }
 
   const objs = (await db.query(query)).all()
   if (Array.isArray(objs) && objs.length > 0) {
-    return objs
+    return await objs
   }
-  return objs
+  return await objs
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
