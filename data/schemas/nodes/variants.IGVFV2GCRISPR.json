@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/nodes/variants.VariantEFFECTSAdapter.json",
+  "$id": "schemas/nodes/variants.IGVFV2GCRISPR.json",
   "allOf": [
     {
       "$ref": "node.base.json"

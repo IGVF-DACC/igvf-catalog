@@ -42,7 +42,7 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
-from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
+from adapters.igvf_V2G_CRISPR_adapter import IGVFV2GCRISPR
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
@@ -129,7 +129,7 @@ KEY_TO_ADAPTER = {
     'variant_disease_gene': ClinGen,
     'mpra': MPRAAdapter,
     'bluestarr_variant_biosample': BlueSTARRVariantBiosample,
-    'variant_effects_variant_gene': VariantEFFECTSAdapter,
+    'igvf_variant_gene_crispr': IGVFV2GCRISPR,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,

@@ -62,8 +62,11 @@ const completeQtlsFormat = z.object({
   effect_size: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().nullish(),
-  log2_fold_change: z.number().nullish(),
+  log2FC: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(),
+  coefficient_stddev: z.number().nullish(),
+  power: z.number().nullish(),
+  significant: z.boolean().nullish(),
   standard_error: z.number().nullish(),
   z_score: z.number().nullish(),
   credible_set_min_r2: z.number().nullish(),
@@ -84,7 +87,7 @@ const completeQtlsFormat = z.object({
 const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
 const variantsGenesAFGREQtl = getSchema('data/schemas/edges/variants_genes.AFGREQtl.json')
 const variantsGenesEQTLCatalog = getSchema('data/schemas/edges/variants_genes.EQTLCatalog.json')
-const variantsGenesVariantEFFECTSAdapter = getSchema('data/schemas/edges/variants_genes.VariantEFFECTSAdapter.json')
+const variantsGenesIGVFV2GCRISPR = getSchema('data/schemas/edges/variants_genes.IGVFV2GCRISPR.json')
 
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
@@ -287,7 +290,7 @@ const buildVariantsGenesQuery = ({
     }
     RETURN MERGE(base,
       record.source == 'IGVF' ? {
-        ${getDBReturnStatements(variantsGenesVariantEFFECTSAdapter)}
+        ${getDBReturnStatements(variantsGenesIGVFV2GCRISPR)}
       } : record.source == 'AFGR' && record.label == 'spliceQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
