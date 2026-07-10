@@ -57,6 +57,7 @@ from collections import defaultdict
 import ast
 from pathlib import Path
 
+import requests
 
 from adapters.base import BaseAdapter
 from adapters.helpers import (
@@ -132,8 +133,12 @@ class MPRAAdapter(BaseAdapter):
 
         if 'encodeproject.org' in source_url:
             self.source = 'ENCODE'
+            self.igvf_accession = self._resolve_igvf_accession_from_encode_accession(
+                self.file_accession)
+            self.writer.add_tag('portal_accessions', self.igvf_accession)
         elif 'data.igvf.org' in source_url:
             self.source = 'IGVF'
+            self.writer.add_tag('portal_accessions', self.file_accession)
         else:
             raise ValueError(f'Invalid source URL: {source_url}')
 
@@ -154,12 +159,24 @@ class MPRAAdapter(BaseAdapter):
             self.reference_source_url = reference_source_url or ''
             self.reference_file_accession = (
                 reference_source_url or '').rstrip('/').split('/')[-1]
+            self.writer.add_tag('portal_accessions',
+                                self.reference_file_accession)
             self.load_mpra_design_mapping(self.mpra_design_file)
         else:
             self.mpra_design_file = None
             self.reference_source_url = None
             self.reference_file_accession = None
         self.excluded_effect_names = self._load_excluded_effect_names()
+
+    def _resolve_igvf_accession_from_encode_accession(self, encode_accession, igvf_api_url='https://api.data.igvf.org'):
+        response = requests.get(
+            f'{igvf_api_url}/search/?type=File&aliases=igvf:{encode_accession}&field=accession')
+        response.raise_for_status()
+        try:
+            return response.json()['@graph'][0]['accession']
+        except (KeyError, IndexError) as e:
+            raise ValueError(
+                f'Failed to resolve IGVF accession from ENCODE accession: {encode_accession}, response: {response.json()}') from e
 
     def _open_file(self):
         """Open file as text, handling optional gzip."""
@@ -414,6 +431,7 @@ class MPRAAdapter(BaseAdapter):
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
+            # in this case the file is always from IGVF so we add the tag
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
                 if i % self.CHUNK_SIZE == 0:
