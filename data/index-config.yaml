@@ -427,8 +427,12 @@ variants_phenotypes:
       - label, class, files_filesets
       - class, files_filesets
       - files_filesets
+      - method
+      - method, files_filesets
       - method, _key
       - files_filesets, _key
+      - _to, _key
+      - source, files_filesets
 
 variants_phenotypes_coding_variants:
   persistent:
