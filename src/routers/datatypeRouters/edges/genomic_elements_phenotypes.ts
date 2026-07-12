@@ -70,7 +70,7 @@ const outputFormat = z.array(z.object({
   num_guides: z.number().nullish(),
   num_guides_hit: z.number().nullish(),
   num_guides_nonhit: z.number().nullish(),
-  pct_guides_hit: z.number().nullish(),
+  fraction_guides_hit: z.number().nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   phenotype: z.string().or(phenotypeOutputFormat)
 }))
@@ -198,7 +198,7 @@ function buildQuery (params: {
         'num_guides': record.num_guides,
         'num_guides_hit': record.num_guides_hit,
         'num_guides_nonhit': record.num_guides_nonhit,
-        'pct_guides_hit': record.pct_guides_hit
+        'fraction_guides_hit': record.fraction_guides_hit
       }
   `
 }
