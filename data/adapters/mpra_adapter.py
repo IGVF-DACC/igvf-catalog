@@ -24,7 +24,6 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
      populate allele sets to skip ``ALT_``* effect names for ref-only biosample edges. A
      *single* row with ``[ref, alt]`` is one reference tile (not two elements).
   3. **Significance** — ``minusLog10QValue >= THRESHOLD`` (default 1) when Q is available.
-  4. **IGVFFI1436TRIH** — optional name exclusion file (``IGVFFI1436TRIH_EXCLUSION_LIST``).
 
 """
 
@@ -55,7 +54,6 @@ import hashlib
 from typing import Optional
 from collections import defaultdict
 import ast
-from pathlib import Path
 
 import requests
 
@@ -102,11 +100,6 @@ class MPRAAdapter(BaseAdapter):
 
     THRESHOLD = 1
     CHUNK_SIZE = 6500
-    IGVFFI1436TRIH_EXCLUSION_LIST = (
-        Path(__file__).resolve().parents[1] /
-        'data_loading_support_files' /
-        'MPRA_IGVFFI1436TRIH_element_exclusion_list.tsv'
-    )
 
     def __init__(
         self,
@@ -166,7 +159,6 @@ class MPRAAdapter(BaseAdapter):
             self.mpra_design_file = None
             self.reference_source_url = None
             self.reference_file_accession = None
-        self.excluded_effect_names = self._load_excluded_effect_names()
 
     def _resolve_igvf_accession_from_encode_accession(self, encode_accession, igvf_api_url='https://api.data.igvf.org'):
         response = requests.get(
@@ -380,32 +372,6 @@ class MPRAAdapter(BaseAdapter):
                     if pos is not None:
                         self.variant_pos_to_element[(spdi, pos)].add(key)
 
-    def _load_excluded_effect_names(self):
-        accession = (self.reference_file_accession or '').strip()
-        if accession != 'IGVFFI1436TRIH':
-            return frozenset()
-        exclusion_path = self.IGVFFI1436TRIH_EXCLUSION_LIST
-        if not exclusion_path.exists():
-            raise FileNotFoundError(
-                f'Configured MPRA exclusion list not found for {accession}: {exclusion_path}'
-            )
-
-        names = set()
-        with open(exclusion_path, 'r') as f:
-            for line in f:
-                raw = line.strip()
-                if not raw:
-                    continue
-                # Some rows include a secondary alias separated by ';'.
-                for token in raw.split(';'):
-                    normalized = token.strip()
-                    if normalized:
-                        names.add(normalized)
-        return frozenset(names)
-
-    def _is_blacklisted_effect_name(self, effect_name):
-        return (effect_name or '').strip() in self.excluded_effect_names
-
     def parse(self):
         # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
         self.seen_elements = set()
@@ -482,9 +448,6 @@ class MPRAAdapter(BaseAdapter):
                             f'not present in MPRA sequence designs file {self.reference_file_accession}.'
                         )
                         continue
-                    if self.has_sequence_designs and self._is_blacklisted_effect_name(row[3]):
-                        # Ignore known bad design entries.
-                        continue
                     if element_id in seen_element_ids:
                         continue
                     seen_element_ids.add(element_id)
@@ -519,11 +482,6 @@ class MPRAAdapter(BaseAdapter):
                     if self.has_sequence_designs:
                         normalized_effect_name = self.normalize_design_name(
                             row[3])
-                        # Must run before missing-allele handling: blacklisted rows
-                        # have no design alleles and share coordinates, which would
-                        # otherwise trigger missing_allele_multi_effect.
-                        if self._is_blacklisted_effect_name(row[3]):
-                            continue
                         effect_class = self.design_name_class.get(
                             normalized_effect_name, '')
                         if 'control' in effect_class:
