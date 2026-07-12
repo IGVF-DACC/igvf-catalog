@@ -1274,7 +1274,7 @@ genomic element to phenotype CRISPR E2P:
     - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
   source: IGVF
-  label: regulatory genomic element effect on phenotype
+  label: regulatory element effect on phenotype
 
 # Prerequisite: load files_filesets for scE2G accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.scE2G)
 # Example: python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI5648GWQX

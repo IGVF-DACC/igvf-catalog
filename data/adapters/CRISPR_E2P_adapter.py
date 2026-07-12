@@ -25,7 +25,7 @@ from adapters.writer import Writer
 class CRISPR_E2P(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_phenotype']
     SOURCE = 'IGVF'
-    COLLECTION_LABEL = 'regulatory genomic element effect on phenotype'
+    COLLECTION_LABEL = 'regulatory element effect on phenotype'
     MAX_LOG10_PVALUE = 240
 
     # Accession -> phenotype ontology term and file column names.

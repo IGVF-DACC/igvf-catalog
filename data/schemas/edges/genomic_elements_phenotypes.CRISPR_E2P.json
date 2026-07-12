@@ -78,7 +78,7 @@
         },
         "label": {
           "enum": [
-            "regulatory genomic element effect on phenotype"
+            "regulatory element effect on phenotype"
           ]
         },
         "source": {

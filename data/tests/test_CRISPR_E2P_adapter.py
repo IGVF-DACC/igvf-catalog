@@ -67,7 +67,7 @@ def test_crispr_e2p_genomic_element_phenotype_migration(mock_file_fileset):
     assert first_item['num_guides_nonhit'] == 32
     assert first_item['fraction_guides_hit'] == 0.0
     assert first_item['crispr_modality'] == 'interference'
-    assert first_item['label'] == 'regulatory genomic element effect on phenotype'
+    assert first_item['label'] == 'regulatory element effect on phenotype'
     assert first_item['name'] == 'associated with'
     assert first_item[
         'biological_context'] == 'human HFF-1 cell line from donor(s) IGVFDO0058YJWC'
