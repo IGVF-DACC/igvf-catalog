@@ -310,6 +310,26 @@ genomic_elements_genes:
     analyzers:
       - text_en_no_stem
 
+genomic_elements_phenotypes:
+  persistent:
+    fields:
+      - method
+      - method, files_filesets
+      - source, files_filesets
+      - files_filesets
+      - files_filesets, _key
+      - z_score, files_filesets
+      - _from, files_filesets
+      - _to, _key
+      - biosample_term, biological_context, source, method, files_filesets
+      - biological_context, source, method, files_filesets
+      - method, source, label, class, files_filesets
+
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
 studies:
   persistent:
     fields:

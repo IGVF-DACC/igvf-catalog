@@ -31,6 +31,7 @@
             "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
             "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
             "IGVFE2GCRISPR": "schemas/nodes/genomic_elements.IGVFE2GCRISPR.json",
+            "CRISPR_E2P": "schemas/nodes/genomic_elements.CRISPR_E2P.json",
             "scE2G": "schemas/nodes/genomic_elements.scE2G.json",
             "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
             "MPRAAdapter": "schemas/nodes/genomic_elements.MPRAAdapter.json"
@@ -134,6 +135,9 @@
             "EncodeElementGeneLink": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
             "IGVFE2GCRISPR": "schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json",
             "scE2G": "schemas/edges/genomic_elements_genes.scE2G.json"
+        },
+        "genomic_elements_phenotypes": {
+            "CRISPR_E2P": "schemas/edges/genomic_elements_phenotypes.CRISPR_E2P.json"
         },
         "genomic_elements_mm_genomic_elements": {
             "HumanMouseElementAdapter": "schemas/edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json"

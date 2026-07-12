@@ -1747,6 +1747,73 @@ export const descriptions = {
       }
     ]),
 
+  genomic_elements_phenotypes:
+    'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
+    At least one of these properties must be defined: region, files_fileset, method, or phenotype_id. <br> \
+    Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype',
+            items: [
+              'phenotype_id = GO_0016477',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI5135QZCS',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Query by region',
+            items: [
+              'region = chr1:101174581-101175330 (maximum length: 10kb)',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
+      }
+    ]),
+
+  phenotypes_genomic_elements:
+    'Retrieve genomic elements associated with phenotypes.<br> \
+    At least one of these properties must be defined: phenotype_id, phenotype_name, files_fileset, or method. <br> \
+    Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0016049',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI9584UDAS',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
+      }
+    ]),
+
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \
