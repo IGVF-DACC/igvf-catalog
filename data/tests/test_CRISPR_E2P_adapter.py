@@ -63,9 +63,9 @@ def test_crispr_e2p_genomic_element_phenotype_migration(mock_file_fileset):
     assert first_item['p_value'] == pytest.approx(0.623284698)
     assert first_item['significant'] is False
     assert first_item['num_guides'] == 32
-    assert first_item['hit_guide_count'] == 0
-    assert first_item['nonhit_guide_count'] == 32
-    assert first_item['fraction_hit'] == 0.0
+    assert first_item['num_guides_hit'] == 0
+    assert first_item['num_guides_nonhit'] == 32
+    assert first_item['pct_guides_hit'] == 0.0
     assert first_item['crispr_modality'] == 'interference'
     assert first_item['label'] == 'regulatory genomic element effect on phenotype'
     assert first_item['name'] == 'associated with'
@@ -90,9 +90,9 @@ def test_crispr_e2p_genomic_element_phenotype_growth(mock_file_fileset):
     assert first_item['_to'] == 'ontology_terms/GO_0016049'
     assert first_item['z_score'] == pytest.approx(-0.122645943)
     assert first_item['p_value'] == pytest.approx(0.718493129)
-    assert first_item['hit_guide_count'] == 1
-    assert first_item['nonhit_guide_count'] == 31
-    assert first_item['fraction_hit'] == pytest.approx(0.03125)
+    assert first_item['num_guides_hit'] == 1
+    assert first_item['num_guides_nonhit'] == 31
+    assert first_item['pct_guides_hit'] == pytest.approx(0.03125)
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI9584UDAS'
 
 

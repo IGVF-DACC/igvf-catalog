@@ -68,9 +68,9 @@ const outputFormat = z.array(z.object({
   neg_log10_pvalue: z.number().nullish(),
   significant: z.boolean().nullish(),
   num_guides: z.number().nullish(),
-  hit_guide_count: z.number().nullish(),
-  nonhit_guide_count: z.number().nullish(),
-  fraction_hit: z.number().nullish(),
+  num_guides_hit: z.number().nullish(),
+  num_guides_nonhit: z.number().nullish(),
+  pct_guides_hit: z.number().nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   phenotype: z.string().or(phenotypeOutputFormat)
 }))
@@ -196,9 +196,9 @@ function buildQuery (params: {
         'neg_log10_pvalue': record.neg_log10_pvalue,
         'significant': record.significant,
         'num_guides': record.num_guides,
-        'hit_guide_count': record.hit_guide_count,
-        'nonhit_guide_count': record.nonhit_guide_count,
-        'fraction_hit': record.fraction_hit
+        'num_guides_hit': record.num_guides_hit,
+        'num_guides_nonhit': record.num_guides_nonhit,
+        'pct_guides_hit': record.pct_guides_hit
       }
   `
 }

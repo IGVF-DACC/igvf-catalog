@@ -47,15 +47,15 @@
           "type": "number",
           "description": "Number of guides targeting the genomic element"
         },
-        "hit_guide_count": {
+        "num_guides_hit": {
           "type": "number",
           "description": "Number of guides that met hit thresholds"
         },
-        "nonhit_guide_count": {
+        "num_guides_nonhit": {
           "type": "number",
           "description": "Number of guides that did not meet hit thresholds"
         },
-        "fraction_hit": {
+        "pct_guides_hit": {
           "type": "number",
           "description": "Fraction of guides that met hit thresholds"
         },
@@ -135,9 +135,9 @@
         "neg_log10_pvalue",
         "significant",
         "num_guides",
-        "hit_guide_count",
-        "nonhit_guide_count",
-        "fraction_hit",
+        "num_guides_hit",
+        "num_guides_nonhit",
+        "pct_guides_hit",
         "files_filesets",
         "crispr_modality",
         "biological_context",
@@ -147,8 +147,8 @@
     }
   ],
   "accessible_via": {
-    "filter_by_range": "z_score, p_value, neg_log10_pvalue, fraction_hit",
-    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, hit_guide_count, nonhit_guide_count, fraction_hit"
+    "filter_by_range": "z_score, p_value, neg_log10_pvalue",
+    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, num_guides_hit, num_guides_nonhit, pct_guides_hit"
   },
   "db_collection_name": "genomic_elements_phenotypes"
 }
