@@ -24,6 +24,8 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
      populate allele sets to skip ``ALT_``* effect names for ref-only biosample edges. A
      *single* row with ``[ref, alt]`` is one reference tile (not two elements).
   3. **Significance** — ``minusLog10QValue >= THRESHOLD`` (default 1) when Q is available.
+  4. **Excluded SPDIs** — ``EXCLUDED_VARIANT_SPDIS`` skips known-bad identical ref/alt
+     variants in IGVFFI4378PZYI before ``load_variant``.
 
 """
 
@@ -100,6 +102,12 @@ class MPRAAdapter(BaseAdapter):
 
     THRESHOLD = 1
     CHUNK_SIZE = 6500
+    # Identical ref/alt SPDIs in IGVFFI4378PZYI that would fail load_variant.
+    EXCLUDED_VARIANT_SPDIS = frozenset({
+        'NC_000014.9:72161134:G:G',
+        'NC_000017.11:22379424:G:G',
+        'NC_000009.12:133278859:T:T',
+    })
 
     def __init__(
         self,
@@ -556,6 +564,8 @@ class MPRAAdapter(BaseAdapter):
             spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}')
         for row in chunk:
             spdi = row[3]
+            if spdi in self.EXCLUDED_VARIANT_SPDIS:
+                continue
             if spdi in loaded_spdis:
                 continue
             variant, skipped_message = load_variant(spdi)
@@ -616,6 +626,8 @@ class MPRAAdapter(BaseAdapter):
             [row[3] for row in chunk])
         for row in chunk:
             spdi = row[3]
+            if spdi in self.EXCLUDED_VARIANT_SPDIS:
+                continue
             if spdi not in loaded_spdis:
                 continue
             if spdi not in self.variant_to_element:

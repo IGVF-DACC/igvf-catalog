@@ -563,6 +563,50 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
     assert len({p['_from'] for p in parsed}) == 2
 
 
+@pytest.mark.parametrize('label', ['variant', 'variant_biosample'])
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb')
+@patch('adapters.mpra_adapter.load_variant')
+def test_excluded_variant_spdis_skip_load_variant(
+    mock_load_variant, mock_check, tmp_path, mock_file_fileset, label
+):
+    excluded = next(iter(MPRAAdapter.EXCLUDED_VARIANT_SPDIS))
+    kept = 'NC_000009.12:135961939:C:T'
+    mock_check.return_value = {kept} if label == 'variant_biosample' else set()
+    mock_load_variant.return_value = ({'_key': kept, 'spdi': kept}, None)
+
+    design_file = tmp_path / 'design.tsv'
+    design_file.write_text(
+        'name\tsequence\tcategory\tclass\tsource\tref\tchr\tstart\tend\tstrand\t'
+        'variant_class\tvariant_pos\tSPDI\tallele\tinfo\n'
+        f'bad\tATG\tvariant\ttest\tsource\tGRCh38\tchr9\t10\t20\t+\t'
+        f'["SNV"]\t[1]\t["{excluded}"]\t["ref"]\tNA\n'
+        f'good\tATG\tvariant\ttest\tsource\tGRCh38\tchr9\t30\t40\t+\t'
+        f'["SNV"]\t[1]\t["{kept}"]\t["ref"]\tNA\n'
+    )
+    effects_file = tmp_path / 'effects.tsv'
+    effects_file.write_text(
+        f'chr9\t10\t20\t{excluded}\t1\t+\t0.1\t0.2\t0.3\t0.4\t0.5\t'
+        f'0.6\t1.5\t0.01\t-0.1\t0.2\t1\tG\tG\n'
+        f'chr9\t30\t40\t{kept}\t1\t+\t0.1\t0.2\t0.3\t0.4\t0.5\t'
+        f'0.6\t1.5\t0.01\t-0.1\t0.2\t1\tC\tT\n'
+    )
+
+    adapter = MPRAAdapter(
+        filepath=str(effects_file),
+        label=label,
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/',
+        reference_filepath=str(design_file),
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/',
+        writer=SpyWriter(),
+        validate=False,
+    )
+    adapter.process_file()
+
+    called = [c.args[0] for c in mock_load_variant.call_args_list]
+    assert excluded not in called
+    assert kept in called
+
+
 def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label'):
