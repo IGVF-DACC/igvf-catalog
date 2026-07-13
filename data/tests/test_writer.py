@@ -98,6 +98,48 @@ def test_s3_writer_context_manager_no_file_on_early_failure(mocker):
     mock_session.client('s3').put_object_tagging.assert_not_called()
 
 
+def test_s3_writer_waits_for_object_before_tagging(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session, version_tag='v123')
+    writer.open()
+    writer.write('content')
+    writer.close()
+
+    # The just-completed multipart object may not be immediately visible to a
+    # PutObjectTagging call, so we wait on the object_exists waiter first.
+    mock_s3_client.get_waiter.assert_called_once_with('object_exists')
+    mock_s3_client.get_waiter.return_value.wait.assert_called_once_with(
+        Bucket='test-bucket', Key='test-key',
+        WaiterConfig={'Delay': 1, 'MaxAttempts': 5},
+    )
+    # Tagging must happen only after waiting for the object to exist.
+    call_names = [c[0] for c in mock_s3_client.mock_calls]
+    wait_index = next(i for i, name in enumerate(call_names)
+                      if name.endswith('wait'))
+    tag_index = call_names.index('put_object_tagging')
+    assert wait_index < tag_index
+
+
+def test_s3_writer_no_wait_when_no_tags(mocker):
+    mock_file = MagicMock()
+    mock_session = MagicMock()
+    mock_s3_client = mock_session.client('s3')
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=mock_session)
+    writer.open()
+    writer.write('content')
+    writer.close()
+
+    # No tags => no tagging call and no need to wait on the object.
+    mock_s3_client.put_object_tagging.assert_not_called()
+    mock_s3_client.get_waiter.assert_not_called()
+
+
 def test_s3_writer_close_with_multiple_tags(mocker):
     mock_file = MagicMock()
     mock_session = MagicMock()
