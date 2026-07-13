@@ -112,18 +112,6 @@ function buildEdgeFilters (input: paramsFormatType): string {
   return `FILTER ${filters.join(' AND ')}`
 }
 
-function logQuery (label: string, query: string, bindVars?: Record<string, unknown>): void {
-  console.log(`[variants/genomic-elements/genes] ${label}`)
-  console.log(query.trim())
-  if (bindVars !== undefined) {
-    const logBindVars = { ...bindVars }
-    if (Array.isArray(logBindVars.elements)) {
-      logBindVars.elements = `[${logBindVars.elements.length} genomic element(s)]`
-    }
-    console.log('bindVars:', JSON.stringify(logBindVars, null, 2))
-  }
-}
-
 function buildMainQuery (allGenes: boolean, edgeFilters: string): string {
   const geneFilters = allGenes
     ? ''
@@ -206,8 +194,6 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
   delete input.all_genes
 
   const edgeFilters = buildEdgeFilters(edgeInput)
-  console.log('[variants/genomic-elements/genes] variantInput:', variantInput)
-  console.log('[variants/genomic-elements/genes] allGenes:', allGenes)
 
   const variants = await variantSearch({
     ...variantInput,
@@ -222,7 +208,6 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
     })
   }
   const variant = variants[0]
-  console.log('[variants/genomic-elements/genes] variant:', variant)
 
   const overlappingElementsQuery = `
     FOR ge IN genomic_elements
@@ -230,10 +215,8 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
       RETURN ge
   `
   const overlappingElementsBindVars = { chr: variant.chr, pos: variant.pos }
-  logQuery('overlapping elements query', overlappingElementsQuery, overlappingElementsBindVars)
 
   const overlappingElements = await (await db.query(overlappingElementsQuery, overlappingElementsBindVars)).all()
-  console.log('[variants/genomic-elements/genes] overlappingElements count:', overlappingElements.length)
 
   if (overlappingElements.length === 0) {
     return []
@@ -260,10 +243,8 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
   if (!allGenes) {
     mainBindVars.chr = variant.chr
   }
-  logQuery('main query', query, mainBindVars)
 
   const results = await (await db.query(query, mainBindVars)).all()
-  console.log('[variants/genomic-elements/genes] results count:', results.length)
   return results
 }
 
