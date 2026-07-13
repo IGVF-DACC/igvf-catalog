@@ -16,6 +16,7 @@ class FileFileSet:
     IGVF_SOURCE_URL = 'https://data.igvf.org/'
     SOURCE_ENCODE = 'ENCODE'
     SOURCE_IGVF = 'IGVF'
+    SOURCE_COMMUNITY = 'Community'
 
     ENCODE_disease_id_mapping = {
         'DOID:0080832': 'HP:0100543',
@@ -811,7 +812,7 @@ class FileFileSet:
             'treatments_term_ids': FileFileSet.none_if_empty(treatment_ids),
             'publication': publication_id,
             'collections': catalog_collections,
-            'source': FileFileSet.SOURCE_IGVF,
+            'source': FileFileSet.SOURCE_COMMUNITY if is_external_curated_set else FileFileSet.SOURCE_IGVF,
             'source_url': file_object.get('source_url') if is_external_curated_set else source_url,
             'version': file_object.get('version') if is_external_curated_set else None,
             'download_link': download_link,

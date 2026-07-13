@@ -26,6 +26,7 @@
             "alan-boyle",
             "bill-majoros",
             "charles-gersbach",
+            "community",
             "doug-fowler",
             "gary-hon",
             "j-michael-cherry",
@@ -91,7 +92,10 @@
           }
         },
         "method": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The method of the file set",
           "enum": [
             "BlueSTARR",
@@ -114,7 +118,8 @@
             "Variant-EFFECTS",
             "scATAC-seq",
             "scE2G",
-            "snATAC-seq"
+            "snATAC-seq",
+            null
           ]
         },
         "class": {
@@ -264,7 +269,8 @@
         "source": {
           "enum": [
             "ENCODE",
-            "IGVF"
+            "IGVF",
+            "Community"
           ]
         },
         "source_url": {
@@ -293,7 +299,10 @@
           ]
         },
         "genome_browser_link": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The genome browser link of the file set",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
@@ -319,6 +328,14 @@
             "prime editing",
             "knockout"
           ]
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The version string of the external data source",
+          "example": "File generated on 2023-10-10"
         }
       },
       "required": [

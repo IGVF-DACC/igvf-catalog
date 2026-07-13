@@ -413,6 +413,41 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
     assert props['method'] == 'CRISPR screen'
 
 
+def test_query_fileset_files_props_igvf_community_curated_set():
+    file_object = {
+        '@id': '/reference-files/IGVFFI6501YXMX/',
+        'accession': 'IGVFFI6501YXMX',
+        'catalog_class': 'biological relationship',
+        'catalog_collections': ['gene_products_terms'],
+        'source_url': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
+        'version': 'File generated on 2023-10-10',
+        'file_set': {'@id': '/curated-sets/IGVFDS3257FDZW/'},
+        'href': '/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS3257FDZW',
+        '@type': ['CuratedSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/community/'},
+        'samples': [],
+        'publications': [],
+        'files': []
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        props, donor_ids, sample_term_ids = FileFileSet.query_fileset_files_props_igvf(
+            file_object)
+    assert props['class'] == 'biological relationship'
+    assert props['method'] is None
+    assert props['source_url'] == 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
+    assert props['version'] == 'File generated on 2023-10-10'
+    assert props['collections'] == ['gene_products_terms']
+    assert props['lab'] == 'community'
+    assert props['source'] == 'Community'
+    assert props['software'] is None
+    assert props['samples'] is None
+    assert donor_ids == set()
+    assert sample_term_ids == []
+
+
 def test_get_donor_props():
     api_url = 'https://api.data.igvf.org/'
     source_url = 'https://data.igvf.org/'
@@ -783,7 +818,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'IGVFFI5688VHRS', 'name': 'IGVFFI5688VHRS', 'file_set_id': 'IGVFDS2175LLDQ', 'lab': 'tim-reddy', 'preferred_assay_titles': ['STARR-seq'], 'assay_term_ids': ['OBI:0002041'], 'method': 'STARR-seq', 'class': 'observed data', 'software': ['BIRD', 'Samtools', 'pandas'], 'samples': ['ontology_terms/EFO_0002067'], 'sample_ids': ['IGVFSM3422QUYJ'], 'simple_sample_summaries': [
-        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None, 'crispr_modality': None, 'browser_index_file': None}
+        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'version': None, 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'genome_browser_link': None, 'crispr_modality': None, 'browser_index_file': None}
 
     write = SpyWriter()
     adapter = FileFileSet(
