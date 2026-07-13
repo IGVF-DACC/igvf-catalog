@@ -66,6 +66,14 @@ class S3Writer(Writer):
         if not self.s3_tags:
             return
         client = self.session.client('s3')
+        # smart_open finalizes the object with CompleteMultipartUpload. Right
+        # after that, PutObjectTagging (a subresource op made through a fresh
+        # client) can intermittently return NoSuchKey while the just-completed
+        # object propagates. Wait for the object to be visible before tagging.
+        client.get_waiter('object_exists').wait(
+            Bucket=self.bucket, Key=self.key,
+            WaiterConfig={'Delay': 1, 'MaxAttempts': 5},
+        )
         client.put_object_tagging(Bucket=self.bucket, Key=self.key, Tagging={
             'TagSet': self.s3_tags
         })
