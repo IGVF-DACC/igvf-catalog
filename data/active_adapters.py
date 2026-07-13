@@ -86,7 +86,7 @@ KEY_TO_ADAPTER = {
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
     'igvf_genomic_element_gene_crispr': IGVFE2GCRISPR,
-    'crispr_e2p': CRISPR_E2P,
+    'crispr_element_phenotype': CRISPR_E2P,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,
