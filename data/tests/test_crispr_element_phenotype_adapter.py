@@ -1,13 +1,13 @@
 import json
 import pytest
 from unittest.mock import patch
-from adapters.crispr_element_phenotype_adapter import CRISPRElementPhenotype
+from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.writer import SpyWriter
 
 
 @pytest.fixture
 def mock_file_fileset():
-    with patch('adapters.crispr_element_phenotype_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.CRISPR_element_phenotype_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
