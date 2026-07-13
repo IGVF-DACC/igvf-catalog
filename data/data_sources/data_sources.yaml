@@ -1251,12 +1251,12 @@ genomic element to gene IGVF CRISPR E2G:
 
 # Prerequisite: load files_filesets for CRISPR element-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR element phenotype)
 # Portal files must have catalog_collections including genomic_elements and genomic_elements_phenotypes.
-# Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_genomic_elements_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element CRISPR element phenotype:
   collection: genomic_elements
   params:
     - label
-  command: python3 data_parser.py --adapter crispr_element_phenotype --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_element_phenotype --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
@@ -1264,12 +1264,12 @@ genomic element CRISPR element phenotype:
   type: tested elements
   source_annotation: enhancer
 
-# Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element_phenotype --output-bucket-key genomic_elements_phenotypes/crispr_element_phenotype_genomic_elements_phenotypes_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element_phenotype --output-bucket-key genomic_elements_phenotypes/crispr_element_phenotype_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element to phenotype CRISPR element phenotype:
   collection: genomic_elements_phenotypes
   params:
     - label
-  command: python3 data_parser.py --adapter crispr_element_phenotype --source-url {source_url} --filepath {datafile} --label genomic_element_phenotype --output-bucket-key genomic_elements_phenotypes/crispr_element_phenotype_genomic_elements_phenotypes_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_element_phenotype --source-url {source_url} --filepath {datafile} --label genomic_element_phenotype --output-bucket-key genomic_elements_phenotypes/crispr_element_phenotype_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
