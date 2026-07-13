@@ -22,7 +22,7 @@ from adapters.writer import Writer
 # 93	chr1:101174581-101175330_93	32	-0.122645943	1	31	0.03125	0.718493129	FALSE
 
 
-class CRISPR_E2P(BaseAdapter):
+class CRISPRElementPhenotype(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_phenotype']
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on phenotype'

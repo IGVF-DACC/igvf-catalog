@@ -1,13 +1,13 @@
 import json
 import pytest
 from unittest.mock import patch
-from adapters.CRISPR_E2P_adapter import CRISPR_E2P
+from adapters.crispr_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.writer import SpyWriter
 
 
 @pytest.fixture
 def mock_file_fileset():
-    with patch('adapters.CRISPR_E2P_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.crispr_element_phenotype_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
@@ -19,10 +19,10 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
-def test_crispr_e2p_genomic_element_migration(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     writer = SpyWriter()
-    adapter = CRISPR_E2P(
-        filepath='./samples/crispr_e2p_migration.example.tsv',
+    adapter = CRISPRElementPhenotype(
+        filepath='./samples/crispr_element_phenotype_migration.example.tsv',
         label='genomic_element',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
@@ -43,10 +43,10 @@ def test_crispr_e2p_genomic_element_migration(mock_file_fileset):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI5135QZCS'
 
 
-def test_crispr_e2p_genomic_element_phenotype_migration(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_fileset):
     writer = SpyWriter()
-    adapter = CRISPR_E2P(
-        filepath='./samples/crispr_e2p_migration.example.tsv',
+    adapter = CRISPRElementPhenotype(
+        filepath='./samples/crispr_element_phenotype_migration.example.tsv',
         label='genomic_element_phenotype',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
@@ -74,10 +74,10 @@ def test_crispr_e2p_genomic_element_phenotype_migration(mock_file_fileset):
     assert first_item['biosample_term'] == 'ontology_terms/CLO_0003730'
 
 
-def test_crispr_e2p_genomic_element_phenotype_growth(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_phenotype_growth(mock_file_fileset):
     writer = SpyWriter()
-    adapter = CRISPR_E2P(
-        filepath='./samples/crispr_e2p_growth.example.tsv',
+    adapter = CRISPRElementPhenotype(
+        filepath='./samples/crispr_element_phenotype_growth.example.tsv',
         label='genomic_element_phenotype',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/',
         writer=writer,
@@ -96,22 +96,22 @@ def test_crispr_e2p_genomic_element_phenotype_growth(mock_file_fileset):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI9584UDAS'
 
 
-def test_crispr_e2p_invalid_label(mock_file_fileset):
+def test_crispr_element_phenotype_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label'):
-        CRISPR_E2P(
-            filepath='./samples/crispr_e2p_migration.example.tsv',
+        CRISPRElementPhenotype(
+            filepath='./samples/crispr_element_phenotype_migration.example.tsv',
             label='invalid_label',
             source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
             writer=writer,
         )
 
 
-def test_crispr_e2p_unsupported_accession(mock_file_fileset):
+def test_crispr_element_phenotype_unsupported_accession(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Unsupported file accession'):
-        CRISPR_E2P(
-            filepath='./samples/crispr_e2p_migration.example.tsv',
+        CRISPRElementPhenotype(
+            filepath='./samples/crispr_element_phenotype_migration.example.tsv',
             label='genomic_element',
             source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
@@ -119,7 +119,7 @@ def test_crispr_e2p_unsupported_accession(mock_file_fileset):
 
 
 def test_parse_element_coords():
-    chrom, start, end = CRISPR_E2P._parse_element_coords(
+    chrom, start, end = CRISPRElementPhenotype._parse_element_coords(
         'chr1:101174581-101175330_93')
     assert chrom == 'chr1'
     assert start == 101174581
@@ -127,18 +127,20 @@ def test_parse_element_coords():
 
 
 def test_parse_element_coords_skips_na_gene_controls():
-    assert CRISPR_E2P._parse_element_coords('NA:NA-NA_ABI2') is None
-    assert CRISPR_E2P._parse_element_coords('NA:NA-NA_ABL1') is None
+    assert CRISPRElementPhenotype._parse_element_coords(
+        'NA:NA-NA_ABI2') is None
+    assert CRISPRElementPhenotype._parse_element_coords(
+        'NA:NA-NA_ABL1') is None
 
 
 def test_parse_element_coords_raises_on_unrecognized():
     with pytest.raises(ValueError, match='Unrecognized element coordinates'):
-        CRISPR_E2P._parse_element_coords('not_a_coordinate')
+        CRISPRElementPhenotype._parse_element_coords('not_a_coordinate')
     with pytest.raises(ValueError, match='Unrecognized element coordinates'):
-        CRISPR_E2P._parse_element_coords('NA:something_else')
+        CRISPRElementPhenotype._parse_element_coords('NA:something_else')
 
 
-def test_crispr_e2p_skips_na_coordinate_rows(mock_file_fileset, tmp_path):
+def test_crispr_element_phenotype_skips_na_coordinate_rows(mock_file_fileset, tmp_path):
     sample = tmp_path / 'mixed.tsv'
     sample.write_text(
         'dhs\tdhs_coords\tdhs_count\tavg_migration_pZ\thit_gRNA_count_mig\t'
@@ -148,7 +150,7 @@ def test_crispr_e2p_skips_na_coordinate_rows(mock_file_fileset, tmp_path):
         'ABL1\tNA:NA-NA_ABL1\t6\t0.72319595\t0\t6\t0\t1\tFALSE\n'
     )
     writer = SpyWriter()
-    adapter = CRISPR_E2P(
+    adapter = CRISPRElementPhenotype(
         filepath=str(sample),
         label='genomic_element_phenotype',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',

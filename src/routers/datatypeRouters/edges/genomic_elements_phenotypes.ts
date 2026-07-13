@@ -12,7 +12,7 @@ const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_phenotypes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_phenotypes', 'source')
 
-const genomicElementsPhenotypesSchema = getSchema('data/schemas/edges/genomic_elements_phenotypes.CRISPR_E2P.json')
+const genomicElementsPhenotypesSchema = getSchema('data/schemas/edges/genomic_elements_phenotypes.CRISPRElementPhenotype.json')
 const genomicElementToPhenotypeCollectionName = 'genomic_elements_phenotypes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/nodes/genomic_elements.CRISPR_E2P.json",
+  "$id": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
   "allOf": [
     {
       "$ref": "node.base.json"
