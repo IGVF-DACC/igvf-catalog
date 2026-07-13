@@ -119,6 +119,7 @@ class IGVFV2GCRISPR(BaseAdapter):
         return posterior_inclusion_probability > cls.PIP_SIGNIFICANCE_THRESHOLD
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         if self.is_crispr_millipede:
             self._parse_crispr_millipede()
         else:
