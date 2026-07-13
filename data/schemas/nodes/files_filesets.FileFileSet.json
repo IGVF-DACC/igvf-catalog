@@ -98,15 +98,15 @@
           ],
           "description": "The method of the file set",
           "enum": [
+            "ADASTRA",
             "BlueSTARR",
-            "candidate Cis-Regulatory Elements",
-            "caQTL",
+            "COXPRESdb",
             "CRISPR screen",
-            "cV2F",
             "DUAL-IPA",
-            "elements",
             "ENCODE-rE2G",
             "ESM-1v",
+            "GVATdb",
+            "GWAS",
             "MPRA",
             "MutPred2",
             "Perturb-seq",
@@ -116,9 +116,16 @@
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
+            "cV2F",
+            "caQTL",
+            "candidate Cis-Regulatory Elements",
+            "eQTL",
+            "elements",
+            "pQTL",
             "scATAC-seq",
             "scE2G",
             "snATAC-seq",
+            "spliceQTL",
             null
           ]
         },
@@ -274,7 +281,11 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "download_link": {
           "type": "string",
