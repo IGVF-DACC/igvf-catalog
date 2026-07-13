@@ -176,6 +176,9 @@ class FileFileSet:
                 'derived_manually',
                 'derived_from',
                 'catalog_class',
+                'catalog_method',
+                'source_url',
+                'version',
                 'file_set',
                 'catalog_collections'
             ],
@@ -698,6 +701,7 @@ class FileFileSet:
         fileset_accession = fileset_object['accession']
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
+        is_external_curated_set = fileset_object_type == 'CuratedSet' and lab == 'community'
         catalog_collections = file_object.get('catalog_collections', [])
         cell_annotation = None
         if fileset_object_type == 'PseudobulkSet':
@@ -753,7 +757,9 @@ class FileFileSet:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             method = list(preferred_assay_titles)[0]
-        if fileset_object_type == 'CuratedSet' and not method:
+        if is_external_curated_set:
+            method = file_object.get('catalog_method')
+        elif fileset_object_type == 'CuratedSet' and not method:
             method = fileset_object.get('file_set_type')
 
         preferred_assay_titles = FileFileSet.none_if_empty(
@@ -806,7 +812,8 @@ class FileFileSet:
             'publication': publication_id,
             'collections': catalog_collections,
             'source': FileFileSet.SOURCE_IGVF,
-            'source_url': source_url,
+            'source_url': file_object.get('source_url') if is_external_curated_set else source_url,
+            'version': file_object.get('version') if is_external_curated_set else None,
             'download_link': download_link,
             'cell_annotation': cell_annotation,
             'genome_browser_link': genome_browser_link,
