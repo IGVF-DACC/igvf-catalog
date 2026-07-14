@@ -49,7 +49,8 @@ def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
-    assert 'score' in first_item
+    assert 'effect_size' in first_item
+    assert 'log2FC' in first_item
     assert 'p_value' in first_item
     assert 'p_value_adj' in first_item
     assert 'neg_log10_pvalue' in first_item
