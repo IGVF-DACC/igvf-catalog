@@ -10,14 +10,30 @@ def filepath():
 
 
 @pytest.fixture
+def drug_filepath():
+    return './samples/pharmGKB_chemicals_example.tsv'
+
+
+@pytest.fixture
+def reference_kwargs():
+    # Use full support tables for edge labels so sample annotation rows resolve
+    return {
+        'drug_reference_filepath': './data_loading_support_files/pharmGKB_chemicals.tsv',
+        'variant_reference_filepath': './data_loading_support_files/pharmGKB_variants.tsv',
+        'study_reference_filepath': './data_loading_support_files/pharmGKB_study_parameters.tsv',
+        'gene_reference_filepath': './data_loading_support_files/pharmGKB_genes.tsv',
+    }
+
+
+@pytest.fixture
 def spy_writer():
     return SpyWriter()
 
 
-def test_drug_label(filepath, spy_writer, mocker):
+def test_drug_label(drug_filepath, spy_writer, mocker):
     mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
                  return_value='fake_variant_id')
-    pharmgkb = PharmGKB(filepath=filepath, label='drug',
+    pharmgkb = PharmGKB(filepath=drug_filepath, label='drug',
                         writer=spy_writer, validate=True)
     assert pharmgkb.label == 'drug'
 
@@ -31,13 +47,17 @@ def test_drug_label(filepath, spy_writer, mocker):
     assert first_item['source'] == 'pharmGKB'
     assert first_item['source_url'].startswith(
         'https://www.pharmgkb.org/chemical/')
+    assert first_item['_key'] == 'PA166301663'
+    assert first_item['name'] == '11-dehydro-thromboxane B2'
+    assert first_item['drug_ontology_terms'] == [
+        'ontology_terms/CHEBI_28667']
 
 
-def test_variant_drug_label(filepath, spy_writer, mocker):
+def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker):
     mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
                  return_value='fake_variant_id')
-    pharmgkb = PharmGKB(filepath=filepath,
-                        label='variant_drug', writer=spy_writer, validate=True)
+    pharmgkb = PharmGKB(filepath=filepath, label='variant_drug',
+                        writer=spy_writer, validate=True, **reference_kwargs)
     assert pharmgkb.label == 'variant_drug'
 
     pharmgkb.process_file()
@@ -54,11 +74,11 @@ def test_variant_drug_label(filepath, spy_writer, mocker):
         'https://www.pharmgkb.org/variantAnnotation/')
 
 
-def test_variant_drug_gene_label(filepath, spy_writer, mocker):
+def test_variant_drug_gene_label(filepath, reference_kwargs, spy_writer, mocker):
     mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
                  return_value='fake_variant_id')
-    pharmgkb = PharmGKB(filepath=filepath,
-                        label='variant_drug_gene', writer=spy_writer, validate=True)
+    pharmgkb = PharmGKB(filepath=filepath, label='variant_drug_gene',
+                        writer=spy_writer, validate=True, **reference_kwargs)
     assert pharmgkb.label == 'variant_drug_gene'
 
     pharmgkb.process_file()
@@ -75,14 +95,19 @@ def test_variant_drug_gene_label(filepath, spy_writer, mocker):
         'https://www.pharmgkb.org/variantAnnotation/')
 
 
+def test_variant_drug_requires_reference_filepaths(filepath, spy_writer):
+    with pytest.raises(ValueError, match='drug_reference_filepath'):
+        PharmGKB(filepath=filepath, label='variant_drug', writer=spy_writer)
+
+
 def test_invalid_label(filepath, spy_writer):
     with pytest.raises(ValueError):
         PharmGKB(filepath=filepath, label='invalid_label', writer=spy_writer)
 
 
-def test_validate_doc_invalid(filepath, spy_writer):
+def test_validate_doc_invalid(filepath, reference_kwargs, spy_writer):
     pharmgkb = PharmGKB(filepath=filepath, label='variant_drug',
-                        writer=spy_writer, validate=True)
+                        writer=spy_writer, validate=True, **reference_kwargs)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123
