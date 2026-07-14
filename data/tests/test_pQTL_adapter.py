@@ -34,6 +34,7 @@ def test_pQTL_adapter(mock_request, mocker):
         assert first_item['method'] == 'pQTL'
         assert first_item['class'] == 'observed data'
         assert first_item['log10pvalue'] == 79.2
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI0000TEST'
 
 
 def test_validate_doc_invalid(mocker):

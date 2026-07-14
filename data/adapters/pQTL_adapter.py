@@ -29,6 +29,7 @@ class pQTL(BaseAdapter):
         self.gene_validator = GeneValidator()
 
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -94,6 +95,7 @@ class pQTL(BaseAdapter):
                             'gene_consequence': row[23] if row[23] else None,
                             'biological_context': pQTL.BIOLOGICAL_CONTEXT,
                             'biosample_term': f'ontology_terms/{pQTL.BIOSAMPLE_TERM}',
+                            'files_filesets': 'files_filesets/' + self.file_accession,
                             'source': pQTL.SOURCE,
                             'source_url': pQTL.SOURCE_URL,
                             'name': 'associated with levels of',
