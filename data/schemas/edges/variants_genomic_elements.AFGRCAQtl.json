@@ -54,6 +54,10 @@
             "https://github.com/smontgomlab/AFGR"
           ]
         },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the variant to genomic element edge"
+        },
         "biological_context": {
           "type": "string",
           "description": "Biological context of the variant to genomic element edge",
@@ -95,7 +99,8 @@
         "p_value",
         "beta",
         "biological_context",
-        "biosample_term"
+        "biosample_term",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
@@ -103,6 +108,6 @@
   "db_collection_name": "variants_genomic_elements",
   "accessible_via": {
     "filter_by_range": "neg_log10_pvalue, p_value, beta",
-    "return": "neg_log10_pvalue, p_value, beta, source, label, source_url, biological_context, biosample_term, name, inverse_name, method"
+    "return": "neg_log10_pvalue, p_value, beta, source, label, source_url, files_filesets, biological_context, biosample_term, name, inverse_name, method"
   }
 }

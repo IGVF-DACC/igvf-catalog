@@ -97,6 +97,10 @@
             "https://github.com/smontgomlab/AFGR"
           ]
         },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the variant to gene edge"
+        },
         "name": {
           "enum": [
             "modulates splicing of"
@@ -126,7 +130,8 @@
         "biological_process",
         "intron_chr",
         "intron_start",
-        "intron_end"
+        "intron_end",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
@@ -134,7 +139,7 @@
   "accessible_via": {
     "filter_by_range": "intron_start, intron_end, neg_log10_pvalue, effect_size",
     "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
-    "return": "intron_chr, intron_start, intron_end, effect_size, neg_log10_pvalue, source, class, method, label, p_value, chr, source_url, biological_context, biosample_term"
+    "return": "intron_chr, intron_start, intron_end, effect_size, neg_log10_pvalue, source, class, method, label, p_value, chr, source_url, files_filesets, biological_context, biosample_term"
   },
   "db_collection_name": "variants_genes"
 }

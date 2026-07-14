@@ -7,13 +7,13 @@ from adapters.writer import SpyWriter
 
 
 def mock_igvf_metadata(mock_request):
-    mock_request.return_value.json.return_value = {
-        'catalog_class': 'observed data',
-        'catalog_method': 'spliceQTL'
+    mock_request.return_value = {
+        'class': 'observed data',
+        'method': 'spliceQTL'
     }
 
 
-@patch('adapters.AFGR_sqtl_adapter.requests.get')
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
 def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
@@ -27,7 +27,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mocker):
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) == 214
-        assert len(first_item) == 20
+        assert len(first_item) == 21
         assert first_item['intron_chr'].startswith('chr')
 
 
@@ -38,7 +38,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_term_invalid_label(mocker):
                            label='invalid_label', writer=writer, validate=True)
 
 
-@patch('adapters.AFGR_sqtl_adapter.requests.get')
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
 def test_AFGR_sqtl_adapter_AFGR_sqtl_term_validate_doc_invalid(mock_request, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
@@ -57,7 +57,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_term_validate_doc_invalid(mock_request, moc
             adapter.validate_doc(invalid_doc)
 
 
-@patch('adapters.AFGR_sqtl_adapter.requests.get')
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
 def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
@@ -72,7 +72,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mocker):
         assert len(writer.contents) == 0
 
 
-@patch('adapters.AFGR_sqtl_adapter.requests.get')
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
 def test_AFGR_sqtl_adapter_AFGR_sqtl_skip_alt_star(mock_request):
     """Test that deletion variants (alt='*') are skipped (covers lines 70-71)"""
     mock_igvf_metadata(mock_request)
@@ -101,7 +101,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_skip_alt_star(mock_request):
         os.unlink(temp_file_path)
 
 
-@patch('adapters.AFGR_sqtl_adapter.requests.get')
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
 def test_AFGR_sqtl_adapter_no_gene_mapping(mock_request, mocker):
     """Test that introns without gene mapping are skipped (covers lines 78-79)"""
     mock_igvf_metadata(mock_request)

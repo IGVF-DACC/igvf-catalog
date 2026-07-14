@@ -36,8 +36,15 @@
           "enum": [
             "caQTL"
           ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the genomic element"
         }
       },
+      "required": [
+        "files_filesets"
+      ],
       "additionalProperties": false
     }
   ],
