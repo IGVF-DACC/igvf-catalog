@@ -6686,7 +6686,7 @@
       "term_name": "K562"
     }
   ],
-  "https://www.encodeproject.org/search/?accession=ENCFF003BKC&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=catalog_method&field=source_url&field=version&field=file_set&field=catalog_collections&format=json&limit=all": [
+  "https://www.encodeproject.org/search/?accession=ENCFF003BKC&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=catalog_method&field=source_url&field=external_host_url&field=version&field=file_set&field=catalog_collections&format=json&limit=all": [
     {
       "@id": "/files/ENCFF003BKC/",
       "@type": [
@@ -6839,7 +6839,7 @@
       "href": "/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz"
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFFI5688VHRS&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=catalog_method&field=source_url&field=version&field=file_set&field=catalog_collections&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFFI5688VHRS&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=catalog_method&field=source_url&field=external_host_url&field=version&field=file_set&field=catalog_collections&format=json&limit=all": [
     {
       "@id": "/tabular-files/IGVFFI5688VHRS/",
       "@type": [
