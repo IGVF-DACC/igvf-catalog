@@ -1,10 +1,10 @@
 import csv
 from collections import defaultdict
 import json
-import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_gene_map_from_arangodb
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -25,7 +25,7 @@ from adapters.writer import Writer
 
 # Other files needed for loading:
 # DepMap_model.csv is also downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set (Model.csv).
-# DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection.
+# Gene symbol to gene ensembl id mapping is queried directly from the IGVF catalog genes collection.
 
 
 class DepMap(BaseAdapter):
@@ -33,7 +33,6 @@ class DepMap(BaseAdapter):
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
-    GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
@@ -129,6 +128,11 @@ class DepMap(BaseAdapter):
                     self.cell_ontology_id_mapping[model_id][prop] = cell_ontology_row[column_index]
 
     def load_gene_id_mapping(self):
-        self.gene_id_mapping = {}  # key: gene symbol; value: gene ensembl id
-        with open(DepMap.GENE_ID_MAPPING_PATH, 'rb') as gene_id_mapping_file:
-            self.gene_id_mapping = pickle.load(gene_id_mapping_file)
+        # key: gene symbol; value: gene ensembl id
+        self.gene_id_mapping = {}
+        gene_map = get_gene_map_from_arangodb('name')
+        for gene_symbol, gene_keys in gene_map.items():
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for symbol ' + gene_symbol + ', using ' + gene_keys[0])
+            self.gene_id_mapping[gene_symbol] = gene_keys[0]

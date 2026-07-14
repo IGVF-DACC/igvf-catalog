@@ -1,7 +1,23 @@
 import json
+from unittest.mock import patch
 from adapters.depmap_adapter import DepMap
 from adapters.writer import SpyWriter
 import pytest
+
+
+# mock get_gene_map_from_arangodb so gene collection data change will not affect the test
+@pytest.fixture(autouse=True)
+def mock_gene_map():
+    """Fixture to mock get_gene_map_from_arangodb function."""
+    with patch('adapters.depmap_adapter.get_gene_map_from_arangodb') as mock_get_gene_map:
+        mock_get_gene_map.return_value = {
+            'A1BG': ['ENSG00000121410'],
+            'A1CF': ['ENSG00000148584'],
+            'A2M': ['ENSG00000175899'],
+            'A2ML1': ['ENSG00000166535'],
+            'A3GALT2': ['ENSG00000184389']
+        }
+        yield mock_get_gene_map
 
 
 def test_depmap_adapter_process_file():
