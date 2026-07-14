@@ -1749,44 +1749,8 @@ export const descriptions = {
 
   genomic_elements_phenotypes:
     'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
-    At least one of these properties must be defined: region, files_fileset, method, or phenotype_id. <br> \
-    Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
-    The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based. <br> <br> \
-    ' + examples([
-      {
-        id: 'crispr-screen',
-        label: 'CRISPR screen',
-        examples: [
-          {
-            label: 'Query by phenotype',
-            items: [
-              'phenotype_id = GO_0016477',
-              'method = CRISPR screen'
-            ]
-          },
-          {
-            label: 'Query by files_fileset',
-            note: FILES_FILESET_METHOD_NOTE,
-            items: [
-              'files_fileset = IGVFFI5135QZCS',
-              'method = CRISPR screen'
-            ]
-          },
-          {
-            label: 'Query by region',
-            items: [
-              'region = chr1:101174581-101175330 (maximum length: 10kb)',
-              'method = CRISPR screen'
-            ]
-          }
-        ]
-      }
-    ]),
-
-  phenotypes_genomic_elements:
-    'Retrieve genomic elements associated with phenotypes.<br> \
-    At least one of these properties must be defined: phenotype_id, phenotype_name, files_fileset, or method. <br> \
+    At least one of these properties must be defined: region, files_fileset, phenotype_id, or phenotype_name. <br> \
+    Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1798,16 +1762,61 @@ export const descriptions = {
           {
             label: 'Query by phenotype identifier',
             items: [
-              'phenotype_id = GO_0016049',
-              'method = CRISPR screen'
+              'phenotype_id = GO_0016477'
+            ]
+          },
+          {
+            label: 'Query by phenotype name',
+            items: [
+              'phenotype_name = cell migration',
+              'significant = true'
             ]
           },
           {
             label: 'Query by files_fileset',
-            note: FILES_FILESET_METHOD_NOTE,
             items: [
-              'files_fileset = IGVFFI9584UDAS',
-              'method = CRISPR screen'
+              'files_fileset = IGVFFI5135QZCS'
+            ]
+          },
+          {
+            label: 'Query by region',
+            items: [
+              'region = chr1:101174581-101175330 (maximum length: 10kb)'
+            ]
+          }
+        ]
+      }
+    ]),
+
+  phenotypes_genomic_elements:
+    'Retrieve genomic elements associated with phenotypes.<br> \
+    At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
+    Set significant = true to return only significant associations.<br> \
+    Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0016049'
+            ]
+          },
+          {
+            label: 'Query by phenotype name',
+            items: [
+              'phenotype_name = cell growth',
+              'significant = true'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            items: [
+              'files_fileset = IGVFFI9584UDAS'
             ]
           }
         ]

@@ -5,12 +5,11 @@ import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
-import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
+import { commonHumanEdgeParamsFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_phenotypes', 'method')
-const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_phenotypes', 'source')
+const PHENOTYPE_NAMES = ['cell growth', 'cell migration'] as const
 
 const genomicElementsPhenotypesSchema = getSchema('data/schemas/edges/genomic_elements_phenotypes.CRISPRElementPhenotype.json')
 const genomicElementToPhenotypeCollectionName = 'genomic_elements_phenotypes'
@@ -19,24 +18,18 @@ const genomicElementCollectionName = genomicElementSchema.db_collection_name as 
 const ontologyCollectionName = 'ontology_terms'
 
 const edgeQueryFormat = z.object({
-  method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
-  biosample_term: z.string().optional(),
-  biological_context: z.string().optional(),
-  source: z.enum(SOURCES).optional(),
   phenotype_id: z.string().trim().optional(),
+  phenotype_name: z.enum(PHENOTYPE_NAMES).optional(),
+  // When true, return only significant associations; false/omitted applies no filter.
   significant: z.enum(['true', 'false']).optional()
 })
 
-const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
-  source: true
-}).merge(edgeQueryFormat)
-  .merge(commonHumanEdgeParamsFormat)
+const genomicElementQueryFormat = z.object({
+  region: z.string().trim().optional()
+}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
-const phenotypeQueryFormat = z.object({
-  phenotype_id: z.string().trim().optional(),
-  phenotype_name: z.string().trim().optional()
-}).merge(edgeQueryFormat.omit({ phenotype_id: true })).merge(commonHumanEdgeParamsFormat)
+const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat)
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -99,61 +92,44 @@ function buildEdgeFilter (input: paramsFormatType): string {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
   }
-  if (input.biosample_term !== undefined) {
-    input.biosample_term = `ontology_terms/${input.biosample_term as string}`
-  }
-  if (input.phenotype_id !== undefined) {
-    input._to = `ontology_terms/${input.phenotype_id as string}`
-    delete input.phenotype_id
-  }
-  if (input.significant !== undefined) {
-    input.significant = input.significant === 'true'
+  // significant=false is a no-op; only significant=true filters results.
+  if (input.significant === 'true') {
+    input.significant = true
+  } else {
+    delete input.significant
   }
 
   const filters = getFilterStatements(genomicElementsPhenotypesSchema, input)
   delete input.files_filesets
-  delete input.biosample_term
-  delete input.biological_context
-  delete input.method
-  delete input.source
-  delete input._to
   delete input.significant
   return filters
 }
 
 async function resolvePhenotypeIds (input: paramsFormatType): Promise<string[]> {
+  const phenotypeName = input.phenotype_name as string | undefined
+  delete input.phenotype_name
+
   if (input.phenotype_id !== undefined) {
     const phenotypeId = `ontology_terms/${input.phenotype_id as string}`
     delete input.phenotype_id
     return [phenotypeId]
   }
 
-  if (input.phenotype_name === undefined) {
+  if (phenotypeName === undefined) {
     return []
   }
 
-  const phenotypeName = input.phenotype_name as string
-  delete input.phenotype_name
-
-  let phenotypes = await (await db.query(`
+  const phenotypes = await (await db.query(`
     FOR record IN ${ontologyCollectionName}
     FILTER record.name == @phenotypeName
     RETURN record._id
   `, { phenotypeName })).all()
 
-  if (phenotypes.length === 0) {
-    phenotypes = await (await db.query(`
-      FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-      SEARCH TOKENS(@phenotypeName, "text_en_no_stem") ALL IN record.name
-      SORT BM25(record) DESC
-      RETURN record._id
-    `, { phenotypeName })).all()
-  }
   return phenotypes
 }
 
-const buildCombinedFilter = (primaryFilter: string, edgeFilter: string): string => {
-  return [primaryFilter, edgeFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
+const buildCombinedFilter = (...filters: string[]): string => {
+  return filters.filter((filter) => filter !== '').join(' AND ') || 'true'
 }
 
 function buildQuery (params: {
@@ -221,7 +197,7 @@ async function executePhenotypesQuery (
 }
 
 async function findPhenotypesFromGenomicElements (input: paramsFormatType): Promise<any[]> {
-  validateQuery(input, ['region', 'files_fileset', 'method', 'phenotype_id'])
+  validateQuery(input, ['region', 'files_fileset', 'phenotype_id', 'phenotype_name'])
   delete input.organism
   const limit = applyLimit(input)
   const page = input.page as number
@@ -235,8 +211,6 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
     isElementQuery = true
     const elementInput: paramsFormatType = {
       region: input.region,
-      type: input.region_type,
-      source_annotation: input.source_annotation,
       page: 0
     }
     const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(elementInput))
@@ -247,20 +221,20 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
     `
     elementIDs = await (await db.query(elementQuery)).all()
     delete input.region
-    delete input.region_type
-    delete input.source_annotation
   }
 
+  const phenotypeIds = await resolvePhenotypeIds(input)
   const edgeFilter = buildEdgeFilter(input)
   const elementFilter = isElementQuery ? 'record._from IN @elementIDs' : ''
-  const combinedFilter = buildCombinedFilter(elementFilter, edgeFilter)
+  const phenotypeFilter = phenotypeIds.length > 0 ? `record._to IN ${JSON.stringify(phenotypeIds)}` : ''
+  const combinedFilter = buildCombinedFilter(elementFilter, phenotypeFilter, edgeFilter)
   const bindVars = isElementQuery ? { elementIDs } : undefined
 
   return await executePhenotypesQuery(combinedFilter, page, limit, verbose, bindVars)
 }
 
 async function findGenomicElementsFromPhenotypes (input: paramsFormatType): Promise<any[]> {
-  validateQuery(input, ['phenotype_id', 'phenotype_name', 'files_fileset', 'method'])
+  validateQuery(input, ['phenotype_id', 'phenotype_name', 'files_fileset'])
   delete input.organism
   const limit = applyLimit(input)
   const page = input.page as number
