@@ -814,7 +814,7 @@ class FileFileSet:
             'publication': publication_id,
             'collections': catalog_collections,
             'source': FileFileSet.SOURCE_COMMUNITY if is_external_curated_set else FileFileSet.SOURCE_IGVF,
-            'source_url': (file_object.get('source_url') or file_object.get('external_host_url')) if is_external_curated_set else source_url,
+            'source_url': (file_object.get('source_url') or file_object.get('external_host_url') or source_url) if is_external_curated_set else source_url,
             'version': file_object.get('version') if is_external_curated_set else None,
             'download_link': download_link,
             'cell_annotation': cell_annotation,

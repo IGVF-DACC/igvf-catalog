@@ -448,6 +448,50 @@ def test_query_fileset_files_props_igvf_community_curated_set():
     assert sample_term_ids == []
 
 
+@pytest.mark.parametrize('source_url,external_host_url,expected_source_url', [
+    (
+        'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
+        None,
+        'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
+    ),
+    (
+        None,
+        'https://www.dbnsfp.org/download',
+        'https://www.dbnsfp.org/download',
+    ),
+    (
+        None,
+        None,
+        'https://data.igvf.org/reference-files/IGVFFI6501YXMX/',
+    ),
+])
+def test_query_fileset_files_props_igvf_community_curated_set_source_url_fallback(
+    source_url, external_host_url, expected_source_url
+):
+    file_object = {
+        '@id': '/reference-files/IGVFFI6501YXMX/',
+        'accession': 'IGVFFI6501YXMX',
+        'catalog_class': 'biological relationship',
+        'catalog_collections': ['gene_products_terms'],
+        'source_url': source_url,
+        'external_host_url': external_host_url,
+        'version': 'File generated on 2023-10-10',
+        'file_set': {'@id': '/curated-sets/IGVFDS3257FDZW/'},
+        'href': '/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS3257FDZW',
+        '@type': ['CuratedSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/community/'},
+        'samples': [],
+        'publications': [],
+        'files': []
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        props, _, _ = FileFileSet.query_fileset_files_props_igvf(file_object)
+    assert props['source_url'] == expected_source_url
+
+
 def test_get_donor_props():
     api_url = 'https://api.data.igvf.org/'
     source_url = 'https://data.igvf.org/'
