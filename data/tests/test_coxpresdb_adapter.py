@@ -1,5 +1,5 @@
 import json
-import pickle
+import os
 from unittest.mock import patch
 import pytest
 
@@ -15,11 +15,20 @@ def mock_get(mock_request):
 
 
 def mock_entrez_gene_map():
-    with open('./data_loading_support_files/entrez_to_ensembl.pkl', 'rb') as f:
-        entrez_ensembl_dict = pickle.load(f)
+    entrez_ids = set()
+    sample_dir = './samples/coxpresdb/'
+    for filename in os.listdir(sample_dir):
+        if not filename.isdigit():
+            continue
+        entrez_ids.add(filename)
+        with open(os.path.join(sample_dir, filename), 'r') as input:
+            for line in input:
+                co_entrez_id, score = line.strip().split()
+                if abs(float(score)) >= 3:
+                    entrez_ids.add(co_entrez_id)
     return {
-        f'ENTREZ:{entrez_id}': [ensembl_id]
-        for entrez_id, ensembl_id in entrez_ensembl_dict.items()
+        f'ENTREZ:{entrez_id}': [f'ENSG{int(entrez_id):011d}']
+        for entrez_id in entrez_ids
     }
 
 
