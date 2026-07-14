@@ -21,8 +21,8 @@ const edgeQueryFormat = z.object({
   files_fileset: z.string().optional(),
   phenotype_id: z.string().trim().optional(),
   phenotype_name: z.enum(PHENOTYPE_NAMES).optional(),
-  // When true, return only significant associations; false/omitted applies no filter.
-  significant: z.enum(['true', 'false']).optional()
+  // Omit or set to true: true returns only significant associations.
+  significant: z.enum(['true']).optional()
 })
 
 const genomicElementQueryFormat = z.object({
@@ -92,7 +92,6 @@ function buildEdgeFilter (input: paramsFormatType): string {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
   }
-  // significant=false is a no-op; only significant=true filters results.
   if (input.significant === 'true') {
     input.significant = true
   } else {
