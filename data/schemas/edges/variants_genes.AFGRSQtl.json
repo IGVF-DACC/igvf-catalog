@@ -58,6 +58,18 @@
           "type": "number",
           "description": "Effect size for the variant to gene edge"
         },
+        "posterior_inclusion_probability": {
+          "type": ["number", "null"],
+          "description": "Posterior inclusion probability for the variant to gene edge"
+        },
+        "log2FC": {
+          "type": ["number", "null"],
+          "description": "Log2 fold change for the variant to gene edge"
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the variant-gene association is statistically significant"
+        },
         "class": {
           "enum": [
             "observed data"
@@ -132,7 +144,7 @@
     }
   ],
   "accessible_via": {
-    "filter_by_range": "intron_start, intron_end, neg_log10_pvalue, effect_size",
+    "filter_by_range": "intron_start, intron_end, neg_log10_pvalue, effect_size, posterior_inclusion_probability, log2FC",
     "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
     "return": "intron_chr, intron_start, intron_end, effect_size, neg_log10_pvalue, source, class, method, label, p_value, chr, source_url, biological_context, biosample_term"
   },

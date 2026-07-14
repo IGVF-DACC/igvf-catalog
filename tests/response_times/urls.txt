@@ -131,3 +131,5 @@ https://api.catalogkg.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG0000
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?neg_log10_pvalue_adj=gte%3A1&regulator_gene_id=ENSG00000152284&page=0
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?response_gene_id=ENSG00000152284&page=0
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?regulator_gene_id=ENSG00000152284&response_gene_name=POU2F1&page=0
+https://api.catalogkg.igvf.org/api/variants/genes?posterior_inclusion_probability=gte%3A0.028&log2FC=gte%3A0.016&significant=false&method=CRISPR%20screen&organism=Homo%20sapiens&verbose=false&page=0
+https://api.catalogkg.igvf.org/api/genes/variants?posterior_inclusion_probability=gte%3A0.028&log2FC=gte%3A0.016&method=CRISPR%20screen&organism=Homo%20sapiens&verbose=false&page=0

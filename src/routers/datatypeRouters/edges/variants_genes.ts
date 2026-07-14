@@ -42,6 +42,9 @@ const qtlsSummaryFormat = z.object({
 const variantsGenesQueryFormat = z.object({
   neg_log10_pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
+  posterior_inclusion_probability: z.string().optional(),
+  log2FC: z.string().optional(),
+  significant: z.enum(['true', 'false']).optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
   label: z.enum(LABELS).optional(),
