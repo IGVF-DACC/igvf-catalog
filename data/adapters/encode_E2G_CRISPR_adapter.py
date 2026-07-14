@@ -1,7 +1,7 @@
 import csv
 import json
 import pickle
-from math import log10
+from math import log10, log2
 from typing import Optional
 
 from adapters.base import BaseAdapter
@@ -127,7 +127,8 @@ class ENCODE2GCRISPR(BaseAdapter):
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'score': float(score),
+                        'effect_size': float(score),
+                        'log2FC': log2(1 + float(score)),
                         'p_value': float(p_value) if p_value != 'NA' else None,
                         'p_value_adj': float(p_value_adj) if p_value_adj != 'NA' else None,
                         'neg_log10_pvalue': neglog10pvalue,
