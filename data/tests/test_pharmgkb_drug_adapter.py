@@ -10,11 +10,6 @@ def filepath():
 
 
 @pytest.fixture
-def drug_filepath():
-    return './samples/pharmGKB_chemicals_example.tsv'
-
-
-@pytest.fixture
 def reference_kwargs():
     # Use full support tables for edge labels so sample annotation rows resolve
     return {
@@ -23,6 +18,11 @@ def reference_kwargs():
         'study_reference_filepath': './data_loading_support_files/pharmGKB_study_parameters.tsv',
         'gene_reference_filepath': './data_loading_support_files/pharmGKB_genes.tsv',
     }
+
+
+@pytest.fixture
+def drug_filepath(reference_kwargs):
+    return reference_kwargs['drug_reference_filepath']
 
 
 @pytest.fixture
@@ -47,10 +47,9 @@ def test_drug_label(drug_filepath, spy_writer, mocker):
     assert first_item['source'] == 'pharmGKB'
     assert first_item['source_url'].startswith(
         'https://www.pharmgkb.org/chemical/')
-    assert first_item['_key'] == 'PA166301663'
-    assert first_item['name'] == '11-dehydro-thromboxane B2'
-    assert first_item['drug_ontology_terms'] == [
-        'ontology_terms/CHEBI_28667']
+    assert first_item['_key'] == 'PA166250381'
+    assert first_item['name'] == '10-desmethyl alpha-dihydrotetrabenazine'
+    assert first_item['drug_ontology_terms'] == []
 
 
 def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker):

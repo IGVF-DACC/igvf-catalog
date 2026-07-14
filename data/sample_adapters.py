@@ -83,7 +83,7 @@ ADAPTERS = {
     'parent_pathway_of': Reactome(filepath='./samples/reactome/ReactomePathwaysRelation.txt', label='parent_pathway_of'),
     'cellosaurus_terms': Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt', label='node'),
     'cellosaurus_relationships': Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt', label='edge'),
-    'drug': PharmGKB(filepath='./samples/pharmGKB_chemicals_example.tsv', label='drug'),
+    'drug': PharmGKB(filepath='./data_loading_support_files/pharmGKB_chemicals.tsv', label='drug'),
     'variant_drug': PharmGKB(
         filepath='./samples/pharmGKB',
         label='variant_drug',
