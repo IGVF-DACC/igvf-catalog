@@ -1819,7 +1819,7 @@ variant to drug:
     - https://api.data.igvf.org/reference-files/IGVFFI1149WTCK/@@download/IGVFFI1149WTCK.tsv.gz # pharmGKB_study_parameters.tsv.gz
   source: pharmGKB
 
-## Example: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pharmGKB/ --drug-reference-filepath ~/dataset/IGVFFI2997DUKO.tsv --variant-reference-filepath ~/dataset/IGVFFI7955ICXJ.tsv --study-reference-filepath ~/dataset/IGVFFI1149WTCK.tsv --gene-reference-filepath ~/dataset/IGVFFI4821BJHQ.tsv --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
+## Example: python3 data_parser.py --adapter variant_drug_gene --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pharmGKB/ --drug-reference-filepath ~/dataset/IGVFFI2997DUKO.tsv --variant-reference-filepath ~/dataset/IGVFFI7955ICXJ.tsv --study-reference-filepath ~/dataset/IGVFFI1149WTCK.tsv --gene-reference-filepath ~/dataset/IGVFFI4821BJHQ.tsv --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
 ## Untar IGVFFI8835SMSP.tar.gz and point --filepath to that folder
 variant drug association to gene:
   collection: variants_drugs_genes
@@ -1830,7 +1830,7 @@ variant drug association to gene:
     - study-reference-filepath
     - gene-reference-filepath
   pypy3: false
-  command: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath {datafolder} --drug-reference-filepath {drug_datafile} --variant-reference-filepath {variant_datafile} --study-reference-filepath {study_datafile} --gene-reference-filepath {gene_datafile} --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
+  command: python3 data_parser.py --adapter variant_drug_gene --output-bucket igvf-catalog-parsed-collections --filepath {datafolder} --drug-reference-filepath {drug_datafile} --variant-reference-filepath {variant_datafile} --study-reference-filepath {study_datafile} --gene-reference-filepath {gene_datafile} --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8835SMSP/@@download/IGVFFI8835SMSP.tar.gz # variantAnnotations.tar.gz
     - https://api.data.igvf.org/reference-files/IGVFFI2997DUKO/@@download/IGVFFI2997DUKO.tsv.gz # pharmGKB_chemicals.tsv.gz
