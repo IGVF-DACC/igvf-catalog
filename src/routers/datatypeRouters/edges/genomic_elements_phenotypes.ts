@@ -152,6 +152,10 @@ async function resolvePhenotypeIds (input: paramsFormatType): Promise<string[]> 
   return phenotypes
 }
 
+const buildCombinedFilter = (primaryFilter: string, edgeFilter: string): string => {
+  return [primaryFilter, edgeFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
+}
+
 function buildQuery (params: {
   combinedFilter: string
   page: number
@@ -203,6 +207,19 @@ function buildQuery (params: {
   `
 }
 
+async function executePhenotypesQuery (
+  combinedFilter: string,
+  page: number,
+  limit: number,
+  verbose: boolean,
+  bindVars?: Record<string, unknown>
+): Promise<any[]> {
+  const query = buildQuery({ combinedFilter, page, limit, verbose })
+  return bindVars !== undefined
+    ? await (await db.query(query, bindVars)).all()
+    : await (await db.query(query)).all()
+}
+
 async function findPhenotypesFromGenomicElements (input: paramsFormatType): Promise<any[]> {
   validateQuery(input, ['region', 'files_fileset', 'method', 'phenotype_id'])
   delete input.organism
@@ -212,14 +229,34 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
   const verbose = input.verbose === 'true'
   delete input.verbose
 
-  const edgeFilter = buildEdgeFilter(input)
-  const elementFilter = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
-  const elementClause = elementFilter !== ''
-    ? `record._from IN (FOR element IN ${genomicElementCollectionName} FILTER ${elementFilter} RETURN element._id)`
-    : ''
-  const combinedFilter = [elementClause, edgeFilter].filter(filter => filter !== '').join(' AND ') || 'true'
+  let elementIDs: string[] = []
+  let isElementQuery = false
+  if (input.region !== undefined) {
+    isElementQuery = true
+    const elementInput: paramsFormatType = {
+      region: input.region,
+      type: input.region_type,
+      source_annotation: input.source_annotation,
+      page: 0
+    }
+    const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(elementInput))
+    const elementQuery = `
+      FOR record IN ${genomicElementCollectionName}
+      FILTER ${genomicElementsFilters}
+      RETURN record._id
+    `
+    elementIDs = await (await db.query(elementQuery)).all()
+    delete input.region
+    delete input.region_type
+    delete input.source_annotation
+  }
 
-  return await (await db.query(buildQuery({ combinedFilter, page, limit, verbose }))).all()
+  const edgeFilter = buildEdgeFilter(input)
+  const elementFilter = isElementQuery ? 'record._from IN @elementIDs' : ''
+  const combinedFilter = buildCombinedFilter(elementFilter, edgeFilter)
+  const bindVars = isElementQuery ? { elementIDs } : undefined
+
+  return await executePhenotypesQuery(combinedFilter, page, limit, verbose, bindVars)
 }
 
 async function findGenomicElementsFromPhenotypes (input: paramsFormatType): Promise<any[]> {
@@ -234,9 +271,9 @@ async function findGenomicElementsFromPhenotypes (input: paramsFormatType): Prom
   const phenotypeIds = await resolvePhenotypeIds(input)
   const edgeFilter = buildEdgeFilter(input)
   const phenotypeFilter = phenotypeIds.length > 0 ? `record._to IN ${JSON.stringify(phenotypeIds)}` : ''
-  const combinedFilter = [phenotypeFilter, edgeFilter].filter(filter => filter !== '').join(' AND ') || 'true'
+  const combinedFilter = buildCombinedFilter(phenotypeFilter, edgeFilter)
 
-  return await (await db.query(buildQuery({ combinedFilter, page, limit, verbose }))).all()
+  return await executePhenotypesQuery(combinedFilter, page, limit, verbose)
 }
 
 const phenotypesFromGenomicElements = publicProcedure
