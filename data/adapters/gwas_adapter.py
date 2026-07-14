@@ -1,12 +1,11 @@
 import json
 import hashlib
 import pickle
-import requests
 from math import log10
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 
@@ -28,18 +27,14 @@ class GWAS(BaseAdapter):
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
+    FILE_ACCESSION = 'IGVFFI1309WDQG'
     SOURCE_URL = 'https://data.igvf.org/reference-files/IGVFFI1309WDQG'
-    API_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG'
     ALLOWED_LABELS = ['studies',
                       'variants_phenotypes']
     SOURCE = 'OpenTargets'
 
     def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
-
-        file_metadata = requests.get(GWAS.API_URL).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
 
         super().__init__(filepath, label, writer, validate)
 
@@ -92,6 +87,7 @@ class GWAS(BaseAdapter):
             'trait_category': row[33],
             'source': self.SOURCE,
             'version': 'October 2022 (22.10)',
+            'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
             'source_url': self.SOURCE_URL
         }
         return props
@@ -189,9 +185,10 @@ class GWAS(BaseAdapter):
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
             'inverse_name': 'associated with',
-            'class': self.collection_class,
-            'method': self.method,
-            'label': self.method
+            'class': self.file_fileset.get('class'),
+            'method': self.file_fileset.get('method'),
+            'label': self.file_fileset.get('method'),
+            'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
         }
 
     def parse(self):
@@ -202,6 +199,9 @@ class GWAS(BaseAdapter):
 
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()
+
+            self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+                self.FILE_ACCESSION)
         header = None
         trying_to_complete_line = None
 

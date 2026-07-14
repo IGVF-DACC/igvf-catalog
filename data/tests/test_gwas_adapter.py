@@ -1,34 +1,20 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.gwas_adapter import GWAS
 from adapters.writer import SpyWriter
 
-# Add this fixture to mock requests.get for all tests in this file
 
-
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
 @pytest.fixture(autouse=True)
-def mock_requests_get(monkeypatch):
-    """Automatically mock requests.get for all tests in this file."""
-    class MockResponse:
-        def json(self):
-            # Return minimal valid metadata for GWAS studies
-            return {
-                'study_id': 'study1',
-                'study_name': 'Test Study',
-                'ancestry_initial': 'EUR',
-                'ancestry_replication': 'EUR',
-                'n_cases': 100,
-                'n_initial': 200,
-                'n_replication': 50,
-                'pmid': '123456',
-                'pub_author': 'Smith et al.',
-                'pub_date': '2022-01-01',
-                'source_url': 'https://example.com',
-                'catalog_class': 'observed data',
-                'catalog_method': 'GWAS'
-            }
-
-    monkeypatch.setattr('requests.get', lambda *args, **kwargs: MockResponse())
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.gwas_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'method': 'GWAS',
+            'class': 'observed data'
+        }
+        yield mock_get_file_fileset
 
 
 @pytest.fixture
@@ -142,6 +128,7 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker):
 
     # Load ontology mapping first
     gwas.load_ontology_name_mapping()
+    gwas.file_fileset = {'method': 'GWAS', 'class': 'observed data'}
 
     # Mock a row with pvalue = 0 (empty string or 0)
     mock_row = [''] * 18
@@ -172,6 +159,7 @@ def test_gwas_empty_ontology_term_handling(gwas_files, mocker):
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
                 label='variants_phenotypes')
+    gwas.file_fileset = {'method': 'GWAS', 'class': 'observed data'}
 
     # Mock a row with empty ontology term
     mock_row = [''] * 18

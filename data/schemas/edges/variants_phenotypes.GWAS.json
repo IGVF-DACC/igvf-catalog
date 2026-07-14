@@ -139,6 +139,13 @@
             "https://data.igvf.org/reference-files/IGVFFI1309WDQG"
           ]
         },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the variant to phenotype edge",
+          "enum": [
+            "files_filesets/IGVFFI1309WDQG"
+          ]
+        },
         "name": {
           "enum": [
             "associated with"
@@ -186,13 +193,14 @@
         "tagged_variants",
         "version",
         "_key",
-        "study"
+        "study",
+        "files_filesets"
       ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
     "filter_by_range": "neg_log10_pvalue",
-    "return": "name, study, source, source_url, class, method, label, version, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_value, neg_log10_pvalue, oddsr_ci_lower, oddsr_ci_upper"
+    "return": "name, study, source, source_url, files_filesets, class, method, label, version, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_value, neg_log10_pvalue, oddsr_ci_lower, oddsr_ci_upper"
   }
 }
