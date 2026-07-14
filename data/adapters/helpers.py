@@ -724,6 +724,11 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
                            'reason': 'Unable to parse this variant id'}
         return variant_json, skipped_message
 
+    if ref == alt:
+        skipped_message = {'variant_id': variant_id,
+                           'reason': 'Ref allele and alt allele are the same'}
+        return variant_json, skipped_message
+
     # Note: we convert the position to 1-based for spdi format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
     # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format, validate ref seq for them seperately and skip normalization part for now
     if format == 'spdi':
