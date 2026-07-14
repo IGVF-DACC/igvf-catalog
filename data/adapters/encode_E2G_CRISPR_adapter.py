@@ -1,11 +1,10 @@
 import csv
 import json
-import pickle
 from math import log10
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
 
@@ -23,7 +22,6 @@ class ENCODE2GCRISPR(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
     SOURCE = 'ENCODE'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
-    GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
     FILE_ACCESSION = 'ENCFF968BZL'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
@@ -175,5 +173,9 @@ class ENCODE2GCRISPR(BaseAdapter):
     def load_gene_id_mapping(self):
         # key: gene symbol; value: gene Ensembl id
         self.gene_id_mapping = {}
-        with open(self.GENE_ID_MAPPING_PATH, 'rb') as mapfile:
-            self.gene_id_mapping = pickle.load(mapfile)
+        gene_map = get_gene_map_from_arangodb('name')
+        for gene_symbol, gene_keys in gene_map.items():
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for symbol ' + gene_symbol + ', using ' + gene_keys[0])
+            self.gene_id_mapping[gene_symbol] = gene_keys[0]

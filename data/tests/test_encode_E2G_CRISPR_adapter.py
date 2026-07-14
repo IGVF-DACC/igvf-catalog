@@ -20,6 +20,18 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+# mock get_gene_map_from_arangodb so gene collection data change will not affect the test
+@pytest.fixture
+def mock_gene_map():
+    """Fixture to mock get_gene_map_from_arangodb function."""
+    with patch('adapters.encode_E2G_CRISPR_adapter.get_gene_map_from_arangodb') as mock_get_gene_map:
+        mock_get_gene_map.return_value = {
+            'CEP104': ['ENSG00000116198'],
+            'LRRC47': ['ENSG00000130764']
+        }
+        yield mock_get_gene_map
+
+
 @pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
     writer = SpyWriter()
@@ -39,7 +51,7 @@ def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
 
 
 @pytest.mark.external_dependency
-def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
+def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset, mock_gene_map):
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                              label='genomic_element_gene', writer=writer, validate=True)
@@ -93,7 +105,7 @@ def test_encode2gcrispr_adapter_load_regulatory_region(mock_file_fileset):
     assert len(adapter.genomic_element_nodes) > 0
 
 
-def test_encode2gcrispr_adapter_load_gene_id_mapping(mock_file_fileset):
+def test_encode2gcrispr_adapter_load_gene_id_mapping(mock_file_fileset, mock_gene_map):
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                              label='genomic_element_gene', writer=writer)
