@@ -85,12 +85,12 @@ const apiKeyToDbFieldMap = {
 }
 
 const ADASTRA_SCORE_EXPR = `(
-  TO_NUMBER(record.fdrp_bh_ref) < 0.05 && TO_NUMBER(record.fdrp_bh_alt) < 0.05
+  TO_NUMBER(record.p_value_adj_ref) < 0.05 && TO_NUMBER(record.p_value_adj_alt) < 0.05
     ? null
     : (
-      TO_NUMBER(record.fdrp_bh_ref) < 0.05
-        ? -TO_NUMBER(record.fdrp_bh_ref)
-        : (TO_NUMBER(record.fdrp_bh_alt) < 0.05 ? TO_NUMBER(record.fdrp_bh_alt) : null)
+      TO_NUMBER(record.p_value_adj_ref) < 0.05
+        ? -TO_NUMBER(record.p_value_adj_ref)
+        : (TO_NUMBER(record.p_value_adj_alt) < 0.05 ? TO_NUMBER(record.p_value_adj_alt) : null)
     )
 )`
 
