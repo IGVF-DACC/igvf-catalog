@@ -35,7 +35,7 @@ const genomicElementOutputFormat = z.object({
 
 const outputFormat = z.array(z.object({
   variant: variantSimplifiedFormat,
-  distance_element_tss: z.number().nullish(),
+  distance_to_tss: z.number().nullish(),
   genomic_element: genomicElementOutputFormat,
   gene: geneOutputFormat,
   name: z.string(),
@@ -61,7 +61,7 @@ const inputFormat = singleVariantQueryFormat.omit({ organism: true }).merge(z.ob
   files_fileset: z.string().optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
-  all_genes: z.enum(['true', 'false']).default('false')
+  nearby_genes: z.enum(['true', 'false']).default('true')
 })).merge(commonHumanEdgeParamsFormat).omit({ verbose: true })
 
 function validateVariantInput (input: paramsFormatType): void {
@@ -112,16 +112,16 @@ function buildEdgeFilters (input: paramsFormatType): string {
   return `FILTER ${filters.join(' AND ')}`
 }
 
-function buildMainQuery (allGenes: boolean, edgeFilters: string): string {
-  const geneFilters = allGenes
-    ? ''
-    : `
+function buildMainQuery (nearbyGenes: boolean, edgeFilters: string): string {
+  const geneFilters = nearbyGenes
+    ? `
         FILTER targetGene.chr == @chr
         LET geneTss = targetGene.strand == '-' ? targetGene.end : targetGene.start
-        LET distanceElementTss = MIN([ABS(ge.start - geneTss), ABS(ge.end - geneTss)])
-        FILTER distanceElementTss <= ${DISTANCE_TO_TSS_BP}`
+        LET distanceToTss = MIN([ABS(ge.start - geneTss), ABS(ge.end - geneTss)])
+        FILTER distanceToTss <= ${DISTANCE_TO_TSS_BP}`
+    : ''
 
-  const distanceReturn = allGenes ? '' : 'distance_element_tss: distanceElementTss,'
+  const distanceReturn = nearbyGenes ? 'distance_to_tss: distanceToTss,' : ''
 
   return `
     FOR ge IN @elements
@@ -190,8 +190,8 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
   const page = input.page as number
   delete input.page
 
-  const allGenes = input.all_genes === 'true'
-  delete input.all_genes
+  const nearbyGenes = input.nearby_genes !== 'false'
+  delete input.nearby_genes
 
   const edgeFilters = buildEdgeFilters(edgeInput)
 
@@ -222,7 +222,7 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
     return []
   }
 
-  const query = buildMainQuery(allGenes, edgeFilters)
+  const query = buildMainQuery(nearbyGenes, edgeFilters)
 
   const mainBindVars: Record<string, unknown> = {
     elements: overlappingElements,
@@ -240,7 +240,7 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
     offset: page * limit,
     limit
   }
-  if (!allGenes) {
+  if (nearbyGenes) {
     mainBindVars.chr = variant.chr
   }
 

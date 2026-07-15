@@ -1035,12 +1035,12 @@ export const descriptions = {
   variants_genomic_elements_genes:
     'Retrieve genes whose expression is modulated by perturbing genomic elements that overlap a variant.<br> \
     The query starts from a variant, finds overlapping Perturb-seq genomic elements, then returns element-gene associations.<br> \
-    By default (all_genes = false), only nearby genes on the same chromosome as the variant are returned, and the overlapping genomic element must be within 2 Mb of the gene TSS.<br> \
-    Set all_genes = true to return all genes linked to the overlapping elements regardless of chromosome or distance.<br> \
+    By default (nearby_genes = true), only nearby genes on the same chromosome as the variant are returned, and the overlapping genomic element must be within 2 Mb of the gene TSS; distance_to_tss is included in the response.<br> \
+    Set nearby_genes = false to return all genes linked to the overlapping elements regardless of chromosome or distance.<br> \
     At least one variant identifier is required: variant_id, spdi, hgvs, or ca_id.<br> \
     Example: variant_id = NC_000001.11:109426297:G:C,<br> \
     spdi = NC_000001.11:109426297:G:C,<br> \
-    all_genes = false,<br> \
+    nearby_genes = true,<br> \
     files_fileset = IGVFFI0206LUDV,<br> \
     biological_context = HCASMC-hTERT,<br> \
     biosample_term = EFO_0022614.<br> \
