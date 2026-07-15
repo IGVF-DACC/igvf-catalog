@@ -104,7 +104,8 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
                          label='depmap', writer=writer)
         adapter.process_file()
 
-        gene_ids = {json.loads(item)['_from'] for item in writer.contents}
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
         assert gene_ids == {'genes/ENSG00000000001', 'genes/ENSG00000000002'}
     finally:
         os.unlink(temp_file_path)
