@@ -14,6 +14,15 @@ def test_cdk_app_can_synth():
     assert app is not None
 
 
+def test_demos_dashboard_stack_can_synth():
+    """Test that the standalone demos dashboard stack can be synthesized."""
+    app = App()
+    app.node.set_context('stack', 'demos-dashboard')
+    build(app)
+
+    assert app is not None
+
+
 def test_basic_imports():
     """Test that basic modules can be imported."""
     try:
