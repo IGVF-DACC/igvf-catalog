@@ -77,6 +77,39 @@ def test_depmap_adapter_missing_gene_id_mapping():
     assert first_item['gene_dependency'] >= DepMap.CUTOFF, 'Dependency score below cutoff.'
 
 
+def test_depmap_adapter_multiple_gene_ids(mocker):
+    """A gene symbol mapping to multiple Ensembl ids should produce an edge for each id, not just the first."""
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={
+            'FAKEGENE': ['ENSG00000000001', 'ENSG00000000002'],
+        }
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from'] for item in writer.contents}
+        assert gene_ids == {'genes/ENSG00000000001', 'genes/ENSG00000000002'}
+    finally:
+        os.unlink(temp_file_path)
+
+
 def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
     adapter = DepMap(

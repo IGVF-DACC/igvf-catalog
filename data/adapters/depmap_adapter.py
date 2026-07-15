@@ -68,8 +68,8 @@ class DepMap(BaseAdapter):
             for line in depmap_file:
                 gene, *values = line.strip().split(',')
                 gene_symbol = gene.split(' ')[0]
-                gene_id = self.gene_id_mapping.get(gene_symbol)
-                if gene_id is None:
+                gene_ids = self.gene_id_mapping.get(gene_symbol)
+                if gene_ids is None:
                     self.logger.warning('no gene id mapping for ' + gene)
                     continue
 
@@ -84,30 +84,31 @@ class DepMap(BaseAdapter):
                         if not cell_ontology_id:  # no CVCL id provided for this model
                             continue
 
-                        _id = gene_id + '_' + cell_ontology_id
-                        _source = 'genes/' + gene_id
-                        _target = 'ontology_terms/' + cell_ontology_id
+                        for gene_id in gene_ids:
+                            _id = gene_id + '_' + cell_ontology_id
+                            _source = 'genes/' + gene_id
+                            _target = 'ontology_terms/' + cell_ontology_id
 
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
-                            'model_id': gene_model_id,
-                            'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
-                            # oncotree code can be mapped to NCIT ids
-                            'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
-                            'gene_dependency': float(value),
-                            'source': DepMap.SOURCE,
-                            'source_url': DepMap.SOURCE_URL,
-                            'source_file': DepMap.SOURCE_FILE,
-                            'name': 'essential in',
-                            'inverse_name': 'dependent on'
-                        }
-                        if self.validate:
-                            self.validate_doc(_props)
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                            _props = {
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
+                                'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
+                                'model_id': gene_model_id,
+                                'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
+                                # oncotree code can be mapped to NCIT ids
+                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
+                                'gene_dependency': float(value),
+                                'source': DepMap.SOURCE,
+                                'source_url': DepMap.SOURCE_URL,
+                                'source_file': DepMap.SOURCE_FILE,
+                                'name': 'essential in',
+                                'inverse_name': 'dependent on'
+                            }
+                            if self.validate:
+                                self.validate_doc(_props)
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
@@ -128,11 +129,11 @@ class DepMap(BaseAdapter):
                     self.cell_ontology_id_mapping[model_id][prop] = cell_ontology_row[column_index]
 
     def load_gene_id_mapping(self):
-        # key: gene symbol; value: gene ensembl id
+        # key: gene symbol; value: list of gene ensembl ids
         self.gene_id_mapping = {}
         gene_map = get_gene_map_from_arangodb('name')
         for gene_symbol, gene_keys in gene_map.items():
             if len(gene_keys) > 1:
                 self.logger.warning(
-                    'multiple gene ids found for symbol ' + gene_symbol + ', using ' + gene_keys[0])
-            self.gene_id_mapping[gene_symbol] = gene_keys[0]
+                    'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
+            self.gene_id_mapping[gene_symbol] = gene_keys
