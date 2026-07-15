@@ -2,11 +2,10 @@ import csv
 import json
 import pickle
 from typing import Optional
-import requests
 import os
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -23,7 +22,6 @@ class pQTL(BaseAdapter):
     BIOSAMPLE_TERM = 'UBERON_0001969'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
@@ -40,10 +38,10 @@ class pQTL(BaseAdapter):
         return 'variants_proteins'
 
     def parse(self):
-        file_metadata = requests.get(
-            pQTL.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.method = file_fileset['method']
         self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
 
