@@ -12,7 +12,7 @@
         "summary": "4b52b7fa-e00e-4fc8-b653-ab0ca32174ba",
         "software_versions": [
           {
-            "summary": "scATAC-seq processing scripts v1.0.0",
+            "summary": "scATAC-seq processing v1.0.0",
             "@id": "/software-versions/scATAC-processing-v1.0.0/"
           }
         ],
@@ -88,7 +88,7 @@
         "summary": "4b52b7fa-e00e-4fc8-b653-ab0ca32174ba",
         "software_versions": [
           {
-            "summary": "scATAC-seq processing scripts v1.0.0",
+            "summary": "scATAC-seq processing v1.0.0",
             "@id": "/software-versions/scATAC-processing-v1.0.0/"
           }
         ],

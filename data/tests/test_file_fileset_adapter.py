@@ -110,7 +110,7 @@ def test_get_batch_objects():
 
 def test_software_titles_from_analysis_step_version_igvf():
     analysis_step_version = {'summary': '4b52b7fa-e00e-4fc8-b653-ab0ca32174ba', 'software_versions': [
-        {'summary': 'scATAC-seq processing scripts v1.0.0', '@id': '/software-versions/scATAC-processing-v1.0.0/'}], '@id': '/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/'}
+        {'summary': 'scATAC-seq processing v1.0.0', '@id': '/software-versions/scATAC-processing-v1.0.0/'}], '@id': '/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/'}
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect):
         software_titles = FileFileSet._software_titles_from_analysis_step_version_igvf(
             analysis_step_version)
