@@ -109,7 +109,8 @@ def test_encode2gcrispr_adapter_multiple_gene_ids(mock_file_fileset, mocker):
             filepath=temp_file_path, label='genomic_element_gene', writer=writer)
         adapter.process_file()
 
-        gene_targets = {json.loads(item)['_to'] for item in writer.contents}
+        gene_targets = {json.loads(item)['_to']
+                        for item in writer.contents if item.startswith('{')}
         assert gene_targets == {
             'genes/ENSG00000000001', 'genes/ENSG00000000002'}
     finally:
