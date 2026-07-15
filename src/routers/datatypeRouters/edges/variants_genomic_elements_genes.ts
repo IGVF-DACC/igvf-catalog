@@ -10,6 +10,7 @@ import { commonHumanEdgeParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 const DISTANCE_TO_TSS_BP = 2_000_000
+const OVERLAPPING_ELEMENT_METHOD = 'Perturb-seq'
 
 const VARIANT_QUERY_KEYS = ['spdi', 'hgvs', 'ca_id', 'variant_id'] as const
 
@@ -209,14 +210,21 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
   }
   const variant = variants[0]
 
+  // Region + method in one AQL FILTER makes ArangoDB prefer the method-leading
+  // index (~10s). Query region alone (force chr/start/end), then filter method
+  // in application code (~0.4s, no length bound needed).
   const overlappingElementsQuery = `
     FOR ge IN genomic_elements
-      FILTER ge.chr == @chr AND ge.start <= @pos AND ge.end > @pos AND ge.method == 'Perturb-seq'
+      OPTIONS { indexHint: "idx_persistent_chr_start_end", forceIndexHint: true }
+      FILTER ge.chr == @chr AND ge.start <= @pos AND ge.end > @pos
       RETURN ge
   `
   const overlappingElementsBindVars = { chr: variant.chr, pos: variant.pos }
 
-  const overlappingElements = await (await db.query(overlappingElementsQuery, overlappingElementsBindVars)).all()
+  const overlappingCandidates = await (await db.query(overlappingElementsQuery, overlappingElementsBindVars)).all()
+  const overlappingElements = overlappingCandidates.filter(
+    (ge: { method?: string }) => ge.method === OVERLAPPING_ELEMENT_METHOD
+  )
 
   if (overlappingElements.length === 0) {
     return []
@@ -244,8 +252,7 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
     mainBindVars.chr = variant.chr
   }
 
-  const results = await (await db.query(query, mainBindVars)).all()
-  return results
+  return await (await db.query(query, mainBindVars)).all()
 }
 
 const variantsGenomicElementsGenes = publicProcedure
