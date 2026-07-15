@@ -739,7 +739,7 @@ class FileFileSet:
                 f'Catalog collections are required for file_fileset {file_object["accession"]}.'))
 
         software = FileFileSet.get_software_igvf(file_object)
-        if not software:
+        if not software and not is_external_curated_set:
             print(
                 f'Warning: no software found for file_fileset {file_object["accession"]}.')
 
