@@ -65,6 +65,14 @@ parser.add_argument('--reference-filepath', type=str,
                     help='The path to a related reference input file that has reference data for adapting the data file. e.g. MPRA sequence designs')
 parser.add_argument('--reference-source-url', type=str,
                     help='The source url for the related input reference file.')
+parser.add_argument('--drug-reference-filepath', type=str,
+                    help='PharmGKB chemicals TSV for drug name→ID mapping (IGVFFI2997DUKO). Required for variant_drug and variant_drug_gene.')
+parser.add_argument('--variant-reference-filepath', type=str,
+                    help='PharmGKB variants TSV for rsID→HGVS mapping (IGVFFI7955ICXJ). Required for variant_drug and variant_drug_gene.')
+parser.add_argument('--study-reference-filepath', type=str,
+                    help='PharmGKB study_parameters TSV (IGVFFI1149WTCK). Required for variant_drug and variant_drug_gene.')
+parser.add_argument('--gene-reference-filepath', type=str,
+                    help='PharmGKB genes TSV for symbol→Ensembl mapping (IGVFFI4821BJHQ). Required for variant_drug_gene.')
 parser.add_argument('--accessions', nargs='+', type=str,
                     help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
 parser.add_argument(
