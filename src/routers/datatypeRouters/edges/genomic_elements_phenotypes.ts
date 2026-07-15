@@ -64,6 +64,7 @@ const outputFormat = z.array(z.object({
   num_guides_hit: z.number().nullish(),
   num_guides_nonhit: z.number().nullish(),
   fraction_guides_hit: z.number().nullish(),
+  phenotype_name: z.string().nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   phenotype: z.string().or(phenotypeOutputFormat)
 }))
@@ -157,8 +158,10 @@ function buildQuery (params: {
     LET phenotypeMap = MERGE(phenotypeLookup)
     LET elementMap = MERGE(elementLookup)
     FOR record IN edgeRecords
+      LET phenotype_name = DOCUMENT(record._to).name
       RETURN {
         'phenotype': ${verbose ? 'phenotypeMap[record._to]' : 'record._to'},
+        'phenotype_name': phenotype_name,
         'genomic_element': ${verbose ? 'elementMap[record._from]' : 'record._from'},
         'name': record.name,
         'class': record.class,

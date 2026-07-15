@@ -1751,77 +1751,26 @@ export const descriptions = {
     'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
     At least one of these properties must be defined: region, files_fileset, phenotype_id, or phenotype_name. <br> \
     Set significant = true to return only significant associations.<br> \
-    Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
+    Set verbose = true to retrieve full info on the genomic element.<br> \
+    Example: phenotype_id = GO_0016477, <br> \
+    phenotype_name = cell migration, <br> \
+    significant = true, <br> \
+    files_fileset = IGVFFI5135QZCS, <br> \
+    region = chr1:101174581-101175330 (maximum length: 10kb). <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based. <br> <br> \
-    ' + examples([
-      {
-        id: 'crispr-screen',
-        label: 'CRISPR screen',
-        examples: [
-          {
-            label: 'Query by phenotype identifier',
-            items: [
-              'phenotype_id = GO_0016477'
-            ]
-          },
-          {
-            label: 'Query by phenotype name',
-            items: [
-              'phenotype_name = cell migration',
-              'significant = true'
-            ]
-          },
-          {
-            label: 'Query by files_fileset',
-            items: [
-              'files_fileset = IGVFFI5135QZCS'
-            ]
-          },
-          {
-            label: 'Query by region',
-            items: [
-              'region = chr1:101174581-101175330 (maximum length: 10kb)'
-            ]
-          }
-        ]
-      }
-    ]),
+    Pagination is 0-based.',
 
   phenotypes_genomic_elements:
     'Retrieve genomic elements associated with phenotypes.<br> \
     At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
     Set significant = true to return only significant associations.<br> \
-    Set verbose = true to retrieve full info on the phenotype and genomic element.<br> \
+    Set verbose = true to retrieve full info on the genomic element.<br> \
+    Example: phenotype_id = GO_0016049, <br> \
+    phenotype_name = cell growth, <br> \
+    significant = true, <br> \
+    files_fileset = IGVFFI9584UDAS. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based. <br> <br> \
-    ' + examples([
-      {
-        id: 'crispr-screen',
-        label: 'CRISPR screen',
-        examples: [
-          {
-            label: 'Query by phenotype identifier',
-            items: [
-              'phenotype_id = GO_0016049'
-            ]
-          },
-          {
-            label: 'Query by phenotype name',
-            items: [
-              'phenotype_name = cell growth',
-              'significant = true'
-            ]
-          },
-          {
-            label: 'Query by files_fileset',
-            items: [
-              'files_fileset = IGVFFI9584UDAS'
-            ]
-          }
-        ]
-      }
-    ]),
+    Pagination is 0-based.',
 
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
