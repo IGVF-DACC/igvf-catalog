@@ -59,6 +59,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
             'fdr_col': 'fdr_adj',
             'neg_log10_fdr_col': 'log_fdr_adj',
             'edit_rate_mean_col': 'edit_rate_mean',
+            'edit_rate_std_col': 'edit_rate_std',
         },
         'IGVFFI7659OTOX': {
             'phenotype_term': 'NTR_0001118',
@@ -345,9 +346,11 @@ class CRISPRVariantPhenotype(BaseAdapter):
                     'num_guides': num_guides,
                     'edit_rate_mean': self._optional_float(
                         row, config.get('edit_rate_mean_col')),
-                    'ci_lower': self._optional_float(
+                    'edit_rate_standard_deviation': self._optional_float(
+                        row, config.get('edit_rate_std_col')),
+                    'effect_size_ci95_lower': self._optional_float(
                         row, config.get('ci_lower_col')),
-                    'ci_upper': self._optional_float(
+                    'effect_size_ci95_upper': self._optional_float(
                         row, config.get('ci_upper_col')),
                     'method': self.method,
                     'crispr_modality': self.crispr_modality,

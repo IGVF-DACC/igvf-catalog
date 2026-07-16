@@ -163,6 +163,7 @@ def test_variant_phenotype_sherwood_base(mock_load, mock_bulk, mock_file_fileset
     assert first['fdr'] == pytest.approx(0.866342209)
     assert first['significant'] is False
     assert first['edit_rate_mean'] == pytest.approx(0.601411259)
+    assert first['edit_rate_standard_deviation'] == pytest.approx(0.217311883)
     assert first['crispr_modality'] == 'base editing'
     assert first['label'] == 'variant effect on phenotype'
     assert first['method'] == 'CRISPR screen'
@@ -193,8 +194,8 @@ def test_variant_phenotype_sherwood_interference(mock_load, mock_bulk, mock_file
     first = json.loads(writer.contents[0])
     assert first['_to'] == 'ontology_terms/NTR_0001118'
     assert first['num_guides'] == 5
-    assert first['ci_lower'] == pytest.approx(-0.195688948)
-    assert first['ci_upper'] == pytest.approx(-0.099777892)
+    assert first['effect_size_ci95_lower'] == pytest.approx(-0.195688948)
+    assert first['effect_size_ci95_upper'] == pytest.approx(-0.099777892)
     assert first['significant'] is True  # CI excludes 0
     assert first['crispr_modality'] == 'interference'
 
