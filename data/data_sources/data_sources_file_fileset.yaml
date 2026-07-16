@@ -34,7 +34,7 @@ igvf_file_accessions:
     - IGVFFI5288RAAV
     - IGVFFI0818FMCC
     - IGVFFI3351LASN
-  IGVF CRISPR E2G:
+  CRISPR element gene:
     - IGVFFI3069QCRA
     - IGVFFI5749WPVK
     - IGVFFI6376HTIF
@@ -65,7 +65,10 @@ igvf_file_accessions:
     - IGVFFI6268OASM
     - IGVFFI1336XWXJ
     - IGVFFI3089UGHM
-  IGVF CRISPR V2G:
+  CRISPR element phenotype:
+    - IGVFFI5135QZCS
+    - IGVFFI9584UDAS
+  CRISPR variant gene:
     - IGVFFI9602ILPC
     - IGVFFI4333XLOF
     - IGVFFI4057VSBO

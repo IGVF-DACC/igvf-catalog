@@ -59,8 +59,8 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_reques
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
     assert 'es_mean_ref' in first_item
     assert 'es_mean_alt' in first_item
-    assert 'fdrp_bh_ref' in first_item
-    assert 'fdrp_bh_alt' in first_item
+    assert 'neg_log10_pvalue_adj_ref' in first_item
+    assert 'neg_log10_pvalue_adj_alt' in first_item
     assert 'biological_context' in first_item
     assert 'biosample_term' in first_item
     assert first_item['biosample_term'].startswith('ontology_terms/')

@@ -5,6 +5,7 @@ import pickle
 from typing import Optional
 import requests
 import os
+from math import log10
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
@@ -28,11 +29,13 @@ class ASB(BaseAdapter):
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
+    DEFAULT_ACCESSION = 'IGVFFI5943XCOS'
 
     def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = os.path.basename(filepath).split('.')[
+            0] or ASB.DEFAULT_ACCESSION
 
     def _get_schema_type(self):
         """This adapter creates edges."""
@@ -123,6 +126,18 @@ class ASB(BaseAdapter):
                             _from = 'variants/' + variant_id
                             _to = 'proteins/' + ensembl_id
 
+                            p_value_adj_ref = float(row[13])  # fdrp_bh_ref
+                            p_value_adj_alt = float(row[15])  # fdrp_bh_alt
+                            neg_log10_pvalue_adj_ref = float('inf')
+                            if p_value_adj_ref > 0:
+                                neg_log10_pvalue_adj_ref = - \
+                                    1 * log10(p_value_adj_ref)
+
+                            neg_log10_pvalue_adj_alt = float('inf')
+                            if p_value_adj_alt > 0:
+                                neg_log10_pvalue_adj_alt = - \
+                                    1 * log10(p_value_adj_alt)
+
                             props = {
                                 '_key': _key,
                                 '_from': _from,
@@ -136,8 +151,10 @@ class ASB(BaseAdapter):
                                 'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
                                 'es_mean_ref': row[10],
                                 'es_mean_alt': row[11],
-                                'fdrp_bh_ref': row[13],
-                                'fdrp_bh_alt': row[15],
+                                'p_value_adj_ref': p_value_adj_ref,
+                                'p_value_adj_alt': p_value_adj_alt,
+                                'neg_log10_pvalue_adj_ref': neg_log10_pvalue_adj_ref,
+                                'neg_log10_pvalue_adj_alt': neg_log10_pvalue_adj_alt,
                                 'biological_context': cell_gtrd_name,
                                 'biosample_term': 'ontology_terms/' + cell_ontology_id,
                                 'source': ASB.SOURCE,

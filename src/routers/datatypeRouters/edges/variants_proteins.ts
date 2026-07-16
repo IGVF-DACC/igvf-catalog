@@ -60,8 +60,8 @@ const outputFormat = z.object({
   source_url: z.string().nullish(),
   is_complex: z.boolean(),
   score: z.number().nullish(),
-  fdrp_bh_ref: z.string().nullish(),
-  fdrp_bh_alt: z.string().nullish(),
+  neg_log10_pvalue_adj_ref: z.number().nullish(),
+  neg_log10_pvalue_adj_alt: z.number().nullish(),
   motif: z.string().nullish(),
   motif_log2FC: z.number().nullish(),
   beta: z.number().nullish(),
@@ -70,7 +70,7 @@ const outputFormat = z.object({
   gene_consequence: z.string().nullish(),
   neg_log10_pvalue: z.number().nullish(),
   p_value: z.number().nullish(),
-  fdr: z.number().nullish(),
+  neg_log10_pvalue_adj: z.number().nullish(),
   variant_effect_score: z.number().nullish(),
   SEMpl_annotation: z.string().nullish(),
   SEMpl_baseline: z.number().nullish(),
@@ -87,12 +87,12 @@ const apiKeyToDbFieldMap = {
 const MOTIF_LOG2FC_RETURN = "'motif_log2FC': (record.motif_fc != null && record.motif_fc != '') ? TO_NUMBER(record.motif_fc) : null"
 
 const ADASTRA_SCORE_EXPR = `(
-  TO_NUMBER(record.fdrp_bh_ref) < 0.05 && TO_NUMBER(record.fdrp_bh_alt) < 0.05
+  TO_NUMBER(record.p_value_adj_ref) < 0.05 && TO_NUMBER(record.p_value_adj_alt) < 0.05
     ? null
     : (
-      TO_NUMBER(record.fdrp_bh_ref) < 0.05
-        ? -TO_NUMBER(record.fdrp_bh_ref)
-        : (TO_NUMBER(record.fdrp_bh_alt) < 0.05 ? TO_NUMBER(record.fdrp_bh_alt) : null)
+      TO_NUMBER(record.p_value_adj_ref) < 0.05
+        ? -TO_NUMBER(record.p_value_adj_ref)
+        : (TO_NUMBER(record.p_value_adj_alt) < 0.05 ? TO_NUMBER(record.p_value_adj_alt) : null)
     )
 )`
 
