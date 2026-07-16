@@ -310,6 +310,17 @@ genomic_elements_genes:
     analyzers:
       - text_en_no_stem
 
+genomic_elements_phenotypes:
+  persistent:
+    fields:
+      - files_filesets
+      - files_filesets, _key
+      - _from, files_filesets
+      - _from, significant
+      - _to, _key
+      - _to, significant
+      - significant, files_filesets
+
 studies:
   persistent:
     fields:
