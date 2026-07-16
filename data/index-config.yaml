@@ -449,8 +449,11 @@ variants_proteins:
   persistent:
     fields:
       - files_filesets, _key, source, label
+      - method, label, source, files_filesets
       - method, label, source, files_filesets, name
+      - label, source, files_filesets
       - label, source, files_filesets, name
+      - source, files_filesets
       - source, files_filesets, name
       - effect_on_binding, files_filesets
       - files_filesets, name
@@ -458,6 +461,7 @@ variants_proteins:
       - files_filesets
       - method
       - gene, method, source, biological_context, _key
+      - gene, method, _key
 
 variants_variants:
   persistent:

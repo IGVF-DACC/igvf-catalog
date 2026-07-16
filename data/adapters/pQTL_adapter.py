@@ -24,10 +24,12 @@ class pQTL(BaseAdapter):
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
+    DEFAULT_ACCESSION = 'IGVFFI2053GDNI'
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-
+        self.file_accession = os.path.basename(filepath).split('.')[
+            0] or pQTL.DEFAULT_ACCESSION
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -86,7 +88,7 @@ class pQTL(BaseAdapter):
                             'label': 'pQTL',
                             'class': self.collection_class,
                             'method': self.method,
-                            'log10pvalue': float(row[14]),
+                            'neg_log10_pvalue': float(row[14]),
                             'beta': float(row[12]),  # i.e. effect size
                             'se': float(row[13]),
                             'regulatory_type': row[19],  # cis/trans
