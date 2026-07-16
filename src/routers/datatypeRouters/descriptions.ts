@@ -579,7 +579,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   phenotypes_variants:
-    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by phenotypes.<br> \
+    'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by phenotypes.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
@@ -651,7 +651,7 @@ export const descriptions = {
     ]),
 
   variants_phenotypes:
-    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by variants.<br> \
+    'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by variants.<br> \
     Filters on phenotype ontology id can be used together.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
@@ -1765,8 +1765,8 @@ export const descriptions = {
     At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
-    Example: phenotype_id = GO_0016049, <br> \
-    phenotype_name = cell growth, <br> \
+    Example: phenotype_id = GO_0008283, <br> \
+    phenotype_name = cell population proliferation, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI9584UDAS. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \

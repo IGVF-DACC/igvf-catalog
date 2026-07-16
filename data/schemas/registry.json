@@ -60,7 +60,8 @@
             "Ontology": "schemas/nodes/ontology_terms.Ontology.json",
             "Oncotree": "schemas/nodes/ontology_terms.Oncotree.json",
             "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json",
-            "FileFileSet": "schemas/nodes/ontology_terms.FileFileSet.json"
+            "FileFileSet": "schemas/nodes/ontology_terms.FileFileSet.json",
+            "CRISPRVariantPhenotype": "schemas/nodes/ontology_terms.CRISPRVariantPhenotype.json"
         },
         "pathways": {
             "ReactomePathway": "schemas/nodes/pathways.ReactomePathway.json"
@@ -83,7 +84,8 @@
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
             "SGE": "schemas/nodes/variants.SGE.json",
             "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
-            "IGVFV2GCRISPR": "schemas/nodes/variants.IGVFV2GCRISPR.json"
+            "IGVFV2GCRISPR": "schemas/nodes/variants.IGVFV2GCRISPR.json",
+            "CRISPRVariantPhenotype": "schemas/nodes/variants.CRISPRVariantPhenotype.json"
         }
     },
     "edges": {
@@ -203,7 +205,8 @@
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
             "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
-            "SGE": "schemas/edges/variants_phenotypes.SGE.json"
+            "SGE": "schemas/edges/variants_phenotypes.SGE.json",
+            "CRISPRVariantPhenotype": "schemas/edges/variants_phenotypes.CRISPRVariantPhenotype.json"
         },
         "variants_proteins": {
             "ASB": "schemas/edges/variants_proteins.ASB.json",

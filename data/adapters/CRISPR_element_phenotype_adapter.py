@@ -10,7 +10,7 @@ from adapters.writer import Writer
 
 # Element-level CRISPR element-to-phenotype screens (Gersbach lab).
 # IGVFFI5135QZCS – cell migration (GO:0016477); columns use migration/mig suffixes.
-# IGVFFI9584UDAS – cell proliferation/growth (GO:0016049); columns use growth suffixes.
+# IGVFFI9584UDAS – cell population proliferation (GO:0008283); columns use growth suffixes.
 # Coordinates are 0-based, half-open (submitter_comment on both files). Stored as provided.
 
 # Example rows (migration):
@@ -40,7 +40,7 @@ class CRISPRElementPhenotype(BaseAdapter):
             'significant_col': 'mig_significant',
         },
         'IGVFFI9584UDAS': {
-            'phenotype_term': 'GO_0016049',  # cell growth / proliferation
+            'phenotype_term': 'GO_0008283',  # cell population proliferation
             'z_score_col': 'avg_growth_pZ',
             'num_guides_hit_col': 'hit_gRNA_count_growth',
             'num_guides_nonhit_col': 'nonhit_gRNA_count_growth',

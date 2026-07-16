@@ -68,6 +68,12 @@ igvf_file_accessions:
   CRISPR element phenotype:
     - IGVFFI5135QZCS
     - IGVFFI9584UDAS
+  CRISPR variant phenotype:
+    - IGVFFI7160EKDK
+    - IGVFFI7659OTOX
+    - IGVFFI7206JILF
+    - IGVFFI2014OOZP
+    - IGVFFI6803HZJG
   CRISPR variant gene:
     - IGVFFI9602ILPC
     - IGVFFI4333XLOF

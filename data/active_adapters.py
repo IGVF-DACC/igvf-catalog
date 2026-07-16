@@ -36,6 +36,7 @@ from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.igvf_E2G_CRISPR_adapter import IGVFE2GCRISPR
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
+from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
@@ -87,6 +88,7 @@ KEY_TO_ADAPTER = {
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
     'igvf_genomic_element_gene_crispr': IGVFE2GCRISPR,
     'crispr_element_phenotype': CRISPRElementPhenotype,
+    'crispr_variant_phenotype': CRISPRVariantPhenotype,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,

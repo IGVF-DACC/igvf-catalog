@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/ontology_terms.CRISPRVariantPhenotype.json",
+  "db_collection_name": "ontology_terms",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "NTR_0001118"
+        },
+        "name": {
+          "example": "LDL-C uptake"
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI for the phenotype ontology term",
+          "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
+        },
+        "term_id": {
+          "type": "string",
+          "description": "Term ID for the phenotype ontology term",
+          "example": "NTR_0001118"
+        },
+        "synonyms": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Synonyms for the ontology term"
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
+        }
+      },
+      "required": [
+        "uri",
+        "term_id",
+        "synonyms"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}
