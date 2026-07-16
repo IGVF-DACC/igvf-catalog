@@ -20,14 +20,26 @@ def spy_writer():
     return SpyWriter()
 
 
-def test_reactome_adapter_genes_pathways(filepath, spy_writer):
+@pytest.fixture
+def mock_file_fileset():
+    with patch('adapters.reactome_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'biological relationship',
+            'method': 'Reactome'
+        }
+        yield mock_get
+
+
+def test_reactome_adapter_genes_pathways(filepath, spy_writer, mock_file_fileset):
     with patch('adapters.reactome_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
         adapter = Reactome(filepath=filepath,
                            label='genes_pathways', writer=spy_writer, validate=True)
+        adapter.file_accession = 'IGVFFI9865XGLF'
         adapter.process_file()
 
+        mock_file_fileset.assert_called_once_with('IGVFFI9865XGLF')
         assert len(spy_writer.contents) > 0
         first_item = json.loads(spy_writer.contents[0])
 
@@ -38,12 +50,17 @@ def test_reactome_adapter_genes_pathways(filepath, spy_writer):
         assert first_item['inverse_name'] == 'has part'
         assert first_item['source'] == 'Reactome'
         assert first_item['source_url'] == 'https://reactome.org/'
+        assert first_item['class'] == 'biological relationship'
+        assert first_item['method'] == 'Reactome'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI9865XGLF'
 
 
-def test_reactome_adapter_parent_pathway_of(parent_pathway_of_filepath, spy_writer):
+def test_reactome_adapter_parent_pathway_of(parent_pathway_of_filepath, spy_writer, mock_file_fileset):
     adapter = Reactome(filepath=parent_pathway_of_filepath,
                        label='parent_pathway_of', writer=spy_writer, validate=True)
+    adapter.file_accession = 'IGVFFI9975LVTN'
     adapter.process_file()
+    mock_file_fileset.assert_called_once_with('IGVFFI9975LVTN')
     assert len(spy_writer.contents) > 0
     first_item = json.loads(spy_writer.contents[0])
     assert '_key' in first_item
@@ -53,6 +70,9 @@ def test_reactome_adapter_parent_pathway_of(parent_pathway_of_filepath, spy_writ
     assert first_item['inverse_name'] == 'child of'
     assert first_item['source'] == 'Reactome'
     assert first_item['source_url'] == 'https://reactome.org/'
+    assert first_item['class'] == 'biological relationship'
+    assert first_item['method'] == 'Reactome'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI9975LVTN'
 
 
 def test_reactome_adapter_initialization(filepath, spy_writer):
@@ -68,7 +88,7 @@ def test_reactome_adapter_invalid_label(filepath, spy_writer):
         Reactome(filepath=filepath, label='invalid_label', writer=spy_writer)
 
 
-def test_reactome_adapter_validate_doc_invalid(parent_pathway_of_filepath, spy_writer):
+def test_reactome_adapter_validate_doc_invalid(parent_pathway_of_filepath, spy_writer, mock_file_fileset):
     adapter = Reactome(filepath=parent_pathway_of_filepath,
                        label='parent_pathway_of', writer=spy_writer, validate=True)
     invalid_doc = {
@@ -79,7 +99,7 @@ def test_reactome_adapter_validate_doc_invalid(parent_pathway_of_filepath, spy_w
         adapter.validate_doc(invalid_doc)
 
 
-def test_reactome_adapter_genes_pathways_invalid_gene_id(filepath, spy_writer):
+def test_reactome_adapter_genes_pathways_invalid_gene_id(filepath, spy_writer, mock_file_fileset):
     with patch('adapters.reactome_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = False

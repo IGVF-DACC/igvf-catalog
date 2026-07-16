@@ -60,6 +60,23 @@
       "enum": [
         "Homo sapiens"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the gene pathway edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the gene pathway edge, from the associated files_filesets record"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the gene pathway edge",
+      "example": "files_filesets/IGVFFI9865XGLF",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -70,11 +87,14 @@
     "source_url",
     "name",
     "inverse_name",
-    "organism"
+    "organism",
+    "class",
+    "method",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "source, source_url, organism"
+    "return": "source, source_url, organism, class, method, files_filesets"
   },
   "db_collection_name": "genes_pathways"
 }

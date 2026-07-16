@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Optional
 
 import requests
@@ -6,6 +7,7 @@ from requests.adapters import HTTPAdapter, Retry
 from json import JSONDecodeError
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # This adapter is used to parse Reactome pathway data.
@@ -24,6 +26,7 @@ class ReactomePathway(BaseAdapter):
 
     def __init__(self, filepath=None, label='pathway', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -34,6 +37,11 @@ class ReactomePathway(BaseAdapter):
         return 'pathways'
 
     def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.method = file_fileset['method']
+
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=1,
                         status_forcelist=[500, 502, 503, 504])
@@ -48,7 +56,10 @@ class ReactomePathway(BaseAdapter):
                         'name': name,
                         'organism': organism,
                         'source': 'Reactome',
-                        'source_url': 'https://reactome.org/'
+                        'source_url': 'https://reactome.org/',
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                     try:

@@ -21,6 +21,23 @@
             "Homo sapiens"
           ]
         },
+        "class": {
+          "type": "string",
+          "description": "The class of the pathway, from the associated files_filesets record"
+        },
+        "method": {
+          "type": "string",
+          "description": "The method of the pathway, from the associated files_filesets record"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the pathway",
+          "example": "files_filesets/IGVFFI1890VCZT",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
         "source": {
           "enum": [
             "Reactome"
@@ -76,13 +93,16 @@
         "id_version",
         "is_in_disease",
         "name_aliases",
-        "is_top_level_pathway"
+        "is_top_level_pathway",
+        "class",
+        "method",
+        "files_filesets"
       ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, source, source_url"
+    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, class, method, files_filesets, source, source_url"
   },
   "db_collection_name": "pathways"
 }
