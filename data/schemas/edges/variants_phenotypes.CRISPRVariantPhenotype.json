@@ -199,7 +199,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "effect_size, z_score, p_value, fdr, neg_log10_pvalue, neg_log10_fdr",
-    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, p_value, fdr, neg_log10_pvalue, neg_log10_fdr, significant, num_guides, edit_rate_mean, edit_rate_standard_deviation, effect_size_ci95_lower, effect_size_ci95_upper"
+    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, p_value, fdr, neg_log10_pvalue, neg_log10_fdr, significant, num_guides, edit_rate_mean, edit_rate_standard_deviation, effect_size_ci95_lower, effect_size_ci95_upper"
   },
   "db_collection_name": "variants_phenotypes"
 }
