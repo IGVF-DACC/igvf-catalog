@@ -279,6 +279,7 @@ genomic_elements:
       - chr, start, end
       - source
       - promoter_of
+      - source, files_filesets
 
 genomic_elements_biosamples:
   persistent:
@@ -350,12 +351,13 @@ variants_biosamples:
       - files_filesets
       - method, _key
       - files_filesets, _key
+      - source, files_filesets, method
 
 variants_coding_variants:
   persistent:
     fields:
       - source
-
+      - source, source_url
 
 variants_diseases:
   persistent:
@@ -398,6 +400,7 @@ variants_genes:
       - files_filesets
       - effect_size
       - method
+      - source, files_filesets, method
   inverted:
     fields: biological_context
     analyzers:
@@ -433,6 +436,7 @@ variants_phenotypes:
       - files_filesets, _key
       - _to, _key
       - source, files_filesets
+      - source, files_filesets, method
 
 variants_phenotypes_coding_variants:
   persistent:
@@ -458,6 +462,7 @@ variants_proteins:
       - files_filesets
       - method
       - gene, method, source, biological_context, _key
+      - source, files_filesets, method
 
 variants_variants:
   persistent:
