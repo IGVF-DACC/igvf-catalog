@@ -135,16 +135,12 @@
           ]
         },
         "source_url": {
-          "enum": [
-            "https://data.igvf.org/reference-files/IGVFFI1309WDQG"
-          ]
+          "type": "string",
+          "description": "Source URL for the variant to phenotype edge"
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to phenotype edge",
-          "enum": [
-            "files_filesets/IGVFFI1309WDQG"
-          ]
+          "description": "The filesets of the variant to phenotype edge"
         },
         "name": {
           "enum": [

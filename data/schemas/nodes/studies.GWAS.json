@@ -107,16 +107,12 @@
           ]
         },
         "source_url": {
-          "enum": [
-            "https://data.igvf.org/reference-files/IGVFFI1309WDQG"
-          ]
+          "type": "string",
+          "description": "Source URL of the study"
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the study",
-          "enum": [
-            "files_filesets/IGVFFI1309WDQG"
-          ]
+          "description": "The filesets of the study"
         }
       },
       "required": [
