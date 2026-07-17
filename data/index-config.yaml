@@ -363,6 +363,7 @@ variants_biosamples:
       - method, _key
       - files_filesets, _key
       - source, files_filesets, method
+      - source, class, files_filesets, method
 
 variants_coding_variants:
   persistent:
@@ -412,6 +413,7 @@ variants_genes:
       - effect_size
       - method
       - source, files_filesets, method
+      - source, class, files_filesets, method
   inverted:
     fields: biological_context
     analyzers:
@@ -448,6 +450,7 @@ variants_phenotypes:
       - _to, _key
       - source, files_filesets
       - source, files_filesets, method
+      - source, class, files_filesets, method
 
 variants_phenotypes_coding_variants:
   persistent:
@@ -478,6 +481,7 @@ variants_proteins:
       - gene, method, source, biological_context, _key
       - source, files_filesets, method
       - gene, method, _key
+      - source, class, files_filesets, method
 
 variants_variants:
   persistent:
