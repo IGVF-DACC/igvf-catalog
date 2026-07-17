@@ -29,6 +29,10 @@
           "type": "string",
           "description": "The method of the pathway, from the associated files_filesets record"
         },
+        "label": {
+          "type": "string",
+          "description": "The label of the pathway, from the associated files_filesets record"
+        },
         "files_filesets": {
           "type": "string",
           "description": "The files filesets of the pathway",
@@ -96,13 +100,14 @@
         "is_top_level_pathway",
         "class",
         "method",
+        "label",
         "files_filesets"
       ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, class, method, files_filesets, source, source_url"
+    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "pathways"
 }
