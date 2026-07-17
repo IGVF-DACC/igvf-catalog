@@ -63,14 +63,17 @@
     },
     "class": {
       "type": "string",
-      "description": "The class of the pathway pathway edge, from the associated files_filesets record"
+      "description": "The class of the pathway pathway edge, from the associated files_filesets record",
+      "enum": [
+        "biological relationship"
+      ]
     },
     "method": {
-      "type": "string",
+      "type": ["string", "null"],
       "description": "The method of the pathway pathway edge, from the associated files_filesets record"
     },
     "label": {
-      "type": "string",
+      "type": ["string", "null"],
       "description": "The label of the pathway pathway edge, from the associated files_filesets record"
     },
     "files_filesets": {
