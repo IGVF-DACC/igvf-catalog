@@ -118,6 +118,7 @@ class SGE(BaseAdapter):
 
     def parse(self):
         # check if all variants in file is already loaded
+        self.writer.add_tag('portal_accessions', self.file_accession)
         skipped_spdis = self.validate_variants()
         invalid_variants = []
         for spdi in skipped_spdis:
