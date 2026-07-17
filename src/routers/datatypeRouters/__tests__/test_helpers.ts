@@ -35,7 +35,7 @@ describe('verboseItems', () => {
     FOR record in genes_pathways
     FILTER record._id in ['id1','id2']
     RETURN {
-      'source': record['source'], 'source_url': record['source_url'], 'organism': record['organism'], 'class': record['class'], 'method': record['method'], 'files_filesets': record['files_filesets']
+      'source': record['source'], 'source_url': record['source_url'], 'organism': record['organism'], 'class': record['class'], 'method': record['method'], 'label': record['label'], 'files_filesets': record['files_filesets']
     }`)
     expect(result).toEqual({
       id1: { _id: 'id1', name: 'Item 1' },
