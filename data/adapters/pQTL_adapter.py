@@ -40,6 +40,7 @@ class pQTL(BaseAdapter):
     def parse(self):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
+        self.writer.add_tag('portal_accessions', self.file_accession)
         self.collection_class = file_fileset['class']
         self.method = file_fileset['method']
         self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
@@ -82,7 +83,7 @@ class pQTL(BaseAdapter):
                             '_to': _target,
                             'rsid': row[10] if row[10] != '-' else None,
                             # 'variant_'
-                            'label': 'pQTL',
+                            'label': self.method,
                             'class': self.collection_class,
                             'method': self.method,
                             'log10pvalue': float(row[14]),
