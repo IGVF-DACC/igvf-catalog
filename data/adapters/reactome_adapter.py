@@ -60,6 +60,7 @@ class Reactome(BaseAdapter):
             self.file_accession)
         self.collection_class = file_fileset['class']
         self.method = file_fileset['method']
+        self.writer.add_tag('portal_accessions', self.file_accession)
 
         with open(self.filepath) as input:
             _props = {
@@ -68,6 +69,7 @@ class Reactome(BaseAdapter):
                 'organism': 'Homo sapiens',
                 'class': self.collection_class,
                 'method': self.method,
+                'label': self.method,
                 'files_filesets': 'files_filesets/' + self.file_accession
             }
             _ids_dict = {}

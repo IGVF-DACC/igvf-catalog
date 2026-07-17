@@ -41,7 +41,7 @@ class ReactomePathway(BaseAdapter):
             self.file_accession)
         self.collection_class = file_fileset['class']
         self.method = file_fileset['method']
-
+        self.writer.add_tag('portal_accessions', self.file_accession)
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=1,
                         status_forcelist=[500, 502, 503, 504])
@@ -59,6 +59,7 @@ class ReactomePathway(BaseAdapter):
                         'source_url': 'https://reactome.org/',
                         'class': self.collection_class,
                         'method': self.method,
+                        'label': self.method,
                         'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
