@@ -409,6 +409,7 @@ variants_genes:
       - files_filesets
       - effect_size
       - method
+      - method, _key
   inverted:
     fields: biological_context
     analyzers:
