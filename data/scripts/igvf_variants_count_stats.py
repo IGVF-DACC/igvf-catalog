@@ -111,12 +111,21 @@ def build_query(cfg):
     )
     return_fields = ', '.join(f'{alias}: {alias}' for alias in group_fields)
 
-    query = f"""
-    FOR doc IN {collection}
-      FILTER doc.{filter_field} == @filter_value
-      COLLECT {collect_clauses} WITH COUNT INTO count
-      RETURN {{ {return_fields}, count: count }}
-    """
+    if collection == 'variants_coding_variants':
+        query = f"""
+      FOR doc IN {collection}
+        FILTER doc.{filter_field} == @filter_value
+        COLLECT {collect_clauses} WITH COUNT INTO count
+        RETURN {{ {return_fields}, count: count }}
+      """
+    else:
+        query = f"""
+      FOR doc IN {collection}
+        FILTER doc.{filter_field} == @filter_value
+        FILTER doc.class == 'observed data'
+        COLLECT {collect_clauses} WITH COUNT INTO count
+        RETURN {{ {return_fields}, count: count }}
+      """
     return query, {'filter_value': filter_value}
 
 
