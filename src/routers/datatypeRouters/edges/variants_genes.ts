@@ -44,7 +44,7 @@ const variantsGenesQueryFormat = z.object({
   effect_size: z.string().optional(),
   posterior_inclusion_probability: z.string().optional(),
   log2FC: z.string().optional(),
-  significant: z.enum(['true', 'false']).optional(),
+  significant: z.enum(['true']).optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
   label: z.enum(LABELS).optional(),
