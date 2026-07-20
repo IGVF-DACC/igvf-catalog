@@ -50,6 +50,7 @@ def test_proteins_interaction_adapter(filepath, spy_writer, mock_file_fileset):
     assert first_item['molecular_function'] == 'ontology_terms/GO_0005515'
     assert first_item['class'] == 'observed data'
     assert first_item['source_url'] == 'https://data.igvf.org/reference-files/IGVFFI4317VDGK'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI4317VDGK'
     mock_file_fileset.assert_called_once_with('IGVFFI4317VDGK')
 
 

@@ -118,7 +118,8 @@ class ProteinsInteraction(BaseAdapter):
                             'method': collection_method,
                             'label': detection_method,
                             'class': self.collection_class,
-                            'source_url': self.source_url
+                            'source_url': self.source_url,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
                         if self.validate:
                             self.validate_doc(props)

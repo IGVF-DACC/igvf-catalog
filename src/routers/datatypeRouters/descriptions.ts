@@ -234,7 +234,8 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000112592',
               'associated_gene_id = ENSG00000163132',
-              'source = BioGRID'
+              'source = BioGRID',
+              'files_fileset = IGVFFI4317VDGK'
             ]
           },
           {
@@ -1051,6 +1052,7 @@ export const descriptions = {
   label = affinity chromatography technology, <br> \
   method = physical association, <br> \
   source = BioGRID, <br> \
+  files_fileset = IGVFFI4317VDGK, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 250. <br> \
   Pagination is 0-based.',

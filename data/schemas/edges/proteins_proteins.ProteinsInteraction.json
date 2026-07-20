@@ -618,6 +618,15 @@
             "observed data"
           ]
         },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the protein to protein edge",
+          "example": "files_filesets/IGVFFI4317VDGK",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
         "source_url": {
           "enum": [
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK",
@@ -635,13 +644,14 @@
         "confidence_value_intact",
         "pmids",
         "organism",
-        "molecular_function"
+        "molecular_function",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism, name, method, label, class, source_url"
+    "return": "_from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism, name, method, label, class, source_url, files_filesets"
   },
   "db_collection_name": "proteins_proteins"
 }

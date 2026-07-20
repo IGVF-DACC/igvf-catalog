@@ -23,10 +23,11 @@ def test_biogrid_gene_gene_adapter_gene_gene_biogrid(mock_file_fileset):
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 2
-    assert len(first_item) == 19
+    assert len(first_item) == 20
     assert first_item['source'] == 'BioGRID'
     assert first_item['confidence_value_biogrid'] is None
     assert first_item['class'] == 'observed data'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI4317VDGK'
     assert first_item['interaction_type'] == [
         'positive genetic interaction (sensu BioGRID)']
     mock_file_fileset.assert_called_once_with('IGVFFI4317VDGK')
@@ -39,9 +40,10 @@ def test_biogrid_gene_gene_adapter_mouse_gene_gene_biogrid(mock_file_fileset):
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 14
-    assert len(first_item) == 19
+    assert len(first_item) == 20
     assert first_item['source'] == 'BioGRID'
     assert first_item['class'] == 'observed data'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI1165YVBA'
     assert first_item['interaction_type'] == [
         'positive genetic interaction (sensu BioGRID)']
     mock_file_fileset.assert_called_once_with('IGVFFI1165YVBA')

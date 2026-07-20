@@ -51,7 +51,8 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
     label: z.enum(labels).optional(),
     method: z.enum(methodsEnum).optional(),
     source: z.enum(sources).optional(),
-    name: z.enum(names).optional()
+    name: z.enum(names).optional(),
+    files_fileset: z.string().trim().optional()
   })
 ).merge(commonEdgeParamsFormat)
 
@@ -72,7 +73,8 @@ const genesGenesRelativeFormat = z.object({
   class: z.string(),
   source: z.string(),
   source_url: z.string().optional(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 function validateInput (input: paramsFormatType): void {
@@ -112,6 +114,11 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     genesGenesSchema = MousegenesGenesSchema
   }
   delete input.organism
+
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
+  }
 
   const genesCollectionName = genesSchema.db_collection_name as string
   const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
