@@ -246,6 +246,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   LET A = (
     FOR record in ${variantToGeneCollectionName}
     FILTER record._from == '${id}'
+    SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToGeneSchema, true)}}
     RETURN {
       'sequence_variant': from,
@@ -255,8 +256,8 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   const proteinsFromVariantQuery = `
   LET B = (
     FOR record in ${variantToProteinCollectionName}
-    FILTER record._from == '${id}'
-    FILTER LEFT(record._to, 9) == 'proteins/'
+    FILTER record._from == '${id}' and STARTS_WITH(record._to, 'proteins/')
+    SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToProteinSchema, true, '', [], true, variantsProteinsApiKeyToDbFieldMap)}}
     RETURN {
       'sequence_variant': from,
@@ -267,26 +268,20 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     ${genesFromVariantQuery}
     ${proteinsFromVariantQuery}
 
-    LET combined = (
-      FOR record in UNION(A, B)
-      COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
-      RETURN { source, relatedObjs }
-    )
-
-    FOR item in combined
-      LET variant = FIRST(
+    FOR record in UNION(A, B)
+    COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
+    RETURN {
+      'sequence_variant': (
         FOR otherRecord in ${variantCollectionName}
-        FILTER otherRecord._id == item.source
+        FILTER otherRecord._id == source
         RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
+      )[0],
+      'related': (
+        FOR ro in relatedObjs
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN ro
       )
-      RETURN {
-        'sequence_variant': variant,
-        'related': (
-          FOR ro in item.relatedObjs
-          LIMIT ${input.page as number * limit}, ${limit}
-          RETURN ro
-        )
-      }
+    }
   `
 
   const objs = await (await db.query(query)).all()
