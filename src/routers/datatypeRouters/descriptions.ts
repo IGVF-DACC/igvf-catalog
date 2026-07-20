@@ -328,6 +328,7 @@ export const descriptions = {
   variants_genes:
     'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, or files_filesets. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -411,6 +412,16 @@ export const descriptions = {
             label: 'query by region',
             items: [
               'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by significance thresholds',
+            items: [
+              'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'posterior_inclusion_probability = gte:0.1',
+              'log2FC = lt:-0.5',
+              'significant = true',
               'method = CRISPR screen'
             ]
           }
