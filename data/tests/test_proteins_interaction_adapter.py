@@ -1,5 +1,6 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.writer import SpyWriter
 
@@ -14,9 +15,19 @@ def spy_writer():
     return SpyWriter()
 
 
-def test_proteins_interaction_adapter(filepath, spy_writer):
+@pytest.fixture
+def mock_file_fileset():
+    with patch('adapters.proteins_interaction_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'observed data',
+            'method': 'affinity chromatography technology'
+        }
+        yield mock_get
+
+
+def test_proteins_interaction_adapter(filepath, spy_writer, mock_file_fileset):
     adapter = ProteinsInteraction(
-        filepath=filepath, label='protein_protein', writer=spy_writer, validate=True)
+        filepath=filepath, label='protein_protein_human', writer=spy_writer, validate=True)
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -39,25 +50,28 @@ def test_proteins_interaction_adapter(filepath, spy_writer):
     assert first_item['molecular_function'] == 'ontology_terms/GO_0005515'
     assert first_item['class'] == 'observed data'
     assert first_item['source_url'] == 'https://data.igvf.org/reference-files/IGVFFI4317VDGK'
+    mock_file_fileset.assert_called_once_with('IGVFFI4317VDGK')
 
 
 def test_proteins_interaction_adapter_initialization(filepath, spy_writer):
     adapter = ProteinsInteraction(
-        filepath=filepath, label='protein_protein', writer=spy_writer)
+        filepath=filepath, label='protein_protein_human', writer=spy_writer)
     assert adapter.filepath == filepath
+    assert adapter.label == 'protein_protein_human'
     assert adapter.organism == 'Homo sapiens'
 
 
 def test_proteins_interaction_adapter_mouse(spy_writer):
-    mouse_filepath = './samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.csv'
+    mouse_filepath = './samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv'
     adapter = ProteinsInteraction(
-        filepath=mouse_filepath, label='protein_protein', writer=spy_writer, validate=True)
+        filepath=mouse_filepath, label='protein_protein_mouse', writer=spy_writer, validate=True)
+    assert adapter.label == 'protein_protein_mouse'
     assert adapter.organism == 'Mus musculus'
 
 
 def test_proteins_interaction_adapter_load_MI_code_mapping(filepath, spy_writer):
     adapter = ProteinsInteraction(
-        filepath=filepath, label='protein_protein', writer=spy_writer)
+        filepath=filepath, label='protein_protein_human', writer=spy_writer)
     adapter.load_MI_code_mapping()
     assert hasattr(adapter, 'MI_code_mapping')
     assert isinstance(adapter.MI_code_mapping, dict)
@@ -66,7 +80,7 @@ def test_proteins_interaction_adapter_load_MI_code_mapping(filepath, spy_writer)
 
 def test_validate_doc_invalid(filepath, spy_writer):
     adapter = ProteinsInteraction(
-        filepath=filepath, label='protein_protein', writer=spy_writer, validate=True)
+        filepath=filepath, label='protein_protein_human', writer=spy_writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

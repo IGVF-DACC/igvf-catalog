@@ -8,6 +8,7 @@ import os
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # (Only loading lines with 'genetic interference' in Detection Method column, the other lines are loaded in ProteinsInteraction Adapter)
@@ -20,12 +21,12 @@ from adapters.writer import Writer
 
 
 class GeneGeneBiogrid(BaseAdapter):
-    ALLOWED_LABELS = ['biogrid_gene_gene', 'mouse_gene_gene_biogrid']
+    ALLOWED_LABELS = ['human_gene_gene_biogrid', 'mouse_gene_gene_biogrid']
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     COLLECTION_LABEL = 'genetic interference'
-    COLLECTION_CLASS = 'observed data'
 
-    def __init__(self, filepath, label='biogrid_gene_gene', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label='human_gene_gene_biogrid', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         # Determine gene collection BEFORE calling super().__init__()
         # because _get_collection_name() needs it for schema loading
         if label == 'mouse_gene_gene_biogrid':
@@ -34,8 +35,7 @@ class GeneGeneBiogrid(BaseAdapter):
         else:
             self.gene_collection = 'genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping.pkl'
-        self.source_url = 'https://data.igvf.org/reference-files/' + \
-            os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
 
         # Initialize base adapter after setting gene_collection
         super().__init__(filepath, label, writer, validate)
@@ -52,6 +52,11 @@ class GeneGeneBiogrid(BaseAdapter):
             return 'mm_genes_mm_genes'
 
     def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
 
@@ -112,7 +117,7 @@ class GeneGeneBiogrid(BaseAdapter):
                             'molecular_function': 'ontology_terms/GO_0005515',
                             'method': collection_method,
                             'label': self.COLLECTION_LABEL,
-                            'class': self.COLLECTION_CLASS,
+                            'class': self.collection_class,
                             'source_url': self.source_url
                         }
                         if self.validate:

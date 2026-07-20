@@ -1718,12 +1718,15 @@ motif to protein:
   source: HOCOMOCOv11
   biological_process: ontology_terms/GO_0003677
 
-# Example: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_mouse_IGVFFI1165YVBA.jsonl
-#          pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl
-# ATTENTION: files must be renamed to original filenames as metadata gets read from them
+# Example: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1165YVBA.csv --output-bucket-key proteins_proteins/proteins_proteins_mouse_IGVFFI1165YVBA.jsonl --label protein_protein_mouse
+#          pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4317VDGK.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl --label protein_protein_human
 protein to protein interaction:
   collection: proteins_proteins
-  command: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath {original_datafile} --output-bucket-key proteins_proteins/proteins_proteins_human_{datafile_name}.jsonl
+  params:
+    - label
+  command:
+    - pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl --label protein_protein_human
+    - pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins_proteins/proteins_proteins_mouse_IGVFFI1165YVBA.jsonl --label protein_protein_mouse
   pypy3: true
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz
@@ -1731,12 +1734,11 @@ protein to protein interaction:
   source: ['BioGRID', 'IntAct']
   molecular_function: ontology_terms/GO_0005515
 
-# Example: pypy3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl
-# ATTENTION: files must be renamed to original filenames as metadata gets read from them
+# Example: pypy3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1165YVBA.csv --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl --label mouse_gene_gene_biogrid
 mouse gene to gene interaction:
   collection: mm_genes_mm_genes
   pypy3: true
-  command: pypy3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl
+  command: pypy3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl --label mouse_gene_gene_biogrid
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI1165YVBA/@@download/IGVFFI1165YVBA.csv.gz # merged_PPI_mouse.UniProt.csv.gz
   source: BioGRID
@@ -1752,10 +1754,10 @@ gene to gene coexpression association:
   source: CoXPresdb
   associated process: ontology_terms/GO_0010467
 
-# Example: python3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4317VDGK.csv --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl
+# Example: python3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4317VDGK.csv --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl --label human_gene_gene_biogrid
 gene to gene interaction:
   collection: genes_genes
-  command: python3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl
+  command: python3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl --label human_gene_gene_biogrid
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz # BioGRID
   source: BioGRID
