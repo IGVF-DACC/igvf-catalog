@@ -145,25 +145,25 @@
             "dosage rescue (sensu BioGRID), phenotypic enhancement (sensu BioGRID)",
             "dosage rescue (sensu BioGRID), synthetic growth defect (sensu BioGRID)",
             "negative genetic interaction (sensu BioGRID)",
+            "negative genetic interaction (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
+            "negative genetic interaction (sensu BioGRID), positive genetic interaction (sensu BioGRID)",
             "negative genetic interaction (sensu BioGRID), synthetic growth defect (sensu BioGRID)",
+            "negative genetic interaction (sensu BioGRID), synthetic growth defect (sensu BioGRID), synthetic lethality (sensu BioGRID)",
             "negative genetic interaction (sensu BioGRID), synthetic lethality (sensu BioGRID)",
-            "negative genetic interaction (sensu BioGRID), synthetic lethality (sensu BioGRID), synthetic growth defect (sensu BioGRID)",
             "phenotypic enhancement (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), positive genetic interaction (sensu BioGRID)",
             "phenotypic enhancement (sensu BioGRID), synthetic growth defect (sensu BioGRID)",
             "phenotypic enhancement (sensu BioGRID), synthetic lethality (sensu BioGRID)",
             "phenotypic suppression (sensu BioGRID)",
-            "phenotypic suppression (sensu BioGRID), negative genetic interaction (sensu BioGRID)",
-            "phenotypic suppression (sensu BioGRID), phenotypic enhancement (sensu BioGRID)",
             "positive genetic interaction (sensu BioGRID)",
-            "positive genetic interaction (sensu BioGRID), negative genetic interaction (sensu BioGRID)",
-            "positive genetic interaction (sensu BioGRID), phenotypic enhancement (sensu BioGRID)",
             "positive genetic interaction (sensu BioGRID), synthetic lethality (sensu BioGRID)",
             "positive genetic interaction (sensu BioGRID), synthetic rescue (sensu BioGRID)",
             "synthetic growth defect (sensu BioGRID)",
+            "synthetic growth defect (sensu BioGRID), synthetic lethality (sensu BioGRID)",
             "synthetic lethality (sensu BioGRID)",
-            "synthetic lethality (sensu BioGRID), synthetic growth defect (sensu BioGRID)",
             "synthetic rescue (sensu BioGRID)"
-        ]
+          ]
         },
         "label": {
           "enum": [

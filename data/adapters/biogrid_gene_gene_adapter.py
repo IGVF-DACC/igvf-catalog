@@ -77,8 +77,8 @@ class GeneGeneBiogrid(BaseAdapter):
 
                 # look up the full name of MI code in column 7 from obo file, instead of loading from column 6
                 interaction_type_code = row[6].split('; ')
-                interaction_type = [self.MI_code_mapping.get(
-                    code) for code in interaction_type_code]
+                interaction_type = sorted([self.MI_code_mapping.get(
+                    code) for code in interaction_type_code])
                 collection_method = ', '.join(interaction_type)
                 # there are some cases where one protein -> multiple genes
                 genes_1 = self.protein_gene_mapping.get(row[0])
