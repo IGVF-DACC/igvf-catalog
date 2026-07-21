@@ -588,11 +588,8 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
   let useIndex = ''
-  if (!isVariantQuery) {
-    useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
-    if (filesetFilter !== '') {
-      useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
-    }
+  if (!isVariantQuery && filesetFilter !== '') {
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
   }
   // combine variantFilter, edgeFilters, restrictiveFilters and filesetFilter
   const baseFilters = [variantFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean)
