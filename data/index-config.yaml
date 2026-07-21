@@ -353,6 +353,13 @@ variants:
     fields:
       - pos
 
+variants_IGVF:
+  persistent:
+    fields:
+      - gwas_results
+      - gwas_results[*].neg_log10_pvalue
+      - gwas_results[*].phenotype_term
+
 variants_biosamples:
   persistent:
     fields:
