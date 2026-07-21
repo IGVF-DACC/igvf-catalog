@@ -710,8 +710,7 @@ def make_gwas_flusher(db, target_collection, gwas_chunk):
 def process_one_gwas_file(s3, bucket, key, gwas_chunk, flush, insert_batch_size,
                           progress_every=500_000, max_retries=3):
     """Stream one GWAS-only JSONL file, keep records with method ==
-    'GWAS' (and source == FILTER_VALUE, to stay scoped to IGVF data),
-    and accumulate {_id, phenotype_term, neg_log10_pvalue} results per
+    'GWAS', and accumulate {_id, phenotype_term, neg_log10_pvalue} results per
     variant_id into the shared gwas_chunk, keyed by result _id so
     retries/re-encounters can't create duplicate entries. Flushes (one
     batched AQL UPDATE-if-exists) whenever the chunk reaches
@@ -743,7 +742,7 @@ def process_one_gwas_file(s3, bucket, key, gwas_chunk, flush, insert_batch_size,
                         f'    !! skipping unparsable line: {e}', file=sys.stderr)
                     continue
 
-                if doc.get(FILTER_FIELD) == FILTER_VALUE and doc.get('method') == 'GWAS':
+                if doc.get('method') == 'GWAS':
                     variant_id = strip_id_prefix(doc.get('_from'))
                     gwas_id = doc.get('_id') or (
                         f"variants_phenotypes/{doc['_key']}" if doc.get(
