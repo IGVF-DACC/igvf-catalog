@@ -42,7 +42,10 @@ const gnrGeneQueryFormat = z.object({
   response_alias: z.string().optional(),
   neg_log10_pvalue: z.string().optional(),
   neg_log10_pvalue_adj: z.string().optional(),
-  method: z.enum(['CRISPR screen', 'Perturb-seq']).optional()
+  method: z.enum(['CRISPR screen', 'Perturb-seq']).optional(),
+  files_fileset: z.string().optional(),
+  significant: z.enum(['true']).optional(),
+  crispr_modality: z.enum(['knockout', 'interference', 'activation']).optional()
 }).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
@@ -466,12 +469,27 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     methodFilter = `['${input.method as string}']`
   }
 
+  let filesFilesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesFilesetFilter = `AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  }
+
+  let significantFilter = ''
+  if (input.significant !== undefined) {
+    significantFilter = `AND record.significant == ${input.significant as string}`
+  }
+
+  let crisprModalityFilter = ''
+  if (input.crispr_modality !== undefined) {
+    crisprModalityFilter = `AND record.crispr_modality == '${input.crispr_modality as string}'`
+  }
+
   const responseQuery = `
     FOR gene IN genes
         FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
         FOR record in genomic_elements_genes
-          FILTER record._to == gene._id AND record.method IN ${methodFilter}
+          FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
           ${pvalueFilter}
           SORT record._key
 
@@ -511,7 +529,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           FILTER ge.promoter_of == gene._id
 
           FOR record in genomic_elements_genes
-            FILTER record._from == ge._id AND record.method IN ${methodFilter}
+            FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
             ${pvalueFilter}
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
@@ -549,7 +567,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
             FOR record in genomic_elements_genes
-              FILTER record._to == response_gene._id AND record.method IN ${methodFilter}
+              FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
               ${pvalueFilter}
 
               FOR ge IN genomic_elements
