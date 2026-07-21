@@ -1,30 +1,61 @@
 #!/usr/bin/env python3
 """
 Stream variants_* JSONL backup files from S3, filter each record to
-source == "IGVF", extract the variant ID from the `_from` field
-(collection prefix stripped, e.g. 'variants/12345' -> '12345'), and
-bulk-insert the unique IDs into an ArangoDB collection (default:
-variants_IGVF).
+source == "IGVF" and class == "observed data", and build ONE document
+per unique variant ID containing the unique set of `method`,
+`files_filesets`, and `class` values seen for that variant across all
+four source collections -- plus `lab` and `preferred_assay_titles`,
+enriched by looking up each files_fileset value against the (small,
+<2500 doc) files_filesets collection, loaded entirely into memory once
+at startup. Documents live in an ArangoDB collection (default:
+variants_IGVF), shaped like:
 
-De-duplication is handled entirely by ArangoDB: each ID is inserted as
-{"_key": variant_id}, and bulk inserts use overwrite_mode="ignore" so
-duplicate keys are silently skipped by the collection's own unique
-primary index -- no need to hold anything in memory or post-process for
-uniqueness.
+    {
+      "_key": "<variant_id>",
+      "method": [...],
+      "files_filesets": [...],
+      "class": [...],
+      "lab": [...],
+      "preferred_assay_titles": [...]
+    }
+
+Merging is done with AQL UPSERT + APPEND()/UNIQUE(): if the variant
+already exists, new method/files_fileset values are appended and
+de-duplicated; if not, the document is created. This avoids any
+external sort/tempfile step -- the database itself handles the merge.
+
+To keep this efficient at scale (potentially hundreds of millions of
+records) without issuing one UPSERT per line, matching records are
+accumulated into small in-memory batches (bounded by
+--insert-batch-size distinct variant IDs, not the total data size), with
+values locally de-duplicated within each batch before a single AQL
+query upserts the whole batch at once. This keeps memory flat regardless
+of total volume: only one batch's worth of data is ever held at a time.
+
+PHASE 2 -- GWAS enrichment (runs after phase 1 completes):
+GWAS results live in separate files (typically under
+variants_phenotypes) that are NOT part of MANIFEST -- configure them in
+GWAS_MANIFEST instead. Phase 2 streams those files, keeps records with
+source == "IGVF" and method == "GWAS", and adds a `gwas_results` field
+(list of {_id, phenotype_term, neg_log10_pvalue} objects) to matching
+variants. Critically, phase 2 only UPDATEs variants that already exist
+in the target collection -- it never creates new ones. A variant_id seen
+in a GWAS file but not already loaded by phase 1 is silently skipped.
 
 Expects S3 layout like:
     s3://igvf-catalog-parsed-collections/variants_biosamples/*.jsonl
-    s3://igvf-catalog-parsed-collections/variants_coding_variants/*.jsonl
+    s3://igvf-catalog-parsed-collections/variants_genes/*.jsonl
     ... etc, one prefix per collection.
 
 Not every file under a prefix need be relevant. Two ways to control
-which files get pulled:
+which files get pulled (applies to both MANIFEST and GWAS_MANIFEST):
   - --file-pattern: a glob restricting filenames when listing a prefix
     (default: *.jsonl)
-  - MANIFEST (hardcoded dict near the top of this file): an EXPLICIT
-    list of filenames per prefix, bypassing S3 listing entirely for
-    those prefixes. Edit it directly, e.g.:
+  - The manifest dicts themselves (hardcoded near the top of this file):
+    an EXPLICIT list of filenames per prefix, bypassing S3 listing
+    entirely for those prefixes. Edit directly, e.g.:
         MANIFEST["variants_biosamples"] = ["part-0001.jsonl", "part-0002.jsonl"]
+        GWAS_MANIFEST["variants_phenotypes"] = ["gwas-part-0001.jsonl"]
     Any prefix left as an empty list falls back to --file-pattern
     based listing.
 
@@ -38,7 +69,7 @@ Usage:
         --db your_db_name \\
         --username your_user \\
         --password your_password \\
-        [--prefixes variants_biosamples,variants_coding_variants,...] \\
+        [--prefixes variants_biosamples,variants_genes,variants_phenotypes,variants_proteins] \\
         [--target-collection variants_IGVF] \\
         [--file-pattern "*.jsonl"] \\
         [--insert-batch-size 5000] \\
@@ -64,7 +95,6 @@ from arango.http import DefaultHTTPClient
 
 DEFAULT_PREFIXES = [
     'variants_biosamples',
-    'variants_coding_variants',
     'variants_genes',
     'variants_phenotypes',
     'variants_proteins',
@@ -372,8 +402,77 @@ MANIFEST = {
     ]
 }
 
+
+# Phase 2 (GWAS enrichment) source files. These are NOT part of MANIFEST
+# above -- they're separate files (typically under variants_phenotypes)
+# containing method == "GWAS" records, processed only after all variants
+# from MANIFEST have been loaded. Fill in directly, e.g.:
+#   GWAS_MANIFEST["variants_phenotypes"] = ["gwas-part-0001.jsonl"]
+GWAS_MANIFEST = {
+    'variants_phenotypes': [
+        'variants_phenotypes_gwas_IGVFFI1309WDQG_20260611.jsonl'
+    ],
+}
+
 FILTER_FIELD = 'source'
 FILTER_VALUE = 'IGVF'
+CLASS_FILTER_VALUE = 'observed data'
+
+UPSERT_QUERY = """
+FOR row IN @rows
+  UPSERT { _key: row.variant_id }
+    INSERT {
+      _key: row.variant_id,
+      method: row.methods,
+      files_filesets: row.filesets,
+      class: row.classes,
+      lab: row.labs,
+      preferred_assay_titles: row.assay_titles
+    }
+    UPDATE {
+      method: UNIQUE(APPEND(OLD.method, row.methods)),
+      files_filesets: UNIQUE(APPEND(OLD.files_filesets, row.filesets)),
+      class: UNIQUE(APPEND(OLD.class, row.classes)),
+      lab: UNIQUE(APPEND(OLD.lab, row.labs)),
+      preferred_assay_titles: UNIQUE(APPEND(OLD.preferred_assay_titles, row.assay_titles))
+    }
+  IN @@collection
+"""
+
+# Phase 2: GWAS enrichment. Only UPDATEs variants that already exist --
+# never creates new ones. DOCUMENT() fetches the current version of each
+# target so we can merge/dedupe gwas_results against it; FILTER existing
+# != null is what guarantees no new documents get created for variant
+# IDs that aren't already in the target collection.
+GWAS_UPDATE_QUERY = """
+FOR row IN @rows
+  LET existing = DOCUMENT(@@collection, row.variant_id)
+  FILTER existing != null
+  UPDATE { _key: row.variant_id }
+  WITH { gwas_results: UNIQUE(APPEND(existing.gwas_results, row.gwas_results)) }
+  IN @@collection
+  OPTIONS { keepNull: false }
+"""
+
+
+def load_files_filesets_lookup(db, collection_name='files_filesets'):
+    """Load the (small, <2500 doc) files_filesets collection entirely
+    into memory, keyed by full document _id (e.g.
+    'files_filesets/ENCFF003HKV') so it matches the string values already
+    stored on variant records. Returns a dict:
+        { "files_filesets/<key>": {"lab": ..., "preferred_assay_titles": [...]} }
+    """
+    print(
+        f"Loading '{collection_name}' lookup table into memory ...", flush=True)
+    cursor = db.aql.execute(f'FOR doc IN {collection_name} RETURN doc')
+    lookup = {}
+    for doc in cursor:
+        lookup[doc['_id']] = {
+            'lab': doc.get('lab'),
+            'preferred_assay_titles': doc.get('preferred_assay_titles') or [],
+        }
+    print(f'Loaded {len(lookup):,} files_filesets records')
+    return lookup
 
 
 def strip_id_prefix(value):
@@ -389,9 +488,8 @@ def list_matching_keys(s3, bucket, prefix, file_pattern, manifest=None):
 
     If the (hardcoded) manifest has a non-empty entry for this prefix,
     use that explicit list of filenames (joined onto the prefix) instead
-    of listing the bucket -- this lets you pick exactly which files to
-    pull per folder rather than everything matching a glob. An empty or
-    missing entry falls back to pattern-based listing.
+    of listing the bucket. An empty or missing entry falls back to
+    pattern-based listing.
     """
     if manifest and manifest.get(prefix):
         filenames = manifest[prefix]
@@ -410,17 +508,146 @@ def list_matching_keys(s3, bucket, prefix, file_pattern, manifest=None):
 
 def iter_jsonl_lines(s3, bucket, key):
     """Stream a plain-text JSONL object from S3 line by line without
-    loading the whole file into memory."""
+    loading the whole file into memory. Uses a larger chunk_size than the
+    iter_lines() default (1KB) since these files can be very large --
+    bigger reads mean fewer round trips for the same amount of data."""
     obj = s3.get_object(Bucket=bucket, Key=key)
     body = obj['Body']  # botocore StreamingBody
-    for line in body.iter_lines():
+    for line in body.iter_lines(chunk_size=1024 * 1024):  # 1 MB reads
         yield line
 
 
-def process_collection(s3, bucket, prefix, file_pattern, arango_collection,
-                       insert_batch_size, stats, manifest=None):
-    """Stream all matching JSONL files for one collection prefix, filter
-    records, and batch-insert unique variant IDs into ArangoDB."""
+def make_flusher(db, target_collection, chunk):
+    """Build a flush function bound to one shared chunk dict. Sends a
+    single AQL UPSERT query covering every distinct variant_id currently
+    in the chunk, appending+deduping method/files_filesets values against
+    whatever's already stored, then clears the chunk."""
+
+    def flush():
+        if not chunk:
+            return
+        rows = [
+            {
+                'variant_id': variant_id,
+                'methods': sorted(m for m in entry['methods'] if m),
+                'filesets': sorted(f for f in entry['filesets'] if f),
+                'classes': sorted(c for c in entry['classes'] if c),
+                'labs': sorted(l for l in entry['labs'] if l),
+                'assay_titles': sorted(a for a in entry['assay_titles'] if a),
+            }
+            for variant_id, entry in chunk.items()
+        ]
+        db.aql.execute(
+            UPSERT_QUERY,
+            bind_vars={'rows': rows, '@collection': target_collection},
+        )
+        chunk.clear()
+
+    return flush
+
+
+def process_one_file(s3, bucket, key, chunk, flush, insert_batch_size, ff_lookup,
+                     progress_every=500_000, max_retries=3):
+    """Stream one JSONL file, filter records, and accumulate matching
+    method/files_fileset/class values -- plus lab/preferred_assay_titles
+    looked up from the files_filesets in-memory table -- per variant_id
+    into the shared chunk dict, flushing (one batched AQL UPSERT)
+    whenever the chunk reaches insert_batch_size distinct variant IDs.
+
+    Prints a heartbeat every `progress_every` lines so a very large file
+    doesn't look hung, and retries the whole file up to `max_retries`
+    times on transient errors. Retrying is safe: UPSERT+APPEND+UNIQUE is
+    idempotent for re-encountered values -- appending the same value
+    twice still dedupes to one via UNIQUE()."""
+    for attempt in range(1, max_retries + 1):
+        file_scanned = 0
+        file_matched = 0
+        last_progress_print = time.perf_counter()
+        try:
+            for raw_line in iter_jsonl_lines(s3, bucket, key):
+                if not raw_line:
+                    continue
+                file_scanned += 1
+
+                if file_scanned % progress_every == 0:
+                    now = time.perf_counter()
+                    print(
+                        f'      ... {file_scanned:,} lines read, '
+                        f'{file_matched:,} matched so far '
+                        f'({now - last_progress_print:.1f}s for last {progress_every:,})',
+                        flush=True,
+                    )
+                    last_progress_print = now
+
+                try:
+                    doc = json.loads(raw_line)
+                except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                    print(
+                        f'    !! skipping unparsable line: {e}', file=sys.stderr)
+                    continue
+
+                if (
+                    doc.get(FILTER_FIELD) == FILTER_VALUE
+                    and doc.get('class') == CLASS_FILTER_VALUE
+                ):
+                    variant_id = strip_id_prefix(doc.get('_from'))
+                    if variant_id:
+                        file_matched += 1
+                        entry = chunk.setdefault(
+                            variant_id,
+                            {
+                                'methods': set(),
+                                'filesets': set(),
+                                'classes': set(),
+                                'labs': set(),
+                                'assay_titles': set(),
+                            },
+                        )
+                        method = doc.get('method')
+                        files_fileset = doc.get('files_filesets')
+                        class_value = doc.get('class')
+                        if method:
+                            entry['methods'].add(method)
+                        if files_fileset:
+                            entry['filesets'].add(files_fileset)
+                        if class_value:
+                            entry['classes'].add(class_value)
+
+                        if files_fileset:
+                            ff_info = ff_lookup.get(files_fileset)
+                            if ff_info:
+                                if ff_info.get('lab'):
+                                    entry['labs'].add(ff_info['lab'])
+                                for title in ff_info.get('preferred_assay_titles') or []:
+                                    entry['assay_titles'].add(title)
+
+                        if len(chunk) >= insert_batch_size:
+                            flush()
+
+            return file_scanned, file_matched  # success
+
+        except Exception as e:
+            print(
+                f'    !! ERROR reading {key} on attempt {attempt}/{max_retries}: {e}',
+                file=sys.stderr,
+            )
+            if attempt < max_retries:
+                wait = 2 ** attempt
+                print(f'    retrying {key} in {wait}s ...', flush=True)
+                time.sleep(wait)
+            else:
+                print(
+                    f'    giving up on {key} after {max_retries} attempts', file=sys.stderr)
+                return file_scanned, file_matched  # partial/failed
+
+    return 0, 0
+
+
+def process_collection(s3, bucket, prefix, file_pattern, chunk, flush,
+                       insert_batch_size, ff_lookup, stats, manifest=None):
+    """Stream all matching JSONL files for one collection prefix,
+    accumulating matched records into the shared chunk (flushed via
+    batched AQL UPSERT as it fills up)."""
     keys = list_matching_keys(s3, bucket, prefix, file_pattern, manifest)
     source_desc = 'hardcoded MANIFEST' if manifest and manifest.get(
         prefix) else f"pattern '{file_pattern}'"
@@ -432,29 +659,88 @@ def process_collection(s3, bucket, prefix, file_pattern, arango_collection,
     start = time.perf_counter()
     scanned = 0
     matched = 0
-    inserted = 0
-    batch = []
-
-    def flush_batch():
-        nonlocal inserted
-        if not batch:
-            return
-        result = arango_collection.insert_many(
-            batch, overwrite_mode='ignore', silent=True
-        )
-        inserted += len(batch)
-        batch.clear()
-        return result
 
     for i, key in enumerate(keys, start=1):
         print(f'  [{i}/{len(keys)}] {key}', flush=True)
+        file_scanned, file_matched = process_one_file(
+            s3, bucket, key, chunk, flush, insert_batch_size, ff_lookup
+        )
+        scanned += file_scanned
+        matched += file_matched
+        print(
+            f'    -> scanned {file_scanned:,} records, matched {file_matched:,}')
+
+    elapsed = time.perf_counter() - start
+    stats.append(
+        {
+            'collection': prefix,
+            'files': len(keys),
+            'scanned': scanned,
+            'matched': matched,
+            'elapsed': elapsed,
+        }
+    )
+    print(
+        f'  {prefix} done: {scanned:,} scanned, {matched:,} matched in {elapsed:.1f}s')
+
+
+def make_gwas_flusher(db, target_collection, gwas_chunk):
+    """Build a flush function for phase 2 (GWAS enrichment). Sends one
+    AQL query per batch that ONLY updates variants already present in
+    target_collection (via FILTER existing != null) -- never creates new
+    documents -- merging+deduping gwas_results against whatever's
+    already stored."""
+
+    def flush():
+        if not gwas_chunk:
+            return
+        rows = [
+            {
+                'variant_id': variant_id,
+                'gwas_results': sorted(
+                    results.values(), key=lambda r: r.get('_id') or ''
+                ),
+            }
+            for variant_id, results in gwas_chunk.items()
+        ]
+        db.aql.execute(
+            GWAS_UPDATE_QUERY,
+            bind_vars={'rows': rows, '@collection': target_collection},
+        )
+        gwas_chunk.clear()
+
+    return flush
+
+
+def process_one_gwas_file(s3, bucket, key, gwas_chunk, flush, insert_batch_size,
+                          progress_every=500_000, max_retries=3):
+    """Stream one GWAS-only JSONL file, keep records with method ==
+    'GWAS' (and source == FILTER_VALUE, to stay scoped to IGVF data),
+    and accumulate {_id, phenotype_term, neg_log10_pvalue} results per
+    variant_id into the shared gwas_chunk, keyed by result _id so
+    retries/re-encounters can't create duplicate entries. Flushes (one
+    batched AQL UPDATE-if-exists) whenever the chunk reaches
+    insert_batch_size distinct variant IDs."""
+    for attempt in range(1, max_retries + 1):
         file_scanned = 0
         file_matched = 0
+        last_progress_print = time.perf_counter()
         try:
             for raw_line in iter_jsonl_lines(s3, bucket, key):
                 if not raw_line:
                     continue
                 file_scanned += 1
+
+                if file_scanned % progress_every == 0:
+                    now = time.perf_counter()
+                    print(
+                        f'      ... {file_scanned:,} lines read, '
+                        f'{file_matched:,} matched so far '
+                        f'({now - last_progress_print:.1f}s for last {progress_every:,})',
+                        flush=True,
+                    )
+                    last_progress_print = now
+
                 try:
                     doc = json.loads(raw_line)
                 except (json.JSONDecodeError, UnicodeDecodeError) as e:
@@ -462,48 +748,90 @@ def process_collection(s3, bucket, prefix, file_pattern, arango_collection,
                         f'    !! skipping unparsable line: {e}', file=sys.stderr)
                     continue
 
-                if (
-                    doc.get(FILTER_FIELD) == FILTER_VALUE
-                ):
+                if doc.get(FILTER_FIELD) == FILTER_VALUE and doc.get('method') == 'GWAS':
                     variant_id = strip_id_prefix(doc.get('_from'))
-                    if variant_id:
+                    gwas_id = doc.get('_id') or (
+                        f"variants_phenotypes/{doc['_key']}" if doc.get(
+                            '_key') else None
+                    )
+                    if variant_id and gwas_id:
                         file_matched += 1
-                        batch.append({'_key': variant_id})
-                        if len(batch) >= insert_batch_size:
-                            flush_batch()
-        except Exception as e:
-            print(f'    !! ERROR reading {key}: {e}', file=sys.stderr)
-            continue
+                        results = gwas_chunk.setdefault(variant_id, {})
+                        results[gwas_id] = {
+                            '_id': gwas_id,
+                            'phenotype_term': doc.get('phenotype_term'),
+                            'neg_log10_pvalue': doc.get('neg_log10_pvalue'),
+                        }
 
+                        if len(gwas_chunk) >= insert_batch_size:
+                            flush()
+
+            return file_scanned, file_matched  # success
+
+        except Exception as e:
+            print(
+                f'    !! ERROR reading {key} on attempt {attempt}/{max_retries}: {e}',
+                file=sys.stderr,
+            )
+            if attempt < max_retries:
+                wait = 2 ** attempt
+                print(f'    retrying {key} in {wait}s ...', flush=True)
+                time.sleep(wait)
+            else:
+                print(
+                    f'    giving up on {key} after {max_retries} attempts', file=sys.stderr)
+                return file_scanned, file_matched  # partial/failed
+
+    return 0, 0
+
+
+def process_gwas_collection(s3, bucket, prefix, file_pattern, gwas_chunk, flush,
+                            insert_batch_size, stats, manifest=None):
+    """Stream all matching GWAS-only JSONL files for one prefix,
+    accumulating matched records into the shared gwas_chunk (flushed via
+    batched update-if-exists AQL as it fills up)."""
+    keys = list_matching_keys(s3, bucket, prefix, file_pattern, manifest)
+    source_desc = 'hardcoded GWAS_MANIFEST' if manifest and manifest.get(
+        prefix) else f"pattern '{file_pattern}'"
+    print(
+        f'\n[GWAS] {prefix}: {len(keys)} file(s) selected via {source_desc} under s3://{bucket}/{prefix}/')
+
+    if not keys:
+        return
+
+    start = time.perf_counter()
+    scanned = 0
+    matched = 0
+
+    for i, key in enumerate(keys, start=1):
+        print(f'  [{i}/{len(keys)}] {key}', flush=True)
+        file_scanned, file_matched = process_one_gwas_file(
+            s3, bucket, key, gwas_chunk, flush, insert_batch_size
+        )
         scanned += file_scanned
         matched += file_matched
         print(
             f'    -> scanned {file_scanned:,} records, matched {file_matched:,}')
 
-    flush_batch()
     elapsed = time.perf_counter() - start
-
     stats.append(
         {
-            'collection': prefix,
+            'collection': f'{prefix} [GWAS]',
             'files': len(keys),
             'scanned': scanned,
             'matched': matched,
-            'inserted_attempted': inserted,
             'elapsed': elapsed,
         }
     )
     print(
-        f'  {prefix} done: {scanned:,} scanned, {matched:,} matched, '
-        f'{inserted:,} insert attempts in {elapsed:.1f}s'
-    )
+        f'  {prefix} [GWAS] done: {scanned:,} scanned, {matched:,} matched in {elapsed:.1f}s')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Stream variants_* JSONL backups from S3, filter to '
-        'IGVF observed-data records, and load unique variant IDs into '
-        'an ArangoDB collection.'
+        'IGVF observed-data records, and upsert per-variant '
+        'method/files_filesets documents into ArangoDB.'
     )
     parser.add_argument('--bucket', required=True, help='S3 bucket name')
     parser.add_argument(
@@ -535,14 +863,22 @@ def parse_args():
     parser.add_argument(
         '--target-collection',
         default='variants_IGVF',
-        help='ArangoDB collection to insert unique variant IDs into '
+        help='ArangoDB collection to upsert variant documents into '
         '(default: variants_IGVF). Created automatically if missing.',
+    )
+    parser.add_argument(
+        '--files-filesets-collection',
+        default='files_filesets',
+        help='ArangoDB collection to load the lab/preferred_assay_titles '
+        'lookup table from (default: files_filesets). Loaded entirely '
+        "into memory once at startup since it's small.",
     )
     parser.add_argument(
         '--insert-batch-size',
         type=int,
         default=5000,
-        help='Number of documents per insert_many() call (default: 5000)',
+        help='Number of distinct variant IDs to accumulate before '
+        'flushing a batched UPSERT (default: 5000)',
     )
     parser.add_argument(
         '--request-timeout',
@@ -557,7 +893,14 @@ def main():
     args = parse_args()
     prefixes = [p.strip() for p in args.prefixes.split(',') if p.strip()]
 
-    s3_config = Config(signature_version=UNSIGNED) if args.anonymous else None
+    boto_config_kwargs = {
+        'connect_timeout': 30,
+        'read_timeout': 120,
+        'retries': {'max_attempts': 10, 'mode': 'adaptive'},
+    }
+    if args.anonymous:
+        boto_config_kwargs['signature_version'] = UNSIGNED
+    s3_config = Config(**boto_config_kwargs)
     s3 = boto3.client('s3', region_name=args.region, config=s3_config)
 
     http_client = DefaultHTTPClient()
@@ -569,24 +912,23 @@ def main():
     if not db.has_collection(args.target_collection):
         print(f"Creating collection '{args.target_collection}' ...")
         db.create_collection(args.target_collection)
-    arango_collection = db.collection(args.target_collection)
+
+    ff_lookup = load_files_filesets_lookup(db, args.files_filesets_collection)
+
+    chunk = {}  # shared across all collections/files: variant_id -> {"methods": set, "filesets": set, "classes": set, "labs": set, "assay_titles": set, "gwas": dict}
+    flush = make_flusher(db, args.target_collection, chunk)
 
     stats = []
     overall_start = time.perf_counter()
     for prefix in prefixes:
         process_collection(
-            s3,
-            args.bucket,
-            prefix,
-            args.file_pattern,
-            arango_collection,
-            args.insert_batch_size,
-            stats,
-            manifest=MANIFEST,
+            s3, args.bucket, prefix, args.file_pattern, chunk, flush,
+            args.insert_batch_size, ff_lookup, stats, manifest=MANIFEST,
         )
+    flush()  # final partial batch
     overall_elapsed = time.perf_counter() - overall_start
 
-    print('\nSummary:')
+    print('\nSummary (phase 1: main load):')
     for s in stats:
         print(
             f"  {s['collection']}: {s['files']} file(s), "
@@ -595,12 +937,38 @@ def main():
         )
 
     total_matched = sum(s['matched'] for s in stats)
-    print(f'\nTotal records matched (pre-dedup): {total_matched:,}')
-    print(f'Total wall time: {overall_elapsed:.1f}s')
+    print(f'\nTotal records matched: {total_matched:,}')
+    print(f'Phase 1 wall time: {overall_elapsed:.1f}s')
 
-    final_count = arango_collection.count()
+    final_count = db.collection(args.target_collection).count()
     print(
-        f"Final unique document count in '{args.target_collection}': {final_count:,}")
+        f"Document count in '{args.target_collection}' after phase 1: {final_count:,}")
+
+    # Phase 2: GWAS enrichment. Runs strictly after phase 1 finishes, and
+    # only updates variants already loaded above -- never creates new ones.
+    gwas_chunk = {}  # variant_id -> {gwas_result_id: {..}}
+    gwas_flush = make_gwas_flusher(db, args.target_collection, gwas_chunk)
+
+    gwas_stats = []
+    gwas_start = time.perf_counter()
+    for prefix in GWAS_MANIFEST:
+        process_gwas_collection(
+            s3, args.bucket, prefix, args.file_pattern, gwas_chunk, gwas_flush,
+            args.insert_batch_size, gwas_stats, manifest=GWAS_MANIFEST,
+        )
+    gwas_flush()  # final partial batch
+    gwas_elapsed = time.perf_counter() - gwas_start
+
+    print('\nSummary (phase 2: GWAS enrichment):')
+    for s in gwas_stats:
+        print(
+            f"  {s['collection']}: {s['files']} file(s), "
+            f"{s['scanned']:,} scanned, {s['matched']:,} matched, "
+            f"{s['elapsed']:.1f}s"
+        )
+    total_gwas_matched = sum(s['matched'] for s in gwas_stats)
+    print(f'\nTotal GWAS records matched: {total_gwas_matched:,}')
+    print(f'Phase 2 wall time: {gwas_elapsed:.1f}s')
 
 
 if __name__ == '__main__':
