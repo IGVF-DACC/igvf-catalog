@@ -135,11 +135,6 @@ MANIFEST = {
         'starr_seq_variants_biosamples_IGVFFI9329ALOP_20260625.jsonl',
         'starr_seq_variants_biosamples_IGVFFI9893OTAT_20260625.jsonl'
     ],
-    'variants_coding_variants': [
-        'variants_coding_variants_vamp.jsonl',
-        'variants_coding_variants_mutpred2_IGVFFI6893ZOAA_Met1_patched_20260219.jsonl',
-        'variants_coding_variants_ESM_IGVFFI8105TNNO_Met1_patched_20260219.jsonl'
-    ],
     'variants_genes': [
         'igvf_crispr_v2g_variant_genes_IGVFFI0524YUIL_06_24_26.jsonl',
         'igvf_crispr_v2g_variant_genes_IGVFFI1254NFRS_06_24_26.jsonl',
