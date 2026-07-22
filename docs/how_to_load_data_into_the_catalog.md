@@ -114,6 +114,50 @@ It will automatically pull files from the `s3://igvf-catalog-parsed-collections`
 
 After loading each JSONL file, the script will delete each file to save space (certain datasets are very large). If you wish to keep the files in your local storage, use the flag `--keep-files`.
 
+## Syncing collections to the IGVF Data Portal
+
+When catalog data files are written to S3 (e.g. `s3://igvf-catalog-parsed-collections`),
+they can be tagged so that the corresponding objects on the IGVF Data Portal are
+automatically kept in sync with the catalog release they belong to. This is handled
+by a standalone service (the collections patcher, `s3-sqs-lambda`) that listens for
+S3 object-tagging events and patches the `collections` property of the referenced
+portal objects.
+
+Two tags on each S3 object drive this:
+
+| Tag key             | Description                                                                   | Example value                               |
+| ------------------- | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| `portal_accessions` | Space-separated portal accession(s) the data file contributes to.            | `IGVFDS3222WCZH IGVFDS7303VUTX`             |
+| `collections`       | Space-separated portal collection(s) / catalog data freeze(s) the object belongs to. | `IGVF_catalog_beta_v0.3 IGVF_catalog_v1.0`  |
+
+The valid `collections` values are defined by the `collections` enum on each portal
+schema (see, for example, the [`analysis_set` profile](https://api.data.igvf.org/profiles/analysis_set/)).
+Note that "collection" is overloaded in the catalog: here it refers to the portal
+`collections` property, which denotes a curated collection or catalog data
+freeze/version (e.g. `IGVF_catalog_beta_v0.3`, `IGVF_catalog_v1.0`), not an ArangoDB
+collection/table.
+
+These two tags are applied at different stages of the pipeline:
+
+1. **Parsing.** When an adapter writes a JSONL to S3, it tags the object with
+   `portal_accessions`, recording which portal object(s) the parsed data was derived
+   from.
+2. **Release.** As part of publishing a catalog version, a separate script,
+   [`data/scripts/tag_s3_data.py`](https://github.com/IGVF-DACC/igvf-catalog/blob/dev/data/scripts/tag_s3_data.py),
+   adds the `collections` tag naming the catalog version being released
+   (e.g. `IGVF_catalog_v1.0`).
+
+The collections patcher only acts when **both** tags are present. The
+`portal_accessions` tag written at parse time does nothing on its own; it is the
+addition of the `collections` tag at release time that triggers the patch. For every
+accession listed in `portal_accessions`, the service adds any missing `collections`
+values to that portal object. Existing collections are preserved, and objects that
+already contain all of the tagged collections are left unchanged.
+
+For example, running the release tagging step adds `collections = "IGVF_catalog_v1.0"`
+to objects that already carry `portal_accessions = "IGVFDS3222WCZH IGVFDS7303VUTX"`.
+The service then ensures `IGVF_catalog_v1.0` is present in the `collections` property
+of both `IGVFDS3222WCZH` and `IGVFDS7303VUTX` on the portal.
 
 ## Loading data into ClickhouseDB
 
