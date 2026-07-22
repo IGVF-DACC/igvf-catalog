@@ -16,6 +16,7 @@ class FileFileSet:
     IGVF_SOURCE_URL = 'https://data.igvf.org/'
     SOURCE_ENCODE = 'ENCODE'
     SOURCE_IGVF = 'IGVF'
+    SOURCE_COMMUNITY = 'Community'
 
     ENCODE_disease_id_mapping = {
         'DOID:0080832': 'HP:0100543',
@@ -176,6 +177,10 @@ class FileFileSet:
                 'derived_manually',
                 'derived_from',
                 'catalog_class',
+                'catalog_method',
+                'source_url',
+                'external_host_url',
+                'version',
                 'file_set',
                 'catalog_collections'
             ],
@@ -698,6 +703,7 @@ class FileFileSet:
         fileset_accession = fileset_object['accession']
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
+        is_external_curated_set = fileset_object_type == 'CuratedSet' and lab == 'community'
         catalog_collections = file_object.get('catalog_collections', [])
         cell_annotation = None
         if fileset_object_type == 'PseudobulkSet':
@@ -733,7 +739,7 @@ class FileFileSet:
                 f'Catalog collections are required for file_fileset {file_object["accession"]}.'))
 
         software = FileFileSet.get_software_igvf(file_object)
-        if not software:
+        if not software and not is_external_curated_set:
             print(
                 f'Warning: no software found for file_fileset {file_object["accession"]}.')
 
@@ -753,7 +759,9 @@ class FileFileSet:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             method = list(preferred_assay_titles)[0]
-        if fileset_object_type == 'CuratedSet' and not method:
+        if is_external_curated_set:
+            method = file_object.get('catalog_method')
+        elif fileset_object_type == 'CuratedSet' and not method:
             method = fileset_object.get('file_set_type')
 
         preferred_assay_titles = FileFileSet.none_if_empty(
@@ -805,8 +813,9 @@ class FileFileSet:
             'treatments_term_ids': FileFileSet.none_if_empty(treatment_ids),
             'publication': publication_id,
             'collections': catalog_collections,
-            'source': FileFileSet.SOURCE_IGVF,
-            'source_url': source_url,
+            'source': FileFileSet.SOURCE_COMMUNITY if is_external_curated_set else FileFileSet.SOURCE_IGVF,
+            'source_url': (file_object.get('source_url') or file_object.get('external_host_url') or source_url) if is_external_curated_set else source_url,
+            'version': file_object.get('version') if is_external_curated_set else None,
             'download_link': download_link,
             'cell_annotation': cell_annotation,
             'genome_browser_link': genome_browser_link,
