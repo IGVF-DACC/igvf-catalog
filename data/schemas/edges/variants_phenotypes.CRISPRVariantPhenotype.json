@@ -11,7 +11,7 @@
         "_key": {
           "type": "string",
           "description": "Unique identifier for the variant to phenotype edge",
-          "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI7160EKDK"
+          "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP"
         },
         "_from": {
           "example": "variants/NC_000001.11:25253603:G:A",
@@ -134,13 +134,13 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/",
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/",
           "pattern": "^https://api.data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
           "description": "The filesets of the variant to phenotype edge",
-          "example": "files_filesets/IGVFFI7160EKDK",
+          "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"

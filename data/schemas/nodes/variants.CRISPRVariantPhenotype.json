@@ -17,13 +17,13 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/",
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/",
           "pattern": "^https://api.data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
           "description": "Filesets of the variant",
-          "example": "files_filesets/IGVFFI7160EKDK",
+          "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"

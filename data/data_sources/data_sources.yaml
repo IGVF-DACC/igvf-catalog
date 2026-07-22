@@ -1280,41 +1280,37 @@ genomic element to phenotype CRISPR element phenotype:
 # Portal files must have catalog_collections including variants and variants_phenotypes.
 # NTR phenotype terms (LDL-C uptake / NTR:0001118) are written by this adapter via --label ontology_term.
 # Lettre file set IGVFDS4143NHHL -> tabular file IGVFFI7206JILF.
-# Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/ --filepath ~/dataset/IGVFFI7160EKDK.csv.gz --label variant --output-bucket-key variants/crispr_variant_phenotype_IGVFFI7160EKDK.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant --output-bucket-key variants/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
 variant CRISPR variant phenotype:
   collection: variants
   params:
     - label
   command: python3 data_parser.py --adapter crispr_variant_phenotype --source-url {source_url} --filepath {datafile} --label variant --output-bucket-key variants/crispr_variant_phenotype_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/@@download/IGVFFI7160EKDK.csv.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI7659OTOX/@@download/IGVFFI7659OTOX.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI7206JILF/@@download/IGVFFI7206JILF.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/ --filepath ~/dataset/IGVFFI7160EKDK.csv.gz --label variant_phenotype --output-bucket-key variants_phenotypes/crispr_variant_phenotype_IGVFFI7160EKDK.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant_phenotype --output-bucket-key variants_phenotypes/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to phenotype CRISPR variant phenotype:
   collection: variants_phenotypes
   params:
     - label
   command: python3 data_parser.py --adapter crispr_variant_phenotype --source-url {source_url} --filepath {datafile} --label variant_phenotype --output-bucket-key variants_phenotypes/crispr_variant_phenotype_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/@@download/IGVFFI7160EKDK.csv.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI7659OTOX/@@download/IGVFFI7659OTOX.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI7206JILF/@@download/IGVFFI7206JILF.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
   source: IGVF
   label: variant effect on phenotype
 
-# Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/ --filepath ' ' --label ontology_term --output-bucket-key ontology_terms/crispr_variant_phenotype_NTR_0001118.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ' ' --label ontology_term --output-bucket-key ontology_terms/crispr_variant_phenotype_NTR_0001118.jsonl --output-bucket igvf-catalog-parsed-collections
 ontology term CRISPR variant phenotype NTR:
   collection: ontology_terms
   params:
     - label
-  command: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI7160EKDK/ --filepath ' ' --label ontology_term --output-bucket-key ontology_terms/crispr_variant_phenotype_NTR_0001118.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ' ' --label ontology_term --output-bucket-key ontology_terms/crispr_variant_phenotype_NTR_0001118.jsonl --output-bucket igvf-catalog-parsed-collections
   source: IGVF
 
 # Prerequisite: load files_filesets for scE2G accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.scE2G)

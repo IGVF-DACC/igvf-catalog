@@ -17,20 +17,18 @@ from adapters.writer import Writer
 
 # Variant-level CRISPR screens linking variants to cellular phenotypes.
 #
-# IGVFFI7160EKDK (Sherwood) – LDL-C uptake (NTR:0001118); base editing
-#   target_id format chr_pos_hg38_ref_alt (not SPDI); coordinates are 1-based
-#   (verified against hg38; treating as 0-based fails ref checks).
-# IGVFFI7659OTOX (Sherwood) – LDL-C uptake (NTR:0001118); interference
-#   target_id format chr_pos_hg38_ref_alt (not SPDI); 1-based (submitter_comment).
 # IGVFFI7206JILF (Lettre / IGVFDS4143NHHL) – cell population proliferation (GO:0008283); base editing
 #   variant_id is SPDI; splicesite_* rows are controls and skipped.
-# IGVFFI2014OOZP (Sherwood) – LDL-C uptake (NTR:0001118); prime editing
-#   variant_id is SPDI (unreleased at adapter authoring time).
-# IGVFFI6803HZJG (Sherwood) – LDL-C uptake (NTR:0001118); prime editing
-#   variant_id is SPDI (unreleased at adapter authoring time).
+# IGVFFI2014OOZP (Sherwood / IGVFDS2873IRMJ) – LDL-C uptake (NTR:0001118); prime editing
+#   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
+# IGVFFI6803HZJG (Sherwood / IGVFDS9278NUAZ) – LDL-C uptake (NTR:0001118); prime editing
+#   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
 #
 # NTR phenotype terms are not loaded by the standard ontology adapter, so this
 # adapter also writes ontology_terms for NTR phenotypes (e.g. NTR_0001118).
+#
+# Note: IGVFFI7160EKDK and IGVFFI7659OTOX (Sherwood chr_pos_hg38_ref_alt files)
+# are intentionally not loaded due to variant-id quality issues.
 
 IGVF_API = 'https://api.data.igvf.org/'
 IGVF_PHENOTYPE_TERM_URL = 'https://data.igvf.org/phenotype-terms/'
@@ -46,39 +44,9 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
     # Accession -> phenotype + column layout.
     FILE_CONFIG = {
-        'IGVFFI7160EKDK': {
-            'phenotype_term': 'NTR_0001118',
-            'phenotype_name': 'LDL-C uptake',
-            'variant_id_format': 'chr_pos_hg38_ref_alt',
-            'pos_base': 1,
-            'variant_id_col': 'target_id',
-            'variant_type_col': 'target_type',
-            'variant_type_value': 'Variant',
-            'effect_size_col': 'mu_adj',
-            'z_score_col': 'mu_z_adj',
-            'fdr_col': 'fdr_adj',
-            'neg_log10_fdr_col': 'log_fdr_adj',
-            'edit_rate_mean_col': 'edit_rate_mean',
-            'edit_rate_std_col': 'edit_rate_std',
-        },
-        'IGVFFI7659OTOX': {
-            'phenotype_term': 'NTR_0001118',
-            'phenotype_name': 'LDL-C uptake',
-            'variant_id_format': 'chr_pos_hg38_ref_alt',
-            'pos_base': 1,
-            'variant_id_col': 'target_id',
-            'variant_type_col': 'target_type',
-            'variant_type_value': 'variant',
-            'effect_size_col': 'mu',
-            'z_score_col': 'mu_z',
-            'num_guides_col': 'n_guides',
-            'ci_lower_col': 'CI[0.025',
-            'ci_upper_col': '0.975]',
-        },
         'IGVFFI7206JILF': {
             'phenotype_term': 'GO_0008283',
             'phenotype_name': 'cell population proliferation',
-            'variant_id_format': 'spdi',
             'variant_id_col': 'variant_id',
             'skip_id_prefix': 'splicesite_',
             'effect_size_col': 'beta',
@@ -90,7 +58,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
         'IGVFFI2014OOZP': {
             'phenotype_term': 'NTR_0001118',
             'phenotype_name': 'LDL-C uptake',
-            'variant_id_format': 'spdi',
             'variant_id_col': 'variant_id',
             'variant_type_col': 'target_group',
             'variant_type_value': 'Variant',
@@ -103,7 +70,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
         'IGVFFI6803HZJG': {
             'phenotype_term': 'NTR_0001118',
             'phenotype_name': 'LDL-C uptake',
-            'variant_id_format': 'spdi',
             'variant_id_col': 'variant_id',
             'variant_type_col': 'target_group',
             'variant_type_value': 'Variant',
@@ -193,34 +159,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
         if type_col:
             return row[type_col].strip().lower() == config['variant_type_value'].lower()
 
-        if config['variant_id_format'] == 'spdi':
-            return variant_id.startswith('NC_')
-        return True
-
-    @staticmethod
-    def _parse_chr_pos_hg38_ref_alt(target_id: str) -> tuple[str, int, str, str]:
-        """Parse IDs like 1_25253604_hg38_G_A or 19_11091518_hg38_GC_G."""
-        parts = target_id.split('_')
-        if len(parts) != 5 or parts[2] != 'hg38':
-            raise ValueError(f'Unrecognized variant id: {target_id!r}')
-        chrom, pos_str, _, ref, alt = parts
-        if not chrom.startswith('chr'):
-            chrom = f'chr{chrom}'
-        return chrom, int(pos_str), ref, alt
-
-    def _row_to_load_variant_id(self, row) -> str:
-        config = self.file_config
-        raw_id = row[config['variant_id_col']].strip()
-        if config['variant_id_format'] == 'spdi':
-            return raw_id
-
-        chrom, pos, ref, alt = self._parse_chr_pos_hg38_ref_alt(raw_id)
-        # gnomad/VCF-style IDs are 1-based; FILE_CONFIG.pos_base must be 1.
-        if config.get('pos_base', 1) != 1:
-            raise ValueError(
-                f'Unsupported pos_base {config.get("pos_base")} for {self.file_accession}'
-            )
-        return f'{chrom}-{pos}-{ref}-{alt}'
+        return variant_id.startswith('NC_')
 
     def _is_significant(self, row) -> bool:
         config = self.file_config
@@ -264,7 +203,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
         skipped_variants = []
 
         for row in chunk:
-            raw_variant_id = self._row_to_load_variant_id(row)
+            raw_variant_id = row[self.file_config['variant_id_col']].strip()
             variant, skipped_message = load_variant(raw_variant_id)
             if variant:
                 spdi = variant['spdi']
