@@ -767,7 +767,12 @@ class FileFileSet:
         if preferred_assay_titles:
             if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq', 'Parse Perturb-seq', 'scCRISPR screen'}):
                 method = 'Perturb-seq'
-            elif set(preferred_assay_titles).issubset({'CRISPR FACS screen', 'CRISPR FlowFISH screen'}):
+            elif set(preferred_assay_titles).issubset({
+                'CRISPR FACS screen',
+                'CRISPR FlowFISH screen',
+                'Migration CRISPR screen',
+                'Proliferation CRISPR screen',
+            }):
                 method = 'CRISPR screen'
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)

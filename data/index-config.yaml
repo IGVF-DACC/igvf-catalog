@@ -310,6 +310,17 @@ genomic_elements_genes:
     analyzers:
       - text_en_no_stem
 
+genomic_elements_phenotypes:
+  persistent:
+    fields:
+      - files_filesets
+      - files_filesets, _key
+      - _from, files_filesets
+      - _from, significant
+      - _to, _key
+      - _to, significant
+      - significant, files_filesets
+
 studies:
   persistent:
     fields:
@@ -398,6 +409,7 @@ variants_genes:
       - files_filesets
       - effect_size
       - method
+      - method, _key
   inverted:
     fields: biological_context
     analyzers:
@@ -449,8 +461,11 @@ variants_proteins:
   persistent:
     fields:
       - files_filesets, _key, source, label
+      - method, label, source, files_filesets
       - method, label, source, files_filesets, name
+      - label, source, files_filesets
       - label, source, files_filesets, name
+      - source, files_filesets
       - source, files_filesets, name
       - effect_on_binding, files_filesets
       - files_filesets, name
@@ -458,6 +473,7 @@ variants_proteins:
       - files_filesets
       - method
       - gene, method, source, biological_context, _key
+      - gene, method, _key
 
 variants_variants:
   persistent:

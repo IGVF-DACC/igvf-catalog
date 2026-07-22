@@ -6,7 +6,6 @@ import re
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.file_fileset_adapter import FileFileSet
 from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
@@ -34,7 +33,6 @@ class VAMPAdapter(BaseAdapter):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.phenotype_term = phenotype_term
-        self.files_filesets = FileFileSet(self.file_accession)
 
         super().__init__(filepath, label, writer, validate)
 
@@ -116,6 +114,7 @@ class VAMPAdapter(BaseAdapter):
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)
             chunk = []
+            self.writer.add_tag('portal_accessions', self.file_accession)
 
             for i, row in enumerate(vamp_csv, 1):
                 # transcript level scores e.g. ENST00000371321.9:c.948C>T
