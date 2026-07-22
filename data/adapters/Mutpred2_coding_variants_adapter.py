@@ -30,6 +30,7 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
     ALLOWED_LABELS = ['coding_variants', 'variants',
                       'variants_coding_variants', 'coding_variants_phenotypes']
     SOURCE = 'IGVF'
+    FILE_ACCESSION_PATTERN = re.compile(r'(?:IGVFFI|ENCFF)[A-Z0-9]+')
     MAPPING_FILE_HEADER = ['transcript_id', 'aa_change', 'mutation_ids', 'hgvsc_ids', 'spdi_ids',
                            'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'Mutpred2 score', 'Mechanisms']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function
@@ -37,7 +38,10 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
 
     def __init__(self, filepath, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        # filepath is the enumerated mapping file (e.g. mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz);
+        # portal accession is extracted from the basename for source_url / files_filesets.
+        self.file_accession = self.FILE_ACCESSION_PATTERN.search(
+            os.path.basename(filepath)).group(0)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
 
