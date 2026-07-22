@@ -5,6 +5,7 @@ The current architecture of the IGVF Catalog contains two databases: ArangoDB (a
 Each database is optimized for specific operations that implement use cases of the IGVF Catalog. Both databases are loaded with the same data provided by a list of datasets.
 
 Each dataset is listed in the Data Sources file at `igvf-catalog/data/data_sources.yaml`.
+(additional data from SEMVAR and ENCODE E2G predictions listed in `igvf-catalog/data/data_sources_SEMpl.yaml` and `igvf-catalog/data/data_sources_e2g_dnaseonly.yaml`)
 
 The Data Sources file lists all datafile links needed to load a dataset into the Catalog. It also describes how to parse each input file. For example:
 
@@ -52,6 +53,12 @@ All examples are written expecting the storage of each JSON directly into S3. To
 For this example, the output JSONL will be written in the S3 bucket `igvf-catalog-parsed-collections` in the `variants_variants/topld_afr_chr1.jsonl`. Both S3 bucket and S3 key value must be specified. The instance running this script must have permission to write into this particular S3 bucket. The AWS profile can be customized with the `--aws-profile` parameter, for example `--aws-profile igvf-dev`, if necessary.
 
 All JSONLs are grouped by folders representing each collection/table in the databases. Each folder contains all data necessary, which can be loaded into ArangoDB and Clickhouse.
+
+In addition to the file data, metadata fields such as `preferred_assay_titles` and sample info are loaded into the `files_filesets` collection by querying the IGVF/ENCODE portal. To generate this data, run:
+```
+python3 data/scripts/generate_files_filesets.py
+```
+This script reads the file accessions from `data/data_sources/data_sources_file_fileset.yaml` and queries the IGVF/ENCODE portal to generate JSONL outputs for the `files_filesets`, `donors`, and `sample_terms` collections.
 
 ## Loading data into ArangoDB
 
