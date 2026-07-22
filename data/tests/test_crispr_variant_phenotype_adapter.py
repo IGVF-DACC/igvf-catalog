@@ -17,11 +17,6 @@ MOCK_VARIANT = {
     'spdi': 'NC_000001.11:25253603:G:A',
     'hgvs': 'NC_000001.11:g.25253604G>A',
     'organism': 'Homo sapiens',
-    'rsid': [],
-    'qual': '100',
-    'annotations': {},
-    'vrs_digest': 'test_digest',
-    'ca_id': 'CA1234567890',
 }
 
 

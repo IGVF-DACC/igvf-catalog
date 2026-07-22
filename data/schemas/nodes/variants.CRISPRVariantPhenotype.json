@@ -31,11 +31,6 @@
         }
       },
       "required": [
-        "rsid",
-        "qual",
-        "annotations",
-        "vrs_digest",
-        "ca_id",
         "files_filesets"
       ],
       "additionalProperties": false
