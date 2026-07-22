@@ -285,8 +285,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
                     'num_guides': num_guides,
                     'edit_rate_mean': self._optional_float(
                         row, config.get('edit_rate_mean_col')),
-                    'edit_rate_standard_deviation': self._optional_float(
-                        row, config.get('edit_rate_std_col')),
                     'effect_size_ci95_lower': self._optional_float(
                         row, config.get('ci_lower_col')),
                     'effect_size_ci95_upper': self._optional_float(
