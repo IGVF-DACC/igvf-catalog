@@ -39,7 +39,7 @@
         "files_filesets": {
           "type": "string",
           "description": "The files filesets of the pathway",
-          "example": "files_filesets/IGVFFI1890VCZT",
+          "example": "files_filesets/IGVFFI6981KOFP",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"

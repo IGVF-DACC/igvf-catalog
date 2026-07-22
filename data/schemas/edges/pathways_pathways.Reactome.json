@@ -79,7 +79,7 @@
     "files_filesets": {
       "type": "string",
       "description": "The files filesets of the pathway pathway edge",
-      "example": "files_filesets/IGVFFI9975LVTN",
+      "example": "files_filesets/IGVFFI8363VRKN",
       "pattern": "^files_filesets/",
       "collections": [
         "files_filesets"

@@ -1734,35 +1734,35 @@ gene to gene interaction:
   source: BioGRID
   molecular_function: ontology_terms/GO_0005515
 
-# Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1890VCZT.txt --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
+# Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6981KOFP.txt --output-bucket-key pathways/pathways_IGVFFI6981KOFP.jsonl
 pathway:
   collection: pathways
   pypy3: false
-  command: python3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
+  command: python3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI6981KOFP.jsonl
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI1890VCZT/@@download/IGVFFI1890VCZT.txt.gz # ReactomePathways_20240603.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6981KOFP/@@download/IGVFFI6981KOFP.txt.gz # ReactomePathways_20260619.txt.gz
   source: Reactome
 
-# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9865XGLF.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI9865XGLF.jsonl --label genes_pathways
+# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7082TATW.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI7082TATW.jsonl --label genes_pathways
 gene to pathway association:
   collection: genes_pathways
   params:
     - label
   pypy3: false
-  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI9865XGLF.jsonl --label genes_pathways
+  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI7082TATW.jsonl --label genes_pathways
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9865XGLF/@@download/IGVFFI9865XGLF.txt.gz # Ensembl2Reactome_All_Levels_20240603.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7082TATW/@@download/IGVFFI7082TATW.txt.gz # Ensembl2Reactome_All_Levels_20260619.txt.gz
   source: Reactome
 
-# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9975LVTN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI9975LVTN.jsonl --label parent_pathway_of
+# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8363VRKN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8363VRKN.jsonl --label parent_pathway_of
 parent pathway of:
   collection: pathways_pathways
   params:
     - label
   pypy3: true
-  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI9975LVTN.jsonl --label parent_pathway_of
+  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8363VRKN.jsonl --label parent_pathway_of
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9975LVTN/@@download/IGVFFI9975LVTN.txt.gz # ReactomePathwaysRelation_20240603.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8363VRKN/@@download/IGVFFI8363VRKN.txt.gz # ReactomePathwaysRelation_20260619.txt.gz
   source: Reactome
 
 # Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath IGVFFI1309WDQG.tsv --output-bucket-key studies/gwas_studies.jsonl --label studies

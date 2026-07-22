@@ -79,7 +79,7 @@
     "files_filesets": {
       "type": "string",
       "description": "The files filesets of the gene pathway edge",
-      "example": "files_filesets/IGVFFI9865XGLF",
+      "example": "files_filesets/IGVFFI7082TATW",
       "pattern": "^files_filesets/",
       "collections": [
         "files_filesets"

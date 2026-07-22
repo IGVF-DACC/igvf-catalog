@@ -36,10 +36,10 @@ def test_reactome_adapter_genes_pathways(filepath, spy_writer, mock_file_fileset
         mock_validator_instance.validate.return_value = True
         adapter = Reactome(filepath=filepath,
                            label='genes_pathways', writer=spy_writer, validate=True)
-        adapter.file_accession = 'IGVFFI9865XGLF'
+        adapter.file_accession = 'IGVFFI7082TATW'
         adapter.process_file()
 
-        mock_file_fileset.assert_called_once_with('IGVFFI9865XGLF')
+        mock_file_fileset.assert_called_once_with('IGVFFI7082TATW')
         assert len(spy_writer.contents) > 0
         first_item = json.loads(spy_writer.contents[0])
 
@@ -52,15 +52,15 @@ def test_reactome_adapter_genes_pathways(filepath, spy_writer, mock_file_fileset
         assert first_item['source_url'] == 'https://reactome.org/'
         assert first_item['class'] == 'biological relationship'
         assert first_item['method'] == 'Reactome'
-        assert first_item['files_filesets'] == 'files_filesets/IGVFFI9865XGLF'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI7082TATW'
 
 
 def test_reactome_adapter_parent_pathway_of(parent_pathway_of_filepath, spy_writer, mock_file_fileset):
     adapter = Reactome(filepath=parent_pathway_of_filepath,
                        label='parent_pathway_of', writer=spy_writer, validate=True)
-    adapter.file_accession = 'IGVFFI9975LVTN'
+    adapter.file_accession = 'IGVFFI8363VRKN'
     adapter.process_file()
-    mock_file_fileset.assert_called_once_with('IGVFFI9975LVTN')
+    mock_file_fileset.assert_called_once_with('IGVFFI8363VRKN')
     assert len(spy_writer.contents) > 0
     first_item = json.loads(spy_writer.contents[0])
     assert '_key' in first_item
@@ -72,7 +72,7 @@ def test_reactome_adapter_parent_pathway_of(parent_pathway_of_filepath, spy_writ
     assert first_item['source_url'] == 'https://reactome.org/'
     assert first_item['class'] == 'biological relationship'
     assert first_item['method'] == 'Reactome'
-    assert first_item['files_filesets'] == 'files_filesets/IGVFFI9975LVTN'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI8363VRKN'
 
 
 def test_reactome_adapter_initialization(filepath, spy_writer):
