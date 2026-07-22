@@ -32,9 +32,13 @@
           "type": "number",
           "description": "The p-value of the variant to protein edge"
         },
-        "log10pvalue": {
+        "p_value_adj": {
           "type": "number",
-          "description": "The log10pvalue of the variant to protein edge"
+          "description": "The adjusted p-value of the variant to protein edge"
+        },
+        "neg_log10_pvalue": {
+          "type": "number",
+          "description": "The neg log10pvalue of the variant to protein edge"
         },
         "experiment": {
           "type": "string",
@@ -66,9 +70,9 @@
           "type": "number",
           "description": "The pbs of the variant to protein edge"
         },
-        "fdr": {
+        "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "The fdr of the variant to protein edge"
+          "description": "The fdr (-log10(pvalue)) of the variant to protein edge"
         },
         "source": {
           "enum": [
@@ -116,7 +120,7 @@
       "required": [
         "_key",
         "p_value",
-        "log10pvalue",
+        "neg_log10_pvalue",
         "experiment",
         "hg19_coordinate",
         "oligo_auc",
@@ -124,7 +128,7 @@
         "ref_auc",
         "alt_auc",
         "pbs",
-        "fdr",
+        "neg_log10_pvalue_adj",
         "biological_process"
       ],
       "additionalProperties": false
@@ -132,6 +136,6 @@
   ],
   "accessible_via": {
     "name": "variants_proteins",
-    "return": "label, method, class, source, source_url, fdr, p_value, log10pvalue"
+    "return": "label, method, class, source, source_url, neg_log10_pvalue_adj, p_value, neg_log10_pvalue"
   }
 }

@@ -24,7 +24,7 @@ def test_asb_gvatdb_adapter_process(mock_request, mocker):
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
-    assert 'log10pvalue' in first_item
+    assert 'neg_log10_pvalue' in first_item
     assert 'p_value' in first_item
     assert 'hg19_coordinate' in first_item
     assert 'experiment' in first_item
@@ -33,7 +33,7 @@ def test_asb_gvatdb_adapter_process(mock_request, mocker):
     assert 'ref_auc' in first_item
     assert 'alt_auc' in first_item
     assert 'pbs' in first_item
-    assert 'fdr' in first_item
+    assert 'neg_log10_pvalue_adj' in first_item
     assert first_item['source'] == ASB_GVATDB.SOURCE
     assert first_item['source_url'] == ASB_GVATDB.SOURCE_URL
     assert first_item['label'] == 'allele-specific binding'
