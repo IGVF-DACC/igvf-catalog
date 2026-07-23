@@ -2153,7 +2153,11 @@ variant cv2f:
     - https://api.data.igvf.org/tabular-files/IGVFFI6811FTJA/@@download/IGVFFI6811FTJA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key variants/variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants
+# ATTENTION: --filepath must be the enumerated mapping file from
+# s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
+# (e.g. mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz), not the portal TSV itself.
+# Portal accession is extracted from the mapping filename for provenance.
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key variants/variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants
 variant Mutpred2:
   collection: variants
   params:
@@ -2161,10 +2165,10 @@ variant Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_mutpred2_{datafile}.jsonl --label variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key coding_variants/coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key coding_variants/coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants
 coding variant Mutpred2:
   collection: coding_variants
   params:
@@ -2172,10 +2176,10 @@ coding variant Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants/coding_variants_mutpred2_{datafile}.jsonl --label coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants_coding_variants
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants_coding_variants
 variant to coding variant Mutpred2:
   collection: variants_coding_variants
   params:
@@ -2183,10 +2187,10 @@ variant to coding variant Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_mutpred2_{datafile}.jsonl --label variants_coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants_phenotypes
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants_phenotypes
 coding variant to phenotype Mutpred2:
   collection: coding_variants_phenotypes
   params:
@@ -2194,11 +2198,14 @@ coding variant to phenotype Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_mutpred2_{datafile}.jsonl --label coding_variants_phenotypes
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
   threshold: Pr >= 0.25 & Pval < 0.05 on property scores
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key variants/variants_ESM_IGVFFI8105TNNO.jsonl --label variants
+# ATTENTION: --filepath must be the enumerated mapping file from
+# s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
+# (e.g. ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz), not the portal TSV itself.
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key variants/variants_ESM_IGVFFI8105TNNO.jsonl --label variants
 variant ESM:
   collection: variants
   params:
@@ -2206,10 +2213,10 @@ variant ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_ESM_{datafile}.jsonl --label variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key coding_variants/coding_variants_ESM_IGVFFI8105TNNO.jsonl --label coding_variants
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key coding_variants/coding_variants_ESM_IGVFFI8105TNNO.jsonl --label coding_variants
 coding variant ESM:
   collection: coding_variants
   params:
@@ -2217,10 +2224,10 @@ coding variant ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants/coding_variants_ESM_{datafile}.jsonl --label coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_ESM_IGVFFI8105TNNO.jsonl --label variants_coding_variants
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_ESM_IGVFFI8105TNNO.jsonl --label variants_coding_variants
 variant to coding variant ESM:
   collection: variants_coding_variants
   params:
@@ -2228,10 +2235,10 @@ variant to coding variant ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_ESM_{datafile}.jsonl --label variants_coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_ESM_IGVFFI8105TNNO.jsonl --label coding_variants_phenotypes
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_ESM_IGVFFI8105TNNO.jsonl --label coding_variants_phenotypes
 coding variant to phenotype ESM:
   collection: coding_variants_phenotypes
   params:
@@ -2239,6 +2246,6 @@ coding variant to phenotype ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_ESM_{datafile}.jsonl --label coding_variants_phenotypes
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
   threshold: -0.6931 # only load rows with score < log(0.5)

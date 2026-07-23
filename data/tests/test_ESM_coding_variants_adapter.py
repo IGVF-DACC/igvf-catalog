@@ -4,7 +4,7 @@ import json
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 import pytest
 
-SAMPLE_FILEPATH = 'IGVFFI8105TNNO.tsv.gz'
+SAMPLE_FILEPATH = 'ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz'
 SAMPLE_MAPPING_TSV = (
     'ENST00000370460.7\tp.Met1Ala\t'
     'AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCA,AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCC\t'

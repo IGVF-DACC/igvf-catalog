@@ -29,6 +29,7 @@ class ESM1vCodingVariantsScores(BaseAdapter):
     ALLOWED_LABELS = ['coding_variants', 'variants',
                       'variants_coding_variants', 'coding_variants_phenotypes']
     SOURCE = 'IGVF'
+    FILE_ACCESSION_PATTERN = re.compile(r'(?:IGVFFI|ENCFF)[A-Z0-9]+')
     MAPPING_FILE_HEADER = ['transcript_id', 'aa_change', 'mutation_ids', 'hgvsc_ids', 'spdi_ids',
                            'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'esm1v_t33_650M_UR90S_1', 'esm1v_t33_650M_UR90S_2', 'esm1v_t33_650M_UR90S_3', 'esm1v_t33_650M_UR90S_4', 'esm1v_t33_650M_UR90S_5', 'esm1v_t33_650M_UR90S_1_next', 'esm1v_t33_650M_UR90S_2_next', 'esm1v_t33_650M_UR90S_3_next', 'esm1v_t33_650M_UR90S_4_next', 'esm1v_t33_650M_UR90S_5_next', 'combined_score']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function, double check
@@ -38,7 +39,10 @@ class ESM1vCodingVariantsScores(BaseAdapter):
     COLLECTION_LABEL_VARIANTS_CODING_VARIANTS = 'codes for'
 
     def __init__(self, filepath, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        # filepath is the enumerated mapping file (e.g. ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz);
+        # portal accession is extracted from the basename for source_url / files_filesets.
+        self.file_accession = self.FILE_ACCESSION_PATTERN.search(
+            os.path.basename(filepath)).group(0)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
 
