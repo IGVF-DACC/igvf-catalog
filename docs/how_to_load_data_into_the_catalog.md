@@ -5,7 +5,7 @@ The current architecture of the IGVF Catalog contains two databases: ArangoDB (a
 Each database is optimized for specific operations that implement use cases of the IGVF Catalog. Both databases are loaded with the same data provided by a list of datasets.
 
 Each dataset is listed in the Data Sources file at `igvf-catalog/data/data_sources.yaml`.
-(additional data from SEMVAR and ENCODE E2G predictions listed in `igvf-catalog/data/data_sources_SEMpl.yaml` and `igvf-catalog/data/data_sources_e2g_dnaseonly.yaml`)
+(additional data from SEMVAR and ENCODE E2G predictions is listed in `igvf-catalog/data/data_sources_SEMpl.yaml` and `igvf-catalog/data/data_sources_e2g_dnaseonly.yaml` because the list of files is too long to include in `igvf-catalog/data/data_sources.yaml`)
 
 The Data Sources file lists all datafile links needed to load a dataset into the Catalog. It also describes how to parse each input file. For example:
 
@@ -58,7 +58,7 @@ In addition to the file data, metadata fields such as `preferred_assay_titles` a
 ```
 python3 data/scripts/generate_files_filesets.py
 ```
-This script reads the file accessions from `data/data_sources/data_sources_file_fileset.yaml` and queries the IGVF/ENCODE portal to generate JSONL outputs for the `files_filesets`, `donors`, and `sample_terms` collections.
+This script is a wrapper for the `file_fileset` adapter. By default it processes all file accessions listed in `data/data_sources/data_sources_file_fileset.yaml`, but specific accessions can be specified via `--accessions`. It was introduced to better standardize `files_filesets` generation at the end of a data loading ticket. The script queries the IGVF/ENCODE portal to generate JSONL outputs for the `files_filesets`, `donors`, and `sample_terms` collections.
 
 ## Loading data into ArangoDB
 
