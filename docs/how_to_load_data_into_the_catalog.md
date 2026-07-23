@@ -142,7 +142,7 @@ schema (see, for example, the [`analysis_set` profile](https://api.data.igvf.org
 Note that "collection" is overloaded in the catalog: here it refers to the portal
 `collections` property, which denotes a curated collection or catalog data
 freeze/version (e.g. `IGVF_catalog_beta_v0.3`, `IGVF_catalog_v1.0`), not an ArangoDB
-collection/table.
+collection/table. Relevant ArangoDB collection is reflected in portal property `catalog_collections`.
 
 These two tags are applied at different stages of the pipeline:
 
