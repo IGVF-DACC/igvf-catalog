@@ -109,6 +109,7 @@ const grnOutputFormat = z.object({
   log2FC: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  significant: z.boolean().nullish(),
   perturbation_efficiency_log2FC: z.number().nullish(),
   perturbation_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
   perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
@@ -515,6 +516,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'log2FC': record.log2FC,
           'neg_log10_pvalue': record.neg_log10_pvalue,
           'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+          'significant': record.significant,
           'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
           'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
           'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
@@ -553,6 +555,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'log2FC': record.log2FC,
             'neg_log10_pvalue': record.neg_log10_pvalue,
             'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+            'significant': record.significant,
             'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
             'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
             'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
@@ -594,6 +597,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'log2FC': record.log2FC,
                   'neg_log10_pvalue': record.neg_log10_pvalue,
                   'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+                  'significant': record.significant,
                   'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
                   'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
                   'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
