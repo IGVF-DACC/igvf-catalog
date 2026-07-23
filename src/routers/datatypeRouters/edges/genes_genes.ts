@@ -72,7 +72,8 @@ const genesGenesRelativeFormat = z.object({
   class: z.string(),
   source: z.string(),
   source_url: z.string().optional(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 function validateInput (input: paramsFormatType): void {
