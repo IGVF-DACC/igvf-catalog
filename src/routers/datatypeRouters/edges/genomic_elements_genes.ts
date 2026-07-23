@@ -112,7 +112,8 @@ const grnOutputFormat = z.object({
   significant: z.boolean().nullish(),
   perturbation_efficiency_log2FC: z.number().nullish(),
   perturbation_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
-  perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish()
+  perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  perturbation_efficiency_significant: z.boolean().nullish()
 })
 
 const buildEdgeFilter = (input: paramsFormatType): string => {
@@ -519,7 +520,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'significant': record.significant,
           'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
           'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
-          'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
+          'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+          'perturbation_efficiency_significant': perturbationEfficiencyEdge.significant
         }
   `
 
@@ -558,7 +560,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'significant': record.significant,
             'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
             'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
-            'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
+            'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+            'perturbation_efficiency_significant': perturbationEfficiencyEdge.significant
           }
   `
 
@@ -600,7 +603,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'significant': record.significant,
                   'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
                   'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
-                  'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj
+                  'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+                  'perturbation_efficiency_significant': perturbationEfficiencyEdge.significant
               }
   `
 
