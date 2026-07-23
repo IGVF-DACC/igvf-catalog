@@ -11,10 +11,15 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const genesPathwaysFormat = z.object({
+const pathwaysPathwaysFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   orgnism: z.string().optional(),
+  organism: z.string().optional(),
+  class: z.string().optional(),
+  method: z.string().nullable().optional(),
+  label: z.string().nullable().optional(),
+  files_filesets: z.string().optional(),
   parent_pathway: z.string().or(pathwayFormat).optional(),
   child_pathway: z.string().or(pathwayFormat).optional(),
   name: z.string()
@@ -82,7 +87,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
 const pathwaysFromPathways = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/pathways/pathways', description: descriptions.pathways_pathways } })
   .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat))
-  .output(z.array(genesPathwaysFormat))
+  .output(z.array(pathwaysPathwaysFormat))
   .query(async ({ input }) => await findGenesFromPathways(input))
 
 export const pathwaysPathwaysRouters = {

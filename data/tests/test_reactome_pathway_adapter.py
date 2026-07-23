@@ -63,6 +63,16 @@ def mock_response_data_no_disease():
     }
 
 
+@pytest.fixture
+def mock_file_fileset():
+    with patch('adapters.reactome_pathway_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'biological relationship',
+            'method': 'Reactome'
+        }
+        yield mock_get
+
+
 def test_reactome_pathway_adapter_initialization(filepath, spy_writer):
     """Test adapter initialization"""
     adapter = ReactomePathway(filepath=filepath, writer=spy_writer)
@@ -71,7 +81,7 @@ def test_reactome_pathway_adapter_initialization(filepath, spy_writer):
     assert adapter.label == 'pathway'
 
 
-def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, mock_response_data):
+def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, mock_response_data, mock_file_fileset):
     """Test adapter processing with disease information"""
     with patch('requests.Session') as mock_session:
         # Setup mock session
@@ -86,8 +96,10 @@ def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, moc
 
         adapter = ReactomePathway(
             filepath=mock_sample_file, writer=spy_writer, validate=True)
+        adapter.file_accession = 'IGVFFI6981KOFP'
         adapter.process_file()
 
+        mock_file_fileset.assert_called_once_with('IGVFFI6981KOFP')
         assert len(spy_writer.contents) > 0
         first_item = json.loads(spy_writer.contents[0])
 
@@ -101,6 +113,9 @@ def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, moc
         assert 'is_in_disease' in first_item
         assert 'name_aliases' in first_item
         assert 'is_top_level_pathway' in first_item
+        assert first_item['class'] == 'biological relationship'
+        assert first_item['method'] == 'Reactome'
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI6981KOFP'
 
         # Check field values (using actual first human pathway from file)
         assert first_item['_key'] == 'R-HSA-164843'
@@ -122,7 +137,7 @@ def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, moc
         assert first_item['go_biological_process'] == 'ontology_terms/GO_0006914'
 
 
-def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, mock_response_data_no_disease):
+def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, mock_response_data_no_disease, mock_file_fileset):
     """Test adapter processing without disease information"""
     with patch('requests.Session') as mock_session:
         # Setup mock session
@@ -137,6 +152,7 @@ def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, 
 
         adapter = ReactomePathway(
             filepath=mock_sample_file, writer=spy_writer, validate=True)
+        adapter.file_accession = 'IGVFFI6981KOFP'
         adapter.process_file()
 
         assert len(spy_writer.contents) > 0
@@ -152,6 +168,7 @@ def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, 
         assert 'is_in_disease' in first_item
         assert 'name_aliases' in first_item
         assert 'is_top_level_pathway' in first_item
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI6981KOFP'
 
         # Check field values (using actual first human pathway from file)
         assert first_item['_key'] == 'R-HSA-164843'
@@ -171,7 +188,7 @@ def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, 
         assert first_item['go_biological_process'] == 'ontology_terms/GO_0006914'
 
 
-def test_reactome_pathway_adapter_404_response(mock_sample_file, spy_writer):
+def test_reactome_pathway_adapter_404_response(mock_sample_file, spy_writer, mock_file_fileset):
     """Test adapter handling of 404 responses"""
     with patch('requests.Session') as mock_session:
         # Setup mock session
@@ -190,9 +207,10 @@ def test_reactome_pathway_adapter_404_response(mock_sample_file, spy_writer):
         assert len(spy_writer.contents) == 0
 
 
-def test_reactome_pathway_adapter_json_decode_error(mock_sample_file, spy_writer):
-    """Test adapter handling of JSON decode errors"""
-    with patch('requests.Session') as mock_session:
+def test_reactome_pathway_adapter_json_decode_error(mock_sample_file, spy_writer, mock_file_fileset):
+    """Test adapter handling of JSON decode errors after retries are exhausted"""
+    with patch('adapters.reactome_pathway_adapter.time.sleep'), \
+            patch('requests.Session') as mock_session:
         # Setup mock session
         mock_session_instance = MagicMock()
         mock_session.return_value = mock_session_instance
@@ -207,12 +225,39 @@ def test_reactome_pathway_adapter_json_decode_error(mock_sample_file, spy_writer
 
         adapter = ReactomePathway(filepath=mock_sample_file, writer=spy_writer)
 
-        # Should re-raise the JSONDecodeError
+        # Should re-raise the JSONDecodeError after retries
         with pytest.raises(json.JSONDecodeError):
             adapter.process_file()
+        assert mock_session_instance.get.call_count == ReactomePathway.QUERY_MAX_ATTEMPTS
 
 
-def test_reactome_pathway_adapter_non_human_organism(mock_sample_file, spy_writer):
+def test_reactome_pathway_adapter_recovers_after_transient_error(mock_sample_file, spy_writer, mock_response_data, mock_file_fileset):
+    """Transient Reactome failures should be retried and then succeed."""
+    with patch('adapters.reactome_pathway_adapter.time.sleep') as mock_sleep, \
+            patch('requests.Session') as mock_session:
+        mock_session_instance = MagicMock()
+        mock_session.return_value = mock_session_instance
+
+        bad_response = MagicMock()
+        bad_response.status_code = 521
+        bad_response.text = '<html>Host Error</html>'
+
+        good_response = MagicMock()
+        good_response.status_code = 200
+        good_response.json.return_value = mock_response_data
+
+        mock_session_instance.get.side_effect = [
+            bad_response, good_response, good_response, good_response]
+
+        adapter = ReactomePathway(filepath=mock_sample_file, writer=spy_writer)
+        adapter.process_file()
+
+        assert mock_session_instance.get.call_count == 4
+        mock_sleep.assert_called()
+        assert len(spy_writer.contents) > 0
+
+
+def test_reactome_pathway_adapter_non_human_organism(mock_sample_file, spy_writer, mock_file_fileset):
     """Test that non-human organisms are filtered out"""
     with patch('requests.Session') as mock_session:
         # Setup mock session
@@ -241,7 +286,7 @@ def test_reactome_pathway_adapter_non_human_organism(mock_sample_file, spy_write
                 assert item['organism'] == 'Homo sapiens'
 
 
-def test_reactome_pathway_adapter_retry_mechanism(mock_sample_file, spy_writer, mock_response_data):
+def test_reactome_pathway_adapter_retry_mechanism(mock_sample_file, spy_writer, mock_response_data, mock_file_fileset):
     """Test that the adapter uses retry mechanism for failed requests"""
     with patch('requests.Session') as mock_session:
         # Setup mock session
@@ -257,14 +302,12 @@ def test_reactome_pathway_adapter_retry_mechanism(mock_sample_file, spy_writer, 
         adapter = ReactomePathway(filepath=mock_sample_file, writer=spy_writer)
         adapter.process_file()
 
-        # Verify that session was configured with retries
+        # Verify that session was configured with retries for http(s)
         mock_session.assert_called_once()
-        # Verify that mount was called (which means retry mechanism was set up)
-        mock_session_instance.mount.assert_called_once()
-
-        # Verify the mount call was made with https:// prefix
-        mount_call_args = mock_session_instance.mount.call_args
-        assert mount_call_args[0][0] == 'https://'
+        assert mock_session_instance.mount.call_count == 2
+        mounted_prefixes = {call.args[0]
+                            for call in mock_session_instance.mount.call_args_list}
+        assert mounted_prefixes == {'https://', 'http://'}
 
 
 def test_reactome_pathway_adapter_dry_run(mock_sample_file, spy_writer):
@@ -276,7 +319,7 @@ def test_reactome_pathway_adapter_dry_run(mock_sample_file, spy_writer):
     assert adapter.label == 'pathway'
 
 
-def test_reactome_pathway_adapter_writer_integration(mock_sample_file, spy_writer, mock_response_data):
+def test_reactome_pathway_adapter_writer_integration(mock_sample_file, spy_writer, mock_response_data, mock_file_fileset):
     """Test that the adapter properly integrates with the writer"""
     with patch('requests.Session') as mock_session:
         # Setup mock session

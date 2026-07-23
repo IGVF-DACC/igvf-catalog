@@ -16,6 +16,11 @@ const genesPathwaysFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   orgnism: z.string().optional(),
+  organism: z.string().optional(),
+  class: z.string().optional(),
+  method: z.string().nullable().optional(),
+  label: z.string().nullable().optional(),
+  files_filesets: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
   pathway: z.string().or(pathwayFormat).optional(),
   name: z.string()

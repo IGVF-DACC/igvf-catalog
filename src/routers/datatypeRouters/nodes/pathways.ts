@@ -47,7 +47,11 @@ export const pathwayFormat = z.object({
   name_aliases: z.array(z.string()),
   is_top_level_pathway: z.boolean(),
   disease_ontology_terms: z.array(z.string()).nullable(),
-  go_biological_process: z.string().nullable()
+  go_biological_process: z.string().nullable(),
+  class: z.string(),
+  method: z.string().nullable(),
+  label: z.string().nullable(),
+  files_filesets: z.string()
 })
 
 export async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): Promise<any[]> {
