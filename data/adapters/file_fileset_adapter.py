@@ -680,7 +680,7 @@ class FileFileSet:
             'download_link': download_link,
             'cell_annotation': None,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': None,
+            'crispr_modality': crispr_modality,
             'browser_index_file': None
         }
         return props, donor_ids, all_sample_types, disease_ids
