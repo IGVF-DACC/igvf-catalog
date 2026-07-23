@@ -1,8 +1,23 @@
 import json
+import tarfile
 from unittest.mock import patch
+
+import pytest
+
 from adapters.adastra_asb_adapter import ASB
 from adapters.writer import SpyWriter
-import pytest
+
+
+FILE_ACCESSION = 'IGVFFI5943XCOS'
+SAMPLE_DIR = './samples/allele_specific_binding'
+
+
+@pytest.fixture
+def sample_archive(tmp_path):
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(SAMPLE_DIR, arcname='.')
+    return str(archive_filepath)
 
 
 def mock_igvf_metadata(mock_request):
@@ -12,21 +27,21 @@ def mock_igvf_metadata(mock_request):
     }
 
 
-def test_adastra_asb_adapter_invalid_label():
+def test_adastra_asb_adapter_invalid_label(sample_archive):
     """Test invalid label handling"""
     with pytest.raises(ValueError, match='Invalid label'):
-        ASB(filepath='./samples/allele_specific_binding', label='invalid_label')
+        ASB(filepath=sample_archive, label='invalid_label')
 
 
 @patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_request):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_request, sample_archive):
     """Test processing file with asb label"""
     mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
-    adapter = ASB(filepath='./samples/allele_specific_binding',
+    adapter = ASB(filepath=sample_archive,
                   label='asb', writer=SpyWriter(), validate=True)
 
     # Actually call process_file to test the full functionality
@@ -34,6 +49,7 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_reques
 
     # Verify that some output was generated
     assert len(adapter.writer.contents) > 0
+    assert adapter.file_accession == FILE_ACCESSION
 
     # Parse the first output item
     first_item = json.loads(adapter.writer.contents[0])
@@ -79,7 +95,7 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_reques
 
 @patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_request):
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_request, sample_archive):
     """Test process_file method with mocked ensembl mapping"""
     mock_igvf_metadata(mock_request)
     # Set up mock data
@@ -91,7 +107,7 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
     }
 
     with patch('adapters.adastra_asb_adapter.pickle.load', return_value=mock_ensembl_mapping):
-        adapter = ASB(filepath='./samples/allele_specific_binding',
+        adapter = ASB(filepath=sample_archive,
                       label='asb', writer=SpyWriter())
 
         # Call process_file
@@ -115,13 +131,13 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
 
 @patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_request, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_request, sample_archive, caplog):
     """Test process_file skips files with unmatched TF uniprot ID"""
     mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
-    adapter = ASB(filepath='./samples/allele_specific_binding',
+    adapter = ASB(filepath=sample_archive,
                   label='asb', writer=SpyWriter())
 
     # Mock the TF mapping loading to return a mapping that doesn't include ATF1_HUMAN
@@ -146,13 +162,13 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
 
 @patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_request, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_request, sample_archive, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""
     mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
-    adapter = ASB(filepath='./samples/allele_specific_binding',
+    adapter = ASB(filepath=sample_archive,
                   label='asb', writer=SpyWriter())
 
     # Load the TF mapping normally first
