@@ -3,9 +3,8 @@ from typing import Optional
 
 from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
-from adapters.helpers import get_gene_map_from_arangodb
+from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
-import requests
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
@@ -14,7 +13,6 @@ import requests
 
 class Coxpresdb(BaseAdapter):
     ALLOWED_LABELS = ['coxpresdb']
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(
         self,
@@ -39,10 +37,11 @@ class Coxpresdb(BaseAdapter):
         return 'genes_genes'
 
     def parse(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
 
         gene_map = get_gene_map_from_arangodb('entrez')
         entrez_ensembl_dict = {
@@ -91,6 +90,7 @@ class Coxpresdb(BaseAdapter):
                                 'class': self.collection_class,
                                 'method': self.method,
                                 'label': self.collection_label,
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                             }
                             if self.validate:
                                 self.validate_doc(_props)
