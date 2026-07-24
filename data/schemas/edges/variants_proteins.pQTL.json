@@ -31,9 +31,9 @@
             "label": {
                 "enum": ["pQTL"]
             },
-            "log10pvalue": {
+            "neg_log10_pvalue": {
                 "type": "number",
-                "description": "The log10pvalue of the variant to protein edge"
+                "description": "The neg log10pvalue of the variant to protein edge"
             },
             "beta": {
                 "type": "number",
@@ -99,13 +99,13 @@
                 ]
             }
             },
-            "required": ["_key",  "rsid", "log10pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term", "regulatory_type", "files_filesets"],
+            "required": ["_key",  "rsid", "neg_log10_pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term", "regulatory_type", "files_filesets"],
             "additionalProperties": false
         }
     ],
     "accessible_via": {
       "name": "variants_proteins",
-      "return": "label, log10pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type, files_filesets"
+      "return": "label, neg_log10_pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type, files_filesets"
     },
     "db_collection_name": "variants_proteins"
 }

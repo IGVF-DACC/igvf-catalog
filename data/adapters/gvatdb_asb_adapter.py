@@ -78,12 +78,18 @@ class ASB_GVATDB(BaseAdapter):
                     _source = 'variants/' + variant_id
                     _target = 'proteins/' + ensembl_id
 
+                    # if p_value_adj is 0, we will set neg_log10_pvalue_adj to 2 (max value in the dataset), otherwise we will calculate it as -log10(p_value_adj)
+                    p_value_adj = float(row[15])
+                    neg_log10_pvalue_adj = 2
+                    if p_value_adj > 0:
+                        neg_log10_pvalue_adj = -1 * log10(p_value_adj)
+
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
                         'p_value': pvalue,
-                        'log10pvalue': log10pvalue,
+                        'neg_log10_pvalue': log10pvalue,
                         'experiment': experiment,
                         'hg19_coordinate': row[8],
                         'oligo_auc': float(row[9]),
@@ -91,7 +97,8 @@ class ASB_GVATDB(BaseAdapter):
                         'ref_auc': float(row[11]),
                         'alt_auc': float(row[12]),
                         'pbs': float(row[13]),
-                        'fdr': float(row[15]),
+                        'p_value_adj': p_value_adj,
+                        'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,
                         'label': 'allele-specific binding',

@@ -25,7 +25,8 @@ class pQTL(BaseAdapter):
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-
+        self.file_accession = os.path.basename(filepath).split('.')[
+            0] or pQTL.DEFAULT_ACCESSION
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -86,7 +87,7 @@ class pQTL(BaseAdapter):
                             'label': self.method,
                             'class': self.collection_class,
                             'method': self.method,
-                            'log10pvalue': float(row[14]),
+                            'neg_log10_pvalue': float(row[14]),
                             'beta': float(row[12]),  # i.e. effect size
                             'se': float(row[13]),
                             'regulatory_type': row[19],  # cis/trans

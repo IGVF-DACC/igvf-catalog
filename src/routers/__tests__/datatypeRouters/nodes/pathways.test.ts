@@ -5,6 +5,13 @@ import * as helpers from '../../../datatypeRouters/_helpers'
 jest.mock('../../../../database')
 jest.mock('../../../datatypeRouters/_helpers')
 
+const mockPathwayMeta = {
+  class: 'biological relationship',
+  method: null as string | null,
+  label: null as string | null,
+  files_filesets: 'files_filesets/IGVFFI6981KOFP'
+}
+
 describe('pathwaysRouters.pathways', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -22,13 +29,14 @@ describe('pathwaysRouters.pathways', () => {
       name_aliases: ['AliasA'],
       is_top_level_pathway: true,
       disease_ontology_terms: ['ontology_terms/DOID:1'],
-      go_biological_process: 'ontology_terms:GO:1'
+      go_biological_process: 'ontology_terms:GO:1',
+      ...mockPathwayMeta
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('_key == "1"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, organism, source, source_url, id_version, is_in_disease, name_aliases, is_top_level_pathway, disease_ontology_terms, go_biological_process')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, organism, source, source_url, id_version, is_in_disease, name_aliases, is_top_level_pathway, disease_ontology_terms, go_biological_process, class, method, label, files_filesets')
 
     const input = { id: '1', page: 0 }
     const result = await pathwaysRouters.pathways({
@@ -54,7 +62,8 @@ describe('pathwaysRouters.pathways', () => {
       name_aliases: ['AliasA'],
       is_top_level_pathway: true,
       disease_ontology_terms: ['ontology_terms/DOID:1'],
-      go_biological_process: 'ontology_terms:GO:1'
+      go_biological_process: 'ontology_terms:GO:1',
+      ...mockPathwayMeta
     }]
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // persistent returns []
@@ -85,7 +94,8 @@ describe('pathwaysRouters.pathways', () => {
       name_aliases: ['AliasA'],
       is_top_level_pathway: true,
       disease_ontology_terms: ['ontology_terms/DOID:1'],
-      go_biological_process: 'ontology_terms:GO:1'
+      go_biological_process: 'ontology_terms:GO:1',
+      ...mockPathwayMeta
     }]
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // persistent returns []

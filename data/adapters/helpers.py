@@ -724,6 +724,11 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
                            'reason': 'Unable to parse this variant id'}
         return variant_json, skipped_message
 
+    if ref == alt:
+        skipped_message = {'variant_id': variant_id,
+                           'reason': 'Ref allele and alt allele are the same'}
+        return variant_json, skipped_message
+
     # Note: we convert the position to 1-based for spdi format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
     # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format, validate ref seq for them seperately and skip normalization part for now
     if format == 'spdi':
@@ -844,10 +849,10 @@ HGNC_GENE_MAP_OVERRIDES = {
 }
 
 
-def get_gene_map_from_arangodb(field):
+def get_gene_map_from_arangodb(field, collection='genes'):
     db = ArangoDB().get_igvf_connection()
     cursor = db.aql.execute(
-        f'FOR gene IN genes RETURN {{ key: gene._key, value: gene.{field} }}'
+        f'FOR gene IN {collection} RETURN {{ key: gene._key, value: gene.{field} }}'
     )
     gene_map = {}
     for record in cursor:
@@ -859,7 +864,7 @@ def get_gene_map_from_arangodb(field):
             gene_map[gval] = [gkey]
         else:
             gene_map[gval].append(gkey)
-    if field == 'hgnc':
+    if field == 'hgnc' and collection == 'genes':
         for hgnc_id, gene_keys in HGNC_GENE_MAP_OVERRIDES.items():
             if hgnc_id not in gene_map:
                 gene_map[hgnc_id] = gene_keys
