@@ -137,3 +137,30 @@ class DepMap(BaseAdapter):
                 self.logger.warning(
                     'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
             self.gene_id_mapping[gene_symbol] = gene_keys
+
+        unmatched_symbols = self._get_unmatched_gene_symbols()
+        if not unmatched_symbols:
+            return
+
+        # fall back to gene synonyms for symbols not found by name. Only run
+        # this (very expensive) query when there's actually something unmatched.
+        synonym_map = get_gene_map_from_arangodb('synonyms')
+        for gene_symbol, gene_keys in synonym_map.items():
+            if gene_symbol not in unmatched_symbols:
+                continue
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for synonym ' + gene_symbol + ': ' + ', '.join(gene_keys))
+            self.gene_id_mapping[gene_symbol] = gene_keys
+
+    def _get_unmatched_gene_symbols(self):
+        # scan just the gene column of the input file (cheap) to see whether
+        # the synonyms fallback is even needed
+        unmatched_symbols = set()
+        with open(self.filepath, 'r') as depmap_file:
+            next(depmap_file)  # skip header row of model ids
+            for line in depmap_file:
+                gene_symbol = line.split(',', 1)[0].split(' ')[0]
+                if gene_symbol not in self.gene_id_mapping:
+                    unmatched_symbols.add(gene_symbol)
+        return unmatched_symbols

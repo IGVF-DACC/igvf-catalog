@@ -409,3 +409,22 @@ def test_get_gene_map_from_arangodb_skips_hgnc_overrides_for_other_fields():
 
         assert result == {'1234': ['ENSG00000000001']}
         assert 'HGNC:32925' not in result
+
+
+def test_get_gene_map_from_arangodb_flattens_array_fields():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSG00000000001', 'value': ['FOO', 'BAR']},
+        {'key': 'ENSG00000000002', 'value': ['BAR']},
+        {'key': 'ENSG00000000003', 'value': []},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_gene_map_from_arangodb('synonyms')
+
+        assert result['FOO'] == ['ENSG00000000001']
+        assert result['BAR'] == ['ENSG00000000001', 'ENSG00000000002']
+        assert not any('ENSG00000000003' in ids for ids in result.values())

@@ -111,6 +111,73 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
         os.unlink(temp_file_path)
 
 
+def test_depmap_adapter_synonym_fallback(mocker):
+    """A gene symbol not found by name should be resolved via its synonym."""
+    def fake_gene_map(field):
+        if field == 'synonyms':
+            return {'FAKEGENE': ['ENSG00000000099']}
+        return {}
+
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        side_effect=fake_gene_map
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
+        assert gene_ids == {'genes/ENSG00000000099'}
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
+    """The (expensive) synonyms lookup should not run when every gene symbol is already matched by name."""
+    mock_get_gene_map = mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={'FAKEGENE': ['ENSG00000000001']}
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.process_file()
+
+        mock_get_gene_map.assert_called_once_with('name')
+    finally:
+        os.unlink(temp_file_path)
+
+
 def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
     adapter = DepMap(
