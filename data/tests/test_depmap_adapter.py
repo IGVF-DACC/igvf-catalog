@@ -178,6 +178,38 @@ def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
         os.unlink(temp_file_path)
 
 
+def test_depmap_adapter_gene_id_mapping_override(mocker):
+    """LOC118142757 has no reliable name/synonym match in the genes collection, so it's hardcoded."""
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={}
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['LOC118142757 (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
+        assert gene_ids == {'genes/ENSG00000290147'}
+    finally:
+        os.unlink(temp_file_path)
+
+
 def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
     adapter = DepMap(

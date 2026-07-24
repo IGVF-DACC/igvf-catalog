@@ -35,6 +35,10 @@ class DepMap(BaseAdapter):
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
+    # gene symbols missing/unresolvable via the genes collection's name or synonyms fields
+    GENE_ID_MAPPING_OVERRIDES = {
+        'LOC118142757': ['ENSG00000290147'],
+    }
 
     def __init__(self, filepath, label='depmap', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
@@ -137,6 +141,8 @@ class DepMap(BaseAdapter):
                 self.logger.warning(
                     'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
             self.gene_id_mapping[gene_symbol] = gene_keys
+
+        self.gene_id_mapping.update(DepMap.GENE_ID_MAPPING_OVERRIDES)
 
         unmatched_symbols = self._get_unmatched_gene_symbols()
         if not unmatched_symbols:
