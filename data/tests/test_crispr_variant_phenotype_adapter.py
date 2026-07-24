@@ -28,7 +28,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'base editing',
+            'crispr_modality': 'prime editing',
             'simple_sample_summaries': ['Homo sapiens HepG2 cell line'],
             'samples': ['ontology_terms/EFO_0001187'],
             'treatments_term_ids': None,
@@ -62,9 +62,9 @@ def test_unsupported_accession(mock_file_fileset):
         )
 
 
-def test_dropped_sherwood_chr_pos_accessions(mock_file_fileset):
+def test_dropped_accessions(mock_file_fileset):
     writer = SpyWriter()
-    for accession in ('IGVFFI7160EKDK', 'IGVFFI7659OTOX'):
+    for accession in ('IGVFFI7160EKDK', 'IGVFFI7659OTOX', 'IGVFFI7206JILF'):
         with pytest.raises(ValueError, match='Unsupported file accession'):
             CRISPRVariantPhenotype(
                 filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
@@ -115,37 +115,6 @@ def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
 @patch(
     'adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb',
     return_value={
-        'NC_000001.11:11845793:A:G',
-        'NC_000001.11:11845916:A:G',
-    },
-)
-@patch(
-    'adapters.CRISPR_variant_phenotype_adapter.load_variant',
-    side_effect=_mock_load_variant,
-)
-def test_variant_phenotype_lettre(mock_load, mock_bulk, mock_file_fileset):
-    writer = SpyWriter()
-    adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_lettre.example.csv',
-        label='variant_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI7206JILF/',
-        writer=writer,
-        validate=True,
-    )
-    adapter.process_file()
-
-    # splicesite skipped; one SPDI once + one SPDI twice (different guide counts)
-    assert len(writer.contents) == 3
-    items = [json.loads(line) for line in writer.contents]
-    assert all(item['_to'] == 'ontology_terms/GO_0008283' for item in items)
-    keys = {item['_key'] for item in items}
-    assert 'NC_000001.11:11845916:A:G_GO_0008283_IGVFFI7206JILF_5' in keys
-    assert 'NC_000001.11:11845916:A:G_GO_0008283_IGVFFI7206JILF_2' in keys
-
-
-@patch(
-    'adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb',
-    return_value={
         'NC_000019.10:11105541:CAGC:GCTG',
         'NC_000019.10:11105382:CTGC:ATGG',
     },
@@ -171,6 +140,9 @@ def test_variant_phenotype_sherwood_prime(mock_load, mock_bulk, mock_file_filese
     assert first['crispr_modality'] == 'prime editing'
     assert first['significant'] is True
     assert first['num_guides'] == 1
+    assert first['_key'] == (
+        'NC_000019.10:11105541:CAGC:GCTG_NTR_0001118_IGVFFI2014OOZP'
+    )
 
 
 @patch('adapters.CRISPR_variant_phenotype_adapter.requests.get')
@@ -203,16 +175,3 @@ def test_ontology_term_ntr(mock_get, mock_file_fileset):
     assert term['term_id'] == 'NTR_0001118'
     assert term['source'] == 'IGVF'
     assert term['synonyms'] is None
-
-
-def test_ontology_term_skips_go(mock_file_fileset):
-    writer = SpyWriter()
-    adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_lettre.example.csv',
-        label='ontology_term',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI7206JILF/',
-        writer=writer,
-        validate=True,
-    )
-    adapter.process_file()
-    assert writer.contents == []

@@ -104,10 +104,7 @@
           "type": "string",
           "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
-            "base editing",
-            "prime editing",
-            "activation",
-            "knockout"
+            "prime editing"
           ]
         },
         "class": {

@@ -17,8 +17,6 @@ from adapters.writer import Writer
 
 # Variant-level CRISPR screens linking variants to cellular phenotypes.
 #
-# IGVFFI7206JILF (Lettre / IGVFDS4143NHHL) – cell population proliferation (GO:0008283); base editing
-#   variant_id is SPDI; splicesite_* rows are controls and skipped.
 # IGVFFI2014OOZP (Sherwood / IGVFDS2873IRMJ) – LDL-C uptake (NTR:0001118); prime editing
 #   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
 # IGVFFI6803HZJG (Sherwood / IGVFDS9278NUAZ) – LDL-C uptake (NTR:0001118); prime editing
@@ -26,9 +24,6 @@ from adapters.writer import Writer
 #
 # NTR phenotype terms are not loaded by the standard ontology adapter, so this
 # adapter also writes ontology_terms for NTR phenotypes (e.g. NTR_0001118).
-#
-# Note: IGVFFI7160EKDK and IGVFFI7659OTOX (Sherwood chr_pos_hg38_ref_alt files)
-# are intentionally not loaded due to variant-id quality issues.
 
 IGVF_API = 'https://api.data.igvf.org/'
 IGVF_PHENOTYPE_TERM_URL = 'https://data.igvf.org/phenotype-terms/'
@@ -44,17 +39,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
     # Accession -> phenotype + column layout.
     FILE_CONFIG = {
-        'IGVFFI7206JILF': {
-            'phenotype_term': 'GO_0008283',
-            'phenotype_name': 'cell population proliferation',
-            'variant_id_col': 'variant_id',
-            'skip_id_prefix': 'splicesite_',
-            'effect_size_col': 'beta',
-            'z_score_col': 'z',
-            'p_value_col': 'p.value',
-            'fdr_col': 'fdr',
-            'num_guides_col': 'sgRNA',
-        },
         'IGVFFI2014OOZP': {
             'phenotype_term': 'NTR_0001118',
             'phenotype_name': 'LDL-C uptake',
@@ -267,12 +251,9 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
                 num_guides = self._optional_int(
                     row, config.get('num_guides_col'))
-                key_parts = [spdi, self.phenotype_term, self.file_accession]
-                if num_guides is not None:
-                    key_parts.append(str(num_guides))
 
                 props = {
-                    '_key': '_'.join(key_parts),
+                    '_key': f'{spdi}_{self.phenotype_term}_{self.file_accession}',
                     '_from': f'variants/{spdi}',
                     '_to': f'ontology_terms/{self.phenotype_term}',
                     'effect_size': float(row[config['effect_size_col']]),
