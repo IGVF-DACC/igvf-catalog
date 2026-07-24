@@ -59,7 +59,8 @@ const gwasVariantPhenotypeFormat = z.object({
   label: z.string().nullish(),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string(),
-  variant: z.string().or(variantSimplifiedFormat)
+  variant: z.string().or(variantSimplifiedFormat),
+  files_filesets: z.string().nullish()
 })
 
 const igvfVariantPhenotypeFormat = z.object({

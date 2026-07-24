@@ -987,7 +987,8 @@ export const descriptions = {
 
   studies: 'Retrieve studies from GWAS. <br> \
   Example: study_id = GCST007798, <br> \
-  pmid = 30929738. <br> \
+  pmid = 30929738, <br> \
+  files_fileset = IGVFFI1309WDQG. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \

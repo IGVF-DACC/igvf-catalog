@@ -12,6 +12,7 @@ const studyCollectionName = schemaObj.db_collection_name as string
 const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),
   pmid: z.string().trim().optional(),
+  files_fileset: z.string().trim().optional(),
   page: z.number().default(0)
 })
 
@@ -38,7 +39,8 @@ export const studyFormat = z.object({
   trait_category: z.string().nullable(),
   source: z.string().optional(),
   study_type: z.string().nullable(),
-  version: z.string().nullable()
+  version: z.string().nullable(),
+  files_filesets: z.string().nullish()
 })
 
 async function studiesSearch (input: paramsFormatType): Promise<any[]> {
@@ -49,6 +51,11 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
 
   if (input.pmid !== undefined) {
     input.pmid = 'PMID:' + (input.pmid as string)
+  }
+
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
   }
 
   const query = `
