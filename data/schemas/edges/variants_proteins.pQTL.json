@@ -88,15 +88,24 @@
             },
             "method": {
                 "enum": ["pQTL"]
+            },
+            "files_filesets": {
+                "type": "string",
+                "description": "The files filesets of the variant to protein edge",
+                "example": "files_filesets/IGVFFI2053GDNI",
+                "pattern": "^files_filesets/",
+                "collections": [
+                    "files_filesets"
+                ]
             }
             },
-            "required": ["_key",  "rsid", "neg_log10_pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term", "regulatory_type"],
+            "required": ["_key",  "rsid", "neg_log10_pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term", "regulatory_type", "files_filesets"],
             "additionalProperties": false
         }
     ],
     "accessible_via": {
       "name": "variants_proteins",
-      "return": "label, neg_log10_pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type"
+      "return": "label, neg_log10_pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type, files_filesets"
     },
     "db_collection_name": "variants_proteins"
 }
