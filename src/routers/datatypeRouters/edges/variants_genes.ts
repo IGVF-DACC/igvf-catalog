@@ -84,7 +84,8 @@ const completeQtlsFormat = z.object({
   biosample_term: z.string(),
   study: z.string().or(studyFormat).nullish(),
   name: z.string().nullish(),
-  class: z.string().nullish()
+  class: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
