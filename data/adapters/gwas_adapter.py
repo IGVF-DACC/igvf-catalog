@@ -188,6 +188,7 @@ class GWAS(BaseAdapter):
             'inverse_name': 'associated with',
             'class': self.file_fileset.get('class'),
             'method': self.file_fileset.get('method'),
+            'label': self.file_fileset.get('method'),
             'files_filesets': 'files_filesets/' + self.file_accession
         }
 
