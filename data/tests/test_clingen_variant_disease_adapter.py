@@ -6,7 +6,17 @@ from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.writer import SpyWriter
 
 
-def test_clingen_adapter_variant_disease():
+@pytest.fixture
+def mock_file_fileset():
+    with patch('adapters.clingen_variant_disease_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'biological relationship',
+            'method': 'ClinGen'
+        }
+        yield mock_get
+
+
+def test_clingen_adapter_variant_disease(mock_file_fileset):
     writer = SpyWriter()
     with patch('adapters.clingen_variant_disease_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
@@ -14,8 +24,10 @@ def test_clingen_adapter_variant_disease():
 
         adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
                           label='variant_disease', writer=writer, validate=True)
+        adapter.file_accession = 'IGVFFI5852GYTT'
         adapter.process_file()
 
+        mock_file_fileset.assert_called_once_with('IGVFFI5852GYTT')
         assert len(writer.contents) > 0
         first_item = json.loads(writer.contents[0])
 
@@ -29,17 +41,23 @@ def test_clingen_adapter_variant_disease():
         assert 'pmids' in first_item
         assert first_item['source'] == 'ClinGen'
         assert first_item['source_url'] == 'https://search.clinicalgenome.org/kb/downloads'
+        assert first_item['class'] == 'biological relationship'
+        assert first_item['method'] == 'ClinGen'
+        assert first_item['label'] == first_item['method']
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI5852GYTT'
 
 
-def test_clingen_adapter_variant_disease_gene():
+def test_clingen_adapter_variant_disease_gene(mock_file_fileset):
     writer = SpyWriter()
     with patch('adapters.clingen_variant_disease_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
         adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
                           label='variant_disease_gene', writer=writer, validate=True)
+        adapter.file_accession = 'IGVFFI5852GYTT'
         adapter.process_file()
 
+        mock_file_fileset.assert_called_once_with('IGVFFI5852GYTT')
         assert len(writer.contents) > 0
         first_item = json.loads(writer.contents[0])
 
@@ -51,6 +69,10 @@ def test_clingen_adapter_variant_disease_gene():
         assert 'inheritance_mode' in first_item
         assert first_item['source'] == 'ClinGen'
         assert first_item['source_url'] == 'https://search.clinicalgenome.org/kb/downloads'
+        assert first_item['class'] == 'biological relationship'
+        assert first_item['method'] == 'ClinGen'
+        assert first_item['label'] == first_item['method']
+        assert first_item['files_filesets'] == 'files_filesets/IGVFFI5852GYTT'
 
 
 def test_clingen_adapter_invalid_label():
@@ -66,6 +88,7 @@ def test_clingen_adapter_initialization():
         assert adapter.filepath == './samples/clinGen_variant_pathogenicity_example.csv'
         assert adapter.label == 'variant_disease'
         assert adapter.gene_validator is not None
+        assert adapter.file_accession == 'clinGen_variant_pathogenicity_example'
 
 
 def test_clingen_adapter_validate_doc_invalid():
@@ -80,7 +103,7 @@ def test_clingen_adapter_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
-def test_clingen_adapter_invalid_gene_id():
+def test_clingen_adapter_invalid_gene_id(mock_file_fileset):
     writer = SpyWriter()
 
     # Mock GeneValidator before creating the adapter
@@ -90,5 +113,6 @@ def test_clingen_adapter_invalid_gene_id():
 
         adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
                           label='variant_disease', writer=writer, validate=True)
+        adapter.file_accession = 'IGVFFI5852GYTT'
         adapter.process_file()
         assert len(writer.contents) == 0

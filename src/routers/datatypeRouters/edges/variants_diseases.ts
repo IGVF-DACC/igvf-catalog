@@ -32,6 +32,10 @@ const variantDiseaseFormat = z.object({
   gene_name: z.string().optional(),
   assertion: z.string().optional(),
   pmids: z.array(z.string()).optional(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
+  files_filesets: z.string().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   name: z.string()

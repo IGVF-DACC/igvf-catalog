@@ -146,6 +146,27 @@
       "type": "string",
       "description": "Source URL for the disease to gene edge",
       "pattern": "^https://thegencc\\.org/submissions/"
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the disease to gene edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the disease to gene edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": "string",
+      "description": "The label of the disease to gene edge; same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the disease to gene edge",
+      "example": "files_filesets/IGVFFI8022JGUK",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -164,11 +185,15 @@
     "submitter",
     "pmids",
     "source",
-    "source_url"
+    "source_url",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmids, source, source_url"
+    "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmids, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "diseases_genes"
 }

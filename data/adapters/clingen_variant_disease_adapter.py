@@ -2,11 +2,13 @@ import csv
 import pickle
 import hashlib
 import json
+import os
 from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # Example row from variant_pathogenicity.tsv
 # ClinVar Variation Id	chr	start	stop	Gene ID	HGNC Gene Symbol	Mondo Id	Disease	Mode of Inheritance	Assertion	Summary of interpretation	PubMed Articles	Evidence Repo Link	Retracted	Allele	HGVS Expressions	Allele Registry Id
@@ -23,6 +25,7 @@ class ClinGen(BaseAdapter):
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -36,6 +39,11 @@ class ClinGen(BaseAdapter):
             return 'variants_diseases_genes'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
         self.load_variant_id_mapping()
 
         with open(self.filepath, 'r') as clingen_file:
@@ -71,7 +79,11 @@ class ClinGen(BaseAdapter):
                         'name': 'associated with',
                         'inverse_name': 'associated with',
                         'source': ClinGen.SOURCE,
-                        'source_url': ClinGen.SOURCE_URL
+                        'source_url': ClinGen.SOURCE_URL,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'label': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
                     if self.validate:
                         self.validate_doc(props)
@@ -91,7 +103,11 @@ class ClinGen(BaseAdapter):
                         # gene-disease specific prop
                         'inheritance_mode': row[8],
                         'source': ClinGen.SOURCE,
-                        'source_url': ClinGen.SOURCE_URL
+                        'source_url': ClinGen.SOURCE_URL,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'label': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
                     if self.validate:
                         self.validate_doc(props)
