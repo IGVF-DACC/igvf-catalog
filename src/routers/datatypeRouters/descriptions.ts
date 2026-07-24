@@ -647,6 +647,27 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = NTR_0001118',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2014OOZP',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
       }
     ]),
 
@@ -716,6 +737,34 @@ export const descriptions = {
             items: [
               'region = chr1:91418-91424',
               'method = cV2F'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000019.10:11105332:TGC:CGG',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr19:11105000-11106000',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2014OOZP',
+              'method = CRISPR screen'
             ]
           }
         ]
