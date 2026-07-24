@@ -20,6 +20,18 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+# mock get_gene_map_from_arangodb so gene collection data change will not affect the test
+@pytest.fixture
+def mock_gene_map():
+    """Fixture to mock get_gene_map_from_arangodb function."""
+    with patch('adapters.encode_E2G_CRISPR_adapter.get_gene_map_from_arangodb') as mock_get_gene_map:
+        mock_get_gene_map.return_value = {
+            'CEP104': ['ENSG00000116198'],
+            'LRRC47': ['ENSG00000130764']
+        }
+        yield mock_get_gene_map
+
+
 @pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
     writer = SpyWriter()
@@ -39,7 +51,7 @@ def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
 
 
 @pytest.mark.external_dependency
-def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
+def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset, mock_gene_map):
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                              label='genomic_element_gene', writer=writer, validate=True)
@@ -64,6 +76,46 @@ def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
     assert first_item['method'] == 'CRISPR screen'
     assert first_item['crispr_modality'] == 'interference'
     assert first_item['class'] == 'observed data'
+
+
+def test_encode2gcrispr_adapter_multiple_gene_ids(mock_file_fileset, mocker):
+    """A gene symbol mapping to multiple Ensembl ids should produce an edge for each id, not just the first."""
+    mocker.patch(
+        'adapters.encode_E2G_CRISPR_adapter.get_gene_map_from_arangodb',
+        return_value={
+            'FAKEGENE': ['ENSG00000000001', 'ENSG00000000002'],
+        }
+    )
+
+    import tempfile
+    import os
+
+    header = ('chrom\tchromStart\tchromEnd\tname\tEffectSize\tstrandPerturbationTarget\tPerturbationTargetID\t'
+              'chrTSS\tstartTSS\tendTSS\tstrandGene\tEffectSize95ConfidenceIntervalLow\tEffectSize95ConfidenceIntervalHigh\t'
+              'measuredGeneSymbol\tmeasuredEnsemblID\tguideSpacerSeq\tguideSeq\tSignificant\tpValue\tpValueAdjusted\t'
+              'PowerAtEffectSize25\tPowerAtEffectSize10\tPowerAtEffectSize15\tPowerAtEffectSize20\tPowerAtEffectSize50\t'
+              'ValidConnection\tNotes\tReference')
+    row = ('chr1\t3774714\t3775214\tFAKEGENE|chr1:3691278-3691778:.\t-0.293431866\t.\tchr1:3691278-3691778:.\t'
+           'chr1\t3857213\t3857214\t-\tNA\tNA\tFAKEGENE\tNA\tNA\tNA\tTRUE\tNA\t0.004023984\t0.825093632\tNA\tNA\tNA\tNA\t'
+           'TRUE\tDataset: Nasser2021\tUlirsch et al., 2016')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as f:
+        f.write(header + '\n')
+        f.write(row + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = ENCODE2GCRISPR(
+            filepath=temp_file_path, label='genomic_element_gene', writer=writer)
+        adapter.process_file()
+
+        gene_targets = {json.loads(item)['_to']
+                        for item in writer.contents if item.startswith('{')}
+        assert gene_targets == {
+            'genes/ENSG00000000001', 'genes/ENSG00000000002'}
+    finally:
+        os.unlink(temp_file_path)
 
 
 def test_encode2gcrispr_adapter_invalid_label(mock_file_fileset):
@@ -94,7 +146,7 @@ def test_encode2gcrispr_adapter_load_regulatory_region(mock_file_fileset):
     assert len(adapter.genomic_element_nodes) > 0
 
 
-def test_encode2gcrispr_adapter_load_gene_id_mapping(mock_file_fileset):
+def test_encode2gcrispr_adapter_load_gene_id_mapping(mock_file_fileset, mock_gene_map):
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                              label='genomic_element_gene', writer=writer)

@@ -29,7 +29,7 @@ const edgeQueryFormat = z.object({
   source: z.enum(SOURCES).optional()
 })
 
-const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.omit({ alias: true }).merge(z.object({ synonym: z.string().trim().optional() })).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const gnrGeneQueryFormat = z.object({
   regulator_gene_id: z.string().optional(),
@@ -331,11 +331,11 @@ const executeLevenshteinMatchQuery = async ({
 }
 
 function geneQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias', 'method', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one of those properties must be defined: gene_id, hgnc_id, name, alias, method, files_fileset.'
+      message: 'At least one of those properties must be defined: gene_id, hgnc_id, name, synonym, method, files_fileset.'
     })
   }
 }
@@ -370,12 +370,12 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   delete input.biological_context
 
   let geneIDs: string[] = []
-  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
-    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, alias: input.alias, organism: 'Homo sapiens', page: 0 }
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, alias: input.synonym, organism: 'Homo sapiens', page: 0 }
     delete input.gene_id
     delete input.hgnc_id
-    delete input.alias
+    delete input.synonym
     delete input.gene_name
     const genes = await geneSearch(geneInput)
     geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
