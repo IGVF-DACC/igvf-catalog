@@ -2,12 +2,11 @@ import csv
 import json
 import pickle
 from typing import Optional
-import requests
 from math import log10
 
 from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # ADASTRA allele-specific binding (ASB) file downloaded from: https://adastra.autosome.org/assets/cltfdata/adastra.cltf.bill_cipher.zip
@@ -27,7 +26,6 @@ class ASB(BaseAdapter):
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(
         self,
@@ -72,10 +70,11 @@ class ASB(BaseAdapter):
                     cell_ontology_id, cell_gtrd_id, cell_gtrd_name]
 
     def parse(self):
-        file_metadata = requests.get(
-            ASB.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
         self.ensembls = pickle.load(open(ASB.ENSEMBL_MAPPING, 'rb'))
@@ -168,6 +167,7 @@ class ASB(BaseAdapter):
                             'label': 'allele-specific binding',
                             'method': self.method,
                             'class': self.collection_class,
+                            'files_filesets': 'files_filesets/' + self.file_accession,
                             'name': 'modulates binding of',
                             'inverse_name': 'binding modulated by',
                             'biological_process': 'ontology_terms/GO_0051101'

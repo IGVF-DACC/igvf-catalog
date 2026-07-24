@@ -20,11 +20,15 @@ def sample_archive(tmp_path):
     return str(archive_filepath)
 
 
-def mock_igvf_metadata(mock_request):
-    mock_request.return_value.json.return_value = {
-        'catalog_class': 'observed data',
-        'catalog_method': 'ADASTRA'
-    }
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.adastra_asb_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': 'ADASTRA'
+        }
+        yield mock_get_file_fileset
 
 
 def test_adastra_asb_adapter_invalid_label(sample_archive):
@@ -33,11 +37,9 @@ def test_adastra_asb_adapter_invalid_label(sample_archive):
         ASB(filepath=sample_archive, label='invalid_label')
 
 
-@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_request, sample_archive):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, sample_archive):
     """Test processing file with asb label"""
-    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -70,6 +72,7 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_reques
     assert first_item['label'] == 'allele-specific binding'
     assert first_item['method'] == 'ADASTRA'
     assert first_item['class'] == 'observed data'
+    assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
     assert first_item['name'] == 'modulates binding of'
     assert first_item['inverse_name'] == 'binding modulated by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
@@ -93,11 +96,9 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_reques
         adapter.validate_doc(invalid_doc)
 
 
-@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_request, sample_archive):
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, sample_archive):
     """Test process_file method with mocked ensembl mapping"""
-    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -127,13 +128,12 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
             assert item['_from'] == 'variants/NC_000019.10:9435653:C:A'
             assert item['_to'].startswith('proteins/ENSP')
             assert item['source'] == ASB.SOURCE
+            assert item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
-@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_request, sample_archive, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_file_fileset, sample_archive, caplog):
     """Test process_file skips files with unmatched TF uniprot ID"""
-    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -160,11 +160,9 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
     assert len(adapter.writer.contents) == 0
 
 
-@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_request, sample_archive, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_file_fileset, sample_archive, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""
-    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
