@@ -1,10 +1,10 @@
 import csv
 from collections import defaultdict
 import json
-import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_gene_map_from_arangodb
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -25,7 +25,7 @@ from adapters.writer import Writer
 
 # Other files needed for loading:
 # DepMap_model.csv is also downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set (Model.csv).
-# DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection.
+# Gene symbol to gene ensembl id mapping is queried directly from the IGVF catalog genes collection.
 
 
 class DepMap(BaseAdapter):
@@ -33,9 +33,12 @@ class DepMap(BaseAdapter):
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
-    GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
+    # gene symbols missing/unresolvable via the genes collection's name or synonyms fields
+    GENE_ID_MAPPING_OVERRIDES = {
+        'LOC118142757': ['ENSG00000290147'],
+    }
 
     def __init__(self, filepath, label='depmap', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
@@ -69,8 +72,8 @@ class DepMap(BaseAdapter):
             for line in depmap_file:
                 gene, *values = line.strip().split(',')
                 gene_symbol = gene.split(' ')[0]
-                gene_id = self.gene_id_mapping.get(gene_symbol)
-                if gene_id is None:
+                gene_ids = self.gene_id_mapping.get(gene_symbol)
+                if gene_ids is None:
                     self.logger.warning('no gene id mapping for ' + gene)
                     continue
 
@@ -85,30 +88,31 @@ class DepMap(BaseAdapter):
                         if not cell_ontology_id:  # no CVCL id provided for this model
                             continue
 
-                        _id = gene_id + '_' + cell_ontology_id
-                        _source = 'genes/' + gene_id
-                        _target = 'ontology_terms/' + cell_ontology_id
+                        for gene_id in gene_ids:
+                            _id = gene_id + '_' + cell_ontology_id
+                            _source = 'genes/' + gene_id
+                            _target = 'ontology_terms/' + cell_ontology_id
 
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
-                            'model_id': gene_model_id,
-                            'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
-                            # oncotree code can be mapped to NCIT ids
-                            'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
-                            'gene_dependency': float(value),
-                            'source': DepMap.SOURCE,
-                            'source_url': DepMap.SOURCE_URL,
-                            'source_file': DepMap.SOURCE_FILE,
-                            'name': 'essential in',
-                            'inverse_name': 'dependent on'
-                        }
-                        if self.validate:
-                            self.validate_doc(_props)
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                            _props = {
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
+                                'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
+                                'model_id': gene_model_id,
+                                'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
+                                # oncotree code can be mapped to NCIT ids
+                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
+                                'gene_dependency': float(value),
+                                'source': DepMap.SOURCE,
+                                'source_url': DepMap.SOURCE_URL,
+                                'source_file': DepMap.SOURCE_FILE,
+                                'name': 'essential in',
+                                'inverse_name': 'dependent on'
+                            }
+                            if self.validate:
+                                self.validate_doc(_props)
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
@@ -129,6 +133,40 @@ class DepMap(BaseAdapter):
                     self.cell_ontology_id_mapping[model_id][prop] = cell_ontology_row[column_index]
 
     def load_gene_id_mapping(self):
-        self.gene_id_mapping = {}  # key: gene symbol; value: gene ensembl id
-        with open(DepMap.GENE_ID_MAPPING_PATH, 'rb') as gene_id_mapping_file:
-            self.gene_id_mapping = pickle.load(gene_id_mapping_file)
+        # key: gene symbol; value: list of gene ensembl ids
+        self.gene_id_mapping = {}
+        gene_map = get_gene_map_from_arangodb('name')
+        for gene_symbol, gene_keys in gene_map.items():
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
+            self.gene_id_mapping[gene_symbol] = gene_keys
+
+        self.gene_id_mapping.update(DepMap.GENE_ID_MAPPING_OVERRIDES)
+
+        unmatched_symbols = self._get_unmatched_gene_symbols()
+        if not unmatched_symbols:
+            return
+
+        # fall back to gene synonyms for symbols not found by name. Only run
+        # this (very expensive) query when there's actually something unmatched.
+        synonym_map = get_gene_map_from_arangodb('synonyms')
+        for gene_symbol, gene_keys in synonym_map.items():
+            if gene_symbol not in unmatched_symbols:
+                continue
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for synonym ' + gene_symbol + ': ' + ', '.join(gene_keys))
+            self.gene_id_mapping[gene_symbol] = gene_keys
+
+    def _get_unmatched_gene_symbols(self):
+        # scan just the gene column of the input file (cheap) to see whether
+        # the synonyms fallback is even needed
+        unmatched_symbols = set()
+        with open(self.filepath, 'r') as depmap_file:
+            next(depmap_file)  # skip header row of model ids
+            for line in depmap_file:
+                gene_symbol = line.split(',', 1)[0].split(' ')[0]
+                if gene_symbol not in self.gene_id_mapping:
+                    unmatched_symbols.add(gene_symbol)
+        return unmatched_symbols

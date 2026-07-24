@@ -5,16 +5,21 @@ import pytest
 from unittest.mock import patch
 
 
-def mock_igvf_metadata(mock_request):
-    mock_request.return_value.json.return_value = {
-        'catalog_class': 'observed data',
-        'catalog_method': 'GVATdb'
-    }
+FILE_ACCESSION = 'GVATdb_sample'
 
 
-@patch('adapters.gvatdb_asb_adapter.requests.get')
-def test_asb_gvatdb_adapter_process(mock_request, mocker):
-    mock_igvf_metadata(mock_request)
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.gvatdb_asb_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': 'GVATdb'
+        }
+        yield mock_get_file_fileset
+
+
+def test_asb_gvatdb_adapter_process(mock_file_fileset, mocker):
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
                          writer=writer, validate=True)
@@ -24,7 +29,7 @@ def test_asb_gvatdb_adapter_process(mock_request, mocker):
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
-    assert 'log10pvalue' in first_item
+    assert 'neg_log10_pvalue' in first_item
     assert 'p_value' in first_item
     assert 'hg19_coordinate' in first_item
     assert 'experiment' in first_item
@@ -33,12 +38,13 @@ def test_asb_gvatdb_adapter_process(mock_request, mocker):
     assert 'ref_auc' in first_item
     assert 'alt_auc' in first_item
     assert 'pbs' in first_item
-    assert 'fdr' in first_item
+    assert 'neg_log10_pvalue_adj' in first_item
     assert first_item['source'] == ASB_GVATDB.SOURCE
     assert first_item['source_url'] == ASB_GVATDB.SOURCE_URL
     assert first_item['label'] == 'allele-specific binding'
     assert first_item['method'] == 'GVATdb'
     assert first_item['class'] == 'observed data'
+    assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
     assert first_item['name'] == 'modulates binding of'
     assert first_item['inverse_name'] == 'binding modulated by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
@@ -60,9 +66,7 @@ def test_asb_gvatdb_adapter_load_tf_uniprot_id_mapping():
     assert len(adapter.tf_uniprot_id_mapping) > 0
 
 
-@patch('adapters.gvatdb_asb_adapter.requests.get')
-def test_asb_gvatdb_adapter_validate_doc_invalid(mock_request):
-    mock_igvf_metadata(mock_request)
+def test_asb_gvatdb_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
                          writer=writer, validate=True)

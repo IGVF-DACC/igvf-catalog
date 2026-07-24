@@ -543,22 +543,22 @@ translates to:
     - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # Mouse GENCODE vM36
   source: GENCODE
 
-# Example: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2053GDNI.csv --output-bucket-key variants_proteins/pqtls_IGVFFI2053GDNI.csv.jsonl
+# Example: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2053GDNI.csv --output-bucket-key variants_proteins/pqtls_IGVFFI2053GDNI.csv.jsonl --label variant_protein
 variant to protein association:
   collection: variants_proteins
   pypy3: false
-  command: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/pqtls_{datafile}.jsonl
+  command: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/pqtls_{datafile}.jsonl --label variant_protein
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2053GDNI/@@download/IGVFFI2053GDNI.csv.gz # pQTL_UKB.csv.gz
   source: UKB
 
-# Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
-# python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
+# Example: the adapter extracts the tarball and its nested zip archive
+# python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5943XCOS.tar.gz --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
 # ATTENTION: run "awk '!seen[$0]++' asb_IGVFFI5943XCOS.jsonl > asb_IGVFFI5943XCOS_uniq.jsonl" to remove duplicate lines from sqtls.
 allele specific binding:
   collection: variants_proteins
   pypy3: false
-  command: python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
+  command: python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
   source: ADASTRA allele-specific TF binding calls
@@ -567,13 +567,13 @@ allele specific binding:
 
 # Reloaded in DSERV-810, Rintsen filtered out invalid variants from liftover
 # Examples:
-# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8897VGII.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI8897VGII.jsonl
+# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8897VGII.tsv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI8897VGII.jsonl --label variant_protein
 allele specific binding gvatdb:
   collection: variants_proteins
   pypy3: false
-  command: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI8897VGII.jsonl
+  command: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI8897VGII.jsonl --label variant_protein
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9899BBBF/@@download/IGVFFI8897VGII.csv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8897VGII/@@download/IGVFFI8897VGII.tsv.gz
   source: GVATdb allele-specific TF binding calls
   label: allele-specific binding
   method: GVATdb
@@ -1249,6 +1249,33 @@ genomic element to gene IGVF CRISPR E2G:
   source: IGVF
   label: str # element effect on gene expression of {readout_gene}
 
+# Prerequisite: load files_filesets for CRISPR element-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR element phenotype)
+# Portal files must have catalog_collections including genomic_elements and genomic_elements_phenotypes.
+# Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element CRISPR element phenotype:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter crispr_element_phenotype --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
+  source: IGVF
+  type: tested elements
+  source_annotation: enhancer
+
+# Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element_phenotype --output-bucket-key genomic_elements_phenotypes/crispr_element_phenotype_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element to phenotype CRISPR element phenotype:
+  collection: genomic_elements_phenotypes
+  params:
+    - label
+  command: python3 data_parser.py --adapter crispr_element_phenotype --source-url {source_url} --filepath {datafile} --label genomic_element_phenotype --output-bucket-key genomic_elements_phenotypes/crispr_element_phenotype_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
+  source: IGVF
+  label: regulatory element effect on phenotype
+
 # Prerequisite: load files_filesets for scE2G accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.scE2G)
 # Example: python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI5648GWQX
 # Example: python3 data_parser.py --adapter scE2G --filepath ~/dataset/IGVFFI5648GWQX.tsv.gz --label genomic_element --output-bucket-key genomic_elements/scE2G_genomic_elements_IGVFFI5648GWQX.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1667,23 +1694,23 @@ gaf:
     - https://api.data.igvf.org/reference-files/IGVFFI9807JOKT/@@download/IGVFFI9807JOKT.gaf.gz # mgi.gaf.gz
   source: Gene Ontology
 
-# Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pwm/ --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label motif
+# Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9678CVIS.tar.gz --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label motif
 motif:
   collection: motifs
   params:
     - label
   pypy3: false
-  command: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label {label}
+  command: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label {label}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
   source: HOCOMOCOv11
 
-# Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pwm/ --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label motif_protein_link
+# Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9678CVIS.tar.gz --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label motif_protein_link
 motif to protein:
   collection: motifs_proteins
   params:
     - label
-  command: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label {label}
+  command: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label {label}
   pypy3: false
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
@@ -1715,10 +1742,10 @@ mouse gene to gene interaction:
   source: BioGRID
   molecular_function: ontology_terms/GO_0005515
 
-# Example: pypy3 data_parser.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d/ --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
+# Example: pypy3 data_parser.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI3321YNBP.tar.gz --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
 gene to gene coexpression association:
   collection: genes_genes
-  command: pypy3 data_parser.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
+  command: pypy3 data_parser.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
   pypy3: true
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3321YNBP/@@download/IGVFFI3321YNBP.tar.gz # Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.tar.gz # CoxpresDB
@@ -1734,35 +1761,35 @@ gene to gene interaction:
   source: BioGRID
   molecular_function: ontology_terms/GO_0005515
 
-# Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1890VCZT.txt --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
+# Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6981KOFP.txt --output-bucket-key pathways/pathways_IGVFFI6981KOFP.jsonl
 pathway:
   collection: pathways
   pypy3: false
-  command: python3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
+  command: python3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI6981KOFP.jsonl
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI1890VCZT/@@download/IGVFFI1890VCZT.txt.gz # ReactomePathways_20240603.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6981KOFP/@@download/IGVFFI6981KOFP.txt.gz # ReactomePathways_20260619.txt.gz
   source: Reactome
 
-# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9865XGLF.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI9865XGLF.jsonl --label genes_pathways
+# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7082TATW.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI7082TATW.jsonl --label genes_pathways
 gene to pathway association:
   collection: genes_pathways
   params:
     - label
   pypy3: false
-  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI9865XGLF.jsonl --label genes_pathways
+  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI7082TATW.jsonl --label genes_pathways
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9865XGLF/@@download/IGVFFI9865XGLF.txt.gz # Ensembl2Reactome_All_Levels_20240603.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7082TATW/@@download/IGVFFI7082TATW.txt.gz # Ensembl2Reactome_All_Levels_20260619.txt.gz
   source: Reactome
 
-# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9975LVTN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI9975LVTN.jsonl --label parent_pathway_of
+# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8363VRKN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8363VRKN.jsonl --label parent_pathway_of
 parent pathway of:
   collection: pathways_pathways
   params:
     - label
   pypy3: true
-  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI9975LVTN.jsonl --label parent_pathway_of
+  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8363VRKN.jsonl --label parent_pathway_of
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9975LVTN/@@download/IGVFFI9975LVTN.txt.gz # ReactomePathwaysRelation_20240603.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8363VRKN/@@download/IGVFFI8363VRKN.txt.gz # ReactomePathwaysRelation_20260619.txt.gz
   source: Reactome
 
 # Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath IGVFFI1309WDQG.tsv --output-bucket-key studies/gwas_studies.jsonl --label studies
@@ -1801,28 +1828,40 @@ drug:
     - https://api.data.igvf.org/reference-files/IGVFFI2997DUKO/@@download/IGVFFI2997DUKO.tsv.gz # pharmGKB_chemicals.tsv.gz
   source: pharmGKB
 
-## Example: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pharmGKB/ --output-bucket-key variants_drugs/variants_drugs_pharmGKB.jsonl --label variant_drug
-## Untar datafile and point adapter to folder
+## Example: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8835SMSP.tar.gz --drug-reference-filepath ~/dataset/IGVFFI2997DUKO.tsv --variant-reference-filepath ~/dataset/IGVFFI7955ICXJ.tsv --study-reference-filepath ~/dataset/IGVFFI1149WTCK.tsv --output-bucket-key variants_drugs/variants_drugs_pharmGKB.jsonl --label variant_drug
 variant to drug:
   collection: variants_drugs
   params:
     - label
+    - drug-reference-filepath
+    - variant-reference-filepath
+    - study-reference-filepath
   pypy3: false
-  command: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath {datafolder} --output-bucket-key variants_drugs/variants_drugs_pharmGKB.jsonl --label variant_drug
+  command: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --drug-reference-filepath {drug_datafile} --variant-reference-filepath {variant_datafile} --study-reference-filepath {study_datafile} --output-bucket-key variants_drugs/variants_drugs_pharmGKB.jsonl --label variant_drug
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8835SMSP/@@download/IGVFFI8835SMSP.tar.gz # variantAnnotations.tar.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2997DUKO/@@download/IGVFFI2997DUKO.tsv.gz # pharmGKB_chemicals.tsv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7955ICXJ/@@download/IGVFFI7955ICXJ.tsv.gz # pharmGKB_variants.tsv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1149WTCK/@@download/IGVFFI1149WTCK.tsv.gz # pharmGKB_study_parameters.tsv.gz
   source: pharmGKB
 
-## Example: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pharmGKB/ --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
-## Untar datafile and point adapter to folder
+## Example: python3 data_parser.py --adapter variant_drug_gene --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8835SMSP.tar.gz --drug-reference-filepath ~/dataset/IGVFFI2997DUKO.tsv --variant-reference-filepath ~/dataset/IGVFFI7955ICXJ.tsv --study-reference-filepath ~/dataset/IGVFFI1149WTCK.tsv --gene-reference-filepath ~/dataset/IGVFFI4821BJHQ.tsv --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
 variant drug association to gene:
   collection: variants_drugs_genes
   params:
     - label
+    - drug-reference-filepath
+    - variant-reference-filepath
+    - study-reference-filepath
+    - gene-reference-filepath
   pypy3: false
-  command: python3 data_parser.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath {datafolder} --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
+  command: python3 data_parser.py --adapter variant_drug_gene --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --drug-reference-filepath {drug_datafile} --variant-reference-filepath {variant_datafile} --study-reference-filepath {study_datafile} --gene-reference-filepath {gene_datafile} --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8835SMSP/@@download/IGVFFI8835SMSP.tar.gz # variantAnnotations.tar.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2997DUKO/@@download/IGVFFI2997DUKO.tsv.gz # pharmGKB_chemicals.tsv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7955ICXJ/@@download/IGVFFI7955ICXJ.tsv.gz # pharmGKB_variants.tsv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1149WTCK/@@download/IGVFFI1149WTCK.tsv.gz # pharmGKB_study_parameters.tsv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4821BJHQ/@@download/IGVFFI4821BJHQ.tsv.gz # pharmGKB_genes.tsv.gz
   source: pharmGKB
 
 # Example: python3 data_parser.py --adapter disease_gene --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4540ZCXZ.xml --output-bucket-key diseases_genes/diseases_genes_IGVFFI4540ZCXZ.jsonl
@@ -2114,7 +2153,11 @@ variant cv2f:
     - https://api.data.igvf.org/tabular-files/IGVFFI6811FTJA/@@download/IGVFFI6811FTJA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key variants/variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants
+# ATTENTION: --filepath must be the enumerated mapping file from
+# s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
+# (e.g. mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz), not the portal TSV itself.
+# Portal accession is extracted from the mapping filename for provenance.
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key variants/variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants
 variant Mutpred2:
   collection: variants
   params:
@@ -2122,10 +2165,10 @@ variant Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_mutpred2_{datafile}.jsonl --label variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key coding_variants/coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key coding_variants/coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants
 coding variant Mutpred2:
   collection: coding_variants
   params:
@@ -2133,10 +2176,10 @@ coding variant Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants/coding_variants_mutpred2_{datafile}.jsonl --label coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants_coding_variants
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_mutpred2_IGVFFI6893ZOAA.jsonl --label variants_coding_variants
 variant to coding variant Mutpred2:
   collection: variants_coding_variants
   params:
@@ -2144,10 +2187,10 @@ variant to coding variant Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_mutpred2_{datafile}.jsonl --label variants_coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6893ZOAA.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants_phenotypes
+# Example: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_mutpred2_IGVFFI6893ZOAA.jsonl --label coding_variants_phenotypes
 coding variant to phenotype Mutpred2:
   collection: coding_variants_phenotypes
   params:
@@ -2155,11 +2198,14 @@ coding variant to phenotype Mutpred2:
   pypy3: false
   command: python3 data_parser.py --adapter mutpred2_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_mutpred2_{datafile}.jsonl --label coding_variants_phenotypes
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI6893ZOAA/@@download/IGVFFI6893ZOAA.tsv.gz
   source: IGVF
   threshold: Pr >= 0.25 & Pval < 0.05 on property scores
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key variants/variants_ESM_IGVFFI8105TNNO.jsonl --label variants
+# ATTENTION: --filepath must be the enumerated mapping file from
+# s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
+# (e.g. ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz), not the portal TSV itself.
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key variants/variants_ESM_IGVFFI8105TNNO.jsonl --label variants
 variant ESM:
   collection: variants
   params:
@@ -2167,10 +2213,10 @@ variant ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_ESM_{datafile}.jsonl --label variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key coding_variants/coding_variants_ESM_IGVFFI8105TNNO.jsonl --label coding_variants
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key coding_variants/coding_variants_ESM_IGVFFI8105TNNO.jsonl --label coding_variants
 coding variant ESM:
   collection: coding_variants
   params:
@@ -2178,10 +2224,10 @@ coding variant ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants/coding_variants_ESM_{datafile}.jsonl --label coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_ESM_IGVFFI8105TNNO.jsonl --label variants_coding_variants
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key variants_coding_variants/variants_coding_variants_ESM_IGVFFI8105TNNO.jsonl --label variants_coding_variants
 variant to coding variant ESM:
   collection: variants_coding_variants
   params:
@@ -2189,10 +2235,10 @@ variant to coding variant ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_ESM_{datafile}.jsonl --label variants_coding_variants
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8105TNNO.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_ESM_IGVFFI8105TNNO.jsonl --label coding_variants_phenotypes
+# Example: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_ESM_IGVFFI8105TNNO.jsonl --label coding_variants_phenotypes
 coding variant to phenotype ESM:
   collection: coding_variants_phenotypes
   params:
@@ -2200,6 +2246,6 @@ coding variant to phenotype ESM:
   pypy3: false
   command: python3 data_parser.py --adapter ESM_coding_variant  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_ESM_{datafile}.jsonl --label coding_variants_phenotypes
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
+    - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
   threshold: -0.6931 # only load rows with score < log(0.5)

@@ -1,11 +1,10 @@
-import os
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
-from adapters.helpers import get_gene_map_from_arangodb
+from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
-import requests
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
@@ -14,14 +13,20 @@ import requests
 
 class Coxpresdb(BaseAdapter):
     ALLOWED_LABELS = ['coxpresdb']
-    FILE_ACCESSION = 'IGVFFI3321YNBP'
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
-    def __init__(self, filepath, label='coxpresdb', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label='coxpresdb',
+        writer: Optional[Writer] = None,
+        validate=False,
+        **kwargs
+    ):
         self.source = 'COXPRESdb'
         self.collection_label = 'co-expression'
         self.source_url = 'https://coxpresdb.jp/'
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -32,10 +37,11 @@ class Coxpresdb(BaseAdapter):
         return 'genes_genes'
 
     def parse(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.FILE_ACCESSION).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
 
         gene_map = get_gene_map_from_arangodb('entrez')
         entrez_ensembl_dict = {
@@ -43,12 +49,13 @@ class Coxpresdb(BaseAdapter):
             for entrez, ensembl_ids in gene_map.items()
             if entrez.startswith('ENTREZ:') and ensembl_ids
         }
-        for filename in os.listdir(self.filepath):
-            entrez_id = filename.split('/')[-1]
+        for input_filepath in get_files_from_folder(self.filepath):
+            filename = input_filepath.name
+            entrez_id = filename
             ensembl_ids = entrez_ensembl_dict.get(entrez_id)
             if not ensembl_ids:
                 continue
-            with open(self.filepath + '/' + filename, 'r') as input:
+            with open(input_filepath, 'r') as input:
                 for line in input:
                     (co_entrez_id, score) = line.strip().split()
                     co_ensembl_ids = entrez_ensembl_dict.get(co_entrez_id)
@@ -83,6 +90,7 @@ class Coxpresdb(BaseAdapter):
                                 'class': self.collection_class,
                                 'method': self.method,
                                 'label': self.collection_label,
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                             }
                             if self.validate:
                                 self.validate_doc(_props)
