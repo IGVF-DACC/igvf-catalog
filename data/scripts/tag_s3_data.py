@@ -53,13 +53,13 @@ def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
                         print(
                             f"Tag '{key_name}' already has the value '{append_value}'. No update needed.")
                     else:
-                        tag['Value'] = '-'.join([tag['Value'], append_value])
+                        tag['Value'] = ' '.join([tag['Value'], append_value])
                         print(f"Updated 'version' tag to: {tag['Value']}")
                     version_found = True
                 updated_tags.append(tag)
 
             if not version_found:
-                new_version = append_value.lstrip('-')
+                new_version = append_value.lstrip(' ')
                 updated_tags.append({'Key': 'version', 'Value': new_version})
                 print(f"Added new 'version' tag with value: {new_version}")
 

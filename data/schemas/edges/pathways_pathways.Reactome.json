@@ -60,6 +60,30 @@
       "enum": [
         "Homo sapiens"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the pathway pathway edge, from the associated files_filesets record",
+      "enum": [
+        "biological relationship"
+      ]
+    },
+    "method": {
+      "type": ["string", "null"],
+      "description": "The method of the pathway pathway edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": ["string", "null"],
+      "description": "The label of the pathway pathway edge, from the associated files_filesets record"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the pathway pathway edge",
+      "example": "files_filesets/IGVFFI8363VRKN",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -70,11 +94,15 @@
     "inverse_name",
     "source",
     "source_url",
-    "organism"
+    "organism",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "source, source_url, organism"
+    "return": "source, source_url, organism, class, method, label, files_filesets"
   },
   "db_collection_name": "pathways_pathways"
 }

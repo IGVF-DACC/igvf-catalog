@@ -1,13 +1,12 @@
 import csv
 import json
-import os
 import pickle
 from typing import Optional
-import requests
-import os
+from math import log10
 
+from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # ADASTRA allele-specific binding (ASB) file downloaded from: https://adastra.autosome.org/assets/cltfdata/adastra.cltf.bill_cipher.zip
@@ -27,12 +26,18 @@ class ASB(BaseAdapter):
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
-    def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label='asb',
+        writer: Optional[Writer] = None,
+        validate=False,
+        **kwargs
+    ):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """This adapter creates edges."""
@@ -65,96 +70,114 @@ class ASB(BaseAdapter):
                     cell_ontology_id, cell_gtrd_id, cell_gtrd_name]
 
     def parse(self):
-        file_metadata = requests.get(
-            ASB.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
         self.ensembls = pickle.load(open(ASB.ENSEMBL_MAPPING, 'rb'))
 
         ensembl_unmatched = 0
-        for filename in os.listdir(self.filepath):
+        for input_filepath in get_files_from_folder(self.filepath):
+            filename = input_filepath.name
             # ignore test files
             if filename.endswith('__test.tsv'):
                 continue
-            if '_HUMAN@' in filename:
-                tf_name = filename.split('@')[0]
-                tf_uniprot_id = self.tf_uniprot_id_mapping.get(tf_name)
-                if tf_uniprot_id is None:
-                    self.logger.warning(
-                        f'TF uniprot id unavailable, skipping: {filename}')
-                    continue
+            if '_HUMAN@' not in filename:
+                continue
+            tf_name = filename.split('@')[0]
+            tf_uniprot_id = self.tf_uniprot_id_mapping.get(tf_name)
+            if tf_uniprot_id is None:
+                self.logger.warning(
+                    f'TF uniprot id unavailable, skipping: {filename}')
+                continue
 
-                # skeletal_muscles@myoblasts in filename -> skeletal_muscles_and_myoblasts in table
-                cell_name = '_and_'.join(
-                    filename.replace('.tsv', '').split('@')[1:])
-                try:
-                    cell_ontology_id, cell_gtrd_id, cell_gtrd_name = self.cell_ontology_id_mapping[
-                        cell_name]
-                except KeyError:
-                    self.logger.warning(
-                        f'Cell ontology id unavailable, skipping: {filename}')
-                    continue
+            # skeletal_muscles@myoblasts in filename -> skeletal_muscles_and_myoblasts in table
+            cell_name = '_and_'.join(
+                filename.replace('.tsv', '').split('@')[1:])
+            try:
+                cell_ontology_id, cell_gtrd_id, cell_gtrd_name = self.cell_ontology_id_mapping[
+                    cell_name]
+            except KeyError:
+                self.logger.warning(
+                    f'Cell ontology id unavailable, skipping: {filename}')
+                continue
 
-                with open(self.filepath + '/' + filename, 'r') as asb:
-                    asb_csv = csv.reader(asb, delimiter='\t')
-                    next(asb_csv)
-                    for row in asb_csv:
-                        chr, pos, rsid, ref, alt = row[:5]
-                        # some files have decimal '.0' in position column
-                        pos = int(float(pos))
-                        variant_id = build_variant_id(
-                            chr, pos, ref, alt, 'GRCh38'
-                        )
+            with open(input_filepath, 'r') as asb:
+                asb_csv = csv.reader(asb, delimiter='\t')
+                next(asb_csv)
+                for row in asb_csv:
+                    chr, pos, rsid, ref, alt = row[:5]
+                    # some files have decimal '.0' in position column
+                    pos = int(float(pos))
+                    variant_id = build_variant_id(
+                        chr, pos, ref, alt, 'GRCh38'
+                    )
 
-                        ensembl_ids = self.ensembls.get(
-                            tf_uniprot_id) or self.ensembls.get(tf_uniprot_id.split('-')[0])
-                        if ensembl_ids is None:
-                            ensembl_unmatched += 1
-                            continue
+                    ensembl_ids = self.ensembls.get(
+                        tf_uniprot_id) or self.ensembls.get(tf_uniprot_id.split('-')[0])
+                    if ensembl_ids is None:
+                        ensembl_unmatched += 1
+                        continue
 
-                        for ensembl_id in ensembl_ids:
-                            _key = variant_id + '_' + \
-                                ensembl_id + '_' + \
-                                row[21].replace(' ', '_') + \
-                                '_ADASTRA_' + cell_gtrd_id
+                    for ensembl_id in ensembl_ids:
+                        _key = variant_id + '_' + \
+                            ensembl_id + '_' + \
+                            row[21].replace(' ', '_') + \
+                            '_ADASTRA_' + cell_gtrd_id
 
-                            _from = 'variants/' + variant_id
-                            _to = 'proteins/' + ensembl_id
+                        _from = 'variants/' + variant_id
+                        _to = 'proteins/' + ensembl_id
 
-                            props = {
-                                '_key': _key,
-                                '_from': _from,
-                                '_to': _to,
-                                'chr': chr,
-                                'rsid': rsid,
-                                'motif_fc': row[18],
-                                'motif_pos': row[19],
-                                'motif_orient': row[20],
-                                'motif_conc': row[21],
-                                'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
-                                'es_mean_ref': row[10],
-                                'es_mean_alt': row[11],
-                                'fdrp_bh_ref': row[13],
-                                'fdrp_bh_alt': row[15],
-                                'biological_context': cell_gtrd_name,
-                                'biosample_term': 'ontology_terms/' + cell_ontology_id,
-                                'source': ASB.SOURCE,
-                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
-                                'label': 'allele-specific binding',
-                                'method': self.method,
-                                'class': self.collection_class,
-                                'name': 'modulates binding of',
-                                'inverse_name': 'binding modulated by',
-                                'biological_process': 'ontology_terms/GO_0051101'
-                            }
+                        p_value_adj_ref = float(row[13])  # fdrp_bh_ref
+                        p_value_adj_alt = float(row[15])  # fdrp_bh_alt
+                        neg_log10_pvalue_adj_ref = float('inf')
+                        if p_value_adj_ref > 0:
+                            neg_log10_pvalue_adj_ref = - \
+                                1 * log10(p_value_adj_ref)
 
-                            if self.validate:
-                                self.validate_doc(props)
+                        neg_log10_pvalue_adj_alt = float('inf')
+                        if p_value_adj_alt > 0:
+                            neg_log10_pvalue_adj_alt = - \
+                                1 * log10(p_value_adj_alt)
 
-                            self.writer.write(json.dumps(props))
-                            self.writer.write('\n')
+                        props = {
+                            '_key': _key,
+                            '_from': _from,
+                            '_to': _to,
+                            'chr': chr,
+                            'rsid': rsid,
+                            'motif_fc': row[18],
+                            'motif_pos': row[19],
+                            'motif_orient': row[20],
+                            'motif_conc': row[21],
+                            'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
+                            'es_mean_ref': row[10],
+                            'es_mean_alt': row[11],
+                            'p_value_adj_ref': p_value_adj_ref,
+                            'p_value_adj_alt': p_value_adj_alt,
+                            'neg_log10_pvalue_adj_ref': neg_log10_pvalue_adj_ref,
+                            'neg_log10_pvalue_adj_alt': neg_log10_pvalue_adj_alt,
+                            'biological_context': cell_gtrd_name,
+                            'biosample_term': 'ontology_terms/' + cell_ontology_id,
+                            'source': ASB.SOURCE,
+                            'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                            'label': 'allele-specific binding',
+                            'method': self.method,
+                            'class': self.collection_class,
+                            'files_filesets': 'files_filesets/' + self.file_accession,
+                            'name': 'modulates binding of',
+                            'inverse_name': 'binding modulated by',
+                            'biological_process': 'ontology_terms/GO_0051101'
+                        }
+
+                        if self.validate:
+                            self.validate_doc(props)
+
+                        self.writer.write(json.dumps(props))
+                        self.writer.write('\n')
 
         if ensembl_unmatched != 0:
             self.logger.warning(

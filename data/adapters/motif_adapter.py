@@ -1,7 +1,7 @@
-import os
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
@@ -30,12 +30,20 @@ class Motif(BaseAdapter):
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_motifs.tsv'
 
-    def __init__(self, filepath, label='motif', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label='motif',
+        writer: Optional[Writer] = None,
+        validate=False,
+        **kwargs
+    ):
         self.tf_ids = Motif.TF_ID_MAPPING_PATH
         self.source = Motif.SOURCE
         self.source_url = Motif.SOURCE_URL
 
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -75,14 +83,15 @@ class Motif(BaseAdapter):
                     pdb.set_trace()
 
     def parse(self):
-        for filename in os.listdir(self.filepath):
+        for input_filepath in get_files_from_folder(self.filepath):
+            filename = input_filepath.name
             if filename.endswith('.pwm'):
                 self.logger.info(filename)
                 tf_name = filename.split('.')[0]
                 model_name = filename.replace('.pwm', '')
                 if self.label == 'motif':
                     pwm = []
-                    with open(self.filepath + '/' + filename, 'r') as pwm_file:
+                    with open(input_filepath, 'r') as pwm_file:
                         next(pwm_file)
                         for line in pwm_file:
                             pwm_row = line.strip().split()

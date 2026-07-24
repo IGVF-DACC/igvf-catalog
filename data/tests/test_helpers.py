@@ -398,16 +398,16 @@ def test_get_gene_map_from_arangodb_does_not_override_existing_hgnc():
 def test_get_gene_map_from_arangodb_skips_hgnc_overrides_for_other_fields():
     mock_cursor = MagicMock()
     mock_cursor.__iter__.return_value = iter([
-        {'key': 'ENSG00000000001', 'value': '1234'},
+        {'key': 'ENSG00000000001', 'value': 'ENTREZ:1234'},
     ])
 
     with patch('adapters.helpers.ArangoDB') as MockArangoDB:
         mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
         mock_db.aql.execute.return_value = mock_cursor
 
-        result = get_gene_map_from_arangodb('entrez_id')
+        result = get_gene_map_from_arangodb('entrez')
 
-        assert result == {'1234': ['ENSG00000000001']}
+        assert result == {'ENTREZ:1234': ['ENSG00000000001']}
         assert 'HGNC:32925' not in result
 
 

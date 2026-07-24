@@ -74,15 +74,25 @@
           "description": "The effect size mean for the alternate allele",
           "example": "-1.7019721868875686"
         },
-        "fdrp_bh_ref": {
-          "type": "string",
+        "p_value_adj_ref": {
+          "type": "number",
           "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
-          "example": "0.0171981040581793"
+          "example": 0.0171981040581793
         },
-        "fdrp_bh_alt": {
-          "type": "string",
+        "p_value_adj_alt": {
+          "type": "number",
           "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
-          "example": "1.0"
+          "example": 1.0
+        },
+        "neg_log10_pvalue_adj_ref": {
+          "type": "number",
+          "description": "The negative log10 of the FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
+          "example": 0.0171981040581793
+        },
+        "neg_log10_pvalue_adj_alt": {
+          "type": "number",
+          "description": "The negative log10 of the FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
+          "example": 1.0
         },
         "biological_context": {
           "type": "string",
@@ -134,6 +144,15 @@
           "enum": [
             "ontology_terms/GO_0051101"
           ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the variant to protein edge",
+          "example": "files_filesets/IGVFFI5943XCOS",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
@@ -147,17 +166,18 @@
         "motif",
         "es_mean_ref",
         "es_mean_alt",
-        "fdrp_bh_ref",
-        "fdrp_bh_alt",
+        "neg_log10_pvalue_adj_ref",
+        "neg_log10_pvalue_adj_alt",
         "biological_context",
         "biosample_term",
-        "biological_process"
+        "biological_process",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif, motif_fc, fdrp_bh_ref, fdrp_bh_alt, biological_context, label, biosample_term, source, source_url, method, class"
+    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
   }
 }

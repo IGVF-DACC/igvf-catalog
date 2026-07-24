@@ -60,6 +60,7 @@ const genesGenesRelativeFormat = z.object({
   gene_1: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   gene_2: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   z_score: z.number().optional(),
+  associated_process: z.string().nullish(),
   detection_method: z.string().optional(),
   detection_method_code: z.string().optional(),
   interaction_type: z.array(z.string()).optional(),
@@ -72,7 +73,8 @@ const genesGenesRelativeFormat = z.object({
   class: z.string(),
   source: z.string(),
   source_url: z.string().optional(),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 function validateInput (input: paramsFormatType): void {

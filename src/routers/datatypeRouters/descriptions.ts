@@ -328,6 +328,7 @@ export const descriptions = {
   variants_genes:
     'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, or files_filesets. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -411,6 +412,16 @@ export const descriptions = {
             label: 'query by region',
             items: [
               'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by significance thresholds',
+            items: [
+              'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'posterior_inclusion_probability = gte:0.1',
+              'log2FC = lt:-0.5',
+              'significant = true',
               'method = CRISPR screen'
             ]
           }
@@ -1032,6 +1043,21 @@ export const descriptions = {
   ca_id = CA1522823495,<br> \
   files_fileset = ENCFF705MLV.',
 
+  variants_genomic_elements_genes:
+    'Retrieve genes whose expression is modulated by perturbing genomic elements that overlap a variant.<br> \
+    The query starts from a variant, finds overlapping Perturb-seq genomic elements, then returns element-gene associations.<br> \
+    By default (nearby_genes = true), only nearby genes on the same chromosome as the variant are returned, and the overlapping genomic element must be within 2 Mb of the gene TSS; distance_to_tss is included in the response.<br> \
+    Set nearby_genes = false to return all genes linked to the overlapping elements regardless of chromosome or distance.<br> \
+    At least one variant identifier is required: variant_id, spdi, hgvs, or ca_id.<br> \
+    Example: variant_id = NC_000001.11:109426297:G:C,<br> \
+    spdi = NC_000001.11:109426297:G:C,<br> \
+    nearby_genes = true,<br> \
+    files_fileset = IGVFFI0206LUDV,<br> \
+    biological_context = HCASMC-hTERT,<br> \
+    biosample_term = EFO_0022614.<br> \
+    The limit parameter controls the page size and can not exceed 100.<br> \
+    Pagination is 0-based.',
+
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
@@ -1629,6 +1655,8 @@ export const descriptions = {
 
   grn:
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+    files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
+    crispr_modality accepts knockout, interference, or activation.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -1641,7 +1669,9 @@ export const descriptions = {
             items: [
               'regulator_gene_id = ENSG00000143190',
               'p_value = gte:0.9',
-              'method = CRISPR screen'
+              'method = CRISPR screen',
+              'crispr_modality = interference',
+              'files_fileset = IGVFFI1336XWXJ'
             ]
           },
           {
@@ -1746,6 +1776,31 @@ export const descriptions = {
         ]
       }
     ]),
+
+  genomic_elements_phenotypes:
+    'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
+    At least one of these properties must be defined: region, files_fileset, phenotype_id, or phenotype_name. <br> \
+    Set significant = true to return only significant associations.<br> \
+    Set verbose = true to retrieve full info on the genomic element.<br> \
+    Example: phenotype_id = GO_0016477, <br> \
+    phenotype_name = cell migration, <br> \
+    significant = true, <br> \
+    files_fileset = IGVFFI5135QZCS, <br> \
+    region = chr1:101174581-101175330 (maximum length: 10kb). <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based.',
+
+  phenotypes_genomic_elements:
+    'Retrieve genomic elements associated with phenotypes.<br> \
+    At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
+    Set significant = true to return only significant associations.<br> \
+    Set verbose = true to retrieve full info on the genomic element.<br> \
+    Example: phenotype_id = GO_0016049, <br> \
+    phenotype_name = cell growth, <br> \
+    significant = true, <br> \
+    files_fileset = IGVFFI9584UDAS. <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based.',
 
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
