@@ -4,10 +4,9 @@ import json
 from math import log10
 from typing import Optional
 import os
-import requests
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, build_regulatory_region_id
+from adapters.helpers import build_variant_id, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example row from sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
@@ -26,7 +25,6 @@ class AFGRCAQtl(BaseAdapter):
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
     EDGE_COLLECTION_NAME = 'modulates accessibility of'
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
@@ -48,10 +46,8 @@ class AFGRCAQtl(BaseAdapter):
             return 'variants_genomic_elements'
 
     def parse(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
@@ -75,7 +71,8 @@ class AFGRCAQtl(BaseAdapter):
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'type': 'accessible dna elements',
-                        'method': self.method
+                        'method': self.file_fileset.get('method'),
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                 elif self.label == 'AFGR_caqtl':
@@ -104,8 +101,9 @@ class AFGRCAQtl(BaseAdapter):
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
                         'name': AFGRCAQtl.EDGE_COLLECTION_NAME,
                         'inverse_name': AFGRCAQtl.EDGE_COLLECTION_INVERSR_NAME,
-                        'method': self.method,
-                        'class': self.collection_class
+                        'method': self.file_fileset.get('method'),
+                        'class': self.file_fileset.get('class'),
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                 if self.validate:

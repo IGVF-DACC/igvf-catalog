@@ -6,9 +6,8 @@ import pickle
 from math import log10
 from typing import Optional
 import os
-import requests
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -26,7 +25,6 @@ class AFGRSQtl(BaseAdapter):
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='AFGR_sqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
@@ -44,10 +42,8 @@ class AFGRSQtl(BaseAdapter):
         return 'variants_genes'
 
     def parse(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         self.load_intron_gene_mapping()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
@@ -95,8 +91,8 @@ class AFGRSQtl(BaseAdapter):
                         'neg_log10_pvalue': log_pvalue,
                         'p_value': pvalue,
                         'effect_size': float(row[6]),
-                        'class': self.collection_class,
-                        'method': self.method,
+                        'class': self.file_fileset.get('class'),
+                        'method': self.file_fileset.get('method'),
                         'label': 'spliceQTL',
                         'intron_chr': 'chr' + intron_id.split(':')[0],
                         'intron_start': intron_id.split(':')[1],
@@ -106,7 +102,8 @@ class AFGRSQtl(BaseAdapter):
                         'name': 'modulates splicing of',
                         'inverse_name': 'splicing modulated by',
                         'biological_process': 'ontology_terms/GO_0043484',
-                        'biosample_term': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
+                        'biosample_term': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
                     if self.validate:
                         self.validate_doc(_props)
