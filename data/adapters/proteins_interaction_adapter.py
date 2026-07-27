@@ -8,6 +8,7 @@ import os
 import obonet
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
@@ -19,15 +20,12 @@ class ProteinsInteraction(BaseAdapter):
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
-    ALLOWED_LABELS = ['protein_protein']
-    ACCESSION_HUMAN = 'IGVFFI4317VDGK'
-    ACCESSION_MOUSE = 'IGVFFI1165YVBA'
-    COLLECTION_CLASS = 'observed data'
+    ALLOWED_LABELS = ['protein_protein_human', 'protein_protein_mouse']
 
-    def __init__(self, filepath, label='protein_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
-        file_accession = os.path.basename(filepath).split('.')[0]
-        self.source_url = 'https://data.igvf.org/reference-files/' + file_accession
-        if file_accession == self.ACCESSION_MOUSE:
+    def __init__(self, filepath, label='protein_protein_human', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
+        if label == 'protein_protein_mouse':
             self.organism = 'Mus musculus'
             self.ensembls = pickle.load(
                 open(self.MOUSE_ENSEMBL_MAPPING, 'rb'))
@@ -53,6 +51,10 @@ class ProteinsInteraction(BaseAdapter):
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
     def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.writer.add_tag('portal_accessions', self.file_accession)
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
         ensembl_unmatched = 0
@@ -115,8 +117,9 @@ class ProteinsInteraction(BaseAdapter):
                             'molecular_function': 'ontology_terms/GO_0005515',
                             'method': collection_method,
                             'label': detection_method,
-                            'class': self.COLLECTION_CLASS,
-                            'source_url': self.source_url
+                            'class': self.collection_class,
+                            'source_url': self.source_url,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
                         if self.validate:
                             self.validate_doc(props)
