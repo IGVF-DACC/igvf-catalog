@@ -29,43 +29,15 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "Estimated phenotype effect size (mu/mu_adj or beta)"
+          "description": "Estimated phenotype effect size (mu or mu_adj)"
         },
         "z_score": {
           "type": "number",
           "description": "Phenotype association z-score"
         },
-        "p_value": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "Phenotype association p-value when provided by the source file"
-        },
-        "fdr": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "False discovery rate when provided by the source file"
-        },
-        "neg_log10_pvalue": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "Negative log10 of the phenotype p-value"
-        },
-        "neg_log10_fdr": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "Negative log10 of the FDR"
-        },
         "significant": {
           "type": "boolean",
-          "description": "Whether the variant met the significance threshold for the phenotype. FDR or p-value < 0.05 when available; otherwise whether the 95% CI excludes 0."
+          "description": "Whether the 95% confidence interval for effect size excludes 0."
         },
         "num_guides": {
           "type": [
@@ -138,12 +110,12 @@
         "biological_context": {
           "type": "string",
           "description": "The biological context of the variant to phenotype edge",
-          "example": "Homo sapiens HepG2 cell line"
+          "example": "human HCT116 cell line from donor(s) IGVFDO0384OZRW"
         },
         "biosample_term": {
           "type": "string",
           "description": "The biosample term of the variant to phenotype edge",
-          "example": "ontology_terms/EFO_0001187",
+          "example": "ontology_terms/EFO_0002824",
           "pattern": "^ontology_terms/"
         },
         "treatments_term_ids": {
@@ -168,10 +140,6 @@
         "_key",
         "effect_size",
         "z_score",
-        "p_value",
-        "fdr",
-        "neg_log10_pvalue",
-        "neg_log10_fdr",
         "significant",
         "num_guides",
         "edit_rate_mean",
@@ -186,8 +154,8 @@
     }
   ],
   "accessible_via": {
-    "filter_by_range": "effect_size, z_score, p_value, fdr, neg_log10_pvalue, neg_log10_fdr",
-    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, p_value, fdr, neg_log10_pvalue, neg_log10_fdr, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper"
+    "filter_by_range": "effect_size, z_score",
+    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper"
   },
   "db_collection_name": "variants_phenotypes"
 }

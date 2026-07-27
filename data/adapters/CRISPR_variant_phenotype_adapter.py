@@ -1,7 +1,6 @@
 import csv
 import gzip
 import json
-from math import log10
 from typing import Optional
 from urllib.parse import urljoin
 
@@ -34,8 +33,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'variant effect on phenotype'
     CHUNK_SIZE = 6500
-    SIGNIFICANCE_THRESHOLD = 0.05
-    MAX_LOG10 = 240
 
     # Accession -> phenotype + column layout.
     FILE_CONFIG = {
@@ -125,13 +122,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
             return None
         return int(float(value))
 
-    def _neg_log10(self, value: Optional[float]) -> Optional[float]:
-        if value is None:
-            return None
-        if value == 0:
-            return self.MAX_LOG10
-        return -1 * log10(value)
-
     def _is_variant_row(self, row) -> bool:
         config = self.file_config
         variant_id = row[config['variant_id_col']].strip()
@@ -147,19 +137,10 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
     def _is_significant(self, row) -> bool:
         config = self.file_config
-        fdr = self._optional_float(row, config.get('fdr_col'))
-        if fdr is not None:
-            return fdr < self.SIGNIFICANCE_THRESHOLD
-
-        p_value = self._optional_float(row, config.get('p_value_col'))
-        if p_value is not None:
-            return p_value < self.SIGNIFICANCE_THRESHOLD
-
         ci_lower = self._optional_float(row, config.get('ci_lower_col'))
         ci_upper = self._optional_float(row, config.get('ci_upper_col'))
         if ci_lower is not None and ci_upper is not None:
             return ci_lower > 0 or ci_upper < 0
-
         return False
 
     def parse(self):
@@ -242,13 +223,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
             if spdi not in loaded_variants:
                 continue
             for row in rows:
-                p_value = self._optional_float(row, config.get('p_value_col'))
-                fdr = self._optional_float(row, config.get('fdr_col'))
-                neg_log10_fdr = self._optional_float(
-                    row, config.get('neg_log10_fdr_col'))
-                if neg_log10_fdr is None:
-                    neg_log10_fdr = self._neg_log10(fdr)
-
                 num_guides = self._optional_int(
                     row, config.get('num_guides_col'))
 
@@ -258,10 +232,6 @@ class CRISPRVariantPhenotype(BaseAdapter):
                     '_to': f'ontology_terms/{self.phenotype_term}',
                     'effect_size': float(row[config['effect_size_col']]),
                     'z_score': float(row[config['z_score_col']]),
-                    'p_value': p_value,
-                    'fdr': fdr,
-                    'neg_log10_pvalue': self._neg_log10(p_value),
-                    'neg_log10_fdr': neg_log10_fdr,
                     'significant': self._is_significant(row),
                     'num_guides': num_guides,
                     'edit_rate_mean': self._optional_float(
