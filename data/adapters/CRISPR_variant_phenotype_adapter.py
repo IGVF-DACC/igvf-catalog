@@ -64,13 +64,15 @@ class CRISPRVariantPhenotype(BaseAdapter):
     }
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source_url = source_url.rstrip('/') + '/'
-        self.file_accession = self.source_url.rstrip('/').split('/')[-1]
+        self.file_accession = source_url.rstrip('/').split('/')[-1]
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '
                 f'Expected one of: {", ".join(sorted(self.FILE_CONFIG))}'
             )
+        self.source_url = (
+            f'https://data.igvf.org/tabular-files/{self.file_accession}/'
+        )
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
 

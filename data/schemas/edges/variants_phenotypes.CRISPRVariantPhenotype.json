@@ -95,8 +95,8 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/",
-          "pattern": "^https://api.data.igvf.org/tabular-files/"
+          "example": "https://data.igvf.org/tabular-files/IGVFFI2014OOZP/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",

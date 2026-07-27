@@ -35,8 +35,8 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/",
-          "pattern": "^https://api.data.igvf.org/tabular-files/"
+          "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "type": {
           "enum": [

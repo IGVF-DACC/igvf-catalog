@@ -109,6 +109,7 @@ def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
     first = json.loads(writer.contents[0])
     assert first['files_filesets'] == 'files_filesets/IGVFFI2014OOZP'
     assert first['source'] == 'IGVF'
+    assert first['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI2014OOZP/'
     assert first['spdi'].startswith('NC_')
 
 
