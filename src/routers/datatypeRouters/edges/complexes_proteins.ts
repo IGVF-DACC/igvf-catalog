@@ -27,6 +27,10 @@ const proteinComplexFormat = z.object({
   isoform_id: z.string().nullish(),
   number_of_paralogs: z.number().nullish(),
   linked_features: z.array(linkedFeatureFormat).nullish(),
+  class: z.string().nullish(),
+  method: z.string().nullable(),
+  label: z.string().nullable(),
+  files_filesets: z.string().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional()
 })

@@ -64,6 +64,33 @@
         "has component",
         "is a function of"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the complex to term edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The method of the complex to term edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The label of the complex to term edge, same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the complex to term edge",
+      "example": "files_filesets/IGVFFI1444TRQL",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -73,7 +100,11 @@
     "source",
     "source_url",
     "name",
-    "inverse_name"
+    "inverse_name",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "db_collection_name": "complexes_terms"

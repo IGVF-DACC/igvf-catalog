@@ -1,7 +1,22 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.ebi_complex_adapter import EBIComplex
 from adapters.writer import SpyWriter
+
+
+FILE_ACCESSION = 'EBI_complex_example'
+
+
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.ebi_complex_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': None
+        }
+        yield mock_get_file_fileset
 
 
 def test_ebi_complex_initialization():
@@ -12,6 +27,7 @@ def test_ebi_complex_initialization():
         assert adapter.filepath == sample_filepath
         assert adapter.label == label
         assert adapter.writer == writer
+        assert adapter.file_accession == FILE_ACCESSION
 
 
 def test_ebi_complex_invalid_label():
@@ -21,7 +37,7 @@ def test_ebi_complex_invalid_label():
         EBIComplex(sample_filepath, label='invalid_label', writer=writer)
 
 
-def test_ebi_complex_process_file():
+def test_ebi_complex_process_file(mock_file_fileset):
     sample_filepath = './samples/EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()
@@ -34,6 +50,10 @@ def test_ebi_complex_process_file():
 
         # Check the structure of the first item
         first_item = json.loads(writer.contents[0])
+        assert first_item['class'] == 'observed data'
+        assert first_item['method'] is None
+        assert first_item['label'] is None
+        assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
         if label == 'complex':
             assert '_key' in first_item
             assert 'name' in first_item

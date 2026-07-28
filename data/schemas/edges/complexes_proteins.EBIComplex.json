@@ -104,6 +104,33 @@
       "enum": [
         "https://www.ebi.ac.uk/complexportal/"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the complex to protein edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The method of the complex to protein edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The label of the complex to protein edge, same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the complex to protein edge",
+      "example": "files_filesets/IGVFFI1444TRQL",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -119,11 +146,15 @@
     "paralogs",
     "linked_features",
     "source",
-    "source_url"
+    "source_url",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "stoichiometry, chain_id, isoform_id, number_of_paralogs, linked_features, source, source_url"
+    "return": "stoichiometry, chain_id, isoform_id, number_of_paralogs, linked_features, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "complexes_proteins"
 }
