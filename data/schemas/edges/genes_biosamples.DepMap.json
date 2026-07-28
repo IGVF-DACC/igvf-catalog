@@ -88,14 +88,17 @@
     },
     "class": {
       "type": "string",
+      "enum": ["observed data"],
       "description": "The class of the gene to biosample edge, from the associated files_filesets record"
     },
     "method": {
       "type": "string",
+      "enum": ["DepMap"],
       "description": "The method of the gene to biosample edge, from the associated files_filesets record"
     },
     "label": {
       "type": "string",
+      "enum": ["DepMap"],
       "description": "The label of the gene to biosample edge; same value as method"
     },
     "files_filesets": {
