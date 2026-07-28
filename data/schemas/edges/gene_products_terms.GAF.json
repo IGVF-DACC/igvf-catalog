@@ -165,6 +165,28 @@
         "contains",
         "is a function of"
       ]
+    },
+    "class": {
+      "type": "string",
+      "enum": ["biological relationship"],
+      "description": "The class of the gene product term edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": ["string", "null"],
+      "description": "The method of the gene product term edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": ["string", "null"],
+      "description": "The label of the gene product term edge; same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the gene product term edge",
+      "example": "files_filesets/IGVFFI1490WZCV",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -192,11 +214,15 @@
     "source",
     "source_url",
     "name",
-    "inverse_name"
+    "inverse_name",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "db, gene_product_id, gene_product_symbol, gene_product_name, gene_product_type, qualifier, go_id, db_reference, evidence, with, aspect, synonyms, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, organism, source, source_url, name, inverse_name"
+    "return": "db, gene_product_id, gene_product_symbol, gene_product_name, gene_product_type, qualifier, go_id, db_reference, evidence, with, aspect, synonyms, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, organism, source, source_url, name, inverse_name, class, method, label, files_filesets"
   },
   "db_collection_name": "gene_products_terms"
 }
