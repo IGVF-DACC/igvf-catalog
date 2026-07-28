@@ -10,7 +10,7 @@ from adapters.writer import Writer
 
 # Element-level CRISPR element-to-phenotype screens (Gersbach lab).
 # IGVFFI5135QZCS – cell migration (GO:0016477); columns use migration/mig suffixes.
-# IGVFFI9584UDAS – cell proliferation/growth (GO:0016049); columns use growth suffixes.
+# IGVFFI9584UDAS – cell population proliferation (GO:0008283); columns use growth suffixes.
 # Coordinates are 0-based, half-open (submitter_comment on both files). Stored as provided.
 
 # Example rows (migration):
@@ -40,7 +40,7 @@ class CRISPRElementPhenotype(BaseAdapter):
             'significant_col': 'mig_significant',
         },
         'IGVFFI9584UDAS': {
-            'phenotype_term': 'GO_0016049',  # cell growth / proliferation
+            'phenotype_term': 'GO_0008283',  # cell population proliferation
             'z_score_col': 'avg_growth_pZ',
             'num_guides_hit_col': 'hit_gRNA_count_growth',
             'num_guides_nonhit_col': 'nonhit_gRNA_count_growth',
@@ -51,13 +51,15 @@ class CRISPRElementPhenotype(BaseAdapter):
     }
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source_url = source_url.rstrip('/') + '/'
-        self.file_accession = self.source_url.rstrip('/').split('/')[-1]
+        self.file_accession = source_url.rstrip('/').split('/')[-1]
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '
                 f'Expected one of: {", ".join(sorted(self.FILE_CONFIG))}'
             )
+        self.source_url = (
+            f'https://data.igvf.org/tabular-files/{self.file_accession}/'
+        )
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
 
@@ -117,6 +119,7 @@ class CRISPRElementPhenotype(BaseAdapter):
         return -1 * log10(p_value)
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         with self._open_file(self.filepath) as f:
             reader = csv.DictReader(f, delimiter='\t')
             if self.label == 'genomic_element':

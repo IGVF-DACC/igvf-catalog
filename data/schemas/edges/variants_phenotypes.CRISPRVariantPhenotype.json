@@ -1,0 +1,161 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_phenotypes.CRISPRVariantPhenotype.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to phenotype edge",
+          "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP"
+        },
+        "_from": {
+          "example": "variants/NC_000001.11:25253603:G:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/NTR_0001118",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "effect_size": {
+          "type": "number",
+          "description": "Estimated phenotype effect size (mu or mu_adj)"
+        },
+        "z_score": {
+          "type": "number",
+          "description": "Phenotype association z-score"
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the 95% confidence interval for effect size excludes 0."
+        },
+        "num_guides": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of guides targeting the variant."
+        },
+        "edit_rate_mean": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Mean editing rate."
+        },
+        "effect_size_ci95_lower": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Lower bound of the 95% confidence interval for effect size."
+        },
+        "effect_size_ci95_upper": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Upper bound of the 95% confidence interval for effect size."
+        },
+        "method": {
+          "enum": [
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": "string",
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            "prime editing"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "variant effect on phenotype"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI2014OOZP/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the variant to phenotype edge",
+          "example": "files_filesets/IGVFFI2014OOZP",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the variant to phenotype edge",
+          "example": "human HCT116 cell line from donor(s) IGVFDO0384OZRW"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the variant to phenotype edge",
+          "example": "ontology_terms/EFO_0002824",
+          "pattern": "^ontology_terms/"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The treatments term ids of the variant to phenotype edge"
+        },
+        "name": {
+          "enum": [
+            "associated with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "effect_size",
+        "z_score",
+        "significant",
+        "num_guides",
+        "edit_rate_mean",
+        "effect_size_ci95_lower",
+        "effect_size_ci95_upper",
+        "files_filesets",
+        "crispr_modality",
+        "biological_context",
+        "biosample_term"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "effect_size, z_score",
+    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper"
+  },
+  "db_collection_name": "variants_phenotypes"
+}

@@ -9,7 +9,7 @@ import { commonHumanEdgeParamsFormat } from '../params'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const PHENOTYPE_NAMES = ['cell growth', 'cell migration'] as const
+const PHENOTYPE_NAMES = ['cell population proliferation', 'cell migration'] as const
 
 const genomicElementsPhenotypesSchema = getSchema('data/schemas/edges/genomic_elements_phenotypes.CRISPRElementPhenotype.json')
 const genomicElementToPhenotypeCollectionName = 'genomic_elements_phenotypes'

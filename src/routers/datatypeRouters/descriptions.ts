@@ -591,7 +591,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   phenotypes_variants:
-    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by phenotypes.<br> \
+    'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by phenotypes.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
@@ -659,11 +659,32 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = NTR_0001118',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2014OOZP',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
       }
     ]),
 
   variants_phenotypes:
-    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by variants.<br> \
+    'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by variants.<br> \
     Filters on phenotype ontology id can be used together.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
@@ -728,6 +749,34 @@ export const descriptions = {
             items: [
               'region = chr1:91418-91424',
               'method = cV2F'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000019.10:11105332:TGC:CGG',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr19:11105000-11106000',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2014OOZP',
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -1798,8 +1847,8 @@ export const descriptions = {
     At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
-    Example: phenotype_id = GO_0016049, <br> \
-    phenotype_name = cell growth, <br> \
+    Example: phenotype_id = GO_0008283, <br> \
+    phenotype_name = cell population proliferation, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI9584UDAS. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
