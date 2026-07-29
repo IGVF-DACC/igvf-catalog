@@ -58,6 +58,26 @@
       "type": "string",
       "description": "The source URL of the genes to mm genes edge",
       "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the genes to mm genes edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The method of the genes to mm genes edge, from the associated files_filesets record"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the genes to mm genes edge",
+      "example": "files_filesets/IGVFFI9177QQPS",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -68,8 +88,14 @@
     "inverse_name",
     "relationship",
     "source",
-    "source_url"
+    "source_url",
+    "class",
+    "method",
+    "files_filesets"
   ],
   "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, inverse_name, relationship, source, source_url, class, method, files_filesets"
+  },
   "db_collection_name": "genes_mm_genes"
 }

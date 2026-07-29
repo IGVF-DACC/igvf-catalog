@@ -1,8 +1,9 @@
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
-from adapters.helpers import get_gene_map_from_arangodb
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 from adapters.writer import Writer
 
 # Sample file:
@@ -16,6 +17,7 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
     ALLOWED_LABELS = ['human_mm_genes_ortholog']
 
     def __init__(self, filepath, label='human_mm_genes_ortholog', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -43,6 +45,11 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
         }
 
     def parse(self):
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         self.gene_mapping = self._entrez_ensembl_map(
             get_gene_map_from_arangodb('entrez')
         )
@@ -113,7 +120,10 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
                             'inverse_name': 'homologous to',
                             'relationship': 'ontology_terms/NCIT_C79968',
                             'source': 'MGI',
-                            'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
+                            'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt',
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
                         if self.validate:
                             self.validate_doc(props)
