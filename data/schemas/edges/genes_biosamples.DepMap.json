@@ -85,6 +85,30 @@
       "enum": [
         "dependent on"
       ]
+    },
+    "class": {
+      "type": "string",
+      "enum": ["observed data"],
+      "description": "The class of the gene to biosample edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": "string",
+      "enum": ["DepMap"],
+      "description": "The method of the gene to biosample edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": "string",
+      "enum": ["DepMap"],
+      "description": "The label of the gene to biosample edge; same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the gene to biosample edge",
+      "example": "files_filesets/IGVFFI8863BMFF",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -100,8 +124,15 @@
     "source_url",
     "source_file",
     "name",
-    "inverse_name"
+    "inverse_name",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
+  "accessible_via": {
+    "return": "biology_context, model_id, model_type, cancer_term, gene_dependency, class, method, label, files_filesets, source, source_url, source_file"
+  },
   "db_collection_name": "genes_biosamples"
 }

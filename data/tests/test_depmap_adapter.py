@@ -20,7 +20,18 @@ def mock_gene_map():
         yield mock_get_gene_map
 
 
-def test_depmap_adapter_process_file():
+@pytest.fixture(autouse=True)
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.depmap_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'observed data',
+            'method': 'DepMap'
+        }
+        yield mock_get
+
+
+def test_depmap_adapter_process_file(mock_file_fileset):
     writer = SpyWriter()
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
@@ -28,8 +39,10 @@ def test_depmap_adapter_process_file():
         writer=writer,
         validate=True
     )
+    adapter.file_accession = 'IGVFFI8863BMFF'
     adapter.process_file()
 
+    mock_file_fileset.assert_called_once_with('IGVFFI8863BMFF')
     assert len(writer.contents) > 1, 'No records were parsed.'
     first_item = json.loads(writer.contents[0])
 
@@ -38,7 +51,8 @@ def test_depmap_adapter_process_file():
         '_key', '_from', '_to', 'biology_context',
         'model_id', 'model_type', 'cancer_term',
         'gene_dependency', 'source', 'source_url',
-        'source_file', 'name', 'inverse_name'
+        'source_file', 'name', 'inverse_name',
+        'class', 'method', 'label', 'files_filesets'
     ]
     for key in expected_keys:
         assert key in first_item, f'Missing key: {key}'
@@ -49,6 +63,10 @@ def test_depmap_adapter_process_file():
     assert first_item['source_file'] == 'CRISPRGeneDependency.csv'
     assert first_item['name'] == 'essential in'
     assert first_item['inverse_name'] == 'dependent on'
+    assert first_item['class'] == 'observed data'
+    assert first_item['method'] == 'DepMap'
+    assert first_item['label'] == first_item['method']
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI8863BMFF'
 
 
 def test_depmap_adapter_initialization():
@@ -59,6 +77,7 @@ def test_depmap_adapter_initialization():
     assert adapter.filepath == './samples/DepMap/CRISPRGeneDependency_transposed_example.csv'
     assert adapter.label == 'depmap'
     assert adapter.writer is None, 'Writer should be None by default.'
+    assert adapter.file_accession == 'CRISPRGeneDependency_transposed_example'
 
 
 def test_depmap_adapter_missing_gene_id_mapping():
@@ -68,6 +87,7 @@ def test_depmap_adapter_missing_gene_id_mapping():
         label='depmap',
         writer=writer
     )
+    adapter.file_accession = 'IGVFFI8863BMFF'
     adapter.process_file()
 
     assert len(
@@ -102,6 +122,7 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
         writer = SpyWriter()
         adapter = DepMap(filepath=temp_file_path,
                          label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
         adapter.process_file()
 
         gene_ids = {json.loads(item)['_from']
@@ -139,6 +160,7 @@ def test_depmap_adapter_synonym_fallback(mocker):
         writer = SpyWriter()
         adapter = DepMap(filepath=temp_file_path,
                          label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
         adapter.process_file()
 
         gene_ids = {json.loads(item)['_from']
@@ -171,6 +193,7 @@ def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
         writer = SpyWriter()
         adapter = DepMap(filepath=temp_file_path,
                          label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
         adapter.process_file()
 
         mock_get_gene_map.assert_called_once_with('name')
@@ -201,6 +224,7 @@ def test_depmap_adapter_gene_id_mapping_override(mocker):
         writer = SpyWriter()
         adapter = DepMap(filepath=temp_file_path,
                          label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
         adapter.process_file()
 
         gene_ids = {json.loads(item)['_from']
@@ -217,6 +241,7 @@ def test_depmap_adapter_dependency_cutoff():
         label='depmap',
         writer=writer
     )
+    adapter.file_accession = 'IGVFFI8863BMFF'
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])

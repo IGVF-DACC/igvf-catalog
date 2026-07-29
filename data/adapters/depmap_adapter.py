@@ -1,10 +1,11 @@
 import csv
 from collections import defaultdict
 import json
+import os
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import get_gene_map_from_arangodb
+from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -42,6 +43,7 @@ class DepMap(BaseAdapter):
 
     def __init__(self, filepath, label='depmap', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -52,6 +54,12 @@ class DepMap(BaseAdapter):
         return 'genes_biosamples'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         self.load_cell_ontology_id_mapping()
         self.load_gene_id_mapping()
 
@@ -107,7 +115,11 @@ class DepMap(BaseAdapter):
                                 'source_url': DepMap.SOURCE_URL,
                                 'source_file': DepMap.SOURCE_FILE,
                                 'name': 'essential in',
-                                'inverse_name': 'dependent on'
+                                'inverse_name': 'dependent on',
+                                'class': self.collection_class,
+                                'method': self.method,
+                                'label': self.method,
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                             }
                             if self.validate:
                                 self.validate_doc(_props)
