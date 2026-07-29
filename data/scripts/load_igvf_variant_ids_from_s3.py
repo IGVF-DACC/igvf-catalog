@@ -32,15 +32,31 @@ values locally de-duplicated within each batch before a single AQL
 query upserts the whole batch at once. This keeps memory flat regardless
 of total volume: only one batch's worth of data is ever held at a time.
 
-PHASE 2 -- GWAS enrichment (runs after phase 1 completes):
-GWAS results live in separate files (typically under
-variants_phenotypes) that are NOT part of MANIFEST -- configure them in
-GWAS_MANIFEST instead. Phase 2 streams those files, keeps records with
-source == "IGVF" and method == "GWAS", and adds a `gwas_results` field
-(list of {_id, phenotype_term, neg_log10_pvalue} objects) to matching
-variants. Critically, phase 2 only UPDATEs variants that already exist
-in the target collection -- it never creates new ones. A variant_id seen
-in a GWAS file but not already loaded by phase 1 is silently skipped.
+PHASE 2+ -- enrichment (each runs after phase 1 completes, in order:
+GWAS, then genes, then proteins):
+
+  GWAS: results live in separate files (typically under
+  variants_phenotypes) that are NOT part of MANIFEST -- configure them
+  in GWAS_MANIFEST instead. Keeps records with source == "IGVF" and
+  method == "GWAS", and adds a `gwas_results` field (list of
+  {_id, phenotype_term, neg_log10_pvalue} objects) to matching variants.
+
+  GENES: results live in separate files (typically under variants_genes)
+  configured in GENES_MANIFEST. Keeps records with source == "IGVF",
+  and adds a `gene_results` field (list of {_id, method, gene_name,
+  p_value, effect_size} objects) to matching variants.
+
+  PROTEINS: results live in separate files (typically under
+  variants_proteins) configured in PROTEINS_MANIFEST. Keeps records
+  with source == "IGVF", and adds a `protein_results` field (list of
+  {_id, method, protein_name, p_value, effect_size} objects) to matching
+  variants. p_value is taken from either a "p_value" or "score" field in
+  the source record, whichever is present.
+
+Critically, every enrichment phase only UPDATEs variants that already
+exist in the target collection -- none of them ever create new ones. A
+variant_id seen in an enrichment file but not already loaded by phase 1
+is silently skipped (and reported in that phase's summary).
 
 Expects S3 layout like:
     s3://igvf-catalog-parsed-collections/variants_biosamples/*.jsonl
@@ -48,7 +64,7 @@ Expects S3 layout like:
     ... etc, one prefix per collection.
 
 Not every file under a prefix need be relevant. Two ways to control
-which files get pulled (applies to both MANIFEST and GWAS_MANIFEST):
+which files get pulled (applies to MANIFEST and all enrichment manifests):
   - --file-pattern: a glob restricting filenames when listing a prefix
     (default: *.jsonl)
   - The manifest dicts themselves (hardcoded near the top of this file):
@@ -56,6 +72,8 @@ which files get pulled (applies to both MANIFEST and GWAS_MANIFEST):
     entirely for those prefixes. Edit directly, e.g.:
         MANIFEST["variants_biosamples"] = ["part-0001.jsonl", "part-0002.jsonl"]
         GWAS_MANIFEST["variants_phenotypes"] = ["gwas-part-0001.jsonl"]
+        GENES_MANIFEST["variants_genes"] = ["genes-part-0001.jsonl"]
+        PROTEINS_MANIFEST["variants_proteins"] = ["proteins-part-0001.jsonl"]
     Any prefix left as an empty list falls back to --file-pattern
     based listing.
 
@@ -397,7 +415,6 @@ MANIFEST = {
     ]
 }
 
-
 # Phase 2 (GWAS enrichment) source files. These are NOT part of MANIFEST
 # above -- they're separate files (typically under variants_phenotypes)
 # containing method == "GWAS" records, processed only after all variants
@@ -406,6 +423,305 @@ MANIFEST = {
 GWAS_MANIFEST = {
     'variants_phenotypes': [
         'variants_phenotypes_gwas_IGVFFI1309WDQG_20260611.jsonl'
+    ],
+}
+
+# Phase 3 (genes enrichment) source files. Separate from MANIFEST, same
+# idea as GWAS_MANIFEST above but sourced from variants_genes files
+# containing {_id, method, gene_name, p_value, effect_size} records.
+GENES_MANIFEST = {
+    'variants_genes': [
+        'variants_genes_afgr_eqtls_IGVFFI8011XYOB_20260609.jsonl',
+        'variants_genes_afgr_sqtls_IGVFFI4560RRRS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0029GGJJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0050HJEC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0182NHRN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0267TSSD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0274HPWD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0298OSRW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0307SQCG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0314GYGG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0334MMPD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0344BJQF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0401PDXY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0417PUDJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0437PHKJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0462CZYX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0521HDPL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0523YPON_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0548HZAE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0566FQKM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0637NPEM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0666LJKQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0710HXIP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0717VHJZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0826KCUO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0839NTGS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0862EKKX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0865ANAN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI0944UKXU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1043CPGQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1111UMAX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1166ZHMA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1207DVBA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1208EEFC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1280KMYQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1285MJRH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1293NABP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1303GKUY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1323CJPT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1399FKEY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1406USNM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1421RDHY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1424ETFG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1431YZYE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1455OZJS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1459QYGW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1560OYLA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1577VPRJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1581TUXD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1621YXCW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1664BOYZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1670GPJF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1674ZMQT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1683UGII_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1688JEFE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1690ZJQB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1814ALPN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1820XIUU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1864LTZS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI1951LMQG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2010CUZI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2044NZEZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2092XZMR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2098UGJK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2134GNXX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2245EHIH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2371UEAY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2498VNLZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2520EPCL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2543NJFG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2552BYSY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2565IOYF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2627IBKW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2648DRQK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2679JRDK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2682NOQW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2683IBTM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2782JTDO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2839UWGA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2858PCRC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2865PTCH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2867MVMH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2897KUMX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2898VRKY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2909SQGR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2951ZOLU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2952PHFO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2960JTMH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI2982ZZZX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3033WNKF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3034ZULB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3100SRLW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3104QKND_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3171GPJW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3194UYMI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3232UKDG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3263RKJQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3280EBLB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3291OWNK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3325FKTM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3328RECE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3347OPJB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3382AWDC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3383BFYN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3444JCEH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3444YSNM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3460ZQOJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3464THUA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3464YYSX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3499GPMY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3500DWXI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3501NOVI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3526JQWE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3568CRYC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3574JXWH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3624EMSN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3693WSFI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3704XREZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3720RFMR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3803OMLE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI3900NKGD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4022KZPF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4031OIOP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4075LMIS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4078BCFH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4124TCZU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4205AVMY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4230UZNP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4270HJIE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4334HPIZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4378XPCO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4404KHST_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4437JIBE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4484XPYE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4553EVDP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4581NNLC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4637FWQJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4660WFJE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4664YZRX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4710YXBG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4723FGUH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4734UEZV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4811GEFO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4878NZFL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4903QKDP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4921ALFW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI4987DOFO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5005VYRT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5071EFKM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5128OUVI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5138JSKB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5161SBYX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5164YZVF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5174XXYV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5177QKSD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5186XGYM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5233DVLP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5294IPOB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5324YYOT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5377AWFA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5377IGFV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5465HRSB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5465SCUR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5509DZPF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5569NEBL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5575VUQL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5764LYQP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5817NEJF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5891JNPA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5902UHPH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5940HONR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5972BJPD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI5973MXVZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6047XUZY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6071GHDF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6108HJIT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6166ZYTR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6175LMTO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6187AAZW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6203GCNT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6235JUYO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6285GYPH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6288WRZK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6311OHVO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6449RYSS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6659GAWS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6733KVAK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6743ABYJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6779STZM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6794BUOV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6812BYNZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6814IHJC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6866WMPD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6914EGZI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6917RQFC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6943UNEF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI6945LSBR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7019IZDF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7066NQSP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7228JTTC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7343XIIE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7354ASJK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7449PKMJ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7457QKWU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7514YDNZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7518RABB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7586RIDN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7637ZCYI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7659ZULI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7709JSWM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7713FBDK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7733CDBS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7737IPDT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7770EAAN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7833YVLI_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7859SRFM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7911BQRV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7920EKKC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7954DUCN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7974MTYZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI7977FXMM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8001LFLV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8041MXWW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8061HMYK_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8105QCBF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8111XTVB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8114YFWV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8157QQSL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8160QEZD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8190XHES_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8258GKPA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8307PWIU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8393HRRW_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8394XHBL_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8396PPDU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8431OEKU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8525TBYT_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8566AKFC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8659JDKA_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8704JDLF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8782ABDF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8787YLBB_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8800CMST_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8804BMXP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8863BLXY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8943DYYM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8959NDTQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI8975ZIHZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9048EOHO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9129TLKR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9230STMS_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9241CBAF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9276IAGM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9309TGSZ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9331LBWM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9347NPBY_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9350LOJH_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9395WUQG_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9453GVNC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9487HSWR_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9494HDGO_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9528IRQX_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9529XQXM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9584PAKE_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9611HXZD_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9612SIVV_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9641QEGP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9655QWDU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9696SKZF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9706KQLU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9715BWOU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9728HRIF_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9778YAQQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9783NDGQ_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9840ZHYM_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9860ZZUN_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9863OVHU_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9966TCMC_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9979FWFP_20260609.jsonl',
+        'variants_genes_EQTLCatalog_IGVFFI9990RUDG_20260609.jsonl',
+    ],
+}
+
+# Phase 4 (proteins enrichment) source files. Separate from MANIFEST,
+# sourced from variants_proteins files containing {_id, method,
+# protein_name, p_value (or score), effect_size} records.
+PROTEINS_MANIFEST = {
+    'variants_proteins': [
+        'variants_proteins_ADASTRA_IGVFFI5943XCOS_20260723.jsonl',
+        'variants_proteins_GVATdb_IGVFFI8897VGII_20260723.jsonl',
+        'pqtls_ukb_IGVFFI2053GDNI_20260717.jsonl'
     ],
 }
 
@@ -434,20 +750,54 @@ FOR row IN @rows
   IN @@collection
 """
 
-# Phase 2: GWAS enrichment. Only UPDATEs variants that already exist --
-# never creates new ones. DOCUMENT() fetches the current version of each
-# target so we can merge/dedupe gwas_results against it; FILTER existing
-# != null is what guarantees no new documents get created for variant
-# IDs that aren't already in the target collection.
-GWAS_UPDATE_QUERY = """
-FOR row IN @rows
-  LET existing = DOCUMENT(@@collection, row.variant_id)
-  FILTER existing != null
-  UPDATE { _key: row.variant_id }
-  WITH { gwas_results: UNIQUE(APPEND(existing.gwas_results, row.gwas_results)) }
-  IN @@collection
-  OPTIONS { keepNull: false }
-"""
+# Phase configs. Each describes one enrichment pass: which manifest to
+# read from, which field to add/merge on the variant document, how to
+# decide a record is relevant, and how to build the result object for a
+# matching record. All phases share the same "update only if exists,
+# never create" guarantee via make_enrichment_flusher/run_enrichment_phase.
+ENRICHMENT_PHASES = [
+    {
+        'label': 'GWAS',
+        'manifest': GWAS_MANIFEST,
+        'result_field': 'gwas_results',
+        'id_fallback_prefix': 'variants_phenotypes',
+        'record_filter': lambda doc: doc.get(FILTER_FIELD) == FILTER_VALUE and doc.get('method') == 'GWAS',
+        'build_result': lambda doc, result_id: {
+            '_id': result_id,
+            'phenotype_term': doc.get('phenotype_term'),
+            'neg_log10_pvalue': doc.get('neg_log10_pvalue'),
+        },
+    },
+    {
+        'label': 'GENES',
+        'manifest': GENES_MANIFEST,
+        'result_field': 'gene_results',
+        'id_fallback_prefix': 'variants_genes',
+        'record_filter': lambda doc: doc.get(FILTER_FIELD) == FILTER_VALUE,
+        'build_result': lambda doc, result_id: {
+            '_id': result_id,
+            'method': doc.get('method'),
+            'gene': doc.get('_from'),
+            'p_value': doc.get('p_value'),
+            'effect_size': doc.get('effect_size'),
+        },
+    },
+    {
+        'label': 'PROTEINS',
+        'manifest': PROTEINS_MANIFEST,
+        'result_field': 'protein_results',
+        'id_fallback_prefix': 'variants_proteins',
+        'record_filter': lambda doc: doc.get(FILTER_FIELD) == FILTER_VALUE,
+        'build_result': lambda doc, result_id: {
+            '_id': result_id,
+            'method': doc.get('method'),
+            'protein': doc.get('_to'),
+            'p_value': doc.get('p_value'),
+            'score': doc.get('score'),
+            'effect_size': doc.get('effect_size'),
+        },
+    },
+]
 
 
 def load_files_filesets_lookup(db, collection_name='files_filesets'):
@@ -679,42 +1029,80 @@ def process_collection(s3, bucket, prefix, file_pattern, chunk, flush,
         f'  {prefix} done: {scanned:,} scanned, {matched:,} matched in {elapsed:.1f}s')
 
 
-def make_gwas_flusher(db, target_collection, gwas_chunk):
-    """Build a flush function for phase 2 (GWAS enrichment). Sends one
-    AQL query per batch that ONLY updates variants already present in
-    target_collection (via FILTER existing != null) -- never creates new
-    documents -- merging+deduping gwas_results against whatever's
-    already stored."""
+def make_enrichment_flusher(db, target_collection, chunk, result_field):
+    """Build a flush function for an enrichment phase (GWAS, genes,
+    proteins, ...). Sends one AQL query per batch that ONLY updates
+    variants already present in target_collection (via FILTER existing
+    != null) -- never creates new documents -- merging+deduping the
+    given result_field against whatever's already stored. Tracks and
+    reports how many variant_ids in each batch actually matched vs were
+    skipped (not previously loaded), with a sample of skipped IDs, so a
+    silent zero-match situation is debuggable instead of invisible."""
+    update_query = f"""
+    FOR row IN @rows
+      LET existing = DOCUMENT(@@collection, row.variant_id)
+      FILTER existing != null
+      UPDATE {{ _key: row.variant_id }}
+      WITH {{ {result_field}: UNIQUE(APPEND(existing.{result_field}, row.results)) }}
+      IN @@collection
+      OPTIONS {{ keepNull: false }}
+      RETURN NEW._key
+    """
 
     def flush():
-        if not gwas_chunk:
+        if not chunk:
             return
         rows = [
             {
                 'variant_id': variant_id,
-                'gwas_results': sorted(
-                    results.values(), key=lambda r: r.get('_id') or ''
-                ),
+                'results': sorted(results.values(), key=lambda r: r.get('_id') or ''),
             }
-            for variant_id, results in gwas_chunk.items()
+            for variant_id, results in chunk.items()
         ]
-        db.aql.execute(
-            GWAS_UPDATE_QUERY,
+        cursor = db.aql.execute(
+            update_query,
             bind_vars={'rows': rows, '@collection': target_collection},
         )
-        gwas_chunk.clear()
+        # NEW._key for every row that actually matched
+        updated_keys = set(cursor)
+        attempted_keys = {r['variant_id'] for r in rows}
+        skipped_keys = attempted_keys - updated_keys
 
+        flush.total_attempted += len(attempted_keys)
+        flush.total_updated += len(updated_keys)
+
+        print(
+            f'    [{result_field} batch] attempted {len(attempted_keys):,}, '
+            f'matched+updated {len(updated_keys):,}, '
+            f'skipped (no match in target) {len(skipped_keys):,}',
+            flush=True,
+        )
+        if skipped_keys:
+            sample = list(skipped_keys)[:5]
+            print(f'      sample skipped variant_id(s): {sample}', flush=True)
+
+        chunk.clear()
+
+    flush.total_attempted = 0
+    flush.total_updated = 0
     return flush
 
 
-def process_one_gwas_file(s3, bucket, key, gwas_chunk, flush, insert_batch_size,
-                          progress_every=500_000, max_retries=3):
-    """Stream one GWAS-only JSONL file, keep records with method ==
-    'GWAS', and accumulate {_id, phenotype_term, neg_log10_pvalue} results per
-    variant_id into the shared gwas_chunk, keyed by result _id so
+def process_one_enrichment_file(s3, bucket, key, chunk, flush, insert_batch_size,
+                                record_filter, build_result, diagnostics,
+                                id_fallback_prefix, progress_every=500_000,
+                                max_retries=3):
+    """Stream one enrichment-source JSONL file, keep records matching
+    record_filter(doc), and accumulate build_result(doc, result_id)
+    objects per variant_id into the shared chunk, keyed by result _id so
     retries/re-encounters can't create duplicate entries. Flushes (one
     batched AQL UPDATE-if-exists) whenever the chunk reaches
-    insert_batch_size distinct variant IDs."""
+    insert_batch_size distinct variant IDs.
+
+    Also records diagnostics (distinct source/method values actually
+    seen, and a sample of extracted variant_ids) regardless of whether
+    they pass the filter, so a zero-match run is debuggable instead of
+    silent."""
     for attempt in range(1, max_retries + 1):
         file_scanned = 0
         file_matched = 0
@@ -742,22 +1130,27 @@ def process_one_gwas_file(s3, bucket, key, gwas_chunk, flush, insert_batch_size,
                         f'    !! skipping unparsable line: {e}', file=sys.stderr)
                     continue
 
-                if doc.get('method') == 'GWAS':
+                # diagnostics: record what's actually in the data,
+                # independent of whether it passes the filter below
+                if len(diagnostics['source_values']) < 20:
+                    diagnostics['source_values'].add(doc.get(FILTER_FIELD))
+                if len(diagnostics['method_values']) < 20:
+                    diagnostics['method_values'].add(doc.get('method'))
+
+                if record_filter(doc):
                     variant_id = strip_id_prefix(doc.get('_from'))
-                    gwas_id = doc.get('_id') or (
-                        f"variants_phenotypes/{doc['_key']}" if doc.get(
+                    result_id = doc.get('_id') or (
+                        f"{id_fallback_prefix}/{doc['_key']}" if doc.get(
                             '_key') else None
                     )
-                    if variant_id and gwas_id:
+                    if variant_id and result_id:
                         file_matched += 1
-                        results = gwas_chunk.setdefault(variant_id, {})
-                        results[gwas_id] = {
-                            '_id': gwas_id,
-                            'phenotype_term': doc.get('phenotype_term'),
-                            'neg_log10_pvalue': doc.get('neg_log10_pvalue'),
-                        }
+                        if len(diagnostics['sample_variant_ids']) < 10:
+                            diagnostics['sample_variant_ids'].add(variant_id)
+                        results = chunk.setdefault(variant_id, {})
+                        results[result_id] = build_result(doc, result_id)
 
-                        if len(gwas_chunk) >= insert_batch_size:
+                        if len(chunk) >= insert_batch_size:
                             flush()
 
             return file_scanned, file_matched  # success
@@ -779,16 +1172,17 @@ def process_one_gwas_file(s3, bucket, key, gwas_chunk, flush, insert_batch_size,
     return 0, 0
 
 
-def process_gwas_collection(s3, bucket, prefix, file_pattern, gwas_chunk, flush,
-                            insert_batch_size, stats, manifest=None):
-    """Stream all matching GWAS-only JSONL files for one prefix,
-    accumulating matched records into the shared gwas_chunk (flushed via
+def process_enrichment_collection(s3, bucket, prefix, file_pattern, chunk, flush,
+                                  insert_batch_size, record_filter, build_result,
+                                  diagnostics, id_fallback_prefix, stats,
+                                  phase_label, manifest=None):
+    """Stream all matching enrichment-source JSONL files for one prefix,
+    accumulating matched records into the shared chunk (flushed via
     batched update-if-exists AQL as it fills up)."""
     keys = list_matching_keys(s3, bucket, prefix, file_pattern, manifest)
-    source_desc = 'hardcoded GWAS_MANIFEST' if manifest and manifest.get(
+    source_desc = f'hardcoded {phase_label}_MANIFEST' if manifest and manifest.get(
         prefix) else f"pattern '{file_pattern}'"
-    print(
-        f'\n[GWAS] {prefix}: {len(keys)} file(s) selected via {source_desc} under s3://{bucket}/{prefix}/')
+    print(f'\n[{phase_label}] {prefix}: {len(keys)} file(s) selected via {source_desc} under s3://{bucket}/{prefix}/')
 
     if not keys:
         return
@@ -799,8 +1193,9 @@ def process_gwas_collection(s3, bucket, prefix, file_pattern, gwas_chunk, flush,
 
     for i, key in enumerate(keys, start=1):
         print(f'  [{i}/{len(keys)}] {key}', flush=True)
-        file_scanned, file_matched = process_one_gwas_file(
-            s3, bucket, key, gwas_chunk, flush, insert_batch_size
+        file_scanned, file_matched = process_one_enrichment_file(
+            s3, bucket, key, chunk, flush, insert_batch_size,
+            record_filter, build_result, diagnostics, id_fallback_prefix,
         )
         scanned += file_scanned
         matched += file_matched
@@ -810,7 +1205,7 @@ def process_gwas_collection(s3, bucket, prefix, file_pattern, gwas_chunk, flush,
     elapsed = time.perf_counter() - start
     stats.append(
         {
-            'collection': f'{prefix} [GWAS]',
+            'collection': f'{prefix} [{phase_label}]',
             'files': len(keys),
             'scanned': scanned,
             'matched': matched,
@@ -818,7 +1213,74 @@ def process_gwas_collection(s3, bucket, prefix, file_pattern, gwas_chunk, flush,
         }
     )
     print(
-        f'  {prefix} [GWAS] done: {scanned:,} scanned, {matched:,} matched in {elapsed:.1f}s')
+        f'  {prefix} [{phase_label}] done: {scanned:,} scanned, {matched:,} matched in {elapsed:.1f}s')
+
+
+def run_enrichment_phase(s3, args, db, phase_config):
+    """Run one full enrichment phase (GWAS, genes, proteins, ...) end to
+    end: stream all files in phase_config['manifest'], accumulate,
+    flush, and print a summary + diagnostics. Never creates new variant
+    documents -- only updates ones already loaded in phase 1."""
+    label = phase_config['label']
+    manifest = phase_config['manifest']
+    result_field = phase_config['result_field']
+    record_filter = phase_config['record_filter']
+    build_result = phase_config['build_result']
+    id_fallback_prefix = phase_config['id_fallback_prefix']
+
+    print(f'\n=== Phase: {label} enrichment ===')
+
+    chunk = {}  # variant_id -> {result_id: {..}}
+    flush = make_enrichment_flusher(
+        db, args.target_collection, chunk, result_field)
+    diagnostics = {
+        'source_values': set(),
+        'method_values': set(),
+        'sample_variant_ids': set(),
+    }
+
+    stats = []
+    start = time.perf_counter()
+    for prefix in manifest:
+        process_enrichment_collection(
+            s3, args.bucket, prefix, args.file_pattern, chunk, flush,
+            args.insert_batch_size, record_filter, build_result, diagnostics,
+            id_fallback_prefix, stats, label, manifest=manifest,
+        )
+    flush()  # final partial batch
+    elapsed = time.perf_counter() - start
+
+    print(f'\nSummary ({label} enrichment):')
+    for s in stats:
+        print(
+            f"  {s['collection']}: {s['files']} file(s), "
+            f"{s['scanned']:,} scanned, {s['matched']:,} matched, "
+            f"{s['elapsed']:.1f}s"
+        )
+    total_matched = sum(s['matched'] for s in stats)
+    print(
+        f'\nTotal {label} records matched (passed filter): {total_matched:,}')
+    print(
+        f'Total distinct variant_ids attempted against target collection: {flush.total_attempted:,}')
+    print(
+        f'Total distinct variant_ids actually updated: {flush.total_updated:,}')
+    print(f'{label} phase wall time: {elapsed:.1f}s')
+
+    print(f'\nDiagnostics ({label}):')
+    print(
+        f"  Distinct '{FILTER_FIELD}' values seen (up to 20 shown): {sorted(diagnostics['source_values'], key=lambda v: (v is None, v))}")
+    print(
+        f"  Distinct 'method' values seen (up to 20 shown): {sorted(diagnostics['method_values'], key=lambda v: (v is None, v))}")
+    print(
+        f"  Sample variant_id(s) extracted from matching records: {sorted(diagnostics['sample_variant_ids'])}")
+    if flush.total_attempted > 0 and flush.total_updated == 0:
+        print(
+            f'  !! ZERO matches against the target collection for {label}. Compare '
+            'the sample variant_id(s) above against the sample existing _key '
+            'values printed before enrichment started -- a formatting '
+            'difference there (case, encoding, extra characters, different ID '
+            'scheme entirely) is the most likely cause.'
+        )
 
 
 def parse_args():
@@ -938,31 +1400,20 @@ def main():
     print(
         f"Document count in '{args.target_collection}' after phase 1: {final_count:,}")
 
-    # Phase 2: GWAS enrichment. Runs strictly after phase 1 finishes, and
-    # only updates variants already loaded above -- never creates new ones.
-    gwas_chunk = {}  # variant_id -> {gwas_result_id: {..}}
-    gwas_flush = make_gwas_flusher(db, args.target_collection, gwas_chunk)
+    # Phases 2+: enrichment (GWAS, genes, proteins). Each runs strictly
+    # after phase 1 finishes, and only updates variants already loaded
+    # above -- never creates new ones.
+    print('\nSample existing _key values in target collection (for format comparison):')
+    sample_cursor = db.aql.execute(
+        f'FOR d IN {args.target_collection} LIMIT 5 RETURN d._key')
+    sample_existing_keys = list(sample_cursor)
+    for k in sample_existing_keys:
+        print(f'  {k!r}')
+    if not sample_existing_keys:
+        print('  (target collection is empty -- enrichment phases will not be able to match anything)')
 
-    gwas_stats = []
-    gwas_start = time.perf_counter()
-    for prefix in GWAS_MANIFEST:
-        process_gwas_collection(
-            s3, args.bucket, prefix, args.file_pattern, gwas_chunk, gwas_flush,
-            args.insert_batch_size, gwas_stats, manifest=GWAS_MANIFEST,
-        )
-    gwas_flush()  # final partial batch
-    gwas_elapsed = time.perf_counter() - gwas_start
-
-    print('\nSummary (phase 2: GWAS enrichment):')
-    for s in gwas_stats:
-        print(
-            f"  {s['collection']}: {s['files']} file(s), "
-            f"{s['scanned']:,} scanned, {s['matched']:,} matched, "
-            f"{s['elapsed']:.1f}s"
-        )
-    total_gwas_matched = sum(s['matched'] for s in gwas_stats)
-    print(f'\nTotal GWAS records matched: {total_gwas_matched:,}')
-    print(f'Phase 2 wall time: {gwas_elapsed:.1f}s')
+    for phase_config in ENRICHMENT_PHASES:
+        run_enrichment_phase(s3, args, db, phase_config)
 
 
 if __name__ == '__main__':
