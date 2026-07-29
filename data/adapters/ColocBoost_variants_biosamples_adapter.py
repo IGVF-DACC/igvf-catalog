@@ -53,8 +53,11 @@ class ColocBoostVariantBiosample(BaseAdapter):
         self.collection_class = file_fileset_obj['class']
 
         with gzip.open(self.filepath, 'rt') as colocboost_tsv:
-            reader = csv.DictReader(
-                self.skip_leading_comment_lines(colocboost_tsv), delimiter='\t')
+            # Some ColocBoost files start with a '# ...' comment line (e.g.
+            # '### VCP threshold 0.1') before the real tab-separated header.
+            # Drop any such lines so csv.DictReader picks up the actual header.
+            lines = (line for line in colocboost_tsv if not line.startswith('#'))
+            reader = csv.DictReader(lines, delimiter='\t')
             rows = self.normalize_rows(list(reader))
             rows = self.merge_duplicate_rows(rows)
 
@@ -67,18 +70,6 @@ class ColocBoostVariantBiosample(BaseAdapter):
                 self.process_edge_chunk(chunk)
 
         self.gene_validator.log()
-
-    @staticmethod
-    def skip_leading_comment_lines(file_obj):
-        """
-        Some ColocBoost files start with a '# ...' comment line (e.g.
-        '### VCP threshold 0.1') before the real tab-separated header.
-        Drop any such lines so csv.DictReader picks up the actual header.
-        """
-        for line in file_obj:
-            if line.startswith('#'):
-                continue
-            yield line
 
     @staticmethod
     def normalize_rows(rows):
@@ -102,6 +93,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
         multiple rows with different, overlapping biosample lists and
         different VCP values. Merge those into a single row: union the
         (UBERONTerm, BiosampleTermName) pairs and take the max VCP.
+        Files are fairly small so we can do this in memory.
 
         Rows with mismatched UBERONTerm/BiosampleTermName lengths are passed
         through unmerged so process_edge_chunk's existing length check still
