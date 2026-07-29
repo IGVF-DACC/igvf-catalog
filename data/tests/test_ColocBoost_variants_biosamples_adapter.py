@@ -122,7 +122,7 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_split_spdi, mock_b
 
     assert len(writer.contents) == 1
     item = json.loads(writer.contents[0])
-    assert item['_key'] == f'{MOCK_VARIANT_ID}_UBERON_0001323_{FILE_ACCESSION}'
+    assert item['_key'] == f'{MOCK_VARIANT_ID}_UBERON_0001323_ENSG00000134245_EFO_0006340_{FILE_ACCESSION}'
     assert item['_from'] == f'variants/{MOCK_VARIANT_ID}'
     assert item['_to'] == 'ontology_terms/UBERON_0001323'
     assert item['biosample_term'] == 'ontology_terms/UBERON_0001323'
@@ -158,10 +158,10 @@ def test_multiple_biosamples_per_row(mock_bulk_check, mock_split_spdi, mock_buil
     assert len(writer.contents) == 2
     items = [json.loads(item) for item in writer.contents]
     by_key = {item['_key']: item for item in items}
-    assert f'{MOCK_VARIANT_ID}_UBERON_0007610_{FILE_ACCESSION}' in by_key
-    assert f'{MOCK_VARIANT_ID}_UBERON_0001323_{FILE_ACCESSION}' in by_key
-    assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0007610_{FILE_ACCESSION}']['biological_context'] == 'tibial artery'
-    assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0001323_{FILE_ACCESSION}']['biological_context'] == 'tibial nerve'
+    assert f'{MOCK_VARIANT_ID}_UBERON_0007610_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}' in by_key
+    assert f'{MOCK_VARIANT_ID}_UBERON_0001323_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}' in by_key
+    assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0007610_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}']['biological_context'] == 'tibial artery'
+    assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0001323_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}']['biological_context'] == 'tibial nerve'
 
 
 @patch('adapters.ColocBoost_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value=set())
