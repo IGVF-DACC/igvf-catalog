@@ -42,6 +42,9 @@ const qtlsSummaryFormat = z.object({
 const variantsGenesQueryFormat = z.object({
   neg_log10_pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
+  posterior_inclusion_probability: z.string().optional(),
+  log2FC: z.string().optional(),
+  significant: z.enum(['true']).optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
   label: z.enum(LABELS).optional(),
@@ -81,7 +84,8 @@ const completeQtlsFormat = z.object({
   biosample_term: z.string(),
   study: z.string().or(studyFormat).nullish(),
   name: z.string().nullish(),
-  class: z.string().nullish()
+  class: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
@@ -585,11 +589,8 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
   let useIndex = ''
-  if (!isVariantQuery) {
-    useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
-    if (filesetFilter !== '') {
-      useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
-    }
+  if (!isVariantQuery && filesetFilter !== '') {
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
   }
   // combine variantFilter, edgeFilters, restrictiveFilters and filesetFilter
   const baseFilters = [variantFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean)

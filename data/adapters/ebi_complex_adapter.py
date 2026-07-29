@@ -1,9 +1,11 @@
 import csv
 import json
+import os
 import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
@@ -34,6 +36,7 @@ class EBIComplex(BaseAdapter):
 
     def __init__(self, filepath, label='complex', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -52,6 +55,11 @@ class EBIComplex(BaseAdapter):
             return 'complexes_terms'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
         self.load_subontologies()
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
@@ -106,7 +114,11 @@ class EBIComplex(BaseAdapter):
                         'complex_source': complex_row[17],
                         'reactome_xref': reactome_xref,
                         'source': EBIComplex.SOURCE,
-                        'source_url': EBIComplex.SOURCE_URL
+                        'source_url': EBIComplex.SOURCE_URL,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'label': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
                     if self.validate:
                         self.validate_doc(props)
@@ -167,7 +179,11 @@ class EBIComplex(BaseAdapter):
                                     'paralogs': paralogs,
                                     'linked_features': linked_features,
                                     'source': EBIComplex.SOURCE,
-                                    'source_url': EBIComplex.SOURCE_URL
+                                    'source_url': EBIComplex.SOURCE_URL,
+                                    'class': self.collection_class,
+                                    'method': self.method,
+                                    'label': self.method,
+                                    'files_filesets': 'files_filesets/' + self.file_accession,
                                 }
                                 if self.validate:
                                     self.validate_doc(props)
@@ -190,7 +206,11 @@ class EBIComplex(BaseAdapter):
                             'source': EBIComplex.SOURCE,
                             'source_url': EBIComplex.SOURCE_URL,
                             'name': 'associated with',
-                            'inverse_name': 'associated with'
+                            'inverse_name': 'associated with',
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'label': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession,
                         }
 
                         if self.subontologies.get(_to):
@@ -236,7 +256,11 @@ class EBIComplex(BaseAdapter):
                                     'source': EBIComplex.SOURCE,
                                     'source_url': EBIComplex.SOURCE_URL,
                                     'name': 'associated with',
-                                    'inverse_name': 'associated with'
+                                    'inverse_name': 'associated with',
+                                    'class': self.collection_class,
+                                    'method': self.method,
+                                    'label': self.method,
+                                    'files_filesets': 'files_filesets/' + self.file_accession,
                                 }
 
                                 if self.subontologies.get(_to):

@@ -234,7 +234,8 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000112592',
               'associated_gene_id = ENSG00000163132',
-              'source = BioGRID'
+              'source = BioGRID',
+              'files_fileset = IGVFFI4317VDGK'
             ]
           },
           {
@@ -328,6 +329,7 @@ export const descriptions = {
   variants_genes:
     'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, or files_filesets. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -411,6 +413,16 @@ export const descriptions = {
             label: 'query by region',
             items: [
               'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by significance thresholds',
+            items: [
+              'region = chr16:28930700-28930800 (maximum length: 10kb)',
+              'posterior_inclusion_probability = gte:0.1',
+              'log2FC = lt:-0.5',
+              'significant = true',
               'method = CRISPR screen'
             ]
           }
@@ -579,7 +591,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   phenotypes_variants:
-    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by phenotypes.<br> \
+    'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by phenotypes.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
@@ -647,11 +659,32 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = NTR_0001118',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2014OOZP',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
       }
     ]),
 
   variants_phenotypes:
-    'Retrieve variant-trait pairs from GWAS, SGE, and cV2F by variants.<br> \
+    'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by variants.<br> \
     Filters on phenotype ontology id can be used together.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
@@ -716,6 +749,34 @@ export const descriptions = {
             items: [
               'region = chr1:91418-91424',
               'method = cV2F'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000019.10:11105332:TGC:CGG',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by region',
+            items: [
+              'region = chr19:11105000-11106000',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI2014OOZP',
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -987,7 +1048,8 @@ export const descriptions = {
 
   studies: 'Retrieve studies from GWAS. <br> \
   Example: study_id = GCST007798, <br> \
-  pmid = 30929738. <br> \
+  pmid = 30929738, <br> \
+  files_fileset = IGVFFI1309WDQG. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
@@ -1032,6 +1094,21 @@ export const descriptions = {
   ca_id = CA1522823495,<br> \
   files_fileset = ENCFF705MLV.',
 
+  variants_genomic_elements_genes:
+    'Retrieve genes whose expression is modulated by perturbing genomic elements that overlap a variant.<br> \
+    The query starts from a variant, finds overlapping Perturb-seq genomic elements, then returns element-gene associations.<br> \
+    By default (nearby_genes = true), only nearby genes on the same chromosome as the variant are returned, and the overlapping genomic element must be within 2 Mb of the gene TSS; distance_to_tss is included in the response.<br> \
+    Set nearby_genes = false to return all genes linked to the overlapping elements regardless of chromosome or distance.<br> \
+    At least one variant identifier is required: variant_id, spdi, hgvs, or ca_id.<br> \
+    Example: variant_id = NC_000001.11:109426297:G:C,<br> \
+    spdi = NC_000001.11:109426297:G:C,<br> \
+    nearby_genes = true,<br> \
+    files_fileset = IGVFFI0206LUDV,<br> \
+    biological_context = HCASMC-hTERT,<br> \
+    biosample_term = EFO_0022614.<br> \
+    The limit parameter controls the page size and can not exceed 100.<br> \
+    Pagination is 0-based.',
+
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
@@ -1051,6 +1128,7 @@ export const descriptions = {
   label = affinity chromatography technology, <br> \
   method = physical association, <br> \
   source = BioGRID, <br> \
+  files_fileset = IGVFFI4317VDGK, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 250. <br> \
   Pagination is 0-based.',
@@ -1629,6 +1707,8 @@ export const descriptions = {
 
   grn:
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+    files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
+    crispr_modality accepts knockout, interference, or activation.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -1641,7 +1721,9 @@ export const descriptions = {
             items: [
               'regulator_gene_id = ENSG00000143190',
               'p_value = gte:0.9',
-              'method = CRISPR screen'
+              'method = CRISPR screen',
+              'crispr_modality = interference',
+              'files_fileset = IGVFFI1336XWXJ'
             ]
           },
           {
@@ -1765,8 +1847,8 @@ export const descriptions = {
     At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
-    Example: phenotype_id = GO_0016049, <br> \
-    phenotype_name = cell growth, <br> \
+    Example: phenotype_id = GO_0008283, <br> \
+    phenotype_name = cell population proliferation, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI9584UDAS. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \

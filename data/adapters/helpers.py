@@ -860,10 +860,14 @@ def get_gene_map_from_arangodb(field, collection='genes'):
         gval = record['value']
         if not gval:
             continue
-        if gval not in gene_map:
-            gene_map[gval] = [gkey]
-        else:
-            gene_map[gval].append(gkey)
+        values = gval if isinstance(gval, list) else [gval]
+        for value in values:
+            if not value:
+                continue
+            if value not in gene_map:
+                gene_map[value] = [gkey]
+            else:
+                gene_map[value].append(gkey)
     if field == 'hgnc' and collection == 'genes':
         for hgnc_id, gene_keys in HGNC_GENE_MAP_OVERRIDES.items():
             if hgnc_id not in gene_map:

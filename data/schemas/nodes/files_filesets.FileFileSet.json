@@ -26,6 +26,7 @@
             "alan-boyle",
             "bill-majoros",
             "charles-gersbach",
+            "community",
             "doug-fowler",
             "gary-hon",
             "j-michael-cherry",
@@ -39,6 +40,7 @@
             "mark-craven",
             "nadav-ahituv",
             "predrag-radivojac",
+            "richard-sherwood",
             "thomas-quertermous",
             "tim-reddy",
             "zhiping-weng"
@@ -91,30 +93,49 @@
           }
         },
         "method": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The method of the file set",
           "enum": [
+            "ADASTRA",
             "BlueSTARR",
-            "candidate Cis-Regulatory Elements",
-            "caQTL",
+            "ClinGen",
+            "COXPRESdb",
             "CRISPR screen",
-            "cV2F",
+            "DepMap",
             "DUAL-IPA",
-            "elements",
             "ENCODE-rE2G",
             "ESM-1v",
+            "GenCC",
+            "GVATdb",
+            "GWAS",
+            "HOCOMOCO",
+            "Homology",
             "MPRA",
             "MutPred2",
+            "Orphanet",
             "Perturb-seq",
+            "PharmGKB",
             "SEMVAR",
             "SGE",
             "STARR-seq",
+            "TopLD",
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant-EFFECTS",
+            "cV2F",
+            "caQTL",
+            "candidate Cis-Regulatory Elements",
+            "eQTL",
+            "elements",
+            "pQTL",
             "scATAC-seq",
             "scE2G",
-            "snATAC-seq"
+            "snATAC-seq",
+            "spliceQTL",
+            null
           ]
         },
         "class": {
@@ -141,6 +162,7 @@
               "bigWigAverageOverBed",
               "BIRD",
               "BlueSTARR",
+              "CRISPR BEAN",
               "CRISPR-Millipede",
               "CRISPResso2",
               "Cooler",
@@ -264,11 +286,16 @@
         "source": {
           "enum": [
             "ENCODE",
-            "IGVF"
+            "IGVF",
+            "Community"
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "download_link": {
           "type": "string",
@@ -293,7 +320,10 @@
           ]
         },
         "genome_browser_link": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The genome browser link of the file set",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
@@ -319,6 +349,14 @@
             "prime editing",
             "knockout"
           ]
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The version string of the external data source",
+          "example": "File generated on 2023-10-10"
         }
       },
       "required": [

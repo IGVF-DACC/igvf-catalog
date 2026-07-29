@@ -5,6 +5,7 @@ The current architecture of the IGVF Catalog contains two databases: ArangoDB (a
 Each database is optimized for specific operations that implement use cases of the IGVF Catalog. Both databases are loaded with the same data provided by a list of datasets.
 
 Each dataset is listed in the Data Sources file at `igvf-catalog/data/data_sources.yaml`.
+(additional data from SEMVAR and ENCODE E2G predictions is listed in `igvf-catalog/data/data_sources_SEMpl.yaml` and `igvf-catalog/data/data_sources_e2g_dnaseonly.yaml` because the list of files is too long to include in `igvf-catalog/data/data_sources.yaml`)
 
 The Data Sources file lists all datafile links needed to load a dataset into the Catalog. It also describes how to parse each input file. For example:
 
@@ -52,6 +53,12 @@ All examples are written expecting the storage of each JSON directly into S3. To
 For this example, the output JSONL will be written in the S3 bucket `igvf-catalog-parsed-collections` in the `variants_variants/topld_afr_chr1.jsonl`. Both S3 bucket and S3 key value must be specified. The instance running this script must have permission to write into this particular S3 bucket. The AWS profile can be customized with the `--aws-profile` parameter, for example `--aws-profile igvf-dev`, if necessary.
 
 All JSONLs are grouped by folders representing each collection/table in the databases. Each folder contains all data necessary, which can be loaded into ArangoDB and Clickhouse.
+
+In addition to the file data, metadata fields such as `preferred_assay_titles` and sample info are loaded into the `files_filesets` collection by querying the IGVF/ENCODE portal. To generate this data, run:
+```
+python3 data/scripts/generate_files_filesets.py
+```
+This script is a wrapper for the `file_fileset` adapter. By default it processes all file accessions listed in `data/data_sources/data_sources_file_fileset.yaml`, but specific accessions can be specified via `--accessions`. It was introduced to better standardize `files_filesets` generation at the end of a data loading ticket. The script queries the IGVF/ENCODE portal to generate JSONL outputs for the `files_filesets`, `donors`, and `sample_terms` collections.
 
 ## Loading data into ArangoDB
 
@@ -114,6 +121,50 @@ It will automatically pull files from the `s3://igvf-catalog-parsed-collections`
 
 After loading each JSONL file, the script will delete each file to save space (certain datasets are very large). If you wish to keep the files in your local storage, use the flag `--keep-files`.
 
+## Syncing collections to the IGVF Data Portal
+
+When catalog data files are written to S3 (e.g. `s3://igvf-catalog-parsed-collections`),
+they can be tagged so that the corresponding objects on the IGVF Data Portal are
+automatically kept in sync with the catalog release they belong to. This is handled
+by a standalone service (the collections patcher, `s3-sqs-lambda`) that listens for
+S3 object-tagging events and patches the `collections` property of the referenced
+portal objects.
+
+Two tags on each S3 object drive this:
+
+| Tag key             | Description                                                                   | Example value                               |
+| ------------------- | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| `portal_accessions` | Space-separated portal accession(s) the data file contributes to.            | `IGVFDS3222WCZH IGVFDS7303VUTX`             |
+| `collections`       | Space-separated portal collection(s) / catalog data freeze(s) the object belongs to. | `IGVF_catalog_beta_v0.3 IGVF_catalog_v1.0`  |
+
+The valid `collections` values are defined by the `collections` enum on each portal
+schema (see, for example, the [`analysis_set` profile](https://api.data.igvf.org/profiles/analysis_set/)).
+Note that "collection" is overloaded in the catalog: here it refers to the portal
+`collections` property, which denotes a curated collection or catalog data
+freeze/version (e.g. `IGVF_catalog_beta_v0.3`, `IGVF_catalog_v1.0`), not an ArangoDB
+collection/table. Relevant ArangoDB collection is reflected in portal property `catalog_collections`.
+
+These two tags are applied at different stages of the pipeline:
+
+1. **Parsing.** When an adapter writes a JSONL to S3, it tags the object with
+   `portal_accessions`, recording which portal object(s) the parsed data was derived
+   from.
+2. **Release.** As part of publishing a catalog version, a separate script,
+   [`data/scripts/tag_s3_data.py`](https://github.com/IGVF-DACC/igvf-catalog/blob/dev/data/scripts/tag_s3_data.py),
+   adds the `collections` tag naming the catalog version being released
+   (e.g. `IGVF_catalog_v1.0`).
+
+The collections patcher only acts when **both** tags are present. The
+`portal_accessions` tag written at parse time does nothing on its own; it is the
+addition of the `collections` tag at release time that triggers the patch. For every
+accession listed in `portal_accessions`, the service adds any missing `collections`
+values to that portal object. Existing collections are preserved, and objects that
+already contain all of the tagged collections are left unchanged.
+
+For example, running the release tagging step adds `collections = "IGVF_catalog_v1.0"`
+to objects that already carry `portal_accessions = "IGVFDS3222WCZH IGVFDS7303VUTX"`.
+The service then ensures `IGVF_catalog_v1.0` is present in the `collections` property
+of both `IGVFDS3222WCZH` and `IGVFDS7303VUTX` on the portal.
 
 ## Loading data into ClickhouseDB
 

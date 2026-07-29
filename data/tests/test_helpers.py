@@ -411,19 +411,20 @@ def test_get_gene_map_from_arangodb_skips_hgnc_overrides_for_other_fields():
         assert 'HGNC:32925' not in result
 
 
-def test_get_gene_map_from_arangodb_queries_mouse_collection():
+def test_get_gene_map_from_arangodb_flattens_array_fields():
     mock_cursor = MagicMock()
     mock_cursor.__iter__.return_value = iter([
-        {'key': 'ENSMUSG00000022144', 'value': 'MGI:107430'},
+        {'key': 'ENSG00000000001', 'value': ['FOO', 'BAR']},
+        {'key': 'ENSG00000000002', 'value': ['BAR']},
+        {'key': 'ENSG00000000003', 'value': []},
     ])
 
     with patch('adapters.helpers.ArangoDB') as MockArangoDB:
         mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
         mock_db.aql.execute.return_value = mock_cursor
 
-        result = get_gene_map_from_arangodb('mgi', collection='mm_genes')
+        result = get_gene_map_from_arangodb('synonyms')
 
-        assert result == {'MGI:107430': ['ENSMUSG00000022144']}
-        mock_db.aql.execute.assert_called_once_with(
-            'FOR gene IN mm_genes RETURN { key: gene._key, value: gene.mgi }'
-        )
+        assert result['FOO'] == ['ENSG00000000001']
+        assert result['BAR'] == ['ENSG00000000001', 'ENSG00000000002']
+        assert not any('ENSG00000000003' in ids for ids in result.values())

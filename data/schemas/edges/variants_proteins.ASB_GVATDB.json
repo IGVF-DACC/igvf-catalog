@@ -115,6 +115,15 @@
           "enum": [
             "ontology_terms/GO_0051101"
           ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the variant to protein edge",
+          "example": "files_filesets/IGVFFI8897VGII",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
@@ -129,13 +138,14 @@
         "alt_auc",
         "pbs",
         "neg_log10_pvalue_adj",
-        "biological_process"
+        "biological_process",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
     "name": "variants_proteins",
-    "return": "label, method, class, source, source_url, neg_log10_pvalue_adj, p_value, neg_log10_pvalue"
+    "return": "label, method, class, source, source_url, neg_log10_pvalue_adj, p_value, neg_log10_pvalue, files_filesets"
   }
 }

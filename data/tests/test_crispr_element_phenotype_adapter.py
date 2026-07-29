@@ -40,6 +40,7 @@ def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     assert first_item['source_annotation'] == 'enhancer'
     assert first_item['method'] == 'CRISPR screen'
     assert first_item['source'] == 'IGVF'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI5135QZCS/'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI5135QZCS'
 
 
@@ -87,7 +88,7 @@ def test_crispr_element_phenotype_genomic_element_phenotype_growth(mock_file_fil
 
     assert len(writer.contents) == 5
     first_item = json.loads(writer.contents[0])
-    assert first_item['_to'] == 'ontology_terms/GO_0016049'
+    assert first_item['_to'] == 'ontology_terms/GO_0008283'
     assert first_item['z_score'] == pytest.approx(-0.122645943)
     assert first_item['p_value'] == pytest.approx(0.718493129)
     assert first_item['num_guides_hit'] == 1

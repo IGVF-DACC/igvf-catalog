@@ -33,7 +33,8 @@ const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
   interaction_type: z.enum(INTERACTION_TYPES).optional(),
   label: labels.optional(),
   method: methods.optional(),
-  source: sources.optional()
+  source: sources.optional(),
+  files_fileset: z.string().trim().optional()
 })).merge(commonEdgeParamsFormat)
 
 const proteinsProteinsFormat = z.object({
@@ -53,7 +54,8 @@ const proteinsProteinsFormat = z.object({
   source: z.string(),
   organism: z.string(),
   pmids: z.array(z.string()),
-  name: z.string()
+  name: z.string(),
+  files_filesets: z.string().nullish()
 })
 
 function validateInput (input: paramsFormatType): void {
@@ -86,6 +88,11 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
     const pmidUrl = 'http://pubmed.ncbi.nlm.nih.gov/'
     input.pmids = pmidUrl + (input.pmid as string)
     delete input.pmid
+  }
+
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
   }
 
   const sourceVerboseQuery = `

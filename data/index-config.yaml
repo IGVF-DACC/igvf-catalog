@@ -305,6 +305,7 @@ genomic_elements_genes:
       - _to, _key
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
+      - method, source, _key
 
   inverted:
     fields: biological_context
@@ -421,6 +422,7 @@ variants_genes:
       - method
       - source, files_filesets, method
       - source, class, files_filesets, method
+      - method, _key
   inverted:
     fields: biological_context
     analyzers:

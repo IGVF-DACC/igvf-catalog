@@ -52,14 +52,15 @@ const gwasVariantPhenotypeFormat = z.object({
   lead_ref: z.string().nullable(),
   lead_alt: z.string().nullable(),
   direction: z.string().nullable(),
-  source: z.string().default('OpenTargets'),
+  source: z.literal('OpenTargets'),
   source_url: z.string().nullish(),
   class: z.string().nullish(),
   method: z.string().nullish(),
   label: z.string().nullish(),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string(),
-  variant: z.string().or(variantSimplifiedFormat)
+  variant: z.string().or(variantSimplifiedFormat),
+  files_filesets: z.string().nullish()
 })
 
 const igvfVariantPhenotypeFormat = z.object({
@@ -67,10 +68,22 @@ const igvfVariantPhenotypeFormat = z.object({
   biological_context: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
-  score: z.number().nullable(),
+  score: z.number().nullish(),
+  effect_size: z.number().nullish(),
+  z_score: z.number().nullish(),
+  p_value: z.number().nullish(),
+  neg_log10_pvalue: z.number().nullish(),
+  significant: z.boolean().nullish(),
+  num_guides: z.number().nullish(),
+  edit_rate_mean: z.number().nullish(),
+  effect_size_ci95_lower: z.number().nullish(),
+  effect_size_ci95_upper: z.number().nullish(),
+  crispr_modality: z.string().nullish(),
   method: z.string().nullable(),
   class: z.string().nullish(),
+  label: z.string().nullish(),
   files_filesets: z.string().nullable(),
+  biosample_term: z.string().nullish(),
   phenotype_term: z.string().nullable(),
   variant: z.string().or(variantSimplifiedFormat),
   phenotype_id: z.string().nullable()
@@ -85,6 +98,7 @@ const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
 const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.GWAS.json')
 const variantsPhenotypeNonGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.cV2F.json')
+const variantsPhenotypeCrisprSchema = getSchema('data/schemas/edges/variants_phenotypes.CRISPRVariantPhenotype.json')
 
 function valueValidation (input: paramsFormatType): void {
   if (input.neg_log10_pvalue !== undefined) {
@@ -200,8 +214,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       beta_ci_upper:  record.source == 'OpenTargets' ? record.beta_ci_upper  : null,
       p_val_mantissa: record.source == 'OpenTargets' ? record.p_val_mantissa : null,
       p_val_exponent: record.source == 'OpenTargets' ? record.p_val_exponent : null,
-      p_value:          record.source == 'OpenTargets' ? record.p_value          : null,
-      neg_log10_pvalue:    record.source == 'OpenTargets' ? record.neg_log10_pvalue    : null,
+      p_value: record.source == 'OpenTargets' ? record.p_value : null,
+      neg_log10_pvalue: record.source == 'OpenTargets' ? record.neg_log10_pvalue : null,
       oddsr_ci_lower: record.source == 'OpenTargets' ? record.oddsr_ci_lower : null,
       oddsr_ci_upper: record.source == 'OpenTargets' ? record.oddsr_ci_upper : null,
       study:          record.source == 'OpenTargets' ? ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'} : null,
@@ -210,7 +224,17 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       score:              record.source != 'OpenTargets' ? record.score              : null,
       files_filesets:     record.source != 'OpenTargets' ? record.files_filesets     : null,
       biosample_term:     record.source != 'OpenTargets' ? record.biosample_term     : null,
-      biological_context: record.source != 'OpenTargets' ? record.biological_context : null
+      biological_context: record.source != 'OpenTargets' ? record.biological_context : null,
+
+      // CRISPR variant phenotype specific
+      effect_size:        record.method == 'CRISPR screen' ? record.effect_size        : null,
+      z_score:            record.method == 'CRISPR screen' ? record.z_score            : null,
+      significant:        record.method == 'CRISPR screen' ? record.significant        : null,
+      num_guides:         record.method == 'CRISPR screen' ? record.num_guides         : null,
+      edit_rate_mean:     record.method == 'CRISPR screen' ? record.edit_rate_mean     : null,
+      effect_size_ci95_lower: record.method == 'CRISPR screen' ? record.effect_size_ci95_lower : null,
+      effect_size_ci95_upper: record.method == 'CRISPR screen' ? record.effect_size_ci95_upper : null,
+      crispr_modality:    record.method == 'CRISPR screen' ? record.crispr_modality    : null
     }
   `
 
@@ -283,10 +307,13 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         (record.source == 'OpenTargets' ? {
           study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
           ${getDBReturnStatements(variantPhenotypeGwasSchema)}
+        } : (record.method == 'CRISPR screen' ? {
+          ${getDBReturnStatements(variantsPhenotypeCrisprSchema)},
+          phenotype_term: DOCUMENT(record._to).name
         } : {
           ${getDBReturnStatements(variantsPhenotypeNonGwasSchema)},
           phenotype_term: DOCUMENT(record._to).name
-        })
+        }))
     )
   `
 

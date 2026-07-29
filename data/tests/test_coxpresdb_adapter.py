@@ -1,27 +1,44 @@
 import json
 import os
+import tarfile
 from unittest.mock import patch
+
 import pytest
 
 from adapters.coxpresdb_adapter import Coxpresdb
 from adapters.writer import SpyWriter
 
 
-def mock_get(mock_request):
-    mock_request.return_value.json.return_value = {
-        'catalog_class': 'observed data',
-        'catalog_method': 'COXPRESdb'
-    }
+FILE_ACCESSION = 'IGVFFI3321YNBP'
+SAMPLE_DIR = './samples/coxpresdb/'
+
+
+@pytest.fixture
+def sample_archive(tmp_path):
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(SAMPLE_DIR, arcname='.')
+    return str(archive_filepath)
+
+
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.coxpresdb_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': 'COXPRESdb'
+        }
+        yield mock_get_file_fileset
 
 
 def mock_entrez_gene_map():
     entrez_ids = set()
-    sample_dir = './samples/coxpresdb/'
-    for filename in os.listdir(sample_dir):
+    for filename in os.listdir(SAMPLE_DIR):
         if not filename.isdigit():
             continue
         entrez_ids.add(filename)
-        with open(os.path.join(sample_dir, filename), 'r') as input:
+        with open(os.path.join(SAMPLE_DIR, filename), 'r') as input:
             for line in input:
                 co_entrez_id, score = line.strip().split()
                 if abs(float(score)) >= 3:
@@ -33,15 +50,14 @@ def mock_entrez_gene_map():
 
 
 @patch('adapters.coxpresdb_adapter.get_gene_map_from_arangodb')
-@patch('adapters.coxpresdb_adapter.requests.get')
-def test_coxpresdb_adapter(mock_request, mock_gene_map):
+def test_coxpresdb_adapter(mock_gene_map, mock_file_fileset, sample_archive):
     mock_gene_map.return_value = mock_entrez_gene_map()
-    mock_get(mock_request)
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/',
+    adapter = Coxpresdb(filepath=sample_archive,
                         writer=writer, validate=True)
     adapter.process_file()
 
+    assert adapter.file_accession == FILE_ACCESSION
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
 
@@ -57,15 +73,14 @@ def test_coxpresdb_adapter(mock_request, mock_gene_map):
     assert first_item['class'] == 'observed data'
     assert first_item['method'] == 'COXPRESdb'
     assert first_item['label'] == adapter.collection_label
+    assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
 @patch('adapters.coxpresdb_adapter.get_gene_map_from_arangodb')
-@patch('adapters.coxpresdb_adapter.requests.get')
-def test_coxpresdb_adapter_z_score_filter(mock_request, mock_gene_map):
+def test_coxpresdb_adapter_z_score_filter(mock_gene_map, mock_file_fileset, sample_archive):
     mock_gene_map.return_value = mock_entrez_gene_map()
-    mock_get(mock_request)
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
+    adapter = Coxpresdb(filepath=sample_archive, writer=writer)
     adapter.process_file()
 
     for item in writer.contents:
@@ -75,12 +90,10 @@ def test_coxpresdb_adapter_z_score_filter(mock_request, mock_gene_map):
 
 
 @patch('adapters.coxpresdb_adapter.get_gene_map_from_arangodb')
-@patch('adapters.coxpresdb_adapter.requests.get')
-def test_coxpresdb_adapter_deduplicates_gene_pairs(mock_request, mock_gene_map):
+def test_coxpresdb_adapter_deduplicates_gene_pairs(mock_gene_map, mock_file_fileset, sample_archive):
     mock_gene_map.return_value = mock_entrez_gene_map()
-    mock_get(mock_request)
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
+    adapter = Coxpresdb(filepath=sample_archive, writer=writer)
     adapter.process_file()
 
     edges = [json.loads(item)
@@ -102,16 +115,17 @@ def test_coxpresdb_adapter_deduplicates_gene_pairs(mock_request, mock_gene_map):
 
 
 def test_coxpresdb_adapter_initialization():
-    adapter = Coxpresdb(filepath='foobarbaz')
-    assert adapter.filepath == 'foobarbaz'
+    adapter = Coxpresdb(filepath=f'{FILE_ACCESSION}.tar.gz')
+    assert adapter.filepath == f'{FILE_ACCESSION}.tar.gz'
+    assert adapter.file_accession == FILE_ACCESSION
     assert adapter.label == 'coxpresdb'
     assert adapter.source == 'COXPRESdb'
     assert adapter.source_url == 'https://coxpresdb.jp/'
 
 
-def test_coxpresdb_adapter_validate_doc_invalid():
+def test_coxpresdb_adapter_validate_doc_invalid(sample_archive):
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/',
+    adapter = Coxpresdb(filepath=sample_archive,
                         writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

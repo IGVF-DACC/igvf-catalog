@@ -24,7 +24,6 @@ parser.add_argument('--aws-profile', type=str, default=None,
 parser.add_argument('--version-tag', type=str, default=None,
                     help='The version tag to use, for example "IGVF_catalog_beta_v0.4".')
 
-
 # arguments that are in at least one adapter signature
 parser.add_argument('--gene-alias-file-path', type=str,
                     help='Gene alias file path for GencodeGene.')
@@ -60,7 +59,7 @@ parser.add_argument('--sem_provenance_path', type=str,
 parser.add_argument('--phenotype_term', type=str,
                     help='The phenotype term id for VAMP-seq and MultiSTEP assays.')
 parser.add_argument('--filepath', type=str,
-                    help='The path to the input file.')
+                    help='The path to the input file or archive.')
 parser.add_argument('--reference-filepath', type=str,
                     help='The path to a related reference input file that has reference data for adapting the data file. e.g. MPRA sequence designs')
 parser.add_argument('--reference-source-url', type=str,

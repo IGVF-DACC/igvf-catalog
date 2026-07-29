@@ -1,11 +1,10 @@
 import csv
 import json
-import pickle
-from math import log10
+from math import log10, log2
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
 
@@ -23,7 +22,6 @@ class ENCODE2GCRISPR(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
     SOURCE = 'ENCODE'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
-    GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
     FILE_ACCESSION = 'ENCFF968BZL'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
@@ -84,10 +82,11 @@ class ENCODE2GCRISPR(BaseAdapter):
                 crispr_csv = csv.reader(crispr_file, delimiter='\t')
                 next(crispr_csv)
                 for row in crispr_csv:
-                    gene_id = row[14]
-                    if gene_id == 'NA':  # map the gene id from gene symbol in column 14
-                        gene_id = self.gene_id_mapping.get(row[13])
-                        if gene_id is None:
+                    if row[14] != 'NA':
+                        gene_ids = [row[14]]
+                    else:  # map the gene id from gene symbol in column 14
+                        gene_ids = self.gene_id_mapping.get(row[13])
+                        if gene_ids is None:
                             self.logger.warning(
                                 'no gene id mapping for ' + row[13])
                             continue
@@ -119,36 +118,38 @@ class ENCODE2GCRISPR(BaseAdapter):
                     genomic_element_id = build_regulatory_region_id(
                         chr, start, end, 'CRISPR')
 
-                    _id = genomic_element_id + '_' + gene_id + '_' + self.FILE_ACCESSION
-                    _source = 'genomic_elements/' + genomic_element_id + \
-                        '_' + self.FILE_ACCESSION
-                    _target = 'genes/' + gene_id
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'score': float(score),
-                        'p_value': float(p_value) if p_value != 'NA' else None,
-                        'p_value_adj': float(p_value_adj) if p_value_adj != 'NA' else None,
-                        'neg_log10_pvalue': neglog10pvalue,
-                        'neg_log10_pvalue_adj': neglog10pvalue_adj,
-                        'significant': significant == 'TRUE',
-                        'method': file_fileset.get('method'),
-                        'crispr_modality': file_fileset.get('crispr_modality'),
-                        'class': file_fileset.get('class'),
-                        'label': self.COLLECTION_LABEL,
-                        'source': self.SOURCE,
-                        'source_url': self.SOURCE_URL,
-                        'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
-                        'biological_context': file_fileset.get('simple_sample_summaries')[0],
-                        'biosample_term': file_fileset.get('samples')[0],
-                        'name': 'regulates',
-                        'inverse_name': 'regulated by'
-                    }
-                    if self.validate:
-                        self.validate_doc(_props)
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    for gene_id in gene_ids:
+                        _id = genomic_element_id + '_' + gene_id + '_' + self.FILE_ACCESSION
+                        _source = 'genomic_elements/' + genomic_element_id + \
+                            '_' + self.FILE_ACCESSION
+                        _target = 'genes/' + gene_id
+                        _props = {
+                            '_key': _id,
+                            '_from': _source,
+                            '_to': _target,
+                            'effect_size': float(score),
+                            'log2FC': log2(1 + float(score)),
+                            'p_value': float(p_value) if p_value != 'NA' else None,
+                            'p_value_adj': float(p_value_adj) if p_value_adj != 'NA' else None,
+                            'neg_log10_pvalue': neglog10pvalue,
+                            'neg_log10_pvalue_adj': neglog10pvalue_adj,
+                            'significant': significant == 'TRUE',
+                            'method': file_fileset.get('method'),
+                            'crispr_modality': file_fileset.get('crispr_modality'),
+                            'class': file_fileset.get('class'),
+                            'label': self.COLLECTION_LABEL,
+                            'source': self.SOURCE,
+                            'source_url': self.SOURCE_URL,
+                            'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
+                            'biological_context': file_fileset.get('simple_sample_summaries')[0],
+                            'biosample_term': file_fileset.get('samples')[0],
+                            'name': 'regulates',
+                            'inverse_name': 'regulated by'
+                        }
+                        if self.validate:
+                            self.validate_doc(_props)
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
 
     def load_genomic_element(self):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
@@ -173,7 +174,11 @@ class ENCODE2GCRISPR(BaseAdapter):
                     self.genomic_element_nodes[genomic_element_coordinate] = 'enhancer'
 
     def load_gene_id_mapping(self):
-        # key: gene symbol; value: gene Ensembl id
+        # key: gene symbol; value: list of gene Ensembl ids
         self.gene_id_mapping = {}
-        with open(self.GENE_ID_MAPPING_PATH, 'rb') as mapfile:
-            self.gene_id_mapping = pickle.load(mapfile)
+        gene_map = get_gene_map_from_arangodb('name')
+        for gene_symbol, gene_keys in gene_map.items():
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
+            self.gene_id_mapping[gene_symbol] = gene_keys

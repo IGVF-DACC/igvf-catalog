@@ -1,10 +1,13 @@
-import os
 import json
 import csv
 import re
 from collections import defaultdict
 from typing import Optional
 
+from adapters.archive_utils import (
+    get_file_accession,
+    get_files_from_folder,
+)
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id_from_hgvs
 from adapters.writer import Writer
@@ -93,6 +96,7 @@ class PharmGKB(BaseAdapter):
                     f'Missing required reference file path(s) for label "{self.label}": '
                     f'{", ".join(missing)}'
                 )
+            self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -146,11 +150,12 @@ class PharmGKB(BaseAdapter):
                 self.load_gene_id_mapping()
             # one variant can be in multiple rows, save those converted variant ids to speed up
             variant_hgvs_id_converted = {}
-            for filename in os.listdir(self.filepath):
+            for input_filepath in get_files_from_folder(self.filepath):
+                filename = input_filepath.name
                 if filename.startswith('var_'):
                     self.file_prefix = '_'.join(filename.split('_')[:2])
                     self.logger.info('Loading:' + filename)
-                    with open(self.filepath + '/' + filename, 'r') as variant_drug_file:
+                    with open(input_filepath, 'r') as variant_drug_file:
                         variant_drug_csv = csv.reader(
                             variant_drug_file, delimiter='\t')
                         next(variant_drug_csv)

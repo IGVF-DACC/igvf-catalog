@@ -1,12 +1,20 @@
 import pytest
 import json
+import tarfile
 from adapters.pharmgkb_drug_adapter import PharmGKB
 from adapters.writer import SpyWriter
 
 
+FILE_ACCESSION = 'IGVFFI8835SMSP'
+SAMPLE_DIR = './samples/pharmGKB'
+
+
 @pytest.fixture
-def filepath():
-    return './samples/pharmGKB'
+def filepath(tmp_path):
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(SAMPLE_DIR, arcname='.')
+    return str(archive_filepath)
 
 
 @pytest.fixture
@@ -58,6 +66,7 @@ def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker):
     pharmgkb = PharmGKB(filepath=filepath, label='variant_drug',
                         writer=spy_writer, validate=True, **reference_kwargs)
     assert pharmgkb.label == 'variant_drug'
+    assert pharmgkb.file_accession == FILE_ACCESSION
 
     pharmgkb.process_file()
 

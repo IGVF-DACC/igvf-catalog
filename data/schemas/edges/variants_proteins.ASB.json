@@ -144,6 +144,15 @@
           "enum": [
             "ontology_terms/GO_0051101"
           ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the variant to protein edge",
+          "example": "files_filesets/IGVFFI5943XCOS",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
@@ -161,13 +170,14 @@
         "neg_log10_pvalue_adj_alt",
         "biological_context",
         "biosample_term",
-        "biological_process"
+        "biological_process",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, biological_context, label, biosample_term, source, source_url, method, class"
+    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
   }
 }
