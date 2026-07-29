@@ -190,9 +190,9 @@ class ColocBoostVariantBiosample(BaseAdapter):
                 t.strip() for t in row['BiosampleTermName'].split(';') if t.strip()]
 
             # OntologyTerm column provides per-row phenotype (e.g. EFO_0006340 or EFO:0006340)
-            ontology_term_raw = row.get('OntologyTerm', '').strip()
-            phenotype = ('ontology_terms/' + ontology_term_raw.replace(':',
-                         '_')) if ontology_term_raw else None
+            ontology_term_raw = row['OntologyTerm'].strip()
+            phenotype = 'ontology_terms/' + \
+                ontology_term_raw.replace(':', '_')
 
             if len(uberon_terms) != len(biosample_names):
                 self.logger.warning(
@@ -201,14 +201,12 @@ class ColocBoostVariantBiosample(BaseAdapter):
                 )
                 continue
 
-            gene_ensembl_raw = row.get('GeneEnsembl', '').strip()
-            gene = None
-            if gene_ensembl_raw:
-                if not self.gene_validator.validate(gene_ensembl_raw):
-                    self.logger.warning(
-                        f'Skipping {spdi}: invalid gene ID {gene_ensembl_raw}')
-                    continue
-                gene = 'genes/' + gene_ensembl_raw
+            gene_ensembl_raw = row['GeneEnsembl'].strip()
+            if not self.gene_validator.validate(gene_ensembl_raw):
+                self.logger.warning(
+                    f'Skipping {spdi}: invalid gene ID {gene_ensembl_raw}')
+                continue
+            gene = 'genes/' + gene_ensembl_raw
 
             phenotype_term_id = ontology_term_raw.replace(':', '_')
 
@@ -232,7 +230,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     'phenotype': phenotype,
                     'vcp': float(row['VCP']),
                     'gene': gene,
-                    'trait_name': row.get('TraitName') or None,
+                    'trait_name': row['TraitName'],
                     'label': self.collection_label,
                     'method': self.method,
                     'class': self.collection_class,
