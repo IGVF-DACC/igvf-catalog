@@ -1221,3 +1221,61 @@ def test_crispr_element_gene_igvf_adapter_validate_doc_invalid(mock_file_fileset
     }
     with pytest.raises(ValueError):
         adapter.validate_doc(invalid_doc)
+
+
+def test_igvf_e2g_crispr_surf_constant_readout_and_most_stringent_fdr(
+        mock_file_fileset_facs_screen, tmp_path):
+    """IGVFFI4396TZAN: constant TOX gene; keep lowest FDR per region; no p_value/log2FC."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'crispr_element_gene_igvf_surf.tsv.gz'
+    header = (
+        'FDR\tChr\tStart\tStop\tDirection\tDeconvolved_Signal_Area\t'
+        'Deconvolved_Signal_Mean\tPadj_Mean\tSupporting_sgRNAs\t'
+        'Supporting_sgRNA_Sequences\n'
+    )
+    rows = (
+        '0.05\tchr8\t58762185\t58768425\tpositive\t0.9\t0.003\t0.01\t97\tAAAA\n'
+        '0.01\tchr8\t58762185\t58768425\tpositive\t1.2\t0.006\t0.001\t46\tAAAA,BBBB\n'
+        '0.05\tchr8\t58803705\t58817665\tnegative\t-2.0\t-0.004\t0.02\t100\tCCCC\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI4396TZAN/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 2
+
+    for edge in parsed:
+        assert edge['_to'] == 'genes/ENSG00000198846'
+        assert 'p_value' not in edge
+        assert 'log2FC' not in edge
+        assert 'neg_log10_pvalue' not in edge
+        assert edge['significant'] is True
+
+    stringent = [
+        e for e in parsed
+        if '58762185_58768425' in e['_from']
+    ][0]
+    assert stringent['effect_size'] == pytest.approx(0.006)
+    assert stringent['p_value_adj'] == pytest.approx(0.001)
+    assert stringent['num_guides'] == 46
+    assert stringent['neg_log10_pvalue_adj'] == pytest.approx(
+        -math.log10(0.001))
+
+    other = [
+        e for e in parsed
+        if '58803705_58817665' in e['_from']
+    ][0]
+    assert other['effect_size'] == pytest.approx(-0.004)
+    assert other['num_guides'] == 100
