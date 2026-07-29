@@ -17,7 +17,10 @@ const motifsToProteinsFormat = z.object({
   protein: z.string().or(proteinFormat).optional(),
   complex: z.string().or(complexFormat).optional(),
   motif: z.string().or(motifFormat).optional(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
@@ -77,7 +80,10 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
         motif: record._key,
         'source': record['source'],
         'protein': ${input.verbose === 'true' ? `(${verboseQueryProtein})[0]` : 'record._to'},
-        'name': record.name
+        'name': record.name,
+        'class': record.class,
+        'method': record.method,
+        'files_filesets': record.files_filesets
       }
    )
     LET motifsComplexes = (
@@ -89,7 +95,10 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
           motif: record._key,
           'source': record['source'],
           'complex': ${input.verbose === 'true' ? `(${verboseQueryComplex})[0]` : 'record._to'},
-          'name': record.name
+          'name': record.name,
+          'class': record.class,
+          'method': record.method,
+          'files_filesets': record.files_filesets
         }
     )
     RETURN APPEND(motifsProteins, motifsComplexes)
@@ -127,7 +136,10 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
         'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         'protein': record._to,
         'source': record.source,
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+        'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+        'class': record.class,
+        'method': record.method,
+        'files_filesets': record.files_filesets
       }
       )
       LET complexes = (
@@ -146,7 +158,10 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
           'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
           'complex': record._to,
           'source': record.source,
-          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+          'class': record.class,
+          'method': record.method,
+          'files_filesets': record.files_filesets
         }
       )
       RETURN APPEND(proteinsMotifs, complexesMotifs)
@@ -187,7 +202,10 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
             'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
             'protein': record._to,
             'source': record.source,
-            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+            'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+            'class': record.class,
+            'method': record.method,
+            'files_filesets': record.files_filesets
           }
       )
       LET motifsComplexes = (
@@ -199,7 +217,10 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
             'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
             'complex': record._to,
             'source': record.source,
-            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+            'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+            'class': record.class,
+            'method': record.method,
+            'files_filesets': record.files_filesets
           }
       )
       RETURN APPEND(motifsProteins, motifsComplexes)

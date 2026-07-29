@@ -53,6 +53,26 @@
       "enum": [
         "HOCOMOCOv11"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the motifs to proteins edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The method of the motifs to proteins edge, from the associated files_filesets record"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the motifs to proteins edge",
+      "example": "files_filesets/IGVFFI1444TRQL",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -62,8 +82,14 @@
     "name",
     "inverse_name",
     "biological_process",
-    "source"
+    "source",
+    "class",
+    "method",
+    "files_filesets"
   ],
   "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, inverse_name, biological_process, source, class, method, files_filesets"
+  },
   "db_collection_name": "motifs_proteins"
 }
