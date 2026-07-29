@@ -596,9 +596,11 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             'biosample_term': file_fileset['samples'][0],
             'treatments_term_ids': file_fileset['treatments_term_ids'],
         }
-        edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
-        edge['log2FC'] = metrics['log2FC']
         edge['significant'] = metrics['significant']
+        if 'neg_log10_pvalue' in metrics:
+            edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
+        if 'log2FC' in metrics:
+            edge['log2FC'] = metrics['log2FC']
         for field in CRISPRElementGeneIGVF.OPTIONAL_EDGE_METRIC_FIELDS:
             if field in metrics:
                 edge[field] = metrics[field]
@@ -714,6 +716,16 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         if current_p is None:
             return True
         return candidate_p < current_p
+
+    @staticmethod
+    def _better_crispr_surf_hit(
+        current: Optional[Tuple[dict, float]],
+        candidate_fdr: float,
+    ) -> bool:
+        """Return True when candidate should replace current (lower FDR wins)."""
+        if current is None:
+            return True
+        return candidate_fdr < current[1]
 
     def _resolve_intended_target_from_row(
         self,
@@ -837,9 +849,12 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         layout_name = self.file_config.get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
+        is_crispr_surf = layout_name == 'crispr_surf'
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
+        crispr_surf_best_edges = {}
         seen_element_gene_ids = set()
+        constant_readout_gene = self.file_config.get('readout_gene')
         with gzip.open(self.filepath, 'rt') as data_file:
             reader = csv.reader(
                 data_file, delimiter=self.layout.get('delimiter', '\t'))
@@ -884,10 +899,13 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     uses_name_hg38=uses_name_hg38,
                 )
 
-                read_idx = colmap['readout_gene']
-                if read_idx is None or read_idx >= len(row):
-                    self._row_load_error('missing readout gene column.')
-                readout_gene_raw = row[read_idx]
+                if constant_readout_gene:
+                    readout_gene_raw = constant_readout_gene
+                else:
+                    read_idx = colmap['readout_gene']
+                    if read_idx is None or read_idx >= len(row):
+                        self._row_load_error('missing readout gene column.')
+                    readout_gene_raw = row[read_idx]
 
                 intended_target_name = self._normalize_ensembl_gene_id(
                     intended_target_gene_raw)
@@ -952,6 +970,20 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         current = scaled_screen_best_edges.get(_id)
                         if self._better_scaled_screen_hit(current, _props):
                             scaled_screen_best_edges[_id] = _props
+                    elif is_crispr_surf:
+                        fdr_idx = name_to_idx.get('FDR')
+                        if fdr_idx is None or fdr_idx >= len(row):
+                            self._row_load_error('missing FDR column.')
+                        try:
+                            candidate_fdr = float(row[fdr_idx].strip())
+                        except ValueError as err:
+                            self._row_load_error(
+                                f'FDR is not a float ({row[fdr_idx]!r}): {err}'
+                            )
+                        current = crispr_surf_best_edges.get(_id)
+                        if self._better_crispr_surf_hit(current, candidate_fdr):
+                            crispr_surf_best_edges[_id] = (
+                                _props, candidate_fdr)
                     else:
                         self._check_unique_element_gene(
                             _id, seen_element_gene_ids)
@@ -959,6 +991,12 @@ class CRISPRElementGeneIGVF(BaseAdapter):
 
             if self.label == 'genomic_element_gene' and is_scaled_screen:
                 for _props in scaled_screen_best_edges.values():
+                    self._check_unique_element_gene(
+                        _props['_key'], seen_element_gene_ids)
+                    self._write_doc(_props)
+
+            if self.label == 'genomic_element_gene' and is_crispr_surf:
+                for _props, _fdr in crispr_surf_best_edges.values():
                     self._check_unique_element_gene(
                         _props['_key'], seen_element_gene_ids)
                     self._write_doc(_props)

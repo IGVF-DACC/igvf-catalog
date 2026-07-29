@@ -459,6 +459,36 @@
       "pval-empirical": "Catalog field empirical_p_value. Empirical p-value comparing perturbation hypergeometric p-value to random background draws. Loaded into the database but not returned by the API."
     }
   },
+  "crispr_surf": {
+      "uuid": "4cda54a6-aa53-4d01-9d65-572475111ad1",
+      "title": "CRISPR-SURF File Format Reference",
+      "lab": "charles-gersbach",
+      "columns": {
+        "FDR": "The Benjamini-Hochberg adjusted p-value threshold at which this region was called significant. One of the values supplied via the -padjs argument (defaults: 0.05, 0.01, 0.001, 0.0001). A region that is significant at multiple thresholds appears once per threshold.",
+        "Chr": "Chromosome name (e.g. chr2).",
+        "Start": "0-based, inclusive start coordinate of the significant region (BED-style half-open convention). The region occupies [Start, Stop) on the chromosome.",
+        "Stop": "0-based, exclusive end coordinate of the significant region (BED-style half-open convention). Region length in bp = Stop - Start.",
+        "Direction": "Sign of the deconvolved beta signal within the region. positive — sgRNAs in this region are enriched relative to controls (the targeted element promotes fitness or expression). negative — sgRNAs are depleted (the targeted element suppresses fitness or expression, or the region is essential).",
+        "Deconvolved_Signal_Area": "Area under the deconvolved beta profile across the region, computed as the sum of beta values at each base-pair bin within [Start, Stop). Larger absolute values indicate stronger or wider regulatory activity.",
+        "Deconvolved_Signal_Mean": "Mean deconvolved beta score across all base-pair bins within the region. Provides a normalised measure of effect magnitude that is independent of region width.",
+        "Padj_Mean": "Mean Benjamini-Hochberg adjusted p-value of the per-base beta scores at positions within the region. Lower values indicate higher statistical confidence.",
+        "Supporting_sgRNAs": "Number of sgRNAs (of type observation) whose Perturbation_Index falls within the region or within the characteristic perturbation range of the region boundaries. Higher counts provide greater statistical confidence.",
+        "Supporting_sgRNA_Sequences": "Comma-separated list of spacer sequences for the supporting sgRNAs (in no guaranteed order). The count equals the value in Supporting_sgRNAs."
+      },
+      "semantic_columns": {
+        "element_coordinates": [
+          "Chr",
+          "Start",
+          "Stop"
+        ],
+        "metrics": {
+          "p_value_adj": "Padj_Mean",
+          "effect_size": "Deconvolved_Signal_Mean",
+          "num_guides": "Supporting_sgRNAs"
+        }
+      },
+      "notes": "No readout gene, log2FC, or uncorrected p_value in this layout. Use file-level readout_gene. FDR is used only to keep the most stringent call per region. Stop is BED exclusive end and is used as-is. Deconvolved_Signal_Mean is SURF beta (effect_size), not DESeq2 log2FC."
+  },
   "files": {
     "IGVFFI3069QCRA": {
       "layout": "t_cell",
@@ -611,6 +641,13 @@
         "enhancer"
       ]
     },
+    "IGVFFI7675NPYB": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
     "IGVFFI8719HCYX": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
@@ -736,6 +773,13 @@
       "targeted_element_types": [
         "promoter"
       ]
+    },
+    "IGVFFI4396TZAN": {
+      "layout": "crispr_surf",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "readout_gene": "ENSG00000198846"
     }
   }
 }
