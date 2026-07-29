@@ -182,11 +182,11 @@ export function validateVariantInput (input: paramsFormatType): void {
 }
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'alias', 'method', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'synonym', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, files_fileset'
+      message: 'At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, synonym, method, files_fileset'
     })
   }
 }
@@ -467,14 +467,14 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   const biologicalContext = input.biological_context as string | undefined
   delete input.biological_context
   let geneIDs: string[] = []
-  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const geneInput: paramsFormatType = (({ gene_id, hgnc_id, gene_name: name, alias }) => ({ gene_id, hgnc_id, name, alias, organism: 'Homo sapiens', page: 0 }))(input)
+    const geneInput: paramsFormatType = (({ gene_id, hgnc_id, gene_name: name, synonym }) => ({ gene_id, hgnc_id, name, synonym, organism: 'Homo sapiens', page: 0 }))(input)
     delete input.gene_id
     delete input.hgnc_id
     delete input.gene_name
-    delete input.alias
+    delete input.synonym
     delete input.organism
     const genes = await geneSearch(geneInput)
     geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
