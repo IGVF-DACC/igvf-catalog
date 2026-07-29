@@ -33,16 +33,39 @@
         "source_url": {
           "pattern": "^https://www\\.pharmgkb\\.org/chemical/[A-Z0-9]+$",
           "example": "https://www.pharmgkb.org/chemical/PA166238901"
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the drug, from the associated files_filesets record"
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The method of the drug, from the associated files_filesets record"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the drug",
+          "example": "files_filesets/IGVFFI2997DUKO",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
-        "drug_ontology_terms"
+        "drug_ontology_terms",
+        "class",
+        "method",
+        "files_filesets"
       ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, drug_ontology_terms, source, source_url"
+    "return": "_id, name, drug_ontology_terms, source, source_url, class, method, files_filesets"
   },
   "db_collection_name": "drugs"
 }
