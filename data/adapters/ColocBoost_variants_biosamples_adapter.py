@@ -43,32 +43,109 @@ class ColocBoostVariantBiosample(BaseAdapter):
         return 'variants'
 
     def process_file(self):
-        self.writer.open()
+        with self.writer:
+            self.parse()
+
+    def parse(self):
         file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.method = file_fileset_obj['method']
         self.collection_class = file_fileset_obj['class']
 
         with gzip.open(self.filepath, 'rt') as colocboost_tsv:
-            reader = csv.DictReader(colocboost_tsv, delimiter='\t')
-            chunk_size = 6500
-            chunk = []
-            for i, row in enumerate(reader, 1):
-                chunk.append(row)
-                if i % chunk_size == 0:
-                    if self.label == 'variant':
-                        self.process_variant_chunk(chunk)
-                    elif self.label == 'variant_biosample':
-                        self.process_edge_chunk(chunk)
-                    chunk = []
-            if chunk:
-                if self.label == 'variant':
-                    self.process_variant_chunk(chunk)
-                elif self.label == 'variant_biosample':
-                    self.process_edge_chunk(chunk)
+            reader = csv.DictReader(
+                self.skip_leading_comment_lines(colocboost_tsv), delimiter='\t')
+            rows = self.normalize_rows(list(reader))
+            rows = self.merge_duplicate_rows(rows)
 
-        self.writer.close()
+        chunk_size = 6500
+        for i in range(0, len(rows), chunk_size):
+            chunk = rows[i:i + chunk_size]
+            if self.label == 'variant':
+                self.process_variant_chunk(chunk)
+            elif self.label == 'variant_biosample':
+                self.process_edge_chunk(chunk)
+
         self.gene_validator.log()
+
+    @staticmethod
+    def skip_leading_comment_lines(file_obj):
+        """
+        Some ColocBoost files start with a '# ...' comment line (e.g.
+        '### VCP threshold 0.1') before the real tab-separated header.
+        Drop any such lines so csv.DictReader picks up the actual header.
+        """
+        for line in file_obj:
+            if line.startswith('#'):
+                continue
+            yield line
+
+    @staticmethod
+    def normalize_rows(rows):
+        """
+        All ColocBoost files provide multiple biosamples per row via
+        semicolon-separated 'UBERONTerm'/'BiosampleTermName' columns, except
+        for one file (IGVFFI5870RJQU) which instead provides a single
+        biosample per row via a 'BiosampleTerm' column. Normalize that file
+        so downstream parsing only has to handle one shape.
+        """
+        if not rows or 'UBERONTerm' in rows[0]:
+            return rows
+        for row in rows:
+            row['UBERONTerm'] = row.get('BiosampleTerm', '')
+        return rows
+
+    @staticmethod
+    def merge_duplicate_rows(rows):
+        """
+        Some ColocBoost files repeat the same (variant, gene, trait) across
+        multiple rows with different, overlapping biosample lists and
+        different VCP values. Merge those into a single row: union the
+        (UBERONTerm, BiosampleTermName) pairs and take the max VCP.
+
+        Rows with mismatched UBERONTerm/BiosampleTermName lengths are passed
+        through unmerged so process_edge_chunk's existing length check still
+        catches and skips them.
+        """
+        merged = {}
+        order = []
+        for row in rows:
+            uberon_terms = [t.strip()
+                            for t in row['UBERONTerm'].split(';') if t.strip()]
+            biosample_names = [
+                t.strip() for t in row['BiosampleTermName'].split(';') if t.strip()]
+
+            if len(uberon_terms) != len(biosample_names):
+                order.append(object())
+                merged[order[-1]] = row
+                continue
+
+            key = (row['SPDI_ID'], row['GeneEnsembl'],
+                   row['TraitName'], row['OntologyTerm'])
+            pairs = list(zip(uberon_terms, biosample_names))
+
+            if key not in merged:
+                merged_row = dict(row)
+                merged_row['_pairs'] = list(dict.fromkeys(pairs))
+                merged[key] = merged_row
+                order.append(key)
+            else:
+                merged_row = merged[key]
+                if float(row['VCP']) > float(merged_row['VCP']):
+                    merged_row['VCP'] = row['VCP']
+                for pair in pairs:
+                    if pair not in merged_row['_pairs']:
+                        merged_row['_pairs'].append(pair)
+
+        merged_rows = []
+        for key in order:
+            row = merged[key]
+            pairs = row.pop('_pairs', None)
+            if pairs is not None:
+                row['UBERONTerm'] = ';'.join(p[0] for p in pairs)
+                row['BiosampleTermName'] = ';'.join(p[1] for p in pairs)
+            merged_rows.append(row)
+        return merged_rows
 
     def process_variant_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
@@ -111,7 +188,8 @@ class ColocBoostVariantBiosample(BaseAdapter):
                 continue
 
             chr, pos_start, ref, alt = split_spdi(spdi)
-            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+            variant_id = build_variant_id(
+                chr, pos_start + 1, ref, alt, 'GRCh38')
 
             # UBERONTerm per row; semicolon-separated for multiple biosamples -> multiple edges
             uberon_terms = [t.strip()
@@ -140,15 +218,22 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     continue
                 gene = 'genes/' + gene_ensembl_raw
 
+            phenotype_term_id = ontology_term_raw.replace(':', '_')
+
             for i, uberon_term in enumerate(uberon_terms):
                 biosample_term_id = uberon_term.replace(':', '_')
                 biosample_ref = 'ontology_terms/' + biosample_term_id
                 biological_context = biosample_names[i]
-                edge_key = _id + '_' + biosample_term_id + '_' + self.file_accession
+                # one variant can be associated with multiple genes, and multiple phenotypes in one outlier file (IGVFFI5870RJQU)
+                # so we need to include gene and phenotype in the edge key to avoid duplicate edges
+                edge_key = (
+                    variant_id + '_' + biosample_term_id + '_' + gene_ensembl_raw
+                    + '_' + phenotype_term_id + '_' + self.file_accession
+                )
 
                 edge_props = {
                     '_key': edge_key,
-                    '_from': 'variants/' + _id,
+                    '_from': 'variants/' + variant_id,
                     '_to': biosample_ref,
                     'biosample_term': biosample_ref,
                     'biological_context': biological_context,
