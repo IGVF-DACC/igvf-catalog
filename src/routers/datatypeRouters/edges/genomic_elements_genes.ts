@@ -13,8 +13,8 @@ const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
-const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
-const genomicElementsIGVF2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
+const genomicElementsGenesCrisprElementGeneEncodeSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json')
+const genomicElementsGenesCrisprElementGeneIgvfSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -130,7 +130,7 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
   // edge filters are the same for all methods
-  const filters = getFilterStatements(genomicElementsGenesEncode2GCrisprSchema, input)
+  const filters = getFilterStatements(genomicElementsGenesCrisprElementGeneEncodeSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
@@ -471,7 +471,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilters.neg_log10_pvalue_adj = input.neg_log10_pvalue_adj
   }
   if (Object.keys(pvalueFilters).length > 0) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, pvalueFilters)}`
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsGenesCrisprElementGeneIgvfSchema, pvalueFilters)}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'

@@ -1,7 +1,7 @@
 import json
 import math
 import pytest
-from adapters.igvf_V2G_CRISPR_adapter import IGVFV2GCRISPR
+from adapters.CRISPR_variant_gene_adapter import CRISPRVariantGene
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
@@ -14,7 +14,7 @@ SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI9602ILPC/'
     (-0.940403039, -4.0686174238861454),
 ])
 def test_fractional_effect_size_to_log2_fold_change(effect_size, log2_fold_change):
-    assert IGVFV2GCRISPR._fractional_effect_size_to_log2_fold_change(
+    assert CRISPRVariantGene._fractional_effect_size_to_log2_fold_change(
         effect_size) == pytest.approx(log2_fold_change)
 
 
@@ -24,7 +24,7 @@ def test_fractional_effect_size_to_log2_fold_change(effect_size, log2_fold_chang
     (None, False),
 ])
 def test_variant_effects_significance(neg_log10_pvalue_adj, significant):
-    assert IGVFV2GCRISPR._is_variant_effects_significant(
+    assert CRISPRVariantGene._is_variant_effects_significant(
         neg_log10_pvalue_adj) is significant
 
 
@@ -35,13 +35,13 @@ def test_variant_effects_significance(neg_log10_pvalue_adj, significant):
     (None, False),
 ])
 def test_millipede_significance(pip, significant):
-    assert IGVFV2GCRISPR._is_millipede_significant(pip) is significant
+    assert CRISPRVariantGene._is_millipede_significant(pip) is significant
 
 
 @pytest.fixture
 def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
-    with patch('adapters.igvf_V2G_CRISPR_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.CRISPR_variant_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'Variant-EFFECTS',
             'simple_sample_summaries': ['donor:human'],
@@ -60,10 +60,10 @@ mock_tsv_data = (
 )
 
 
-@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb', return_value=set())
+@patch('adapters.CRISPR_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.CRISPR_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch(
-    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
+    'adapters.CRISPR_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'name': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -84,8 +84,8 @@ mock_tsv_data = (
 )
 def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
-    adapter = IGVFV2GCRISPR(
-        filepath='./samples/igvf_v2g_crispr.example.tsv',
+    adapter = CRISPRVariantGene(
+        filepath='./samples/crispr_variant_gene.example.tsv',
         source_url=SOURCE_URL,
         writer=writer,
         label='variant',
@@ -115,10 +115,10 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
         adapter.validate_doc(invalid_doc)
 
 
-@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
+@patch('adapters.CRISPR_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.CRISPR_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
 @patch(
-    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
+    'adapters.CRISPR_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'name': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -139,8 +139,8 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
 )
 def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
-    adapter = IGVFV2GCRISPR(
-        filepath='./samples/igvf_v2g_crispr.example.tsv',
+    adapter = CRISPRVariantGene(
+        filepath='./samples/crispr_variant_gene.example.tsv',
         source_url=SOURCE_URL,
         writer=writer,
         label='variant_gene',
@@ -171,13 +171,13 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert first_item['significant'] is True
 
 
-@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.CRISPR_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch(
-    'adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb',
+    'adapters.CRISPR_variant_gene_adapter.bulk_check_variants_in_arangodb',
     return_value={'NC_000010.11:79347444::CCTCCTCAGG'},
 )
 @patch(
-    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
+    'adapters.CRISPR_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'name': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -202,8 +202,8 @@ def test_variant_pass_re_emits_when_only_loaded_from_same_fileset(
     """Variants attributed to this fileset are excluded from the loaded check."""
     mock_bulk_check.return_value = set()
     writer = SpyWriter()
-    adapter = IGVFV2GCRISPR(
-        filepath='./samples/igvf_v2g_crispr.example.tsv',
+    adapter = CRISPRVariantGene(
+        filepath='./samples/crispr_variant_gene.example.tsv',
         source_url=SOURCE_URL,
         writer=writer,
         label='variant',
@@ -222,8 +222,8 @@ def test_variant_pass_re_emits_when_only_loaded_from_same_fileset(
 
 def test_invalid_label(mock_file_fileset):
     with pytest.raises(ValueError, match='Invalid label: invalid. Allowed values: variant, variant_gene'):
-        IGVFV2GCRISPR(
-            filepath='./samples/igvf_v2g_crispr.example.tsv',
+        CRISPRVariantGene(
+            filepath='./samples/crispr_variant_gene.example.tsv',
             source_url=SOURCE_URL,
             writer=SpyWriter(),
             label='invalid'
@@ -243,7 +243,7 @@ mock_crispr_millipede_data = (
 
 @pytest.fixture
 def mock_crispr_millipede_file_fileset():
-    with patch('adapters.igvf_V2G_CRISPR_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.CRISPR_variant_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'simple_sample_summaries': ['human NALM-6 cell line'],
@@ -254,10 +254,10 @@ def mock_crispr_millipede_file_fileset():
         yield mock_get_file_fileset
 
 
-@patch('adapters.igvf_V2G_CRISPR_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.igvf_V2G_CRISPR_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000016.10:28930710:G:A'})
+@patch('adapters.CRISPR_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.CRISPR_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000016.10:28930710:G:A'})
 @patch(
-    'adapters.igvf_V2G_CRISPR_adapter.load_variant',
+    'adapters.CRISPR_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000016.10:28930710:G:A',
         'name': 'NC_000016.10:28930710:G:A',
@@ -280,8 +280,8 @@ def test_crispr_millipede_file_uses_hardcoded_cd19_gene(
     mock_load_variant, mock_bulk_check, mock_gene_validator, mock_crispr_millipede_file_fileset, caplog
 ):
     writer = SpyWriter()
-    adapter = IGVFV2GCRISPR(
-        filepath='./samples/igvf_v2g_crispr_millipede.example.csv',
+    adapter = CRISPRVariantGene(
+        filepath='./samples/crispr_variant_gene_millipede.example.csv',
         source_url=CRISPR_MILLIPEDE_SOURCE_URL,
         writer=writer,
         label='variant_gene',

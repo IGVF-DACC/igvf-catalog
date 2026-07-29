@@ -1,6 +1,6 @@
 {
   "_context": {
-    "description": "Parser configuration for IGVF CRISPR element-to-gene (E2G) tabular files loaded by igvf_E2G_CRISPR_adapter.py.",
+    "description": "Parser configuration for IGVF CRISPR element-to-gene (E2G) tabular files loaded by CRISPR_element_gene_IGVF_adapter.py.",
     "layout_names": "Top-level keys other than `files` and `_context` are layout definitions. Layout names (e.g. t_cell, crudo_tap_seq, pySpade) are shorthand identifiers reflective of each lab's internal naming for the experiment or analysis pipeline. These are not formal IGVF file-format terms.",
     "structure": "Each layout describes column semantics and derived metrics for one file shape. The `files` section maps each IGVF file accession to a layout and file-specific options (e.g. targeted_element_types, skip_rows)."
   },

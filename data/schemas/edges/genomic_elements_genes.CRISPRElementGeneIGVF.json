@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "edges/genomic_elements_genes.IGVFE2GCRISPR.json",
+  "$id": "edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
   "db_collection_name": "genomic_elements_genes",
   "allOf": [
     {

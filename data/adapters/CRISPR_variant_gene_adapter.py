@@ -32,7 +32,7 @@ CRISPR_MILLIPEDE_INTERCEPT_ROW_IDS = frozenset({
 # NC_000016.10:28930710:G:A,0.0284163262526425,-0.0116633875205405,0.0699744682130392
 
 
-class IGVFV2GCRISPR(BaseAdapter):
+class CRISPRVariantGene(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_gene']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
@@ -132,7 +132,7 @@ class IGVFV2GCRISPR(BaseAdapter):
             chunk = []
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
-                if i % IGVFV2GCRISPR.CHUNK_SIZE == 0:
+                if i % CRISPRVariantGene.CHUNK_SIZE == 0:
                     self._process_variant_effects_chunk(chunk)
                     chunk = []
 
@@ -147,7 +147,7 @@ class IGVFV2GCRISPR(BaseAdapter):
             chunk = []
             for i, row in enumerate(reader, 1):
                 chunk.append((row, name_to_idx))
-                if i % IGVFV2GCRISPR.CHUNK_SIZE == 0:
+                if i % CRISPRVariantGene.CHUNK_SIZE == 0:
                     self._process_crispr_millipede_chunk(chunk)
                     chunk = []
 
