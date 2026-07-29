@@ -14,8 +14,8 @@ from adapters.writer import Writer
 _CRISPR_E2G_DEFINITIONS_PATH = (
     Path(__file__).resolve().parents[1] /
     'data_loading_support_files' /
-    'IGVF_E2G_CRISPR' /
-    'igvf_e2g_crispr_definitions.json'
+    'CRISPR_element_gene_IGVF' /
+    'crispr_element_gene_igvf_definitions.json'
 )
 
 
@@ -28,7 +28,7 @@ def _load_crispr_e2g_definitions() -> Tuple[dict, dict]:
     return layouts, file_config
 
 
-# Layout specs and per-accession parser config live in igvf_e2g_crispr_definitions.json.
+# Layout specs and per-accession parser config live in crispr_element_gene_igvf_definitions.json.
 CRISPR_E2G_LAYOUTS, CRISPR_E2G_FILE_CONFIG = _load_crispr_e2g_definitions()
 
 
@@ -46,7 +46,7 @@ _IGVF_E2G_LAYOUT_KEYS = frozenset({
 })
 
 
-class IGVFE2GCRISPR(BaseAdapter):
+class CRISPRElementGeneIGVF(BaseAdapter):
 
     ALLOWED_LABELS = [
         'genomic_element',
@@ -55,7 +55,8 @@ class IGVFE2GCRISPR(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
-    MAX_LOG10_PVALUE = 240  # encode_E2G_CRISPR_adapter; max log10pvalue from file is 235
+    # CRISPR_element_gene_ENCODE_adapter; max log10pvalue from file is 235
+    MAX_LOG10_PVALUE = 240
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
         'p_value',
         'p_value_adj',
@@ -307,11 +308,11 @@ class IGVFE2GCRISPR(BaseAdapter):
 
     @staticmethod
     def _perturb_seq_negative_control(row: list, type_col: Optional[int]) -> bool:
-        return IGVFE2GCRISPR._cell(row, type_col) == 'negative_control'
+        return CRISPRElementGeneIGVF._cell(row, type_col) == 'negative_control'
 
     @staticmethod
     def _non_targeting_control(row: list, source_annotation_col: Optional[int]) -> bool:
-        return IGVFE2GCRISPR._cell(row, source_annotation_col).lower() == 'non-targeting'
+        return CRISPRElementGeneIGVF._cell(row, source_annotation_col).lower() == 'non-targeting'
 
     def _resolve_explicit_interval(
         self,
@@ -379,7 +380,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     @staticmethod
     def _pick_column(name_to_idx: Dict[str, int], *candidates) -> Optional[int]:
         for candidate in candidates:
-            for name in IGVFE2GCRISPR._candidate_columns(candidate):
+            for name in CRISPRElementGeneIGVF._candidate_columns(candidate):
                 if name in name_to_idx:
                     return name_to_idx[name]
         return None
@@ -577,15 +578,15 @@ class IGVFE2GCRISPR(BaseAdapter):
         crispr_modality: str,
         metrics: dict,
     ) -> dict:
-        """Build a genomic_elements_genes edge (see IGVFE2GCRISPR schema)."""
+        """Build a genomic_elements_genes edge (see CRISPRElementGeneIGVF schema)."""
         edge = {
             '_key': _key,
             '_from': _from,
             '_to': f'genes/{readout_gene}',
-            'source': IGVFE2GCRISPR.SOURCE,
+            'source': CRISPRElementGeneIGVF.SOURCE,
             'source_url': source_url,
             'files_filesets': f'files_filesets/{file_accession}',
-            'label': IGVFE2GCRISPR.COLLECTION_LABEL,
+            'label': CRISPRElementGeneIGVF.COLLECTION_LABEL,
             'class': file_fileset['class'],
             'name': 'modulates expression of',
             'inverse_name': 'expression modulated by',
@@ -598,7 +599,7 @@ class IGVFE2GCRISPR(BaseAdapter):
         edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
         edge['log2FC'] = metrics['log2FC']
         edge['significant'] = metrics['significant']
-        for field in IGVFE2GCRISPR.OPTIONAL_EDGE_METRIC_FIELDS:
+        for field in CRISPRElementGeneIGVF.OPTIONAL_EDGE_METRIC_FIELDS:
             if field in metrics:
                 edge[field] = metrics[field]
         return edge
@@ -793,7 +794,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             self.logger.warning(
                 'No CRISPR E2G file config for accession %s; '
                 'using promoter/enhancer per-row heuristic. Add this file under '
-                '"files" in igvf_e2g_crispr_definitions.json.',
+                '"files" in crispr_element_gene_igvf_definitions.json.',
                 self.file_accession,
             )
         layout_name = self.file_config.get('layout')
@@ -848,7 +849,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             if not self.layout:
                 raise ValueError(
                     f'File {self.file_accession} has no CRISPR E2G layout; add it under '
-                    f'"files" in igvf_e2g_crispr_definitions.json.'
+                    f'"files" in crispr_element_gene_igvf_definitions.json.'
                 )
             colmap = self._columns_from_layout(name_to_idx)
             uses_name_hg38 = colmap['name_hg38'] is not None
@@ -975,7 +976,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         'end': int(genomic_element[2]),
                         'method': method,
                         'source_annotation': source_annotation,
-                        'source': IGVFE2GCRISPR.SOURCE,
+                        'source': CRISPRElementGeneIGVF.SOURCE,
                         'source_url': self.source_url,
                         'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession

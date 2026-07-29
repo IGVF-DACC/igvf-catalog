@@ -63,7 +63,7 @@ Each adapter can write to several collections. Below is the table to display the
 | pQTL                 | pQTL_adapter              | variants_proteins                                       |
 | GeneGeneBiogrid      | biogrid_gene_gene_adapter | genes_genes                                             |
 |                      |                           | mm_genes_mm_genes                                       |
-| ENCODE2GCRISPR       | encode_E2G_CRISPR_adapter | regulatory_regions                                      |
+| CRISPRElementGeneENCODE       | CRISPR_element_gene_ENCODE_adapter | regulatory_regions                                      |
 |                      |                           | regulatory_regions_genes                                |
 | MouseGenomesProjectAdapter | mouse_genomes_project_adapter| mm_variants                                    |
 | ClinGen        | clingen_variant_disease_adapter | variants_diseases                                       |

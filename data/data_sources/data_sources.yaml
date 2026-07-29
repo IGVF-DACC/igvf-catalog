@@ -988,12 +988,12 @@ variant to genomic element bluestarr:
   biosample_term: ontology_terms/EFO_0002067
   label: predicted effect on regulatory function
 
-# Example: python3 data_parser.py --adapter igvf_variant_gene_crispr --filepath ~/dataset/IGVFFI9602ILPC.tsv --source-url https://data.igvf.org/tabular-files/IGVFFI9602ILPC/ --label variant --output-bucket-key variants/igvf_crispr_v2g_variants_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.tsv --source-url https://data.igvf.org/tabular-files/IGVFFI9602ILPC/ --label variant --output-bucket-key variants/crispr_variant_gene_variants_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant variant effects:
   collection: variants
   params:
     - label
-  command: python3 data_parser.py --adapter igvf_variant_gene_crispr --filepath {filepath} --source-url https://data.igvf.org/tabular-files/{datafile}/ --label variant --output-bucket-key variants/igvf_crispr_v2g_variants_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_variant_gene --filepath {filepath} --source-url https://data.igvf.org/tabular-files/{datafile}/ --label variant --output-bucket-key variants/crispr_variant_gene_variants_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
@@ -1012,12 +1012,12 @@ variant variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI8101RHSC/@@download/IGVFFI8101RHSC.csv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter igvf_variant_gene_crispr --filepath ~/dataset/IGVFFI9602ILPC.bed --source-url https://data.igvf.org/tabular-files/IGVFFI9602ILPC/ --label variant_gene --output-bucket-key variants_genes/igvf_crispr_v2g_variant_genes_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.bed --source-url https://data.igvf.org/tabular-files/IGVFFI9602ILPC/ --label variant_gene --output-bucket-key variants_genes/crispr_variant_gene_variant_genes_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to gene variant effects:
   collection: variants_genes
   params:
     - label
-  command: python3 data_parser.py --adapter igvf_variant_gene_crispr --filepath {filepath} --source-url https://data.igvf.org/tabular-files/{datafile}/ --label variant_gene --output-bucket-key variants_genes/igvf_crispr_v2g_variant_genes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_variant_gene --filepath {filepath} --source-url https://data.igvf.org/tabular-files/{datafile}/ --label variant_gene --output-bucket-key variants_genes/crispr_variant_gene_variant_genes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
@@ -1143,13 +1143,13 @@ mouse genomic element ccre:
   type: candidate cis regulatory element
   source_annotation: str # ccre annotation
 
-# Example: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF968BZL.tsv --output-bucket-key genomic_elements/encode_crispr_genomic_elements.jsonl --label genomic_element
+# Example: python3 data_parser.py --adapter crispr_element_gene_encode --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF968BZL.tsv --output-bucket-key genomic_elements/crispr_element_gene_encode_genomic_elements.jsonl --label genomic_element
 genomic element encode E2G CRISPR:
   collection: genomic_elements
   pypy3: true
   params:
     - label
-  command: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_crispr_genomic_elements.jsonl --label genomic_element
+  command: python3 data_parser.py --adapter crispr_element_gene_encode --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/crispr_element_gene_encode_genomic_elements.jsonl --label genomic_element
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
   source: ENCODE
@@ -1157,24 +1157,24 @@ genomic element encode E2G CRISPR:
   source_annotation: ['negative control', 'enhancer']
   biological_context: ontology_terms/EFO_0002067
 
-# Example: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF968BZL.tsv --output-bucket-key genomic_elements_genes/encode_crispr_genomic_elements_genes.jsonl --label genomic_element_gene
+# Example: python3 data_parser.py --adapter crispr_element_gene_encode --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF968BZL.tsv --output-bucket-key genomic_elements_genes/crispr_element_gene_encode_genomic_elements_genes.jsonl --label genomic_element_gene
 genomic element to gene expression association encode E2G CRISPR:
   collection: genomic_elements_genes
   pypy3: true
   params:
     - label
-  command: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_crispr_genomic_elements_genes.jsonl --label genomic_element_gene
+  command: python3 data_parser.py --adapter crispr_element_gene_encode --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/crispr_element_gene_encode_genomic_elements_genes.jsonl --label genomic_element_gene
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
   source: ENCODE
   biological_context: ontology_terms/EFO_0002067
 
-# Example: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/igvf_crispr_e2g_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_element_gene_igvf --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/crispr_element_gene_igvf_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element IGVF CRISPR E2G:
   collection: genomic_elements
   params:
     - label
-  command: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/igvf_crispr_e2g_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_element_gene_igvf --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/crispr_element_gene_igvf_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
@@ -1209,12 +1209,12 @@ genomic element IGVF CRISPR E2G:
   source: IGVF
   type: tested elements
 
-# Example: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/igvf_crispr_e2g_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter crispr_element_gene_igvf --source-url https://data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/crispr_element_gene_igvf_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element to gene IGVF CRISPR E2G:
   collection: genomic_elements_genes
   params:
     - label
-  command: python3 data_parser.py --adapter igvf_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements_genes/igvf_crispr_e2g_genomic_elements_genes_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter crispr_element_gene_igvf --source-url {source_url} --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements_genes/crispr_element_gene_igvf_genomic_elements_genes_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
