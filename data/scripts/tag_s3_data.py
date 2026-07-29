@@ -4,12 +4,12 @@
 # Useful when deploying new versions of the IGVF Catalog in S3.
 #
 # Usage:
-# python tag_s3_data.py --bucket_name <bucket_name> --append_value <append_value> --key_name <key_name> --dry_run
+# python tag_s3_data.py --bucket_name <bucket_name> --append_value <append_value> --key_name <key_name> --profile <aws_profile> --dry_run
 #
 #
 # Requirements:
 # - boto3
-# - AWS credentials configured in your environment
+# - AWS credentials configured in your environment, or an AWS profile passed via --profile
 # - Permissions to access the specified S3 bucket and modify object tags
 #
 # For catalog deployments, use: python3 tag_s3_data.py --dry_run // to preview changes with default values
@@ -23,8 +23,10 @@ APPEND_VALUE = 'IGVF_catalog_v1.0.0'
 KEY_NAME = 'version'
 
 
-def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
-    s3 = boto3.client('s3')
+def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True, profile=None):
+    session = boto3.Session(
+        profile_name=profile) if profile else boto3.Session()
+    s3 = session.client('s3')
     paginator = s3.get_paginator('list_objects_v2')
 
     for page in paginator.paginate(Bucket=bucket_name):
@@ -49,11 +51,13 @@ def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
 
             for tag in current_tags:
                 if tag['Key'] == key_name:
-                    if tag['Value'] == append_value:
+                    existing_values = tag['Value'].split()
+                    if append_value in existing_values:
                         print(
-                            f"Tag '{key_name}' already has the value '{append_value}'. No update needed.")
+                            f"Tag '{key_name}' already contains the value '{append_value}'. No update needed.")
                     else:
-                        tag['Value'] = ' '.join([tag['Value'], append_value])
+                        existing_values.append(append_value)
+                        tag['Value'] = ' '.join(existing_values)
                         print(f"Updated 'version' tag to: {tag['Value']}")
                     version_found = True
                 updated_tags.append(tag)
@@ -88,8 +92,10 @@ if __name__ == '__main__':
         '--key_name', help='The key name for the version tag.', default=KEY_NAME)
     parser.add_argument('--dry-run', action='store_true',
                         help='If set, will not apply changes.', default=False)
+    parser.add_argument(
+        '--profile', help='Optional AWS profile name to use. If omitted, credentials are read from the environment.', default=None)
 
     args = parser.parse_args()
 
     append_to_version_tag(args.bucket_name, args.key_name,
-                          args.append_value, dry_run=args.dry_run)
+                          args.append_value, dry_run=args.dry_run, profile=args.profile)
