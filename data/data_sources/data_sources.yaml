@@ -1208,6 +1208,14 @@ genomic element IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI6268OASM/@@download/IGVFFI6268OASM.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3089UGHM/@@download/IGVFFI3089UGHM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9490RJAU/@@download/IGVFFI9490RJAU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4427JNUK/@@download/IGVFFI4427JNUK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4766SRSA/@@download/IGVFFI4766SRSA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1600ZEPT/@@download/IGVFFI1600ZEPT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4093WUVB/@@download/IGVFFI4093WUVB.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/@@download/IGVFFI7368COWA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9322VVTR/@@download/IGVFFI9322VVTR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/@@download/IGVFFI4081AUXT.csv.gz
   source: IGVF
   type: tested elements
 
@@ -1250,6 +1258,14 @@ genomic element to gene IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI6268OASM/@@download/IGVFFI6268OASM.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3089UGHM/@@download/IGVFFI3089UGHM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9490RJAU/@@download/IGVFFI9490RJAU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4427JNUK/@@download/IGVFFI4427JNUK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4766SRSA/@@download/IGVFFI4766SRSA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1600ZEPT/@@download/IGVFFI1600ZEPT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4093WUVB/@@download/IGVFFI4093WUVB.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/@@download/IGVFFI7368COWA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9322VVTR/@@download/IGVFFI9322VVTR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/@@download/IGVFFI4081AUXT.csv.gz
   source: IGVF
   label: str # element effect on gene expression of {readout_gene}
 

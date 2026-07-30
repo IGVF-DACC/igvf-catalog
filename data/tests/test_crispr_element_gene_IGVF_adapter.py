@@ -1342,3 +1342,143 @@ def test_igvf_e2g_crispr_surf_constant_readout_and_most_stringent_fdr(
     ][0]
     assert other['effect_size'] == pytest.approx(-0.004)
     assert other['num_guides'] == 100
+
+
+def test_igvf_e2g_pdx1_region_level_distal_elements_z_score_idr(
+        mock_file_fileset_facs_screen, tmp_path):
+    """IGVFFI7368COWA: distal element; LFC/z/IDR mapped; |z|>=1.96 => significant."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'crispr_element_gene_igvf_pdx1_region.tsv.gz'
+    header = (
+        'intended_target_chr\tintended_target_start\tintended_target_end\t'
+        'LFC\tZ-score\tIDR\treadout_gene_ensembl\treadout_gene_symbol\n'
+    )
+    rows = (
+        'chr13\t27899317\t27899618\t-0.158\t-0.76\t0.087\t'
+        'ENSG00000139515\tPDX1\n'
+        'chr13\t27908614\t27909993\t-2.15\t-11.93\t3.79E-05\t'
+        'ENSG00000139515\tPDX1\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    edges = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(edges) == 2
+    weak = [e for e in edges if '27899317' in e['_from']][0]
+    strong = [e for e in edges if '27908614' in e['_from']][0]
+
+    assert weak['_to'] == 'genes/ENSG00000139515'
+    assert weak['log2FC'] == pytest.approx(-0.158)
+    assert weak['z_score'] == pytest.approx(-0.76)
+    assert weak['idr'] == pytest.approx(0.087)
+    assert weak['significant'] is False
+    assert 'p_value' not in weak
+    assert 'p_value_adj' not in weak
+
+    assert strong['z_score'] == pytest.approx(-11.93)
+    assert strong['idr'] == pytest.approx(3.79e-05)
+    assert strong['significant'] is True
+
+    writer_ge = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter_ge = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/',
+            label='genomic_element',
+            writer=writer_ge,
+            validate=True,
+        )
+        adapter_ge.process_file()
+
+    elements = [json.loads(line)
+                for line in writer_ge.contents if line.strip()]
+    assert len(elements) == 2
+    assert all(e['source_annotation'] == 'distal element' for e in elements)
+    assert all('promoter_of' not in e for e in elements)
+
+
+def test_igvf_e2g_ccr_perturb_seq_drops_failing_qc_and_labels_mixed_types(
+        mock_file_fileset_perturb_seq, tmp_path):
+    """IGVFFI4081AUXT: drop pass_qc=false; distal element vs promoter from genomic_element."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'crispr_element_gene_igvf_ccr_perturb_seq.csv.gz'
+    header = (
+        'intended_target_chr,intended_target_start,intended_target_end,'
+        'response_ensembl,response_gene_symbol,pass_qc,p_value,'
+        'log_2_fold_change,significant,genomic_element,'
+        'promoter_gene_symbol,promoter_gene_ensembl\n'
+    )
+    rows = (
+        'chr16,79294289,79295018,ENSG00000178573,MAF,True,'
+        '3.66e-33,0.955,True,distal element,,\n'
+        'chr17,49946538,49947811,ENSG00000002919,SNX11,False,'
+        '1.0,0.0,False,distal element,,\n'
+        'chr3,27680784,27680913,ENSG00000163512,AZI2,True,'
+        '0.043,0.825,True,promoter,EOMES,ENSG00000163508\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = (
+            lambda x: x.startswith('ENSG')
+        )
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    edges = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(edges) == 2
+    assert all('49946538' not in e['_from'] for e in edges)
+
+    distal = [e for e in edges if '79294289' in e['_from']][0]
+    assert distal['_to'] == 'genes/ENSG00000178573'
+    assert distal['log2FC'] == pytest.approx(0.955)
+    assert distal['p_value'] == pytest.approx(3.66e-33)
+    assert distal['significant'] is True
+
+    promoter_edge = [e for e in edges if '27680784' in e['_from']][0]
+    assert promoter_edge['_to'] == 'genes/ENSG00000163512'
+
+    writer_ge = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = (
+            lambda x: x.startswith('ENSG')
+        )
+        adapter_ge = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/',
+            label='genomic_element',
+            writer=writer_ge,
+            validate=True,
+        )
+        adapter_ge.process_file()
+
+    elements = [json.loads(line)
+                for line in writer_ge.contents if line.strip()]
+    assert len(elements) == 2
+    distal_ge = [e for e in elements if e['start'] == 79294289][0]
+    promoter_ge = [e for e in elements if e['start'] == 27680784][0]
+    assert distal_ge['source_annotation'] == 'distal element'
+    assert 'promoter_of' not in distal_ge
+    assert promoter_ge['source_annotation'] == 'promoter'
+    assert promoter_ge['promoter_of'] == 'genes/ENSG00000163508'

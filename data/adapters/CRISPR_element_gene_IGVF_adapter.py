@@ -80,6 +80,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         'num_cells',
         'z_score',
         't_score',
+        'idr',
     })
 
     @staticmethod
@@ -213,6 +214,14 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 return True
         return False
 
+    @staticmethod
+    def _non_promoter_source_annotation(targeted_element_types: list) -> str:
+        """Label used for non-promoter elements (enhancer, distal element, etc.)."""
+        for annotation in targeted_element_types:
+            if annotation != 'promoter':
+                return annotation
+        return 'enhancer'
+
     def _promoter_gene_and_source_annotation(
         self,
         targeted_element_types: list,
@@ -224,10 +233,12 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         Raises ValueError for rows that cannot be loaded; use skip_rows for known exceptions.
         """
         supports_promoter = 'promoter' in targeted_element_types
-        supports_enhancer = 'enhancer' in targeted_element_types
+        supports_non_promoter = any(
+            annotation != 'promoter' for annotation in targeted_element_types
+        )
         if not supports_promoter:
-            return (None, 'enhancer')
-        if not supports_enhancer:
+            return (None, self._non_promoter_source_annotation(targeted_element_types))
+        if not supports_non_promoter:
             self._require_valid_promoter_gene(
                 intended_target_name,
                 intended_target_gene_raw,
@@ -242,7 +253,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             )
             return (intended_target_name, 'promoter')
         promoter_gene = None
-        source_annotation = 'enhancer'
+        source_annotation = self._non_promoter_source_annotation(
+            targeted_element_types)
         if self._is_ensembl_gene_id(intended_target_name):
             if self.gene_validator.validate(intended_target_name):
                 promoter_gene = intended_target_name
@@ -267,8 +279,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             colmap,
             missing_column_error='missing source annotation column.',
         )
-        if source_annotation == 'enhancer':
-            return None, 'enhancer'
+        if source_annotation in {'enhancer', 'distal element'}:
+            return None, source_annotation
         if source_annotation != 'promoter':
             source_idx = colmap['source_annotation']
             self._row_load_error(
@@ -473,8 +485,11 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             return False
         if self._is_explicitly_skipped_row(row, name_to_idx):
             return False
-        if is_scaled_screen and not self._scaled_screen_row_should_load(
-                row, name_to_idx, colmap):
+        if self.layout.get('require_pass_qc') and not self._passes_qc_column(
+                row, name_to_idx):
+            return False
+        if is_scaled_screen and not self._scaled_screen_has_targeted_element(
+                row, colmap):
             return False
         if is_pyspade and self._non_targeting_control(
                 row, colmap.get('source_annotation')):
@@ -616,14 +631,15 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 edge[field] = metrics[field]
         return edge
 
-    def _scaled_screen_passes_qc(
+    def _passes_qc_column(
         self,
         row: list,
         name_to_idx: Dict[str, int],
     ) -> bool:
+        """Return True when pass_qc is explicitly true. Missing column is an error."""
         pass_qc_idx = name_to_idx.get('pass_qc')
         if pass_qc_idx is None:
-            self._row_load_error('missing pass_qc column for scaled screen.')
+            self._row_load_error('missing pass_qc column.')
         if pass_qc_idx >= len(row):
             return False
         return self._parse_bool(row[pass_qc_idx]) is True
@@ -641,17 +657,6 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             if not value or value.lower() in {'nan', 'na', 'none'}:
                 return False
         return True
-
-    def _scaled_screen_row_should_load(
-        self,
-        row: list,
-        name_to_idx: Dict[str, int],
-        colmap: Dict[str, Optional[int]],
-    ) -> bool:
-        return (
-            self._scaled_screen_passes_qc(row, name_to_idx)
-            and self._scaled_screen_has_targeted_element(row, colmap)
-        )
 
     @staticmethod
     def _scaled_screen_perturbed_genes(value: str) -> List[str]:

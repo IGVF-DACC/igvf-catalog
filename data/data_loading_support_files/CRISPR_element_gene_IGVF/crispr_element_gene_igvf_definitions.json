@@ -137,6 +137,67 @@
     },
     "notes": "No readout gene or p-value columns. Use file-level readout_gene (MYH9). significant is derived from |z_score| >= ~1.96 (two-tailed alpha=0.05)."
   },
+  "fractel": {
+    "uuid": "a1e71caa-3da7-4c2d-b955-ca259536b5d5",
+    "title": "Element-level FRACTEL Results",
+    "lab": "charles-gersbach",
+    "columns": {
+      "dhs": "DNase I Hypersensitive Site (DHS) genomic coordinates in the format chromosome:start-end (e.g., chr6:29702283-29703026). Identifies the regulatory element whose activity is being linked to gene expression.",
+      "ensembl_id": "Ensembl stable gene identifier for the gene whose expression is associated with the DHS (e.g., ENSG00000204574).",
+      "gene_symbol": "HGNC gene symbol corresponding to the Ensembl ID (e.g., ABCF1, ABHD16A).",
+      "FRACTEL_effect_size": "Effect size estimate from the FRACTEL model quantifying the magnitude of the regulatory relationship between regulatory elements and target genes. Positive values indicate that perturbations increase the expression level of tested genes; negative values indicate decreased expression of tested gene. We consider each element as having either a primarily positive or negative effect on the phenotype, and compute two directional weighted averages of effects using one-sided p-values p− and p+, taking the absolute maximum as the effect size of the element.",
+      "FRACTEL_pval": "Nominal p-value from the FRACTEL statistical test for the association between regulatory element and gene expression.",
+      "FRACTEL_pval_fdr_corr": "False Discovery Rate (FDR)-corrected p-value (Benjamini-Hochberg) for the FRACTEL p-value, adjusted for multiple testing across all element-gene pairs tested.",
+      "intended_target_name": "Name or coordinate string of the intended CRISPR perturbation target associated with this DHS (e.g., chr6:29702283-29703026). Typically matches the DHS coordinates.",
+      "intended_target_chr": "Chromosome of the intended CRISPR perturbation target (e.g., chr6).",
+      "intended_target_start": "Genomic start coordinate of the intended perturbation target.",
+      "intended_target_end": "Genomic end coordinate of the intended perturbation target."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "ensembl_id",
+      "metrics": {
+        "p_value": "FRACTEL_pval",
+        "p_value_adj": "FRACTEL_pval_fdr_corr",
+        "log2FC": "FRACTEL_effect_size"
+      }
+    },
+    "notes": "FRACTEL_effect_size is the weighted-average NB GLM Estimate from sc-crispr-de / FRACTEL (same catalog mapping as bulk_t_cell log2FC). These files are enhancer DHS screens; promoters are filtered out per submitter_comment."
+  },
+  "crispr_surf": {
+    "uuid": "4cda54a6-aa53-4d01-9d65-572475111ad1",
+    "title": "CRISPR-SURF File Format Reference",
+    "lab": "charles-gersbach",
+    "columns": {
+      "FDR": "The Benjamini-Hochberg adjusted p-value threshold at which this region was called significant. One of the values supplied via the -padjs argument (defaults: 0.05, 0.01, 0.001, 0.0001). A region that is significant at multiple thresholds appears once per threshold.",
+      "Chr": "Chromosome name (e.g. chr2).",
+      "Start": "0-based, inclusive start coordinate of the significant region (BED-style half-open convention). The region occupies [Start, Stop) on the chromosome.",
+      "Stop": "0-based, exclusive end coordinate of the significant region (BED-style half-open convention). Region length in bp = Stop - Start.",
+      "Direction": "Sign of the deconvolved beta signal within the region. positive — sgRNAs in this region are enriched relative to controls (the targeted element promotes fitness or expression). negative — sgRNAs are depleted (the targeted element suppresses fitness or expression, or the region is essential).",
+      "Deconvolved_Signal_Area": "Area under the deconvolved beta profile across the region, computed as the sum of beta values at each base-pair bin within [Start, Stop). Larger absolute values indicate stronger or wider regulatory activity.",
+      "Deconvolved_Signal_Mean": "Mean deconvolved beta score across all base-pair bins within the region. Provides a normalised measure of effect magnitude that is independent of region width.",
+      "Padj_Mean": "Mean Benjamini-Hochberg adjusted p-value of the per-base beta scores at positions within the region. Lower values indicate higher statistical confidence.",
+      "Supporting_sgRNAs": "Number of sgRNAs (of type observation) whose Perturbation_Index falls within the region or within the characteristic perturbation range of the region boundaries. Higher counts provide greater statistical confidence.",
+      "Supporting_sgRNA_Sequences": "Comma-separated list of spacer sequences for the supporting sgRNAs (in no guaranteed order). The count equals the value in Supporting_sgRNAs."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "Chr",
+        "Start",
+        "Stop"
+      ],
+      "metrics": {
+        "p_value_adj": "Padj_Mean",
+        "effect_size": "Deconvolved_Signal_Mean",
+        "num_guides": "Supporting_sgRNAs"
+      }
+    },
+    "notes": "No readout gene, log2FC, or uncorrected p_value in this layout. Use file-level readout_gene. FDR is used only to keep the most stringent call per region. Stop is BED exclusive end and is used as-is. Deconvolved_Signal_Mean is SURF beta (effect_size), not DESeq2 log2FC."
+  },
   "parse_perturb_seq": {
     "uuid": "0447d492-9a9c-4ac9-8299-ac6f0e785920",
     "title": "Global_differential_quantification_output file format specification for Parse Perturb-seq",
@@ -427,6 +488,7 @@
         "log2FC": "log_2_fold_change"
       }
     },
+    "require_pass_qc": true,
     "notes": "Title derived from portal metadata description property, as no title is provided in the file format specification document."
   },
   "pySpade": {
@@ -494,36 +556,71 @@
       "pval-empirical": "Catalog field empirical_p_value. Empirical p-value comparing perturbation hypergeometric p-value to random background draws. Loaded into the database but not returned by the API."
     }
   },
-  "crispr_surf": {
-      "uuid": "4cda54a6-aa53-4d01-9d65-572475111ad1",
-      "title": "CRISPR-SURF File Format Reference",
-      "lab": "charles-gersbach",
-      "columns": {
-        "FDR": "The Benjamini-Hochberg adjusted p-value threshold at which this region was called significant. One of the values supplied via the -padjs argument (defaults: 0.05, 0.01, 0.001, 0.0001). A region that is significant at multiple thresholds appears once per threshold.",
-        "Chr": "Chromosome name (e.g. chr2).",
-        "Start": "0-based, inclusive start coordinate of the significant region (BED-style half-open convention). The region occupies [Start, Stop) on the chromosome.",
-        "Stop": "0-based, exclusive end coordinate of the significant region (BED-style half-open convention). Region length in bp = Stop - Start.",
-        "Direction": "Sign of the deconvolved beta signal within the region. positive — sgRNAs in this region are enriched relative to controls (the targeted element promotes fitness or expression). negative — sgRNAs are depleted (the targeted element suppresses fitness or expression, or the region is essential).",
-        "Deconvolved_Signal_Area": "Area under the deconvolved beta profile across the region, computed as the sum of beta values at each base-pair bin within [Start, Stop). Larger absolute values indicate stronger or wider regulatory activity.",
-        "Deconvolved_Signal_Mean": "Mean deconvolved beta score across all base-pair bins within the region. Provides a normalised measure of effect magnitude that is independent of region width.",
-        "Padj_Mean": "Mean Benjamini-Hochberg adjusted p-value of the per-base beta scores at positions within the region. Lower values indicate higher statistical confidence.",
-        "Supporting_sgRNAs": "Number of sgRNAs (of type observation) whose Perturbation_Index falls within the region or within the characteristic perturbation range of the region boundaries. Higher counts provide greater statistical confidence.",
-        "Supporting_sgRNA_Sequences": "Comma-separated list of spacer sequences for the supporting sgRNAs (in no guaranteed order). The count equals the value in Supporting_sgRNAs."
-      },
-      "semantic_columns": {
-        "element_coordinates": [
-          "Chr",
-          "Start",
-          "Stop"
-        ],
-        "metrics": {
-          "p_value_adj": "Padj_Mean",
-          "effect_size": "Deconvolved_Signal_Mean",
-          "num_guides": "Supporting_sgRNAs"
-        }
-      },
-      "notes": "No readout gene, log2FC, or uncorrected p_value in this layout. Use file-level readout_gene. FDR is used only to keep the most stringent call per region. Stop is BED exclusive end and is used as-is. Deconvolved_Signal_Mean is SURF beta (effect_size), not DESeq2 log2FC."
+  "pdx1_region_level": {
+    "uuid": "35e80cf6-fd86-4ee5-99c3-cb2d4bd4b802",
+    "title": "CRISPRi/a PDX1 Region-Level Results File Format",
+    "lab": "danwei-huangfu",
+    "columns": {
+      "intended_target_chr": "Chromosome of the competent chromatin region",
+      "intended_target_start": "Start coordinate of the competent chromatin region on GRCh38",
+      "intended_target_end": "End coordinate of the competent chromatin region on GRCh38",
+      "LFC": "Estimated region-level log2 fold change in PDX1 expression associated with perturbation of the intended target region.",
+      "Z-score": "Mean enrichment score",
+      "IDR": "Irreproducible discovery rate metric summarizing crossreplicate reproducibility; lower values indicate more reproducible guide-level signals.",
+      "readout_gene_ensembl": "Ensembl gene identifier for the measured readout gene.",
+      "readout_gene_symbol": "HGNC-style gene symbol for the measured readout gene."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "readout_gene_ensembl",
+      "metrics": {
+        "log2FC": "LFC",
+        "z_score": "Z-score",
+        "idr": "IDR"
+      }
+    },
+    "notes": "No p-values (overlapping sliding windows). significant is derived from |z_score| >= ~1.96."
   },
+  "ccr_perturb_seq": {
+    "uuid": "1c2ff754-e4ee-48d1-9931-ce979e73cedf",
+    "title": "10x Perturb-Seq Region-Level Inference File Format",
+    "lab": "danwei-huangfu",
+    "delimiter": ",",
+    "columns": {
+      "intended_target_chr": "Chromosome of targeted cis regulatory element.",
+      "intended_target_start": "Start coordinate of targeted cis regulatory element on GRCh38 ",
+      "intended_target_end": "End coordinate of targeted cis regulatory element on GRCh38",
+      "response_ensembl": "Ensembl gene identifier for the gene tested in the region-gene association.",
+      "response_gene_symbol": "Gene symbol for the tested expression readout.",
+      "pass_qc": "Indicates whether the region-gene test passed SCEPTRE quality-control requirements and produced an interpretable result.",
+      "p_value": "P-value reported by SCEPTRE for the region-gene association. Blank when the test did not pass quality control or was not evaluated.",
+      "log_2_fold_change": "Estimated log2 fold change in readout-gene expression associated with perturbation of the region. Positive values indicate increased expression and negative values indicate decreased expression.",
+      "significant": "Significance call produced by the analysis pipeline. Blank when the test did not pass quality control or was not evaluated.",
+      "genomic_element": "whether the tested cis regulatory element is distal or proximal to TSS",
+      "promoter_gene_symbol": "if the tested element is proximal to a gene TSS, the Ensembl gene identifier for the gene",
+      "promoter_gene_ensembl": "if the tested element is proximal to a gene TSS, the gene symbol for the gene"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "response_ensembl",
+      "perturbed_gene": "promoter_gene_ensembl",
+      "source_annotation": "genomic_element",
+      "metrics": {
+        "log2FC": "log_2_fold_change",
+        "p_value": "p_value"
+      }
+    },
+    "require_pass_qc": true
+  },
+
   "files": {
     "IGVFFI3069QCRA": {
       "layout": "t_cell",
@@ -822,6 +919,55 @@
         "enhancer"
       ],
       "readout_gene": "ENSG00000100345"
+    },
+    "IGVFFI9490RJAU": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4427JNUK": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4766SRSA": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI1600ZEPT": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4093WUVB": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI7368COWA": {
+      "layout": "pdx1_region_level",
+      "targeted_element_types": [
+        "distal element"
+      ]
+    },
+    "IGVFFI9322VVTR": {
+      "layout": "pdx1_region_level",
+      "targeted_element_types": [
+        "distal element"
+      ]
+    },
+    "IGVFFI4081AUXT": {
+      "layout": "ccr_perturb_seq",
+      "targeted_element_types": [
+        "distal element",
+        "promoter"
+      ]
     }
   }
 }
