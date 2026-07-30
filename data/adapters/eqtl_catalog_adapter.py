@@ -7,7 +7,11 @@ from math import log10
 import os
 import requests
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, to_float
+from adapters.helpers import (
+    build_variant_id,
+    get_file_fileset_by_accession_in_arangodb,
+    to_float,
+)
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -41,6 +45,9 @@ from adapters.gene_validator import GeneValidator
 
 
 class EQTLCatalog(BaseAdapter):
+    # Shared EBI tabix metadata (study_id, dataset_id, tissue, ftp paths, etc.).
+    # Used by qtl to resolve dataset_id -> biosample/study/source_url, and by study
+    # to select which study_ids to emit (quant_method ge/leafcutter + condition naive).
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study']
     MAX_LOG10_PVALUE = 400
@@ -60,8 +67,8 @@ class EQTLCatalog(BaseAdapter):
                 yield row
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label == 'qtl':
-            self.file_accession = os.path.basename(filepath).split('.')[0]
+        # filepath basename is IGVFFI*.tsv.gz for both qtl and study
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source = 'EBI'
         self.gene_validator = GeneValidator()
 
@@ -82,16 +89,18 @@ class EQTLCatalog(BaseAdapter):
             return 'studies'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         if self.label == 'qtl':
             self.process_qtl()
         elif self.label == 'study':
             self.process_study()
 
     def process_qtl(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        # class/method come from catalog files_filesets (same pattern as other adapters)
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.method = file_fileset['method']
         if self.method == 'eQTL':
             label = 'eQTL'
             name = 'modulates expression of'
@@ -104,8 +113,12 @@ class EQTLCatalog(BaseAdapter):
             biological_process = 'ontology_terms/GO_0043484'
         else:
             raise ValueError(f'Invalid method: {self.method}')
+
+        # aliases are not stored on files_filesets; use IGVF portal API for dataset_id
         # alias example: igvf:igvf_catalog_ebi_eqtl_QTD000026
-        alias = file_metadata['aliases'][0]
+        portal_metadata = requests.get(
+            self.IGVF_API + self.file_accession).json()
+        alias = portal_metadata['aliases'][0]
         dataset_id = alias.split('_')[-1]
         found_dataset = False
         for row in self.metadata_rows(self.METADATA_PATH):
@@ -172,7 +185,8 @@ class EQTLCatalog(BaseAdapter):
                     'standard_error': float(row[9]),
                     'z_score': float(row[10]),
                     'credible_set_min_r2': float(row[11]),
-                    'region': row[12]
+                    'region': row[12],
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                 }
                 if label == 'spliceQTL':
                     molecular_trait_id_list = row[0].split(':')
@@ -192,7 +206,7 @@ class EQTLCatalog(BaseAdapter):
                 if row[0] not in study_list:
                     study_list.append(row[0])
         visited_study_ids = []
-        with open(self.filepath, 'r') as f:
+        with gzip.open(self.filepath, 'rt') as f:
             study_reader = csv.reader(f, delimiter='\t')
             next(study_reader)
             for row in study_reader:
@@ -205,8 +219,8 @@ class EQTLCatalog(BaseAdapter):
                         'pmid': row[9],
                         'study_type': row[10],
                         'source': self.source,
-                        'source_url': self.STUDY_SOURCE_URL
-
+                        'source_url': self.STUDY_SOURCE_URL,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
                     if self.validate:
                         self.validate_doc(_props)

@@ -74,6 +74,15 @@
             "spliceQTL"
           ]
         },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the variant to gene edge",
+          "example": "files_filesets/IGVFFI2520EPCL",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
         "name": {
           "enum": [
             "modulates expression of",
@@ -181,7 +190,11 @@
         "standard_error",
         "z_score",
         "credible_set_min_r2",
-        "region"
+        "region",
+        "class",
+        "method",
+        "label",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
@@ -189,7 +202,7 @@
   "db_collection_name": "variants_genes",
   "accessible_via": {
     "filter_by_range": "neg_log10_pvalue",
-    "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
-    "return": "neg_log10_pvalue, p_value, posterior_inclusion_probability, effect_size, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term"
+    "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context, files_filesets",
+    "return": "neg_log10_pvalue, p_value, posterior_inclusion_probability, effect_size, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term, files_filesets"
   }
 }
