@@ -38,6 +38,36 @@
       }
     }
   },
+  "bulk_t_cell": {
+    "uuid": "919d1d76-72f2-494b-9c86-372e0d26a229",
+    "title": "FRACTEL element-level results (bulk screens)",
+    "lab": "charles-gersbach",
+    "columns": {
+      "FRACTEL_pval": "Element-level p-values for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (https://github.com/GersbachlabBioinformatics/FRACTEL)",
+      "FRACTEL_pval_fdr_corr": "Corrected FRACTEL_pval after applying the Benjamini-Hochberg procedure",
+      "FRACTEL_effect_size": "Element-level effect-size for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
+      "intended_target_name": "ID of the targeted element (grouping singleton measurements, like gRNA-gene p-values). In promoter screens, this column will contain the ENSEMBL ID of the targeted gene.",
+      "intended_target_chr": "Chromosome of the target element",
+      "intended_target_start": "Start coordinate of the target element",
+      "intended_target_end": "End coordinate of the target element",
+      "readout_gene": "ENSEMBL ID of the readout gene",
+      "readout_gene_symbol": "Gene symbol associated with `readout_gene`"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "readout_gene",
+      "perturbed_gene": "intended_target_name",
+      "metrics": {
+        "p_value": "FRACTEL_pval",
+        "p_value_adj": "FRACTEL_pval_fdr_corr",
+        "log2FC": "FRACTEL_effect_size"
+      }
+    }
+  },
   "mechanoenhancer": {
     "uuid": "5e3aac5c-2f44-4586-9ea0-237889e32e49",
     "title": "Element-level Seurat/MAST file format specification",
@@ -72,35 +102,40 @@
     },
     "notes": "File format specification document reused from `t_cell` layout. Data file format does not actually match the fields defined in file format specification document precisely, i.e. ensembl_id instead of target_gene."
   },
-  "bulk_t_cell": {
-    "uuid": "919d1d76-72f2-494b-9c86-372e0d26a229",
-    "title": "FRACTEL element-level results (bulk screens)",
+  "bulk_mechanoenhancer": {
+    "uuid": "ef46b27b-a387-4fc2-8f7f-9320a798234b",
+    "title": "MYH9 FACS screen results file format specification",
     "lab": "charles-gersbach",
     "columns": {
-      "FRACTEL_pval": "Element-level p-values for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (https://github.com/GersbachlabBioinformatics/FRACTEL)",
-      "FRACTEL_pval_fdr_corr": "Corrected FRACTEL_pval after applying the Benjamini-Hochberg procedure",
-      "FRACTEL_effect_size": "Element-level effect-size for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
-      "intended_target_name": "ID of the targeted element (grouping singleton measurements, like gRNA-gene p-values). In promoter screens, this column will contain the ENSEMBL ID of the targeted gene.",
-      "intended_target_chr": "Chromosome of the target element",
-      "intended_target_start": "Start coordinate of the target element",
-      "intended_target_end": "End coordinate of the target element",
-      "readout_gene": "ENSEMBL ID of the readout gene",
-      "readout_gene_symbol": "Gene symbol associated with `readout_gene`"
+      "DHS_numeric": "Numeric ID of the DHS - derived from guide grouping",
+      "DHS_label": "DHS with Numeric ID (e.g., DHS_1)",
+      "chrom": "Chromosome where the DHS is located",
+      "start": "Start coordinate of the DHS",
+      "end": "End coordinate of the DHS",
+      "DHS_coordinate": "Combined genomic coordinate string",
+      "DHS_count": "Number of guides used for that DHS (counts only minus strand guide)",
+      "median_foldchange": "Median(highrep1/Lowrep1)",
+      "medianFC_normToCtl": "Fold change normalized to baseline",
+      "median_log2FC": "median log2FC",
+      "pZ": "phenotype z-score",
+      "tscore": "Stats from t-test"
     },
     "semantic_columns": {
       "element_coordinates": [
-        "intended_target_chr",
-        "intended_target_start",
-        "intended_target_end"
+        "chrom",
+        "start",
+        "end"
       ],
-      "readout_gene": "readout_gene",
-      "perturbed_gene": "intended_target_name",
       "metrics": {
-        "p_value": "FRACTEL_pval",
-        "p_value_adj": "FRACTEL_pval_fdr_corr",
-        "log2FC": "FRACTEL_effect_size"
+        "log2FC": "median_log2FC",
+        "fold_change": "median_foldchange",
+        "background_corrected_fold_change": "medianFC_normToCtl",
+        "num_guides": "DHS_count",
+        "z_score": "pZ",
+        "t_score": "tscore"
       }
-    }
+    },
+    "notes": "No readout gene or p-value columns. Use file-level readout_gene (MYH9). significant is derived from |z_score| >= ~1.96 (two-tailed alpha=0.05)."
   },
   "parse_perturb_seq": {
     "uuid": "0447d492-9a9c-4ac9-8299-ac6f0e785920",
@@ -780,6 +815,13 @@
         "enhancer"
       ],
       "readout_gene": "ENSG00000198846"
+    },
+    "IGVFFI6649RDHW": {
+      "layout": "bulk_mechanoenhancer",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "readout_gene": "ENSG00000100345"
     }
   }
 }

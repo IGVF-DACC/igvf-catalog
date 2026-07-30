@@ -1210,6 +1210,20 @@ def test_apply_adapter_calculated_fields_crudo_rules():
     )
     assert metrics['significant'] is False
 
+    metrics = adapter._apply_adapter_calculated_fields(
+        row=['putative_enhancer'],
+        colmap=colmap,
+        metrics={'z_score': 2.0},
+    )
+    assert metrics['significant'] is True
+
+    metrics = adapter._apply_adapter_calculated_fields(
+        row=['putative_enhancer'],
+        colmap=colmap,
+        metrics={'z_score': 1.0},
+    )
+    assert metrics['significant'] is False
+
 
 def test_crispr_element_gene_igvf_adapter_validate_doc_invalid(mock_file_fileset_perturb_seq):
     writer = SpyWriter()
@@ -1221,6 +1235,55 @@ def test_crispr_element_gene_igvf_adapter_validate_doc_invalid(mock_file_fileset
     }
     with pytest.raises(ValueError):
         adapter.validate_doc(invalid_doc)
+
+
+def test_igvf_e2g_bulk_mechanoenhancer_maps_z_score_and_significance(
+        mock_file_fileset_facs_screen, tmp_path):
+    """IGVFFI6649RDHW: constant MYH9; z_score/t_score mapped; |z|>=1.96 => significant."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'crispr_element_gene_igvf_bulk_mechano.tsv.gz'
+    header = (
+        'DHS_numeric\tDHS_label\tchrom\tstart\tend\tDHS_coordinate\t'
+        'DHS_count\tmedian_foldchange\tmedianFC_normToCtl\tmedian_log2FC\t'
+        'pZ\ttscore\n'
+    )
+    rows = (
+        '1\tDHS_1\tchr22\t36123868\t36124406\tchr22:36123868-36124406\t'
+        '27\t0.74\t0.04\t-0.43\t0.32\t0.07\n'
+        '2\tDHS_2\tchr22\t36129464\t36129878\tchr22:36129464-36129878\t'
+        '7\t0.5\t0.02\t-1.0\t2.5\t3.1\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.return_value = True
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI6649RDHW/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 2
+    weak = [e for e in parsed if '36123868' in e['_from']][0]
+    strong = [e for e in parsed if '36129464' in e['_from']][0]
+
+    assert weak['_to'] == 'genes/ENSG00000100345'
+    assert weak['z_score'] == pytest.approx(0.32)
+    assert weak['t_score'] == pytest.approx(0.07)
+    assert weak['log2FC'] == pytest.approx(-0.43)
+    assert weak['num_guides'] == 27
+    assert weak['significant'] is False
+    assert 'p_value' not in weak
+
+    assert strong['z_score'] == pytest.approx(2.5)
+    assert strong['t_score'] == pytest.approx(3.1)
+    assert strong['significant'] is True
 
 
 def test_igvf_e2g_crispr_surf_constant_readout_and_most_stringent_fdr(
