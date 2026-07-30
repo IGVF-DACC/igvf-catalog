@@ -34,7 +34,8 @@
           "example": "promoter",
           "enum": [
             "enhancer",
-            "promoter"
+            "promoter",
+            "distal element"
           ]
         },
         "source": {

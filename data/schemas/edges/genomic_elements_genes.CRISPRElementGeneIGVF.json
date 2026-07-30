@@ -199,6 +199,10 @@
         "t_score": {
           "type": "number",
           "description": "T-statistic for the element-gene association when reported by the source."
+        },
+        "idr": {
+          "type": "number",
+          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility."
         }
       },
       "required": [
@@ -212,7 +216,7 @@
       ],
       "additionalProperties": false,
       "accessible_via": {
-        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, z_score",
+        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
         "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
       }
     }
