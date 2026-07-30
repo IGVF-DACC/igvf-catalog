@@ -1826,6 +1826,27 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'sce2g',
+        label: 'scE2G',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000156875',
+              'method = scE2G'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI4235YTNW',
+              'method = scE2G'
+            ]
+          }
+        ]
       }
     ]),
 
@@ -1919,6 +1940,27 @@ export const descriptions = {
             items: [
               'files_fileset = IGVFFI3069QCRA',
               'method = Perturb-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sce2g',
+        label: 'scE2G',
+        examples: [
+          {
+            label: 'Query by region',
+            items: [
+              'region = chr1:169893055-169894554 (maximum length: 10kb)',
+              'method = scE2G'
+            ]
+          },
+          {
+            label: 'Query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI4235YTNW',
+              'method = scE2G'
             ]
           }
         ]
