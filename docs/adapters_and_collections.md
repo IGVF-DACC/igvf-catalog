@@ -10,19 +10,19 @@ Each adapter can write to several collections. Below is the table to display the
 | GencodeGene          | gencode_gene_adapter      | genes                                                   |
 |                      |                           | mm_genes                                                |
 | TopLD                | topld_adapter             | variants_variants                                       |
-| CAQtl                | encode_caqtl_adapter      | regulatory_regions                                      |
-|                      |                           | variants_regulatory_regions                             |
-| CCRE                 | ccre_adapter              | regulatory_regions                                      |
+| CAQtl                | encode_caqtl_adapter      | genomic_elements                                      |
+|                      |                           | variants_genomic_elements                             |
+| CCRE                 | ccre_adapter              | genomic_elements                                      |
 | Ontology             | ontologies_adapter        | ontology_terms                                          |
 |                      |                           | ontology_terms_ontology_terms                           |
 | Favor                | favor_adapter             | variants                                                |
 | ASB                  | adastra_asb_adapter       | variants_proteins                                       |
-|EncodeElementGeneLink |encode_element_gene_adapter| regulatory_regions_genes                                |
-|                      |                           | regulatory_regions                                      |
-|                      |                           | regulatory_regions_genes_biosamples                     |
-|                      |                           | regulatory_regions_genes_biosamples_treatments_CHEBI    |
-|                      |                           | regulatory_regions_genes_biosamples_treatments_proteins |
-|                      |                           | regulatory_regions_genes_biosamples_donors              |
+|EncodeElementGeneLink |encode_element_gene_adapter| genomic_elements_genes                                |
+|                      |                           | genomic_elements                                      |
+|                      |                           | genomic_elements_genes_biosamples                     |
+|                      |                           | genomic_elements_genes_biosamples_treatments_CHEBI    |
+|                      |                           | genomic_elements_genes_biosamples_treatments_proteins |
+|                      |                           | genomic_elements_genes_biosamples_donors              |
 |                      |                           | donors                                                  |
 |                      |                           | ontology_terms                                          |
 | GAF                  | gaf_adapter               | go_terms_annotations                                    |
@@ -47,24 +47,33 @@ Each adapter can write to several collections. Below is the table to display the
 |                      |                           | complexes_proteins                                      |
 |                      |                           | complexes_terms                                         |
 | ProteinsInteraction  | proteins_interaction_adapter | proteins_proteins                                    |
-| HumanMouseElementAdapter | human_mouse_element_adapter | mm_regulatory_regions                             |
-|                      |                           | regulatory_regions                                      |
-|                      |                           | regulatory_regions_mm_regulatory_regions                |
-| EncodeMPRA           | encode_mpra_adapter       | regulatory_regions                                      |
-|                      |                           | regulatory_regions_biosamples                           |
+| HumanMouseElementAdapter | human_mouse_element_adapter | mm_genomic_elements                             |
+|                      |                           | genomic_elements                                      |
+|                      |                           | genomic_elements_mm_genomic_elements                |
+| EncodeMPRA           | encode_mpra_adapter       | genomic_elements                                      |
+|                      |                           | genomic_elements_biosamples                           |
 | MGIHumanMouseOrthologAdapter | mgi_human_mouse_ortholog_adapter | genes_mm_genes                           |
 | ASB_GVATDB           | gvatdb_asb_adapter        | variants_proteins                                       |
 | AFGREQtl             | AFGR_eqtl_adapter         | variants_genes                                          |
 | AFGRSQtl             | AFGR_sqtl_adapter         | variants_genes                                          |
-| AFGRCAQtl            | AFGR_caqtl_adapter        | regulatory_regions                                      |
-|                      |                           | variants_regulatory_regions                             |
+| AFGRCAQtl            | AFGR_caqtl_adapter        | genomic_elements                                      |
+|                      |                           | variants_genomic_elements                             |
 | DbSNFPAdapter        | dbSNFP_adapter            | coding_variants                                         |
 |                      |                           | variants_coding_variants                                |
 | pQTL                 | pQTL_adapter              | variants_proteins                                       |
 | GeneGeneBiogrid      | biogrid_gene_gene_adapter | genes_genes                                             |
 |                      |                           | mm_genes_mm_genes                                       |
-| CRISPRElementGeneENCODE       | CRISPR_element_gene_ENCODE_adapter | regulatory_regions                                      |
-|                      |                           | regulatory_regions_genes                                |
+| CRISPRElementGeneENCODE | CRISPR_element_gene_ENCODE_adapter | genomic_elements                               |
+|                      |                           | genomic_elements_genes                                  |
+| CRISPRElementGeneIGVF | CRISPR_element_gene_IGVF_adapter | genomic_elements                                    |
+|                      |                           | genomic_elements_genes                                  |
+| CRISPRElementPhenotype | CRISPR_element_phenotype_adapter | genomic_elements                                  |
+|                      |                           | genomic_elements_phenotypes                             |
+| CRISPRVariantGene    | CRISPR_variant_gene_adapter | variants                                              |
+|                      |                           | variants_genes                                          |
+| CRISPRVariantPhenotype | CRISPR_variant_phenotype_adapter | variants                                          |
+|                      |                           | variants_phenotypes                                     |
+|                      |                           | ontology_terms                                          |
 | MouseGenomesProjectAdapter | mouse_genomes_project_adapter| mm_variants                                    |
 | ClinGen        | clingen_variant_disease_adapter | variants_diseases                                       |
 |                      |                           | variants_diseases_genes                                 |
