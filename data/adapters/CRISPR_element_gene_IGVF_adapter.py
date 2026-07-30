@@ -55,6 +55,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
+    # Two-tailed normal critical value for SIGNIFICANCE_THRESHOLD (≈ normsinv(0.975)).
+    Z_SCORE_SIGNIFICANCE_THRESHOLD = 1.959963984540054
     # CRISPR_element_gene_ENCODE_adapter; max log10pvalue from file is 235
     MAX_LOG10_PVALUE = 240
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
@@ -76,6 +78,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         'cpm_perturb',
         'cpm_bg',
         'num_cells',
+        'z_score',
+        't_score',
     })
 
     @staticmethod
@@ -497,14 +501,20 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 metrics['p_value_adj'])
 
     def _apply_standard_significant_field(self, metrics: dict) -> None:
-        """Set significant from p_value_adj or p_value using SIGNIFICANCE_THRESHOLD."""
+        """Set significant from p-values or |z_score| using SIGNIFICANCE_THRESHOLD."""
         p_value = metrics.get('p_value_adj')
         if p_value is None:
             p_value = metrics.get('p_value')
         if p_value is not None:
             metrics['significant'] = p_value < self.SIGNIFICANCE_THRESHOLD
-        else:
-            metrics['significant'] = False
+            return
+        z_score = metrics.get('z_score')
+        if z_score is not None:
+            metrics['significant'] = (
+                abs(z_score) >= self.Z_SCORE_SIGNIFICANCE_THRESHOLD
+            )
+            return
+        metrics['significant'] = False
 
     def _apply_adapter_calculated_fields(
         self,

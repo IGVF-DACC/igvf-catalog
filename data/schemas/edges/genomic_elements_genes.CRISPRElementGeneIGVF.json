@@ -191,6 +191,14 @@
         "num_cells": {
           "type": "number",
           "description": "Number of cells with perturbation guides at the element."
+        },
+        "z_score": {
+          "type": "number",
+          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
+        },
+        "t_score": {
+          "type": "number",
+          "description": "T-statistic for the element-gene association when reported by the source."
         }
       },
       "required": [
@@ -204,7 +212,7 @@
       ],
       "additionalProperties": false,
       "accessible_via": {
-        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj",
+        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, z_score",
         "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
       }
     }
