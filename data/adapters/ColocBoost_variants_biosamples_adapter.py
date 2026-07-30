@@ -47,6 +47,8 @@ class ColocBoostVariantBiosample(BaseAdapter):
             self.parse()
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
         file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.method = file_fileset_obj['method']
