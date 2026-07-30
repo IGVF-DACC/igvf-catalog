@@ -466,6 +466,86 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files
         return set(cursor)
 
 
+def _hgvs_with_space_after_colon(hgvs):
+    """Insert a space after the accession colon if missing.
+
+    Catalog variants sometimes store HGVS as 'NC_000017.11: g....' instead of
+    the canonical 'NC_000017.11:g....'.
+    """
+    if ':' not in hgvs:
+        return hgvs
+    accession, rest = hgvs.split(':', 1)
+    if rest.startswith(' '):
+        return hgvs
+    return f'{accession}: {rest}'
+
+
+def _bulk_query_variant_keys_by_field(identifiers, field, chunk_size=500):
+    """Chunked IN-lookup of variants._key by a single variants field."""
+    ids = [identifier for identifier in set(identifiers) if identifier]
+    if not ids:
+        return {}
+
+    db = ArangoDB().get_igvf_connection()
+    query = f'''
+    FOR v IN variants
+      FILTER v.{field} IN @ids
+      RETURN {{ id: v.{field}, key: v._key }}
+    '''
+
+    id_to_keys = {}
+    for i in range(0, len(ids), chunk_size):
+        chunk = ids[i:i + chunk_size]
+        cursor = db.aql.execute(query, bind_vars={'ids': chunk})
+        for record in cursor:
+            identifier = record['id']
+            key = record['key']
+            if not identifier or not key:
+                continue
+            id_to_keys.setdefault(identifier, []).append(key)
+    return id_to_keys
+
+
+def bulk_query_variant_keys_by_identifier(identifiers, check_by='ca_id', chunk_size=500):
+    """Bulk-lookup variant _keys by spdi, hgvs, ca_id, or _key.
+
+    Returns a dict mapping each input identifier -> list of matching variants._key
+    values. Empty/None identifiers are ignored; identifiers with no catalog match
+    are omitted. Queries are chunked to avoid ArangoDB gateway timeouts.
+
+    For check_by='hgvs', unmatched identifiers are retried after inserting a space
+    after the accession colon (e.g. 'NC_...:g.' -> 'NC_...: g.') to handle known
+    DB formatting inconsistencies. Results are still keyed by the original
+    (unspaced) identifier.
+    """
+    allowed = ('_key', 'spdi', 'hgvs', 'ca_id')
+    if check_by not in allowed:
+        raise ValueError(f'check_by must be one of {allowed}')
+
+    ids = [identifier for identifier in set(identifiers) if identifier]
+    if not ids:
+        return {}
+
+    id_to_keys = _bulk_query_variant_keys_by_field(ids, check_by, chunk_size)
+
+    if check_by == 'hgvs':
+        unmatched = [
+            identifier for identifier in ids if identifier not in id_to_keys]
+        spaced_to_original = {}
+        for original in unmatched:
+            spaced = _hgvs_with_space_after_colon(original)
+            if spaced != original:
+                spaced_to_original[spaced] = original
+        if spaced_to_original:
+            spaced_matches = _bulk_query_variant_keys_by_field(
+                list(spaced_to_original.keys()), 'hgvs', chunk_size)
+            for spaced, keys in spaced_matches.items():
+                original = spaced_to_original[spaced]
+                id_to_keys.setdefault(original, []).extend(keys)
+
+    return id_to_keys
+
+
 def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
     # given pairs of protein_id and hgvsp, return matched coding variants keys mapping
     db = ArangoDB().get_igvf_connection()

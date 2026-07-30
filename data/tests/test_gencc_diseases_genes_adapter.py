@@ -23,15 +23,27 @@ def mock_gene_map():
         yield m
 
 
-def test_gencc_process_file_writes_edge(mock_gene_map):
+@pytest.fixture
+def mock_file_fileset():
+    with patch('adapters.gencc_diseases_genes_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'biological relationship',
+            'method': 'GenCC'
+        }
+        yield mock_get
+
+
+def test_gencc_process_file_writes_edge(mock_gene_map, mock_file_fileset):
     writer = SpyWriter()
     adapter = GenccDiseasesGenes(
         filepath=SAMPLE_TSV,
         writer=writer,
         validate=True,
     )
+    adapter.file_accession = 'IGVFFI8022JGUK'
     adapter.process_file()
 
+    mock_file_fileset.assert_called_once_with('IGVFFI8022JGUK')
     docs = _parsed_docs(writer)
     assert len(docs) == 2
     doc = next(d for d in docs if d['_to'] == 'genes/ENSG00000123456')
@@ -52,15 +64,20 @@ def test_gencc_process_file_writes_edge(mock_gene_map):
     assert doc['pmids'] == ['28106320', '12345678']
     assert doc['source'] == GenccDiseasesGenes.SOURCE
     assert doc['source_url'] == 'https://thegencc.org/submissions/SGC-TEST001.1'
+    assert doc['class'] == 'biological relationship'
+    assert doc['method'] == 'GenCC'
+    assert doc['label'] == doc['method']
+    assert doc['files_filesets'] == 'files_filesets/IGVFFI8022JGUK'
 
 
-def test_gencc_process_file_one_row_per_gene_ensembl(mock_gene_map):
+def test_gencc_process_file_one_row_per_gene_ensembl(mock_gene_map, mock_file_fileset):
     writer = SpyWriter()
     adapter = GenccDiseasesGenes(
         filepath=SAMPLE_TSV,
         writer=writer,
         validate=True,
     )
+    adapter.file_accession = 'IGVFFI8022JGUK'
     adapter.process_file()
 
     docs = _parsed_docs(writer)
@@ -76,13 +93,14 @@ def test_gencc_process_file_one_row_per_gene_ensembl(mock_gene_map):
     }
 
 
-def test_gencc_skips_row_when_hgnc_not_in_gene_map(mock_gene_map):
+def test_gencc_skips_row_when_hgnc_not_in_gene_map(mock_gene_map, mock_file_fileset):
     writer = SpyWriter()
     adapter = GenccDiseasesGenes(
         filepath=SAMPLE_TSV,
         writer=writer,
         validate=False,
     )
+    adapter.file_accession = 'IGVFFI8022JGUK'
     adapter.process_file()
     docs = _parsed_docs(writer)
     assert len(docs) == 2
@@ -111,3 +129,4 @@ def test_gencc_initialization():
     adapter = GenccDiseasesGenes(filepath=SAMPLE_TSV, label='disease_gene')
     assert adapter.filepath == SAMPLE_TSV
     assert adapter.label == 'disease_gene'
+    assert adapter.file_accession == 'gencc_submissions'

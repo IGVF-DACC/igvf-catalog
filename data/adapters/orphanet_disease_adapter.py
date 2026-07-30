@@ -1,10 +1,12 @@
 import xml.etree.ElementTree as ET
 import json
+import os
 from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # The xml file was download from https://www.orphadata.com/genes/
 # The disease-gene association elements are under each Disorder element in the tree from the xml file
@@ -41,6 +43,7 @@ class Disease(BaseAdapter):
         self.gene_validator = GeneValidator()
 
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -51,6 +54,11 @@ class Disease(BaseAdapter):
         return 'diseases_genes'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
 
         # the xml file is relatively small, just parse at once here
         # or could return an iterator with ET.iterparse(xmlfile)
@@ -101,7 +109,11 @@ class Disease(BaseAdapter):
                     'association_type': assoc_type_name,
                     'association_status': assoc_status_name,
                     'source': Disease.SOURCE,
-                    'source_url': Disease.SOURCE_URL
+                    'source_url': Disease.SOURCE_URL,
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'label': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                 }
 
                 if self.validate:

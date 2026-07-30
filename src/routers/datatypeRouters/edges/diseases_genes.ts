@@ -48,6 +48,10 @@ const diseasesToGenesFormat = z.object({
   moi_id: z.string().nullish(), // GenCC only
   moi_name: z.string().nullish(), // GenCC only
   submitter: z.string().nullish(), // GenCC only
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
+  files_filesets: z.string().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
@@ -289,7 +293,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 
   LET CLINGENUNIQ = (
     FOR record IN CLINGEN
-    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, name = record.name INTO variantGroup = record.variant
+    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, class = record.class, method = record.method, label = record.label, files_filesets = record.files_filesets, name = record.name INTO variantGroup = record.variant
     LET variants = (
       FOR v IN variantGroup
         FILTER v != null
@@ -302,6 +306,10 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
       'inheritance_mode': inheritance_mode,
       'source': source,
       'source_url': source_url,
+      'class': class,
+      'method': method,
+      'label': label,
+      'files_filesets': files_filesets,
       'name': name
     }
   )
