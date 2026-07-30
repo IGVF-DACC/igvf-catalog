@@ -42,9 +42,9 @@
           "example": "ontology_terms/EFO_0006340",
           "pattern": "^ontology_terms/"
         },
-        "vcp": {
+        "VCP": {
           "type": "number",
-          "description": "Variant Colocalization Probability for the variants to biosamples edge",
+          "description": "Variant Colocalization Probability for the variants to biosamples edge. Source files only include associations above a VCP > 0.1 threshold.",
           "minimum": 0,
           "maximum": 1
         },
@@ -108,7 +108,7 @@
         "biosample_term",
         "biological_context",
         "phenotype",
-        "vcp",
+        "VCP",
         "gene",
         "trait_name",
         "source_url",

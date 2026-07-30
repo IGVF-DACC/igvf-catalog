@@ -230,7 +230,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     'biosample_term': biosample_ref,
                     'biological_context': biological_context,
                     'phenotype': phenotype,
-                    'vcp': float(row['VCP']),
+                    'VCP': float(row['VCP']),
                     'gene': gene,
                     'trait_name': row['TraitName'],
                     'label': self.collection_label,
