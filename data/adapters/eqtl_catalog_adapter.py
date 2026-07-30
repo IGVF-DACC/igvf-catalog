@@ -67,7 +67,6 @@ class EQTLCatalog(BaseAdapter):
                 yield row
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        # filepath basename is IGVFFI*.tsv.gz for both qtl and study
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source = 'EBI'
         self.gene_validator = GeneValidator()
