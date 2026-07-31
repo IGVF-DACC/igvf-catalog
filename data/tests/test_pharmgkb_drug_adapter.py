@@ -35,8 +35,8 @@ def reference_kwargs():
     # Use full support tables for edge labels so sample annotation rows resolve
     return {
         'drug_reference_filepath': './data_loading_support_files/IGVFFI2997DUKO.pharmGKB_chemicals.tsv',
-        'variant_reference_filepath': './data_loading_support_files/pharmGKB_variants.tsv',
-        'study_reference_filepath': './data_loading_support_files/pharmGKB_study_parameters.tsv',
+        'variant_reference_filepath': './data_loading_support_files/IGVFFI7955ICXJ.pharmGKB_variants.tsv',
+        'study_reference_filepath': './data_loading_support_files/IGVFFI1149WTCK.pharmGKB_study_parameters.tsv',
         'gene_reference_filepath': './data_loading_support_files/pharmGKB_genes.tsv',
     }
 
