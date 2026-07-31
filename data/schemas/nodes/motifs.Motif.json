@@ -28,10 +28,7 @@
           ]
         },
         "method": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": "string",
           "description": "The method of the motif, from the associated files_filesets record",
           "enum": [
             "HOCOMOCO"
