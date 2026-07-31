@@ -40,7 +40,11 @@ const goAnnotationFormat = z.object({
   organism: z.string(),
   evidence: z.string(),
   go_id: z.string(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
+  files_filesets: z.string().nullish()
 }).optional()
 
 async function transcriptIds (id: string): Promise<any[]> {
