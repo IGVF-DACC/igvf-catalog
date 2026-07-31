@@ -454,14 +454,14 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             if col_idx >= len(row):
                 continue
             cell = row[col_idx].strip()
-            if cell:
-                try:
-                    value = float(cell)
-                    metrics[key] = value
-                except ValueError as err:
-                    self._row_load_error(
-                        f'metric {key!r} is not a float ({row[col_idx]!r}): {err}'
-                    )
+            if not cell or cell.lower() in {'na', 'nan', 'none', 'null'}:
+                continue
+            try:
+                metrics[key] = float(cell)
+            except ValueError as err:
+                self._row_load_error(
+                    f'metric {key!r} is not a float ({row[col_idx]!r}): {err}'
+                )
         return metrics
 
     @classmethod
@@ -870,7 +870,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         crispr_surf_best_edges = {}
         seen_element_gene_ids = set()
         constant_readout_gene = self.file_config.get('readout_gene')
-        with gzip.open(self.filepath, 'rt') as data_file:
+        with gzip.open(self.filepath, 'rt', encoding='utf-8-sig') as data_file:
             reader = csv.reader(
                 data_file, delimiter=self.layout.get('delimiter', '\t'))
             header = next(reader)
