@@ -26,6 +26,18 @@
             "ontology_terms"
           ]
         },
+        "genomic_element": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reference to the candidate cis-regulatory element the variant falls in; null when the source file has no linked cCREs.",
+          "example": "genomic_elements/candidate_cis_regulatory_element_chr10_10457_10458_GRCh38_ENCFF420VPZ",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
         "log2FC": {
           "type": "number",
           "description": "Log2FC of the variant to biosample edge"
@@ -94,6 +106,7 @@
       },
       "required": [
         "_key",
+        "genomic_element",
         "log2FC",
         "biological_context",
         "biosample_term",
