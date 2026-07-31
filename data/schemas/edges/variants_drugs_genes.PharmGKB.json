@@ -64,10 +64,7 @@
       ]
     },
     "method": {
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": "string",
       "description": "The method of the variant to drug to gene edge, from the associated files_filesets record",
       "enum": [
         "PharmGKB"
