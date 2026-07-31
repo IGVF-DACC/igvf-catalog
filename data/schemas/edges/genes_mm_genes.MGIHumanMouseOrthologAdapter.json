@@ -67,9 +67,7 @@
       ]
     },
     "method": {
-      "type": [
-        "string"
-      ],
+      "type": "string",
       "description": "The method of the genes to mm genes edge, from the associated files_filesets record",
       "enum": [
         "Homology"
