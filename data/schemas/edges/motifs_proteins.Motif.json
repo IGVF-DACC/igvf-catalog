@@ -62,9 +62,7 @@
       ]
     },
     "method": {
-      "type": [
-        "string"
-      ],
+      "type": "string",
       "description": "The method of the motifs to proteins edge, from the associated files_filesets record",
       "enum": [
         "HOCOMOCO"
