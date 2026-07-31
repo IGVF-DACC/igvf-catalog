@@ -1252,6 +1252,8 @@ def test_igvf_e2g_bulk_mechanoenhancer_maps_z_score_and_significance(
         '27\t0.74\t0.04\t-0.43\t0.32\t0.07\n'
         '2\tDHS_2\tchr22\t36129464\t36129878\tchr22:36129464-36129878\t'
         '7\t0.5\t0.02\t-1.0\t2.5\t3.1\n'
+        '3\tDHS_3\tchr22\t36200221\t36200402\tchr22:36200221-36200402\t'
+        '1\t0.8\t0.05\t-0.34\t0.67\tNA\n'
     )
     with gzip.open(test_file, 'wt') as out:
         out.write(header)
@@ -1269,21 +1271,26 @@ def test_igvf_e2g_bulk_mechanoenhancer_maps_z_score_and_significance(
         adapter.process_file()
 
     parsed = [json.loads(line) for line in writer.contents if line.strip()]
-    assert len(parsed) == 2
+    assert len(parsed) == 3
     weak = [e for e in parsed if '36123868' in e['_from']][0]
     strong = [e for e in parsed if '36129464' in e['_from']][0]
+    missing_t = [e for e in parsed if '36200221' in e['_from']][0]
 
     assert weak['_to'] == 'genes/ENSG00000100345'
     assert weak['z_score'] == pytest.approx(0.32)
     assert weak['t_score'] == pytest.approx(0.07)
     assert weak['log2FC'] == pytest.approx(-0.43)
-    assert weak['num_guides'] == 27
     assert weak['significant'] is False
-    assert 'p_value' not in weak
 
     assert strong['z_score'] == pytest.approx(2.5)
     assert strong['t_score'] == pytest.approx(3.1)
     assert strong['significant'] is True
+
+    assert missing_t['z_score'] == pytest.approx(0.67)
+    assert 't_score' not in missing_t
+    assert missing_t['significant'] is False
+    assert weak['num_guides'] == 27
+    assert 'p_value' not in weak
 
 
 def test_igvf_e2g_crispr_surf_constant_readout_and_most_stringent_fdr(
@@ -1349,8 +1356,9 @@ def test_igvf_e2g_pdx1_region_level_distal_elements_z_score_idr(
     """IGVFFI7368COWA: distal element; LFC/z/IDR mapped; |z|>=1.96 => significant."""
     writer = SpyWriter()
     test_file = tmp_path / 'crispr_element_gene_igvf_pdx1_region.tsv.gz'
+    # Include a UTF-8 BOM like the portal downloads for this format.
     header = (
-        'intended_target_chr\tintended_target_start\tintended_target_end\t'
+        '\ufeffintended_target_chr\tintended_target_start\tintended_target_end\t'
         'LFC\tZ-score\tIDR\treadout_gene_ensembl\treadout_gene_symbol\n'
     )
     rows = (
