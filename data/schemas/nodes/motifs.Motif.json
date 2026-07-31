@@ -22,14 +22,20 @@
         },
         "class": {
           "type": "string",
-          "description": "The class of the motif, from the associated files_filesets record"
+          "description": "The class of the motif, from the associated files_filesets record",
+          "enum": [
+            "observed data"
+          ]
         },
         "method": {
           "type": [
             "string",
             "null"
           ],
-          "description": "The method of the motif, from the associated files_filesets record"
+          "description": "The method of the motif, from the associated files_filesets record",
+          "enum": [
+            "HOCOMOCO"
+          ]
         },
         "files_filesets": {
           "type": "string",

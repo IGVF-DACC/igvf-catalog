@@ -31,7 +31,7 @@ def mock_file_fileset():
     with patch('adapters.motif_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'class': 'observed data',
-            'method': None
+            'method': 'HOCOMOCO'
         }
         yield mock_get_file_fileset
 
@@ -54,7 +54,7 @@ def test_motif_node(sample_archive, spy_writer, mock_file_fileset):
     assert data['source'] == Motif.SOURCE
     assert data['source_url'].startswith(Motif.SOURCE_URL)
     assert data['class'] == 'observed data'
-    assert data['method'] is None
+    assert data['method'] == 'HOCOMOCO'
     assert data['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
@@ -94,7 +94,7 @@ def test_motif_protein_link(sample_archive, spy_writer, mock_file_fileset):
     assert data['biological_process'] == 'ontology_terms/GO_0003677'
     assert data['source'] == Motif.SOURCE
     assert data['class'] == 'observed data'
-    assert data['method'] is None
+    assert data['method'] == 'HOCOMOCO'
     assert data['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
