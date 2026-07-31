@@ -42,10 +42,7 @@
           ]
         },
         "method": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": "string",
           "description": "The method of the drug, from the associated files_filesets record",
           "enum": [
             "PharmGKB"
