@@ -25,7 +25,7 @@ def mock_file_fileset():
     with patch('adapters.pharmgkb_drug_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'class': 'observed data',
-            'method': None
+            'method': 'PharmGKB'
         }
         yield mock_get_file_fileset
 
@@ -73,7 +73,7 @@ def test_drug_label(drug_filepath, spy_writer, mocker, mock_file_fileset):
     assert first_item['name'] == '10-desmethyl alpha-dihydrotetrabenazine'
     assert first_item['drug_ontology_terms'] == []
     assert first_item['class'] == 'observed data'
-    assert first_item['method'] is None
+    assert first_item['method'] == 'PharmGKB'
     assert first_item['files_filesets'] == f'files_filesets/{DRUG_FILE_ACCESSION}'
 
 
@@ -99,7 +99,7 @@ def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker, mock
     assert first_item['source_url'].startswith(
         'https://www.pharmgkb.org/variantAnnotation/')
     assert first_item['class'] == 'observed data'
-    assert first_item['method'] is None
+    assert first_item['method'] == 'PharmGKB'
     assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
@@ -124,7 +124,7 @@ def test_variant_drug_gene_label(filepath, reference_kwargs, spy_writer, mocker,
     assert first_item['source_url'].startswith(
         'https://www.pharmgkb.org/variantAnnotation/')
     assert first_item['class'] == 'observed data'
-    assert first_item['method'] is None
+    assert first_item['method'] == 'PharmGKB'
     assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
