@@ -25,7 +25,7 @@ def mock_file_fileset():
     with patch('adapters.mgi_human_mouse_ortholog_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'class': 'observed data',
-            'method': None
+            'method': 'Homology'
         }
         yield mock_get_file_fileset
 
@@ -88,7 +88,7 @@ def test_process_file(mock_gene_map, sample_filepath, spy_writer, mock_file_file
     assert data['source'] == 'MGI'
     assert data['source_url'] == 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
     assert data['class'] == 'observed data'
-    assert data['method'] is None
+    assert data['method'] == 'Homology'
     assert data['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 

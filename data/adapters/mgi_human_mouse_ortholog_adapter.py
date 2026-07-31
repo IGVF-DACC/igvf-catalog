@@ -45,6 +45,8 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
         }
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
         file_metadata = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.collection_class = file_metadata['class']
