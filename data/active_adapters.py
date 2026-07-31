@@ -45,6 +45,7 @@ from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
 from adapters.igvf_V2G_CRISPR_adapter import IGVFV2GCRISPR
+from adapters.ColocBoost_variants_biosamples_adapter import ColocBoostVariantBiosample
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
@@ -134,6 +135,7 @@ KEY_TO_ADAPTER = {
     'mpra': MPRAAdapter,
     'bluestarr_variant_biosample': BlueSTARRVariantBiosample,
     'igvf_variant_gene_crispr': IGVFV2GCRISPR,
+    'colocboost_variant_biosample': ColocBoostVariantBiosample,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,

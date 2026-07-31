@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_biosamples.ColocBoostVariantBiosample.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variants to biosamples edge",
+          "example": "NC_000001.11:112503772:T:C_UBERON_0001323_IGVFFI7493PNOA"
+        },
+        "_from": {
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term for the variants to biosamples edge",
+          "example": "ontology_terms/UBERON_0001323",
+          "pattern": "^ontology_terms/"
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context for the variants to biosamples edge",
+          "example": "tibial nerve"
+        },
+        "phenotype": {
+          "type": "string",
+          "description": "Phenotype for the variants to biosamples edge",
+          "example": "ontology_terms/EFO_0006340",
+          "pattern": "^ontology_terms/"
+        },
+        "VCP": {
+          "type": "number",
+          "description": "Variant Colocalization Probability for the variants to biosamples edge. Source files only include associations above a VCP > 0.1 threshold.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "gene": {
+          "type": "string",
+          "description": "Gene associated with the variants to biosamples edge",
+          "example": "genes/ENSG00000134245",
+          "pattern": "^genes/",
+          "collections": ["genes"]
+        },
+        "trait_name": {
+          "type": "string",
+          "description": "Trait name for the variants to biosamples edge"
+        },
+        "label": {
+          "enum": [
+            "predicted variant effect on phenotype"
+          ]
+        },
+        "method": {
+          "enum": [
+            "ColocBoost"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "name": {
+          "enum": [
+            "colocalizes with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "colocalized by variant"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI7493PNOA/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the variants to biosamples edge",
+          "example": "files_filesets/IGVFFI7493PNOA",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "biosample_term",
+        "biological_context",
+        "phenotype",
+        "VCP",
+        "gene",
+        "trait_name",
+        "source_url",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants_biosamples"
+}
