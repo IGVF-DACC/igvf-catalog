@@ -80,6 +80,7 @@ class PharmGKB(BaseAdapter):
         self.variant_reference_filepath = variant_reference_filepath
         self.study_reference_filepath = study_reference_filepath
         self.gene_reference_filepath = gene_reference_filepath
+
         self.file_accession = get_file_accession(filepath)
 
         if self.label in ('variant_drug', 'variant_drug_gene'):
@@ -116,6 +117,12 @@ class PharmGKB(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
+        self.writer.add_tag('portal_accessions', get_file_accession(
+            self.drug_reference_filepath))
+        self.writer.add_tag('portal_accessions', get_file_accession(
+            self.variant_reference_filepath))
+        self.writer.add_tag('portal_accessions', get_file_accession(
+            self.study_reference_filepath))
 
         file_metadata = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
