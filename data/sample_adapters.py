@@ -110,7 +110,7 @@ ADAPTERS = {
     'gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='human_gene_gene_biogrid'),
     'mouse_gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv', label='mouse_gene_gene_biogrid'),
     'genomic_element_mm_genomic_element': HumanMouseElementAdapter(filepath='./samples/element_mapping_example.txt.gz', label='genomic_element_mm_genomic_element'),
-    'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'),
+    'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', label='coding_variants'),
     'variants_coding_variants': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', label='variants_coding_variants'),
     'coding_variants_proteins': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', label='coding_variants_proteins'),

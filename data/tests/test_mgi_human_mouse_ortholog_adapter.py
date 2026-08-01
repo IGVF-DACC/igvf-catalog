@@ -6,14 +6,28 @@ from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapt
 from adapters.writer import SpyWriter
 
 
+FILE_ACCESSION = 'IGVFFI9177QQPS'
+
+
 @pytest.fixture
 def sample_filepath():
-    return './samples/HOM_MouseHumanSequence_sample.rpt'
+    return './samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'
 
 
 @pytest.fixture
 def spy_writer():
     return SpyWriter()
+
+
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.mgi_human_mouse_ortholog_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': 'Homology'
+        }
+        yield mock_get_file_fileset
 
 
 def _collect_sample_entrez_and_mgi_ids(filepath):
@@ -30,7 +44,7 @@ def _collect_sample_entrez_and_mgi_ids(filepath):
     return entrez_ids, mgi_ids
 
 
-def mock_human_entrez_gene_map(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'):
+def mock_human_entrez_gene_map(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'):
     entrez_ids, _ = _collect_sample_entrez_and_mgi_ids(filepath)
     return {
         f'ENTREZ:{entrez_id}': [f'ENSG{int(entrez_id):011d}']
@@ -38,7 +52,7 @@ def mock_human_entrez_gene_map(filepath='./samples/HOM_MouseHumanSequence_sample
     }
 
 
-def mock_mouse_mgi_gene_map(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'):
+def mock_mouse_mgi_gene_map(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'):
     _, mgi_ids = _collect_sample_entrez_and_mgi_ids(filepath)
     return {
         mgi_id: [f'ENSMUSG{int(mgi_id.split(":")[1]):011d}']
@@ -55,7 +69,7 @@ def mock_get_gene_map_from_arangodb(field, collection='genes'):
 
 
 @patch('adapters.mgi_human_mouse_ortholog_adapter.get_gene_map_from_arangodb')
-def test_process_file(mock_gene_map, sample_filepath, spy_writer):
+def test_process_file(mock_gene_map, sample_filepath, spy_writer, mock_file_fileset):
     mock_gene_map.side_effect = mock_get_gene_map_from_arangodb
     adapter = MGIHumanMouseOrthologAdapter(
         sample_filepath, writer=spy_writer, validate=True)
@@ -73,10 +87,13 @@ def test_process_file(mock_gene_map, sample_filepath, spy_writer):
     assert data['relationship'] == 'ontology_terms/NCIT_C79968'
     assert data['source'] == 'MGI'
     assert data['source_url'] == 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
+    assert data['class'] == 'observed data'
+    assert data['method'] == 'Homology'
+    assert data['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
 @patch('adapters.mgi_human_mouse_ortholog_adapter.get_gene_map_from_arangodb')
-def test_load_mappings(mock_gene_map, sample_filepath, spy_writer):
+def test_load_mappings(mock_gene_map, sample_filepath, spy_writer, mock_file_fileset):
     mock_gene_map.side_effect = mock_get_gene_map_from_arangodb
     adapter = MGIHumanMouseOrthologAdapter(sample_filepath, writer=spy_writer)
     adapter.parse()
@@ -90,7 +107,7 @@ def test_load_mappings(mock_gene_map, sample_filepath, spy_writer):
 
 
 @patch('adapters.mgi_human_mouse_ortholog_adapter.get_gene_map_from_arangodb')
-def test_emits_edges_for_all_ensembl_ids(mock_gene_map, sample_filepath, spy_writer):
+def test_emits_edges_for_all_ensembl_ids(mock_gene_map, sample_filepath, spy_writer, mock_file_fileset):
     def mock_multi_ensembl(field, collection='genes'):
         if collection == 'mm_genes':
             return {
