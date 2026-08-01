@@ -60,11 +60,11 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
   delete input.gene_id
   delete input.hgnc_id
-  delete input.alias
+  delete input.synonym
   delete input.gene_name
   delete input.organism
   const empty = Object.entries(geneInput).filter(([k]) => k !== 'page').every(([, v]) => v === undefined)

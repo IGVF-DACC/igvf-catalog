@@ -137,10 +137,10 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     Example: gene_name = ATF3, <br> \
     hgnc_id = HGNC:28208, <br> \
-    alias = CKLF, <br> \
+    synonym = CKLF, <br> \
     organism = Homo sapiens, <br> \
     gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -159,9 +159,9 @@ export const descriptions = {
 
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
   Example: gene_name = ATF3, <br> \
-  alias = CKLF, <br> \
+  synonym = CKLF, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc_id = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -221,7 +221,7 @@ export const descriptions = {
   genes_genes:
     'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
     The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -434,7 +434,7 @@ export const descriptions = {
     'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by Ensembl gene ids.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, or files_fileset. <br> \
+    At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, synonym, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -453,7 +453,7 @@ export const descriptions = {
           {
             label: 'Group results',
             items: [
-              'alias = PERM1',
+              'synonym = PERM1',
               'method = eQTL'
             ]
           }
@@ -476,7 +476,7 @@ export const descriptions = {
           {
             label: 'Group results',
             items: [
-              'alias = NOC2L',
+              'synonym = NOC2L',
               'method = spliceQTL'
             ]
           }
@@ -497,7 +497,7 @@ export const descriptions = {
           {
             label: 'Group results',
             items: [
-              'alias = PPIF',
+              'synonym = PPIF',
               'method = Variant-EFFECTS'
             ]
           }
@@ -794,10 +794,10 @@ export const descriptions = {
 
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet, GenCC and ClinGen by genes.<br> \
     Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     Example: gene_id = ENSG00000171759, <br> \
     gene_name = PAH, <br> \
-    alias = PKU1, <br> \
+    synonym = PKU1, <br> \
     source = ClinGen, <br> \
     hgnc_id = HGNC:8582. <br> \
     The limit parameter controls the page size and can not exceed 25. <br> \
@@ -1241,11 +1241,11 @@ export const descriptions = {
 
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
   Example: gene_id = ENSG00000183840, <br> \
   hgnc_id = HGNC:4496, <br> \
   gene_name = GPR39, <br> \
-  alias = ZnR. <br> \
+  synonym = ZnR. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -1513,7 +1513,7 @@ export const descriptions = {
 
   genes_coding_variants:
     'Retrieve scores and predictions of associated coding variants for one specific gene.<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, alias. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -1759,7 +1759,7 @@ export const descriptions = {
 
   genes_genomic_elements:
     'Retrieve genomic elements and gene pairs by querying genes.<br> \
-    One of these fields is required: gene_id, hgnc_id, gene_name, alias, method, or files_fileset. <br> \
+    One of these fields is required: gene_id, hgnc_id, gene_name, synonym, method, or files_fileset. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based. <br> <br> \

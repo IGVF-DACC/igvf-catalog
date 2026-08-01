@@ -29,17 +29,17 @@ const edgeQueryFormat = z.object({
   source: z.enum(SOURCES).optional()
 })
 
-const geneQueryFormat = genesCommonQueryFormat.omit({ alias: true }).merge(z.object({ synonym: z.string().trim().optional() })).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const gnrGeneQueryFormat = z.object({
   regulator_gene_id: z.string().optional(),
   regulator_hgnc_id: z.string().optional(),
   regulator_gene_name: z.string().optional(),
-  regulator_alias: z.string().optional(),
+  regulator_synonym: z.string().optional(),
   response_gene_id: z.string().optional(),
   response_hgnc_id: z.string().optional(),
   response_gene_name: z.string().optional(),
-  response_alias: z.string().optional(),
+  response_synonym: z.string().optional(),
   neg_log10_pvalue: z.string().optional(),
   neg_log10_pvalue_adj: z.string().optional(),
   method: z.enum(['CRISPR screen', 'Perturb-seq']).optional(),
@@ -349,8 +349,8 @@ function geneQueryValidation (input: paramsFormatType): void {
 }
 
 function grnQueryValidation (input: paramsFormatType): void {
-  const isInvalidRegulatorFilter = Object.keys(input).every(item => !['regulator_gene_id', 'regulator_hgnc_id', 'regulator_gene_name', 'regulator_alias'].includes(item))
-  const isInvalidResponseFilter = Object.keys(input).every(item => !['response_gene_id', 'response_hgnc_id', 'response_gene_name', 'response_alias'].includes(item))
+  const isInvalidRegulatorFilter = Object.keys(input).every(item => !['regulator_gene_id', 'regulator_hgnc_id', 'regulator_gene_name', 'regulator_synonym'].includes(item))
+  const isInvalidResponseFilter = Object.keys(input).every(item => !['response_gene_id', 'response_hgnc_id', 'response_gene_name', 'response_synonym'].includes(item))
 
   if (isInvalidRegulatorFilter && isInvalidResponseFilter) {
     throw new TRPCError({
@@ -380,7 +380,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   let geneIDs: string[] = []
   const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
-    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, alias: input.synonym, organism: 'Homo sapiens', page: 0 }
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, synonym: input.synonym, organism: 'Homo sapiens', page: 0 }
     delete input.gene_id
     delete input.hgnc_id
     delete input.synonym
@@ -456,8 +456,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   grnQueryValidation(input)
   const limit = applyLimit(input)
 
-  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id, name: input.regulator_gene_name, synonyms: input.regulator_alias, organism: 'Homo sapiens', page: 0 }
-  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id, name: input.response_gene_name, synonyms: input.response_alias, organism: 'Homo sapiens', page: 0 }
+  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: 'Homo sapiens', page: 0 }
+  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id, name: input.response_gene_name, synonyms: input.response_synonym, organism: 'Homo sapiens', page: 0 }
 
   const hasRegulatorInput = Object.keys(regulatorGeneInput).some(key => !['organism', 'page'].includes(key) && regulatorGeneInput[key] !== undefined)
   const hasResponseInput = Object.keys(responseGeneInput).some(key => !['organism', 'page'].includes(key) && responseGeneInput[key] !== undefined)

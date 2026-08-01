@@ -45,7 +45,7 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
     associated_gene_id: z.string().trim().optional(),
     associated_hgnc_id: z.string().trim().optional(),
     associated_gene_name: z.string().trim().optional(),
-    associated_alias: z.string().trim().optional(),
+    associated_synonym: z.string().trim().optional(),
     z_score: z.string().trim().optional(),
     interaction_type: interactionTypes.optional(),
     label: z.enum(labels).optional(),
@@ -79,8 +79,8 @@ const genesGenesRelativeFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidGeneFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
-  const isInvalidAssociatedGeneFilter = Object.keys(input).every(item => !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_alias'].includes(item))
+  const isInvalidGeneFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
+  const isInvalidAssociatedGeneFilter = Object.keys(input).every(item => !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].includes(item))
 
   if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter) {
     throw new TRPCError({
@@ -125,24 +125,24 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, alias } = input
-  const geneInput: paramsFormatType = { _key: gene_id, hgnc_id, name, alias, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym } = input
+  const geneInput: paramsFormatType = { _key: gene_id, hgnc_id, name, synonyms: synonym, page: 0 }
   delete input.gene_id
   delete input.hgnc_id
   delete input.gene_name
-  delete input.alias
+  delete input.synonym
 
   const associatedGeneInput: paramsFormatType = {
     _key: input.associated_gene_id,
     hgnc_id: input.associated_hgnc_id,
     name: input.associated_gene_name,
-    alias: input.associated_alias,
+    synonyms: input.associated_synonym,
     page: 0
   }
   delete input.associated_gene_id
   delete input.associated_hgnc_id
   delete input.associated_gene_name
-  delete input.associated_alias
+  delete input.associated_synonym
 
   const filters = []
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
