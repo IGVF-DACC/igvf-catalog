@@ -867,12 +867,12 @@ EBI eQTL catalog variant to gene association:
   biological_process: ['ontology_terms/GO_0010468', 'ontology_terms/GO_0043484']
   source: eQTL Catalogue
 
-# Example: ...
+# Example: python3 data_parser.py --adapter eqtl_catalog --label study --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9074FIDG.tsv.gz --output-bucket-key studies/studies_EQTLCatalog_IGVFFI9074FIDG.jsonl
 EBI eQTL catalog study:
   collection: studies
-  command: python3 data_parser.py --adapter eqtl_catalog --label study --output-bucket igvf-catalog-parsed-collections --filepath {file_path} --output-bucket-key variants_genes/eqtl_catalog_{dataset_id}.jsonl
+  command: python3 data_parser.py --adapter eqtl_catalog --label study --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key studies/studies_EQTLCatalog_IGVFFI9074FIDG.jsonl
   datafiles:
-    - data_loading_support_files/eqtl_catalog/dataset_metadata.tsv
+    - https://api.data.igvf.org/reference-files/IGVFFI9074FIDG/@@download/IGVFFI9074FIDG.tsv.gz
   source: eQTL Catalogue
 
 # Example: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
