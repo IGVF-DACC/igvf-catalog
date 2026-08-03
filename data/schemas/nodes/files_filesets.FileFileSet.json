@@ -74,6 +74,7 @@
               "TAP-seq",
               "VAMP-seq",
               "VAMP-seq (MultiSTEP)",
+              "Variant painting via fluorescence",
               "Variant-EFFECTS"
             ]
           }
@@ -123,6 +124,7 @@
             "TopLD",
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
+            "Variant painting via fluorescence",
             "Variant-EFFECTS",
             "cV2F",
             "caQTL",
@@ -165,6 +167,7 @@
               "CRISPR-Millipede",
               "CRISPR-SURF",
               "CRISPResso2",
+              "Cell Profiler",
               "Cooler",
               "CountESS",
               "cV2F",
