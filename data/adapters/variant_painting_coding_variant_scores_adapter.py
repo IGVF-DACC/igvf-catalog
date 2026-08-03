@@ -5,11 +5,10 @@ import gzip
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.file_fileset_adapter import FileFileSet
 from adapters.helpers import bulk_query_coding_variants_from_spdi_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
-# Example line from variant painting file (IGVFFI4788HTHI.tsv.gz):
+# Example line from variant painting file (IGVFFI9499PJFU.tsv.gz):
 # gene_variant  spdi  mislocalization_hit  localization_score  hgvs_protein
 # LITAF_Pro135Thr  NC_000016.10:11549719:G:T  True  0.9606993  ENSP00000483114.1:p.Pro135Thr
 
@@ -26,7 +25,6 @@ class VariantPaintingAdapter(BaseAdapter):
     def __init__(self, filepath, label='coding_variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
-        self.files_filesets = FileFileSet(self.file_accession)
 
         super().__init__(filepath, label, writer, validate)
 
@@ -93,6 +91,7 @@ class VariantPaintingAdapter(BaseAdapter):
             self.logger.warning(
                 f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
         with gzip.open(self.filepath, 'rt') as vp_file:
+            self.writer.add_tag('portal_accessions', self.file_accession)
             vp_csv = csv.reader(vp_file, delimiter='\t')
             self.header = next(vp_csv)
             chunk = []

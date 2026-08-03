@@ -32,7 +32,7 @@
           ]
         },
         "source_url": {
-          "example": "https://data.igvf.org/tabular-files/IGVFFI4788HTHI",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9499PJFU",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "name": {
@@ -48,7 +48,7 @@
         "files_filesets": {
           "type": "string",
           "description": "Filesets for the coding variant to phenotype edge",
-          "example": "files_filesets/IGVFFI4788HTHI",
+          "example": "files_filesets/IGVFFI9499PJFU",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"
@@ -65,8 +65,9 @@
           "example": "ontology_terms/EFO_0002869"
         },
         "method": {
-          "type": "string",
-          "description": "The assay method"
+          "enum": [
+            "Variant painting via fluorescence"
+          ]
         },
         "label": {
           "enum": [

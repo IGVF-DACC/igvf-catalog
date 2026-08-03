@@ -2138,6 +2138,17 @@ coding variant to phenotype DUAL-IPA:
     - https://api.data.igvf.org/tabular-files/IGVFFI6224HZMG/@@download/IGVFFI6224HZMG.tsv.gz
   source: IGVF
 
+# Example: python3 data_parser.py --adapter variant_painting_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9499PJFU.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_variant_painting_IGVFFI9499PJFU.jsonl --label coding_variants_phenotypes
+coding variant to phenotype Variant painting:
+  collection: coding_variants_phenotypes
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter variant_painting_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_variant_painting_{datafile}.jsonl --label coding_variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI9499PJFU/@@download/IGVFFI9499PJFU.tsv.gz
+  source: IGVF
+
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants
 variants SGE:
   collection: variants

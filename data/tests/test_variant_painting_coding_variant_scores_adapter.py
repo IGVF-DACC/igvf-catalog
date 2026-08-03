@@ -33,7 +33,7 @@ MOCKED_FILE_FILESET = {
 def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query, mock_file_fileset):
     writer = SpyWriter()
     adapter = VariantPaintingAdapter(
-        'IGVFFI4788HTHI.tsv.gz',
+        'IGVFFI9499PJFU.tsv.gz',
         label='coding_variants_phenotypes',
         writer=writer,
         validate=True
@@ -44,19 +44,19 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     assert len(records) == 3
 
     first = records[0]
-    assert first['_key'] == 'LITAF_ENST00000261509_p.Pro135Thr_c.403C-A_GO_0008104_IGVFFI4788HTHI'
+    assert first['_key'] == 'LITAF_ENST00000261509_p.Pro135Thr_c.403C-A_GO_0008104_IGVFFI9499PJFU'
     assert first['_from'] == 'coding_variants/LITAF_ENST00000261509_p.Pro135Thr_c.403C-A'
     assert first['_to'] == 'ontology_terms/GO_0008104'
     assert first['name'] == 'mutational effect'
     assert first['inverse_name'] == 'altered due to mutation'
     assert first['source'] == 'IGVF'
-    assert first['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI4788HTHI'
+    assert first['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI9499PJFU'
     assert first['label'] == 'protein variant effect'
     assert first['method'] == 'Variant painting via fluorescence'
     assert first['class'] == 'observed data'
     assert first['biological_context'] == 'U2OS'
     assert first['biosample_term'] == 'ontology_terms/EFO_0002869'
-    assert first['files_filesets'] == 'files_filesets/IGVFFI4788HTHI'
+    assert first['files_filesets'] == 'files_filesets/IGVFFI9499PJFU'
     assert first['localization_score'] == 0.9606993000231892
     assert first['mislocalization_hit'] is True
 
@@ -71,7 +71,7 @@ def test_missing_variant_is_skipped(mock_gzip_open, mock_bulk_query, mock_file_f
     writer = SpyWriter()
     mock_bulk_query.return_value = {}
     adapter = VariantPaintingAdapter(
-        'IGVFFI4788HTHI.tsv.gz',
+        'IGVFFI9499PJFU.tsv.gz',
         label='coding_variants_phenotypes',
         writer=writer,
         validate=True
@@ -85,7 +85,7 @@ def test_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants_phenotypes'):
         VariantPaintingAdapter(
-            'IGVFFI4788HTHI.tsv.gz',
+            'IGVFFI9499PJFU.tsv.gz',
             label='invalid_label',
             writer=writer,
         )
@@ -97,7 +97,7 @@ def test_invalid_label():
 def test_validate_doc_invalid(mock_gzip_open, mock_bulk_query, mock_file_fileset):
     writer = SpyWriter()
     adapter = VariantPaintingAdapter(
-        'IGVFFI4788HTHI.tsv.gz',
+        'IGVFFI9499PJFU.tsv.gz',
         label='coding_variants_phenotypes',
         writer=writer,
         validate=True
