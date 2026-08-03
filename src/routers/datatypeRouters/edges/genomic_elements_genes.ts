@@ -13,8 +13,8 @@ const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
-const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
-const genomicElementsIGVF2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json')
+const genomicElementsGenesCrisprElementGeneEncodeSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json')
+const genomicElementsGenesCrisprElementGeneIgvfSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -88,10 +88,14 @@ const outputFormat = z.array(z.object({
   rna_pseudobulk_tpm: z.number().nullish(),
   log2FC: z.number().nullish(),
   effect_size: z.number().nullish(),
+  z_score: z.number().nullish(),
+  t_score: z.number().nullish(),
+  idr: z.number().nullish(),
   p_value: z.number().or(z.string()).nullish(),
   p_value_adj: z.number().or(z.string()).nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  significant: z.boolean().nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
@@ -130,7 +134,7 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
   // edge filters are the same for all methods
-  const filters = getFilterStatements(genomicElementsGenesEncode2GCrisprSchema, input)
+  const filters = getFilterStatements(genomicElementsGenesCrisprElementGeneEncodeSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
@@ -202,10 +206,14 @@ function buildQuery (params: {
         'rna_pseudobulk_tpm': record.rna_pseudobulk_tpm,
         'log2FC': record.log2FC,
         'effect_size': record.effect_size,
+        'z_score': record.z_score,
+        't_score': record.t_score,
+        'idr': record.idr,
         'p_value': record.p_value,
         'p_value_adj': record.p_value_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
-        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+        'significant': record.significant
       }
   `
 }
@@ -471,7 +479,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilters.neg_log10_pvalue_adj = input.neg_log10_pvalue_adj
   }
   if (Object.keys(pvalueFilters).length > 0) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsIGVF2GCrisprSchema, pvalueFilters)}`
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsGenesCrisprElementGeneIgvfSchema, pvalueFilters)}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'

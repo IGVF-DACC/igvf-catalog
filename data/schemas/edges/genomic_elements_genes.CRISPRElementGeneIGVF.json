@@ -1,0 +1,289 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
+  "db_collection_name": "genomic_elements_genes",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the genomic element to gene edge: CRISPR_{chr}_{start}_{end}_GRCh38_{readout_gene}_{file_accession}",
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
+        },
+        "_from": {
+          "description": "Genomic element (tested CRISPR target) node",
+          "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "description": "Readout gene whose expression was measured for this element-gene association",
+          "example": "genes/ENSG00000123685",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "description": "IGVF portal URL for the source tabular file",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Associated files_filesets record for the source IGVF tabular file",
+          "example": "files_filesets/IGVFFI3069QCRA",
+          "pattern": "^files_filesets/"
+        },
+        "label": {
+          "enum": [
+            "regulatory element effect on gene expression"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates expression of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "expression modulated by"
+          ]
+        },
+        "method": {
+          "description": "Assay method from the associated files_filesets record",
+          "enum": [
+            "Perturb-seq",
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": [
+            "string"
+          ],
+          "description": "CRISPR perturbation modality from the associated files_filesets record (interference, activation, or knockout)",
+          "enum": [
+            "interference",
+            "activation",
+            "knockout"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Ontology term for the biosample / cell type used in the screen",
+          "example": "ontology_terms/EFO_0002067",
+          "pattern": "^ontology_terms/"
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Short sample summary for the biosample (e.g. cell line name)",
+          "example": "K562"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Treatment ontology term IDs applied to the biosample, when present on the files_filesets record",
+          "items": {
+            "type": "string"
+          }
+        },
+        "p_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Uncorrected p-value for the element-gene association from the source analysis.."
+        },
+        "p_value_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Multiple-testing-adjusted p-value for the element-gene association (Bonferroni, Benjamini-Hochberg FDR, or assay-specific correction as reported by the source)."
+        },
+        "neg_log10_pvalue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of p_value. Capped when p_value is zero."
+        },
+        "neg_log10_pvalue_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of p_value_adj. Capped when p_value_adj is zero."
+        },
+        "log2FC": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Primary signed effect on readout-gene expression for the element perturbation. Typically log2 fold change (positive = increased expression in the perturbed group; negative = decreased)."
+        },
+        "log2FC_ci95_lower": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Lower bound of a 95% confidence interval for log2FC."
+        },
+        "log2FC_ci95_upper": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Upper bound of a 95% confidence interval for log2FC."
+        },
+        "pct_1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of cells in the first comparison group (typically the perturbed group) where the readout gene is detected."
+        },
+        "pct_2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of cells in the second comparison group (typically the reference / control group) where the readout gene is detected."
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the element-gene association is called significant. Derived by the adapter: p_value_adj (else p_value) < 0.05 when a p-value is available; otherwise |z_score| >= ~1.96 (two-tailed alpha = 0.05)."
+        },
+        "effect_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Native perturbation effect on readout expression when reported separately from log2FC."
+        },
+        "effect_size_ci_95": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Half-width of the 95% confidence interval on effect_size."
+        },
+        "num_guides": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of guides (gRNAs / sgRNAs) targeting the perturbed element."
+        },
+        "fold_change": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Linear fold change of readout expression in perturbed versus background or control cells. Values greater than 1 indicate up-regulation; values less than 1 indicate down-regulation."
+        },
+        "background_corrected_fold_change": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Fold change of readout expression in perturbed cells versus a matched or selected background."
+        },
+        "gamma_approximation_ln_p_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Natural log of the pySpade Significance_score (gamma-approximation significance after background correction)."
+        },
+        "hypergeometric_ln_p_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Natural log of the pySpade hypergeometric p-value (log(pval)-hypergeom): initial test of perturbed versus all other cells without random-background correction."
+        },
+        "empirical_p_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "pySpade pval-empirical: empirical p-value comparing the perturbation hypergeometric p-value to random background draws."
+        },
+        "cpm_perturb": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Counts per million reads for the readout gene in cells carrying perturbation guides at the element."
+        },
+        "cpm_bg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Counts per million reads for the readout gene in background (non-perturbed) cells."
+        },
+        "num_cells": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of cells with perturbation guides targeting the element. When multiple sgRNAs target the same region, cells are pooled."
+        },
+        "z_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Phenotype or enrichment z-score for the element-gene association when reported by the source."
+        },
+        "t_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "T-statistic for the element-gene association when reported by the source."
+        },
+        "idr": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Irreproducible discovery rate summarizing cross-replicate reproducibility of guide-level signals for the element-gene association. Lower values indicate higher reproducibility."
+        }
+      },
+      "required": [
+        "_key",
+        "files_filesets",
+        "crispr_modality",
+        "biosample_term",
+        "biological_context",
+        "treatments_term_ids",
+        "significant"
+      ],
+      "additionalProperties": false,
+      "accessible_via": {
+        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
+        "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
+      }
+    }
+  ]
+}

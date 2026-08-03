@@ -29,7 +29,7 @@ from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
-from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
+from adapters.CRISPR_element_gene_ENCODE_adapter import CRISPRElementGeneENCODE
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
@@ -65,8 +65,8 @@ ADAPTERS = {
     'encode_biosample': EncodeElementGeneLink(filepath='./samples/E2G_ENCFF728HSS.bed.gz', label='ontology_term', source='ENCODE-E2G-DNaseOnly', source_url='https://www.encodeproject.org/files/ENCFF728HSS/', biological_context='NTR_0000502'),
     'mpra_genomic_element': MPRAAdapter(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element', source_url='https://www.encodeproject.org/files/ENCFF802FUV/'),
     'mpra_genomic_element_biosample': MPRAAdapter(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element_biosample', source_url='https://www.encodeproject.org/files/ENCFF802FUV/'),
-    'encode_genomic_element_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element'),
-    'encode_genomic_element_gene_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element_gene'),
+    'crispr_element_gene_encode': CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv', label='genomic_element'),
+    'crispr_element_gene_encode_gene': CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv', label='genomic_element_gene'),
     'encode_file_fileset': FileFileSet(accession='ENCFF923FSV', label='encode_file_fileset'),
     'igvf_file_fileset': FileFileSet(accession='IGVFFI1663LKVQ', label='igvf_file_fileset'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz', label='human'),

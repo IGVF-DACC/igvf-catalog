@@ -91,7 +91,7 @@ const completeQtlsFormat = z.object({
 const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
 const variantsGenesAFGREQtl = getSchema('data/schemas/edges/variants_genes.AFGREQtl.json')
 const variantsGenesEQTLCatalog = getSchema('data/schemas/edges/variants_genes.EQTLCatalog.json')
-const variantsGenesIGVFV2GCRISPR = getSchema('data/schemas/edges/variants_genes.IGVFV2GCRISPR.json')
+const variantsGenesCRISPRVariantGene = getSchema('data/schemas/edges/variants_genes.CRISPRVariantGene.json')
 
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
@@ -294,7 +294,7 @@ const buildVariantsGenesQuery = ({
     }
     RETURN MERGE(base,
       record.source == 'IGVF' ? {
-        ${getDBReturnStatements(variantsGenesIGVFV2GCRISPR)}
+        ${getDBReturnStatements(variantsGenesCRISPRVariantGene)}
       } : record.source == 'AFGR' && record.label == 'spliceQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {

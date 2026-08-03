@@ -17,7 +17,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # Rename significant:boolean to significant in header file; Replace 'True' with 'true', 'False' with 'false' in parsed data files
 
 
-class ENCODE2GCRISPR(BaseAdapter):
+class CRISPRElementGeneENCODE(BaseAdapter):
 
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
     SOURCE = 'ENCODE'
