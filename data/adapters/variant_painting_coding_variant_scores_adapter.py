@@ -84,13 +84,13 @@ class VariantPaintingAdapter(BaseAdapter):
                     skipped_list.write(skipped + '\n')
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         if file_fileset_obj is None:
             self.logger.warning(
                 f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
         with gzip.open(self.filepath, 'rt') as vp_file:
-            self.writer.add_tag('portal_accessions', self.file_accession)
             vp_csv = csv.reader(vp_file, delimiter='\t')
             self.header = next(vp_csv)
             chunk = []
