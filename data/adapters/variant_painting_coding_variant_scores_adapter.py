@@ -83,8 +83,7 @@ class VariantPaintingAdapter(BaseAdapter):
                 for skipped in skipped_coding_variants:
                     skipped_list.write(skipped + '\n')
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         if file_fileset_obj is None:
@@ -108,5 +107,3 @@ class VariantPaintingAdapter(BaseAdapter):
                 if self.label == 'coding_variants_phenotypes':
                     self.process_coding_variant_phenotype_chunk(
                         chunk, file_fileset_obj)
-
-        self.writer.close()
