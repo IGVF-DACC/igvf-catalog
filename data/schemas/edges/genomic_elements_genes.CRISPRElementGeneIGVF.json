@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
+  "$id": "schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
   "db_collection_name": "genomic_elements_genes",
   "allOf": [
     {
@@ -11,10 +11,11 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Unique identifier for the genomic element to gene edge: CRISPR_{chr}_{start}_{end}_GRCh38_{readout_gene}_{file_accession}",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
         "_from": {
+          "description": "Genomic element (tested CRISPR target) node",
           "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
           "pattern": "^genomic_elements/",
           "collections": [
@@ -22,6 +23,7 @@
           ]
         },
         "_to": {
+          "description": "Readout gene whose expression was measured for this element-gene association",
           "example": "genes/ENSG00000123685",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
@@ -34,11 +36,12 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+          "description": "IGVF portal URL for the source tabular file",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
+          "description": "Associated files_filesets record for the source IGVF tabular file",
           "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         },
@@ -58,6 +61,7 @@
           ]
         },
         "method": {
+          "description": "Assay method from the associated files_filesets record",
           "enum": [
             "Perturb-seq",
             "CRISPR screen"
@@ -67,7 +71,7 @@
           "type": [
             "string"
           ],
-          "description": "The CRISPR modality from the associated files_filesets record",
+          "description": "CRISPR perturbation modality from the associated files_filesets record (interference, activation, or knockout)",
           "enum": [
             "interference",
             "activation",
@@ -81,12 +85,13 @@
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
-          "example": "ontology_terms/EFO_0002067"
+          "description": "Ontology term for the biosample / cell type used in the screen",
+          "example": "ontology_terms/EFO_0002067",
+          "pattern": "^ontology_terms/"
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
+          "description": "Short sample summary for the biosample (e.g. cell line name)",
           "example": "K562"
         },
         "treatments_term_ids": {
@@ -94,115 +99,175 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the genomic element to gene edge"
+          "description": "Treatment ontology term IDs applied to the biosample, when present on the files_filesets record",
+          "items": {
+            "type": "string"
+          }
         },
         "p_value": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
+          "description": "Uncorrected p-value for the element-gene association from the source analysis.."
         },
         "p_value_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Multiple-testing-adjusted p-value for the element-gene association (Bonferroni, Benjamini-Hochberg FDR, or assay-specific correction as reported by the source)."
         },
         "neg_log10_pvalue": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Negative log10 of p-value."
+          "description": "Negative log10 of p_value. Capped when p_value is zero."
         },
         "neg_log10_pvalue_adj": {
-          "type": "number",
-          "description": "Negative log10 of adjusted p-value."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of p_value_adj. Capped when p_value_adj is zero."
         },
         "log2FC": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Log2 fold change of readout gene expression for the perturbation."
+          "description": "Primary signed effect on readout-gene expression for the element perturbation. Typically log2 fold change (positive = increased expression in the perturbed group; negative = decreased)."
         },
         "log2FC_ci95_lower": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Lower bound of a 95% confidence interval for log2FC."
         },
         "log2FC_ci95_upper": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Upper bound of a 95% confidence interval for log2FC."
         },
         "pct_1": {
-          "type": "number",
-          "description": "Fraction of cells in the first comparison group expressing the readout gene."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of cells in the first comparison group (typically the perturbed group) where the readout gene is detected."
         },
         "pct_2": {
-          "type": "number",
-          "description": "Fraction of cells in the second comparison group expressing the readout gene."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of cells in the second comparison group (typically the reference / control group) where the readout gene is detected."
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the source analysis calls the element-gene pair significant."
+          "description": "Whether the element-gene association is called significant. Derived by the adapter: p_value_adj (else p_value) < 0.05 when a p-value is available; otherwise |z_score| >= ~1.96 (two-tailed alpha = 0.05)."
         },
         "effect_size": {
-          "type": "number",
-          "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Native perturbation effect on readout expression when reported separately from log2FC."
         },
         "effect_size_ci_95": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Half-width of the 95% confidence interval on effect_size."
         },
         "num_guides": {
-          "type": "number",
-          "description": "Number of guides targeting the perturbed element."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of guides (gRNAs / sgRNAs) targeting the perturbed element."
         },
         "fold_change": {
-          "type": "number",
-          "description": "Fold change of readout expression in perturbed versus background cells."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Linear fold change of readout expression in perturbed versus background or control cells. Values greater than 1 indicate up-regulation; values less than 1 indicate down-regulation."
         },
         "background_corrected_fold_change": {
-          "type": "number",
-          "description": "Fold change of readout expression in perturbed versus a matched or selected background."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Fold change of readout expression in perturbed cells versus a matched or selected background."
         },
         "gamma_approximation_ln_p_value": {
-          "type": "number",
-          "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Natural log of the pySpade Significance_score (gamma-approximation significance after background correction)."
         },
         "hypergeometric_ln_p_value": {
-          "type": "number",
-          "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Natural log of the pySpade hypergeometric p-value (log(pval)-hypergeom): initial test of perturbed versus all other cells without random-background correction."
         },
         "empirical_p_value": {
-          "type": "number",
-          "description": "pySpade pval-empirical: empirical p-value from random background comparison. Stored but not returned by the API."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "pySpade pval-empirical: empirical p-value comparing the perturbation hypergeometric p-value to random background draws."
         },
         "cpm_perturb": {
-          "type": "number",
-          "description": "Counts per million reads for the readout gene in perturbed cells."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Counts per million reads for the readout gene in cells carrying perturbation guides at the element."
         },
         "cpm_bg": {
-          "type": "number",
-          "description": "Counts per million reads for the readout gene in background cells."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Counts per million reads for the readout gene in background (non-perturbed) cells."
         },
         "num_cells": {
-          "type": "number",
-          "description": "Number of cells with perturbation guides at the element."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of cells with perturbation guides targeting the element. When multiple sgRNAs target the same region, cells are pooled."
         },
         "z_score": {
-          "type": "number",
-          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Phenotype or enrichment z-score for the element-gene association when reported by the source."
         },
         "t_score": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "T-statistic for the element-gene association when reported by the source."
         },
         "idr": {
-          "type": "number",
-          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Irreproducible discovery rate summarizing cross-replicate reproducibility of guide-level signals for the element-gene association. Lower values indicate higher reproducibility."
         }
       },
       "required": [

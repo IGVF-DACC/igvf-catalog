@@ -12,17 +12,30 @@
       "type": "object",
       "properties": {
         "_key": {
+          "description": "Unique identifier for the tested CRISPR element: CRISPR_{chr}_{start}_{end}_GRCh38_{file_accession}",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "name": {
+          "description": "Display name for the tested CRISPR element (same as _key)",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
+        },
+        "chr": {
+          "description": "Chromosome of the intended CRISPR target element (GRCh38)"
+        },
+        "start": {
+          "description": "Start coordinate of the intended CRISPR target element (GRCh38)"
+        },
+        "end": {
+          "description": "End coordinate of the intended CRISPR target element (GRCh38)"
         },
         "promoter_of": {
           "type": "string",
-          "description": "Promoter of the genomic element",
-          "example": "genes/ENSG00000123685"
+          "description": "Ensembl gene whose promoter was the intended CRISPR target when source_annotation is promoter. Absent for enhancer and distal element targets.",
+          "example": "genes/ENSG00000123685",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$"
         },
         "method": {
+          "description": "Assay method from the associated files_filesets record",
           "enum": [
             "Perturb-seq",
             "CRISPR screen"
@@ -30,7 +43,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Class of the tested genomic element as annotated by the experiment or file config (enhancer, promoter, or distal element)",
           "example": "promoter",
           "enum": [
             "enhancer",
@@ -44,16 +57,18 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+          "description": "IGVF portal URL for the source tabular file",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "type": {
+          "description": "Element type for CRISPR element-gene screens",
           "enum": [
             "tested elements"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Associated files_filesets record for the source IGVF tabular file",
           "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         }
