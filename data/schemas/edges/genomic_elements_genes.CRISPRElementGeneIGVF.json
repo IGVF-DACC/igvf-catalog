@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
-  "db_collection_name": "genomic_elements_genes",
+  "$id": "schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -214,11 +213,12 @@
         "treatments_term_ids",
         "significant"
       ],
-      "additionalProperties": false,
-      "accessible_via": {
-        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
-        "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
-      }
+      "additionalProperties": false
     }
-  ]
+  ],
+  "accessible_via": {
+    "filter_by_range": "log2FC, effect_size, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
+    "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_ci95_lower, log2FC_ci95_upper, effect_size, effect_size_ci_95, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, pct_1, pct_2, num_guides, num_cells, fold_change, background_corrected_fold_change, z_score, t_score, idr, cpm_perturb, cpm_bg, gamma_approximation_ln_p_value, hypergeometric_ln_p_value"
+  },
+  "db_collection_name": "genomic_elements_genes"
 }
