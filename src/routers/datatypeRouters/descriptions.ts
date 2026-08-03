@@ -1537,6 +1537,7 @@ export const descriptions = {
   sample_summary = GM12878,<br>\
   software = Distal regulation ENCODE-rE2G,<br>\
   cell_annotation = mesodermal cell, <br>\
+  cell_annotation_term = CL_0000352, <br>\
   class = prediction,<br>\
   source = ENCODE.<br>\
   The limit parameter controls the page size and can not exceed 500. <br> \
