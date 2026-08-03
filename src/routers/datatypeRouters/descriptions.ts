@@ -47,20 +47,10 @@ export const descriptions = {
   enhancer_gene_predictions:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
     Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
+    method can be either ENCODE-rE2G or scE2G; if not provided, both methods are searched. <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> \
     ' + examples([
-      {
-        id: 'crispr-screen',
-        label: 'CRISPR screen',
-        examples: [
-          {
-            label: 'query by gene identifier',
-            items: [
-              'gene_id = ENSG00000055950',
-              'method = CRISPR screen'
-            ]
-          }
-        ]
-      },
       {
         id: 'encode-re2g',
         label: 'ENCODE-rE2G',
@@ -75,14 +65,14 @@ export const descriptions = {
         ]
       },
       {
-        id: 'perturb-seq',
-        label: 'Perturb-seq',
+        id: 'sce2g',
+        label: 'scE2G',
         examples: [
           {
             label: 'query by gene identifier',
             items: [
               'gene_id = ENSG00000055950',
-              'method = Perturb-seq'
+              'method = scE2G'
             ]
           }
         ]

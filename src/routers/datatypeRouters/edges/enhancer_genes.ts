@@ -1,21 +1,25 @@
 import { z } from 'zod'
 import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
 import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { genesCommonQueryFormat } from '../params'
-import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
+import { getSchema } from '../schema'
 
-const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
+const MAX_PAGE_SIZE = 500
+const METHODS = ['ENCODE-rE2G', 'scE2G'] as [string, ...string[]]
 
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneCollectionName = geneSchema.db_collection_name as string
 
 const genesGenomicElementsInputFormat = genesCommonQueryFormat.merge(z.object({
   method: z.enum(METHODS).optional(),
-  files_fileset: z.string().optional()
+  files_fileset: z.string().optional(),
+  page: z.number().default(0),
+  limit: z.number().optional()
 }))
 
 const elementOutputFormat = z.object({
@@ -48,16 +52,24 @@ const genesGenomicElementsOutputFormat = z.array(z.object({
 }))
 
 async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+  const page = input.page as number
+  delete input.page
+
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
     filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
   }
 
-  let methodFilter = ''
-  if (input.method !== undefined) {
-    methodFilter = ` AND record.method == '${input.method as string}'`
-    delete input.method
-  }
+  const methodProvided = input.method !== undefined
+  let methodFilter = methodProvided
+    ? ` AND record.method == '${input.method as string}'`
+    : ` AND record.method IN ['${METHODS.join('\', \'')}']`
+  delete input.method
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
@@ -81,19 +93,17 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
       })
     }
   } else {
-    if (filesetFilter !== '') {
-      filesetFilter = filesetFilter.replace('AND', '')
-    }
-
-    if (methodFilter !== '' && filesetFilter === '') {
-      methodFilter = methodFilter.replace('AND', '')
-    }
-
-    if (filesetFilter === '' && methodFilter === '') {
+    if (filesetFilter === '' && !methodProvided) {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'At least one parameter must be defined.'
       })
+    }
+
+    if (filesetFilter !== '') {
+      filesetFilter = filesetFilter.replace('AND', '')
+    } else {
+      methodFilter = methodFilter.replace('AND', '')
     }
   }
 
@@ -101,6 +111,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     FOR record IN genomic_elements_genes
     FILTER ${empty ? '' : `record._to IN ['${geneIDs.join('\', \'')}']`} ${filesetFilter} ${methodFilter}
     SORT record._key
+    LIMIT ${page * limit}, ${limit}
 
     LET genomicElement = DOCUMENT(record._from)
 
