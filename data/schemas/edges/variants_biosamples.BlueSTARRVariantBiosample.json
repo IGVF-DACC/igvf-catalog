@@ -59,17 +59,11 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context of the variant to biosample edge",
-          "enum": [
-            "K562"
-          ]
+          "description": "Biological context of the variant to biosample edge"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term of the variant to biosample edge",
-          "enum": [
-            "ontology_terms/EFO_0002067"
-          ]
+          "description": "Biosample term of the variant to biosample edge"
         },
         "name": {
           "enum": [
