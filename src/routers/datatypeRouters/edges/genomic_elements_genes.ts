@@ -95,6 +95,7 @@ const outputFormat = z.array(z.object({
   p_value_adj: z.number().or(z.string()).nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  significant: z.boolean().nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
@@ -211,7 +212,8 @@ function buildQuery (params: {
         'p_value': record.p_value,
         'p_value_adj': record.p_value_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
-        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+        'significant': record.significant
       }
   `
 }
