@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/nodes/variants.STARRseqVariantBiosample.json",
+  "$id": "schemas/nodes/variants.BlueSTARRVariantBiosample.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -17,13 +17,13 @@
           ]
         },
         "source_url": {
-          "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
           "description": "Filesets of the variant",
-          "example": "files_filesets/IGVFFI0332UGDD",
+          "example": "files_filesets/IGVFFI1663LKVQ",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"

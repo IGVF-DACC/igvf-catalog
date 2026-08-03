@@ -84,6 +84,7 @@
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
             "SGE": "schemas/nodes/variants.SGE.json",
             "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
+            "BlueSTARRVariantBiosample": "schemas/nodes/variants.BlueSTARRVariantBiosample.json",
             "IGVFV2GCRISPR": "schemas/nodes/variants.IGVFV2GCRISPR.json",
             "CRISPRVariantPhenotype": "schemas/nodes/variants.CRISPRVariantPhenotype.json"
         }
@@ -173,7 +174,8 @@
         },
         "variants_biosamples": {
             "MPRAAdapter": "schemas/edges/variants_biosamples.MPRAAdapter.json",
-            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
+            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json",
+            "BlueSTARRVariantBiosample": "schemas/edges/variants_biosamples.BlueSTARRVariantBiosample.json"
         },
         "variants_coding_variants": {
             "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
