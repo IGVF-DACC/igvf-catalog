@@ -2,6 +2,7 @@ import json
 import tarfile
 
 import pytest
+from unittest.mock import patch
 
 from adapters.motif_adapter import Motif
 from adapters.writer import SpyWriter
@@ -24,7 +25,18 @@ def spy_writer():
     return SpyWriter()
 
 
-def test_motif_node(sample_archive, spy_writer):
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.motif_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': 'HOCOMOCO'
+        }
+        yield mock_get_file_fileset
+
+
+def test_motif_node(sample_archive, spy_writer, mock_file_fileset):
     motif = Motif(sample_archive, label='motif',
                   writer=spy_writer, validate=True)
     motif.process_file()
@@ -41,9 +53,12 @@ def test_motif_node(sample_archive, spy_writer):
     assert 'length' in data
     assert data['source'] == Motif.SOURCE
     assert data['source_url'].startswith(Motif.SOURCE_URL)
+    assert data['class'] == 'observed data'
+    assert data['method'] == 'HOCOMOCO'
+    assert data['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
-def test_motif_accepts_archive_and_derives_accession(tmp_path, spy_writer):
+def test_motif_accepts_archive_and_derives_accession(tmp_path, spy_writer, mock_file_fileset):
     input_directory = tmp_path / 'pwm'
     input_directory.mkdir()
     (input_directory / 'TEST_HUMAN.H11MO.0.A.pwm').write_text(
@@ -60,7 +75,7 @@ def test_motif_accepts_archive_and_derives_accession(tmp_path, spy_writer):
     assert json.loads(spy_writer.contents[0])['tf_name'] == 'TEST_HUMAN'
 
 
-def test_motif_protein_link(sample_archive, spy_writer):
+def test_motif_protein_link(sample_archive, spy_writer, mock_file_fileset):
     motif = Motif(sample_archive, label='motif_protein_link',
                   writer=spy_writer, validate=True)
     motif.process_file()
@@ -78,6 +93,9 @@ def test_motif_protein_link(sample_archive, spy_writer):
     assert data['inverse_name'] == 'uses'
     assert data['biological_process'] == 'ontology_terms/GO_0003677'
     assert data['source'] == Motif.SOURCE
+    assert data['class'] == 'observed data'
+    assert data['method'] == 'HOCOMOCO'
+    assert data['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
 def test_invalid_label(sample_archive, spy_writer):

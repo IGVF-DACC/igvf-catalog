@@ -3,6 +3,7 @@ from typing import Optional
 
 from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # ENSEMBL Mapping extracted from https://www.uniprot.org/id-mapping
@@ -83,6 +84,13 @@ class Motif(BaseAdapter):
                     pdb.set_trace()
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         for input_filepath in get_files_from_folder(self.filepath):
             filename = input_filepath.name
             if filename.endswith('.pwm'):
@@ -108,7 +116,10 @@ class Motif(BaseAdapter):
                         'source': self.source,
                         'source_url': self.source_url + model_name,
                         'pwm': pwm,
-                        'length': length
+                        'length': length,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                     if self.validate:
@@ -133,7 +144,10 @@ class Motif(BaseAdapter):
                             'name': 'is used by',
                             'inverse_name': 'uses',
                             'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
-                            'source': self.source
+                            'source': self.source,
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
 
                         if self.validate:

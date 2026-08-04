@@ -18,7 +18,10 @@ export const motifFormat = z.object({
   length: z.number(),
   pwm: z.array(z.array(z.string().optional())),
   source: z.string(),
-  source_url: z.string()
+  source_url: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 async function motifSearch (input: paramsFormatType): Promise<any[]> {
