@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/proteins_proteins.SemiQY2H.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the proteins interaction edge"
+        },
+        "_from": {
+          "example": "proteins/ENSP00000320646",
+          "pattern": "^proteins/",
+          "collections": [
+            "proteins"
+          ]
+        },
+        "_to": {
+          "example": "proteins/ENSP00000366984",
+          "pattern": "^proteins/",
+          "collections": [
+            "proteins"
+          ]
+        },
+        "coding_variants": {
+          "type": "string",
+          "description": "The coding variant tested in this semi-qY2H interaction assay",
+          "example": "coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "consensus_score": {
+          "type": "number",
+          "description": "Consensus growth score for the variant PPI, arbitrary units in 0-800 range, higher values indicating stronger protein-protein interaction"
+        },
+        "wt_consensus_score": {
+          "type": "number",
+          "description": "Consensus growth score for the corresponding reference PPI"
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "Log2 fold change, log2((consensus_score + 1) / (wt_consensus_score + 1))"
+        },
+        "molecular_function": {
+          "type": "string",
+          "description": "The molecular function of the proteins interaction edge",
+          "enum": [
+            "ontology_terms/GO_0005515"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "name": {
+          "enum": [
+            "physically interacts with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "physically interacts with"
+          ]
+        },
+        "method": {
+          "type": "string",
+          "description": "The method of the proteins interaction edge"
+        },
+        "label": {
+          "enum": [
+            "semi-quantitative yeast two-hybrid"
+          ]
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the proteins interaction edge"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the protein to protein edge",
+          "example": "files_filesets/IGVFFI1611ZIBI",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI1611ZIBI"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "coding_variants",
+        "consensus_score",
+        "wt_consensus_score",
+        "log2FC",
+        "molecular_function",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "return": "_from, _to, coding_variants, consensus_score, wt_consensus_score, log2FC, molecular_function, source, name, inverse_name, method, label, class, source_url, files_filesets"
+  },
+  "db_collection_name": "proteins_proteins"
+}
