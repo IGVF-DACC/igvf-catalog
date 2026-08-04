@@ -33,8 +33,8 @@ from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
-from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
-from adapters.igvf_E2G_CRISPR_adapter import IGVFE2GCRISPR
+from adapters.CRISPR_element_gene_ENCODE_adapter import CRISPRElementGeneENCODE
+from adapters.CRISPR_element_gene_IGVF_adapter import CRISPRElementGeneIGVF
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
@@ -44,7 +44,7 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
-from adapters.igvf_V2G_CRISPR_adapter import IGVFV2GCRISPR
+from adapters.CRISPR_variant_gene_adapter import CRISPRVariantGene
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
@@ -84,10 +84,10 @@ KEY_TO_ADAPTER = {
     'encode_genomic_element_gene_treatment_protein': EncodeElementGeneLink,
     'encode_donor': EncodeElementGeneLink,
     'encode_biosample': EncodeElementGeneLink,
-    'encode_genomic_element_crispr': ENCODE2GCRISPR,
-    'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
-    'igvf_genomic_element_gene_crispr': IGVFE2GCRISPR,
+    'crispr_element_gene_encode': CRISPRElementGeneENCODE,
+    'crispr_element_gene_igvf': CRISPRElementGeneIGVF,
     'crispr_element_phenotype': CRISPRElementPhenotype,
+    'crispr_variant_gene': CRISPRVariantGene,
     'crispr_variant_phenotype': CRISPRVariantPhenotype,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
@@ -133,7 +133,6 @@ KEY_TO_ADAPTER = {
     'variant_disease_gene': ClinGen,
     'mpra': MPRAAdapter,
     'bluestarr_variant_biosample': BlueSTARRVariantBiosample,
-    'igvf_variant_gene_crispr': IGVFV2GCRISPR,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,

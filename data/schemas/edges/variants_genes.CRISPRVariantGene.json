@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/variants_genes.IGVFV2GCRISPR.json",
+  "$id": "schemas/edges/variants_genes.CRISPRVariantGene.json",
   "allOf": [
     {
       "$ref": "edges.base.json"

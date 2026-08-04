@@ -14,8 +14,8 @@ from adapters.writer import Writer
 _CRISPR_E2G_DEFINITIONS_PATH = (
     Path(__file__).resolve().parents[1] /
     'data_loading_support_files' /
-    'IGVF_E2G_CRISPR' /
-    'igvf_e2g_crispr_definitions.json'
+    'CRISPR_element_gene_IGVF' /
+    'crispr_element_gene_igvf_definitions.json'
 )
 
 
@@ -28,7 +28,7 @@ def _load_crispr_e2g_definitions() -> Tuple[dict, dict]:
     return layouts, file_config
 
 
-# Layout specs and per-accession parser config live in igvf_e2g_crispr_definitions.json.
+# Layout specs and per-accession parser config live in crispr_element_gene_igvf_definitions.json.
 CRISPR_E2G_LAYOUTS, CRISPR_E2G_FILE_CONFIG = _load_crispr_e2g_definitions()
 
 
@@ -46,7 +46,7 @@ _IGVF_E2G_LAYOUT_KEYS = frozenset({
 })
 
 
-class IGVFE2GCRISPR(BaseAdapter):
+class CRISPRElementGeneIGVF(BaseAdapter):
 
     ALLOWED_LABELS = [
         'genomic_element',
@@ -55,7 +55,10 @@ class IGVFE2GCRISPR(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
-    MAX_LOG10_PVALUE = 240  # encode_E2G_CRISPR_adapter; max log10pvalue from file is 235
+    # Two-tailed normal critical value for SIGNIFICANCE_THRESHOLD (≈ normsinv(0.975)).
+    Z_SCORE_SIGNIFICANCE_THRESHOLD = 1.959963984540054
+    # CRISPR_element_gene_ENCODE_adapter; max log10pvalue from file is 235
+    MAX_LOG10_PVALUE = 240
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
         'p_value',
         'p_value_adj',
@@ -75,6 +78,9 @@ class IGVFE2GCRISPR(BaseAdapter):
         'cpm_perturb',
         'cpm_bg',
         'num_cells',
+        'z_score',
+        't_score',
+        'idr',
     })
 
     @staticmethod
@@ -208,6 +214,14 @@ class IGVFE2GCRISPR(BaseAdapter):
                 return True
         return False
 
+    @staticmethod
+    def _non_promoter_source_annotation(targeted_element_types: list) -> str:
+        """Label used for non-promoter elements (enhancer, distal element, etc.)."""
+        for annotation in targeted_element_types:
+            if annotation != 'promoter':
+                return annotation
+        return 'enhancer'
+
     def _promoter_gene_and_source_annotation(
         self,
         targeted_element_types: list,
@@ -219,10 +233,12 @@ class IGVFE2GCRISPR(BaseAdapter):
         Raises ValueError for rows that cannot be loaded; use skip_rows for known exceptions.
         """
         supports_promoter = 'promoter' in targeted_element_types
-        supports_enhancer = 'enhancer' in targeted_element_types
+        supports_non_promoter = any(
+            annotation != 'promoter' for annotation in targeted_element_types
+        )
         if not supports_promoter:
-            return (None, 'enhancer')
-        if not supports_enhancer:
+            return (None, self._non_promoter_source_annotation(targeted_element_types))
+        if not supports_non_promoter:
             self._require_valid_promoter_gene(
                 intended_target_name,
                 intended_target_gene_raw,
@@ -237,7 +253,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             )
             return (intended_target_name, 'promoter')
         promoter_gene = None
-        source_annotation = 'enhancer'
+        source_annotation = self._non_promoter_source_annotation(
+            targeted_element_types)
         if self._is_ensembl_gene_id(intended_target_name):
             if self.gene_validator.validate(intended_target_name):
                 promoter_gene = intended_target_name
@@ -262,8 +279,8 @@ class IGVFE2GCRISPR(BaseAdapter):
             colmap,
             missing_column_error='missing source annotation column.',
         )
-        if source_annotation == 'enhancer':
-            return None, 'enhancer'
+        if source_annotation in {'enhancer', 'distal element'}:
+            return None, source_annotation
         if source_annotation != 'promoter':
             source_idx = colmap['source_annotation']
             self._row_load_error(
@@ -307,11 +324,11 @@ class IGVFE2GCRISPR(BaseAdapter):
 
     @staticmethod
     def _perturb_seq_negative_control(row: list, type_col: Optional[int]) -> bool:
-        return IGVFE2GCRISPR._cell(row, type_col) == 'negative_control'
+        return CRISPRElementGeneIGVF._cell(row, type_col) == 'negative_control'
 
     @staticmethod
     def _non_targeting_control(row: list, source_annotation_col: Optional[int]) -> bool:
-        return IGVFE2GCRISPR._cell(row, source_annotation_col).lower() == 'non-targeting'
+        return CRISPRElementGeneIGVF._cell(row, source_annotation_col).lower() == 'non-targeting'
 
     def _resolve_explicit_interval(
         self,
@@ -379,7 +396,7 @@ class IGVFE2GCRISPR(BaseAdapter):
     @staticmethod
     def _pick_column(name_to_idx: Dict[str, int], *candidates) -> Optional[int]:
         for candidate in candidates:
-            for name in IGVFE2GCRISPR._candidate_columns(candidate):
+            for name in CRISPRElementGeneIGVF._candidate_columns(candidate):
                 if name in name_to_idx:
                     return name_to_idx[name]
         return None
@@ -437,14 +454,14 @@ class IGVFE2GCRISPR(BaseAdapter):
             if col_idx >= len(row):
                 continue
             cell = row[col_idx].strip()
-            if cell:
-                try:
-                    value = float(cell)
-                    metrics[key] = value
-                except ValueError as err:
-                    self._row_load_error(
-                        f'metric {key!r} is not a float ({row[col_idx]!r}): {err}'
-                    )
+            if not cell or cell.lower() in {'na', 'nan', 'none', 'null'}:
+                continue
+            try:
+                metrics[key] = float(cell)
+            except ValueError as err:
+                self._row_load_error(
+                    f'metric {key!r} is not a float ({row[col_idx]!r}): {err}'
+                )
         return metrics
 
     @classmethod
@@ -468,8 +485,11 @@ class IGVFE2GCRISPR(BaseAdapter):
             return False
         if self._is_explicitly_skipped_row(row, name_to_idx):
             return False
-        if is_scaled_screen and not self._scaled_screen_row_should_load(
-                row, name_to_idx, colmap):
+        if self.layout.get('require_pass_qc') and not self._passes_qc_column(
+                row, name_to_idx):
+            return False
+        if is_scaled_screen and not self._scaled_screen_has_targeted_element(
+                row, colmap):
             return False
         if is_pyspade and self._non_targeting_control(
                 row, colmap.get('source_annotation')):
@@ -496,14 +516,20 @@ class IGVFE2GCRISPR(BaseAdapter):
                 metrics['p_value_adj'])
 
     def _apply_standard_significant_field(self, metrics: dict) -> None:
-        """Set significant from p_value_adj or p_value using SIGNIFICANCE_THRESHOLD."""
+        """Set significant from p-values or |z_score| using SIGNIFICANCE_THRESHOLD."""
         p_value = metrics.get('p_value_adj')
         if p_value is None:
             p_value = metrics.get('p_value')
         if p_value is not None:
             metrics['significant'] = p_value < self.SIGNIFICANCE_THRESHOLD
-        else:
-            metrics['significant'] = False
+            return
+        z_score = metrics.get('z_score')
+        if z_score is not None:
+            metrics['significant'] = (
+                abs(z_score) >= self.Z_SCORE_SIGNIFICANCE_THRESHOLD
+            )
+            return
+        metrics['significant'] = False
 
     def _apply_adapter_calculated_fields(
         self,
@@ -577,15 +603,15 @@ class IGVFE2GCRISPR(BaseAdapter):
         crispr_modality: str,
         metrics: dict,
     ) -> dict:
-        """Build a genomic_elements_genes edge (see IGVFE2GCRISPR schema)."""
+        """Build a genomic_elements_genes edge (see CRISPRElementGeneIGVF schema)."""
         edge = {
             '_key': _key,
             '_from': _from,
             '_to': f'genes/{readout_gene}',
-            'source': IGVFE2GCRISPR.SOURCE,
+            'source': CRISPRElementGeneIGVF.SOURCE,
             'source_url': source_url,
             'files_filesets': f'files_filesets/{file_accession}',
-            'label': IGVFE2GCRISPR.COLLECTION_LABEL,
+            'label': CRISPRElementGeneIGVF.COLLECTION_LABEL,
             'class': file_fileset['class'],
             'name': 'modulates expression of',
             'inverse_name': 'expression modulated by',
@@ -595,22 +621,25 @@ class IGVFE2GCRISPR(BaseAdapter):
             'biosample_term': file_fileset['samples'][0],
             'treatments_term_ids': file_fileset['treatments_term_ids'],
         }
-        edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
-        edge['log2FC'] = metrics['log2FC']
         edge['significant'] = metrics['significant']
-        for field in IGVFE2GCRISPR.OPTIONAL_EDGE_METRIC_FIELDS:
+        if 'neg_log10_pvalue' in metrics:
+            edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
+        if 'log2FC' in metrics:
+            edge['log2FC'] = metrics['log2FC']
+        for field in CRISPRElementGeneIGVF.OPTIONAL_EDGE_METRIC_FIELDS:
             if field in metrics:
                 edge[field] = metrics[field]
         return edge
 
-    def _scaled_screen_passes_qc(
+    def _passes_qc_column(
         self,
         row: list,
         name_to_idx: Dict[str, int],
     ) -> bool:
+        """Return True when pass_qc is explicitly true. Missing column is an error."""
         pass_qc_idx = name_to_idx.get('pass_qc')
         if pass_qc_idx is None:
-            self._row_load_error('missing pass_qc column for scaled screen.')
+            self._row_load_error('missing pass_qc column.')
         if pass_qc_idx >= len(row):
             return False
         return self._parse_bool(row[pass_qc_idx]) is True
@@ -628,17 +657,6 @@ class IGVFE2GCRISPR(BaseAdapter):
             if not value or value.lower() in {'nan', 'na', 'none'}:
                 return False
         return True
-
-    def _scaled_screen_row_should_load(
-        self,
-        row: list,
-        name_to_idx: Dict[str, int],
-        colmap: Dict[str, Optional[int]],
-    ) -> bool:
-        return (
-            self._scaled_screen_passes_qc(row, name_to_idx)
-            and self._scaled_screen_has_targeted_element(row, colmap)
-        )
 
     @staticmethod
     def _scaled_screen_perturbed_genes(value: str) -> List[str]:
@@ -713,6 +731,16 @@ class IGVFE2GCRISPR(BaseAdapter):
         if current_p is None:
             return True
         return candidate_p < current_p
+
+    @staticmethod
+    def _better_crispr_surf_hit(
+        current: Optional[Tuple[dict, float]],
+        candidate_fdr: float,
+    ) -> bool:
+        """Return True when candidate should replace current (lower FDR wins)."""
+        if current is None:
+            return True
+        return candidate_fdr < current[1]
 
     def _resolve_intended_target_from_row(
         self,
@@ -793,7 +821,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             self.logger.warning(
                 'No CRISPR E2G file config for accession %s; '
                 'using promoter/enhancer per-row heuristic. Add this file under '
-                '"files" in igvf_e2g_crispr_definitions.json.',
+                '"files" in crispr_element_gene_igvf_definitions.json.',
                 self.file_accession,
             )
         layout_name = self.file_config.get('layout')
@@ -836,10 +864,13 @@ class IGVFE2GCRISPR(BaseAdapter):
         layout_name = self.file_config.get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
+        is_crispr_surf = layout_name == 'crispr_surf'
         genomic_coordinates_to_element_id = {}
         scaled_screen_best_edges = {}
+        crispr_surf_best_edges = {}
         seen_element_gene_ids = set()
-        with gzip.open(self.filepath, 'rt') as data_file:
+        constant_readout_gene = self.file_config.get('readout_gene')
+        with gzip.open(self.filepath, 'rt', encoding='utf-8-sig') as data_file:
             reader = csv.reader(
                 data_file, delimiter=self.layout.get('delimiter', '\t'))
             header = next(reader)
@@ -848,7 +879,7 @@ class IGVFE2GCRISPR(BaseAdapter):
             if not self.layout:
                 raise ValueError(
                     f'File {self.file_accession} has no CRISPR E2G layout; add it under '
-                    f'"files" in igvf_e2g_crispr_definitions.json.'
+                    f'"files" in crispr_element_gene_igvf_definitions.json.'
                 )
             colmap = self._columns_from_layout(name_to_idx)
             uses_name_hg38 = colmap['name_hg38'] is not None
@@ -883,10 +914,13 @@ class IGVFE2GCRISPR(BaseAdapter):
                     uses_name_hg38=uses_name_hg38,
                 )
 
-                read_idx = colmap['readout_gene']
-                if read_idx is None or read_idx >= len(row):
-                    self._row_load_error('missing readout gene column.')
-                readout_gene_raw = row[read_idx]
+                if constant_readout_gene:
+                    readout_gene_raw = constant_readout_gene
+                else:
+                    read_idx = colmap['readout_gene']
+                    if read_idx is None or read_idx >= len(row):
+                        self._row_load_error('missing readout gene column.')
+                    readout_gene_raw = row[read_idx]
 
                 intended_target_name = self._normalize_ensembl_gene_id(
                     intended_target_gene_raw)
@@ -951,6 +985,20 @@ class IGVFE2GCRISPR(BaseAdapter):
                         current = scaled_screen_best_edges.get(_id)
                         if self._better_scaled_screen_hit(current, _props):
                             scaled_screen_best_edges[_id] = _props
+                    elif is_crispr_surf:
+                        fdr_idx = name_to_idx.get('FDR')
+                        if fdr_idx is None or fdr_idx >= len(row):
+                            self._row_load_error('missing FDR column.')
+                        try:
+                            candidate_fdr = float(row[fdr_idx].strip())
+                        except ValueError as err:
+                            self._row_load_error(
+                                f'FDR is not a float ({row[fdr_idx]!r}): {err}'
+                            )
+                        current = crispr_surf_best_edges.get(_id)
+                        if self._better_crispr_surf_hit(current, candidate_fdr):
+                            crispr_surf_best_edges[_id] = (
+                                _props, candidate_fdr)
                     else:
                         self._check_unique_element_gene(
                             _id, seen_element_gene_ids)
@@ -958,6 +1006,12 @@ class IGVFE2GCRISPR(BaseAdapter):
 
             if self.label == 'genomic_element_gene' and is_scaled_screen:
                 for _props in scaled_screen_best_edges.values():
+                    self._check_unique_element_gene(
+                        _props['_key'], seen_element_gene_ids)
+                    self._write_doc(_props)
+
+            if self.label == 'genomic_element_gene' and is_crispr_surf:
+                for _props, _fdr in crispr_surf_best_edges.values():
                     self._check_unique_element_gene(
                         _props['_key'], seen_element_gene_ids)
                     self._write_doc(_props)
@@ -975,7 +1029,7 @@ class IGVFE2GCRISPR(BaseAdapter):
                         'end': int(genomic_element[2]),
                         'method': method,
                         'source_annotation': source_annotation,
-                        'source': IGVFE2GCRISPR.SOURCE,
+                        'source': CRISPRElementGeneIGVF.SOURCE,
                         'source_url': self.source_url,
                         'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession

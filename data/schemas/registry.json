@@ -28,9 +28,9 @@
             "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
             "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json",
-            "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
+            "CRISPRElementGeneENCODE": "schemas/nodes/genomic_elements.CRISPRElementGeneENCODE.json",
             "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
-            "IGVFE2GCRISPR": "schemas/nodes/genomic_elements.IGVFE2GCRISPR.json",
+            "CRISPRElementGeneIGVF": "schemas/nodes/genomic_elements.CRISPRElementGeneIGVF.json",
             "CRISPRElementPhenotype": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
             "scE2G": "schemas/nodes/genomic_elements.scE2G.json",
             "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
@@ -85,7 +85,7 @@
             "SGE": "schemas/nodes/variants.SGE.json",
             "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
             "BlueSTARRVariantBiosample": "schemas/nodes/variants.BlueSTARRVariantBiosample.json",
-            "IGVFV2GCRISPR": "schemas/nodes/variants.IGVFV2GCRISPR.json",
+            "CRISPRVariantGene": "schemas/nodes/variants.CRISPRVariantGene.json",
             "CRISPRVariantPhenotype": "schemas/nodes/variants.CRISPRVariantPhenotype.json"
         }
     },
@@ -134,9 +134,9 @@
             "MPRAAdapter": "schemas/edges/genomic_elements_biosamples.MPRAAdapter.json"
         },
         "genomic_elements_genes": {
-            "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
+            "CRISPRElementGeneENCODE": "schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json",
             "EncodeElementGeneLink": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
-            "IGVFE2GCRISPR": "schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json",
+            "CRISPRElementGeneIGVF": "schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
             "scE2G": "schemas/edges/genomic_elements_genes.scE2G.json"
         },
         "genomic_elements_phenotypes": {
@@ -198,7 +198,7 @@
             "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
             "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json",
             "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json",
-            "IGVFV2GCRISPR": "schemas/edges/variants_genes.IGVFV2GCRISPR.json"
+            "CRISPRVariantGene": "schemas/edges/variants_genes.CRISPRVariantGene.json"
         },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",

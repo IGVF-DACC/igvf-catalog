@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "edges/genomic_elements_genes.IGVFE2GCRISPR.json",
-  "db_collection_name": "genomic_elements_genes",
+  "$id": "schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -97,7 +96,10 @@
           "description": "The treatments term ids of the genomic element to gene edge"
         },
         "p_value": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
         },
         "p_value_adj": {
@@ -108,7 +110,10 @@
           "description": "Multiple-testing-adjusted p-value when reported by the source."
         },
         "neg_log10_pvalue": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Negative log10 of p-value."
         },
         "neg_log10_pvalue_adj": {
@@ -116,7 +121,10 @@
           "description": "Negative log10 of adjusted p-value."
         },
         "log2FC": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Log2 fold change of readout gene expression for the perturbation."
         },
         "log2FC_ci95_lower": {
@@ -182,6 +190,18 @@
         "num_cells": {
           "type": "number",
           "description": "Number of cells with perturbation guides at the element."
+        },
+        "z_score": {
+          "type": "number",
+          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
+        },
+        "t_score": {
+          "type": "number",
+          "description": "T-statistic for the element-gene association when reported by the source."
+        },
+        "idr": {
+          "type": "number",
+          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility."
         }
       },
       "required": [
@@ -191,16 +211,14 @@
         "biosample_term",
         "biological_context",
         "treatments_term_ids",
-        "p_value",
-        "neg_log10_pvalue",
-        "log2FC",
         "significant"
       ],
-      "additionalProperties": false,
-      "accessible_via": {
-        "filter_by_range": "log2FC, neg_log10_pvalue, neg_log10_pvalue_adj",
-        "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term"
-      }
+      "additionalProperties": false
     }
-  ]
+  ],
+  "accessible_via": {
+    "filter_by_range": "log2FC, effect_size, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
+    "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_ci95_lower, log2FC_ci95_upper, effect_size, effect_size_ci_95, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, pct_1, pct_2, num_guides, num_cells, fold_change, background_corrected_fold_change, z_score, t_score, idr, cpm_perturb, cpm_bg, gamma_approximation_ln_p_value, hypergeometric_ln_p_value"
+  },
+  "db_collection_name": "genomic_elements_genes"
 }
