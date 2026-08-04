@@ -23,7 +23,10 @@ export const drugFormat = z.object({
   name: z.string(),
   drug_ontology_terms: z.array(z.string()).optional(),
   source: z.string(),
-  source_url: z.string()
+  source_url: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 async function drugSearch (input: paramsFormatType): Promise<any[]> {

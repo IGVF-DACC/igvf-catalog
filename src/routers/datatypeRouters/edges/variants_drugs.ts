@@ -44,7 +44,10 @@ const variantsToDrugsFormat = z.object({
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 }).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
 const drugsToVariantsFormat = z.object({
@@ -56,7 +59,10 @@ const drugsToVariantsFormat = z.object({
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
 function validateInput (input: paramsFormatType): void {

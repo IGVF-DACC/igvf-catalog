@@ -9,7 +9,7 @@ from adapters.archive_utils import (
     get_files_from_folder,
 )
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id_from_hgvs
+from adapters.helpers import build_variant_id_from_hgvs, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
@@ -81,6 +81,8 @@ class PharmGKB(BaseAdapter):
         self.study_reference_filepath = study_reference_filepath
         self.gene_reference_filepath = gene_reference_filepath
 
+        self.file_accession = get_file_accession(filepath)
+
         if self.label in ('variant_drug', 'variant_drug_gene'):
             missing = []
             if not self.drug_reference_filepath:
@@ -96,7 +98,6 @@ class PharmGKB(BaseAdapter):
                     f'Missing required reference file path(s) for label "{self.label}": '
                     f'{", ".join(missing)}'
                 )
-            self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -115,6 +116,19 @@ class PharmGKB(BaseAdapter):
             return 'variants_drugs_genes'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        if self.label in ('variant_drug', 'variant_drug_gene'):
+            self.writer.add_tag('portal_accessions', get_file_accession(
+                self.drug_reference_filepath))
+            self.writer.add_tag('portal_accessions', get_file_accession(
+                self.variant_reference_filepath))
+            self.writer.add_tag('portal_accessions', get_file_accession(
+                self.study_reference_filepath))
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
 
         if self.label == 'drug':
             with open(self.filepath, 'r') as drug_file:
@@ -136,7 +150,10 @@ class PharmGKB(BaseAdapter):
                         'name': drug_name,
                         'drug_ontology_terms': ['ontology_terms/' + term for term in drug_ontology_terms],
                         'source': PharmGKB.SOURCE,
-                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'chemical/' + _key
+                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'chemical/' + _key,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
                     if self.validate:
                         self.validate_doc(props)
@@ -284,7 +301,10 @@ class PharmGKB(BaseAdapter):
                                             'name': 'associated with',
                                             'inverse_name': 'associated with',
                                             'source': PharmGKB.SOURCE,
-                                            'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                            'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id,
+                                            'class': self.collection_class,
+                                            'method': self.method,
+                                            'files_filesets': 'files_filesets/' + self.file_accession
                                         }
                                         if self.validate:
                                             self.validate_doc(props)
@@ -315,7 +335,10 @@ class PharmGKB(BaseAdapter):
                                                         'inverse_name': 'associated with',
                                                         'gene_symbol': gene_symbol,
                                                         'source': PharmGKB.SOURCE,
-                                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id,
+                                                        'class': self.collection_class,
+                                                        'method': self.method,
+                                                        'files_filesets': 'files_filesets/' + self.file_accession
                                                     }
                                                     if self.validate:
                                                         self.validate_doc(
