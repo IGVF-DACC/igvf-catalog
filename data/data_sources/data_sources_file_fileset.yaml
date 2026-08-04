@@ -723,6 +723,9 @@ igvf_file_accessions:
     - IGVFFI9719LGLD
     - IGVFFI9779WEGD
     - IGVFFI9815VYTN
+  semi-qY2H:
+    - IGVFFI1611ZIBI
+    - IGVFFI0709BESF
   community reference files:
     - IGVFFI9074FIDG
     - IGVFFI7449PKMJ
