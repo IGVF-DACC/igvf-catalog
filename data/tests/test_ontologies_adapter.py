@@ -72,6 +72,9 @@ def test_process_ontology_sets_file_metadata(mock_default_world, mock_get_ontolo
     ont.process_ontology()
 
     mock_get_file_fileset.assert_called_once_with('IGVFFI7407XTPX')
+    for writer in mock_writers.values():
+        writer.add_tag.assert_called_once_with(
+            'portal_accessions', 'IGVFFI7407XTPX')
     assert ont.collection_class == 'biological relationship'
     assert ont.method is None
 
