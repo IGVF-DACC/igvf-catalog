@@ -1373,7 +1373,7 @@ export const descriptions = {
       },
       {
         id: 'variant-painting',
-        label: 'Variant painting',
+        label: 'Variant painting via fluorescence',
         examples: [
           {
             label: 'query by phenotype identifier',
@@ -1502,7 +1502,7 @@ export const descriptions = {
       },
       {
         id: 'variant-painting',
-        label: 'Variant painting',
+        label: 'Variant painting via fluorescence',
         examples: [
           {
             label: 'Single result',
