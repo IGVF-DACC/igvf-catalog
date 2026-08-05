@@ -7,6 +7,8 @@ from jsonschema import Draft202012Validator, ValidationError
 
 from owlready2 import *
 
+from adapters.archive_utils import get_file_accession
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from schemas.registry import get_schema
 
@@ -14,17 +16,21 @@ from schemas.registry import get_schema
 class Ontology:
 
     ONTOLOGIES = {
-        'uberon': 'https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz',
-        'clo': 'https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz',
-        'cl': 'https://api.data.igvf.org/reference-files/IGVFFI0402TNDW/@@download/IGVFFI0402TNDW.owl.gz',
-        'hpo': 'https://api.data.igvf.org/reference-files/IGVFFI1298JRGV/@@download/IGVFFI1298JRGV.owl.gz',
-        'mondo': 'https://api.data.igvf.org/reference-files/IGVFFI9789TIWM/@@download/IGVFFI9789TIWM.owl.gz',
-        'go': 'https://api.data.igvf.org/reference-files/IGVFFI8306RHIV/@@download/IGVFFI8306RHIV.owl.gz',
-        'efo': 'https://api.data.igvf.org/reference-files/IGVFFI0719VRZV/@@download/IGVFFI0719VRZV.owl.gz',
-        'chebi': 'https://api.data.igvf.org/reference-files/IGVFFI6182DQZM/@@download/IGVFFI6182DQZM.owl.gz',
-        'vario': 'https://api.data.igvf.org/reference-files/IGVFFI4219OZTA/@@download/IGVFFI4219OZTA.owl.gz',
-        'orphanet': 'https://api.data.igvf.org/reference-files/IGVFFI8953HXRQ/@@download/IGVFFI8953HXRQ.owl.gz',
-        'ncit': 'https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz'
+        'uberon': 'https://api.data.igvf.org/reference-files/IGVFFI7407XTPX/@@download/IGVFFI7407XTPX.owl.gz',
+        'clo': 'https://api.data.igvf.org/reference-files/IGVFFI0354CFDI/@@download/IGVFFI0354CFDI.owl.gz',
+        'cl': 'https://api.data.igvf.org/reference-files/IGVFFI1876TWNM/@@download/IGVFFI1876TWNM.owl.gz',
+        'pcl': 'https://api.data.igvf.org/reference-files/IGVFFI5988GBLY/@@download/IGVFFI5988GBLY.owl.gz',
+        'hpo': 'https://api.data.igvf.org/reference-files/IGVFFI0664IPKB/@@download/IGVFFI0664IPKB.owl.gz',
+        'mondo': 'https://api.data.igvf.org/reference-files/IGVFFI7520SEBS/@@download/IGVFFI7520SEBS.owl.gz',
+        'go': 'https://api.data.igvf.org/reference-files/IGVFFI7433WATG/@@download/IGVFFI7433WATG.owl.gz',
+        'efo': 'https://api.data.igvf.org/reference-files/IGVFFI8049QQIN/@@download/IGVFFI8049QQIN.owl.gz',
+        'chebi': 'https://api.data.igvf.org/reference-files/IGVFFI6667HMZF/@@download/IGVFFI6667HMZF.owl.gz',
+        'vario': 'https://api.data.igvf.org/reference-files/IGVFFI6726JWOJ/@@download/IGVFFI6726JWOJ.owl.gz',
+        'orphanet': 'https://api.data.igvf.org/reference-files/IGVFFI4620DCPC/@@download/IGVFFI4620DCPC.owl.gz',
+        'ncit': 'https://api.data.igvf.org/reference-files/IGVFFI3556AFVR/@@download/IGVFFI3556AFVR.owl.gz',
+        'oba': 'https://api.data.igvf.org/reference-files/IGVFFI0656AUEU/@@download/IGVFFI0656AUEU.owl.gz',
+        'doid': 'https://api.data.igvf.org/reference-files/IGVFFI6329ZTOH/@@download/IGVFFI6329ZTOH.owl.gz',
+        'obi': 'https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz'
     }
 
     SOURCE_LINKS = {
@@ -32,6 +38,7 @@ class Ontology:
         'clo': 'https://obofoundry.org/ontology/clo.html',
         'chebi': 'https://www.ebi.ac.uk/chebi/',
         'cl': 'https://obophenotype.github.io/cell-ontology/',
+        'pcl': 'https://obophenotype.github.io/provisional_cell_ontology/',
         'efo': 'https://www.ebi.ac.uk/efo/',
         'mondo': 'https://mondo.monarchinitiative.org/',
         'ncit': 'https://github.com/NCI-Thesaurus/thesaurus-obo-edition',
@@ -42,7 +49,9 @@ class Ontology:
         'encode': 'https://encodeproject.org',
         'bao': 'http://bioassayontology.org/',
         'oba': 'https://github.com/obophenotype/bio-attribute-ontology',
-        'orphanet': 'https://www.orpha.net/'
+        'orphanet': 'https://www.orpha.net/',
+        'doid': 'https://disease-ontology.org/',
+        'obi': 'https://obi-ontology.org/'
     }
 
     GO_SUBONTOLGIES = ['molecular_function',
@@ -103,6 +112,7 @@ class Ontology:
     ):
         self.filepath = filepath
         self.ontology = ontology
+        self.file_accession = get_file_accession(Ontology.ONTOLOGIES[ontology])
         self.node_primary_writer = node_primary_writer
         self.node_secondary_writer = node_secondary_writer
         self.edge_primary_writer = edge_primary_writer
@@ -151,6 +161,11 @@ class Ontology:
             self.process_ontology()
 
     def process_ontology(self):
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         onto = get_ontology(self.filepath).load()
         with onto:
             self.graph = default_world.as_rdflib_graph()
@@ -239,7 +254,10 @@ class Ontology:
                     'name': self.predicate_name(predicate_for_props),
                     'type_uri': str(predicate_for_props),
                     'source': self.ontology.upper(),
-                    'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower())
+                    'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower()),
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession
                 }
 
                 inverse_name = 'type of'  # for name = subclass
@@ -282,7 +300,10 @@ class Ontology:
                                      self.get_all_property_values_from_node(node, 'exact_synonyms'))),
                 'source': self.ontology.upper(),
                 'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower()),
-                'subontology': go_namespaces.get(node, None)
+                'subontology': go_namespaces.get(node, None),
+                'class': self.collection_class,
+                'method': self.method,
+                'files_filesets': 'files_filesets/' + self.file_accession
             }
 
             if self.validate:

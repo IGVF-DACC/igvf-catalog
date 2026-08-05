@@ -31,7 +31,10 @@ export const ontologyFormat = z.object({
   description: z.string().nullish(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable(),
-  source_url: z.string().optional().nullable()
+  source_url: z.string().optional().nullable(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {

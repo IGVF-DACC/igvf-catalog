@@ -1,11 +1,23 @@
 import json
 
 import pytest
+from unittest.mock import patch
 from adapters.cellosaurus_ontology_adapter import Cellosaurus
 from adapters.writer import SpyWriter
 
 
-def test_cellosaurus_adapter_node():
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.cellosaurus_ontology_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'biological relationship',
+            'method': None
+        }
+        yield mock_get_file_fileset
+
+
+def test_cellosaurus_adapter_node(mock_file_fileset):
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
                           label='ontology_term', writer=writer, validate=True)
@@ -16,9 +28,12 @@ def test_cellosaurus_adapter_node():
     assert 'name' in first_item
     assert 'uri' in first_item
     assert first_item['source'] == 'Cellosaurus'
+    assert first_item['class'] == 'biological relationship'
+    assert first_item['method'] is None
+    assert first_item['files_filesets'] == f'files_filesets/{Cellosaurus.FILE_ACCESSION}'
 
 
-def test_cellosaurus_adapter_edge():
+def test_cellosaurus_adapter_edge(mock_file_fileset):
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
                           label='ontology_relationship', writer=writer, validate=True)
@@ -31,9 +46,12 @@ def test_cellosaurus_adapter_edge():
     assert 'name' in first_item
     assert 'inverse_name' in first_item
     assert first_item['source'] == 'Cellosaurus'
+    assert first_item['class'] == 'biological relationship'
+    assert first_item['method'] is None
+    assert first_item['files_filesets'] == f'files_filesets/{Cellosaurus.FILE_ACCESSION}'
 
 
-def test_cellosaurus_adapter_species_filter():
+def test_cellosaurus_adapter_species_filter(mock_file_fileset):
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
                           label='ontology_term', species_filter=True, writer=writer)

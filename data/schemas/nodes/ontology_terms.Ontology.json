@@ -43,6 +43,7 @@
             "CHEBI",
             "CL",
             "CLO",
+            "DOID",
             "EFO",
             "ENCODE",
             "GO",
@@ -50,8 +51,10 @@
             "MONDO",
             "NCIT",
             "OBA",
+            "OBI",
             "Oncotree",
             "ORPHANET",
+            "PCL",
             "UBERON",
             "VARIO"
           ]
@@ -71,6 +74,32 @@
             "molecular_function",
             null
           ]
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the ontology term, from the associated files_filesets record",
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The method of the ontology term, from the associated files_filesets record",
+          "enum": [
+            null
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the ontology term",
+          "example": "files_filesets/IGVFFI7407XTPX",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
@@ -78,13 +107,16 @@
         "term_id",
         "description",
         "synonyms",
-        "subontology"
+        "subontology",
+        "class",
+        "method",
+        "files_filesets"
       ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, uri, term_id, name, synonyms, description, source, subontology, source_url"
+    "return": "_id, uri, term_id, name, synonyms, description, source, subontology, source_url, class, method, files_filesets"
   },
   "db_collection_name": "ontology_terms"
 }

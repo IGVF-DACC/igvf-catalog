@@ -44,6 +44,36 @@ def test_init_sets_attributes(mock_writers):
     assert ont.filepath == 'dummy.owl'
     assert ont.ontology == 'uberon'
     assert ont.node_primary_writer is mock_writers['node_primary_writer']
+    assert ont.file_accession == 'IGVFFI7407XTPX'
+
+
+@patch('adapters.ontologies_adapter.get_file_fileset_by_accession_in_arangodb')
+@patch('adapters.ontologies_adapter.get_ontology')
+@patch('adapters.ontologies_adapter.default_world')
+def test_process_ontology_sets_file_metadata(mock_default_world, mock_get_ontology, mock_get_file_fileset, mock_writers):
+    mock_graph = MagicMock()
+    mock_graph.subject_objects.return_value = []
+    mock_default_world.as_rdflib_graph.return_value = mock_graph
+    mock_onto = MagicMock()
+    mock_get_ontology.return_value.load.return_value = mock_onto
+    mock_get_file_fileset.return_value = {
+        'class': 'biological relationship',
+        'method': None
+    }
+
+    ont = Ontology(
+        filepath='dummy.owl',
+        ontology='uberon',
+        node_primary_writer=mock_writers['node_primary_writer'],
+        node_secondary_writer=mock_writers['node_secondary_writer'],
+        edge_primary_writer=mock_writers['edge_primary_writer'],
+        edge_secondary_writer=mock_writers['edge_secondary_writer'],
+    )
+    ont.process_ontology()
+
+    mock_get_file_fileset.assert_called_once_with('IGVFFI7407XTPX')
+    assert ont.collection_class == 'biological relationship'
+    assert ont.method is None
 
 
 @patch('adapters.ontologies_adapter.get_ontology')
