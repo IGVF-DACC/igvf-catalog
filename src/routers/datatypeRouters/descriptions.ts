@@ -1370,6 +1370,27 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'variant-painting',
+        label: 'Variant painting via fluorescence',
+        examples: [
+          {
+            label: 'query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0008104',
+              'method = Variant painting via fluorescence'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI9499PJFU',
+              'method = Variant painting via fluorescence'
+            ]
+          }
+        ]
       }
     ]),
 
@@ -1475,6 +1496,26 @@ export const descriptions = {
             items: [
               'gene_name = CYP2C19',
               'method = VAMP-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'variant-painting',
+        label: 'Variant painting via fluorescence',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = LITAF_ENST00000622633_p.Pro135Thr_c.403C-A',
+              'method = Variant painting via fluorescence'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = LITAF',
+              'method = Variant painting via fluorescence'
             ]
           }
         ]

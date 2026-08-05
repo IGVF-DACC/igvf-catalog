@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the coding variant to phenotype edge"
+        },
+        "_from": {
+          "example": "coding_variants/coding_var_1",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/phenotype_1",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9499PJFU",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "name": {
+          "enum": [
+            "mutational effect"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "altered due to mutation"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the coding variant to phenotype edge",
+          "example": "files_filesets/IGVFFI9499PJFU",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the coding variant to phenotype edge",
+          "example": "U2OS"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the coding variant to phenotype edge",
+          "example": "ontology_terms/EFO_0002869"
+        },
+        "method": {
+          "enum": [
+            "Variant painting via fluorescence"
+          ]
+        },
+        "label": {
+          "enum": [
+            "protein variant effect"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "localization_score": {
+          "type": "number",
+          "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant"
+        },
+        "mislocalization_hit": {
+          "type": "boolean",
+          "description": "Whether the variant is classified as causing protein mislocalization based on the localization score threshold"
+        }
+      },
+      "required": [
+        "_key",
+        "files_filesets",
+        "biosample_term",
+        "biological_context",
+        "localization_score",
+        "mislocalization_hit"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "coding_variants_phenotypes"
+}

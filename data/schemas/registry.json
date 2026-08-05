@@ -95,7 +95,8 @@
             "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
             "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
             "SGE": "schemas/edges/coding_variants_phenotypes.SGE.json",
-            "DUALIPAAdapter": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json"
+            "DUALIPAAdapter": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
+            "VariantPaintingAdapter": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json"
         },
         "coding_variants_proteins": {
             "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
