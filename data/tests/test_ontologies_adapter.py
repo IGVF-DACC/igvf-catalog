@@ -1,3 +1,4 @@
+import json
 import os
 
 import pytest
@@ -204,6 +205,37 @@ def test_dedupe_punned_classes_removes_conflicting_class_decl(ontology_instance,
     assert 'owl:Class rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"' not in cleaned_content
     assert 'owl:Class rdf:about="http://example.org/OTHER_CLASS"' in cleaned_content
     os.remove(cleaned_path)
+
+
+def test_to_key_sanitizes_illegal_arangodb_key_characters():
+    assert Ontology.sanitize_key('Wikipedia_Artery#Systemic_arteries') == \
+        'Wikipedia_Artery_Systemic_arteries'
+    assert Ontology.sanitize_key('safe-Key_1.2:3') == 'safe-Key_1.2:3'
+
+
+def test_process_edges_sanitizes_xref_key_with_hash(ontology_instance, mock_writers):
+    ontology_instance.outputs = {
+        'node': {'primary': mock_writers['node_primary_writer'], 'secondary': mock_writers['node_secondary_writer']},
+        'edge': {'primary': mock_writers['edge_primary_writer'], 'secondary': mock_writers['edge_secondary_writer']},
+    }
+    ontology_instance.collection_class = 'biological relationship'
+    ontology_instance.method = None
+    ontology_instance.file_accession = 'IGVFFI0000TEST'
+
+    from_node = URIRef('http://purl.obolibrary.org/obo/UBERON_0004573')
+    to_node = Literal('Wikipedia:Artery#Systemic_arteries')
+    ontology_instance.graph = MagicMock()
+    ontology_instance.graph.subject_objects.return_value = [
+        (from_node, to_node)]
+
+    ontology_instance.process_edges(Ontology.DB_XREF)
+
+    written_doc = json.loads(
+        mock_writers['edge_primary_writer'].write.call_args[0][0])
+    assert '#' not in written_doc['_key']
+    assert '#' not in written_doc['_to']
+    assert written_doc['_key'] == 'UBERON_0004573_oboInOwl.hasDbXref_Wikipedia_Artery_Systemic_arteries'
+    assert written_doc['_to'] == 'ontology_terms/Wikipedia_Artery_Systemic_arteries'
 
 
 def test_dedupe_punned_classes_noop_when_no_punning(ontology_instance, tmp_path):

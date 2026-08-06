@@ -110,6 +110,12 @@ class Ontology:
     PROPERTY_DECL_RE = re.compile(
         r'<owl:(?:AnnotationProperty|ObjectProperty|DatatypeProperty) rdf:about="([^"]+)"')
 
+    # ArangoDB document keys only allow letters, digits, and _ - : . @ ( ) + , = ; $ ! * ' %
+    # (https://docs.arangodb.com/stable/concepts/data-structure/documents/document-keys/).
+    # Anything else (e.g. '#', '/' from xref values like "Wikipedia:Artery#Systemic_arteries")
+    # must be substituted or ArangoDB rejects the insert with "illegal document key".
+    ILLEGAL_KEY_CHARS_RE = re.compile(r"[^a-zA-Z0-9_\-:.@()+,=;$!*'%]")
+
     def __init__(
         self,
         filepath,
@@ -296,7 +302,8 @@ class Ontology:
                                 'Unsupported format for xref: ' + str(to_node))
                             continue
 
-                        to_node_key = str(to_node).replace(':', '_')
+                        to_node_key = Ontology.sanitize_key(
+                            str(to_node).replace(':', '_'))
 
                         if from_node_key == to_node_key:
                             print('Skipping self xref for: ' + from_node_key)
@@ -415,7 +422,12 @@ class Ontology:
         if key.replace('.', '').isnumeric():
             return None
 
-        return key
+        return cls.sanitize_key(key)
+
+    @classmethod
+    def sanitize_key(cls, key):
+        """Replace characters ArangoDB disallows in document keys (e.g. '#', '/') with '_'."""
+        return cls.ILLEGAL_KEY_CHARS_RE.sub('_', key)
 
     # Example of a restriction block:
     # <rdfs:subClassOf>
