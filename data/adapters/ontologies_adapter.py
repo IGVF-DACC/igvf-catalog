@@ -1,4 +1,6 @@
 import json
+import os
+import re
 from contextlib import ExitStack
 from typing import Optional
 from rdflib import RDF, BNode, Literal, URIRef
@@ -99,6 +101,15 @@ class Ontology:
         URIRef('http://purl.obolibrary.org/obo/RO_0000052')
     }
 
+    # Some ontology releases import a term from another ontology (e.g. CL importing a
+    # STATO term) and end up declaring the same IRI as both a property and an owl:Class
+    # ("punning"). Owlready2 models each IRI as a single typed entity and raises a hard
+    # TypeError on such conflicts, so we strip the redundant owl:Class declaration
+    # before loading (see _dedupe_punned_classes).
+    CLASS_DECL_RE = re.compile(r'<owl:Class rdf:about="([^"]+)"')
+    PROPERTY_DECL_RE = re.compile(
+        r'<owl:(?:AnnotationProperty|ObjectProperty|DatatypeProperty) rdf:about="([^"]+)"')
+
     def __init__(
         self,
         filepath,
@@ -170,7 +181,10 @@ class Ontology:
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
 
-        onto = get_ontology(self.filepath).load()
+        onto_path = self._dedupe_punned_classes(self.filepath)
+        onto = get_ontology(onto_path).load()
+        if onto_path != self.filepath:
+            os.remove(onto_path)
         with onto:
             self.graph = default_world.as_rdflib_graph()
             print('Processing {}...'.format(self.ontology))
@@ -187,6 +201,51 @@ class Ontology:
                     # Go nodes are processed independently of predicates to consider subontologies
                     nodes_in_go_namespaces = self.find_go_nodes(self.graph)
                     self.process_nodes(nodes, nodes_in_go_namespaces)
+
+    def _dedupe_punned_classes(self, filepath):
+        """
+        Scan an OWL/XML file for IRIs declared as both a property (owl:AnnotationProperty,
+        owl:ObjectProperty or owl:DatatypeProperty) and an owl:Class. If any are found,
+        write a copy of the file with the redundant owl:Class declaration(s) removed and
+        return its path; otherwise return the original filepath unchanged.
+        """
+        property_iris = set()
+        class_iris = set()
+        with open(filepath, 'r') as f:
+            for line in f:
+                prop_match = Ontology.PROPERTY_DECL_RE.search(line)
+                if prop_match:
+                    property_iris.add(prop_match.group(1))
+                    continue
+                class_match = Ontology.CLASS_DECL_RE.search(line)
+                if class_match:
+                    class_iris.add(class_match.group(1))
+
+        punned = property_iris & class_iris
+        if not punned:
+            return filepath
+
+        print('Dropping owl:Class declaration(s) also declared as a property '
+              '(owlready2 cannot load an IRI typed as both): ' + ', '.join(sorted(punned)))
+
+        cleaned_path = filepath + '.deduped.owl'
+        in_punned_class = False
+        with open(filepath, 'r') as src, open(cleaned_path, 'w') as dst:
+            for line in src:
+                if in_punned_class:
+                    if '</owl:Class>' in line:
+                        in_punned_class = False
+                    continue
+
+                class_match = Ontology.CLASS_DECL_RE.search(line)
+                if class_match and class_match.group(1) in punned:
+                    if not line.rstrip().endswith('/>'):
+                        in_punned_class = True
+                    continue
+
+                dst.write(line)
+
+        return cleaned_path
 
     def process_edges(self, predicate):
         nodes = set()

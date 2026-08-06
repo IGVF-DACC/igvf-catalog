@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from unittest.mock import MagicMock, patch
 from rdflib import URIRef, BNode, Literal
@@ -50,7 +52,7 @@ def test_init_sets_attributes(mock_writers):
 @patch('adapters.ontologies_adapter.get_file_fileset_by_accession_in_arangodb')
 @patch('adapters.ontologies_adapter.get_ontology')
 @patch('adapters.ontologies_adapter.default_world')
-def test_process_ontology_sets_file_metadata(mock_default_world, mock_get_ontology, mock_get_file_fileset, mock_writers):
+def test_process_ontology_sets_file_metadata(mock_default_world, mock_get_ontology, mock_get_file_fileset, mock_writers, tmp_path):
     mock_graph = MagicMock()
     mock_graph.subject_objects.return_value = []
     mock_default_world.as_rdflib_graph.return_value = mock_graph
@@ -61,8 +63,11 @@ def test_process_ontology_sets_file_metadata(mock_default_world, mock_get_ontolo
         'method': None
     }
 
+    owl_file = tmp_path / 'dummy.owl'
+    owl_file.write_text('<owl:Class rdf:about="http://example.org/A"/>\n')
+
     ont = Ontology(
-        filepath='dummy.owl',
+        filepath=str(owl_file),
         ontology='uberon',
         node_primary_writer=mock_writers['node_primary_writer'],
         node_secondary_writer=mock_writers['node_secondary_writer'],
@@ -175,3 +180,41 @@ def test_find_go_nodes_returns_namespace_dict(ontology_instance):
     result = ontology_instance.find_go_nodes(mock_graph)
     assert result[URIRef('A')] == 'molecular_function'
     assert URIRef('B') not in result
+
+
+def test_dedupe_punned_classes_removes_conflicting_class_decl(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        '<!-- http://example.org/OTHER_CLASS -->\n'
+        '<owl:Class rdf:about="http://example.org/OTHER_CLASS">\n'
+        '    <rdfs:label>other class</rdfs:label>\n'
+        '</owl:Class>\n'
+        '<owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"/>\n'
+        '<!-- http://purl.obolibrary.org/obo/STATO_0000416 -->\n'
+        '<owl:Class rdf:about="http://purl.obolibrary.org/obo/STATO_0000416">\n'
+        '    <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/STATO_0000607"/>\n'
+        '</owl:Class>\n'
+    )
+
+    cleaned_path = ontology_instance._dedupe_punned_classes(str(owl_file))
+
+    assert cleaned_path != str(owl_file)
+    cleaned_content = open(cleaned_path).read()
+    assert 'owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"' in cleaned_content
+    assert 'owl:Class rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"' not in cleaned_content
+    assert 'owl:Class rdf:about="http://example.org/OTHER_CLASS"' in cleaned_content
+    os.remove(cleaned_path)
+
+
+def test_dedupe_punned_classes_noop_when_no_punning(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        '<owl:Class rdf:about="http://example.org/OTHER_CLASS">\n'
+        '    <rdfs:label>other class</rdfs:label>\n'
+        '</owl:Class>\n'
+        '<owl:AnnotationProperty rdf:about="http://example.org/SOME_PROPERTY"/>\n'
+    )
+
+    cleaned_path = ontology_instance._dedupe_punned_classes(str(owl_file))
+
+    assert cleaned_path == str(owl_file)
