@@ -46,6 +46,7 @@ class AFGRCAQtl(BaseAdapter):
             return 'variants_genomic_elements'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
 
