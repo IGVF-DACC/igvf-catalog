@@ -52,7 +52,7 @@ const scoreSummaryOutputFormat = z.object({
 const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
-  // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting)
+  // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence)
   score: z.number().nullable(),
   method: z.string().nullish().optional(),
   class: z.string().nullish(),

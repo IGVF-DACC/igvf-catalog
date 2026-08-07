@@ -1612,7 +1612,21 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'painting',
+        label: 'Variant painting with fluorescence',
+        examples: [
+          {
+            label: 'query by gene identifier',
+            items: [
+              'gene_id = ENSG00000133703',
+              'method = Variant painting with fluorescence'
+            ]
+          }
+        ]
       }
+
     ]),
 
   genes_coding_variants_all_scores: 'Retrieve a list of all numeric scores of associated coding variants for a gene and a dataset.<br> \

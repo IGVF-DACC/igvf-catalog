@@ -81,6 +81,14 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.score
     `
+  } else if (input.dataset === 'Variant painting via fluorescence') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
+        FILTER p._from IN codingVariantsIds && p.method == "Variant painting via fluorescence"
+        SORT p.localization_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN p.localization_score
+    `
   } else if (input.dataset === 'ESM-1v') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
@@ -231,7 +239,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     }
   }
 
-  // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
+  // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq, dualipa_abun_score => DUAL-IPA, localization_score => Variant painting via fluorescence
   const query = `
     LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
 
@@ -265,7 +273,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         RETURN {
           codingVariant: p._from,
           variant: variantByCodingVariant[p._from],
-          score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score,
+          score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score OR p.localization_score,
           method: p.method,
           source_url: p.source_url,
           files_filesets: p.files_filesets

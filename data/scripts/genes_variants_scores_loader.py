@@ -82,7 +82,7 @@ with open(GENES, 'r') as file:
                     RETURN {
                         codingVariant: p._from,
                         variant: variantByCodingVariant[p._from],
-                        score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score,
+                        score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score OR p.localization_score,
                         method: p.method,
                         source_url: p.source_url,
                         files_filesets: p.files_filesets
