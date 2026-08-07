@@ -4,6 +4,7 @@ import os
 import pytest
 from unittest.mock import MagicMock, patch
 from rdflib import URIRef, BNode, Literal
+from owlready2 import get_ontology
 from adapters.ontologies_adapter import Ontology
 
 
@@ -250,3 +251,41 @@ def test_dedupe_punned_classes_noop_when_no_punning(ontology_instance, tmp_path)
     cleaned_path = ontology_instance._dedupe_punned_classes(str(owl_file))
 
     assert cleaned_path == str(owl_file)
+
+
+def test_convert_functional_syntax_noop_for_rdfxml(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        '<?xml version="1.0"?>\n'
+        '<owl:Class rdf:about="http://example.org/OTHER_CLASS"/>\n'
+    )
+
+    result_path = ontology_instance._convert_functional_syntax_if_needed(
+        str(owl_file))
+
+    assert result_path == str(owl_file)
+
+
+def test_convert_functional_syntax_converts_to_rdfxml(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        'Prefix(:=<http://example.org/test.owl#>)\n'
+        'Prefix(owl:=<http://www.w3.org/2002/07/owl#>)\n'
+        'Ontology(<http://example.org/test.owl>\n'
+        'Declaration(Class(<http://example.org/test.owl#TestClass>))\n'
+        ')\n'
+    )
+
+    result_path = ontology_instance._convert_functional_syntax_if_needed(
+        str(owl_file))
+
+    try:
+        assert result_path != str(owl_file)
+        content = open(result_path).read()
+        assert content.lstrip().startswith('<')
+        assert 'TestClass' in content
+
+        onto = get_ontology(result_path).load()
+        assert any('TestClass' in str(c) for c in onto.classes())
+    finally:
+        os.remove(result_path)

@@ -3,8 +3,9 @@ import os
 import re
 from contextlib import ExitStack
 from typing import Optional
-from rdflib import RDF, BNode, Literal, URIRef
+from rdflib import Graph as RDFGraph, RDF, BNode, Literal, URIRef
 from rdflib.collection import Collection
+from funowl.converters.functional_converter import to_python as parse_functional_syntax
 from jsonschema import Draft202012Validator, ValidationError
 
 from owlready2 import *
@@ -187,10 +188,14 @@ class Ontology:
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
 
-        onto_path = self._dedupe_punned_classes(self.filepath)
+        converted_path = self._convert_functional_syntax_if_needed(
+            self.filepath)
+        onto_path = self._dedupe_punned_classes(converted_path)
         onto = get_ontology(onto_path).load()
-        if onto_path != self.filepath:
+        if onto_path != converted_path:
             os.remove(onto_path)
+        if converted_path != self.filepath:
+            os.remove(converted_path)
         with onto:
             self.graph = default_world.as_rdflib_graph()
             print('Processing {}...'.format(self.ontology))
@@ -207,6 +212,31 @@ class Ontology:
                     # Go nodes are processed independently of predicates to consider subontologies
                     nodes_in_go_namespaces = self.find_go_nodes(self.graph)
                     self.process_nodes(nodes, nodes_in_go_namespaces)
+
+    def _convert_functional_syntax_if_needed(self, filepath):
+        """
+        Owlready2 only understands RDF/XML, OWL/XML and NTriples (see _guess_format in
+        owlready2/driver.py). Some ontology releases (e.g. a VARIO release) are published
+        in OWL 2 Functional-Style Syntax instead (starting with "Prefix(" / "Ontology("
+        rather than "<"), which owlready2 misdetects as ntriples and fails to parse with
+        an OwlReadyOntologyParsingError. Detect that case and convert to RDF/XML via
+        funowl before handing the file to owlready2; otherwise return filepath unchanged.
+        """
+        with open(filepath, 'rb') as f:
+            head = f.read(4096).lstrip()
+
+        if head.startswith(b'<'):
+            return filepath
+
+        print(f'{filepath} does not look like RDF/XML; parsing it as OWL '
+              'Functional-Style Syntax and converting to RDF/XML.')
+        doc = parse_functional_syntax(filepath, print_progress=False)
+        graph = RDFGraph()
+        doc.to_rdf(graph)
+
+        converted_path = filepath + '.converted.owl'
+        graph.serialize(destination=converted_path, format='xml')
+        return converted_path
 
     def _dedupe_punned_classes(self, filepath):
         """
