@@ -81,6 +81,14 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.score
     `
+  } else if (input.dataset == 'Variant painting via fluorescence') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
+        FILTER p._from IN codingVariantsIds && p.method == "Variant painting via fluorescence"
+        SORT p.localization_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN p.localization_score
+    `
   } else if (input.dataset === 'ESM-1v') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
