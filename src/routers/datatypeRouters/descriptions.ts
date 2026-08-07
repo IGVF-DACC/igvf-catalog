@@ -1626,7 +1626,7 @@ export const descriptions = {
           }
         ]
       }
-	
+
     ]),
 
   genes_coding_variants_all_scores: 'Retrieve a list of all numeric scores of associated coding variants for a gene and a dataset.<br> \
