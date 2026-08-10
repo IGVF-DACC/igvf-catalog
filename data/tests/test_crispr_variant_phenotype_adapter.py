@@ -176,3 +176,6 @@ def test_ontology_term_ntr(mock_get, mock_file_fileset):
     assert term['term_id'] == 'NTR_0001118'
     assert term['source'] == 'IGVF'
     assert term['synonyms'] is None
+    assert term['class'] == 'observed data'
+    assert term['method'] == 'CRISPR screen'
+    assert term['files_filesets'] == 'files_filesets/IGVFFI2014OOZP'
