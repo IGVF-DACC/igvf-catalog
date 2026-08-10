@@ -749,9 +749,9 @@ class FileFileSet:
 
         if fileset_object_type == 'PredictionSet' and not (software):
             raise (ValueError(f'Prediction sets require software to be loaded.'))
-        if fileset_object_type not in ['PredictionSet', 'AnalysisSet', 'CuratedSet', 'PseudobulkSet']:
+        if fileset_object_type not in ['PredictionSet', 'AnalysisSet', 'CuratedSet', 'PseudobulkSet', 'ModelSet']:
             raise (ValueError(
-                f'Loading data from file sets other than prediction sets, analysis sets, curated sets, and pseudobulk sets is currently unsupported.'))
+                f'Loading data from file sets other than prediction sets, analysis sets, curated sets, pseudobulk sets, and model sets is currently unsupported.'))
         if fileset_object_type in ['AnalysisSet', 'PseudobulkSet']:
             preferred_assay_titles, assay_term_ids = FileFileSet.parse_analysis_set_igvf(
                 fileset_object)
