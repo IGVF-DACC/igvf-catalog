@@ -12,14 +12,20 @@ REGULATORY_ELEMENT_ID = (
     'promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX'
 )
 GENE_ID = 'ENSG00000000457'
-CELL_TYPE_TERM_ID = 'CL_0000336'
-EDGE_KEY = f'{REGULATORY_ELEMENT_ID}_{GENE_ID}_{CELL_TYPE_TERM_ID}'
+BIOSAMPLE_TERM_ID = 'CL_0000336'
+CELL_ANNOTATION_TERM_ID = 'CL_0000336'
+EDGE_KEY = (
+    f'{REGULATORY_ELEMENT_ID}_{GENE_ID}_'
+    f'{BIOSAMPLE_TERM_ID}_{CELL_ANNOTATION_TERM_ID}'
+)
 
 MOCK_FILE_FILESET = {
     'method': 'scE2G',
     'class': 'prediction',
     'simple_sample_summaries': ['adrenal medulla chromaffin cell'],
     'samples': ['ontology_terms/CL_0000336'],
+    'cell_annotation': 'adrenal medulla chromaffin cell',
+    'cell_annotation_term': 'ontology_terms/CL_0000336',
 }
 
 SCE2G_HEADER = (
@@ -69,7 +75,8 @@ ALTERNATE_REGULATORY_ELEMENT_ID = (
 )
 ALTERNATE_GENE_ID = 'ENSG00000228794'
 ALTERNATE_EDGE_KEY = (
-    f'{ALTERNATE_REGULATORY_ELEMENT_ID}_{ALTERNATE_GENE_ID}_{CELL_TYPE_TERM_ID}'
+    f'{ALTERNATE_REGULATORY_ELEMENT_ID}_{ALTERNATE_GENE_ID}_'
+    f'{BIOSAMPLE_TERM_ID}_{CELL_ANNOTATION_TERM_ID}'
 )
 
 
@@ -184,8 +191,10 @@ def test_scE2G_adapter_genomic_element_gene(mock_file_fileset, sce2g_filepath):
         assert first_item['score'] == pytest.approx(0.996889932534048)
         assert first_item['rna_pseudobulk_tpm'] == pytest.approx(
             22.8574991753656)
-        assert first_item['cell_type'] == 'adrenal medulla chromaffin cell'
-        assert first_item['cell_type_term'] == 'ontology_terms/CL_0000336'
+        assert first_item['biological_context'] == 'adrenal medulla chromaffin cell'
+        assert first_item['biosample_term'] == 'ontology_terms/CL_0000336'
+        assert first_item['cell_annotation'] == 'adrenal medulla chromaffin cell'
+        assert first_item['cell_annotation_term'] == 'ontology_terms/CL_0000336'
         assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
         assert first_item['label'] == scE2G.COLLECTION_LABEL
         assert first_item['method'] == 'scE2G'
@@ -272,7 +281,7 @@ def test_scE2G_adapter_skips_comment_and_blank_rows(
         assert parsed[0]['_to'] == 'genes/ENSG00000000457'
         assert parsed[1]['_key'] == (
             'genic_chr1_24321501_24322805_GRCh38_IGVFFI5648GWQX'
-            '_ENSG00000001460_CL_0000336'
+            f'_ENSG00000001460_{BIOSAMPLE_TERM_ID}_{CELL_ANNOTATION_TERM_ID}'
         )
         assert parsed[1]['_to'] == 'genes/ENSG00000001460'
 
@@ -327,6 +336,183 @@ def test_scE2G_adapter_genomic_element_gene_extended_header(
         assert first_item['score'] == pytest.approx(0.996889932534048)
         assert first_item['rna_pseudobulk_tpm'] == pytest.approx(
             22.8574991753656)
+        # Prefer files_filesets values when present
+        assert first_item['biological_context'] == 'adrenal medulla chromaffin cell'
+        assert first_item['biosample_term'] == 'ontology_terms/CL_0000336'
+        assert first_item['cell_annotation'] == 'adrenal medulla chromaffin cell'
+        assert first_item['cell_annotation_term'] == 'ontology_terms/CL_0000336'
+
+
+def test_scE2G_adapter_falls_back_to_tsv_when_fileset_missing_fields(
+    mock_file_fileset, sce2g_filepath
+):
+    """IGVFFI4048DVFE-like: no samples/cell_annotation on files_filesets."""
+    mock_file_fileset.return_value = {
+        'method': 'scE2G',
+        'class': 'prediction',
+        'simple_sample_summaries': None,
+        'samples': None,
+        'cell_annotation': None,
+        'cell_annotation_term': None,
+    }
+    writer = SpyWriter()
+    with patch('adapters.scE2G_adapter.GeneValidator') as mock_gene_validator:
+        mock_validator_instance = MagicMock()
+        mock_validator_instance.validate.return_value = True
+        mock_gene_validator.return_value = mock_validator_instance
+
+        adapter = scE2G(
+            filepath=sce2g_filepath(
+                rows=[SCE2G_EXTENDED_ROW],
+                header=SCE2G_EXTENDED_HEADER,
+            ),
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+        parsed = [json.loads(item) for item in writer.contents if item.strip()]
+        assert len(parsed) == 1
+        first_item = parsed[0]
+        assert first_item['biological_context'] == 'K562'
+        assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
+        assert first_item['cell_annotation'] == (
+            'CRISPRi Adrenal medulla chromaffin cell from K562'
+        )
+        assert first_item['cell_annotation_term'] == 'ontology_terms/CL_0000336'
+        assert first_item['_key'] == (
+            f'{REGULATORY_ELEMENT_ID}_{GENE_ID}_EFO_0002067_CL_0000336'
+        )
+
+
+def test_scE2G_adapter_cell_annotation_omits_from_when_sample_name_missing(
+    mock_file_fileset, sce2g_filepath
+):
+    """IGVFFI4048DVFE empty SampleOntologyTermName: omit ' from ' suffix."""
+    mock_file_fileset.return_value = {
+        'method': 'scE2G',
+        'class': 'prediction',
+        'simple_sample_summaries': None,
+        'samples': None,
+        'cell_annotation': None,
+        'cell_annotation_term': None,
+    }
+    empty_sample_row = (
+        'chr1\t169893055\t169894554\tchr1:169893055-169894554\tpromoter\t'
+        'SCYL3\tENSG00000000457\t169893959\tK562\t'
+        'CL:0000336\tK562\t\t\t\t0.996889932534048\t22.8574991753656\n'
+    )
+    writer = SpyWriter()
+    with patch('adapters.scE2G_adapter.GeneValidator') as mock_gene_validator:
+        mock_validator_instance = MagicMock()
+        mock_validator_instance.validate.return_value = True
+        mock_gene_validator.return_value = mock_validator_instance
+
+        adapter = scE2G(
+            filepath=sce2g_filepath(
+                rows=[empty_sample_row],
+                header=SCE2G_EXTENDED_HEADER,
+            ),
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+        parsed = [json.loads(item) for item in writer.contents if item.strip()]
+        assert len(parsed) == 1
+        assert parsed[0]['biological_context'] is None
+        assert parsed[0]['biosample_term'] is None
+        assert parsed[0]['cell_annotation'] == 'K562'
+        assert parsed[0]['_key'] == (
+            f'{REGULATORY_ELEMENT_ID}_{GENE_ID}_NA_CL_0000336'
+        )
+
+
+def test_scE2G_adapter_cell_annotation_uses_biological_context_prefix(
+    mock_file_fileset, sce2g_filepath
+):
+    """IGVFFI8252JBBA/IGVFFI8813VARU: fileset biosample + TSV cell annotation."""
+    mock_file_fileset.return_value = {
+        'method': 'scE2G',
+        'class': 'prediction',
+        'simple_sample_summaries': ['coronary artery'],
+        'samples': ['ontology_terms/UBERON_0001621'],
+        'cell_annotation': None,
+        'cell_annotation_term': None,
+    }
+    writer = SpyWriter()
+    with patch('adapters.scE2G_adapter.GeneValidator') as mock_gene_validator:
+        mock_validator_instance = MagicMock()
+        mock_validator_instance.validate.return_value = True
+        mock_gene_validator.return_value = mock_validator_instance
+
+        adapter = scE2G(
+            filepath=sce2g_filepath(
+                rows=[SCE2G_EXTENDED_ROW],
+                header=SCE2G_EXTENDED_HEADER,
+            ),
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+        parsed = [json.loads(item) for item in writer.contents if item.strip()]
+        assert len(parsed) == 1
+        first_item = parsed[0]
+        assert first_item['biological_context'] == 'coronary artery'
+        assert first_item['biosample_term'] == 'ontology_terms/UBERON_0001621'
+        assert first_item['cell_annotation'] == (
+            'coronary artery CRISPRi Adrenal medulla chromaffin cell'
+        )
+        assert first_item['cell_annotation_term'] == 'ontology_terms/CL_0000336'
+        assert first_item['_key'] == (
+            f'{REGULATORY_ELEMENT_ID}_{GENE_ID}_UBERON_0001621_CL_0000336'
+        )
+
+
+def test_scE2G_adapter_cell_annotation_qualifier_includes_biological_context(
+    mock_file_fileset, sce2g_filepath
+):
+    """Do not duplicate biological_context when Qualifier already starts with it."""
+    mock_file_fileset.return_value = {
+        'method': 'scE2G',
+        'class': 'prediction',
+        'simple_sample_summaries': ['coronary artery'],
+        'samples': ['ontology_terms/UBERON_0001621'],
+        'cell_annotation': None,
+        'cell_annotation_term': None,
+    }
+    row = (
+        'chr1\t169893055\t169894554\tchr1:169893055-169894554\tpromoter\t'
+        'SCYL3\tENSG00000000457\t169893959\tlymphocyte\t'
+        'CL:0000542\tlymphocyte\tNA\tNA\t'
+        'coronary artery T and NK cells\t0.996889932534048\t22.8574991753656\n'
+    )
+    writer = SpyWriter()
+    with patch('adapters.scE2G_adapter.GeneValidator') as mock_gene_validator:
+        mock_validator_instance = MagicMock()
+        mock_validator_instance.validate.return_value = True
+        mock_gene_validator.return_value = mock_validator_instance
+
+        adapter = scE2G(
+            filepath=sce2g_filepath(
+                rows=[row],
+                header=SCE2G_EXTENDED_HEADER,
+            ),
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+        parsed = [json.loads(item) for item in writer.contents if item.strip()]
+        assert len(parsed) == 1
+        assert parsed[0]['cell_annotation'] == (
+            'coronary artery T and NK cells lymphocyte'
+        )
 
 
 def test_scE2G_adapter_genomic_element_gene_alternate_header(
@@ -360,7 +546,10 @@ def test_scE2G_adapter_genomic_element_gene_alternate_header(
         assert first_item['_to'] == f'genes/{ALTERNATE_GENE_ID}'
         assert first_item['score'] == pytest.approx(0.20658503871143)
         assert first_item['rna_pseudobulk_tpm'] is None
-        assert first_item['cell_type'] == 'adrenal medulla chromaffin cell'
+        assert first_item['biological_context'] == 'adrenal medulla chromaffin cell'
+        assert first_item['biosample_term'] == 'ontology_terms/CL_0000336'
+        assert first_item['cell_annotation'] == 'adrenal medulla chromaffin cell'
+        assert first_item['cell_annotation_term'] == 'ontology_terms/CL_0000336'
 
 
 def test_scE2G_adapter_genomic_element_alternate_header(

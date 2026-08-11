@@ -684,6 +684,7 @@ class FileFileSet:
             'source_url': source_url,
             'download_link': download_link,
             'cell_annotation': None,
+            'cell_annotation_term': None,
             'genome_browser_link': genome_browser_link,
             'crispr_modality': crispr_modality,
             'browser_index_file': None
@@ -706,16 +707,9 @@ class FileFileSet:
         is_external_curated_set = fileset_object_type == 'CuratedSet' and lab == 'community'
         catalog_collections = file_object.get('catalog_collections', [])
         cell_annotation = None
+        cell_annotation_term = None
         if fileset_object_type == 'PseudobulkSet':
             genome_browser_link = download_link
-            cell_qualifier = fileset_object.get('cell_qualifier')
-            cell_type_term_name = fileset_object.get(
-                'cell_type').get('term_name')
-            # not all pseudobulk sets have a cell qualifier
-            if cell_qualifier:
-                cell_annotation = f'{cell_qualifier} {cell_type_term_name}'
-            else:
-                cell_annotation = cell_type_term_name
         else:
             files = fileset_object.get('files', [])
             for file in files:
@@ -796,6 +790,16 @@ class FileFileSet:
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
 
+        # igvf portal has cell_annotation data for most scE2G and all PseudobulkSet
+        if method == 'scE2G' or fileset_object_type == 'PseudobulkSet':
+            cell_annotation = fileset_object.get('cell_annotation')
+            cell_type_term_id = (fileset_object.get(
+                'cell_type') or {}).get('term_id')
+            if cell_type_term_id:
+                cell_annotation_term = f"ontology_terms/{cell_type_term_id.replace(':', '_')}"
+            else:
+                cell_annotation_term = None
+
         props = {
             '_key': file_object['accession'],
             'name': file_object['accession'],
@@ -818,6 +822,7 @@ class FileFileSet:
             'version': file_object.get('version') if is_external_curated_set else None,
             'download_link': download_link,
             'cell_annotation': cell_annotation,
+            'cell_annotation_term': cell_annotation_term,
             'genome_browser_link': genome_browser_link,
             'crispr_modality': modality,
             'browser_index_file': browser_index_file

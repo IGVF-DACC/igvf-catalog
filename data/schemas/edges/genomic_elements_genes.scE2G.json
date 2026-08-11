@@ -10,8 +10,8 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge, including the cell type ontology term ID suffix",
-          "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX_ENSG00000000457_CL_0000336"
+          "description": "Unique identifier for the genomic element to gene edge, including biosample and cell annotation ontology term ID suffixes",
+          "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX_ENSG00000000457_CL_0000336_CL_0000336"
         },
         "_from": {
           "example": "genomic_elements/promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX",
@@ -57,14 +57,31 @@
           ],
           "description": "RNA pseudobulk TPM of the target gene in the cell type"
         },
-        "cell_type": {
-          "type": "string",
-          "description": "Cell type for the genomic element to gene edge",
+        "biological_context": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biosample / sample summary for the genomic element to gene edge",
           "example": "adrenal medulla chromaffin cell"
         },
-        "cell_type_term": {
+        "biosample_term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Ontology term for the biosample",
+          "example": "ontology_terms/CL_0000336",
+          "pattern": "^ontology_terms/"
+        },
+        "cell_annotation": {
           "type": "string",
-          "description": "Ontology term for the cell type",
+          "description": "Cell annotation label for the genomic element to gene edge (optionally including Qualifier)",
+          "example": "adrenal medulla chromaffin cell"
+        },
+        "cell_annotation_term": {
+          "type": "string",
+          "description": "Ontology term for the cell annotation",
           "example": "ontology_terms/CL_0000336",
           "pattern": "^ontology_terms/"
         },
@@ -99,8 +116,10 @@
         "score",
         "transcription_start_site",
         "rna_pseudobulk_tpm",
-        "cell_type",
-        "cell_type_term",
+        "biological_context",
+        "biosample_term",
+        "cell_annotation",
+        "cell_annotation_term",
         "files_filesets"
       ],
       "additionalProperties": false
@@ -108,7 +127,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "score",
-    "return": "class, label, method, source, source_url, files_filesets, cell_type, cell_type_term, score, transcription_start_site, rna_pseudobulk_tpm"
+    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, cell_annotation, cell_annotation_term, score, transcription_start_site, rna_pseudobulk_tpm"
   },
   "db_collection_name": "genomic_elements_genes"
 }

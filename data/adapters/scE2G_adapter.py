@@ -22,6 +22,10 @@ from adapters.gene_validator import GeneValidator
 # 1. Standard (13 columns): includes ElementClass, Score, RNA_pseudobulkTPM
 # 2. Extended (16 columns): standard plus SampleOntologyTerm, SampleOntologyTermName, Qualifier
 # 3. Alternate (12 columns): no ElementClass or RNA_pseudobulkTPM; uses SampleSummaryShort
+#
+# Edge biosample/cell fields prefer files_filesets (samples, simple_sample_summaries,
+# cell_annotation, cell_annotation_term). For the few multi-cell-type files missing those
+# on files_filesets, values are taken from the TSV row.
 
 
 class scE2G(BaseAdapter):
@@ -33,6 +37,16 @@ class scE2G(BaseAdapter):
     COLLECTION_LABEL = 'predicted regulatory element effect on gene expression'
     TYPE = 'accessible dna elements'
     DEFAULT_ELEMENT_CLASS = 'enhancer'
+    # Fixed indices for the three multi-cell-type files that lack some
+    # files_filesets fields (IGVFFI4048DVFE, IGVFFI8252JBBA, IGVFFI8813VARU).
+    # Those files share the same 16-column extended header.
+    INDEX_EXTERNAL_FILE = {
+        'CellTypeOntologyTerm': 9,
+        'CellTypeOntologyTermName': 10,
+        'SampleOntologyTerm': 11,
+        'SampleOntologyTermName': 12,
+        'Qualifier': 13,
+    }
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = filepath.split('/')[-1].split('.')[0]
@@ -87,6 +101,7 @@ class scE2G(BaseAdapter):
             self.file_accession)
         method = file_fileset.get('method')
         collection_class = file_fileset.get('class')
+        self.writer.add_tag('portal_accessions', self.file_accession)
         with gzip.open(self.filepath, 'rt') as f:
             reader = csv.reader(f, delimiter='\t')
             header_map = self._read_header_map(reader)
@@ -101,17 +116,71 @@ class scE2G(BaseAdapter):
                     chr, start, end, class_name=element_class_name) + '_' + self.file_accession
 
                 if self.label == 'genomic_element_gene':
+                    # IGVFFI4048DVFE needs sample info from file, but it may be missing
                     if not file_fileset.get('simple_sample_summaries'):
-                        cell_type = row[10]
-                        cell_type_term_id = row[9].replace(':', '_')
-                        cell_type_term_endpoint = f'ontology_terms/{cell_type_term_id}'
+                        biological_context = row[self.INDEX_EXTERNAL_FILE['SampleOntologyTermName']]
+                        if biological_context == '':
+                            biological_context = None
+                        biosample_term = row[self.INDEX_EXTERNAL_FILE['SampleOntologyTerm']].replace(
+                            ':', '_')
+                        if not biosample_term or biosample_term.upper() == 'NA':
+                            biosample_term = 'NA'
+                            biosample_term_endpoint = None
+                        else:
+                            biosample_term_endpoint = f'ontology_terms/{biosample_term}'
                     else:
-                        cell_type = file_fileset.get(
+                        biological_context = file_fileset.get(
                             'simple_sample_summaries')[0]
-                        cell_type_term_endpoint = file_fileset.get('samples')[
+                        biosample_term_endpoint = file_fileset.get('samples')[
                             0]
-                        cell_type_term_id = cell_type_term_endpoint.split(
+                        biosample_term = biosample_term_endpoint.split(
                             '/')[-1]
+                    # IGVFFI4048DVFE, IGVFFI8252JBBA, IGVFFI8813VARU need cell annotation info from file
+                    if not file_fileset.get('cell_annotation'):
+                        qualifier = row[self.INDEX_EXTERNAL_FILE['Qualifier']]
+                        cell_type_name = row[self.INDEX_EXTERNAL_FILE['CellTypeOntologyTermName']]
+                        if not file_fileset.get('simple_sample_summaries'):
+                            # IGVFFI4048DVFE: Qualifier + CellTypeOntologyTermName
+                            # [+ " from " + SampleOntologyTermName when sample name is present]
+                            sample_name = row[self.INDEX_EXTERNAL_FILE['SampleOntologyTermName']]
+                            cell_annotation_parts = []
+                            if qualifier and qualifier.upper() != 'NA':
+                                cell_annotation_parts.append(qualifier)
+                            cell_annotation_parts.append(cell_type_name)
+                            cell_annotation = ' '.join(cell_annotation_parts)
+                            if sample_name and sample_name.upper() != 'NA':
+                                cell_annotation = f'{cell_annotation} from {sample_name}'
+                        else:
+                            # IGVFFI8252JBBA / IGVFFI8813VARU:
+                            # biological_context + Qualifier + CellTypeOntologyTermName
+                            # Skip empty/NA Qualifier. If Qualifier already includes
+                            # biological_context (equal or prefixed), use Qualifier alone.
+                            cell_annotation_parts = []
+                            if qualifier and qualifier.upper() != 'NA':
+                                if (
+                                    qualifier == biological_context
+                                    or qualifier.startswith(biological_context + ' ')
+                                ):
+                                    cell_annotation_parts.append(qualifier)
+                                else:
+                                    cell_annotation_parts.append(
+                                        biological_context)
+                                    cell_annotation_parts.append(qualifier)
+                            else:
+                                cell_annotation_parts.append(
+                                    biological_context)
+                            cell_annotation_parts.append(cell_type_name)
+                            cell_annotation = ' '.join(cell_annotation_parts)
+                        cell_annotation_term = row[self.INDEX_EXTERNAL_FILE['CellTypeOntologyTerm']].replace(
+                            ':', '_')
+                        cell_annotation_term_endpoint = f'ontology_terms/{cell_annotation_term}'
+                    else:
+                        cell_annotation = file_fileset.get('cell_annotation')
+                        cell_annotation_term_endpoint = file_fileset.get(
+                            'cell_annotation_term')
+                        cell_annotation_term = cell_annotation_term_endpoint.split(
+                            '/')[-1]
+
                     gene_id = row[header_map['GeneEnsemblID']]
                     is_valid_gene_id = self.gene_validator.validate(gene_id)
                     if not is_valid_gene_id:
@@ -122,7 +191,12 @@ class scE2G(BaseAdapter):
                     score = float(row[header_map['Score']])
                     rna_pseudobulk_tpm = self._get_rna_pseudobulk_tpm(
                         row, header_map)
-                    key = f'{regulatory_element_id}_{gene_id}_{cell_type_term_id}'
+                    # Include both biosample and cell annotation in the key so
+                    # multi-cell-type files (same biosample, many cell types) do not collide.
+                    key = (
+                        f'{regulatory_element_id}_{gene_id}_'
+                        f'{biosample_term}_{cell_annotation_term}'
+                    )
                     props = {
                         '_key': key,
                         '_from': f'genomic_elements/{regulatory_element_id}',
@@ -130,8 +204,10 @@ class scE2G(BaseAdapter):
                         'transcription_start_site': transcription_start_site,
                         'score': score,
                         'rna_pseudobulk_tpm': rna_pseudobulk_tpm,
-                        'cell_type': cell_type,
-                        'cell_type_term': cell_type_term_endpoint,
+                        'biological_context': biological_context,
+                        'biosample_term': biosample_term_endpoint,
+                        'cell_annotation': cell_annotation,
+                        'cell_annotation_term': cell_annotation_term_endpoint,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'label': self.COLLECTION_LABEL,
                         'method': method,

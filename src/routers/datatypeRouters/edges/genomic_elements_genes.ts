@@ -26,6 +26,8 @@ const edgeQueryFormat = z.object({
   files_fileset: z.string().optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
+  cell_annotation: z.string().optional(),
+  cell_annotation_term: z.string().optional(),
   source: z.enum(SOURCES).optional()
 })
 
@@ -79,8 +81,8 @@ const outputFormat = z.array(z.object({
   source_url: z.string(),
   biological_context: z.string().nullish(),
   biosample_term: z.string().nullish(),
-  cell_type: z.string().nullish(),
-  cell_type_term: z.string().nullish(),
+  cell_annotation: z.string().nullish(),
+  cell_annotation_term: z.string().nullish(),
   files_filesets: z.string(),
   crispr_modality: z.string().nullish(),
   score: z.number().nullish(),
@@ -133,11 +135,16 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
+  if (input.cell_annotation_term !== undefined) {
+    input.cell_annotation_term = `ontology_terms/${input.cell_annotation_term as string}`
+  }
   // edge filters are the same for all methods
   const filters = getFilterStatements(genomicElementsGenesCrisprElementGeneEncodeSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
+  delete input.cell_annotation
+  delete input.cell_annotation_term
   delete input.method
   delete input.source
   return filters
@@ -198,8 +205,8 @@ function buildQuery (params: {
         'files_filesets': record.files_filesets,
         'biological_context': record.biological_context,
         'biosample_term': record.biosample_term,
-        'cell_type': record.cell_type,
-        'cell_type_term': record.cell_type_term,
+        'cell_annotation': record.cell_annotation,
+        'cell_annotation_term': record.cell_annotation_term,
         'crispr_modality': record.crispr_modality,
         'score': record.score,
         'transcription_start_site': record.transcription_start_site,
