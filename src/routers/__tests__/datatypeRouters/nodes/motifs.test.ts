@@ -80,4 +80,25 @@ describe('motifsRouters.motifs', () => {
     })
     expect(result).toEqual(mockResult)
   })
+
+  it('transforms files_fileset input into a files_filesets filter', async () => {
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([])
+    } as any)
+    const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('name')
+
+    const input = { files_fileset: 'IGVFFI9678CVIS', page: 0 }
+    await motifsRouters.motifs({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    const passedInput = getFilterStatementsSpy.mock.calls[0][1]
+    expect(passedInput.files_filesets).toBe('files_filesets/IGVFFI9678CVIS')
+    expect(passedInput.files_fileset).toBeUndefined()
+  })
 })

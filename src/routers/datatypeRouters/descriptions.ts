@@ -557,14 +557,16 @@ export const descriptions = {
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
-  source = HOCOMOCOv11. <br> \
+  source = HOCOMOCOv11, <br> \
+  files_fileset = IGVFFI1626MMBD. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
   motifs_proteins: 'Retrieve proteins and complexes for motifs.<br> \
   Set verbose = true to retrieve full info on the proteins and complexes.<br> \
   Example: tf_name = ATF1_HUMAN, <br> \
-  source = HOCOMOCOv11. <br> \
+  source = HOCOMOCOv11, <br> \
+  files_fileset = IGVFFI1626MMBD. <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
@@ -575,7 +577,8 @@ export const descriptions = {
   protein_name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
-  dbxrefs = P49711,<br> \
+  dbxrefs = P49711, <br> \
+  files_fileset = IGVFFI1626MMBD, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',

@@ -23,7 +23,13 @@ const motifsToProteinsFormat = z.object({
   files_filesets: z.string().nullish()
 })
 
-const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
+const proteinsQuery = proteinsCommonQueryFormat.merge(z.object({
+  files_fileset: z.string().optional()
+})).merge(commonHumanEdgeParamsFormat)
+
+const motifsToProteinsQueryFormat = motifsCommonQueryFormat.merge(z.object({
+  files_fileset: z.string().optional()
+})).merge(commonHumanEdgeParamsFormat)
 
 const motifProteinCollectionName = 'motifs_proteins'
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
@@ -45,6 +51,12 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
+  }
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
   }
 
   let filterBy = ''
@@ -73,7 +85,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
     LET motifsProteins = (
 
     FOR record IN ${motifProteinCollectionName}
-      FILTER record._from IN sources and record._to LIKE 'proteins/%'
+      FILTER record._from IN sources and record._to LIKE 'proteins/%' ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -88,7 +100,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
    )
     LET motifsComplexes = (
       FOR record IN ${motifProteinCollectionName}
-        FILTER record._from IN sources and record._to LIKE 'complexes/%'
+        FILTER record._from IN sources and record._to LIKE 'complexes/%' ${filesetFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
@@ -117,6 +129,12 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   const verboseQuery = `
     FOR otherRecord IN ${motifCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
@@ -129,7 +147,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 
       LET proteinsMotifs = (
       FOR record IN ${motifProteinCollectionName}
-      FILTER record._to IN proteins
+      FILTER record._to IN proteins ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -151,7 +169,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET complexesMotifs = (
         FOR record IN ${motifProteinCollectionName}
-        FILTER record._to IN complexes
+        FILTER record._to IN complexes ${filesetFilter}
         SORT record._key
         LIMIT 0, ${limit}
         RETURN {
@@ -195,7 +213,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET motifsProteins = (
         FOR record IN ${motifProteinCollectionName}
-          FILTER record._to IN proteins
+          FILTER record._to IN proteins ${filesetFilter}
           SORT record._key
           LIMIT ${input.page as number * limit}, ${limit}
           RETURN {
@@ -210,7 +228,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET motifsComplexes = (
         FOR record IN ${motifProteinCollectionName}
-          FILTER record._to IN complexes
+          FILTER record._to IN complexes ${filesetFilter}
           SORT record._key
           LIMIT ${input.page as number * limit}, ${limit}
           RETURN {
@@ -241,7 +259,7 @@ const motifsFromProteins = publicProcedure
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
-  .input(motifsCommonQueryFormat.merge(commonHumanEdgeParamsFormat))
+  .input(motifsToProteinsQueryFormat)
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await proteinsFromMotifSearch(input))
 

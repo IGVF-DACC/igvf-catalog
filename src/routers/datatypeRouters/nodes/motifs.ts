@@ -12,6 +12,10 @@ const MAX_PAGE_SIZE = 500
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
 const motifCollectionName = motifSchema.db_collection_name as string
 
+const motifsQueryFormat = motifsCommonQueryFormat.merge(z.object({
+  files_fileset: z.string().optional()
+}))
+
 export const motifFormat = z.object({
   name: z.string(),
   tf_name: z.string(),
@@ -28,6 +32,11 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   if (input.tf_name !== undefined) {
     input.tf_name = (input.tf_name as string).toUpperCase()
+  }
+
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
   }
 
   let limit = QUERY_LIMIT
@@ -54,7 +63,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
 
 const motifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs } })
-  .input(motifsCommonQueryFormat.merge(commonHumanNodesParamsFormat))
+  .input(motifsQueryFormat.merge(commonHumanNodesParamsFormat))
   .output(z.array(motifFormat))
   .query(async ({ input }) => await motifSearch(input))
 
