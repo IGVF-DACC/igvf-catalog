@@ -477,6 +477,7 @@ ontology term:
     - https://api.data.igvf.org/reference-files/IGVFFI4854HJDG/@@download/IGVFFI4854HJDG.obo.gz # cellosaurus - adapter: cellosaurus_terms
     # Oncotree needs to be run separately. It does not have datafiles (data fetched from Oncotree API).
     # ENCODE NTR terms need to be run separately. It does not have datafiles (data fetched from ENCODE API).
+    # Two data support files must be also loaded individually: data_loading_support_files/DUAL_IPA/protein_abundance_method_term.jsonl and AFGR/chromatin_acessibility_method_term.jsonl
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_relationships --label ontology_relationship --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
