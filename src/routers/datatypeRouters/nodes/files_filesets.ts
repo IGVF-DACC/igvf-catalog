@@ -48,13 +48,13 @@ const filesFilesetsQueryFormat = z.object({
   ...rest
 }))
 
-const filesFilesetsFormat = z.object({
+export const filesFilesetsFormat = z.object({
   _id: z.string(),
   file_set_id: z.string(),
   lab: z.string(),
   preferred_assay_titles: z.array(z.string()).nullish(),
   assay_term_ids: z.array(z.string()).nullish(),
-  method: z.string(),
+  method: z.string().nullish(),
   class: z.string(),
   software: z.array(z.string()).nullish(),
   collections: z.array(z.string()).nullish(),
@@ -63,7 +63,7 @@ const filesFilesetsFormat = z.object({
   simple_sample_summaries: z.array(z.string()).nullish(),
   donors: z.array(z.string()).nullish(),
   source: z.string(),
-  source_url: z.string(),
+  source_url: z.string().nullish(),
   download_link: z.string(),
   cell_annotation: z.string().nullish(),
   genome_browser_link: z.string().nullish(),
