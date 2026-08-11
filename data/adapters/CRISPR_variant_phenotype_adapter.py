@@ -297,7 +297,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
             'source_url': uri,
             'class': self.collection_class,
             'method': self.method,
-            'files_filesets': f'files_filesets/{self.file_accession}',
+            'files_filesets': None,  # should not be associated with any datasets. See DSERV-1466
         }
         if self.validate:
             self.validate_doc(props)
