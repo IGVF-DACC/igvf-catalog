@@ -92,4 +92,25 @@ describe('ontologyRouters.ontologyTerm', () => {
     })
     expect(result).toEqual([])
   })
+
+  it('transforms files_fileset input into a files_filesets filter', async () => {
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([])
+    } as any)
+    const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('uri, term_id')
+
+    const input = { files_fileset: 'IGVFFI7407XTPX', page: 0 }
+    await ontologyRouters.ontologyTerm({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    const passedInput = getFilterStatementsSpy.mock.calls[0][1]
+    expect(passedInput.files_filesets).toBe('files_filesets/IGVFFI7407XTPX')
+    expect(passedInput.files_fileset).toBeUndefined()
+  })
 })

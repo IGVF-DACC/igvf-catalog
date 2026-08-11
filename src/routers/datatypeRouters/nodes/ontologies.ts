@@ -10,7 +10,7 @@ import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 const MAX_PAGE_SIZE = 1000
 
 const ontologySchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyCollectionName = ontologySchema.db_collection_name as string
+const ontologyCollectionName = 'ontology_terms_QA' // TEMPORARY FOR QA! ontologySchema.db_collection_name as string
 
 const ontologySources = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'source')
 const subontologies = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'subontology')
@@ -20,7 +20,8 @@ export const ontologyQueryFormat = z.object({
   name: z.string().trim().optional(),
   synonyms: z.string().optional(),
   source: z.enum(ontologySources).optional(),
-  subontology: z.enum(subontologies).optional()
+  subontology: z.enum(subontologies).optional(),
+  files_fileset: z.string().optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 export const ontologyFormat = z.object({
@@ -137,6 +138,11 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 export async function ontologySearch (input: paramsFormatType): Promise<any[]> {
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
+  }
+
   const objects = await exactMatchSearch(input)
 
   if (('name' in input && input.name !== undefined) && objects.length === 0) {

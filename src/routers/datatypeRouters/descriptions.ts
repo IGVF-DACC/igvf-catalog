@@ -798,7 +798,8 @@ export const descriptions = {
   name = Rare genetic eye disease, <br> \
   synonyms = WTC11, <br> \
   source = EFO, <br> \
-  subontology = molecular_function. <br> \
+  subontology = molecular_function, <br> \
+  files_fileset = IGVFFI7407XTPX. <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
