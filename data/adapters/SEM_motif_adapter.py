@@ -6,6 +6,7 @@ import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
@@ -136,6 +137,11 @@ class SEMMotif(BaseAdapter):
         self.load_tf_id_mapping()
         self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
 
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         with gzip.open(self.filepath, 'rt') as sem_file:
             baseline = next(sem_file).strip().split(':')[1]
             tf_name = next(sem_file).strip().split()[0]
@@ -157,6 +163,9 @@ class SEMMotif(BaseAdapter):
                     'pwm': pwm,
                     'length': length,
                     'baseline': float(baseline),
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession
                 }
                 if self.validate:
                     self.validate_doc(props)
@@ -191,7 +200,10 @@ class SEMMotif(BaseAdapter):
                         'inverse_name': 'uses',
                         'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
                         'source': 'IGVF',
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                     if self.validate:

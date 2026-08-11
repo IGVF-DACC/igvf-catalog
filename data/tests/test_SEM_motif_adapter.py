@@ -1,10 +1,25 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.writer import SpyWriter
 
 
-def test_sem_motif_adapter_motif():
+FILE_ACCESSION = 'SEM_model_file'
+
+
+@pytest.fixture
+def mock_file_fileset():
+    """Mock get_file_fileset_by_accession_in_arangodb so ArangoDB is not required."""
+    with patch('adapters.SEM_motif_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'class': 'observed data',
+            'method': 'SEMpl'
+        }
+        yield mock_get_file_fileset
+
+
+def test_sem_motif_adapter_motif(mock_file_fileset):
     writer = SpyWriter()
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
                        sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
@@ -18,9 +33,12 @@ def test_sem_motif_adapter_motif():
     assert 'source_url' in first_item
     assert 'pwm' in first_item
     assert 'length' in first_item
+    assert first_item['class'] == 'observed data'
+    assert first_item['method'] == 'SEMpl'
+    assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
-def test_sem_motif_adapter_motif_protein_link():
+def test_sem_motif_adapter_motif_protein_link(mock_file_fileset):
     writer = SpyWriter()
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
                        label='motif_protein', writer=writer, validate=True)
@@ -38,6 +56,9 @@ def test_sem_motif_adapter_motif_protein_link():
     assert first_item['name'] == 'is used by'
     assert first_item['inverse_name'] == 'uses'
     assert first_item['biological_process'] == 'ontology_terms/GO_0003677'
+    assert first_item['class'] == 'observed data'
+    assert first_item['method'] == 'SEMpl'
+    assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
 def test_sem_motif_adapter_invalid_label():
