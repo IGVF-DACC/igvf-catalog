@@ -5,15 +5,18 @@ import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanNodesParamsFormat, motifsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
 const motifCollectionName = motifSchema.db_collection_name as string
 
+const METHODS = getCollectionEnumValuesOrThrow('nodes', 'motifs', 'method')
+
 const motifsQueryFormat = motifsCommonQueryFormat.merge(z.object({
-  files_fileset: z.string().optional()
+  files_fileset: z.string().optional(),
+  method: z.enum(METHODS).optional()
 }))
 
 export const motifFormat = z.object({

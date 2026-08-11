@@ -8,9 +8,11 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, motifsCommonQueryFormat, proteinsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
+
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'motifs_proteins', 'method')
 
 const motifsToProteinsFormat = z.object({
   source: z.string().optional(),
@@ -24,11 +26,13 @@ const motifsToProteinsFormat = z.object({
 })
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(z.object({
-  files_fileset: z.string().optional()
+  files_fileset: z.string().optional(),
+  method: z.enum(METHODS).optional()
 })).merge(commonHumanEdgeParamsFormat)
 
 const motifsToProteinsQueryFormat = motifsCommonQueryFormat.merge(z.object({
-  files_fileset: z.string().optional()
+  files_fileset: z.string().optional(),
+  method: z.enum(METHODS).optional()
 })).merge(commonHumanEdgeParamsFormat)
 
 const motifProteinCollectionName = 'motifs_proteins'
@@ -59,6 +63,12 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
     delete input.files_fileset
   }
 
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = ` AND record.method == '${input.method as string}'`
+    delete input.method
+  }
+
   let filterBy = ''
   const filterSts = getFilterStatements(motifSchema, input)
   if (filterSts !== '') {
@@ -85,7 +95,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
     LET motifsProteins = (
 
     FOR record IN ${motifProteinCollectionName}
-      FILTER record._from IN sources and record._to LIKE 'proteins/%' ${filesetFilter}
+      FILTER record._from IN sources and record._to LIKE 'proteins/%' ${filesetFilter} ${methodFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -100,7 +110,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
    )
     LET motifsComplexes = (
       FOR record IN ${motifProteinCollectionName}
-        FILTER record._from IN sources and record._to LIKE 'complexes/%' ${filesetFilter}
+        FILTER record._from IN sources and record._to LIKE 'complexes/%' ${filesetFilter} ${methodFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
@@ -135,6 +145,12 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
     delete input.files_fileset
   }
 
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = ` AND record.method == '${input.method as string}'`
+    delete input.method
+  }
+
   const verboseQuery = `
     FOR otherRecord IN ${motifCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
@@ -147,7 +163,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 
       LET proteinsMotifs = (
       FOR record IN ${motifProteinCollectionName}
-      FILTER record._to IN proteins ${filesetFilter}
+      FILTER record._to IN proteins ${filesetFilter} ${methodFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -169,7 +185,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET complexesMotifs = (
         FOR record IN ${motifProteinCollectionName}
-        FILTER record._to IN complexes ${filesetFilter}
+        FILTER record._to IN complexes ${filesetFilter} ${methodFilter}
         SORT record._key
         LIMIT 0, ${limit}
         RETURN {
@@ -213,7 +229,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET motifsProteins = (
         FOR record IN ${motifProteinCollectionName}
-          FILTER record._to IN proteins ${filesetFilter}
+          FILTER record._to IN proteins ${filesetFilter} ${methodFilter}
           SORT record._key
           LIMIT ${input.page as number * limit}, ${limit}
           RETURN {
@@ -228,7 +244,7 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET motifsComplexes = (
         FOR record IN ${motifProteinCollectionName}
-          FILTER record._to IN complexes ${filesetFilter}
+          FILTER record._to IN complexes ${filesetFilter} ${methodFilter}
           SORT record._key
           LIMIT ${input.page as number * limit}, ${limit}
           RETURN {

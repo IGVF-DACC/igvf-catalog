@@ -555,33 +555,160 @@ export const descriptions = {
     coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT, <br> \
     files_fileset = IGVFFI6893ZOAA.',
 
-  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
-  Example: tf_name = STAT3_HUMAN, <br> \
-  source = HOCOMOCOv11, <br> \
-  files_fileset = IGVFFI1626MMBD. <br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
+  motifs:
+    'Retrieve transcription factor binding motifs from HOCOMOCO and SEMpl.<br> \
+    method can be either HOCOMOCO or SEMpl; if not provided, both methods are searched. <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based. <br> \
+    ' + examples([
+      {
+        id: 'hocomoco',
+        label: 'HOCOMOCO',
+        examples: [
+          {
+            label: 'query by tf_name',
+            items: [
+              'tf_name = STAT3_HUMAN',
+              'source = HOCOMOCOv11',
+              'method = HOCOMOCO'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI1626MMBD',
+              'method = HOCOMOCO'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sempl',
+        label: 'SEMpl',
+        examples: [
+          {
+            label: 'query by tf_name',
+            items: [
+              'tf_name = AHR',
+              'method = SEMpl'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI5279OTVZ',
+              'method = SEMpl'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  motifs_proteins: 'Retrieve proteins and complexes for motifs.<br> \
-  Set verbose = true to retrieve full info on the proteins and complexes.<br> \
-  Example: tf_name = ATF1_HUMAN, <br> \
-  source = HOCOMOCOv11, <br> \
-  files_fileset = IGVFFI1626MMBD. <br> \
-  The limit parameter controls the page size and can not exceed 1000. <br> \
-  Pagination is 0-based.',
+  motifs_proteins:
+    'Retrieve proteins and complexes for motifs.<br> \
+    Set verbose = true to retrieve full info on the proteins and complexes.<br> \
+    method can be either HOCOMOCO or SEMpl; if not provided, both methods are searched. <br> \
+    The limit parameter controls the page size and can not exceed 1000. <br> \
+    Pagination is 0-based. <br> \
+    ' + examples([
+      {
+        id: 'hocomoco',
+        label: 'HOCOMOCO',
+        examples: [
+          {
+            label: 'query by tf_name',
+            items: [
+              'tf_name = ATF1_HUMAN',
+              'source = HOCOMOCOv11',
+              'method = HOCOMOCO'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI1626MMBD',
+              'method = HOCOMOCO'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sempl',
+        label: 'SEMpl',
+        examples: [
+          {
+            label: 'query by tf_name',
+            items: [
+              'tf_name = AHR',
+              'method = SEMpl'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI5279OTVZ',
+              'method = SEMpl'
+            ]
+          }
+        ]
+      }
+    ]),
 
-  proteins_motifs: 'Retrieve motifs for proteins.<br> \
-  Set verbose = true to retrieve full info on the motifs.<br> \
-  Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
-  Example: protein_id = ENSP00000384707, <br> \
-  protein_name = CTCF, <br> \
-  uniprot_name = CTCF_HUMAN, <br> \
-  uniprot_full_name = Transcriptional repressor CTCF, <br> \
-  dbxrefs = P49711, <br> \
-  files_fileset = IGVFFI1626MMBD, <br> \
-  organism = Homo sapiens. <br> \
-  The limit parameter controls the page size and can not exceed 1000. <br> \
-  Pagination is 0-based.',
+  proteins_motifs:
+    'Retrieve motifs for proteins.<br> \
+    Set verbose = true to retrieve full info on the motifs.<br> \
+    Protein IDs support the following formats: ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids)<br> \
+    method can be either HOCOMOCO or SEMpl; if not provided, both methods are searched. <br> \
+    The limit parameter controls the page size and can not exceed 1000. <br> \
+    Pagination is 0-based. <br> \
+    ' + examples([
+      {
+        id: 'hocomoco',
+        label: 'HOCOMOCO',
+        examples: [
+          {
+            label: 'query by protein identifier',
+            items: [
+              'protein_id = ENSP00000384707',
+              'method = HOCOMOCO'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI1626MMBD',
+              'method = HOCOMOCO'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sempl',
+        label: 'SEMpl',
+        examples: [
+          {
+            label: 'query by protein identifier',
+            items: [
+              'protein_id = ENSP00000384707',
+              'method = SEMpl'
+            ]
+          },
+          {
+            label: 'query by files_fileset',
+            note: FILES_FILESET_METHOD_NOTE,
+            items: [
+              'files_fileset = IGVFFI5279OTVZ',
+              'method = SEMpl'
+            ]
+          }
+        ]
+      }
+    ]),
 
   phenotypes_variants:
     'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by phenotypes.<br> \
