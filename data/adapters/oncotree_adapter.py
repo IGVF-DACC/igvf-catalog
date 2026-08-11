@@ -79,7 +79,8 @@ class Oncotree:
                     'uri': Oncotree.URI,
                     'source_url': Oncotree.SOURCE_URL,
                     'class': Oncotree.CLASS,
-                    'method': Oncotree.METHOD
+                    'method': Oncotree.METHOD,
+                    'files_filesets': None,
                 }
 
                 if self.validate:
@@ -108,7 +109,8 @@ class Oncotree:
                         'type': type,
                         'source': Oncotree.SOURCE,
                         'class': Oncotree.CLASS,
-                        'method': Oncotree.METHOD
+                        'method': Oncotree.METHOD,
+                        'files_filesets': None,
                     }
 
                     if self.validate:
