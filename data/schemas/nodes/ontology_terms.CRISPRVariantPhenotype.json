@@ -58,8 +58,11 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "The files filesets of the ontology term",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The files filesets of the ontology term. Null because the NTR phenotype term is shared vocabulary, not tied to a single dataset. See DSERV-1466.",
           "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [
