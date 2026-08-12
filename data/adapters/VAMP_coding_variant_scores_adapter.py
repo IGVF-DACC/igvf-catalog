@@ -59,7 +59,7 @@ class VAMPAdapter(BaseAdapter):
             self.logger.error('Invalid type in bulk coding variants query.')
             return
 
-        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
 
         for row in chunk:
@@ -83,11 +83,11 @@ class VAMPAdapter(BaseAdapter):
                         'name': self.PHENOTYPE_EDGE_NAME,
                         'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'method': file_fileset_obj['method'],
-                        'class': file_fileset_obj['class'],
+                        'method': self.file_fileset['method'],
+                        'class': self.file_fileset['class'],
                         'label': VAMPAdapter.LABEL,
-                        'biological_context': file_fileset_obj['simple_sample_summaries'][0],
-                        'biosample_term': file_fileset_obj['samples'][0]
+                        'biological_context': self.file_fileset['simple_sample_summaries'][0],
+                        'biosample_term': self.file_fileset['samples'][0]
                     }
                     for i, value in enumerate(row[1:], 1):
                         prop = {}
@@ -114,8 +114,11 @@ class VAMPAdapter(BaseAdapter):
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)
             chunk = []
-            self.writer.add_tag('portal_accessions', self.file_accession)
 
+            self.writer.add_tag('portal_accessions', self.file_accession)
+            file_set_accession = self.file_fileset.get('file_set_id')
+            if file_set_accession:
+                self.writer.add_tag('portal_accessions', file_set_accession)
             for i, row in enumerate(vamp_csv, 1):
                 # transcript level scores e.g. ENST00000371321.9:c.948C>T
                 if row[0].startswith('ENST'):

@@ -139,6 +139,9 @@ class SEMMotif(BaseAdapter):
 
         file_metadata = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
+        file_set_accession = file_metadata.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
 

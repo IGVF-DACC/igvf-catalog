@@ -61,6 +61,9 @@ class Reactome(BaseAdapter):
         self.collection_class = file_fileset['class']
         self.method = file_fileset['method']
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         with open(self.filepath) as input:
             _props = {

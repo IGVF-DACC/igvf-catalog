@@ -119,6 +119,11 @@ class SGE(BaseAdapter):
     def parse(self):
         # check if all variants in file is already loaded
         self.writer.add_tag('portal_accessions', self.file_accession)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         skipped_spdis = self.validate_variants()
         invalid_variants = []
         for spdi in skipped_spdis:

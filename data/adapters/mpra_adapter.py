@@ -408,6 +408,10 @@ class MPRAAdapter(BaseAdapter):
 
     def parse(self):
         # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.files_filesets.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = (
