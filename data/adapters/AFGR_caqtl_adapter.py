@@ -49,6 +49,9 @@ class AFGRCAQtl(BaseAdapter):
         self.writer.add_tag('portal_accessions', self.file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
