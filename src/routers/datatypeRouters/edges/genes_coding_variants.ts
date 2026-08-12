@@ -27,7 +27,6 @@ const allVariantsQueryFormat = z.object({
 
 const codingVariantsScoresFormat = z.object({
   protein_change: z.object({
-    coding_variant_id: z.string().nullish(),
     protein_id: z.string().nullish(),
     protein_name: z.string().nullish(),
     transcript_id: z.string().nullish(),
@@ -41,7 +40,8 @@ const codingVariantsScoresFormat = z.object({
     scores: z.array(z.object({
       method: z.string(),
       score: z.number().nullish(),
-      source_url: z.string().nullish()
+      source_url: z.string().nullish(),
+      files_filesets: z.string().nullish()
     }))
   })).nullish()
 })
@@ -81,6 +81,14 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.score
     `
+  } else if (input.dataset === 'Variant painting via fluorescence') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
+        FILTER p._from IN codingVariantsIds && p.method == "Variant painting via fluorescence"
+        SORT p.localization_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN p.localization_score
+    `
   } else if (input.dataset === 'ESM-1v') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
@@ -96,6 +104,14 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
         SORT p.pathogenicity_score DESC
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.pathogenicity_score
+    `
+  } else if (input.dataset === 'DUAL-IPA') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
+        FILTER p._from IN codingVariantsIds && p.method == "DUAL-IPA"
+        SORT p.dualipa_abun_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN p.dualipa_abun_score
     `
   }
 
@@ -117,7 +133,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined, page: number): Promise<any> {
   if (method !== undefined) {
     const query = `
-      LET doc = DOCUMENT(genes_coding_variants_scores_grp, "${input.gene_id as string}")
+      LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
 
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
@@ -152,7 +168,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
   }
 
   const query = `
-    FOR doc IN genes_coding_variants_scores_grp
+    FOR doc IN genes_coding_variants_scores
       FILTER doc._key == "${input.gene_id as string}"
       RETURN (
         FOR v IN doc.variant_scores
@@ -172,7 +188,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
 }
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -223,14 +239,14 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     }
   }
 
-  // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
+  // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq, dualipa_abun_score => DUAL-IPA, localization_score => Variant painting via fluorescence
   const query = `
     LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
 
     LET codingVariants = (
       FOR cv IN ${codingVariantCollectionName}
         FILTER cv.gene_name == gene_name
-        RETURN cv._id
+        RETURN CONCAT("coding_variants/", cv._key)
     )
     LET variantMap = (
       FOR vcv IN variants_coding_variants
@@ -257,9 +273,10 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         RETURN {
           codingVariant: p._from,
           variant: variantByCodingVariant[p._from],
-          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+          score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score OR p.localization_score,
           method: p.method,
-          source_url: p.source_url
+          source_url: p.source_url,
+          files_filesets: p.files_filesets
         }
     )
     LET allResults = (
@@ -276,7 +293,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         COLLECT variant = result.variant INTO variantGroup = result
         RETURN {
           variant: variant,
-          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }],
+          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url, files_filesets: CURRENT.files_filesets }],
           maxScore: MAX(variantGroup[*].score),
           protein_change: FIRST(variantGroup).protein_change,
           cvDoc: FIRST(variantGroup).cvDoc
@@ -285,13 +302,13 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
     FOR vws IN variantWithScores
       COLLECT protein_change = vws.protein_change INTO grouped = vws
+      FILTER protein_change.aapos != -1
       LET maxScore = MAX(grouped[*].maxScore)
-      SORT protein_change.protein_id ASC, protein_change.aapos ASC
-      LIMIT ${page as number * limit}, ${limit}
       LET firstCvDoc = FIRST(grouped).cvDoc
+      SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC
+      LIMIT ${page as number * limit}, ${limit}
       RETURN {
         protein_change: {
-          coding_variant_id: firstCvDoc._key,
           protein_id: firstCvDoc.protein_id,
           protein_name: firstCvDoc.protein_name,
           transcript_id: firstCvDoc.transcript_id,
@@ -317,7 +334,7 @@ const codingVariantsFromGenes = publicProcedure
   .query(async ({ input }) => await findCodingVariantsFromGenes(input))
 
 const allCodingVariantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants_all_scores } })
   .input(allVariantsQueryFormat)
   .output(z.array(z.number().optional()))
   .query(async ({ input }) => await findAllCodingVariantsFromGenes(input))

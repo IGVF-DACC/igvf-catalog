@@ -1,12 +1,15 @@
-import os
 import json
 import csv
 import re
 from collections import defaultdict
 from typing import Optional
 
+from adapters.archive_utils import (
+    get_file_accession,
+    get_files_from_folder,
+)
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id_from_hgvs
+from adapters.helpers import build_variant_id_from_hgvs, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
@@ -30,13 +33,23 @@ from adapters.writer import Writer
 # genes.tsv: map gene symbols to Ensembl IDs
 
 
+def _normalize_phenotype_categories(cell) -> list:
+    """
+    PharmGKB column 'Phenotype Category' is comma-separated; blanks and
+    stray commas (e.g. 'Dosage, ') produce '' after split — strip and drop those.
+    """
+    if cell is None or not str(cell).strip():
+        return []
+    parts = [p.strip() for p in str(cell).split(', ')]
+    # drop empty part, sort and return
+    parts = [p for p in parts if p]
+    parts.sort()
+    return parts
+
+
 class PharmGKB(BaseAdapter):
     SOURCE = 'pharmGKB'
     SOURCE_URL_PREFIX = 'https://www.pharmgkb.org/'
-    DRUG_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_chemicals.tsv'
-    VARIANT_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_variants.tsv'
-    STUDY_PARAMETERS_MAPPING_PATH = './data_loading_support_files/pharmGKB_study_parameters.tsv'
-    GENE_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_genes.tsv'
     # The first 11 columns are same across three variant annotation files
     VAR_ANNO_FILE_INDEX = {
         'var_drug': {'multiple_drugs': 16, 'alleles': 9, 'comparison_alleles': 20},
@@ -49,8 +62,42 @@ class PharmGKB(BaseAdapter):
         'variant_drug_gene',
     ]
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label,
+        writer: Optional[Writer] = None,
+        validate=False,
+        drug_reference_filepath: Optional[str] = None,
+        variant_reference_filepath: Optional[str] = None,
+        study_reference_filepath: Optional[str] = None,
+        gene_reference_filepath: Optional[str] = None,
+        **kwargs
+    ):
         super().__init__(filepath, label, writer, validate)
+
+        self.drug_reference_filepath = drug_reference_filepath
+        self.variant_reference_filepath = variant_reference_filepath
+        self.study_reference_filepath = study_reference_filepath
+        self.gene_reference_filepath = gene_reference_filepath
+
+        self.file_accession = get_file_accession(filepath)
+
+        if self.label in ('variant_drug', 'variant_drug_gene'):
+            missing = []
+            if not self.drug_reference_filepath:
+                missing.append('drug_reference_filepath')
+            if not self.variant_reference_filepath:
+                missing.append('variant_reference_filepath')
+            if not self.study_reference_filepath:
+                missing.append('study_reference_filepath')
+            if self.label == 'variant_drug_gene' and not self.gene_reference_filepath:
+                missing.append('gene_reference_filepath')
+            if missing:
+                raise ValueError(
+                    f'Missing required reference file path(s) for label "{self.label}": '
+                    f'{", ".join(missing)}'
+                )
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -68,11 +115,23 @@ class PharmGKB(BaseAdapter):
         elif self.label == 'variant_drug_gene':
             return 'variants_drugs_genes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        if self.label in ('variant_drug', 'variant_drug_gene'):
+            self.writer.add_tag('portal_accessions', get_file_accession(
+                self.drug_reference_filepath))
+            self.writer.add_tag('portal_accessions', get_file_accession(
+                self.variant_reference_filepath))
+            self.writer.add_tag('portal_accessions', get_file_accession(
+                self.study_reference_filepath))
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
 
         if self.label == 'drug':
-            with open(PharmGKB.DRUG_ID_MAPPING_PATH, 'r') as drug_file:
+            with open(self.filepath, 'r') as drug_file:
                 drug_csv = csv.reader(drug_file, delimiter='\t')
                 next(drug_csv)
                 for drug_row in drug_csv:
@@ -91,13 +150,14 @@ class PharmGKB(BaseAdapter):
                         'name': drug_name,
                         'drug_ontology_terms': ['ontology_terms/' + term for term in drug_ontology_terms],
                         'source': PharmGKB.SOURCE,
-                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'chemical/' + _key
+                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'chemical/' + _key,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
                     if self.validate:
                         self.validate_doc(props)
                     self.save_props(props)
-
-            self.writer.close()
 
         else:
             self.load_drug_id_mapping()
@@ -107,11 +167,12 @@ class PharmGKB(BaseAdapter):
                 self.load_gene_id_mapping()
             # one variant can be in multiple rows, save those converted variant ids to speed up
             variant_hgvs_id_converted = {}
-            for filename in os.listdir(self.filepath):
+            for input_filepath in get_files_from_folder(self.filepath):
+                filename = input_filepath.name
                 if filename.startswith('var_'):
                     self.file_prefix = '_'.join(filename.split('_')[:2])
                     self.logger.info('Loading:' + filename)
-                    with open(self.filepath + '/' + filename, 'r') as variant_drug_file:
+                    with open(input_filepath, 'r') as variant_drug_file:
                         variant_drug_csv = csv.reader(
                             variant_drug_file, delimiter='\t')
                         next(variant_drug_csv)
@@ -122,7 +183,14 @@ class PharmGKB(BaseAdapter):
                                 continue
                             # variant info
                             variant_anno_id = variant_drug_row[0]
-                            variant_name = variant_drug_row[1]
+                            # study info
+                            study_info = self.study_paramters_mapping.get(
+                                variant_anno_id)
+                            if study_info is None:
+                                self.logger.warning(variant_anno_id +
+                                                    ' has no matched study info.')
+                                continue
+
                             variant_hgvs_ids = self.variant_id_mapping.get(
                                 variant_name)
                             if variant_hgvs_ids is None:
@@ -156,13 +224,6 @@ class PharmGKB(BaseAdapter):
                                                         ' failed converting hgvs id.')
                                     continue
 
-                            # study info
-                            study_info = self.study_paramters_mapping.get(
-                                variant_anno_id)
-                            if study_info is None:
-                                self.logger.warning(variant_anno_id +
-                                                    ' has no matched study info.')
-                                continue
                             # gene info
                             # can be multiple genes split by ', ', or empty str for NA cases
                             gene_symbols = variant_drug_row[2].split(', ')
@@ -236,11 +297,14 @@ class PharmGKB(BaseAdapter):
                                             'gene_symbol': gene_symbols,
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
-                                            'phenotype_categories': variant_drug_row[5].split(', '),
+                                            'phenotype_categories': _normalize_phenotype_categories(variant_drug_row[5]),
                                             'name': 'associated with',
                                             'inverse_name': 'associated with',
                                             'source': PharmGKB.SOURCE,
-                                            'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                            'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id,
+                                            'class': self.collection_class,
+                                            'method': self.method,
+                                            'files_filesets': 'files_filesets/' + self.file_accession
                                         }
                                         if self.validate:
                                             self.validate_doc(props)
@@ -271,19 +335,21 @@ class PharmGKB(BaseAdapter):
                                                         'inverse_name': 'associated with',
                                                         'gene_symbol': gene_symbol,
                                                         'source': PharmGKB.SOURCE,
-                                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id,
+                                                        'class': self.collection_class,
+                                                        'method': self.method,
+                                                        'files_filesets': 'files_filesets/' + self.file_accession
                                                     }
                                                     if self.validate:
                                                         self.validate_doc(
                                                             props)
                                                     self.save_props(props)
 
-            self.writer.close()
-
     def load_drug_id_mapping(self):
         # e.g. key: '17-alpha-dihydroequilenin sulfate', value: 'PA166238901'
+        # IGVFFI2997DUKO (pharmGKB chemicals.tsv)
         self.drug_id_mapping = {}
-        with open(PharmGKB.DRUG_ID_MAPPING_PATH, 'r') as drug_id_mapfile:
+        with open(self.drug_reference_filepath, 'r') as drug_id_mapfile:
             next(drug_id_mapfile)
             for line in drug_id_mapfile:
                 drug_row = line.strip('\n').split('\t')
@@ -292,8 +358,9 @@ class PharmGKB(BaseAdapter):
     def load_gene_id_mapping(self):
         # e.g. key: 'ABCB1', value: 'ENSG00000085563'
         # a few genes mapped to multiple Ensembl IDs, e.g. SLCO1B3 -> ENSG00000111700, ENSG00000257046
+        # IGVFFI4821BJHQ (pharmGKB genes.tsv)
         self.gene_id_mapping = {}
-        with open(PharmGKB.GENE_ID_MAPPING_PATH, 'r') as gene_id_mapfile:
+        with open(self.gene_reference_filepath, 'r') as gene_id_mapfile:
             gene_id_csv = csv.reader(gene_id_mapfile, delimiter='\t')
             next(gene_id_csv)
             for gene_id_row in gene_id_csv:
@@ -302,8 +369,9 @@ class PharmGKB(BaseAdapter):
 
     def load_variant_id_mapping(self):
         # e.g. key: 'rs1000002', value: 'NC_000003.12:g.183917980C>T'
+        # IGVFFI7955ICXJ (pharmGKB variants.tsv)
         self.variant_id_mapping = {}
-        with open(PharmGKB.VARIANT_ID_MAPPING_PATH, 'r') as variant_id_mapfile:
+        with open(self.variant_reference_filepath, 'r') as variant_id_mapfile:
             next(variant_id_mapfile)
             for line in variant_id_mapfile:
                 variant_row = line.strip('\n').split('\t')
@@ -342,7 +410,8 @@ class PharmGKB(BaseAdapter):
         self.study_paramters_mapping = defaultdict(
             list)  # key: variant annotation ID
         # each variant annotation entry (from one publication though) can have multiple study parameter sets
-        with open(PharmGKB.STUDY_PARAMETERS_MAPPING_PATH, 'r') as study_mapfile:
+        # IGVFFI1149WTCK (pharmGKB study_parameters.tsv)
+        with open(self.study_reference_filepath, 'r') as study_mapfile:
             next(study_mapfile)
             for line in study_mapfile:
                 study_row = line.strip('\n').split('\t')

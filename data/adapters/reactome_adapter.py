@@ -1,7 +1,9 @@
 import json
+import os
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -40,6 +42,7 @@ class Reactome(BaseAdapter):
             self.gene_validator = GeneValidator()
 
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -52,13 +55,22 @@ class Reactome(BaseAdapter):
         elif self.label == 'parent_pathway_of':
             return 'pathways_pathways'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.method = file_fileset['method']
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
         with open(self.filepath) as input:
             _props = {
                 'source': 'Reactome',
                 'source_url': 'https://reactome.org/',
-                'organism': 'Homo sapiens'
+                'organism': 'Homo sapiens',
+                'class': self.collection_class,
+                'method': self.method,
+                'label': self.method,
+                'files_filesets': 'files_filesets/' + self.file_accession
             }
             _ids_dict = {}
             for line in input:
@@ -109,6 +121,5 @@ class Reactome(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
         if self.label == 'genes_pathways':
             self.gene_validator.log()

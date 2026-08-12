@@ -28,7 +28,7 @@ jobs:
       - run: pre-commit run --all-files
   trpc:
     docker:
-      - image: cimg/node:20.12
+      - image: cimg/node:20.20.2
     working_directory: ~/igvf-catalog
     steps:
       - checkout
@@ -64,7 +64,7 @@ jobs:
           fail_on_error: false
   build:
     docker:
-      - image: cimg/node:20.12
+      - image: cimg/node:20.20.2
     resource_class: medium
     working_directory: ~/igvf-catalog
     steps:

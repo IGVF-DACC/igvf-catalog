@@ -20,6 +20,7 @@ coding_variants_phenotypes:
       - files_filesets
       - files_filesets, _key
       - _from, _key
+      - _to, _key
       - method, _key
   persistent_sparse:
     fields:
@@ -71,12 +72,14 @@ files_filesets:
       - lab
       - preferred_assay_titles[*]
       - method
+      - crispr_modality
       - donors[*]
       - samples[*]
       - simple_sample_summaries[*]
       - software[*]
       - source
       - class
+      - genome_browser_link
 
 genes:
   persistent:
@@ -262,10 +265,12 @@ proteins_proteins:
       - pmids[*], source, organism
       - source, organism, _key
       - organism
+      - method
 
 genomic_elements:
   persistent:
     fields:
+      - method, source, chr, type, source_annotation, files_filesets
       - source, chr, type, source_annotation, files_filesets
       - chr, type, source_annotation, files_filesets
       - type, source_annotation, files_filesets
@@ -273,6 +278,9 @@ genomic_elements:
       - files_filesets
       - source_annotation, _key
       - chr, start, end
+      - source
+      - method, _key
+      - promoter_of
 
 genomic_elements_biosamples:
   persistent:
@@ -288,20 +296,34 @@ genomic_elements_biosamples:
 genomic_elements_genes:
   persistent:
     fields:
-      - method
       - method, files_filesets
+      - method, _key
       - source, files_filesets
       - files_filesets
+      - files_filesets, _key
       - score, files_filesets
       - _from, files_filesets
       - _to, _key
+      - method, _key
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
+      - method, source, _key
 
   inverted:
     fields: biological_context
     analyzers:
       - text_en_no_stem
+
+genomic_elements_phenotypes:
+  persistent:
+    fields:
+      - files_filesets
+      - files_filesets, _key
+      - _from, files_filesets
+      - _from, significant
+      - _to, _key
+      - _to, significant
+      - significant, files_filesets
 
 studies:
   persistent:
@@ -378,17 +400,20 @@ variants_drugs_genes:
 variants_genes:
   zkd_sparse:
     fields:
-      - slope, log10pvalue, effect_size
-      - log10pvalue, effect_size
+      - slope, neg_log10_pvalue, effect_size
+      - neg_log10_pvalue, effect_size
       - intron_start, intron_end
   persistent:
     fields:
-      - biosample_term, biological_context, label, source, files_filesets
-      - biological_context, label, source, files_filesets
-      - label, source, files_filesets
+      - biosample_term, biological_context, label, method, source, files_filesets
+      - biological_context, label, method, source, files_filesets
+      - label, method, source, files_filesets
+      - method, source, files_filesets
       - source, files_filesets
       - files_filesets
       - effect_size
+      - method
+      - method, _key
   inverted:
     fields: biological_context
     analyzers:
@@ -410,11 +435,6 @@ variants_genomic_elements:
     analyzers:
       - text_en_no_stem
 
-variants_phenotypes_studies:
-  zkd:
-    fields:
-      - log10pvalue
-
 variants_phenotypes:
   persistent:
     fields:
@@ -423,8 +443,12 @@ variants_phenotypes:
       - label, class, files_filesets
       - class, files_filesets
       - files_filesets
+      - method
+      - method, files_filesets
       - method, _key
       - files_filesets, _key
+      - _to, _key
+      - source, files_filesets
 
 variants_phenotypes_coding_variants:
   persistent:
@@ -441,14 +465,19 @@ variants_proteins:
   persistent:
     fields:
       - files_filesets, _key, source, label
+      - method, label, source, files_filesets
       - method, label, source, files_filesets, name
+      - label, source, files_filesets
       - label, source, files_filesets, name
+      - source, files_filesets
       - source, files_filesets, name
-      - effect_on_binding, files_filesets HEAD
+      - effect_on_binding, files_filesets
       - files_filesets, name
       - name
       - files_filesets
       - method
+      - gene, method, source, biological_context, _key
+      - gene, method, _key
 
 variants_variants:
   persistent:

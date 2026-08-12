@@ -30,7 +30,7 @@
           "description": "The z score of the gene gene edge",
           "example": 1.23
         },
-        "associated process": {
+        "associated_process": {
           "type": "string",
           "description": "The associated process of the gene gene edge",
           "enum": ["ontology_terms/GO_0010467"]
@@ -55,13 +55,20 @@
         },
         "inverse_name": {
           "enum": ["coexpressed with"]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the gene gene edge",
+          "example": "files_filesets/IGVFFI3321YNBP",
+          "pattern": "^files_filesets/",
+          "collections": ["files_filesets"]
         }
       },
-      "required": ["_key", "z_score", "associated process"],
+      "required": ["_key", "z_score", "associated_process", "files_filesets"],
       "additionalProperties": false,
       "accessible_via": {
         "filter_by_range": "z_score",
-        "return": "z_score, source, source_url, method, class, label"
+        "return": "z_score, associated_process, source, source_url, method, class, label, files_filesets"
       }
     }
   ],

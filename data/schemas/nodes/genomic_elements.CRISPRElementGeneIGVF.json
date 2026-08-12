@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/genomic_elements.CRISPRElementGeneIGVF.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
+        },
+        "name": {
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
+        },
+        "promoter_of": {
+          "type": "string",
+          "description": "Promoter of the genomic element",
+          "example": "genes/ENSG00000123685"
+        },
+        "method": {
+          "enum": [
+            "Perturb-seq",
+            "CRISPR screen"
+          ]
+        },
+        "source_annotation": {
+          "type": "string",
+          "description": "Source annotation for the genomic element",
+          "example": "promoter",
+          "enum": [
+            "enhancer",
+            "promoter",
+            "distal element"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+        },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the genomic element",
+          "example": "files_filesets/IGVFFI3069QCRA",
+          "pattern": "^files_filesets/"
+        }
+      },
+      "required": [
+        "source_annotation",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements"
+}

@@ -59,7 +59,7 @@ for (const frequency in frequencySources.Values) {
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'cadd_rawscore': record['annotations']['cadd_rawscore'], 'cadd_phred': record['annotations']['cadd_phred'], 'GENCODE_category': record['annotations']['funseq_description'] }`
 
 const variantsFromRegionsFormat = z.object({
-  region: z.string().trim().optional()
+  region: z.string().trim()
 })
 
 export const singleVariantQueryFormat = z.object({
@@ -132,7 +132,6 @@ export const variantFormat = z.object({
   ca_id: z.string().nullish(),
   strain: z.array(z.string()).nullish(),
   qual: z.string().nullish(),
-  filter: z.string().nullish(),
   files_filesets: z.string().nullish(),
   annotations: z.object({
     bravo_af: z.number().nullish(),
@@ -191,6 +190,16 @@ export const variantSimplifiedFormat = z.object({
   ca_id: z.string().nullish(),
   _id: z.string().optional()
 })
+
+function validateVariantInput (input: paramsFormatType): void {
+  const isInvalidInput = Object.keys(input).every(item => !['spdi', 'hgvs', 'rsid', 'ca_id', 'variant_id', 'region'].includes(item))
+  if (isInvalidInput) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region'
+    })
+  }
+}
 
 export async function findVariantIDBySpdi (spdi: string): Promise<string | null> {
   const query = `
@@ -256,6 +265,7 @@ export function preProcessVariantParams (input: paramsFormatType): paramsFormatT
 }
 
 export async function variantSearch (input: paramsFormatType): Promise<any[]> {
+  validateVariantInput(input)
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema

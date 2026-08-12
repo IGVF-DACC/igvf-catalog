@@ -93,8 +93,7 @@ class GencodeStructure(BaseAdapter):
                 mapping_line = row.strip().split('\t')
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         UTR_keys = set()
         exon_transcript = None
         last_exon_end = 0
@@ -233,5 +232,3 @@ class GencodeStructure(BaseAdapter):
                 last_exon_end = int(
                     split_line[GencodeStructure.INDEX['coord_end']]) if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
                     split_line[GencodeStructure.INDEX['coord_start']])
-
-        self.writer.close()

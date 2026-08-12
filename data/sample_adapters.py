@@ -29,7 +29,7 @@ from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
-from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
+from adapters.CRISPR_element_gene_ENCODE_adapter import CRISPRElementGeneENCODE
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
@@ -65,17 +65,16 @@ ADAPTERS = {
     'encode_biosample': EncodeElementGeneLink(filepath='./samples/E2G_ENCFF728HSS.bed.gz', label='ontology_term', source='ENCODE-E2G-DNaseOnly', source_url='https://www.encodeproject.org/files/ENCFF728HSS/', biological_context='NTR_0000502'),
     'mpra_genomic_element': MPRAAdapter(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element', source_url='https://www.encodeproject.org/files/ENCFF802FUV/'),
     'mpra_genomic_element_biosample': MPRAAdapter(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element_biosample', source_url='https://www.encodeproject.org/files/ENCFF802FUV/'),
-    'encode_genomic_element_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element'),
-    'encode_genomic_element_gene_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element_gene'),
+    'crispr_element_gene_encode': CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv', label='genomic_element'),
+    'crispr_element_gene_encode_gene': CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv', label='genomic_element_gene'),
     'encode_file_fileset': FileFileSet(accession='ENCFF923FSV', label='encode_file_fileset'),
     'igvf_file_fileset': FileFileSet(accession='IGVFFI1663LKVQ', label='igvf_file_fileset'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz', label='human'),
     'gaf_mouse': GAF(filepath='./samples/mgi_sample.gaf.gz', label='mouse'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', label='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', label='rna'),
-    'gwas_studies': GWAS(filepath='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', label='studies'),
-    'gwas_var_phenotypes': GWAS(filepath='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', label='variants_phenotypes'),
-    'gwas_var_phenotypes_studies': GWAS(filepath='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', label='variants_phenotypes_studies'),
+    'gwas_studies': GWAS(filepath='./samples/gwas_v2d_igvf_sample.tsv', label='studies'),
+    'gwas_var_phenotypes': GWAS(filepath='./samples/gwas_v2d_igvf_sample.tsv', label='variants_phenotypes'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
     'coxpresdb': Coxpresdb(filepath='./samples/coxpresdb/1'),
@@ -84,9 +83,22 @@ ADAPTERS = {
     'parent_pathway_of': Reactome(filepath='./samples/reactome/ReactomePathwaysRelation.txt', label='parent_pathway_of'),
     'cellosaurus_terms': Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt', label='node'),
     'cellosaurus_relationships': Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt', label='edge'),
-    'drug': PharmGKB(filepath='./samples/pharmGKB', label='drug'),
-    'variant_drug': PharmGKB(filepath='./samples/pharmGKB', label='variant_drug'),
-    'variant_drug_gene': PharmGKB(filepath='./samples/pharmGKB', label='variant_drug_gene'),
+    'drug': PharmGKB(filepath='./data_loading_support_files/IGVFFI2997DUKO.pharmGKB_chemicals.tsv', label='drug'),
+    'variant_drug': PharmGKB(
+        filepath='./samples/pharmGKB',
+        label='variant_drug',
+        drug_reference_filepath='./data_loading_support_files/IGVFFI2997DUKO.pharmGKB_chemicals.tsv',
+        variant_reference_filepath='./data_loading_support_files/IGVFFI7955ICXJ.pharmGKB_variants.tsv',
+        study_reference_filepath='./data_loading_support_files/IGVFFI1149WTCK.pharmGKB_study_parameters.tsv',
+    ),
+    'variant_drug_gene': PharmGKB(
+        filepath='./samples/pharmGKB',
+        label='variant_drug_gene',
+        drug_reference_filepath='./data_loading_support_files/IGVFFI2997DUKO.pharmGKB_chemicals.tsv',
+        variant_reference_filepath='./data_loading_support_files/IGVFFI7955ICXJ.pharmGKB_variants.tsv',
+        study_reference_filepath='./data_loading_support_files/IGVFFI1149WTCK.pharmGKB_study_parameters.tsv',
+        gene_reference_filepath='./data_loading_support_files/pharmGKB_genes.tsv',
+    ),
     'disease_gene': Disease(filepath='./samples/orphanet_example.xml'),
     'oncotree_terms': Oncotree(label='node'),
     'oncotree_relationships': Oncotree(label='edge'),
@@ -94,11 +106,11 @@ ADAPTERS = {
     'complex': EBIComplex(filepath='./samples/EBI_complex_example.tsv', label='complex'),
     'complex_protein': EBIComplex(filepath='./samples/EBI_complex_example.tsv', label='complex_protein'),
     'complex_term': EBIComplex(filepath='./samples/EBI_complex_example.tsv', label='complex_term'),
-    'protein_protein': ProteinsInteraction(filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='protein_protein'),
-    'gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='gene_gene_biogrid'),
+    'protein_protein': ProteinsInteraction(filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='protein_protein_human'),
+    'gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='human_gene_gene_biogrid'),
     'mouse_gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv', label='mouse_gene_gene_biogrid'),
     'genomic_element_mm_genomic_element': HumanMouseElementAdapter(filepath='./samples/element_mapping_example.txt.gz', label='genomic_element_mm_genomic_element'),
-    'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'),
+    'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', label='coding_variants'),
     'variants_coding_variants': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', label='variants_coding_variants'),
     'coding_variants_proteins': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', label='coding_variants_proteins'),

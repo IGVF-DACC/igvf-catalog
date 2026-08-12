@@ -18,7 +18,7 @@ const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_phenotypes', '
 
 const variantsPhenotypesQueryFormat = z.object({
   phenotype_id: z.string().trim().optional(),
-  log10pvalue: z.string().trim().optional(),
+  neg_log10_pvalue: z.string().trim().optional(),
   method: z.enum(METHODS).optional(),
   label: z.enum(LABELS).optional(),
   class: z.enum(CLASS).optional()
@@ -27,7 +27,7 @@ const variantsPhenotypesQueryFormat = z.object({
 const phenotypesVariantsInputFormat = z.object({
   phenotype_id: z.string().trim().optional(),
   phenotype_name: z.string().trim().optional(),
-  log10pvalue: z.string().trim().optional(),
+  neg_log10_pvalue: z.string().trim().optional(),
   method: z.enum(METHODS).optional(),
   label: z.enum(LABELS).optional(),
   class: z.enum(CLASS).optional(),
@@ -40,8 +40,8 @@ const gwasVariantPhenotypeFormat = z.object({
   phenotype_id: z.string().nullable(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
-  log10pvalue: z.number().nullable(),
-  p_val: z.number().nullable(),
+  neg_log10_pvalue: z.number().nullish(),
+  p_value: z.number().nullable(),
   beta: z.number().nullable(),
   beta_ci_lower: z.number().nullable(),
   beta_ci_upper: z.number().nullable(),
@@ -52,14 +52,15 @@ const gwasVariantPhenotypeFormat = z.object({
   lead_ref: z.string().nullable(),
   lead_alt: z.string().nullable(),
   direction: z.string().nullable(),
-  source: z.string().default('OpenTargets'),
+  source: z.literal('OpenTargets'),
   source_url: z.string().nullish(),
   class: z.string().nullish(),
   method: z.string().nullish(),
   label: z.string().nullish(),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string(),
-  variant: z.string().or(variantSimplifiedFormat)
+  variant: z.string().or(variantSimplifiedFormat),
+  files_filesets: z.string().nullish()
 })
 
 const igvfVariantPhenotypeFormat = z.object({
@@ -67,10 +68,22 @@ const igvfVariantPhenotypeFormat = z.object({
   biological_context: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
-  score: z.number().nullable(),
+  score: z.number().nullish(),
+  effect_size: z.number().nullish(),
+  z_score: z.number().nullish(),
+  p_value: z.number().nullish(),
+  neg_log10_pvalue: z.number().nullish(),
+  significant: z.boolean().nullish(),
+  num_guides: z.number().nullish(),
+  edit_rate_mean: z.number().nullish(),
+  effect_size_ci95_lower: z.number().nullish(),
+  effect_size_ci95_upper: z.number().nullish(),
+  crispr_modality: z.string().nullish(),
   method: z.string().nullable(),
   class: z.string().nullish(),
+  label: z.string().nullish(),
   files_filesets: z.string().nullable(),
+  biosample_term: z.string().nullish(),
   phenotype_term: z.string().nullable(),
   variant: z.string().or(variantSimplifiedFormat),
   phenotype_id: z.string().nullable()
@@ -85,6 +98,18 @@ const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
 const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.GWAS.json')
 const variantsPhenotypeNonGwasSchema = getSchema('data/schemas/edges/variants_phenotypes.cV2F.json')
+const variantsPhenotypeCrisprSchema = getSchema('data/schemas/edges/variants_phenotypes.CRISPRVariantPhenotype.json')
+
+function valueValidation (input: paramsFormatType): void {
+  if (input.neg_log10_pvalue !== undefined) {
+    if (isNaN(Number(input.neg_log10_pvalue)) && !(input.neg_log10_pvalue as string).includes(':')) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'neg_log10_pvalue must be a number or a string in the format of "operator:value", where operator can be one of "gt", "gte", "lt" or "lte".'
+      })
+    }
+  }
+}
 
 export function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'files_fileset', 'method'].includes(item))
@@ -95,6 +120,8 @@ export function variantQueryValidation (input: paramsFormatType): void {
       message: 'At least one variant property, or method, or files_filesets must be defined.'
     })
   }
+
+  valueValidation(input)
 }
 
 function phenotypeQueryValidation (input: paramsFormatType): void {
@@ -106,13 +133,14 @@ function phenotypeQueryValidation (input: paramsFormatType): void {
       message: 'At least one phenotype property, or method, or files_filesets must be defined.'
     })
   }
+
+  valueValidation(input)
 }
 
 function buildCombinedFilter (phenotypeFilter: string, nonGWASFilter: string, GWASFilter: string): string {
   return [phenotypeFilter, nonGWASFilter, GWASFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
 }
 
-// Query for endpoint phenotypes/variants/, by phenotype query (allow fuzzy search), (AND p-value filter)
 async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promise<any[]> {
   phenotypeQueryValidation(input)
   delete input.organism
@@ -130,8 +158,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   const nonGwasFilterInput: paramsFormatType = { method: input.method, class: input.class, label: input.label, files_filesets: input.files_filesets, source: input.source }
   const nonGWASFilter = getFilterStatements(variantsPhenotypeNonGwasSchema, nonGwasFilterInput)
   let GWASFilter = ''
-  if (input.log10pvalue !== undefined) {
-    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { log10pvalue: input.log10pvalue })}`
+  if (input.neg_log10_pvalue !== undefined) {
+    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })}`
   }
 
   const studyVerboseQuery = `
@@ -140,10 +168,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
 
-  let isPhenotypeQuery = false
   let phenotypeIds = []
   if (input.phenotype_id !== undefined || input.phenotype_name !== undefined) {
-    isPhenotypeQuery = true
     if (input.phenotype_id !== undefined) {
       phenotypeIds.push(`ontology_terms/${input.phenotype_id as string}`)
     } else {
@@ -155,31 +181,65 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       phenotypeIds = await (await db.query(phenotypeQuery)).all()
     }
   }
-  const phenotypeFilter = isPhenotypeQuery ? 'record._to IN @phenotypeIds' : ''
-  const combinedFilter = buildCombinedFilter(phenotypeFilter, nonGWASFilter, GWASFilter)
+  const phenotypeFilter = phenotypeIds.length > 0 ? 'record._to IN @phenotypeIds' : ''
+
   const query = `
-    FOR record IN ${variantToPhenotypeCollectionName}
-    FILTER ${combinedFilter}
+  FOR record IN ${variantToPhenotypeCollectionName}
+    FILTER ${buildCombinedFilter(phenotypeFilter, nonGWASFilter, GWASFilter)}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
-    ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
-    RETURN MERGE(
-      {
-        variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'},
-        phenotype_id: record._to,
-      },
 
-        (record.source == 'OpenTargets' ? {
-          study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
-          ${getDBReturnStatements(variantPhenotypeGwasSchema).replaceAll('record', 'record')}
-        } : {
-          ${getDBReturnStatements(variantsPhenotypeNonGwasSchema).replaceAll('record', 'record')},
-          phenotype_term: DOCUMENT(record._to).name
-        })
-    )
+    ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
+    LET phenotype_name = DOCUMENT(record._to).name
+    RETURN {
+      variant:      ${input.verbose === 'true' ? variantVerboseFields : 'record._from'},
+      phenotype_id: record._to,
+      name:         record.name,
+      source:       record.source,
+      source_url:   record.source_url,
+      class:        record.class,
+      method:       record.method,
+      label:        record.label,
+      phenotype_term: phenotype_name,
+
+      // OpenTargets-specific
+      version:        record.source == 'OpenTargets' ? record.version        : null,
+      lead_chrom:     record.source == 'OpenTargets' ? record.lead_chrom     : null,
+      lead_pos:       record.source == 'OpenTargets' ? record.lead_pos       : null,
+      lead_ref:       record.source == 'OpenTargets' ? record.lead_ref       : null,
+      lead_alt:       record.source == 'OpenTargets' ? record.lead_alt       : null,
+      direction:      record.source == 'OpenTargets' ? record.direction      : null,
+      beta:           record.source == 'OpenTargets' ? record.beta           : null,
+      beta_ci_lower:  record.source == 'OpenTargets' ? record.beta_ci_lower  : null,
+      beta_ci_upper:  record.source == 'OpenTargets' ? record.beta_ci_upper  : null,
+      p_val_mantissa: record.source == 'OpenTargets' ? record.p_val_mantissa : null,
+      p_val_exponent: record.source == 'OpenTargets' ? record.p_val_exponent : null,
+      p_value: record.source == 'OpenTargets' ? record.p_value : null,
+      neg_log10_pvalue: record.source == 'OpenTargets' ? record.neg_log10_pvalue : null,
+      oddsr_ci_lower: record.source == 'OpenTargets' ? record.oddsr_ci_lower : null,
+      oddsr_ci_upper: record.source == 'OpenTargets' ? record.oddsr_ci_upper : null,
+      study:          record.source == 'OpenTargets' ? ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'} : null,
+
+      // non-OpenTargets specific
+      score:              record.source != 'OpenTargets' ? record.score              : null,
+      files_filesets:     record.source != 'OpenTargets' ? record.files_filesets     : null,
+      biosample_term:     record.source != 'OpenTargets' ? record.biosample_term     : null,
+      biological_context: record.source != 'OpenTargets' ? record.biological_context : null,
+
+      // CRISPR variant phenotype specific
+      effect_size:        record.method == 'CRISPR screen' ? record.effect_size        : null,
+      z_score:            record.method == 'CRISPR screen' ? record.z_score            : null,
+      significant:        record.method == 'CRISPR screen' ? record.significant        : null,
+      num_guides:         record.method == 'CRISPR screen' ? record.num_guides         : null,
+      edit_rate_mean:     record.method == 'CRISPR screen' ? record.edit_rate_mean     : null,
+      effect_size_ci95_lower: record.method == 'CRISPR screen' ? record.effect_size_ci95_lower : null,
+      effect_size_ci95_upper: record.method == 'CRISPR screen' ? record.effect_size_ci95_upper : null,
+      crispr_modality:    record.method == 'CRISPR screen' ? record.crispr_modality    : null
+    }
   `
+
   let result = []
-  if (isPhenotypeQuery) {
+  if (phenotypeIds.length > 0) {
     result = await ((await db.query(query, { phenotypeIds })).all())
   } else {
     result = await ((await db.query(query)).all())
@@ -208,8 +268,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   const nonGwasFilterInput: paramsFormatType = { method: input.method, class: input.class, label: input.label, files_filesets: input.files_filesets, source: input.source, _to: input.phenotype_id }
   const nonGWASFilter = getFilterStatements(variantsPhenotypeNonGwasSchema, nonGwasFilterInput)
   let GWASFilter = ''
-  if (input.log10pvalue !== undefined) {
-    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { log10pvalue: input.log10pvalue })}`
+  if (input.neg_log10_pvalue !== undefined) {
+    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })}`
   }
 
   const studyVerboseQuery = `
@@ -246,14 +306,17 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
         (record.source == 'OpenTargets' ? {
           study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
-          ${getDBReturnStatements(variantPhenotypeGwasSchema).replaceAll('record', 'record')}
-        } : {
-          ${getDBReturnStatements(variantsPhenotypeNonGwasSchema).replaceAll('record', 'record')},
+          ${getDBReturnStatements(variantPhenotypeGwasSchema)}
+        } : (record.method == 'CRISPR screen' ? {
+          ${getDBReturnStatements(variantsPhenotypeCrisprSchema)},
           phenotype_term: DOCUMENT(record._to).name
-        })
+        } : {
+          ${getDBReturnStatements(variantsPhenotypeNonGwasSchema)},
+          phenotype_term: DOCUMENT(record._to).name
+        }))
     )
   `
-  console.log(query)
+
   let result = []
   if (hasVariantQuery) {
     result = await ((await db.query(query, { variantIDs })).all())

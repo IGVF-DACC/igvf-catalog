@@ -30,13 +30,18 @@ class Oncotree:
     URI = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
     SOURCE_URL = 'https://oncotree.mskcc.org/api/tumorTypes'
+    ALLOWED_LABELS = ['node', 'edge']
+    # Oncotree is fetched live from its own API rather than an IGVF/ENCODE reference
+    # file, so there's no files_fileset record to source these from like other adapters.
+    CLASS = 'biological relationship'
+    METHOD = None
 
-    def __init__(self, type, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.type = type
+    def __init__(self, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.label = label
         self.writer = writer
         self.validate = validate
         if self.validate:
-            if self.type == 'node':
+            if self.label == 'node':
                 self.schema = get_schema(
                     'nodes', 'ontology_terms', self.__class__.__name__)
             else:
@@ -51,13 +56,16 @@ class Oncotree:
             raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
-        self.writer.open()
+        with self.writer:
+            self.parse()
+
+    def parse(self):
         oncotree_json = requests.get(Oncotree.API_URL).json()
         for node in oncotree_json:
             # reformating for one illegal term: MDS/MPN
             key = node['code'].replace('/', '_')
 
-            if self.type == 'node':
+            if self.label == 'node':
                 _id = 'Oncotree_' + key
                 _props = {
                     '_key': _id,
@@ -69,7 +77,9 @@ class Oncotree:
                     'source': Oncotree.SOURCE,
                     # didn't find individual uri for each node so not sure if this is appropriate
                     'uri': Oncotree.URI,
-                    'source_url': Oncotree.SOURCE_URL
+                    'source_url': Oncotree.SOURCE_URL,
+                    'class': Oncotree.CLASS,
+                    'method': Oncotree.METHOD,
                 }
 
                 if self.validate:
@@ -97,6 +107,8 @@ class Oncotree:
                         '_to': _target,
                         'type': type,
                         'source': Oncotree.SOURCE,
+                        'class': Oncotree.CLASS,
+                        'method': Oncotree.METHOD
                     }
 
                     if self.validate:
@@ -122,10 +134,11 @@ class Oncotree:
                                 '_to': _target,
                                 'type': type,
                                 'source': Oncotree.SOURCE,
+                                'class': Oncotree.CLASS,
+                                'method': Oncotree.METHOD
                             }
 
                             if self.validate:
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-        self.writer.close()

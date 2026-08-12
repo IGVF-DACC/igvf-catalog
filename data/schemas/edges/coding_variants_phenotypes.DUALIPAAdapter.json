@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the coding variant to phenotype edge"
+        },
+        "_from": {
+          "example": "coding_variants/ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/BAO:0040014",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI6224HZMG",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "name": {
+          "enum": [
+            "mutational effect"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "altered due to mutation"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "File and fileset reference for this edge",
+          "example": "files_filesets/IGVFFI6224HZMG",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context of the measurement",
+          "example": "HEK293 cell line, female, Homo sapiens"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample ontology term reference",
+          "example": "ontology_terms/EFO_0001182"
+        },
+        "method": {
+          "enum": [
+            "DUAL-IPA"
+          ]
+        },
+        "label": {
+          "enum": [
+            "protein variant effect"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "avg_gfp": {
+          "type": "number",
+          "description": "Single cells mean GFP fluorescence value per well"
+        },
+        "avg_mcherry": {
+          "type": "number",
+          "description": "Single cells mean mCherry fluorescence value per well"
+        },
+        "avg_GFP_mCherry_ratio": {
+          "type": "number",
+          "description": "Ratio of avg_gfp/avg_mcherry"
+        },
+        "wt_GFP_mCherry_ratio": {
+          "type": "number",
+          "description": "Ratio of avg_gfp/avg_mcherry of related wild-type measurement"
+        },
+        "allele_wt_ratio": {
+          "type": "number",
+          "description": "Ratio of avg_GFP_mCherry_ratio/wt_GFP_mCherry_ratio"
+        },
+        "dualipa_abun_score": {
+          "type": "number",
+          "description": "Log2 Z-score of allele_wt_ratio"
+        },
+        "dualipa_abun_change": {
+          "type": "string",
+          "enum": ["Y", "N", "Uncertain"],
+          "description": "Significant change of abundance determined by thresholds derived from the log likelihood ratio method"
+        }
+      },
+      "required": [
+        "_key",
+        "files_filesets",
+        "biological_context",
+        "biosample_term",
+        "avg_gfp",
+        "avg_mcherry",
+        "avg_GFP_mCherry_ratio",
+        "wt_GFP_mCherry_ratio",
+        "allele_wt_ratio",
+        "dualipa_abun_score",
+        "dualipa_abun_change"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "coding_variants_phenotypes"
+}

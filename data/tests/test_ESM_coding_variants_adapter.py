@@ -4,6 +4,7 @@ import json
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 import pytest
 
+SAMPLE_FILEPATH = 'ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz'
 SAMPLE_MAPPING_TSV = (
     'ENST00000370460.7\tp.Met1Ala\t'
     'AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCA,AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCC\t'
@@ -32,7 +33,7 @@ def mock_file_fileset():
 def test_load_from_mapping_file_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None, label='variants', writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -51,7 +52,7 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
 def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_file_fileset):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None, label='variants_coding_variants', writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='variants_coding_variants', writer=writer, validate=True)
     # Initialize igvf_metadata_props for variants_coding_variants label
     adapter.igvf_metadata_props = mock_file_fileset.return_value
     adapter.process_file()
@@ -76,7 +77,7 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_fi
 def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None, label='coding_variants', writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -99,7 +100,7 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
 def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_file_fileset):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None,
+        SAMPLE_FILEPATH,
         label='coding_variants_phenotypes',
         writer=writer,
         validate=True
@@ -126,7 +127,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_file_files
 def test_validate_doc_invalid():
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None,
+        SAMPLE_FILEPATH,
         label='coding_variants_phenotypes',
         writer=writer,
         validate=True
@@ -143,7 +144,7 @@ def test_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants, variants, variants_coding_variants, coding_variants_phenotypes'):
         ESM1vCodingVariantsScores(
-            None,
+            SAMPLE_FILEPATH,
             label='invalid_label',
             writer=writer,
             validate=True

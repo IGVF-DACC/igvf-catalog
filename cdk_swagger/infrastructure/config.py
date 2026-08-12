@@ -52,6 +52,8 @@ config: Dict[str, Any] = {
             },
             'backend_url': 'https://db-dev.catalog.igvf.org/',
             'catalog_llm_query_service_url': 'https://catalog-llm-dev.demo.igvf.org/query',
+            'security_group_name': 'igvf-catalog-fargate-demos',
+            'security_group_id': 'sg-0eb97aa23e3597bad',
             'tags': [
                 ('time-to-live-hours', '72'),
                 ('turn-off-on-friday-night', 'yes'),
@@ -74,6 +76,8 @@ config: Dict[str, Any] = {
             },
             'backend_url': 'https://db-dev.catalog.igvf.org/',
             'catalog_llm_query_service_url': 'https://catalog-llm-dev.demo.igvf.org/query',
+            'security_group_name': 'igvf-catalog-fargate-demos',
+            'security_group_id': 'sg-0eb97aa23e3597bad',
             'tags': [
             ],
             'open_api_config_type': 'development',
@@ -94,6 +98,8 @@ config: Dict[str, Any] = {
             },
             'backend_url': 'https://db.catalog.igvf.org/',
             'catalog_llm_query_service_url': 'https://llm.catalogkg.igvf.org/query',
+            'security_group_name': 'igvf-catalog-fargate',
+            'security_group_id': 'sg-033f7a12444e86317',
             'tags': [
             ],
             'url_prefix': 'api',
@@ -125,6 +131,8 @@ class Config:
     backend_url: str
     catalog_llm_query_service_url: str
     open_api_config_type: str
+    security_group_id: str
+    security_group_name: str
     frontend: Dict[str, Any]
     tags: List[Tuple[str, str]]
     cloudfront: Dict[str, bool]

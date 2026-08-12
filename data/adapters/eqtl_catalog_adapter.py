@@ -7,7 +7,11 @@ from math import log10
 import os
 import requests
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, to_float
+from adapters.helpers import (
+    build_variant_id,
+    get_file_fileset_by_accession_in_arangodb,
+    to_float,
+)
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -41,15 +45,29 @@ from adapters.gene_validator import GeneValidator
 
 
 class EQTLCatalog(BaseAdapter):
+    # Shared EBI tabix metadata (study_id, dataset_id, tissue, ftp paths, etc.).
+    # Used by qtl to resolve dataset_id -> biosample/study/source_url, and by study
+    # to select which study_ids to emit (quant_method ge/leafcutter + condition naive).
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study']
     MAX_LOG10_PVALUE = 400
     STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
+    @staticmethod
+    def metadata_rows(filepath):
+        with open(filepath, 'r') as f:
+            metadata_reader = csv.reader(f, delimiter='\t')
+            # we added comment in metadata file. Need to skip the comment row when reading the file.
+            for row in metadata_reader:
+                if row and row[0].startswith('#'):
+                    continue
+                break  # first non-comment row is the header
+            for row in metadata_reader:
+                yield row
+
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label == 'qtl':
-            self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source = 'EBI'
         self.gene_validator = GeneValidator()
 
@@ -69,17 +87,19 @@ class EQTLCatalog(BaseAdapter):
         else:
             return 'studies'
 
-    def process_file(self):
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         if self.label == 'qtl':
             self.process_qtl()
         elif self.label == 'study':
             self.process_study()
 
     def process_qtl(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        # class/method come from catalog files_filesets (same pattern as other adapters)
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.method = file_fileset['method']
         if self.method == 'eQTL':
             label = 'eQTL'
             name = 'modulates expression of'
@@ -92,27 +112,27 @@ class EQTLCatalog(BaseAdapter):
             biological_process = 'ontology_terms/GO_0043484'
         else:
             raise ValueError(f'Invalid method: {self.method}')
+
+        # aliases are not stored on files_filesets; use IGVF portal API for dataset_id
         # alias example: igvf:igvf_catalog_ebi_eqtl_QTD000026
-        alias = file_metadata['aliases'][0]
+        portal_metadata = requests.get(
+            self.IGVF_API + self.file_accession).json()
+        alias = portal_metadata['aliases'][0]
         dataset_id = alias.split('_')[-1]
         found_dataset = False
-        with open(self.METADATA_PATH, 'r') as f:
-            metadata_reader = csv.reader(f, delimiter='\t')
-            next(metadata_reader)
-            for row in metadata_reader:
-                if row[1] == dataset_id:
-                    biosample_term = f'ontology_terms/{row[4]}'
-                    study = f'studies/{row[0]}'
-                    biological_context = row[5]
-                    # example: ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz
-                    source_url = row[10]
-                    found_dataset = True
-                    break
+        for row in self.metadata_rows(self.METADATA_PATH):
+            if row[1] == dataset_id:
+                biosample_term = f'ontology_terms/{row[4]}'
+                study = f'studies/{row[0]}'
+                biological_context = row[5]
+                # example: ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz
+                source_url = row[10]
+                found_dataset = True
+                break
         if not found_dataset:
             raise ValueError(f'No metadata found for dataset {dataset_id}')
 
         with gzip.open(self.filepath, 'rt') as f:
-            self.writer.open()
             qtl_reader = csv.reader(f, delimiter='\t')
             next(qtl_reader)
             for row in qtl_reader:
@@ -159,12 +179,13 @@ class EQTLCatalog(BaseAdapter):
                     'credible_set_size': int(row[5]),
                     'posterior_inclusion_probability': float(row[6]),
                     'p_value': p_value,
-                    'log10pvalue': log_pvalue,
+                    'neg_log10_pvalue': log_pvalue,
                     'effect_size': to_float(row[8]),
                     'standard_error': float(row[9]),
                     'z_score': float(row[10]),
                     'credible_set_min_r2': float(row[11]),
-                    'region': row[12]
+                    'region': row[12],
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                 }
                 if label == 'spliceQTL':
                     molecular_trait_id_list = row[0].split(':')
@@ -175,21 +196,16 @@ class EQTLCatalog(BaseAdapter):
                     self.validate_doc(_props)
                 self.writer.write(json.dumps(_props) + '\n')
 
-            self.writer.close()
             self.gene_validator.log()
 
     def process_study(self):
         study_list = []
-        with open(self.METADATA_PATH, 'r') as f:
-            metadata_reader = csv.reader(f, delimiter='\t')
-            next(metadata_reader)
-            for row in metadata_reader:
-                if row[8] in ['ge', 'leafcutter'] and row[6] == 'naive':
-                    if row[0] not in study_list:
-                        study_list.append(row[0])
+        for row in self.metadata_rows(self.METADATA_PATH):
+            if row[8] in ['ge', 'leafcutter'] and row[6] == 'naive':
+                if row[0] not in study_list:
+                    study_list.append(row[0])
         visited_study_ids = []
-        with open(self.filepath, 'r') as f:
-            self.writer.open()
+        with gzip.open(self.filepath, 'rt') as f:
             study_reader = csv.reader(f, delimiter='\t')
             next(study_reader)
             for row in study_reader:
@@ -202,10 +218,9 @@ class EQTLCatalog(BaseAdapter):
                         'pmid': row[9],
                         'study_type': row[10],
                         'source': self.source,
-                        'source_url': self.STUDY_SOURCE_URL
-
+                        'source_url': self.STUDY_SOURCE_URL,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
                     if self.validate:
                         self.validate_doc(_props)
                     self.writer.write(json.dumps(_props) + '\n')
-            self.writer.close()

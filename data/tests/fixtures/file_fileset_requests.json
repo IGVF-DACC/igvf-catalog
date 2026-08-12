@@ -1,57 +1,96 @@
 {
-  "https://api.data.igvf.org/search/?accession=IGVFFI9721OCVW&accession=IGVFFI8400FXRX&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=file_set&field=catalog_collections&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFFI9100GKNS&accession=IGVFFI8400FXRX&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=file_set&field=catalog_collections&format=json&limit=all": [
     {
       "@id": "/signal-files/IGVFFI8400FXRX/",
-      "@type": ["SignalFile", "File", "Item"],
+      "@type": [
+        "SignalFile",
+        "File",
+        "Item"
+      ],
       "accession": "IGVFFI8400FXRX",
       "analysis_step_version": {
         "summary": "4b52b7fa-e00e-4fc8-b653-ab0ca32174ba",
         "software_versions": [
-          {"summary": "scATAC-seq processing scripts v1.0.0", "@id": "/software-versions/scATAC-processing-v1.0.0/"}
+          {
+            "summary": "scATAC-seq processing v1.0.0",
+            "@id": "/software-versions/scATAC-processing-v1.0.0/"
+          }
         ],
         "@id": "/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/"
       },
       "catalog_class": "observed data",
-      "derived_from": ["/tabular-files/IGVFFI9775SYBY/"],
+      "derived_from": [
+        "/tabular-files/IGVFFI9775SYBY/"
+      ],
       "derived_manually": false,
-      "file_set": {"@id": "/pseudobulk-sets/IGVFDS2190NKLE/"},
+      "file_set": {
+        "@id": "/pseudobulk-sets/IGVFDS2190NKLE/"
+      },
       "href": "/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
     },
     {
-      "@id": "/tabular-files/IGVFFI9721OCVW/",
-      "@type": ["TabularFile", "File", "Item"],
-      "accession": "IGVFFI9721OCVW",
+      "@id": "/tabular-files/IGVFFI9100GKNS/",
+      "@type": [
+        "TabularFile",
+        "File",
+        "Item"
+      ],
+      "accession": "IGVFFI9100GKNS",
       "analysis_step_version": {
         "summary": "7e314d3d-6cc1-40ca-9061-8992396a0be2",
         "software_versions": [
-          {"summary": "FRACTEL v0.1.0", "@id": "/software-versions/fractel-v0.1.0/"}
+          {
+            "summary": "FRACTEL v0.1.0",
+            "@id": "/software-versions/fractel-v0.1.0/"
+          }
         ],
         "@id": "/analysis-step-versions/7e314d3d-6cc1-40ca-9061-8992396a0be2/"
       },
       "catalog_class": "observed data",
-      "catalog_collections": ["genomic_elements_genes", "genomic_elements"],
-      "derived_from": ["/tabular-files/IGVFFI2629EIOZ/"],
+      "catalog_collections": [
+        "genomic_elements_genes",
+        "genomic_elements"
+      ],
+      "derived_from": [
+        "/tabular-files/IGVFFI2629EIOZ/"
+      ],
       "derived_manually": false,
-      "file_set": {"@id": "/analysis-sets/IGVFDS8364HJHL/"},
-      "href": "/tabular-files/IGVFFI9721OCVW/@@download/IGVFFI9721OCVW.tsv.gz"
+      "file_set": {
+        "@id": "/analysis-sets/IGVFDS8364HJHL/"
+      },
+      "href": "/tabular-files/IGVFFI9100GKNS/@@download/IGVFFI9100GKNS.tsv.gz"
     }
   ],
   "https://api.data.igvf.org/search/?@id=/software-versions/scATAC-processing-v1.0.0/&field=software&format=json&limit=all": [
     {
       "@id": "/software-versions/scATAC-processing-v1.0.0/",
-      "@type": ["SoftwareVersion", "Item"],
-      "software": {"@id": "/software/scATAC-processing/", "title": "scATAC-seq processing scripts", "status": "released"}
+      "@type": [
+        "SoftwareVersion",
+        "Item"
+      ],
+      "software": {
+        "@id": "/software/scATAC-processing/",
+        "title": "scATAC-seq processing scripts",
+        "status": "released"
+      }
     }
   ],
   "https://api.data.igvf.org/search/?accession=IGVFFI9775SYBY&field=analysis_step_version&format=json&limit=all": [
     {
       "@id": "/tabular-files/IGVFFI9775SYBY/",
-      "@type": ["TabularFile", "File", "Item"],
+      "@type": [
+        "TabularFile",
+        "File",
+        "Item"
+      ],
       "accession": "IGVFFI9775SYBY",
       "analysis_step_version": {
         "summary": "4b52b7fa-e00e-4fc8-b653-ab0ca32174ba",
         "software_versions": [
-          {"summary": "scATAC-seq processing scripts v1.0.0", "@id": "/software-versions/scATAC-processing-v1.0.0/"}
+          {
+            "summary": "scATAC-seq processing v1.0.0",
+            "@id": "/software-versions/scATAC-processing-v1.0.0/"
+          }
         ],
         "@id": "/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/"
       }
@@ -60,26 +99,51 @@
   "https://api.data.igvf.org/search/?@id=/software/scATAC-processing/&field=title&format=json&limit=all": [
     {
       "@id": "/software/scATAC-processing/",
-      "@type": ["Software", "Item"],
+      "@type": [
+        "Software",
+        "Item"
+      ],
       "title": "scATAC-seq processing scripts"
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFSM4284RDJK&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFSM4284RDJK&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&field=modifications&format=json&limit=all": [
     {
       "@id": "/in-vitro-systems/IGVFSM4284RDJK/",
-      "@type": ["InVitroSystem", "Biosample", "Sample", "Item"],
+      "@type": [
+        "InVitroSystem",
+        "Biosample",
+        "Sample",
+        "Item"
+      ],
       "accession": "IGVFSM4284RDJK",
-      "classifications": ["differentiated cell specimen"],
-      "donors": [{"accession": "IGVFDO3898MNLZ"}],
-      "sample_terms": [{"term_name": "mouse embryonic stem cell", "@id": "/sample-terms/EFO_0004038/"}],
-      "targeted_sample_term": {"term_name": "embryoid body", "@id": "/sample-terms/UBERON_0014374/"},
+      "classifications": [
+        "differentiated cell specimen"
+      ],
+      "donors": [
+        {
+          "accession": "IGVFDO3898MNLZ"
+        }
+      ],
+      "sample_terms": [
+        {
+          "term_name": "mouse embryonic stem cell",
+          "@id": "/sample-terms/EFO_0004038/"
+        }
+      ],
+      "targeted_sample_term": {
+        "term_name": "embryoid body",
+        "@id": "/sample-terms/UBERON_0014374/"
+      },
       "construct_library_sets": []
     }
   ],
   "https://api.data.igvf.org/search/?accession=IGVFDO3898MNLZ&field=sex&field=age&field=age_units&field=ethnicities&field=ethnicity&field=phenotypic_features&field=accession&format=json&limit=all": [
     {
       "@id": "/rodent-donors/IGVFDO3898MNLZ/",
-      "@type": ["Donor", "Item"],
+      "@type": [
+        "Donor",
+        "Item"
+      ],
       "accession": "IGVFDO3898MNLZ",
       "sex": "male",
       "age": "21",
@@ -90,8 +154,12 @@
   ],
   "https://api.data.igvf.org/search/?accession=IGVFDS1560LMQZ&field=preferred_assay_titles&field=assay_term&format=json&limit=all": [
     {
-      "preferred_assay_titles": ["scATAC-seq"],
-      "assay_term": {"@id": "/assay-terms/OBI_0002764/"}
+      "preferred_assay_titles": [
+        "scATAC-seq"
+      ],
+      "assay_term": {
+        "@id": "/assay-terms/OBI_0002764/"
+      }
     }
   ],
   "https://api.data.igvf.org/pseudobulk-sets/IGVFDS2190NKLE//@@embedded?format=json": {
@@ -948,7 +1016,7 @@
       ]
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFSM6820XJKR&accession=IGVFSM4284RDJK&accession=IGVFSM9475FJUV&accession=IGVFSM7126ZMPT&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&format=json&limit=all" : [
+  "https://api.data.igvf.org/search/?accession=IGVFSM6820XJKR&accession=IGVFSM4284RDJK&accession=IGVFSM9475FJUV&accession=IGVFSM7126ZMPT&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&field=modifications&format=json&limit=all": [
     {
       "@id": "/in-vitro-systems/IGVFSM7126ZMPT/",
       "@type": [
@@ -5666,232 +5734,6 @@
     "hub": "/annotations/ENCSR297HTV/@@hub/hub.txt",
     "superseded_by": []
   },
-  "https://www.encodeproject.org/search/?accession=ENCFF003BKC&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=file_set&field=catalog_collections&format=json&limit=all":[
-    {
-      "@id": "/files/ENCFF003BKC/",
-      "@type": [
-        "File",
-        "Item"
-      ],
-      "accession": "ENCFF003BKC",
-      "analysis_step_version": {
-        "schema_version": "4",
-        "aliases": [
-          "encode:encode-re2g_enhancer_gene_predictions_step_v2_version"
-        ],
-        "software_versions": [
-          {
-            "schema_version": "4",
-            "aliases": [
-              "encode:rE2g_v2"
-            ],
-            "software": {
-              "aliases": [
-                "encode:re2g_model"
-              ],
-              "references": [],
-              "date_created": "2023-06-27T19:00:41.613175+00:00",
-              "@type": [
-                "Software",
-                "Item"
-              ],
-              "submitted_by": "/users/8c832fff-23ec-4589-81c9-49a1c0020e46/",
-              "description": "Train ENCODE-rE2G models on CRISPR enhancer screen data and apply to generate genome-wide predictions of enhancer-gene regulatory connections.",
-              "lab": "/labs/jesse-engreitz/",
-              "title": "Distal regulation ENCODE-rE2G",
-              "used_by": [
-                "ENCODE"
-              ],
-              "uuid": "11d1fe31-2784-449a-a3d8-e1fd41116a1d",
-              "source_url": "https://github.com/EngreitzLab/ENCODE_rE2G",
-              "schema_version": "10",
-              "award": "/awards/UM1HG009436/",
-              "versions": [
-                "/software-versions/db685a75-a35c-4052-bc9b-dc1f9da977e3/",
-                "/software-versions/5b51197d-5cb0-4f54-afe6-d270665c9fbe/"
-              ],
-              "name": "distal-regulation-encode_re2g",
-              "@id": "/software/distal-regulation-encode_re2g/",
-              "status": "released"
-            },
-            "date_created": "2024-05-28T04:29:01.090382+00:00",
-            "@type": [
-              "SoftwareVersion",
-              "Item"
-            ],
-            "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
-            "@id": "/software-versions/5b51197d-5cb0-4f54-afe6-d270665c9fbe/",
-            "downloaded_url": "https://github.com/EngreitzLab/ENCODE_rE2G/releases/tag/v1.0.0",
-            "version": "1.0.0",
-            "uuid": "5b51197d-5cb0-4f54-afe6-d270665c9fbe",
-            "status": "released"
-          }
-        ],
-        "date_created": "2024-05-28T21:36:34.996156+00:00",
-        "analysis_step": {
-          "aliases": [
-            "encode:encode-re2g_enhancer_gene_predictions_step_v2"
-          ],
-          "analysis_step_types": [
-            "element gene link prediction"
-          ],
-          "documents": [],
-          "date_created": "2024-05-28T05:30:31.599940+00:00",
-          "@type": [
-            "AnalysisStep",
-            "Item"
-          ],
-          "input_file_types": [
-            "element gene links"
-          ],
-          "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
-          "current_version": "/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/",
-          "title": "encode-e2g-enhancer-gene-predictions-step",
-          "step_label": "encode-e2g-enhancer-gene-predictions-step",
-          "uuid": "689ef7b2-0553-48c5-a4ac-73a58ec4e3aa",
-          "schema_version": "17",
-          "output_file_types": [
-            "element gene links",
-            "thresholded element gene links",
-            "thresholded links"
-          ],
-          "major_version": 2,
-          "pipelines": [
-            {
-              "analysis_steps": [
-                "/analysis-steps/abc-element-gene-link-prediction-step-v-2/",
-                "/analysis-steps/encode-e2g-enhancer-gene-predictions-step-v-2/"
-              ],
-              "aliases": [
-                "encode:encode_rE2G_pipeline"
-              ],
-              "references": [],
-              "documents": [],
-              "assay_term_names": [
-                "DNase-seq",
-                "ChIP-seq",
-                "CAGE",
-                "HiC"
-              ],
-              "date_created": "2024-05-28T04:23:49.891641+00:00",
-              "@type": [
-                "Pipeline",
-                "Item"
-              ],
-              "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
-              "description": "Applies ENCODE_rE2G models on chromatin accessibility assays to predict genome-wide enhancer-gene regulatory connection",
-              "accession": "ENCPL835OUC",
-              "lab": "/labs/jesse-engreitz/",
-              "title": "ENCODE_rE2G Pipeline",
-              "uuid": "b3a1519f-6190-4316-ac39-8caffbf9691c",
-              "schema_version": "14",
-              "award": "/awards/UM1HG009436/",
-              "alternate_accessions": [],
-              "@id": "/pipelines/ENCPL835OUC/",
-              "status": "released"
-            }
-          ],
-          "versions": [
-            "/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/"
-          ],
-          "name": "encode-e2g-enhancer-gene-predictions-step-v-2",
-          "@id": "/analysis-steps/encode-e2g-enhancer-gene-predictions-step-v-2/",
-          "status": "released",
-          "parents": [
-            "/analysis-steps/abc-element-gene-link-prediction-step-v-2/"
-          ]
-        },
-        "@type": [
-          "AnalysisStepVersion",
-          "Item"
-        ],
-        "name": "encode-e2g-enhancer-gene-predictions-step-v-2-0",
-        "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
-        "@id": "/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/",
-        "uuid": "4e1fd6ec-7796-40e1-af89-58dc729aff6b",
-        "status": "released",
-        "minor_version": 0
-      },
-      "dataset": "/annotations/ENCSR297HTV/",
-      "derived_from": [
-        "/files/ENCFF632XQP/"
-      ],
-      "href": "/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz"
-    }
-  ],
-  "https://api.data.igvf.org/search/?accession=IGVFFI5688VHRS&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=file_set&field=catalog_collections&format=json&limit=all": [
-    {
-      "@id": "/tabular-files/IGVFFI5688VHRS/",
-      "@type": [
-        "TabularFile",
-        "File",
-        "Item"
-      ],
-      "accession": "IGVFFI5688VHRS",
-      "catalog_class": "observed data",
-      "catalog_collections": [
-        "variants_biosamples",
-        "variants"
-      ],
-      "derived_from": [
-        "/tabular-files/IGVFFI0801FWTW/",
-        "/tabular-files/IGVFFI0441VKFN/"
-      ],
-      "derived_manually": true,
-      "file_set": {
-        "summary": "STARR-seq integrating a reporter library targeting random selections genome-wide pooled from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235",
-        "file_set_type": "principal analysis",
-        "data_use_limitation_summaries": [
-          "no certificate"
-        ],
-        "@type": [
-          "AnalysisSet",
-          "FileSet",
-          "Item"
-        ],
-        "donors": [
-          {
-            "summary": "female (GM05372, K562)",
-            "accession": "IGVFDO9208RPQQ",
-            "@id": "/human-donors/IGVFDO9208RPQQ/",
-            "status": "released"
-          }
-        ],
-        "accession": "IGVFDS2175LLDQ",
-        "@id": "/analysis-sets/IGVFDS2175LLDQ/",
-        "lab": {
-          "@id": "/labs/tim-reddy/",
-          "title": "Tim Reddy, Duke"
-        },
-        "samples": [
-          {
-            "summary": "Homo sapiens (female) K562 cell line nucleofected with a reporter library targeting random selections genome-wide pooled from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235",
-            "taxa": "Homo sapiens",
-            "classifications": [
-              "cell line"
-            ],
-            "@type": [
-              "InVitroSystem",
-              "Biosample",
-              "Sample",
-              "Item"
-            ],
-            "accession": "IGVFSM3422QUYJ",
-            "@id": "/in-vitro-systems/IGVFSM3422QUYJ/",
-            "status": "released",
-            "sample_terms": [
-              {
-                "term_name": "K562",
-                "@id": "/sample-terms/EFO_0002067/",
-                "status": "released"
-              }
-            ]
-          }
-        ]
-      },
-      "href": "/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz"
-    }
-  ],
   "https://api.data.igvf.org/analysis-sets/IGVFDS2175LLDQ//@@embedded?format=json": {
     "doi": "10.65695/IGVFDS2175LLDQ",
     "lab": {
@@ -6577,7 +6419,7 @@
       ]
     }
   ],
-  "https://api.data.igvf.org/search/?accession=IGVFSM3422QUYJ&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&format=json&limit=all": [
+  "https://api.data.igvf.org/search/?accession=IGVFSM3422QUYJ&field=accession&field=donors&field=sample_terms&field=targeted_sample_term&field=classifications&field=treatments&field=construct_library_sets&field=modifications&format=json&limit=all": [
     {
       "@id": "/in-vitro-systems/IGVFSM3422QUYJ/",
       "@type": [
@@ -6842,6 +6684,232 @@
       ],
       "term_id": "NTR:0002067",
       "term_name": "K562"
+    }
+  ],
+  "https://www.encodeproject.org/search/?accession=ENCFF003BKC&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=catalog_method&field=source_url&field=external_host_url&field=version&field=file_set&field=catalog_collections&format=json&limit=all": [
+    {
+      "@id": "/files/ENCFF003BKC/",
+      "@type": [
+        "File",
+        "Item"
+      ],
+      "accession": "ENCFF003BKC",
+      "analysis_step_version": {
+        "schema_version": "4",
+        "aliases": [
+          "encode:encode-re2g_enhancer_gene_predictions_step_v2_version"
+        ],
+        "software_versions": [
+          {
+            "schema_version": "4",
+            "aliases": [
+              "encode:rE2g_v2"
+            ],
+            "software": {
+              "aliases": [
+                "encode:re2g_model"
+              ],
+              "references": [],
+              "date_created": "2023-06-27T19:00:41.613175+00:00",
+              "@type": [
+                "Software",
+                "Item"
+              ],
+              "submitted_by": "/users/8c832fff-23ec-4589-81c9-49a1c0020e46/",
+              "description": "Train ENCODE-rE2G models on CRISPR enhancer screen data and apply to generate genome-wide predictions of enhancer-gene regulatory connections.",
+              "lab": "/labs/jesse-engreitz/",
+              "title": "Distal regulation ENCODE-rE2G",
+              "used_by": [
+                "ENCODE"
+              ],
+              "uuid": "11d1fe31-2784-449a-a3d8-e1fd41116a1d",
+              "source_url": "https://github.com/EngreitzLab/ENCODE_rE2G",
+              "schema_version": "10",
+              "award": "/awards/UM1HG009436/",
+              "versions": [
+                "/software-versions/db685a75-a35c-4052-bc9b-dc1f9da977e3/",
+                "/software-versions/5b51197d-5cb0-4f54-afe6-d270665c9fbe/"
+              ],
+              "name": "distal-regulation-encode_re2g",
+              "@id": "/software/distal-regulation-encode_re2g/",
+              "status": "released"
+            },
+            "date_created": "2024-05-28T04:29:01.090382+00:00",
+            "@type": [
+              "SoftwareVersion",
+              "Item"
+            ],
+            "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
+            "@id": "/software-versions/5b51197d-5cb0-4f54-afe6-d270665c9fbe/",
+            "downloaded_url": "https://github.com/EngreitzLab/ENCODE_rE2G/releases/tag/v1.0.0",
+            "version": "1.0.0",
+            "uuid": "5b51197d-5cb0-4f54-afe6-d270665c9fbe",
+            "status": "released"
+          }
+        ],
+        "date_created": "2024-05-28T21:36:34.996156+00:00",
+        "analysis_step": {
+          "aliases": [
+            "encode:encode-re2g_enhancer_gene_predictions_step_v2"
+          ],
+          "analysis_step_types": [
+            "element gene link prediction"
+          ],
+          "documents": [],
+          "date_created": "2024-05-28T05:30:31.599940+00:00",
+          "@type": [
+            "AnalysisStep",
+            "Item"
+          ],
+          "input_file_types": [
+            "element gene links"
+          ],
+          "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
+          "current_version": "/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/",
+          "title": "encode-e2g-enhancer-gene-predictions-step",
+          "step_label": "encode-e2g-enhancer-gene-predictions-step",
+          "uuid": "689ef7b2-0553-48c5-a4ac-73a58ec4e3aa",
+          "schema_version": "17",
+          "output_file_types": [
+            "element gene links",
+            "thresholded element gene links",
+            "thresholded links"
+          ],
+          "major_version": 2,
+          "pipelines": [
+            {
+              "analysis_steps": [
+                "/analysis-steps/abc-element-gene-link-prediction-step-v-2/",
+                "/analysis-steps/encode-e2g-enhancer-gene-predictions-step-v-2/"
+              ],
+              "aliases": [
+                "encode:encode_rE2G_pipeline"
+              ],
+              "references": [],
+              "documents": [],
+              "assay_term_names": [
+                "DNase-seq",
+                "ChIP-seq",
+                "CAGE",
+                "HiC"
+              ],
+              "date_created": "2024-05-28T04:23:49.891641+00:00",
+              "@type": [
+                "Pipeline",
+                "Item"
+              ],
+              "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
+              "description": "Applies ENCODE_rE2G models on chromatin accessibility assays to predict genome-wide enhancer-gene regulatory connection",
+              "accession": "ENCPL835OUC",
+              "lab": "/labs/jesse-engreitz/",
+              "title": "ENCODE_rE2G Pipeline",
+              "uuid": "b3a1519f-6190-4316-ac39-8caffbf9691c",
+              "schema_version": "14",
+              "award": "/awards/UM1HG009436/",
+              "alternate_accessions": [],
+              "@id": "/pipelines/ENCPL835OUC/",
+              "status": "released"
+            }
+          ],
+          "versions": [
+            "/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/"
+          ],
+          "name": "encode-e2g-enhancer-gene-predictions-step-v-2",
+          "@id": "/analysis-steps/encode-e2g-enhancer-gene-predictions-step-v-2/",
+          "status": "released",
+          "parents": [
+            "/analysis-steps/abc-element-gene-link-prediction-step-v-2/"
+          ]
+        },
+        "@type": [
+          "AnalysisStepVersion",
+          "Item"
+        ],
+        "name": "encode-e2g-enhancer-gene-predictions-step-v-2-0",
+        "submitted_by": "/users/6667a92a-d202-493a-8c7d-7a56d1380356/",
+        "@id": "/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/",
+        "uuid": "4e1fd6ec-7796-40e1-af89-58dc729aff6b",
+        "status": "released",
+        "minor_version": 0
+      },
+      "dataset": "/annotations/ENCSR297HTV/",
+      "derived_from": [
+        "/files/ENCFF632XQP/"
+      ],
+      "href": "/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz"
+    }
+  ],
+  "https://api.data.igvf.org/search/?accession=IGVFFI5688VHRS&field=@id&field=accession&field=href&field=dataset&field=analysis_step_version&field=derived_manually&field=derived_from&field=catalog_class&field=catalog_method&field=source_url&field=external_host_url&field=version&field=file_set&field=catalog_collections&format=json&limit=all": [
+    {
+      "@id": "/tabular-files/IGVFFI5688VHRS/",
+      "@type": [
+        "TabularFile",
+        "File",
+        "Item"
+      ],
+      "accession": "IGVFFI5688VHRS",
+      "catalog_class": "observed data",
+      "catalog_collections": [
+        "variants_biosamples",
+        "variants"
+      ],
+      "derived_from": [
+        "/tabular-files/IGVFFI0801FWTW/",
+        "/tabular-files/IGVFFI0441VKFN/"
+      ],
+      "derived_manually": true,
+      "file_set": {
+        "summary": "STARR-seq integrating a reporter library targeting random selections genome-wide pooled from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235",
+        "file_set_type": "principal analysis",
+        "data_use_limitation_summaries": [
+          "no certificate"
+        ],
+        "@type": [
+          "AnalysisSet",
+          "FileSet",
+          "Item"
+        ],
+        "donors": [
+          {
+            "summary": "female (GM05372, K562)",
+            "accession": "IGVFDO9208RPQQ",
+            "@id": "/human-donors/IGVFDO9208RPQQ/",
+            "status": "released"
+          }
+        ],
+        "accession": "IGVFDS2175LLDQ",
+        "@id": "/analysis-sets/IGVFDS2175LLDQ/",
+        "lab": {
+          "@id": "/labs/tim-reddy/",
+          "title": "Tim Reddy, Duke"
+        },
+        "samples": [
+          {
+            "summary": "Homo sapiens (female) K562 cell line nucleofected with a reporter library targeting random selections genome-wide pooled from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235",
+            "taxa": "Homo sapiens",
+            "classifications": [
+              "cell line"
+            ],
+            "@type": [
+              "InVitroSystem",
+              "Biosample",
+              "Sample",
+              "Item"
+            ],
+            "accession": "IGVFSM3422QUYJ",
+            "@id": "/in-vitro-systems/IGVFSM3422QUYJ/",
+            "status": "released",
+            "sample_terms": [
+              {
+                "term_name": "K562",
+                "@id": "/sample-terms/EFO_0002067/",
+                "status": "released"
+              }
+            ]
+          }
+        ]
+      },
+      "href": "/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz"
     }
   ]
 }

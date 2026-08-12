@@ -29,18 +29,21 @@ class ESM1vCodingVariantsScores(BaseAdapter):
     ALLOWED_LABELS = ['coding_variants', 'variants',
                       'variants_coding_variants', 'coding_variants_phenotypes']
     SOURCE = 'IGVF'
-    MAPPING_FILE = 'ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz'
+    FILE_ACCESSION_PATTERN = re.compile(r'(?:IGVFFI|ENCFF)[A-Z0-9]+')
     MAPPING_FILE_HEADER = ['transcript_id', 'aa_change', 'mutation_ids', 'hgvsc_ids', 'spdi_ids',
                            'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'esm1v_t33_650M_UR90S_1', 'esm1v_t33_650M_UR90S_2', 'esm1v_t33_650M_UR90S_3', 'esm1v_t33_650M_UR90S_4', 'esm1v_t33_650M_UR90S_5', 'esm1v_t33_650M_UR90S_1_next', 'esm1v_t33_650M_UR90S_2_next', 'esm1v_t33_650M_UR90S_3_next', 'esm1v_t33_650M_UR90S_4_next', 'esm1v_t33_650M_UR90S_5_next', 'combined_score']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function, double check
-    FILE_ACCESSION = 'IGVFFI8105TNNO'
     PHENOTYPE_EDGE_NAME = 'mutational effect'
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES = 'predicted protein variant effect'
     COLLECTION_LABEL_VARIANTS_CODING_VARIANTS = 'codes for'
 
-    def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source_url = 'https://data.igvf.org/tabular-files/' + self.FILE_ACCESSION
+    def __init__(self, filepath, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
+        # filepath is the enumerated mapping file (e.g. ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz);
+        # portal accession is extracted from the basename for source_url / files_filesets.
+        self.file_accession = self.FILE_ACCESSION_PATTERN.search(
+            os.path.basename(filepath)).group(0)
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -61,15 +64,14 @@ class ESM1vCodingVariantsScores(BaseAdapter):
         elif self.label == 'coding_variants_phenotypes':
             return 'coding_variants_phenotypes'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         if self.label == 'coding_variants_phenotypes':
             self.igvf_metadata_props = get_file_fileset_by_accession_in_arangodb(
-                self.FILE_ACCESSION)
-            # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
-        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
+                self.file_accession)
+        with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
+            self.writer.add_tag('portal_accessions', self.file_accession)
             for row in map_csv:
                 # trim version number in ENST
                 mutation_ids = [
@@ -156,13 +158,13 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                     if score < -0.6931:
                         for coding_variant_id in coding_variant_ids:
                             _props = {
-                                '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.FILE_ACCESSION]),
+                                '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.file_accession]),
                                 '_from': 'coding_variants/' + coding_variant_id,
                                 '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
                                 'name': self.PHENOTYPE_EDGE_NAME,
                                 'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                                 'esm_1v_score': score,  # property scores passing threshold
-                                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                                 'method': self.igvf_metadata_props.get('method'),
                                 'label': self.COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES,
                                 'class': self.igvf_metadata_props.get('class'),
@@ -184,4 +186,3 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-        self.writer.close()

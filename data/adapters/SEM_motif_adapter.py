@@ -6,6 +6,7 @@ import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
@@ -34,6 +35,9 @@ class SEMMotif(BaseAdapter):
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
+        # assumes that both sem_provenance_path and filepath have accession as prefix
+        self.sem_provenance_accession = os.path.basename(
+            sem_provenance_path).split('.')[0]
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
 
@@ -122,16 +126,21 @@ class SEMMotif(BaseAdapter):
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
-        self.writer.close()
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
         if self.label in ['complex', 'complex_protein']:
             self.load_complexes()
             return
 
         self.load_tf_id_mapping()
         self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
 
         with gzip.open(self.filepath, 'rt') as sem_file:
             baseline = next(sem_file).strip().split(':')[1]
@@ -154,6 +163,9 @@ class SEMMotif(BaseAdapter):
                     'pwm': pwm,
                     'length': length,
                     'baseline': float(baseline),
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession
                 }
                 if self.validate:
                     self.validate_doc(props)
@@ -188,12 +200,13 @@ class SEMMotif(BaseAdapter):
                         'inverse_name': 'uses',
                         'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
                         'source': 'IGVF',
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                     if self.validate:
                         self.validate_doc(props)
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
-
-        self.writer.close()

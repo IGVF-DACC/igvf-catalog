@@ -10,7 +10,7 @@ import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 const MAX_PAGE_SIZE = 1000
 
 const ontologySchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyCollectionName = ontologySchema.db_collection_name as string
+const ontologyCollectionName = 'ontology_terms'
 
 const ontologySources = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'source')
 const subontologies = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'subontology')
@@ -19,9 +19,9 @@ export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   synonyms: z.string().optional(),
-  description: z.string().trim().optional(),
   source: z.enum(ontologySources).optional(),
-  subontology: z.enum(subontologies).optional()
+  subontology: z.enum(subontologies).optional(),
+  files_fileset: z.string().optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 export const ontologyFormat = z.object({
@@ -32,7 +32,10 @@ export const ontologyFormat = z.object({
   description: z.string().nullish(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable(),
-  source_url: z.string().optional().nullable()
+  source_url: z.string().optional().nullable(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
@@ -91,20 +94,6 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
     delete input.name
   }
 
-  if (input.description !== undefined) {
-    const description = (input.description as string).toLowerCase()
-
-    queryStatementsToken.push(`TOKENS("${decodeURIComponent(description)}", "text_en_no_stem") ALL in record.description`)
-    queryStatementsFuzzy.push(`LEVENSHTEIN_MATCH(
-      record.description,
-      TOKENS("${decodeURIComponent(description)}", "text_en_no_stem")[0],
-      1,    // max distance
-      false // without transpositions
-    )`)
-
-    delete input.description
-  }
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -149,9 +138,14 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 export async function ontologySearch (input: paramsFormatType): Promise<any[]> {
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
+  }
+
   const objects = await exactMatchSearch(input)
 
-  if ((('name' in input && input.name !== undefined) || ('description' in input && input.description !== undefined)) && objects.length === 0) {
+  if (('name' in input && input.name !== undefined) && objects.length === 0) {
     return await fuzzyTextSearch(input)
   }
 

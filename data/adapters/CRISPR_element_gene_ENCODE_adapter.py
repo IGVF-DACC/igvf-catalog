@@ -1,0 +1,184 @@
+import csv
+import json
+from math import log10, log2
+from typing import Optional
+
+from adapters.base import BaseAdapter
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
+from adapters.writer import Writer
+from adapters.file_fileset_adapter import FileFileSet
+
+# Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
+# chrom	chromStart	chromEnd	name	EffectSize	strandPerturbationTarget	PerturbationTargetID	chrTSS	startTSS	endTSS	strandGene	EffectSize95ConfidenceIntervalLow	EffectSize95ConfidenceIntervalHigh	measuredGeneSymbol	measuredEnsemblID	guideSpacerSeq	guideSeq	Significant	pValue	pValueAdjusted	PowerAtEffectSize25	PowerAtEffectSize10	PowerAtEffectSize15	PowerAtEffectSize20	PowerAtEffectSize50	ValidConnection	Notes	Reference
+# chr1	3774714	3775214	CEP104|chr1:3691278-3691778:.	-0.293431866	.	chr1:3691278-3691778:.	chr1	3857213	3857214	-	NA	NA	CEP104	NA	NA	NA	TRUE	NA	0.004023984	0.825093632	NA	NA	NA	NA	TRUE	Dataset: Nasser2021	Ulirsch et al., 2016
+# chr1	3774714	3775214	LRRC47|chr1:3691278-3691778:.	-0.331178093	.	chr1:3691278-3691778:.	chr1	3796503	3796504	-	NA	NA	LRRC47	NA	NA	NA	TRUE	NA	0.007771168	0.608994236	NA	NA	NA	NA	TRUE	Dataset: Nasser2021	Ulirsch et al., 2016
+
+# Note: need to do some changes mannually before running arangoimp, to load the significant field correctly as a boolean type:
+# Rename significant:boolean to significant in header file; Replace 'True' with 'true', 'False' with 'false' in parsed data files
+
+
+class CRISPRElementGeneENCODE(BaseAdapter):
+
+    ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
+    SOURCE = 'ENCODE'
+    SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
+    FILE_ACCESSION = 'ENCFF968BZL'
+    MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
+    COLLECTION_LABEL = 'regulatory element effect on gene expression'
+
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.files_filesets = FileFileSet(self.FILE_ACCESSION)
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'genomic_elements_genes'
+
+    def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.FILE_ACCESSION)
+        if self.label == 'genomic_element':
+            self.logger.info('loading regulatory regions')
+            self.load_genomic_element()
+
+            for region_coordinate, region_type in self.genomic_element_nodes.items():
+                chr, start, end = region_coordinate.split(',')
+                _id = build_regulatory_region_id(
+                    chr, start, end, 'CRISPR') + '_' + self.FILE_ACCESSION
+
+                _props = {
+                    '_key': _id,
+                    'name': _id,
+                    'chr': chr,
+                    'start': int(start),
+                    'end': int(end),
+                    'method': file_fileset.get('method'),
+                    'type': 'tested elements',
+                    'source_annotation': region_type,
+                    'source': self.SOURCE,
+                    'source_url': self.SOURCE_URL,
+                    'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
+                }
+
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
+
+        elif self.label == 'genomic_element_gene':
+            self.load_gene_id_mapping()
+
+            with open(self.filepath, 'r') as crispr_file:
+                crispr_csv = csv.reader(crispr_file, delimiter='\t')
+                next(crispr_csv)
+                for row in crispr_csv:
+                    if row[14] != 'NA':
+                        gene_ids = [row[14]]
+                    else:  # map the gene id from gene symbol in column 14
+                        gene_ids = self.gene_id_mapping.get(row[13])
+                        if gene_ids is None:
+                            self.logger.warning(
+                                'no gene id mapping for ' + row[13])
+                            continue
+
+                    chr = row[0]
+                    start = row[1]
+                    end = row[2]
+                    score = row[4]  # i.e. effect size from perturb experiment
+                    if score == 'NA':
+                        score = 0  # assign 0 if unavailable
+                    p_value = row[18]  # pValue
+                    if p_value == 'NA':
+                        neglog10pvalue = None
+                    elif float(p_value) == 0:
+                        neglog10pvalue = self.MAX_LOG10_PVALUE
+                    else:
+                        neglog10pvalue = -1 * log10(float(p_value))
+
+                    p_value_adj = row[19]  # pValueAdjusted
+                    if p_value_adj == 'NA':
+                        neglog10pvalue_adj = None
+                    elif float(p_value_adj) == 0:
+                        neglog10pvalue_adj = self.MAX_LOG10_PVALUE
+                    else:
+                        neglog10pvalue_adj = -1 * log10(float(p_value_adj))
+
+                    significant = row[17]  # TRUE or FALSE
+
+                    genomic_element_id = build_regulatory_region_id(
+                        chr, start, end, 'CRISPR')
+
+                    for gene_id in gene_ids:
+                        _id = genomic_element_id + '_' + gene_id + '_' + self.FILE_ACCESSION
+                        _source = 'genomic_elements/' + genomic_element_id + \
+                            '_' + self.FILE_ACCESSION
+                        _target = 'genes/' + gene_id
+                        _props = {
+                            '_key': _id,
+                            '_from': _source,
+                            '_to': _target,
+                            'effect_size': float(score),
+                            'log2FC': log2(1 + float(score)),
+                            'p_value': float(p_value) if p_value != 'NA' else None,
+                            'p_value_adj': float(p_value_adj) if p_value_adj != 'NA' else None,
+                            'neg_log10_pvalue': neglog10pvalue,
+                            'neg_log10_pvalue_adj': neglog10pvalue_adj,
+                            'significant': significant == 'TRUE',
+                            'method': file_fileset.get('method'),
+                            'crispr_modality': file_fileset.get('crispr_modality'),
+                            'class': file_fileset.get('class'),
+                            'label': self.COLLECTION_LABEL,
+                            'source': self.SOURCE,
+                            'source_url': self.SOURCE_URL,
+                            'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
+                            'biological_context': file_fileset.get('simple_sample_summaries')[0],
+                            'biosample_term': file_fileset.get('samples')[0],
+                            'name': 'regulates',
+                            'inverse_name': 'regulated by'
+                        }
+                        if self.validate:
+                            self.validate_doc(_props)
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
+
+    def load_genomic_element(self):
+        # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
+        # one regulatory region can be tested in multiple rows, i.e. with multiple genes
+        # type will all be 'tested elements'
+        # assign source_annotation = 'enhancer' if the genomic element has significant = 'TRUE' with any tested gene, else assign source_annotation = 'negative control'
+        # store those info in a dictionary here and output all nodes info at the end, since the file is not big (3,962 unique regions tested)
+        self.genomic_element_nodes = {}
+
+        with open(self.filepath, 'r') as crispr_file:
+            crispr_csv = csv.reader(crispr_file, delimiter='\t')
+            next(crispr_csv)
+            for row in crispr_csv:
+                genomic_element_coordinate = ','.join(row[:3])
+
+                significant = row[17]
+
+                if self.genomic_element_nodes.get(genomic_element_coordinate) is None:
+                    self.genomic_element_nodes[genomic_element_coordinate] = 'negative control'
+
+                if significant == 'TRUE':
+                    self.genomic_element_nodes[genomic_element_coordinate] = 'enhancer'
+
+    def load_gene_id_mapping(self):
+        # key: gene symbol; value: list of gene Ensembl ids
+        self.gene_id_mapping = {}
+        gene_map = get_gene_map_from_arangodb('name')
+        for gene_symbol, gene_keys in gene_map.items():
+            if len(gene_keys) > 1:
+                self.logger.warning(
+                    'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
+            self.gene_id_mapping[gene_symbol] = gene_keys

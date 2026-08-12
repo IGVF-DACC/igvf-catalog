@@ -28,33 +28,23 @@ export const complexFormat = z.object({
   complex_assembly: z.string().or(z.array(z.string())).nullish(),
   complex_source: z.string().nullish(),
   reactome_xref: z.array(z.string()).nullish(),
+  class: z.string().nullish(),
+  method: z.string().nullable(),
+  label: z.string().nullable(),
+  files_filesets: z.string().nullish(),
   source: z.string(),
   source_url: z.string()
 })
 
-async function findComplexByID (id: string): Promise<any> {
-  const query = `
-    FOR record IN ${complexCollectionName}
-    FILTER record._key == '${decodeURIComponent(id)}'
-    RETURN { ${getDBReturnStatements(complexSchema)} }
-  `
-
-  const cursor = await db.query(query)
-  const record = (await cursor.all())[0]
-
-  if (record === undefined) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Complex ${id} not found.`
-    })
-  }
-
-  return record
-}
-
 export async function complexSearch (input: paramsFormatType): Promise<any[]> {
   if (input.complex_id !== undefined) {
-    return await findComplexByID(input.complex_id as string)
+    const query = `
+      FOR record IN ${complexCollectionName}
+      FILTER record._key == '${decodeURIComponent(input.complex_id as string)}'
+      RETURN { ${getDBReturnStatements(complexSchema)} }
+    `
+
+    return await (await db.query(query)).all()
   }
 
   const fuzzyFilters = []
@@ -88,7 +78,7 @@ export async function complexSearch (input: paramsFormatType): Promise<any[]> {
 export const complexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes', description: descriptions.complex } })
   .input(complexQueryFormat)
-  .output(z.array(complexFormat).or(complexFormat))
+  .output(z.array(complexFormat))
   .query(async ({ input }) => await complexSearch(input))
 
 export const complexesRouters = {

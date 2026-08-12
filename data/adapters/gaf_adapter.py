@@ -2,12 +2,14 @@ import gzip
 import json
 import pickle
 import hashlib
+import os
 from typing import Optional
 
 from Bio.UniProt.GOA import gafiterator
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
 #
@@ -61,6 +63,7 @@ class GAF(BaseAdapter):
 
     def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -82,8 +85,13 @@ class GAF(BaseAdapter):
         self.mouse_mgi_mapping = pickle.load(
             open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rb'))
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         ensembl_unmatched = 0
 
         if self.label == 'rna':
@@ -153,7 +161,11 @@ class GAF(BaseAdapter):
                         'organism': self.organism,
 
                         'source': 'Gene Ontology',
-                        'source_url': GAF.SOURCES[self.label]
+                        'source_url': GAF.SOURCES[self.label],
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'label': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
 
                     if props['aspect'] == 'C':
@@ -175,5 +187,3 @@ class GAF(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.info(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()

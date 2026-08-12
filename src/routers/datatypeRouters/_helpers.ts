@@ -4,6 +4,21 @@ import { configType } from '../../constants'
 
 export type paramsFormatType = Record<string, string | number | boolean | undefined>
 
+// Range/numeric filter operands (see getFilterStatements) are interpolated directly into
+// AQL as bare tokens (unquoted), so a non-numeric value produces invalid/dangerous AQL
+// instead of a clean validation error - e.g. `record['x'] == C5X2Cfnl1M75` gets parsed by
+// ArangoDB as a collection/view reference and fails with "collection or view not found".
+// Guard every such operand here before it reaches string interpolation.
+function assertValidNumericOperand (field: string, raw: string | undefined): string {
+  if (raw === undefined || raw.trim() === '' || isNaN(Number(raw)) || !isFinite(Number(raw))) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `${field} must be a valid number. Received: "${raw ?? ''}"`
+    })
+  }
+  return raw
+}
+
 export function distanceGeneVariant (geneStart: number, geneEnd: number, variantPos: number): number {
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
 }
@@ -92,12 +107,17 @@ export async function verboseItems (ids: string[], schema: configType): Promise<
 // Example:
 // for return statement based on schema: "return: _id, pos, name"
 // outputs: "{ id: record._key, pos: record.pos, name: record.name }"
+//
+// Optional `returnKeyByField`: maps each field name from the schema return list to the JSON key
+// in the response (DB attribute stays the same). Example: { db_field: 'api_field' }.
+// Does not apply to `_id` (same as before: `_id: record._key` when `changeId` is true, else `'_id': record['_id']`).
 export function getDBReturnStatements (
   schema: configType,
   simplified: boolean = false,
   extraReturn: string = '',
   skipFields: string[] = [],
-  changeId: boolean = true
+  changeId: boolean = true,
+  returnKeyByField?: Record<string, string>
 ): string {
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
   if (simplified && (schema.accessible_via as Record<string, string>).simplified_return) {
@@ -110,8 +130,11 @@ export function getDBReturnStatements (
   filteredReturnFields.forEach((field: string) => {
     if (field === '_id' && changeId) {
       returns.push('_id: record._key')
-    } else {
+    } else if (field === '_id') {
       returns.push(`'${field}': record['${field}']`)
+    } else {
+      const jsonKey = returnKeyByField?.[field] ?? field
+      returns.push(`'${jsonKey}': record['${field}']`)
     }
   })
 
@@ -159,6 +182,8 @@ export function getFilterStatements (
           const rangeValue = value?.split(':') as string[]
           const fieldOperands = rangeValue[0].split('-')
           const rangeOperands = rangeValue[1].split('-')
+          assertValidNumericOperand(element, rangeOperands[0])
+          assertValidNumericOperand(element, rangeOperands[1])
 
           // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
           // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
@@ -169,6 +194,8 @@ export function getFilterStatements (
         if (stringOperator === 'range') {
           const rangeValue = value?.split(':') as string[]
           const rangeOperands = rangeValue[1].split('-')
+          assertValidNumericOperand(element, rangeOperands[0])
+          assertValidNumericOperand(element, rangeOperands[1])
           dbFilterBy.push(`record.${element} >= ${rangeOperands[0]} and record.${element} < ${rangeOperands[1]}`)
           return
         }
@@ -190,6 +217,7 @@ export function getFilterStatements (
           default:
             operator = '=='
         }
+        assertValidNumericOperand(element, operand as unknown as string)
         dbFilterBy.push(`record['${element}'] ${operator} ${operand}`)
       } else {
         if (element === 'dbxrefs') {
@@ -197,6 +225,7 @@ export function getFilterStatements (
         } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'array' || (schema.properties)[element].type.includes('array'))) {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
         } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'integer' || (schema.properties)[element].type === 'number' || (schema.properties)[element].type.includes('integer') || (schema.properties)[element].type.includes('number'))) {
+          assertValidNumericOperand(element, queryParams[element]?.toString())
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
         } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'boolean' || (schema.properties)[element].type.includes('boolean'))) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)

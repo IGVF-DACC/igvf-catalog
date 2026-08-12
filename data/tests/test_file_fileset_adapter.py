@@ -65,7 +65,7 @@ def test_none_if_empty():
 def test_get_batch_objects():
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect) as mock_get:
         objects = FileFileSet.get_batch_objects(
-            ids=['IGVFFI9721OCVW', 'IGVFFI8400FXRX'],
+            ids=['IGVFFI9100GKNS', 'IGVFFI8400FXRX'],
             fields=['@id', 'accession', 'href', 'dataset', 'analysis_step_version',
                     'derived_manually', 'derived_from', 'catalog_class', 'file_set',
                     'catalog_collections'],
@@ -75,11 +75,11 @@ def test_get_batch_objects():
 
     assert mock_get.call_args_list
     accessions = sorted(obj['accession'] for obj in objects)
-    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9721OCVW']
+    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9100GKNS']
 
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect) as mock_get:
         objects = FileFileSet.get_batch_objects(
-            ids={'IGVFFI9721OCVW', 'IGVFFI8400FXRX'},
+            ids={'IGVFFI9100GKNS', 'IGVFFI8400FXRX'},
             fields=['@id', 'accession', 'href', 'dataset', 'analysis_step_version',
                     'derived_manually', 'derived_from', 'catalog_class', 'file_set',
                     'catalog_collections'],
@@ -89,7 +89,7 @@ def test_get_batch_objects():
 
     assert mock_get.call_args_list
     accessions = sorted(obj['accession'] for obj in objects)
-    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9721OCVW']
+    assert accessions == ['IGVFFI8400FXRX', 'IGVFFI9100GKNS']
 
     objects = FileFileSet.get_batch_objects(
         ids=[],
@@ -101,7 +101,7 @@ def test_get_batch_objects():
 
     with pytest.raises(ValueError, match='id_type must be'):
         FileFileSet.get_batch_objects(
-            ids=['IGVFFI9721OCVW', 'IGVFFI8400FXRX'],
+            ids=['IGVFFI9100GKNS', 'IGVFFI8400FXRX'],
             fields=['accession'],
             id_type='wrong_type',
             api_url='https://api.data.igvf.org/'
@@ -110,7 +110,7 @@ def test_get_batch_objects():
 
 def test_software_titles_from_analysis_step_version_igvf():
     analysis_step_version = {'summary': '4b52b7fa-e00e-4fc8-b653-ab0ca32174ba', 'software_versions': [
-        {'summary': 'scATAC-seq processing scripts v1.0.0', '@id': '/software-versions/scATAC-processing-v1.0.0/'}], '@id': '/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/'}
+        {'summary': 'scATAC-seq processing v1.0.0', '@id': '/software-versions/scATAC-processing-v1.0.0/'}], '@id': '/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/'}
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect):
         software_titles = FileFileSet._software_titles_from_analysis_step_version_igvf(
             analysis_step_version)
@@ -212,7 +212,7 @@ def test_parse_sample_donor_treatment_igvf():
         {'treatment_term_id': 'CHEBI:22222'}
     ]
     with patch.object(FileFileSet, 'get_batch_objects', side_effect=[sample_objects, treatment_objects]):
-        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = FileFileSet.parse_sample_donor_treatment_igvf(
+        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids, modality = FileFileSet.parse_sample_donor_treatment_igvf(
             samples,
             method)
     assert sample_ids == {'IGVFSM4284RDJK'}
@@ -222,6 +222,64 @@ def test_parse_sample_donor_treatment_igvf():
         'mouse embryonic stem cell differentiated cell specimen induced to embryoid body from IGVFDO3898MNLZ treated with drug a, drug b'
     }
     assert treatment_ids == {'CHEBI:11111', 'CHEBI:22222'}
+    assert modality is None
+
+
+def test_parse_sample_donor_treatment_igvf_crispr_modality():
+    samples = [{'accession': 'IGVFSM0001AAAA'}]
+    method = 'CRISPR screen'
+    sample_objects = [{
+        'accession': 'IGVFSM0001AAAA',
+        'donors': [{'accession': 'IGVFDO0001AAAA'}],
+        'sample_terms': [{
+            'term_name': 'K562',
+            '@id': '/sample-terms/EFO_0002067/'
+        }],
+        'classifications': ['cell line'],
+        'construct_library_sets': [],
+        'modifications': [
+            {
+                '@id': '/crispr-modifications/IGVFCM0001AAAA/',
+                'modality': 'interference'
+            },
+            {
+                '@id': '/modifications/IGVFMF0001AAAA/',
+                'modality': 'ignored'
+            }
+        ]
+    }]
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=sample_objects):
+        *_unused, modality = FileFileSet.parse_sample_donor_treatment_igvf(
+            samples,
+            method)
+    assert modality == 'interference'
+
+
+def test_parse_sample_donor_treatment_igvf_multiple_crispr_modalities_error():
+    samples = [{'accession': 'IGVFSM0001AAAA'},
+               {'accession': 'IGVFSM0002BBBB'}]
+    method = 'CRISPR screen'
+    sample_objects = [
+        {
+            'accession': 'IGVFSM0001AAAA',
+            'donors': [{'accession': 'IGVFDO0001AAAA'}],
+            'sample_terms': [{'term_name': 'K562', '@id': '/sample-terms/EFO_0002067/'}],
+            'classifications': ['cell line'],
+            'construct_library_sets': [],
+            'modifications': [{'@id': '/crispr-modifications/IGVFCM0001AAAA/', 'modality': 'interference'}]
+        },
+        {
+            'accession': 'IGVFSM0002BBBB',
+            'donors': [{'accession': 'IGVFDO0002BBBB'}],
+            'sample_terms': [{'term_name': 'K562', '@id': '/sample-terms/EFO_0002067/'}],
+            'classifications': ['cell line'],
+            'construct_library_sets': [],
+            'modifications': [{'@id': '/crispr-modifications/IGVFCM0002BBBB/', 'modality': 'activation'}]
+        }
+    ]
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=sample_objects):
+        with pytest.raises(ValueError, match='multiple CRISPR modalities'):
+            FileFileSet.parse_sample_donor_treatment_igvf(samples, method)
 
 
 def decompose_analysis_set_to_measurement_set_igvf():
@@ -258,8 +316,180 @@ def test_fileset_query_files_props_igvf():
     assert props['method'] == 'scATAC-seq'
     assert props['class'] == 'observed data'
     assert props['software'] == ['scATAC-seq processing scripts']
+    assert props['genome_browser_link'] == (
+        'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/'
+        'IGVFFI8400FXRX.bigWig'
+    )
     assert donor_ids == {'IGVFDO3898MNLZ'}
     assert sample_term_ids == ['UBERON_0014374']
+
+
+def test_query_fileset_files_props_igvf_with_crispr_modality():
+    file_object = {
+        '@id': '/tabular-files/IGVFFI0000TEST/',
+        'accession': 'IGVFFI0000TEST',
+        'catalog_class': 'observed data',
+        'catalog_collections': ['genomic_elements'],
+        'file_set': {
+            '@id': '/analysis-sets/IGVFDS0000TEST/'
+        },
+        'href': '/tabular-files/IGVFFI0000TEST/@@download/IGVFFI0000TEST.tsv.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS0000TEST',
+        '@type': ['AnalysisSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/tim-reddy/'},
+        'samples': [{'accession': 'IGVFSM0000TEST'}],
+        'publications': [],
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000TEST/'}],
+        'sample_summary': 'K562 cell line treated with drug a, drug b'
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        with patch.object(FileFileSet, 'get_software_igvf', return_value={'Sceptre'}):
+            with patch.object(FileFileSet, 'parse_analysis_set_igvf', return_value=({'CRISPR FACS screen'}, {'OBI:0003662'})):
+                with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
+                    with patch.object(
+                        FileFileSet,
+                        'parse_sample_donor_treatment_igvf',
+                        return_value=(
+                            {'IGVFSM0000TEST'},
+                            {'IGVFDO0000TEST'},
+                            {'EFO:0002067'},
+                            {'K562'},
+                            set(),
+                            'interference'
+                        )
+                    ):
+                        props, donor_ids, sample_term_ids = FileFileSet.query_fileset_files_props_igvf(
+                            file_object)
+    assert props['crispr_modality'] == 'interference'
+    assert props['method'] == 'CRISPR screen'
+    assert donor_ids == {'IGVFDO0000TEST'}
+    assert sample_term_ids == ['EFO_0002067']
+
+
+def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_screen():
+    file_object = {
+        '@id': '/tabular-files/IGVFFI0000FLOW/',
+        'accession': 'IGVFFI0000FLOW',
+        'catalog_class': 'observed data',
+        'catalog_collections': ['genomic_elements'],
+        'file_set': {
+            '@id': '/analysis-sets/IGVFDS0000FLOW/'
+        },
+        'href': '/tabular-files/IGVFFI0000FLOW/@@download/IGVFFI0000FLOW.tsv.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS0000FLOW',
+        '@type': ['AnalysisSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/jesse-engreitz/'},
+        'samples': [{'accession': 'IGVFSM0000TEST'}],
+        'publications': [],
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000FLOW/'}],
+        'sample_summary': 'HCT116',
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        with patch.object(FileFileSet, 'get_software_igvf', return_value={'pandas'}):
+            with patch.object(
+                    FileFileSet,
+                    'parse_analysis_set_igvf',
+                    return_value=({'CRISPR FlowFISH screen'}, {'OBI:0003661'})):
+                with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
+                    with patch.object(
+                        FileFileSet,
+                        'parse_sample_donor_treatment_igvf',
+                        return_value=(
+                            {'IGVFSM0000TEST'},
+                            {'IGVFDO0000TEST'},
+                            {'EFO:0002824'},
+                            {'HCT116'},
+                            set(),
+                            'interference'
+                        )
+                    ):
+                        props, _, _ = FileFileSet.query_fileset_files_props_igvf(
+                            file_object)
+    assert props['preferred_assay_titles'] == ['CRISPR FlowFISH screen']
+    assert props['method'] == 'CRISPR screen'
+
+
+def test_query_fileset_files_props_igvf_community_curated_set():
+    file_object = {
+        '@id': '/reference-files/IGVFFI6501YXMX/',
+        'accession': 'IGVFFI6501YXMX',
+        'catalog_class': 'biological relationship',
+        'catalog_collections': ['gene_products_terms'],
+        'source_url': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
+        'version': 'File generated on 2023-10-10',
+        'file_set': {'@id': '/curated-sets/IGVFDS3257FDZW/'},
+        'href': '/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS3257FDZW',
+        '@type': ['CuratedSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/community/'},
+        'samples': [],
+        'publications': [],
+        'files': []
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        props, donor_ids, sample_term_ids = FileFileSet.query_fileset_files_props_igvf(
+            file_object)
+    assert props['class'] == 'biological relationship'
+    assert props['method'] is None
+    assert props['source_url'] == 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
+    assert props['version'] == 'File generated on 2023-10-10'
+    assert props['collections'] == ['gene_products_terms']
+    assert props['lab'] == 'community'
+    assert props['source'] == 'Community'
+    assert props['software'] is None
+    assert props['samples'] is None
+    assert donor_ids == set()
+    assert sample_term_ids == []
+
+
+@pytest.mark.parametrize('source_url,external_host_url,expected_source_url', [
+    (
+        'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
+        None,
+        'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
+    ),
+    (
+        None,
+        'https://www.dbnsfp.org/download',
+        'https://www.dbnsfp.org/download',
+    ),
+    (
+        None,
+        None,
+        'https://data.igvf.org/reference-files/IGVFFI6501YXMX/',
+    ),
+])
+def test_query_fileset_files_props_igvf_community_curated_set_source_url_fallback(
+    source_url, external_host_url, expected_source_url
+):
+    file_object = {
+        '@id': '/reference-files/IGVFFI6501YXMX/',
+        'accession': 'IGVFFI6501YXMX',
+        'catalog_class': 'biological relationship',
+        'catalog_collections': ['gene_products_terms'],
+        'source_url': source_url,
+        'external_host_url': external_host_url,
+        'version': 'File generated on 2023-10-10',
+        'file_set': {'@id': '/curated-sets/IGVFDS3257FDZW/'},
+        'href': '/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS3257FDZW',
+        '@type': ['CuratedSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/community/'},
+        'samples': [],
+        'publications': [],
+        'files': []
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        props, _, _ = FileFileSet.query_fileset_files_props_igvf(file_object)
+    assert props['source_url'] == expected_source_url
 
 
 def test_get_donor_props():
@@ -584,7 +814,7 @@ def test_query_fileset_files_props_encode():
         props, donor_ids, sample_types, disease_ids = FileFileSet.query_fileset_files_props_encode(
             file_object)
     assert props == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None}
     assert donor_ids == {'ENCDO948PMW'}
     assert sample_types == ['/biosample-types/tissue_UBERON_0002626/']
     assert disease_ids == []
@@ -623,7 +853,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None}
 
     writer = SpyWriter()
     adapter = FileFileSet(accessions=[
@@ -632,7 +862,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'IGVFFI5688VHRS', 'name': 'IGVFFI5688VHRS', 'file_set_id': 'IGVFDS2175LLDQ', 'lab': 'tim-reddy', 'preferred_assay_titles': ['STARR-seq'], 'assay_term_ids': ['OBI:0002041'], 'method': 'STARR-seq', 'class': 'observed data', 'software': ['BIRD', 'Samtools', 'pandas'], 'samples': ['ontology_terms/EFO_0002067'], 'sample_ids': ['IGVFSM3422QUYJ'], 'simple_sample_summaries': [
-        'K562 with variants from 1000 Genomes donors: NA19108, NA19141, NA19146, NA19204, NA19235'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None}
+        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'version': None, 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': None, 'crispr_modality': None, 'browser_index_file': None}
 
     write = SpyWriter()
     adapter = FileFileSet(

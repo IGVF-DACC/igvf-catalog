@@ -2,11 +2,10 @@ import csv
 import json
 import pickle
 from typing import Optional
-import requests
 import os
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -23,12 +22,13 @@ class pQTL(BaseAdapter):
     BIOSAMPLE_TERM = 'UBERON_0001969'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-
+        self.file_accession = os.path.basename(filepath).split('.')[
+            0] or pQTL.DEFAULT_ACCESSION
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -38,12 +38,12 @@ class pQTL(BaseAdapter):
         """Get collection name."""
         return 'variants_proteins'
 
-    def process_file(self):
-        file_metadata = requests.get(
-            pQTL.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
-        self.writer.open()
+    def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.method = file_fileset['method']
         self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
 
@@ -84,10 +84,10 @@ class pQTL(BaseAdapter):
                             '_to': _target,
                             'rsid': row[10] if row[10] != '-' else None,
                             # 'variant_'
-                            'label': 'pQTL',
+                            'label': self.method,
                             'class': self.collection_class,
                             'method': self.method,
-                            'log10pvalue': float(row[14]),
+                            'neg_log10_pvalue': float(row[14]),
                             'beta': float(row[12]),  # i.e. effect size
                             'se': float(row[13]),
                             'regulatory_type': row[19],  # cis/trans
@@ -95,6 +95,7 @@ class pQTL(BaseAdapter):
                             'gene_consequence': row[23] if row[23] else None,
                             'biological_context': pQTL.BIOLOGICAL_CONTEXT,
                             'biosample_term': f'ontology_terms/{pQTL.BIOSAMPLE_TERM}',
+                            'files_filesets': 'files_filesets/' + self.file_accession,
                             'source': pQTL.SOURCE,
                             'source_url': pQTL.SOURCE_URL,
                             'name': 'associated with levels of',
@@ -104,5 +105,4 @@ class pQTL(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
         self.gene_validator.log()

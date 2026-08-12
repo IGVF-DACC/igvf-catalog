@@ -3,10 +3,10 @@ import json
 import pickle
 from math import log10
 from typing import Optional
-import requests
 import os
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 
@@ -26,7 +26,6 @@ class ASB_GVATDB(BaseAdapter):
     # so the max log10pvalue is 5.
     MAX_LOG10_PVALUE = 5
     ALLOWED_LABELS = ['variant_protein']
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
@@ -40,12 +39,12 @@ class ASB_GVATDB(BaseAdapter):
         """Get collection name."""
         return 'variants_proteins'
 
-    def process_file(self):
-        file_metadata = requests.get(
-            ASB_GVATDB.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
-        self.writer.open()
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
         self.load_tf_uniprot_id_mapping()
         self.ensembls = pickle.load(open(ASB_GVATDB.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
@@ -79,12 +78,18 @@ class ASB_GVATDB(BaseAdapter):
                     _source = 'variants/' + variant_id
                     _target = 'proteins/' + ensembl_id
 
+                    # if p_value_adj is 0, we will set neg_log10_pvalue_adj to 2 (max value in the dataset), otherwise we will calculate it as -log10(p_value_adj)
+                    p_value_adj = float(row[15])
+                    neg_log10_pvalue_adj = 2
+                    if p_value_adj > 0:
+                        neg_log10_pvalue_adj = -1 * log10(p_value_adj)
+
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
                         'p_value': pvalue,
-                        'log10pvalue': log10pvalue,
+                        'neg_log10_pvalue': log10pvalue,
                         'experiment': experiment,
                         'hg19_coordinate': row[8],
                         'oligo_auc': float(row[9]),
@@ -92,12 +97,14 @@ class ASB_GVATDB(BaseAdapter):
                         'ref_auc': float(row[11]),
                         'alt_auc': float(row[12]),
                         'pbs': float(row[13]),
-                        'fdr': float(row[15]),
+                        'p_value_adj': p_value_adj,
+                        'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,
                         'label': 'allele-specific binding',
                         'method': self.method,
                         'class': self.collection_class,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                         'name': 'modulates binding of',
                         'inverse_name': 'binding modulated by',
                         'biological_process': 'ontology_terms/GO_0051101'
@@ -112,8 +119,6 @@ class ASB_GVATDB(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.warning(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()
 
     def load_tf_uniprot_id_mapping(self):
         # map tf names to uniprot ids

@@ -56,8 +56,9 @@ class BlueSTARRVariantBiosample(BaseAdapter):
         else:
             return 'variants'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
         file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.method = file_fileset_obj['method']
@@ -84,8 +85,6 @@ class BlueSTARRVariantBiosample(BaseAdapter):
                     self.process_variant_chunk(chunk)
                 elif self.label == 'variant_biosample':
                     self.process_edge_chunk(chunk)
-
-        self.writer.close()
 
     def process_variant_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(

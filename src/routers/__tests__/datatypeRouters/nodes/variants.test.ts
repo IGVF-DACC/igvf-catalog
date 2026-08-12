@@ -30,7 +30,7 @@ describe('variantsRouters.variants', () => {
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('chr == "chr1"')
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, chr, pos, ref, alt, annotations, source, source_url')
 
-    const input = { chr: 'chr1', page: 0 }
+    const input = { region: 'chr1:12345-54321', page: 0 }
     const result = await variantsRouters.variants({
       input,
       ctx: {},
@@ -60,7 +60,7 @@ describe('variantsRouters.variants', () => {
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('chr == "chr2"')
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, chr, pos, ref, alt, annotations, source, source_url')
 
-    const input = { organism: 'Mus musculus', chr: 'chr2', page: 0 }
+    const input = { organism: 'Mus musculus', region: 'chr2:123-321', page: 0 }
     const result = await variantsRouters.variants({
       input,
       ctx: {},
@@ -90,7 +90,7 @@ describe('variantsRouters.variants', () => {
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, chr, pos, ref, alt, annotations, source, source_url')
 
-    const input = { page: 0, limit: 10000 }
+    const input = { region: 'chr3:11111-22222', page: 0, limit: 10000 }
     const result = await variantsRouters.variants({
       input,
       ctx: {},

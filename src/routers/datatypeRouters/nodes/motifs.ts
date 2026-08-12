@@ -5,12 +5,19 @@ import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanNodesParamsFormat, motifsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
 const motifCollectionName = motifSchema.db_collection_name as string
+
+const METHODS = getCollectionEnumValuesOrThrow('nodes', 'motifs', 'method')
+
+const motifsQueryFormat = motifsCommonQueryFormat.merge(z.object({
+  files_fileset: z.string().optional(),
+  method: z.enum(METHODS).optional()
+}))
 
 export const motifFormat = z.object({
   name: z.string(),
@@ -18,13 +25,21 @@ export const motifFormat = z.object({
   length: z.number(),
   pwm: z.array(z.array(z.string().optional())),
   source: z.string(),
-  source_url: z.string()
+  source_url: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 async function motifSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   if (input.tf_name !== undefined) {
     input.tf_name = (input.tf_name as string).toUpperCase()
+  }
+
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
   }
 
   let limit = QUERY_LIMIT
@@ -51,7 +66,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
 
 const motifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs } })
-  .input(motifsCommonQueryFormat.merge(commonHumanNodesParamsFormat))
+  .input(motifsQueryFormat.merge(commonHumanNodesParamsFormat))
   .output(z.array(motifFormat))
   .query(async ({ input }) => await motifSearch(input))
 

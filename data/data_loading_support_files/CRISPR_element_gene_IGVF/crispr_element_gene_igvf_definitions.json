@@ -1,0 +1,973 @@
+{
+  "_context": {
+    "description": "Parser configuration for IGVF CRISPR element-to-gene (E2G) tabular files loaded by CRISPR_element_gene_IGVF_adapter.py.",
+    "layout_names": "Top-level keys other than `files` and `_context` are layout definitions. Layout names (e.g. t_cell, crudo_tap_seq, pySpade) are shorthand identifiers reflective of each lab's internal naming for the experiment or analysis pipeline. These are not formal IGVF file-format terms.",
+    "structure": "Each layout describes column semantics and derived metrics for one file shape. The `files` section maps each IGVF file accession to a layout and file-specific options (e.g. targeted_element_types, skip_rows)."
+  },
+  "t_cell": {
+    "uuid": "5e3aac5c-2f44-4586-9ea0-237889e32e49",
+    "title": "Element-level Seurat/MAST file format specification",
+    "lab": "charles-gersbach",
+    "columns": {
+      "p_val": "P-value computed with MAST (https://rglab.github.io/MAST/). This method identifies differentially expressed genes between two groups of cells using a hurdle model",
+      "avg_log2FC": "log fold-change of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group",
+      "pct.1": "The percentage of cells where the gene is detected in the first group",
+      "pct.2": "The percentage of cells where the gene is detected in the second group",
+      "p_val_adj": "The percentage of cells where the gene is detected in the second group",
+      "guide_id": "gRNA ID of the selected / most significant perturbation per element and target gene",
+      "target_gene": "ENSEMBL ID of the tested gene",
+      "intended_target_name": "ENSEMBL ID of the element / TF promoter",
+      "intended_target_chr": "Chromosome of the element / TF promoter",
+      "intended_target_start": "Start coordinate of the element / TF promoter",
+      "intended_target_end": "End coordinate of the element / TF promoter"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "target_gene",
+      "perturbed_gene": "intended_target_name",
+      "metrics": {
+        "p_value": "p_val",
+        "p_value_adj": "p_val_adj",
+        "log2FC": "avg_log2FC",
+        "pct_1": "pct.1",
+        "pct_2": "pct.2"
+      }
+    }
+  },
+  "bulk_t_cell": {
+    "uuid": "919d1d76-72f2-494b-9c86-372e0d26a229",
+    "title": "FRACTEL element-level results (bulk screens)",
+    "lab": "charles-gersbach",
+    "columns": {
+      "FRACTEL_pval": "Element-level p-values for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (https://github.com/GersbachlabBioinformatics/FRACTEL)",
+      "FRACTEL_pval_fdr_corr": "Corrected FRACTEL_pval after applying the Benjamini-Hochberg procedure",
+      "FRACTEL_effect_size": "Element-level effect-size for the `intended_target_name` and `readout_gene` pair, as computed by FRACTEL (weighted average across guides within an element)",
+      "intended_target_name": "ID of the targeted element (grouping singleton measurements, like gRNA-gene p-values). In promoter screens, this column will contain the ENSEMBL ID of the targeted gene.",
+      "intended_target_chr": "Chromosome of the target element",
+      "intended_target_start": "Start coordinate of the target element",
+      "intended_target_end": "End coordinate of the target element",
+      "readout_gene": "ENSEMBL ID of the readout gene",
+      "readout_gene_symbol": "Gene symbol associated with `readout_gene`"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "readout_gene",
+      "perturbed_gene": "intended_target_name",
+      "metrics": {
+        "p_value": "FRACTEL_pval",
+        "p_value_adj": "FRACTEL_pval_fdr_corr",
+        "log2FC": "FRACTEL_effect_size"
+      }
+    }
+  },
+  "mechanoenhancer": {
+    "uuid": "5e3aac5c-2f44-4586-9ea0-237889e32e49",
+    "title": "Element-level Seurat/MAST file format specification",
+    "lab": "charles-gersbach",
+    "columns": {
+      "p_val": "P-value computed with MAST (https://rglab.github.io/MAST/). This method identifies differentially expressed genes between two groups of cells using a hurdle model",
+      "avg_log2FC": "log fold-change of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group",
+      "pct.1": "The percentage of cells where the gene is detected in the first group",
+      "pct.2": "The percentage of cells where the gene is detected in the second group",
+      "p_val_adj": "Adjusted p-value, based on Bonferroni correction using all genes in the dataset",
+      "gene_symbol": "HGNC gene symbol of the tested gene",
+      "ensembl_id": "ENSEMBL ID of the tested gene",
+      "intended_target_name": "Name of target element, i.e. {chr}:{start}-{end}. Same as in guide metadata file",
+      "intended_target_chr": "Chromosome of the element",
+      "intended_target_start": "Start coordinate of the element",
+      "intended_target_end": "End coordinate of the element"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "ensembl_id",
+      "metrics": {
+        "p_value": "p_val",
+        "p_value_adj": "p_val_adj",
+        "log2FC": "avg_log2FC",
+        "pct_1": "pct.1",
+        "pct_2": "pct.2"
+      }
+    },
+    "notes": "File format specification document reused from `t_cell` layout. Data file format does not actually match the fields defined in file format specification document precisely, i.e. ensembl_id instead of target_gene."
+  },
+  "bulk_mechanoenhancer": {
+    "uuid": "ef46b27b-a387-4fc2-8f7f-9320a798234b",
+    "title": "MYH9 FACS screen results file format specification",
+    "lab": "charles-gersbach",
+    "columns": {
+      "DHS_numeric": "Numeric ID of the DHS - derived from guide grouping",
+      "DHS_label": "DHS with Numeric ID (e.g., DHS_1)",
+      "chrom": "Chromosome where the DHS is located",
+      "start": "Start coordinate of the DHS",
+      "end": "End coordinate of the DHS",
+      "DHS_coordinate": "Combined genomic coordinate string",
+      "DHS_count": "Number of guides used for that DHS (counts only minus strand guide)",
+      "median_foldchange": "Median(highrep1/Lowrep1)",
+      "medianFC_normToCtl": "Fold change normalized to baseline",
+      "median_log2FC": "median log2FC",
+      "pZ": "phenotype z-score",
+      "tscore": "Stats from t-test"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "chrom",
+        "start",
+        "end"
+      ],
+      "metrics": {
+        "log2FC": "median_log2FC",
+        "fold_change": "median_foldchange",
+        "background_corrected_fold_change": "medianFC_normToCtl",
+        "num_guides": "DHS_count",
+        "z_score": "pZ",
+        "t_score": "tscore"
+      }
+    },
+    "notes": "No readout gene or p-value columns. Use file-level readout_gene (MYH9). significant is derived from |z_score| >= ~1.96 (two-tailed alpha=0.05)."
+  },
+  "fractel": {
+    "uuid": "a1e71caa-3da7-4c2d-b955-ca259536b5d5",
+    "title": "Element-level FRACTEL Results",
+    "lab": "charles-gersbach",
+    "columns": {
+      "dhs": "DNase I Hypersensitive Site (DHS) genomic coordinates in the format chromosome:start-end (e.g., chr6:29702283-29703026). Identifies the regulatory element whose activity is being linked to gene expression.",
+      "ensembl_id": "Ensembl stable gene identifier for the gene whose expression is associated with the DHS (e.g., ENSG00000204574).",
+      "gene_symbol": "HGNC gene symbol corresponding to the Ensembl ID (e.g., ABCF1, ABHD16A).",
+      "FRACTEL_effect_size": "Effect size estimate from the FRACTEL model quantifying the magnitude of the regulatory relationship between regulatory elements and target genes. Positive values indicate that perturbations increase the expression level of tested genes; negative values indicate decreased expression of tested gene. We consider each element as having either a primarily positive or negative effect on the phenotype, and compute two directional weighted averages of effects using one-sided p-values p− and p+, taking the absolute maximum as the effect size of the element.",
+      "FRACTEL_pval": "Nominal p-value from the FRACTEL statistical test for the association between regulatory element and gene expression.",
+      "FRACTEL_pval_fdr_corr": "False Discovery Rate (FDR)-corrected p-value (Benjamini-Hochberg) for the FRACTEL p-value, adjusted for multiple testing across all element-gene pairs tested.",
+      "intended_target_name": "Name or coordinate string of the intended CRISPR perturbation target associated with this DHS (e.g., chr6:29702283-29703026). Typically matches the DHS coordinates.",
+      "intended_target_chr": "Chromosome of the intended CRISPR perturbation target (e.g., chr6).",
+      "intended_target_start": "Genomic start coordinate of the intended perturbation target.",
+      "intended_target_end": "Genomic end coordinate of the intended perturbation target."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "ensembl_id",
+      "metrics": {
+        "p_value": "FRACTEL_pval",
+        "p_value_adj": "FRACTEL_pval_fdr_corr",
+        "log2FC": "FRACTEL_effect_size"
+      }
+    },
+    "notes": "FRACTEL_effect_size is the weighted-average NB GLM Estimate from sc-crispr-de / FRACTEL (same catalog mapping as bulk_t_cell log2FC). These files are enhancer DHS screens; promoters are filtered out per submitter_comment."
+  },
+  "crispr_surf": {
+    "uuid": "4cda54a6-aa53-4d01-9d65-572475111ad1",
+    "title": "CRISPR-SURF File Format Reference",
+    "lab": "charles-gersbach",
+    "columns": {
+      "FDR": "The Benjamini-Hochberg adjusted p-value threshold at which this region was called significant. One of the values supplied via the -padjs argument (defaults: 0.05, 0.01, 0.001, 0.0001). A region that is significant at multiple thresholds appears once per threshold.",
+      "Chr": "Chromosome name (e.g. chr2).",
+      "Start": "0-based, inclusive start coordinate of the significant region (BED-style half-open convention). The region occupies [Start, Stop) on the chromosome.",
+      "Stop": "0-based, exclusive end coordinate of the significant region (BED-style half-open convention). Region length in bp = Stop - Start.",
+      "Direction": "Sign of the deconvolved beta signal within the region. positive — sgRNAs in this region are enriched relative to controls (the targeted element promotes fitness or expression). negative — sgRNAs are depleted (the targeted element suppresses fitness or expression, or the region is essential).",
+      "Deconvolved_Signal_Area": "Area under the deconvolved beta profile across the region, computed as the sum of beta values at each base-pair bin within [Start, Stop). Larger absolute values indicate stronger or wider regulatory activity.",
+      "Deconvolved_Signal_Mean": "Mean deconvolved beta score across all base-pair bins within the region. Provides a normalised measure of effect magnitude that is independent of region width.",
+      "Padj_Mean": "Mean Benjamini-Hochberg adjusted p-value of the per-base beta scores at positions within the region. Lower values indicate higher statistical confidence.",
+      "Supporting_sgRNAs": "Number of sgRNAs (of type observation) whose Perturbation_Index falls within the region or within the characteristic perturbation range of the region boundaries. Higher counts provide greater statistical confidence.",
+      "Supporting_sgRNA_Sequences": "Comma-separated list of spacer sequences for the supporting sgRNAs (in no guaranteed order). The count equals the value in Supporting_sgRNAs."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "Chr",
+        "Start",
+        "Stop"
+      ],
+      "metrics": {
+        "p_value_adj": "Padj_Mean",
+        "effect_size": "Deconvolved_Signal_Mean",
+        "num_guides": "Supporting_sgRNAs"
+      }
+    },
+    "notes": "No readout gene, log2FC, or uncorrected p_value in this layout. Use file-level readout_gene. FDR is used only to keep the most stringent call per region. Stop is BED exclusive end and is used as-is. Deconvolved_Signal_Mean is SURF beta (effect_size), not DESeq2 log2FC."
+  },
+  "parse_perturb_seq": {
+    "uuid": "0447d492-9a9c-4ac9-8299-ac6f0e785920",
+    "title": "Global_differential_quantification_output file format specification for Parse Perturb-seq",
+    "lab": "thomas-quertermous",
+    "columns": {
+      "intended_target_name": "Name of target element, i.e. {chr}:{start}-{end}. Same as in guide metadata file",
+      "Intended_target_gene_id": "Ensembl gene id",
+      "guide_id(s)": "Comma-separated list of guide ids targeting this element (same ids as in guide metadata file)",
+      "targeting_chr": "Chromosome name of targeted element Gencode/UCSC notation",
+      "targeting_start": "Start coordinate of the targeted element (0-based)",
+      "targeting_end": "End coordinate of the targeted element (0-based)",
+      "gene_id": "Ensembl gene id",
+      "gene_symbol": "Gene Symbol according to Ensembl. Useful for downstream analyses",
+      "sceptre_log2_fc": "Log2 fold change effect size calculated by sceptre",
+      "sceptre_p_value": "Uncorrected p-value calculated by sceptre",
+      "sceptre_adj_p_value": "FDR adjusted p-value calculated by sceptre",
+      "significant": "Specifying whether tested E-G pair is significant",
+      "type": "Type of the perturbation target, direct or indirect"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "targeting_chr",
+        "targeting_start",
+        "targeting_end"
+      ],
+      "readout_gene": "gene_id",
+      "perturbed_gene": "Intended_target_gene_id",
+      "metrics": {
+        "p_value": "sceptre_p_value",
+        "p_value_adj": "sceptre_adj_p_value",
+        "log2FC": "sceptre_log2_fc"
+      }
+    }
+  },
+  "tap_seq_sceptre_power_XX": {
+    "uuid": "07d3e43a-509d-4bb5-aaf2-4a79892daa33",
+    "title": "Per-element output format for TAP-seq",
+    "lab": "thomas-quertermous",
+    "columns": {
+      "intended_target_name": "Name of target element, i.e. {chr}:{start}-{end}. Same as in guide metadata file",
+      "guide_id(s)": "Comma-separated list of guide ids targeting this element (same ids as in guide metadata file)",
+      "targeting_chr": "Chromosome name of targeted element Gencode/UCSC notation",
+      "targeting_start": "Start coordinate of the targeted element (0-based)",
+      "targeting_end": "End coordinate of the targeted element (0-based)",
+      "type": "Type of the perturbation target",
+      "gene_id": "Ensembl gene id",
+      "gene_symbol": "Gene Symbol according to Ensembl. Useful for downstream analyses ",
+      "sceptre_log2_fc": "Log2 fold change effect size calculated by sceptre",
+      "sceptre_p_value": "Uncorrected p-value calculated by sceptre",
+      "sceptre_adj_p_value": "FDR adjusted p-value calculated by sceptre",
+      "significant": "Specifying whether tested E-G pair is significant",
+      "sample_term_name": "Cell type / biosample name. Useful when aggregating results from multiple experiments",
+      "sample_term_id": "UBERON, CL for cell type / biosample",
+      "sample_summary_short": "Short sample description including treatments",
+      "power_at_effect_size_15": "(optional) Estimated statistical power to detect a perturbation effect of effect size XX",
+      "notes": "(optional) Field for optional notes, e.g. reference or source of data",
+      "power_at_effect_size_XX": "(optional) Estimated statistical power to detect a perturbation effect of effect size XX"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "targeting_chr",
+        "targeting_start",
+        "targeting_end"
+      ],
+      "readout_gene": "gene_id",
+      "metrics": {
+        "p_value": "sceptre_p_value",
+        "p_value_adj": "sceptre_adj_p_value",
+        "log2FC": "sceptre_log2_fc"
+      }
+    },
+    "notes": "power_at_effect_size_XX is a variable field name that only sometimes actually gets renamed depending on the effect size value ex. power_at_effect_size_15."
+  },
+  "crudo_tap_seq": {
+    "uuid": "962440ae-91c6-4d7e-b27c-cbf7b73fafd9",
+    "title": "File format specification document for CRUDO_noAux analysis output files",
+    "lab": "jesse-engreitz",
+    "columns": {
+      "name_hg19": "Name of target element, i.e. {chr}:{start}-{end}. Hg19 genome coordinates.",
+      "name_hg38": "Name of target element, i.e. {chr}:{start}-{end}. Hg38 genome coordinates.",
+      "n": "Number of gRNAs targeting this element",
+      "TargetGene": "Gene symbol",
+      "TargetGeneID": "Ensembl Gene ID",
+      "type": "Defines the nature of targeted element, ie putative enhancer, TSS, or negative control",
+      "EnhancerEffect.noAux.Rep1": "Effect of enhancer on target gene expression identified by perturbation effect for replicate 1",
+      "EnhancerEffect.noAux.Rep2": "Effect of enhancer on target gene expression identified by perturbation effect for replicate 2",
+      "EnhancerEffect.noAux": "Effect of enhancer on target gene expression identified by perturbation effect averaged across replicates",
+      "ci95.EnhancerEffect.noAux.Rep1": "95th confidence interval for enhancer effect for replicate 1",
+      "ci95.EnhancerEffect.noAux.Rep2": "95th confidence interval for enhancer effect for replicate 2",
+      "ci95.EnhancerEffect.noAux": "95th confidence interval for enhancer effect for replicate averages",
+      "pval.EnhancerEffect.noAux.Rep1": "Uncorrected p-value calculated for replicate 1",
+      "pval.EnhancerEffect.noAux.Rep2": "Uncorrected p-value calculated for replicate 2",
+      "pval.EnhancerEffect.noAux": "Uncorrected p-value calculated for the replicate averages",
+      "adj.pval.EnhancerEffect.noAux.Rep1": "FDR adjusted p-value calculated for replicate1",
+      "adj.pval.EnhancerEffect.noAux.Rep2": "FDR adjusted p-value calculated for replicate2",
+      "adj.pval.EnhancerEffect.noAux": "FDR adjusted p-value calculated for the replicate averages",
+      "Significant": "Specifying whether tested E-G pair is significant: TRUE or FALSE"
+    },
+    "semantic_columns": {
+      "element_coordinates": "name_hg38",
+      "readout_gene": "TargetGeneID",
+      "source_annotation": "type",
+      "source_annotation_map": {
+        "putative_enhancer": "enhancer",
+        "CCND1_TSS": "promoter",
+        "KITLG_TSS": "promoter",
+        "SSFA2_TSS": "promoter",
+        "FAM3C_TSS": "promoter",
+        "MYC_TSS": "promoter"
+      },
+      "promoter_gene_map": {
+        "CCND1_TSS": "ENSG00000110092",
+        "KITLG_TSS": "ENSG00000049130",
+        "SSFA2_TSS": "ENSG00000138434",
+        "FAM3C_TSS": "ENSG00000196937",
+        "MYC_TSS": "ENSG00000136997"
+      },
+      "metrics": {
+        "num_guides": "n",
+        "p_value": "pval.EnhancerEffect.noAux",
+        "effect_size_ci_95": "ci95.EnhancerEffect.noAux",
+        "p_value_adj": "adj.pval.EnhancerEffect.noAux",
+        "effect_size": "EnhancerEffect.noAux"
+      }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "log2FC",
+        "rule": "log2_one_minus",
+        "from": "effect_size"
+      },
+      {
+        "field": "log2FC_ci95_lower",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "add": "effect_size_ci_95"
+      },
+      {
+        "field": "log2FC_ci95_upper",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "subtract": "effect_size_ci_95"
+      }
+    ],
+    "notes": "Differs from the file format specification document: `name` is renamed `name_hg19`."
+  },
+  "crudo_flowfish": {
+    "uuid": "962440ae-91c6-4d7e-b27c-cbf7b73fafd9",
+    "title": "File format specification document for CRUDO_noAux analysis output files",
+    "lab": "jesse-engreitz",
+    "columns": {
+      "name": "Name of target element, i.e. {chr}:{start}-{end}. Hg19 genome coordinates.",
+      "name_hg38": "Name of target element, i.e. {chr}:{start}-{end}. Hg38 genome coordinates.",
+      "n": "Number of gRNAs targeting this element",
+      "TargetGene": "Gene symbol",
+      "TargetGeneID": "Ensembl Gene ID",
+      "type": "Defines the nature of targeted element: putative_enhancer, TSS, or negative_control",
+      "EnhancerEffect.noAux.Rep1": "Effect of enhancer on target gene expression for replicate 1",
+      "EnhancerEffect.noAux.Rep2": "Effect of enhancer on target gene expression for replicate 2",
+      "EnhancerEffect.noAux": "Effect of enhancer on target gene expression averaged across replicates",
+      "ci95.EnhancerEffect.noAux.Rep1": "95th confidence interval for replicate 1",
+      "ci95.EnhancerEffect.noAux.Rep2": "95th confidence interval for replicate 2",
+      "ci95.EnhancerEffect.noAux": "95th confidence interval for replicate averages",
+      "pval.EnhancerEffect.noAux.Rep1": "Uncorrected p-value for replicate 1",
+      "pval.EnhancerEffect.noAux.Rep2": "Uncorrected p-value for replicate 2",
+      "pval.EnhancerEffect.noAux": "Uncorrected p-value for the replicate averages",
+      "adj.pval.EnhancerEffect.noAux.Rep1": "FDR adjusted p-value for replicate1",
+      "adj.pval.EnhancerEffect.noAux.Rep2": "FDR adjusted p-value for replicate2",
+      "adj.pval.EnhancerEffect.noAux": "FDR adjusted p-value for the replicate averages",
+      "Significant": "Specifying whether tested E-G pair is significant: TRUE or FALSE"
+    },
+    "semantic_columns": {
+      "element_coordinates": "name_hg38",
+      "readout_gene": "TargetGeneID",
+      "source_annotation": "type",
+      "source_annotation_map": {
+        "putative_enhancer": "enhancer",
+        "TSS": "promoter"
+      },
+      "metrics": {
+        "num_guides": "n",
+        "p_value": "pval.EnhancerEffect.noAux",
+        "effect_size_ci_95": "ci95.EnhancerEffect.noAux",
+        "p_value_adj": "adj.pval.EnhancerEffect.noAux",
+        "effect_size": "EnhancerEffect.noAux"
+      }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "log2FC",
+        "rule": "log2_one_minus",
+        "from": "effect_size"
+      },
+      {
+        "field": "log2FC_ci95_lower",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "add": "effect_size_ci_95"
+      },
+      {
+        "field": "log2FC_ci95_upper",
+        "rule": "log2_one_minus",
+        "from": "effect_size",
+        "subtract": "effect_size_ci_95"
+      }
+    ],
+    "notes": "FlowFISH files use type=TSS (not {gene}_TSS) like crudo_tap_seq. TSS rows are promoter self-effects: promoter_of = TargetGeneID."
+  },
+  "teloHAEC_flowfish": {
+    "uuid": "bb3038df-261d-453c-ab59-bdfe9cd3fdd3",
+    "title": "CRISPRi FlowFISH Full Enhancer Score Analysis Submission Format",
+    "lab": "jesse-engreitz",
+    "delimiter": ",",
+    "columns": {
+      "intended_target_name": "Name of the target element, formatted as {chr}:{start}-{end}.",
+      "guide_id(s)": "Comma-separated list of guide IDs targeting this element (must match guide metadata).",
+      "targeting_chr": "Chromosome of the targeted element",
+      "targeting_start": "Start coordinate of the targeted element",
+      "targeting_end": "End coordinate of the targeted element",
+      "type": "Type of the perturbation target",
+      "gene_id": "Ensembl gene ID",
+      "gene_symbol": "Gene symbol (Ensembl)",
+      "log2_fc": "Log2 fold change effect size compared to negative control guides",
+      "p_value": "Uncorrected p-value from t-test (range: 0\u20131)",
+      "adj_p_value": "FDR-adjusted p-value (range: 0\u20131)",
+      "significant": "Indicates whether the tested enhancer-gene pair is significant (TRUE or FALSE)",
+      "sample_term_name": "Name of the cell type or biosample (useful for multi-experiment aggregation)",
+      "sample_term_id": "UBERON or CL ID for the biosample or cell type",
+      "sample_summary_shor": "Short description of the sample, including treatments",
+      "notes": "(optional) Field for notes, such as reference, source, or annotation details"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "targeting_chr",
+        "targeting_start",
+        "targeting_end"
+      ],
+      "readout_gene": "gene_id",
+      "metrics": {
+        "log2FC": "log2_fc",
+        "p_value": "p_value",
+        "p_value_adj": "adj_p_value"
+      },
+      "notes": "Data files have `sample_summary_shor` not `sample_summary_short` as specified in the file format specification document."
+    }
+  },
+  "scaled_screen": {
+    "uuid": "69c4aefb-5c5d-489c-84fe-89dbb852538b",
+    "title": "File Format Specifications for CRISPRa Scaled Screen Table S4",
+    "lab": "jay-shendure",
+    "columns": {
+      "guide_id": "gRNA ID number",
+      "spacer_g_start": "Constant G start of 20bp spacer sequence to promoter Pol III transcription.",
+      "protospacer": "Variable 19bp gRNA spacer sequence.",
+      "targeting": "Whether the gRNA is targeting.",
+      "type": "Type of gRNA (targeting or non-targeting).",
+      "guide_chr": "gRNA chromosome.",
+      "guide_start": "gRNA start position.",
+      "guide_end": "gRNA end position.",
+      "strand": "plus or minus strand.",
+      "pam": "PAM sequence.",
+      "genomic_element": "Class of genomic element targeted.",
+      "intended_target_chr": "Intended target chromosome.",
+      "intended_target_start": "Intended target start position.",
+      "intended_target_end": "Intended target end position.",
+      "response_id": "Putative target gene.",
+      "hgnc_symbol": "Putative target HGNC symbol.",
+      "n_nonzero_trt": "Number of gRNA cells with nonzero expression of putative target gene.",
+      "n_nonzero_cntrl": "Number of gRNA cells with nonzero expression of putative target gene.",
+      "pass_qc": "Whether the DE test passed QC.",
+      "p_value": "P-value from DE test.",
+      "log_2_fold_change": "Log 2 fold change in putative target gene expression between gRNA cells and control cells.",
+      "full_piggyflex_oligo": "Full sequence of gRNA oligo ordered and cloned into piggyFlex gRNA expression vector.",
+      "putative_target_genes": "All putative target genes of gRNA.",
+      "putative_target_genes_hgnc": "All putative target genes of gRNA HGNC symbol format."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "response_id",
+      "perturbed_gene": "putative_target_genes",
+      "source_annotation": "genomic_element",
+      "metrics": {
+        "p_value": "p_value",
+        "log2FC": "log_2_fold_change"
+      }
+    },
+    "require_pass_qc": true,
+    "notes": "Title derived from portal metadata description property, as no title is provided in the file format specification document."
+  },
+  "pySpade": {
+    "uuid": "868ce311-328b-4bbb-9baf-84470df45dd1",
+    "title": "pySpade DE table",
+    "lab": "gary-hon",
+    "delimiter": ",",
+    "columns": {
+      "idx": "",
+      "gene_names": "The gene name of differential expressed gene.",
+      "gene_name_ensembl": "The gene name of differential expressed gene in ENSG format.",
+      "chromosome": "The chromosome where differential expressed gene is located.",
+      "pos": "The perturbation region in the screen.",
+      "strand": "",
+      "color_idx": "",
+      "chr_idx": "",
+      "genomic_element": "",
+      "region": "The perturbation region in the screen.",
+      "intended_target_name": "The name of the perturbed element (gene name or genomic region).",
+      "intended_target_name_ensmbl": "The name of the perturbed element (gene name or genomic region) in ENSG format.",
+      "num_cell": "The number of cells with perturbation sgRNAs. Note: if the perturbation region has multiple sgRNAs, all the sgRNAs are pooled together.",
+      "bin": "",
+      "log(pval)-hypergeom": "Natural log p-value of hypergeometric test. This is the initial statistical test without considering background correction method.",
+      "fc": "The fold change of perturbation cells versus background cells. Bigger than 1 means up-regulation, smaller than 1 means down-regulation. It is calculated as: cpm_perturb / cpm_bg.",
+      "Significance_score": "Natural log p-value after background correction. Please look at pySpade's paper for more details about the statistical strategy.",
+      "fc_by_rand_dist_cpm": "The fold change of perturbation cells versus the selected background cells. Bigger than 1 means up-regulation, smaller than 1 means down-regulation.",
+      "pval-empirical": "The number of background selection whose p-value is smaller than the hypergeometric p-value. Please refer pySpade's paper for more detail.",
+      "cpm_perturb": "The cpm (counts per million reads) of the gene in cells with perturbation.",
+      "cpm_bg": "The cpm of the gene in all the other cells.",
+      "log2fc": "The Log2 of the fc (Fold Change) field."
+    },
+    "semantic_columns": {
+      "element_coordinates": "region",
+      "readout_gene": "gene_name_ensembl",
+      "perturbed_gene": "intended_target_name_ensmbl",
+      "source_annotation": "genomic_element",
+      "metrics": {
+        "gamma_approximation_ln_p_value": "Significance_score",
+        "log2FC": "log2fc",
+        "fold_change": "fc",
+        "hypergeometric_ln_p_value": "log(pval)-hypergeom",
+        "background_corrected_fold_change": "fc_by_rand_dist_cpm",
+        "empirical_p_value": "pval-empirical",
+        "cpm_perturb": "cpm_perturb",
+        "cpm_bg": "cpm_bg",
+        "num_cells": "num_cell"
+      }
+    },
+    "adapter_calculated_fields": [
+      {
+        "field": "p_value",
+        "rule": "exp_ln_p",
+        "from": "hypergeometric_ln_p_value"
+      },
+      {
+        "field": "p_value_adj",
+        "rule": "exp_ln_p",
+        "from": "gamma_approximation_ln_p_value"
+      }
+    ],
+    "notes": "Most fields from the data file are undefined in the file format specification document.",
+    "column_catalog_notes": {
+      "log(pval)-hypergeom": "Catalog raw p-value source. Stored natively as hypergeometric_ln_p_value; catalog p_value = exp(column). Initial hypergeometric test (perturbed vs all other cells) with no random-background correction.",
+      "Significance_score": "Catalog adjusted p-value (q-value) source. Stored natively as gamma_approximation_ln_p_value; catalog p_value_adj = exp(column). Gamma-approximation significance score modeling background and perturbation p-values (per pySpade / Yihan Hon lab).",
+      "pval-empirical": "Catalog field empirical_p_value. Empirical p-value comparing perturbation hypergeometric p-value to random background draws. Loaded into the database but not returned by the API."
+    }
+  },
+  "pdx1_region_level": {
+    "uuid": "35e80cf6-fd86-4ee5-99c3-cb2d4bd4b802",
+    "title": "CRISPRi/a PDX1 Region-Level Results File Format",
+    "lab": "danwei-huangfu",
+    "columns": {
+      "intended_target_chr": "Chromosome of the competent chromatin region",
+      "intended_target_start": "Start coordinate of the competent chromatin region on GRCh38",
+      "intended_target_end": "End coordinate of the competent chromatin region on GRCh38",
+      "LFC": "Estimated region-level log2 fold change in PDX1 expression associated with perturbation of the intended target region.",
+      "Z-score": "Mean enrichment score",
+      "IDR": "Irreproducible discovery rate metric summarizing crossreplicate reproducibility; lower values indicate more reproducible guide-level signals.",
+      "readout_gene_ensembl": "Ensembl gene identifier for the measured readout gene.",
+      "readout_gene_symbol": "HGNC-style gene symbol for the measured readout gene."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "readout_gene_ensembl",
+      "metrics": {
+        "log2FC": "LFC",
+        "z_score": "Z-score",
+        "idr": "IDR"
+      }
+    },
+    "notes": "No p-values (overlapping sliding windows). significant is derived from |z_score| >= ~1.96."
+  },
+  "ccr_perturb_seq": {
+    "uuid": "1c2ff754-e4ee-48d1-9931-ce979e73cedf",
+    "title": "10x Perturb-Seq Region-Level Inference File Format",
+    "lab": "danwei-huangfu",
+    "delimiter": ",",
+    "columns": {
+      "intended_target_chr": "Chromosome of targeted cis regulatory element.",
+      "intended_target_start": "Start coordinate of targeted cis regulatory element on GRCh38 ",
+      "intended_target_end": "End coordinate of targeted cis regulatory element on GRCh38",
+      "response_ensembl": "Ensembl gene identifier for the gene tested in the region-gene association.",
+      "response_gene_symbol": "Gene symbol for the tested expression readout.",
+      "pass_qc": "Indicates whether the region-gene test passed SCEPTRE quality-control requirements and produced an interpretable result.",
+      "p_value": "P-value reported by SCEPTRE for the region-gene association. Blank when the test did not pass quality control or was not evaluated.",
+      "log_2_fold_change": "Estimated log2 fold change in readout-gene expression associated with perturbation of the region. Positive values indicate increased expression and negative values indicate decreased expression.",
+      "significant": "Significance call produced by the analysis pipeline. Blank when the test did not pass quality control or was not evaluated.",
+      "genomic_element": "whether the tested cis regulatory element is distal or proximal to TSS",
+      "promoter_gene_symbol": "if the tested element is proximal to a gene TSS, the Ensembl gene identifier for the gene",
+      "promoter_gene_ensembl": "if the tested element is proximal to a gene TSS, the gene symbol for the gene"
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "response_ensembl",
+      "perturbed_gene": "promoter_gene_ensembl",
+      "source_annotation": "genomic_element",
+      "metrics": {
+        "log2FC": "log_2_fold_change",
+        "p_value": "p_value"
+      }
+    },
+    "require_pass_qc": true
+  },
+
+  "files": {
+    "IGVFFI3069QCRA": {
+      "layout": "t_cell",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI5749WPVK": {
+      "layout": "t_cell",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI6296RCJK": {
+      "layout": "mechanoenhancer",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "ensembl_id": "ENSG00000232196",
+          "intended_target_name": "chr16:3171499-3172694",
+          "notes": "ENSG00000232196 on line 1331 is not valid ENSEMBL for GENCODE v43. It is a pseudogene."
+        },
+        {
+          "ensembl_id": "ENSG00000239569",
+          "intended_target_name": "chr7:105439040-105439994",
+          "gene_symbol": "LHFPL3-AS2",
+          "notes": "ENSG00000239569 is KMT2E-AS1, not LHFPL3-AS2. ENSG00000239569-chr7:105439040-105439994 pair exists elsewhere in the data file with the correct gene symbol (KMT2E-AS1)."
+        }
+      ]
+    },
+    "IGVFFI6376HTIF": {
+      "layout": "parse_perturb_seq",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI0206LUDV": {
+      "layout": "parse_perturb_seq",
+      "targeted_element_types": [
+        "promoter"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "SKIV2L",
+          "notes": "Missing Intended_target_gene_id."
+        },
+        {
+          "intended_target_name": "C16orf91",
+          "notes": "Missing Intended_target_gene_id."
+        },
+        {
+          "intended_target_name": "WDR61",
+          "notes": "Missing Intended_target_gene_id."
+        }
+      ]
+    },
+    "IGVFFI4544JMWL": {
+      "layout": "scaled_screen",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI0830FXFI": {
+      "layout": "pySpade",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "gene_name_ensembl": "ENSG00000112096",
+          "notes": "ENSG00000112096 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000215271",
+          "notes": "ENSG00000215271 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000285106",
+          "notes": "ENSG00000285106 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000273888",
+          "notes": "ENSG00000273888 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000285447",
+          "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000130723",
+          "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000182230",
+          "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
+        }
+      ]
+    },
+    "IGVFFI5903QAWP": {
+      "layout": "crudo_tap_seq",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI7280ZZFA": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "name": "chr11:69088621-69089984",
+          "TargetGeneID": "ENSG00000110092",
+          "type": "putative_enhancer",
+          "notes": "Row lacks name_hg38 in the released file."
+        }
+      ]
+    },
+    "IGVFFI5288BRAZ": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI7810AFPF": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI3340LKKZ": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI6120DUWX": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI7675NPYB": {
+      "layout": "crudo_flowfish",
+      "targeted_element_types": [
+        "promoter",
+        "enhancer"
+      ]
+    },
+    "IGVFFI8719HCYX": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4404SMPQ": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI1068KEUM": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI9298BISV": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI9134FSCT": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
+      ]
+    },
+    "IGVFFI0629LUWT": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
+      ]
+    },
+    "IGVFFI6843QWSB": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
+      ]
+    },
+    "IGVFFI5749FOUE": {
+      "layout": "teloHAEC_flowfish",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "chr7:150993445-150994053",
+          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+        }
+      ]
+    },
+    "IGVFFI6600VCYY": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI7195XKBC": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI9246AJEK": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI3434YAPX": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI1168JUYR": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI9100GKNS": {
+      "layout": "bulk_t_cell",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI6268OASM": {
+      "layout": "bulk_t_cell",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI1336XWXJ": {
+      "layout": "bulk_t_cell",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI3089UGHM": {
+      "layout": "bulk_t_cell",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI4396TZAN": {
+      "layout": "crispr_surf",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "readout_gene": "ENSG00000198846"
+    },
+    "IGVFFI6649RDHW": {
+      "layout": "bulk_mechanoenhancer",
+      "targeted_element_types": [
+        "enhancer"
+      ],
+      "readout_gene": "ENSG00000100345"
+    },
+    "IGVFFI9490RJAU": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4427JNUK": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4766SRSA": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI1600ZEPT": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI4093WUVB": {
+      "layout": "fractel",
+      "targeted_element_types": [
+        "enhancer"
+      ]
+    },
+    "IGVFFI7368COWA": {
+      "layout": "pdx1_region_level",
+      "targeted_element_types": [
+        "distal element"
+      ]
+    },
+    "IGVFFI9322VVTR": {
+      "layout": "pdx1_region_level",
+      "targeted_element_types": [
+        "distal element"
+      ]
+    },
+    "IGVFFI4081AUXT": {
+      "layout": "ccr_perturb_seq",
+      "targeted_element_types": [
+        "distal element",
+        "promoter"
+      ]
+    }
+  }
+}

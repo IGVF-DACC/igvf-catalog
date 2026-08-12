@@ -46,9 +46,9 @@
           "example": "chr1",
           "pattern": "^chr"
         },
-        "log10pvalue": {
+        "neg_log10_pvalue": {
           "type": "number",
-          "description": "Log10pvalue for the variant to gene edge"
+          "description": "Negative log10 of the p-value for the variant to gene edge"
         },
         "p_value": {
           "type": "number",
@@ -57,6 +57,18 @@
         "effect_size": {
           "type": "number",
           "description": "Effect size for the variant to gene edge"
+        },
+        "posterior_inclusion_probability": {
+          "type": ["number", "null"],
+          "description": "Posterior inclusion probability for the variant to gene edge"
+        },
+        "log2FC": {
+          "type": ["number", "null"],
+          "description": "Log2 fold change for the variant to gene edge"
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the variant-gene association is statistically significant"
         },
         "class": {
           "enum": [
@@ -97,6 +109,10 @@
             "https://github.com/smontgomlab/AFGR"
           ]
         },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the variant to gene edge"
+        },
         "name": {
           "enum": [
             "modulates splicing of"
@@ -118,7 +134,7 @@
       "required": [
         "_key",
         "chr",
-        "log10pvalue",
+        "neg_log10_pvalue",
         "p_value",
         "effect_size",
         "biological_context",
@@ -126,15 +142,16 @@
         "biological_process",
         "intron_chr",
         "intron_start",
-        "intron_end"
+        "intron_end",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "filter_by_range": "intron_start, intron_end, log10pvalue, effect_size",
-    "simplified_return": "class, method, label, source, log10pvalue, biological_context",
-    "return": "intron_chr, intron_start, intron_end, effect_size, log10pvalue, source, class, method, label, p_value, chr, source_url, biological_context, biosample_term"
+    "filter_by_range": "intron_start, intron_end, neg_log10_pvalue, effect_size, posterior_inclusion_probability, log2FC",
+    "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
+    "return": "intron_chr, intron_start, intron_end, effect_size, neg_log10_pvalue, source, class, method, label, p_value, posterior_inclusion_probability, log2FC, chr, source_url, files_filesets, biological_context, biosample_term"
   },
   "db_collection_name": "variants_genes"
 }

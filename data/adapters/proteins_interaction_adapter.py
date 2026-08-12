@@ -8,6 +8,7 @@ import os
 import obonet
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
@@ -19,15 +20,12 @@ class ProteinsInteraction(BaseAdapter):
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
-    ALLOWED_LABELS = ['protein_protein']
-    ACCESSION_HUMAN = 'IGVFFI4317VDGK'
-    ACCESSION_MOUSE = 'IGVFFI1165YVBA'
-    COLLECTION_CLASS = 'observed data'
+    ALLOWED_LABELS = ['protein_protein_human', 'protein_protein_mouse']
 
-    def __init__(self, filepath, label='protein_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
-        file_accession = os.path.basename(filepath).split('.')[0]
-        self.source_url = 'https://data.igvf.org/reference-files/' + file_accession
-        if file_accession == self.ACCESSION_MOUSE:
+    def __init__(self, filepath, label='protein_protein_human', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
+        if label == 'protein_protein_mouse':
             self.organism = 'Mus musculus'
             self.ensembls = pickle.load(
                 open(self.MOUSE_ENSEMBL_MAPPING, 'rb'))
@@ -52,8 +50,11 @@ class ProteinsInteraction(BaseAdapter):
         for node in graph.nodes():
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_fileset['class']
+        self.writer.add_tag('portal_accessions', self.file_accession)
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
         ensembl_unmatched = 0
@@ -89,11 +90,14 @@ class ProteinsInteraction(BaseAdapter):
                         _key = hashlib.sha256('_'.join(
                             [protein_from_ensembl, protein_to_ensembl, row[4].replace(':', '_')] + pmids).encode()).hexdigest()
                         interaction_type_code = row[6].split('; ')
-                        interaction_type = [self.MI_code_mapping.get(
-                            code) for code in interaction_type_code]
+                        interaction_type = sorted([self.MI_code_mapping.get(
+                            code) for code in interaction_type_code])
                         # collection method should be a string of interaction type separated by ', '
                         collection_method = ', '.join(interaction_type)
                         detection_method = self.MI_code_mapping.get(row[4])
+                        source = row[-1]
+                        if source == 'IntAct; BioGRID':
+                            source = 'BioGRID; IntAct'
 
                         props = {
                             '_key': _key,
@@ -105,8 +109,7 @@ class ProteinsInteraction(BaseAdapter):
                             'interaction_type_code': interaction_type_code,
                             'confidence_value_biogrid': float(row[7]) if row[7] else None,
                             'confidence_value_intact': float(row[-2]) if row[-2] else None,
-                            # BioGRID or IntAct or BioGRID; IntAct
-                            'source': row[-1],
+                            'source': source,
                             'pmids': [pmid_url + pmid for pmid in pmids],
                             'organism': self.organism,
                             'name': 'physically interacts with',
@@ -114,8 +117,9 @@ class ProteinsInteraction(BaseAdapter):
                             'molecular_function': 'ontology_terms/GO_0005515',
                             'method': collection_method,
                             'label': detection_method,
-                            'class': self.COLLECTION_CLASS,
-                            'source_url': self.source_url
+                            'class': self.collection_class,
+                            'source_url': self.source_url,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
                         if self.validate:
                             self.validate_doc(props)
@@ -125,5 +129,3 @@ class ProteinsInteraction(BaseAdapter):
         if ensembl_unmatched != 0:
             self.logger.warning(
                 f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
-
-        self.writer.close()

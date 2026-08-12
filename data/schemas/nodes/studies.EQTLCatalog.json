@@ -32,14 +32,22 @@
             "EBI"
           ]
         },
-        "source_url": {}
+        "source_url": {},
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the study"
+        }
       },
       "required": [
         "pmid",
-        "study_type"
+        "study_type",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
+  "accessible_via": {
+    "return": "_id, name, pmid, study_type, source, source_url, files_filesets"
+  },
   "db_collection_name": "studies"
 }

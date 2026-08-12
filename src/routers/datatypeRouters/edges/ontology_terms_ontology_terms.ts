@@ -31,7 +31,10 @@ const ontologyPathFormat = z.object({
     synonyms: z.array(z.string()),
     description: z.string(),
     source: z.string(),
-    subontology: z.string().nullish()
+    subontology: z.string().nullish(),
+    class: z.string().nullish(),
+    method: z.string().nullish(),
+    files_filesets: z.string().nullish()
   })),
   paths: z.array(z.array(z.object({
     from: z.string(),

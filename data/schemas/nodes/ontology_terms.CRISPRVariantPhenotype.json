@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/ontology_terms.CRISPRVariantPhenotype.json",
+  "db_collection_name": "ontology_terms",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "NTR_0001118"
+        },
+        "name": {
+          "example": "LDL-C uptake"
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI for the phenotype ontology term",
+          "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
+        },
+        "term_id": {
+          "type": "string",
+          "description": "Term ID for the phenotype ontology term",
+          "example": "NTR_0001118"
+        },
+        "synonyms": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Synonyms for the ontology term"
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the ontology term, from the associated files_filesets record",
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The method of the ontology term, from the associated files_filesets record",
+          "enum": [
+            "CRISPR screen"
+          ]
+        },
+        "files_filesets": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The files filesets of the ontology term. Null because the NTR phenotype term is shared vocabulary, not tied to a single dataset. See DSERV-1466.",
+          "example": "files_filesets/IGVFFI2014OOZP",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "uri",
+        "term_id",
+        "synonyms",
+        "class",
+        "method",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

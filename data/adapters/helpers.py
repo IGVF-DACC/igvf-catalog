@@ -1,4 +1,5 @@
 import hashlib
+import sys
 
 from inspect import getfullargspec
 from math import log10, floor, isinf
@@ -19,6 +20,34 @@ from functools import lru_cache
 
 
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
+
+# UTA connects via psycopg2/libpq. On some macOS setups, disabling GSS
+# negotiation avoids connect-time crashes; only libpq 12+ accepts gssencmode.
+_psycopg2_gss_workaround_installed = False
+
+
+def _ensure_psycopg2_macos_gss_workaround():
+    global _psycopg2_gss_workaround_installed
+    if _psycopg2_gss_workaround_installed:
+        return
+    _psycopg2_gss_workaround_installed = True
+    if sys.platform != 'darwin':
+        return
+
+    import psycopg2
+
+    libpq_v = getattr(psycopg2, '__libpq_version__', 0)
+    if (libpq_v // 10000) < 12:
+        return
+
+    original_connect = psycopg2.connect
+
+    def _connect(*args, **kwargs):
+        kwargs.setdefault('gssencmode', 'disable')
+        return original_connect(*args, **kwargs)
+
+    psycopg2.connect = _connect
+
 
 CHR_MAP = {
     'GRCh38': {
@@ -341,6 +370,7 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
     # translate hgvs naming to vcf format e.g. NC_000003.12:g.183917980C>T -> 3_183917980_C_T
     if validate:  # use tools from hgvs, which corrects ref allele if it's wrong
         # got connection timed out error occasionally, could add a retry function
+        _ensure_psycopg2_macos_gss_workaround()
         hdp = hgvs.dataproviders.uta.connect()
         babelfish38 = Babelfish(hdp, assembly_name=assembly)
         p = parser.Parser()
@@ -350,7 +380,6 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
         except Exception as e:
             print(e)
             return None
-
         if type == 'sub' or type == 'delins':
             return build_variant_id(chr, pos_start+1, ref[1:], alt[1:])
         else:
@@ -435,6 +464,86 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files
         query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN v._key'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
         return set(cursor)
+
+
+def _hgvs_with_space_after_colon(hgvs):
+    """Insert a space after the accession colon if missing.
+
+    Catalog variants sometimes store HGVS as 'NC_000017.11: g....' instead of
+    the canonical 'NC_000017.11:g....'.
+    """
+    if ':' not in hgvs:
+        return hgvs
+    accession, rest = hgvs.split(':', 1)
+    if rest.startswith(' '):
+        return hgvs
+    return f'{accession}: {rest}'
+
+
+def _bulk_query_variant_keys_by_field(identifiers, field, chunk_size=500):
+    """Chunked IN-lookup of variants._key by a single variants field."""
+    ids = [identifier for identifier in set(identifiers) if identifier]
+    if not ids:
+        return {}
+
+    db = ArangoDB().get_igvf_connection()
+    query = f'''
+    FOR v IN variants
+      FILTER v.{field} IN @ids
+      RETURN {{ id: v.{field}, key: v._key }}
+    '''
+
+    id_to_keys = {}
+    for i in range(0, len(ids), chunk_size):
+        chunk = ids[i:i + chunk_size]
+        cursor = db.aql.execute(query, bind_vars={'ids': chunk})
+        for record in cursor:
+            identifier = record['id']
+            key = record['key']
+            if not identifier or not key:
+                continue
+            id_to_keys.setdefault(identifier, []).append(key)
+    return id_to_keys
+
+
+def bulk_query_variant_keys_by_identifier(identifiers, check_by='ca_id', chunk_size=500):
+    """Bulk-lookup variant _keys by spdi, hgvs, ca_id, or _key.
+
+    Returns a dict mapping each input identifier -> list of matching variants._key
+    values. Empty/None identifiers are ignored; identifiers with no catalog match
+    are omitted. Queries are chunked to avoid ArangoDB gateway timeouts.
+
+    For check_by='hgvs', unmatched identifiers are retried after inserting a space
+    after the accession colon (e.g. 'NC_...:g.' -> 'NC_...: g.') to handle known
+    DB formatting inconsistencies. Results are still keyed by the original
+    (unspaced) identifier.
+    """
+    allowed = ('_key', 'spdi', 'hgvs', 'ca_id')
+    if check_by not in allowed:
+        raise ValueError(f'check_by must be one of {allowed}')
+
+    ids = [identifier for identifier in set(identifiers) if identifier]
+    if not ids:
+        return {}
+
+    id_to_keys = _bulk_query_variant_keys_by_field(ids, check_by, chunk_size)
+
+    if check_by == 'hgvs':
+        unmatched = [
+            identifier for identifier in ids if identifier not in id_to_keys]
+        spaced_to_original = {}
+        for original in unmatched:
+            spaced = _hgvs_with_space_after_colon(original)
+            if spaced != original:
+                spaced_to_original[spaced] = original
+        if spaced_to_original:
+            spaced_matches = _bulk_query_variant_keys_by_field(
+                list(spaced_to_original.keys()), 'hgvs', chunk_size)
+            for spaced, keys in spaced_matches.items():
+                original = spaced_to_original[spaced]
+                id_to_keys.setdefault(original, []).extend(keys)
+
+    return id_to_keys
 
 
 def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
@@ -557,6 +666,53 @@ def bulk_query_coding_variants_from_hgvsc_in_arangodb(transcript_hgvsc):
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 
 
+def bulk_query_coding_variants_from_spdi_in_arangodb(spdi_protein_hgvsp_triples):
+    # given (spdi, protein_id, hgvsp) triples, look up variants_coding_variants by
+    # _from == 'variants/<spdi>', then filter on the coding_variant's protein_id and hgvsp
+    # to get the exact coding variant for that specific nucleotide change and protein isoform
+    db = ArangoDB().get_igvf_connection()
+    valid_triples = [
+        {'spdi': spdi, 'protein_id': protein_id, 'hgvsp': hgvsp}
+        for spdi, protein_id, hgvsp in spdi_protein_hgvsp_triples
+    ]
+
+    query = '''
+    FOR triple IN @triples
+        FOR vc IN variants_coding_variants
+        FILTER vc._from == CONCAT('variants/', triple.spdi)
+        LET cv = DOCUMENT(vc._to)
+        FILTER cv.protein_id == triple.protein_id AND cv.hgvsp == triple.hgvsp
+        RETURN {
+            spdi: triple.spdi,
+            protein_id: triple.protein_id,
+            hgvsp: triple.hgvsp,
+            coding_variant_key: PARSE_IDENTIFIER(vc._to).key
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'triples': valid_triples}
+    )
+
+    results = list(cursor)
+    mappings = {}
+    for r in results:
+        key = (r['spdi'], r['protein_id'], r['hgvsp'])
+        if key not in mappings:
+            mappings[key] = [r['coding_variant_key']]
+        else:
+            if r['coding_variant_key'] not in mappings[key]:
+                mappings[key].append(r['coding_variant_key'])
+
+    for key, values in mappings.items():
+        if len(values) > 1:
+            print(
+                f'WARNING: multiple coding variants found for {key}: {values}')
+
+    return mappings
+
+
 def build_coding_variant_id(variant_id, protein_id, transcript_id, gene_id):
     key = variant_id + '_' + protein_id + '_' + transcript_id + '_' + gene_id
     return hashlib.sha256(key.encode()).hexdigest()
@@ -648,6 +804,11 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
                            'reason': 'Unable to parse this variant id'}
         return variant_json, skipped_message
 
+    if ref == alt:
+        skipped_message = {'variant_id': variant_id,
+                           'reason': 'Ref allele and alt allele are the same'}
+        return variant_json, skipped_message
+
     # Note: we convert the position to 1-based for spdi format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
     # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format, validate ref seq for them seperately and skip normalization part for now
     if format == 'spdi':
@@ -699,12 +860,13 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if error is not None:
         return variant_json, error
 
+    pos_from_spdi = int(spdi.split(':')[1])
+
     variant_json = {
         '_key': _id,
         'name': spdi,
         'chr': f'chr{chr}' if not chr.startswith('chr') else chr,
-        'pos': int(pos_start) - 1,  # 0-indexed
-        'pos': pos_start,
+        'pos': pos_from_spdi,
         'ref': ref,
         'alt': alt,
         'variation_type': variation_type,
@@ -759,3 +921,35 @@ def get_file_fileset_by_accession_in_arangodb(accession):
     db = ArangoDB().get_igvf_connection()
     files_filesets_collection = db.collection('files_filesets')
     return files_filesets_collection.get(accession)
+
+
+# HGNC IDs missing from the genes collection at load time.
+HGNC_GENE_MAP_OVERRIDES = {
+    'HGNC:32925': ['ENSG00000288330'],
+}
+
+
+def get_gene_map_from_arangodb(field, collection='genes'):
+    db = ArangoDB().get_igvf_connection()
+    cursor = db.aql.execute(
+        f'FOR gene IN {collection} RETURN {{ key: gene._key, value: gene.{field} }}'
+    )
+    gene_map = {}
+    for record in cursor:
+        gkey = record['key']
+        gval = record['value']
+        if not gval:
+            continue
+        values = gval if isinstance(gval, list) else [gval]
+        for value in values:
+            if not value:
+                continue
+            if value not in gene_map:
+                gene_map[value] = [gkey]
+            else:
+                gene_map[value].append(gkey)
+    if field == 'hgnc' and collection == 'genes':
+        for hgnc_id, gene_keys in HGNC_GENE_MAP_OVERRIDES.items():
+            if hgnc_id not in gene_map:
+                gene_map[hgnc_id] = gene_keys
+    return gene_map

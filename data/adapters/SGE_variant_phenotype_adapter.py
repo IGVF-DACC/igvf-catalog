@@ -116,9 +116,9 @@ class SGE(BaseAdapter):
                     return protein_id
         return None
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         # check if all variants in file is already loaded
+        self.writer.add_tag('portal_accessions', self.file_accession)
         skipped_spdis = self.validate_variants()
         invalid_variants = []
         for spdi in skipped_spdis:
@@ -139,9 +139,9 @@ class SGE(BaseAdapter):
                     f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
                 invalid_variants.append(skipped['variant_id'])
 
-        self.logger.info(f'Skipping {len(invalid_variants)} invalid variants.')
+        self.logger.info(
+            f'Skipping {len(invalid_variants)} invalid variants.')
         if self.label == 'variants':
-            self.writer.close()
             return
         else:
             protein_id = self.get_protein_id()
@@ -257,4 +257,3 @@ class SGE(BaseAdapter):
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
-            self.writer.close()

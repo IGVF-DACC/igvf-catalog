@@ -2,7 +2,6 @@ import { genesStructureRouters } from '../../../datatypeRouters/nodes/genes_stru
 import * as dbModule from '../../../../database'
 import * as helpers from '../../../datatypeRouters/_helpers'
 import * as proteinModule from '../../../datatypeRouters/edges/transcripts_proteins'
-import { TRPCError } from '@trpc/server'
 
 jest.mock('../../../../database')
 jest.mock('../../../datatypeRouters/_helpers')
@@ -133,18 +132,5 @@ describe('genesStructureRouters.genesStructure', () => {
     expect(result).toEqual(mockResult)
     expect(proteinModule.findTranscriptsFromProteinSearch).toHaveBeenCalled()
     expect(dbModule.db.query).toHaveBeenCalled()
-  })
-
-  it('throws BAD_REQUEST if multiple parameter categories are provided', async () => {
-    const input = { gene_id: 'GENE1', transcript_id: 'TX1', page: 0 }
-    await expect(
-      genesStructureRouters.genesStructure({
-        input,
-        ctx: {},
-        type: 'query',
-        path: '',
-        rawInput: input
-      })
-    ).rejects.toThrow(TRPCError)
   })
 })

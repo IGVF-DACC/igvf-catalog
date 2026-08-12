@@ -1,12 +1,12 @@
 import json
 import hashlib
+import os
 import pickle
-import requests
 from math import log10
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 
@@ -28,18 +28,14 @@ class GWAS(BaseAdapter):
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
-    SOURCE_URL = 'https://data.igvf.org/reference-files/IGVFFI1309WDQG'
-    API_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG'
     ALLOWED_LABELS = ['studies',
                       'variants_phenotypes']
     SOURCE = 'OpenTargets'
 
     def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
-
-        file_metadata = requests.get(GWAS.API_URL).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
+        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
 
         super().__init__(filepath, label, writer, validate)
 
@@ -92,7 +88,8 @@ class GWAS(BaseAdapter):
             'trait_category': row[33],
             'source': self.SOURCE,
             'version': 'October 2022 (22.10)',
-            'source_url': self.SOURCE_URL
+            'files_filesets': 'files_filesets/' + self.file_accession,
+            'source_url': self.source_url
         }
         return props
 
@@ -181,21 +178,21 @@ class GWAS(BaseAdapter):
             'oddsr_ci_upper': float(row[14] or 0),
             'p_val_mantissa': float(row[15] or 0),
             'p_val_exponent': float(row[16] or 0),
-            'p_val': pvalue,
-            'log10pvalue': log_pvalue,
+            'p_value': pvalue,
+            'neg_log10_pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
             'source': self.SOURCE,
-            'source_url': self.SOURCE_URL,
+            'source_url': self.source_url,
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
             'inverse_name': 'associated with',
-            'class': self.collection_class,
-            'method': self.method,
-            'label': self.method
+            'class': self.file_fileset.get('class'),
+            'method': self.file_fileset.get('method'),
+            'label': self.file_fileset.get('method'),
+            'files_filesets': 'files_filesets/' + self.file_accession
         }
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
@@ -203,6 +200,9 @@ class GWAS(BaseAdapter):
 
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()
+
+            self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+                self.file_accession)
         header = None
         trying_to_complete_line = None
 
@@ -242,8 +242,6 @@ class GWAS(BaseAdapter):
                 self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
-
-        self.writer.close()
 
     def get_tagged_variants(self):
         header = None

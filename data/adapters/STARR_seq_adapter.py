@@ -67,7 +67,8 @@ class STARRseqVariantBiosample(BaseAdapter):
         else:
             return 'variants_biosamples'
 
-    def process_file(self):
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.simple_sample_summaries = file_fileset['simple_sample_summaries']
@@ -75,7 +76,6 @@ class STARRseqVariantBiosample(BaseAdapter):
         self.treatments_term_ids = file_fileset['treatments_term_ids']
         self.method = file_fileset['method']
         self.collection_class = file_fileset['class']
-        self.writer.open()
 
         open_file = gzip.open(self.filepath, 'rt') if self.filepath.endswith(
             '.gz') else open(self.filepath, 'r')
@@ -90,8 +90,6 @@ class STARRseqVariantBiosample(BaseAdapter):
 
             if chunk:
                 self.process_chunk(chunk)
-
-        self.writer.close()
 
     def process_chunk(self, chunk):
         variant_id_to_variant = {}
@@ -185,7 +183,7 @@ class STARRseqVariantBiosample(BaseAdapter):
                         '_to': self.biosample_term[0],
                         'name': 'modulates expression in',
                         'inverse_name': 'regulatory activity modulated by',
-                        'log2FoldChange': float(row[6]),
+                        'log2FC': float(row[6]),
                         'inputCountRef': float(row[7]),
                         'outputCountRef': float(row[8]),
                         'inputCountAlt': float(row[9]),

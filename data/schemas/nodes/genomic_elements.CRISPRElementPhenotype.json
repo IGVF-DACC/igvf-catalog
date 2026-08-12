@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
+        },
+        "name": {
+          "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
+        },
+        "method": {
+          "enum": [
+            "CRISPR screen"
+          ]
+        },
+        "source_annotation": {
+          "type": "string",
+          "description": "Source annotation for the genomic element",
+          "enum": [
+            "enhancer"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the genomic element",
+          "example": "files_filesets/IGVFFI5135QZCS",
+          "pattern": "^files_filesets/"
+        }
+      },
+      "required": [
+        "source_annotation",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements"
+}

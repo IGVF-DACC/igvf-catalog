@@ -26,16 +26,22 @@
             "alan-boyle",
             "bill-majoros",
             "charles-gersbach",
+            "community",
+            "danwei-huangfu",
             "doug-fowler",
+            "gary-hon",
             "j-michael-cherry",
             "jay-shendure",
             "jesse-engreitz",
             "karen-mohlke",
             "kushal-dey",
             "lea-starita",
+            "luca-pinello",
+            "marc-vidal",
             "mark-craven",
             "nadav-ahituv",
             "predrag-radivojac",
+            "richard-sherwood",
             "thomas-quertermous",
             "tim-reddy",
             "zhiping-weng"
@@ -51,17 +57,24 @@
             "type": "string",
             "enum": [
               "CRISPR FACS screen",
+              "CRISPR FlowFISH screen",
               "DNase-seq",
+              "DUAL-IPA",
               "electroporated MPRA",
               "lentiMPRA",
+              "Migration CRISPR screen",
               "MPRA",
               "Perturb-seq",
-              "scATAC-seq",
+              "Parse Perturb-seq",
+              "Proliferation CRISPR screen",
+              "scCRISPR screen",
               "SGE",
+              "snATAC-seq",
               "STARR-seq",
               "TAP-seq",
               "VAMP-seq",
               "VAMP-seq (MultiSTEP)",
+              "Variant painting via fluorescence",
               "Variant-EFFECTS"
             ]
           }
@@ -80,31 +93,51 @@
           }
         },
         "method": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The method of the file set",
           "enum": [
+            "ADASTRA",
             "BlueSTARR",
-            "candidate Cis-Regulatory Elements",
-            "caQTL",
-            "CRISPR enhancer perturbation screen",
-            "CRISPR FACS screen",
-            "cV2F",
+            "ClinGen",
+            "COXPRESdb",
+            "CRISPR screen",
+            "DepMap",
+            "DUAL-IPA",
             "ENCODE-rE2G",
             "ESM-1v",
-            "GRCh38 elements",
-            "Homo sapiens GRCh38 elements",
-            "Homo sapiens GRCh38 hg19 elements",
+            "GenCC",
+            "GVATdb",
+            "GWAS",
+            "HOCOMOCO",
+            "Homology",
             "MPRA",
             "MutPred2",
+            "Orphanet",
             "Perturb-seq",
+            "PharmGKB",
             "SEMVAR",
+            "SEMpl",
             "SGE",
             "STARR-seq",
-            "TAP-seq",
+            "TopLD",
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
+            "Variant painting via fluorescence",
             "Variant-EFFECTS",
-            "scATAC-seq"
+            "cV2F",
+            "caQTL",
+            "candidate Cis-Regulatory Elements",
+            "eQTL",
+            "elements",
+            "pQTL",
+            "scATAC-seq",
+            "scE2G",
+            "snATAC-seq",
+            "spliceQTL",
+            null
           ]
         },
         "class": {
@@ -131,25 +164,46 @@
               "bigWigAverageOverBed",
               "BIRD",
               "BlueSTARR",
+              "CRISPR BEAN",
+              "CRISPR-Millipede",
+              "CRISPR-SURF",
+              "CRISPResso2",
+              "Cell Profiler",
+              "Cooler",
               "CountESS",
               "cV2F",
               "cyp2c19_2c9",
               "DESeq2",
               "Distal regulation ENCODE-rE2G",
+              "DUAL-IPA analysis scripts",
               "DistalRegulationCRISPRdata",
-              "Engreitz Variant-EFFECTS scripts",
+              "Variant-EFFECTS",
               "ESM-1v",
               "FRACTEL",
+              "Irreproducible Discovery Rate",
+              "matplotlib",
               "MPRAflow tsv-to-bed",
               "mpralm",
               "MutPred2",
+              "NumPy",
               "pandas",
+              "pybedtools",
+              "Pysam",
+              "pySpade",
+              "R",
               "Samtools",
-              "scATAC-seq processing scripts",
+              "scATAC-seq processing",
+              "Seaborn",
               "SEMVAR",
+              "SEMpl",
+              "scE2G",
               "Sceptre",
+              "SciPy",
               "Seurat",
-              "SGE Pipeline"
+              "SGE Pipeline",
+              "Snakemake",
+              "statsmodels",
+              "Straw"
             ]
           }
         },
@@ -238,11 +292,16 @@
         "source": {
           "enum": [
             "ENCODE",
-            "IGVF"
+            "IGVF",
+            "Community"
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "download_link": {
           "type": "string",
@@ -255,16 +314,55 @@
             "null"
           ],
           "description": "The cell annotation of the file set",
+          "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
+        },
+        "cell_annotation_term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Ontology term id for the cell annotation (from fileset cell_type.term_id)",
+          "example": "ontology_terms/CL_0000352",
+          "pattern": "^ontology_terms/[A-Z0-9_]+$"
+        },
+        "genome_browser_link": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The genome browser link of the file set",
+          "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
+        },
+        "browser_index_file": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Download link for the genome browser index file (.tbi). Null for ENCODE files; for IGVF files, the tabix index file when present in the file set.",
+          "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
+        },
+        "crispr_modality": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The CRISPR modality of the file set",
           "enum": [
             null,
-            "extraembryonic parietal endodermal cell",
-            "extraembryonic visceral endodermal cell",
-            "intermediate extraembryonic parietal endodermal cell",
-            "mesodermal cell",
-            "neurectodermal cell",
-            "pluripotent epiblast cell",
-            "surface ectodermal cell"
+            "interference",
+            "activation",
+            "base editing",
+            "prime editing",
+            "knockout"
           ]
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The version string of the external data source",
+          "example": "File generated on 2023-10-10"
         }
       },
       "required": [
@@ -282,13 +380,16 @@
         "treatments_term_ids",
         "publication",
         "download_link",
-        "cell_annotation"
+        "cell_annotation",
+        "cell_annotation_term",
+        "browser_index_file",
+        "crispr_modality"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, cell_annotation_term, genome_browser_link, browser_index_file, crispr_modality"
   },
   "db_collection_name": "files_filesets"
 }

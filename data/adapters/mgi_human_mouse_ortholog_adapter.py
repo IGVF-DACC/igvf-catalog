@@ -1,8 +1,9 @@
 import json
-import pickle
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 from adapters.writer import Writer
 
 # Sample file:
@@ -14,10 +15,9 @@ from adapters.writer import Writer
 
 class MGIHumanMouseOrthologAdapter(BaseAdapter):
     ALLOWED_LABELS = ['human_mm_genes_ortholog']
-    MGI_ENSEMBL_FILEPATH = 'data_loading_support_files/MRK_ENSEMBL.rpt'
-    HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH = './data_loading_support_files/entrez_to_ensembl.pkl'
 
     def __init__(self, filepath, label='human_mm_genes_ortholog', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -28,20 +28,36 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
         """Get collection name."""
         return 'genes_mm_genes'
 
-    def load_entrz_ensembl_mapping(self):
-        with open(MGIHumanMouseOrthologAdapter.HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH, 'rb') as f:
-            self.gene_mapping = pickle.load(f)
+    @staticmethod
+    def _entrez_ensembl_map(gene_map):
+        return {
+            entrez.removeprefix('ENTREZ:'): ensembl_ids
+            for entrez, ensembl_ids in gene_map.items()
+            if entrez.startswith('ENTREZ:') and ensembl_ids
+        }
 
-    def load_mgi_ensembl_mapping(self):
-        self.mm_gene_mapping = {}
-        for line in open(MGIHumanMouseOrthologAdapter.MGI_ENSEMBL_FILEPATH, 'r'):
-            data_line = line.strip().split('\t')
-            self.mm_gene_mapping[data_line[0]] = data_line[5]
+    @staticmethod
+    def _mgi_ensembl_map(gene_map):
+        return {
+            mgi_id: ensembl_ids
+            for mgi_id, ensembl_ids in gene_map.items()
+            if ensembl_ids
+        }
 
-    def process_file(self):
-        self.writer.open()
-        self.load_mgi_ensembl_mapping()
-        self.load_entrz_ensembl_mapping()
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
+        self.gene_mapping = self._entrez_ensembl_map(
+            get_gene_map_from_arangodb('entrez')
+        )
+        self.mm_gene_mapping = self._mgi_ensembl_map(
+            get_gene_map_from_arangodb('mgi', collection='mm_genes')
+        )
 
         orthologs = {}
 
@@ -53,31 +69,31 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
 
             if data_line[1].startswith('mouse'):
                 mgi_id = data_line[5]
-
-                gene_id = self.mm_gene_mapping.get(mgi_id)
-                if gene_id is None:
+                ensembl_ids = self.mm_gene_mapping.get(mgi_id)
+                if not ensembl_ids:
                     self.logger.warning(
                         "Can't process Mouse MGI ID: " + mgi_id)
                     continue
-                else:
-                    gene_id = 'mm_genes/' + gene_id
+                gene_ids = ['mm_genes/' +
+                            ensembl_id for ensembl_id in ensembl_ids]
 
             elif data_line[1].startswith('human'):
                 entrez_id = data_line[4]
-
-                gene_id = self.gene_mapping.get(entrez_id)
-                if gene_id is None:
+                ensembl_ids = self.gene_mapping.get(entrez_id)
+                if not ensembl_ids:
                     self.logger.warning(
                         "Can't process Human Entrez ID: " + entrez_id)
                     continue
-                else:
-                    gene_id = 'genes/' + gene_id
+                gene_ids = ['genes/' +
+                            ensembl_id for ensembl_id in ensembl_ids]
+            else:
+                continue
 
             ortholog_id = data_line[0]
             if orthologs.get(ortholog_id):
-                orthologs[ortholog_id].append(gene_id)
+                orthologs[ortholog_id].extend(gene_ids)
             else:
-                orthologs[ortholog_id] = [gene_id]
+                orthologs[ortholog_id] = gene_ids
 
         for key in orthologs:
             if len(orthologs[key]) <= 1:
@@ -106,10 +122,12 @@ class MGIHumanMouseOrthologAdapter(BaseAdapter):
                             'inverse_name': 'homologous to',
                             'relationship': 'ontology_terms/NCIT_C79968',
                             'source': 'MGI',
-                            'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
+                            'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt',
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
                         if self.validate:
                             self.validate_doc(props)
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
-        self.writer.close()

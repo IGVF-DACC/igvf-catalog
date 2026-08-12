@@ -13,7 +13,8 @@ const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
-const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
+const genomicElementsGenesCrisprElementGeneEncodeSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json')
+const genomicElementsGenesCrisprElementGeneIgvfSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -25,10 +26,29 @@ const edgeQueryFormat = z.object({
   files_fileset: z.string().optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
+  cell_annotation: z.string().optional(),
+  cell_annotation_term: z.string().optional(),
   source: z.enum(SOURCES).optional()
 })
 
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+
+const gnrGeneQueryFormat = z.object({
+  regulator_gene_id: z.string().optional(),
+  regulator_hgnc_id: z.string().optional(),
+  regulator_gene_name: z.string().optional(),
+  regulator_synonym: z.string().optional(),
+  response_gene_id: z.string().optional(),
+  response_hgnc_id: z.string().optional(),
+  response_gene_name: z.string().optional(),
+  response_synonym: z.string().optional(),
+  neg_log10_pvalue: z.string().optional(),
+  neg_log10_pvalue_adj: z.string().optional(),
+  method: z.enum(['CRISPR screen', 'Perturb-seq']).optional(),
+  files_fileset: z.string().optional(),
+  significant: z.enum(['true']).optional(),
+  crispr_modality: z.enum(['knockout', 'interference', 'activation']).optional()
+}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -59,14 +79,52 @@ const outputFormat = z.array(z.object({
   class: z.string(),
   source: z.string(),
   source_url: z.string(),
-  biological_context: z.string(),
-  biosample_term: z.string(),
+  biological_context: z.string().nullish(),
+  biosample_term: z.string().nullish(),
+  cell_annotation: z.string().nullish(),
+  cell_annotation_term: z.string().nullish(),
   files_filesets: z.string(),
-  score: z.number().nullable(),
+  crispr_modality: z.string().nullish(),
+  score: z.number().nullish(),
+  transcription_start_site: z.number().nullish(),
+  rna_pseudobulk_tpm: z.number().nullish(),
+  log2FC: z.number().nullish(),
+  effect_size: z.number().nullish(),
+  z_score: z.number().nullish(),
+  t_score: z.number().nullish(),
+  idr: z.number().nullish(),
   p_value: z.number().or(z.string()).nullish(),
+  p_value_adj: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  significant: z.boolean().nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
+
+const grnOutputFormat = z.object({
+  response_gene: z.string(),
+  genomic_element: z.object({
+    chr: z.string(),
+    start: z.number(),
+    end: z.number(),
+    regulator_gene: z.string()
+  }),
+  crispr_modality: z.string().nullish(),
+  class: z.string(),
+  method: z.string(),
+  source: z.string(),
+  biological_context: z.string(),
+  files_filesets: z.string(),
+  log2FC: z.number().nullish(),
+  neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  significant: z.boolean().nullish(),
+  perturbation_efficiency_log2FC: z.number().nullish(),
+  perturbation_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
+  perturbation_efficiency_significant: z.boolean().nullish()
+})
 
 const buildEdgeFilter = (input: paramsFormatType): string => {
   if (input.files_fileset !== undefined) {
@@ -77,11 +135,16 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
+  if (input.cell_annotation_term !== undefined) {
+    input.cell_annotation_term = `ontology_terms/${input.cell_annotation_term as string}`
+  }
   // edge filters are the same for all methods
-  const filters = getFilterStatements(genomicElementsGenesEncode2GCrisprSchema, input)
+  const filters = getFilterStatements(genomicElementsGenesCrisprElementGeneEncodeSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
+  delete input.cell_annotation
+  delete input.cell_annotation_term
   delete input.method
   delete input.source
   return filters
@@ -130,7 +193,6 @@ function buildQuery (params: {
     FOR record IN edgeRecords
       LET gene = ${verbose ? 'geneMap[record._to]' : 'record._to'}
       LET element = ${verbose ? 'elementMap[record._from]' : 'record._from'}
-      LET p_value = record.method IN ['CRISPR FACS screen', 'Perturb-seq', 'TAP-seq'] ? record.p_value_adj : record.p_value
       RETURN {
         'gene': gene,
         'genomic_element': element,
@@ -143,8 +205,22 @@ function buildQuery (params: {
         'files_filesets': record.files_filesets,
         'biological_context': record.biological_context,
         'biosample_term': record.biosample_term,
-        'score': record.score || record.effect_size || record.log2FC,
-        'p_value': p_value
+        'cell_annotation': record.cell_annotation,
+        'cell_annotation_term': record.cell_annotation_term,
+        'crispr_modality': record.crispr_modality,
+        'score': record.score,
+        'transcription_start_site': record.transcription_start_site,
+        'rna_pseudobulk_tpm': record.rna_pseudobulk_tpm,
+        'log2FC': record.log2FC,
+        'effect_size': record.effect_size,
+        'z_score': record.z_score,
+        't_score': record.t_score,
+        'idr': record.idr,
+        'p_value': record.p_value,
+        'p_value_adj': record.p_value_adj,
+        'neg_log10_pvalue': record.neg_log10_pvalue,
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+        'significant': record.significant
       }
   `
 }
@@ -278,11 +354,23 @@ const executeLevenshteinMatchQuery = async ({
 }
 
 function geneQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias', 'method', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one of those properties must be defined: gene_id, hgnc_id, name, alias, method, files_fileset.'
+      message: 'At least one of those properties must be defined: gene_id, hgnc_id, name, synonym, method, files_fileset.'
+    })
+  }
+}
+
+function grnQueryValidation (input: paramsFormatType): void {
+  const isInvalidRegulatorFilter = Object.keys(input).every(item => !['regulator_gene_id', 'regulator_hgnc_id', 'regulator_gene_name', 'regulator_synonym'].includes(item))
+  const isInvalidResponseFilter = Object.keys(input).every(item => !['response_gene_id', 'response_hgnc_id', 'response_gene_name', 'response_synonym'].includes(item))
+
+  if (isInvalidRegulatorFilter && isInvalidResponseFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of gene must be defined.'
     })
   }
 }
@@ -305,12 +393,12 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   delete input.biological_context
 
   let geneIDs: string[] = []
-  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
-    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, alias: input.alias, organism: 'Homo sapiens', page: 0 }
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, synonym: input.synonym, organism: 'Homo sapiens', page: 0 }
     delete input.gene_id
     delete input.hgnc_id
-    delete input.alias
+    delete input.synonym
     delete input.gene_name
     const genes = await geneSearch(geneInput)
     geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
@@ -377,6 +465,186 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     edgeNameField: 'inverse_name',
     bindVars
   })
+}
+
+async function grnSearch (input: paramsFormatType): Promise<any> {
+  grnQueryValidation(input)
+  const limit = applyLimit(input)
+
+  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: 'Homo sapiens', page: 0 }
+  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id, name: input.response_gene_name, synonyms: input.response_synonym, organism: 'Homo sapiens', page: 0 }
+
+  const hasRegulatorInput = Object.keys(regulatorGeneInput).some(key => !['organism', 'page'].includes(key) && regulatorGeneInput[key] !== undefined)
+  const hasResponseInput = Object.keys(responseGeneInput).some(key => !['organism', 'page'].includes(key) && responseGeneInput[key] !== undefined)
+
+  let pvalueFilter = ''
+  const pvalueFilters: paramsFormatType = {}
+  if (input.neg_log10_pvalue !== undefined) {
+    pvalueFilters.neg_log10_pvalue = input.neg_log10_pvalue
+  }
+  if (input.neg_log10_pvalue_adj !== undefined) {
+    pvalueFilters.neg_log10_pvalue_adj = input.neg_log10_pvalue_adj
+  }
+  if (Object.keys(pvalueFilters).length > 0) {
+    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsGenesCrisprElementGeneIgvfSchema, pvalueFilters)}`
+  }
+
+  let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
+  if (input.method !== undefined) {
+    methodFilter = `['${input.method as string}']`
+  }
+
+  let filesFilesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesFilesetFilter = `AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  }
+
+  let significantFilter = ''
+  if (input.significant !== undefined) {
+    significantFilter = `AND record.significant == ${input.significant as string}`
+  }
+
+  let crisprModalityFilter = ''
+  if (input.crispr_modality !== undefined) {
+    crisprModalityFilter = `AND record.crispr_modality == '${input.crispr_modality as string}'`
+  }
+
+  const responseQuery = `
+    FOR gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
+
+        FOR record in genomic_elements_genes
+          FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
+          ${pvalueFilter}
+          SORT record._key
+
+          LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+          LET ge = DOCUMENT(record._from)
+          LET perturbationEfficiencyEdge = FIRST(
+            FOR se IN genomic_elements_genes
+              FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
+              LIMIT 1
+              RETURN se
+          )
+
+          RETURN {
+          'response_gene': gene.name,
+          'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': DOCUMENT(ge.promoter_of).name },
+          'crispr_modality': record.crispr_modality,
+          'class': record.class,
+          'method': record.method,
+          'source': record.source,
+          'files_filesets': record.files_filesets,
+          'biological_context': record.biological_context,
+          'log2FC': record.log2FC,
+          'neg_log10_pvalue': record.neg_log10_pvalue,
+          'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+          'significant': record.significant,
+          'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
+          'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
+          'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+          'perturbation_efficiency_significant': perturbationEfficiencyEdge.significant
+        }
+  `
+
+  const regulatorQuery = `
+    FOR gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
+
+        FOR ge in genomic_elements
+          FILTER ge.promoter_of == gene._id
+
+          FOR record in genomic_elements_genes
+            FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
+            ${pvalueFilter}
+            SORT record._key
+            LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+            LET perturbationEfficiencyEdge = FIRST(
+              FOR se IN genomic_elements_genes
+                FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
+                LIMIT 1
+                RETURN se
+            )
+
+            RETURN {
+            'response_gene': DOCUMENT(record._to).name,
+            'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': gene.name },
+            'crispr_modality': record.crispr_modality,
+            'class': record.class,
+            'method': record.method,
+            'source': record.source,
+            'files_filesets': record.files_filesets,
+            'biological_context': record.biological_context,
+            'log2FC': record.log2FC,
+            'neg_log10_pvalue': record.neg_log10_pvalue,
+            'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+            'significant': record.significant,
+            'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
+            'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
+            'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+            'perturbation_efficiency_significant': perturbationEfficiencyEdge.significant
+          }
+  `
+
+  const regulatorResponseQuery = `
+    FOR regulator_gene IN genes
+        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}
+
+        FOR response_gene IN genes
+            FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
+
+            FOR record in genomic_elements_genes
+              FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
+              ${pvalueFilter}
+
+              FOR ge IN genomic_elements
+                FILTER ge._id == record._from AND ge.promoter_of == regulator_gene._id
+                SORT record._key
+                LIMIT ${(input.page as number || 0) * limit}, ${limit}
+
+                LET perturbationEfficiencyEdge = FIRST(
+                  FOR se IN genomic_elements_genes
+                    FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
+                    LIMIT 1
+                    RETURN se
+                )
+
+                RETURN {
+                  'response_gene': response_gene.name,
+                  'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': regulator_gene.name },
+                  'crispr_modality': record.crispr_modality,
+                  'class': record.class,
+                  'method': record.method,
+                  'source': record.source,
+                  'files_filesets': record.files_filesets,
+                  'biological_context': record.biological_context,
+                  'log2FC': record.log2FC,
+                  'neg_log10_pvalue': record.neg_log10_pvalue,
+                  'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+                  'significant': record.significant,
+                  'perturbation_efficiency_log2FC': perturbationEfficiencyEdge.log2FC,
+                  'perturbation_efficiency_neg_log10_pvalue': perturbationEfficiencyEdge.neg_log10_pvalue,
+                  'perturbation_efficiency_neg_log10_pvalue_adj': perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+                  'perturbation_efficiency_significant': perturbationEfficiencyEdge.significant
+              }
+  `
+
+  let query = ''
+  if (hasRegulatorInput && hasResponseInput) {
+    query = regulatorResponseQuery
+  } else if (hasRegulatorInput) {
+    query = regulatorQuery
+  } else if (hasResponseInput) {
+    query = responseQuery
+  }
+
+  const objs = (await db.query(query)).all()
+  if (Array.isArray(objs) && objs.length > 0) {
+    return await objs
+  }
+  return await objs
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
@@ -477,7 +745,14 @@ const genesFromGenomicElements = publicProcedure
   .output(outputFormat)
   .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
+const grn = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn } })
+  .input(gnrGeneQueryFormat)
+  .output(z.array(grnOutputFormat))
+  .query(async ({ input }) => await grnSearch(input))
+
 export const genomicElementsGenesRouters = {
   genomicElementsFromGenes,
-  genesFromGenomicElements
+  genesFromGenomicElements,
+  grn
 }

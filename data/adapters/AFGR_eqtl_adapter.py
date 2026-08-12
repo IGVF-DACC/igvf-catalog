@@ -4,9 +4,8 @@ import hashlib
 import json
 from typing import Optional
 import os
-import requests
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -21,7 +20,6 @@ class AFGREQtl(BaseAdapter):
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
-    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='AFGR_eqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
@@ -38,12 +36,9 @@ class AFGREQtl(BaseAdapter):
     def _get_collection_name(self):
         return 'variants_genes'
 
-    def process_file(self):
-        file_metadata = requests.get(
-            self.IGVF_API + self.file_accession).json()
-        self.collection_class = file_metadata['catalog_class']
-        self.method = file_metadata['catalog_method']
-        self.writer.open()
+    def parse(self):
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
             next(qtl_csv)
@@ -77,18 +72,19 @@ class AFGREQtl(BaseAdapter):
                     'chr': 'chr' + chr,
                     # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
                     # Manually changed data type from double to long in header file before importing into Arangodb
-                    'log10pvalue': float(row[8]),  # MAX=616
+                    'neg_log10_pvalue': float(row[8]),  # MAX=616
                     'p_value': float(row[9]),
                     'effect_size': float(row[10]),
-                    'class': self.collection_class,
-                    'method': self.method,
+                    'class': self.file_fileset.get('class'),
+                    'method': self.file_fileset.get('method'),
                     'label': 'eQTL',
                     'source': AFGREQtl.SOURCE,
                     'source_url': AFGREQtl.SOURCE_URL,
                     'name': 'modulates expression of',
                     'inverse_name': 'expression modulated by',
                     'biological_process': 'ontology_terms/GO_0010468',
-                    'biosample_term': 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM
+                    'biosample_term': 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM,
+                    'files_filesets': 'files_filesets/' + self.file_accession
                 }
 
                 if self.validate:
@@ -97,5 +93,4 @@ class AFGREQtl(BaseAdapter):
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
-        self.writer.close()
         self.gene_validator.log()

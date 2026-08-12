@@ -56,13 +56,36 @@
           "items": {
             "type": "string"
           }
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the ontology term, from the associated files_filesets record"
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The method of the ontology term, from the associated files_filesets record"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the ontology term",
+          "example": "files_filesets/IGVFFI9279GNOP",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
         "uri",
         "term_id",
         "synonyms",
-        "subset"
+        "subset",
+        "class",
+        "method",
+        "files_filesets"
       ]
     }
   ],

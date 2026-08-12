@@ -25,7 +25,7 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
-  log10pvalue: z.number().nullish(),
+  neg_log10_pvalue: z.number().nullish(),
   chr: z.string(),
   biological_context: z.string().nullish(),
   effect_size: z.number().nullish(),
@@ -35,12 +35,16 @@ const qtlsSummaryFormat = z.object({
     gene_start: z.number(),
     gene_end: z.number()
   }).nullish(),
-  name: z.string().nullish()
+  name: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 const variantsGenesQueryFormat = z.object({
-  log10pvalue: z.string().trim().optional(),
+  neg_log10_pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
+  posterior_inclusion_probability: z.string().optional(),
+  log2FC: z.string().optional(),
+  significant: z.enum(['true']).optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
   label: z.enum(LABELS).optional(),
@@ -59,15 +63,18 @@ const completeQtlsFormat = z.object({
   intron_start: z.string().nullish(),
   intron_end: z.string().nullish(),
   effect_size: z.number().nullish(),
-  log10pvalue: z.number().or(z.string()).nullish(),
-  fdr_nlog10: z.number().nullish(),
-  log2_fold_change: z.number().nullish(),
-  p_nominal_nlog10: z.number().nullish(),
+  neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue_adj: z.number().nullish(),
+  log2FC: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(),
+  coefficient_stddev: z.number().nullish(),
+  power: z.number().nullish(),
+  significant: z.boolean().nullish(),
   standard_error: z.number().nullish(),
   z_score: z.number().nullish(),
   credible_set_min_r2: z.number().nullish(),
   method: z.string().nullish(),
+  crispr_modality: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
   label: z.string(),
@@ -77,13 +84,14 @@ const completeQtlsFormat = z.object({
   biosample_term: z.string(),
   study: z.string().or(studyFormat).nullish(),
   name: z.string().nullish(),
-  class: z.string().nullish()
+  class: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
 const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
 const variantsGenesAFGREQtl = getSchema('data/schemas/edges/variants_genes.AFGREQtl.json')
 const variantsGenesEQTLCatalog = getSchema('data/schemas/edges/variants_genes.EQTLCatalog.json')
-const variantsGenesVariantEFFECTSAdapter = getSchema('data/schemas/edges/variants_genes.VariantEFFECTSAdapter.json')
+const variantsGenesCRISPRVariantGene = getSchema('data/schemas/edges/variants_genes.CRISPRVariantGene.json')
 
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
@@ -98,19 +106,37 @@ function raiseInvalidParameters (param: string): void {
 }
 
 export async function qtlSummary (input: paramsFormatType): Promise<any> {
+  let idxHint = ''
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    filesetFilter = `record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    idxHint = 'OPTIONS { indexHint: "idx_persistent_files_filesets", forceIndexHint: true }'
     delete input.files_fileset
   }
 
-  input.page = 0
-  const variant = (await variantSearch(input))
+  let variantClause = ''
+  if (Object.keys(input).length !== 0) {
+    const variant = (await variantSearch(input))
 
-  if (variant.length === 0) {
+    if (variant.length === 0) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Variant not found.'
+      })
+    }
+    variantClause = `record._from == 'variants/${variant[0]._id as string}'`
+  } else if (filesetFilter === '') {
     throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'Variant not found.'
+      code: 'BAD_REQUEST',
+      message: 'At least one parameter must be defined.'
+    })
+  }
+
+  const searchClause = [variantClause, filesetFilter].filter(clause => clause !== '').join(' AND ')
+  if (searchClause === '') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one parameter must be defined.'
     })
   }
 
@@ -125,18 +151,23 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   `
 
   const query = `
-    FOR record IN variants_genes
-    FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
+    FOR record IN variants_genes ${idxHint}
+    FILTER ${searchClause}
+    SORT record._key
+    LIMIT ${(input.page as number || 0) * QUERY_LIMIT}, ${QUERY_LIMIT}
     RETURN {
+      '_id': record._id,
       qtl_type: record.label,
-      log10pvalue: record.log10pvalue or record.p_nominal_nlog10,
-      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0] OR '${variant[0].chr as string}',
+      neg_log10_pvalue: record.neg_log10_pvalue,
+      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
-      'gene': (${targetQuery})[0],
-      'name': record.name
+      gene: (${targetQuery})[0],
+      name: record.name,
+      files_filesets: record.files_filesets
     }
   `
+
   return await (await db.query(query)).all()
 }
 
@@ -151,11 +182,11 @@ export function validateVariantInput (input: paramsFormatType): void {
 }
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'alias', 'method', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'synonym', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, files_fileset'
+      message: 'At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, synonym, method, files_fileset'
     })
   }
 }
@@ -171,10 +202,10 @@ const getQueryLimit = (input: paramsFormatType): number => {
 
 const getRestrictiveFiltersArray = (input: paramsFormatType): string[] => {
   const restrictiveFiltersArray: string[] = []
-  if ('log10pvalue' in input) {
-    restrictiveFiltersArray.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
-    if (!(input.log10pvalue as string).includes(':')) {
-      raiseInvalidParameters('log10pvalue')
+  if ('neg_log10_pvalue' in input) {
+    restrictiveFiltersArray.push(`record.neg_log10_pvalue <= ${MAX_LOG10_PVALUE}`)
+    if (!(input.neg_log10_pvalue as string).includes(':')) {
+      raiseInvalidParameters('neg_log10_pvalue')
     }
   }
   if ('effect_size' in input) {
@@ -263,7 +294,7 @@ const buildVariantsGenesQuery = ({
     }
     RETURN MERGE(base,
       record.source == 'IGVF' ? {
-        ${getDBReturnStatements(variantsGenesVariantEFFECTSAdapter)}
+        ${getDBReturnStatements(variantsGenesCRISPRVariantGene)}
       } : record.source == 'AFGR' && record.label == 'spliceQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
@@ -274,7 +305,6 @@ const buildVariantsGenesQuery = ({
       } : {}
     )
   `
-
 const executeVariantsGenesQuery = async (query: string, bindVars?: Record<string, unknown>): Promise<any[]> => {
   const cursor = bindVars ? await db.query(query, bindVars) : await db.query(query)
   return await cursor.all()
@@ -413,8 +443,8 @@ const executeLevenshteinMatchQuery = async ({
 const normalizeLog10Pvalue = (objects: any[]): any[] => {
   for (let index = 0; index < objects.length; index++) {
     const element = objects[index]
-    if (element.log10pvalue === MAX_LOG10_PVALUE) {
-      objects[index].log10pvalue = 'inf'
+    if (element.neg_log10_pvalue === MAX_LOG10_PVALUE) {
+      objects[index].neg_log10_pvalue = 'inf'
     }
   }
   return objects
@@ -437,14 +467,14 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   const biologicalContext = input.biological_context as string | undefined
   delete input.biological_context
   let geneIDs: string[] = []
-  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const geneInput: paramsFormatType = (({ gene_id, hgnc_id, gene_name: name, alias }) => ({ gene_id, hgnc_id, name, alias, organism: 'Homo sapiens', page: 0 }))(input)
+    const geneInput: paramsFormatType = (({ gene_id, hgnc_id, gene_name: name, synonym }) => ({ gene_id, hgnc_id, name, synonym, organism: 'Homo sapiens', page: 0 }))(input)
     delete input.gene_id
     delete input.hgnc_id
     delete input.gene_name
-    delete input.alias
+    delete input.synonym
     delete input.organism
     const genes = await geneSearch(geneInput)
     geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
@@ -559,11 +589,8 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
   let useIndex = ''
-  if (!isVariantQuery) {
-    useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
-    if (filesetFilter !== '') {
-      useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
-    }
+  if (!isVariantQuery && filesetFilter !== '') {
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
   }
   // combine variantFilter, edgeFilters, restrictiveFilters and filesetFilter
   const baseFilters = [variantFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean)
@@ -700,7 +727,7 @@ const nearestGenes = publicProcedure
 
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().optional().default(0), limit: z.number().optional(), files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 

@@ -38,9 +38,12 @@
         "associated_with"
       ]
     },
-    "pmid": {
+    "pmids": {
       "type": "array",
       "description": "PMIDs for the disease to gene edge",
+      "items": {
+        "type": "string"
+      },
       "example": [
         "22587682"
       ]
@@ -78,6 +81,27 @@
       "enum": [
         "https://www.orphadata.com/genes/"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the disease to gene edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the disease to gene edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": "string",
+      "description": "The label of the disease to gene edge; same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the disease to gene edge",
+      "example": "files_filesets/IGVFFI4540ZCXZ",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -86,17 +110,21 @@
     "_to",
     "name",
     "inverse_name",
-    "pmid",
+    "pmids",
     "term_name",
     "gene_symbol",
     "association_type",
     "association_status",
     "source",
-    "source_url"
+    "source_url",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "pmid, term_name, gene_symbol, association_type, association_status, source, source_url"
+    "return": "pmids, term_name, gene_symbol, association_type, association_status, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "diseases_genes"
 }

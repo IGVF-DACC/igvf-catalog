@@ -1,8 +1,9 @@
-import os
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # ENSEMBL Mapping extracted from https://www.uniprot.org/id-mapping
@@ -30,12 +31,20 @@ class Motif(BaseAdapter):
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_motifs.tsv'
 
-    def __init__(self, filepath, label='motif', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label='motif',
+        writer: Optional[Writer] = None,
+        validate=False,
+        **kwargs
+    ):
         self.tf_ids = Motif.TF_ID_MAPPING_PATH
         self.source = Motif.SOURCE
         self.source_url = Motif.SOURCE_URL
 
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -74,16 +83,23 @@ class Motif(BaseAdapter):
                     import pdb
                     pdb.set_trace()
 
-    def process_file(self):
-        self.writer.open()
-        for filename in os.listdir(self.filepath):
+    def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
+        for input_filepath in get_files_from_folder(self.filepath):
+            filename = input_filepath.name
             if filename.endswith('.pwm'):
                 self.logger.info(filename)
                 tf_name = filename.split('.')[0]
                 model_name = filename.replace('.pwm', '')
                 if self.label == 'motif':
                     pwm = []
-                    with open(self.filepath + '/' + filename, 'r') as pwm_file:
+                    with open(input_filepath, 'r') as pwm_file:
                         next(pwm_file)
                         for line in pwm_file:
                             pwm_row = line.strip().split()
@@ -100,7 +116,10 @@ class Motif(BaseAdapter):
                         'source': self.source,
                         'source_url': self.source_url + model_name,
                         'pwm': pwm,
-                        'length': length
+                        'length': length,
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                     if self.validate:
@@ -125,7 +144,10 @@ class Motif(BaseAdapter):
                             'name': 'is used by',
                             'inverse_name': 'uses',
                             'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
-                            'source': self.source
+                            'source': self.source,
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
 
                         if self.validate:
@@ -133,5 +155,3 @@ class Motif(BaseAdapter):
 
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
-
-        self.writer.close()

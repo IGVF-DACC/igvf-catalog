@@ -1,10 +1,37 @@
 import json
+from unittest.mock import patch
 from adapters.depmap_adapter import DepMap
 from adapters.writer import SpyWriter
 import pytest
 
 
-def test_depmap_adapter_process_file():
+# mock get_gene_map_from_arangodb so gene collection data change will not affect the test
+@pytest.fixture(autouse=True)
+def mock_gene_map():
+    """Fixture to mock get_gene_map_from_arangodb function."""
+    with patch('adapters.depmap_adapter.get_gene_map_from_arangodb') as mock_get_gene_map:
+        mock_get_gene_map.return_value = {
+            'A1BG': ['ENSG00000121410'],
+            'A1CF': ['ENSG00000148584'],
+            'A2M': ['ENSG00000175899'],
+            'A2ML1': ['ENSG00000166535'],
+            'A3GALT2': ['ENSG00000184389']
+        }
+        yield mock_get_gene_map
+
+
+@pytest.fixture(autouse=True)
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.depmap_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get:
+        mock_get.return_value = {
+            'class': 'observed data',
+            'method': 'DepMap'
+        }
+        yield mock_get
+
+
+def test_depmap_adapter_process_file(mock_file_fileset):
     writer = SpyWriter()
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
@@ -12,8 +39,10 @@ def test_depmap_adapter_process_file():
         writer=writer,
         validate=True
     )
+    adapter.file_accession = 'IGVFFI8863BMFF'
     adapter.process_file()
 
+    mock_file_fileset.assert_called_once_with('IGVFFI8863BMFF')
     assert len(writer.contents) > 1, 'No records were parsed.'
     first_item = json.loads(writer.contents[0])
 
@@ -22,7 +51,8 @@ def test_depmap_adapter_process_file():
         '_key', '_from', '_to', 'biology_context',
         'model_id', 'model_type', 'cancer_term',
         'gene_dependency', 'source', 'source_url',
-        'source_file', 'name', 'inverse_name'
+        'source_file', 'name', 'inverse_name',
+        'class', 'method', 'label', 'files_filesets'
     ]
     for key in expected_keys:
         assert key in first_item, f'Missing key: {key}'
@@ -33,6 +63,10 @@ def test_depmap_adapter_process_file():
     assert first_item['source_file'] == 'CRISPRGeneDependency.csv'
     assert first_item['name'] == 'essential in'
     assert first_item['inverse_name'] == 'dependent on'
+    assert first_item['class'] == 'observed data'
+    assert first_item['method'] == 'DepMap'
+    assert first_item['label'] == first_item['method']
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI8863BMFF'
 
 
 def test_depmap_adapter_initialization():
@@ -43,6 +77,7 @@ def test_depmap_adapter_initialization():
     assert adapter.filepath == './samples/DepMap/CRISPRGeneDependency_transposed_example.csv'
     assert adapter.label == 'depmap'
     assert adapter.writer is None, 'Writer should be None by default.'
+    assert adapter.file_accession == 'CRISPRGeneDependency_transposed_example'
 
 
 def test_depmap_adapter_missing_gene_id_mapping():
@@ -52,6 +87,7 @@ def test_depmap_adapter_missing_gene_id_mapping():
         label='depmap',
         writer=writer
     )
+    adapter.file_accession = 'IGVFFI8863BMFF'
     adapter.process_file()
 
     assert len(
@@ -61,6 +97,143 @@ def test_depmap_adapter_missing_gene_id_mapping():
     assert first_item['gene_dependency'] >= DepMap.CUTOFF, 'Dependency score below cutoff.'
 
 
+def test_depmap_adapter_multiple_gene_ids(mocker):
+    """A gene symbol mapping to multiple Ensembl ids should produce an edge for each id, not just the first."""
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={
+            'FAKEGENE': ['ENSG00000000001', 'ENSG00000000002'],
+        }
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
+        assert gene_ids == {'genes/ENSG00000000001', 'genes/ENSG00000000002'}
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_depmap_adapter_synonym_fallback(mocker):
+    """A gene symbol not found by name should be resolved via its synonym."""
+    def fake_gene_map(field):
+        if field == 'synonyms':
+            return {'FAKEGENE': ['ENSG00000000099']}
+        return {}
+
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        side_effect=fake_gene_map
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
+        assert gene_ids == {'genes/ENSG00000000099'}
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
+    """The (expensive) synonyms lookup should not run when every gene symbol is already matched by name."""
+    mock_get_gene_map = mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={'FAKEGENE': ['ENSG00000000001']}
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter.process_file()
+
+        mock_get_gene_map.assert_called_once_with('name')
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_depmap_adapter_gene_id_mapping_override(mocker):
+    """LOC118142757 has no reliable name/synonym match in the genes collection, so it's hardcoded."""
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={}
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['LOC118142757 (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
+        assert gene_ids == {'genes/ENSG00000290147'}
+    finally:
+        os.unlink(temp_file_path)
+
+
 def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
     adapter = DepMap(
@@ -68,6 +241,7 @@ def test_depmap_adapter_dependency_cutoff():
         label='depmap',
         writer=writer
     )
+    adapter.file_accession = 'IGVFFI8863BMFF'
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])

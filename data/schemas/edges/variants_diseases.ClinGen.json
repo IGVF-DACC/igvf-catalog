@@ -78,6 +78,27 @@
       "enum": [
         "https://search.clinicalgenome.org/kb/downloads"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the variant to disease edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the variant to disease edge, from the associated files_filesets record"
+    },
+    "label": {
+      "type": "string",
+      "description": "The label of the variant to disease edge; same value as method"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the variant to disease edge",
+      "example": "files_filesets/IGVFFI5852GYTT",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -90,11 +111,15 @@
     "source_url",
     "gene_id",
     "assertion",
-    "pmids"
+    "pmids",
+    "class",
+    "method",
+    "label",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "inheritance_mode, assertion, gene_id, pmids"
+    "return": "assertion, gene_id, pmids, class, method, label, files_filesets"
   },
   "db_collection_name": "variants_diseases"
 }

@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS variants (
 	ref String,
 	alt String,
  	qual String,
-	filter String,
 	variation_type String,
 	annotations JSON,
 	spdi String,
@@ -376,33 +375,6 @@ CREATE TABLE IF NOT EXISTS variants_phenotypes (
 	ontology_terms_id String
 );
 
-CREATE TABLE IF NOT EXISTS variants_phenotypes_studies (
-	lead_chrom String,
-	lead_pos UInt32,
-	lead_ref String,
-	lead_alt String,
-	phenotype_term String,
-	direction String,
-	beta Float64,
-	beta_ci_lower Float64,
-	beta_ci_upper Float64,
-	odds_ratio Float64,
-	oddsr_ci_lower Float64,
-	oddsr_ci_upper Float64,
-	p_val_mantissa Float64,
-	p_val_exponent Float64,
-	p_val Float64,
-	log10pvalue Float64,
-	tagged_variants Array(JSON),
-	source String,
-	version String,
-	name String,
-	inverse_name String,
-	variants_phenotypes_id String,
-	studies_id String
-)
-engine MergeTree order by (variants_phenotypes_id, studies_id);
-
 CREATE TABLE IF NOT EXISTS drugs (
 	name String,
 	drug_ontology_terms Array(String),
@@ -486,7 +458,7 @@ CREATE TABLE IF NOT EXISTS variants_proteins_terms (
 CREATE TABLE IF NOT EXISTS variants_genes (
 	chr String,
 	p_value Float64,
-	log10pvalue Float64,
+	neg_log10_pvalue Float64,
 	effect_size Float64,
 	sqrt_maf Float64,
 	pval_nominal_threshold Float64,
@@ -759,7 +731,7 @@ CREATE TABLE IF NOT EXISTS mm_genomic_elements (
 
 CREATE TABLE IF NOT EXISTS variants_genomic_elements (
 	label String,
-	log10pvalue Float64,
+	neg_log10_pvalue Float64,
 	p_value Float64,
 	beta Float64,
 	source String,

@@ -88,8 +88,7 @@ class HumanMouseElementAdapter(BaseAdapter):
         else:
             return 'genomic_elements_mm_genomic_elements'
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             next(reader)
@@ -174,4 +173,3 @@ class HumanMouseElementAdapter(BaseAdapter):
                     self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
-        self.writer.close()

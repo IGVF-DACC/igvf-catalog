@@ -35,9 +35,9 @@
             "regulatory activity modulated by"
           ]
         },
-        "log2FoldChange": {
+        "log2FC": {
           "type": "number",
-          "description": "Log2FoldChange for the variants to biosamples edge"
+          "description": "Log2 fold change for the variants to biosamples edge"
         },
         "inputCountRef": {
           "type": "number",
@@ -128,7 +128,7 @@
       },
       "required": [
         "_key",
-        "log2FoldChange",
+        "log2FC",
         "inputCountRef",
         "inputCountAlt",
         "outputCountRef",

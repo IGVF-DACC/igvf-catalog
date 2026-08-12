@@ -90,6 +90,29 @@
       "description": "Source URL for the variant to drug edge",
       "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
       "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the variant to drug edge, from the associated files_filesets record",
+      "enum": [
+        "observed data"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the variant to drug edge, from the associated files_filesets record",
+      "enum": [
+        "PharmGKB"
+      ]
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the variant to drug edge",
+      "example": "files_filesets/IGVFFI8835SMSP",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -103,11 +126,14 @@
     "study_parameters",
     "phenotype_categories",
     "source",
-    "source_url"
+    "source_url",
+    "class",
+    "method",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url"
+    "return": "_from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url, class, method, files_filesets"
   },
   "db_collection_name": "variants_drugs"
 }

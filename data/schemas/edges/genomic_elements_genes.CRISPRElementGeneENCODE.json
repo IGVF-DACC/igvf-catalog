@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the genomic element to gene edge",
+          "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
+        },
+        "_from": {
+          "example": "genomic_elements/CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000116198",
+          "pattern": "^genes/",
+          "collections": [
+            "genes"
+          ]
+        },
+        "effect_size": {
+          "type": "number",
+          "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "Log2 fold change of readout gene expression for the perturbation."
+        },
+        "p_value": {
+          "type": ["number", "null"],
+          "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
+        },
+        "p_value_adj": {
+          "type": ["number", "null"],
+          "description": "The adjusted p value of the genomic element to gene edge. Can be 'NA' or a number."
+        },
+        "neg_log10_pvalue": {
+          "type": ["number", "null"],
+          "description": "The neg_log10_pvalue of the genomic element to gene edge"
+        },
+        "neg_log10_pvalue_adj": {
+          "type": ["number", "null"],
+          "description": "The adjusted neg_log10_pvalue of the genomic element to gene edge"
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "The significant of the genomic element to gene edge"
+        },
+        "method": {
+          "enum": [
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": [
+            "string"
+          ],
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            "interference"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "regulatory element effect on gene expression"
+          ]
+        },
+        "source": {
+          "enum": [
+            "ENCODE"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://www.encodeproject.org/files/ENCFF968BZL/"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the genomic element to gene edge",
+          "enum": [
+            "files_filesets/ENCFF968BZL"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the genomic element to gene edge",
+          "enum": [
+            "K562"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the genomic element to gene edge",
+          "enum": [
+            "ontology_terms/EFO_0002067"
+          ]
+        },
+        "name": {
+          "enum": [
+            "regulates"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "regulated by"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "effect_size",
+        "log2FC",
+        "p_value",
+        "p_value_adj",
+        "neg_log10_pvalue",
+        "neg_log10_pvalue_adj",
+        "significant",
+        "files_filesets",
+        "crispr_modality",
+        "biological_context",
+        "biosample_term"
+      ],
+      "additionalProperties": false
+
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "effect_size, log2FC",
+    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, log2FC, p_value"
+  },
+  "db_collection_name": "genomic_elements_genes"
+}

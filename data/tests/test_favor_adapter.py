@@ -11,20 +11,30 @@ def mock_writer():
     return MagicMock()
 
 
-@patch('adapters.favor_adapter.build_spdi', return_value='21:5025532:G:C')
-@patch('adapters.favor_adapter.build_hgvs_from_spdi', return_value='chr21:g.5025533G>C')
-@patch('adapters.favor_adapter.SeqRepo')
-@patch('adapters.favor_adapter.create_dataproxy')
+@patch('adapters.favor_adapter.SeqRepoDataProxy')
+@patch('adapters.favor_adapter.get_seqrepo')
 @patch('adapters.favor_adapter.AlleleTranslator')
+@patch('adapters.favor_adapter.load_variant')
 def test_process_file_writes_json(
+    mock_load_variant,
     mock_translator_cls,
-    mock_create_dp,
-    mock_seqrepo,
-    mock_build_hgvs,
-    mock_build_spdi,
+    mock_get_seqrepo,
+    mock_dp_cls,
     mock_writer,
 ):
-    # Setup mocks for translator and allele
+    mock_load_variant.return_value = ({
+        '_key': '21:5025532:G:C',
+        'name': '21:5025532:G:C',
+        'chr': 'chr21',
+        'pos': 5025531,
+        'ref': 'G',
+        'alt': 'C',
+        'variation_type': 'SNP',
+        'spdi': '21:5025532:G:C',
+        'hgvs': 'chr21:g.5025533G>C',
+        'organism': 'Homo sapiens',
+    }, None)
+
     mock_translator = MagicMock()
     mock_allele = MagicMock()
     mock_allele.digest = 'digest123'
@@ -47,10 +57,11 @@ def test_process_file_writes_json(
                       ca_ids_path='dummy.rdict', writer=mock_writer)
         favor.process_file()
 
-    # Writer should be opened, written to, and closed
-    assert mock_writer.open.called
+    # Writer should be entered (opened), written to, and exited (closed)
+    # via the context-manager protocol that BaseAdapter.process_file uses.
+    assert mock_writer.__enter__.called
     assert mock_writer.write.call_count > 0
-    assert mock_writer.close.called
+    assert mock_writer.__exit__.called
 
     # Check that the output JSON contains expected keys
     written_json = None
@@ -63,6 +74,7 @@ def test_process_file_writes_json(
     assert written_json['chr'] == 'chr21'
     assert written_json['ref'] == 'G'
     assert written_json['alt'] == 'C'
+    assert written_json['pos'] == 5025531
     assert written_json['spdi'] == '21:5025532:G:C'
     assert written_json['vrs_digest'] == 'digest123'
     assert written_json['ca_id'] == 'CA123'

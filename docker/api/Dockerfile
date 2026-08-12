@@ -1,6 +1,6 @@
 # Development Dockerfile for local development
-# Use Node.js 20.12-bookworm-slim as base image
-FROM node:20.12-bookworm-slim
+# Use Node.js 20.20.2-bookworm-slim as base image
+FROM node:20.20.2-bookworm-slim
 
 # Set working directory
 WORKDIR /docker

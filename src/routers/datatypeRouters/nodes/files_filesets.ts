@@ -16,8 +16,8 @@ const METHOD = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'method
 const CLASS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'class')
 const SOURCE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'source')
 const ASSAYS = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'preferred_assay_titles')
+const CRISPR_MODALITY = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'crispr_modality')
 const SOFTWARE = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'software')
-const CELL_ANNOTATION = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'cell_annotation')
 
 const filesFilesetsQueryFormat = z.object({
   file_fileset_id: z.string().optional(),
@@ -25,11 +25,14 @@ const filesFilesetsQueryFormat = z.object({
   lab: z.enum(LABS).optional(),
   preferred_assay_title: z.enum(ASSAYS).optional(),
   method: z.enum(METHOD).optional(),
+  crispr_modality: z.enum(CRISPR_MODALITY).optional(),
   donor_id: z.string().optional(),
   sample_term: z.string().optional(),
   sample_summary: z.string().optional(),
   software: z.enum(SOFTWARE).optional(),
-  cell_annotation: z.enum(CELL_ANNOTATION).optional(),
+  cell_annotation: z.string().optional(),
+  cell_annotation_term: z.string().optional(),
+  has_genome_browser_link: z.enum(['true', 'false']).optional(),
   source: z.enum(SOURCE).optional(),
   class: z.enum(CLASS).optional(),
   page: z.number().default(0),
@@ -45,13 +48,13 @@ const filesFilesetsQueryFormat = z.object({
   ...rest
 }))
 
-const filesFilesetsFormat = z.object({
+export const filesFilesetsFormat = z.object({
   _id: z.string(),
   file_set_id: z.string(),
   lab: z.string(),
   preferred_assay_titles: z.array(z.string()).nullish(),
   assay_term_ids: z.array(z.string()).nullish(),
-  method: z.string(),
+  method: z.string().nullish(),
   class: z.string(),
   software: z.array(z.string()).nullish(),
   collections: z.array(z.string()).nullish(),
@@ -60,9 +63,12 @@ const filesFilesetsFormat = z.object({
   simple_sample_summaries: z.array(z.string()).nullish(),
   donors: z.array(z.string()).nullish(),
   source: z.string(),
-  source_url: z.string(),
+  source_url: z.string().nullish(),
   download_link: z.string(),
-  cell_annotation: z.string().nullish()
+  cell_annotation: z.string().nullish(),
+  cell_annotation_term: z.string().nullish(),
+  genome_browser_link: z.string().nullish(),
+  crispr_modality: z.string().nullish()
 })
 
 async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
@@ -76,8 +82,19 @@ async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
     input.samples = `ontology_terms/${input.samples as string}`
   }
 
+  if (input.cell_annotation_term !== undefined) {
+    input.cell_annotation_term = `ontology_terms/${input.cell_annotation_term as string}`
+  }
+
   if (input.donors !== undefined) {
     input.donors = `donors/${input.donors as string}`
+  }
+
+  let hasGenomeBrowserFilter = ''
+  if (input.has_genome_browser_link !== undefined) {
+    hasGenomeBrowserFilter = 'FILTER record.genome_browser_link '
+    hasGenomeBrowserFilter += (input.has_genome_browser_link === 'true') ? '!= NULL' : '== NULL'
+    delete input.has_genome_browser_link
   }
 
   let filterBy = ''
@@ -89,6 +106,7 @@ async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
   const query = `
     FOR record IN ${filesFilesetsCollectionName}
     ${filterBy}
+    ${hasGenomeBrowserFilter}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(filesFilesetsSchema)} }

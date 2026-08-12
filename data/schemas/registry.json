@@ -28,9 +28,11 @@
             "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
             "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json",
-            "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
+            "CRISPRElementGeneENCODE": "schemas/nodes/genomic_elements.CRISPRElementGeneENCODE.json",
             "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
-            "IGVFE2GCRISPR": "schemas/nodes/genomic_elements.IGVFE2GCRISPR.json",
+            "CRISPRElementGeneIGVF": "schemas/nodes/genomic_elements.CRISPRElementGeneIGVF.json",
+            "CRISPRElementPhenotype": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
+            "scE2G": "schemas/nodes/genomic_elements.scE2G.json",
             "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
             "MPRAAdapter": "schemas/nodes/genomic_elements.MPRAAdapter.json"
         },
@@ -58,7 +60,8 @@
             "Ontology": "schemas/nodes/ontology_terms.Ontology.json",
             "Oncotree": "schemas/nodes/ontology_terms.Oncotree.json",
             "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json",
-            "FileFileSet": "schemas/nodes/ontology_terms.FileFileSet.json"
+            "FileFileSet": "schemas/nodes/ontology_terms.FileFileSet.json",
+            "CRISPRVariantPhenotype": "schemas/nodes/ontology_terms.CRISPRVariantPhenotype.json"
         },
         "pathways": {
             "ReactomePathway": "schemas/nodes/pathways.ReactomePathway.json"
@@ -81,7 +84,9 @@
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
             "SGE": "schemas/nodes/variants.SGE.json",
             "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
-            "VariantEFFECTSAdapter": "schemas/nodes/variants.VariantEFFECTSAdapter.json"
+            "BlueSTARRVariantBiosample": "schemas/nodes/variants.BlueSTARRVariantBiosample.json",
+            "CRISPRVariantGene": "schemas/nodes/variants.CRISPRVariantGene.json",
+            "CRISPRVariantPhenotype": "schemas/nodes/variants.CRISPRVariantPhenotype.json"
         }
     },
     "edges": {
@@ -89,7 +94,9 @@
             "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
             "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
             "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
-            "SGE": "schemas/edges/coding_variants_phenotypes.SGE.json"
+            "SGE": "schemas/edges/coding_variants_phenotypes.SGE.json",
+            "DUALIPAAdapter": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
+            "VariantPaintingAdapter": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json"
         },
         "coding_variants_proteins": {
             "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
@@ -102,7 +109,8 @@
             "EBIComplex": "schemas/edges/complexes_terms.EBIComplex.json"
         },
         "diseases_genes": {
-            "Disease": "schemas/edges/diseases_genes.Disease.json"
+            "Disease": "schemas/edges/diseases_genes.Disease.json",
+            "GenccDiseasesGenes": "schemas/edges/diseases_genes.GenccDiseasesGenes.json"
         },
         "gene_products_terms": {
             "GAF": "schemas/edges/gene_products_terms.GAF.json"
@@ -127,9 +135,13 @@
             "MPRAAdapter": "schemas/edges/genomic_elements_biosamples.MPRAAdapter.json"
         },
         "genomic_elements_genes": {
-            "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
+            "CRISPRElementGeneENCODE": "schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json",
             "EncodeElementGeneLink": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
-            "IGVFE2GCRISPR": "schemas/edges/genomic_elements_genes.IGVFE2GCRISPR.json"
+            "CRISPRElementGeneIGVF": "schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json",
+            "scE2G": "schemas/edges/genomic_elements_genes.scE2G.json"
+        },
+        "genomic_elements_phenotypes": {
+            "CRISPRElementPhenotype": "schemas/edges/genomic_elements_phenotypes.CRISPRElementPhenotype.json"
         },
         "genomic_elements_mm_genomic_elements": {
             "HumanMouseElementAdapter": "schemas/edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json"
@@ -163,7 +175,8 @@
         },
         "variants_biosamples": {
             "MPRAAdapter": "schemas/edges/variants_biosamples.MPRAAdapter.json",
-            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
+            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json",
+            "BlueSTARRVariantBiosample": "schemas/edges/variants_biosamples.BlueSTARRVariantBiosample.json"
         },
         "variants_coding_variants": {
             "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
@@ -186,7 +199,7 @@
             "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
             "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json",
             "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json",
-            "VariantEFFECTSAdapter": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json"
+            "CRISPRVariantGene": "schemas/edges/variants_genes.CRISPRVariantGene.json"
         },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
@@ -195,10 +208,8 @@
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
             "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
-            "SGE": "schemas/edges/variants_phenotypes.SGE.json"
-        },
-        "variants_phenotypes_studies": {
-            "GWAS": "schemas/edges/variants_phenotypes_studies.GWAS.json"
+            "SGE": "schemas/edges/variants_phenotypes.SGE.json",
+            "CRISPRVariantPhenotype": "schemas/edges/variants_phenotypes.CRISPRVariantPhenotype.json"
         },
         "variants_proteins": {
             "ASB": "schemas/edges/variants_proteins.ASB.json",

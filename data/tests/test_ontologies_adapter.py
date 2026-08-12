@@ -1,6 +1,10 @@
+import json
+import os
+
 import pytest
 from unittest.mock import MagicMock, patch
 from rdflib import URIRef, BNode, Literal
+from owlready2 import get_ontology
 from adapters.ontologies_adapter import Ontology
 
 
@@ -44,6 +48,42 @@ def test_init_sets_attributes(mock_writers):
     assert ont.filepath == 'dummy.owl'
     assert ont.ontology == 'uberon'
     assert ont.node_primary_writer is mock_writers['node_primary_writer']
+    assert ont.file_accession == 'IGVFFI7407XTPX'
+
+
+@patch('adapters.ontologies_adapter.get_file_fileset_by_accession_in_arangodb')
+@patch('adapters.ontologies_adapter.get_ontology')
+@patch('adapters.ontologies_adapter.default_world')
+def test_process_ontology_sets_file_metadata(mock_default_world, mock_get_ontology, mock_get_file_fileset, mock_writers, tmp_path):
+    mock_graph = MagicMock()
+    mock_graph.subject_objects.return_value = []
+    mock_default_world.as_rdflib_graph.return_value = mock_graph
+    mock_onto = MagicMock()
+    mock_get_ontology.return_value.load.return_value = mock_onto
+    mock_get_file_fileset.return_value = {
+        'class': 'biological relationship',
+        'method': None
+    }
+
+    owl_file = tmp_path / 'dummy.owl'
+    owl_file.write_text('<owl:Class rdf:about="http://example.org/A"/>\n')
+
+    ont = Ontology(
+        filepath=str(owl_file),
+        ontology='uberon',
+        node_primary_writer=mock_writers['node_primary_writer'],
+        node_secondary_writer=mock_writers['node_secondary_writer'],
+        edge_primary_writer=mock_writers['edge_primary_writer'],
+        edge_secondary_writer=mock_writers['edge_secondary_writer'],
+    )
+    ont.process_ontology()
+
+    mock_get_file_fileset.assert_called_once_with('IGVFFI7407XTPX')
+    for writer in mock_writers.values():
+        writer.add_tag.assert_called_once_with(
+            'portal_accessions', 'IGVFFI7407XTPX')
+    assert ont.collection_class == 'biological relationship'
+    assert ont.method is None
 
 
 @patch('adapters.ontologies_adapter.get_ontology')
@@ -64,9 +104,12 @@ def test_process_file_opens_and_closes_writers(mock_default_world, mock_get_onto
     )
     with patch.object(ont, 'process_ontology') as mock_process_ontology:
         ont.process_file()
+    # process_file drives the writers through the context-manager protocol
+    # (via ExitStack), so each writer is entered and exited rather than having
+    # open()/close() called directly.
     for w in mock_writers.values():
-        assert w.open.called
-        assert w.close.called
+        assert w.__enter__.called
+        assert w.__exit__.called
 
 
 def test_predicate_name_returns_expected_strings():
@@ -139,3 +182,110 @@ def test_find_go_nodes_returns_namespace_dict(ontology_instance):
     result = ontology_instance.find_go_nodes(mock_graph)
     assert result[URIRef('A')] == 'molecular_function'
     assert URIRef('B') not in result
+
+
+def test_dedupe_punned_classes_removes_conflicting_class_decl(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        '<!-- http://example.org/OTHER_CLASS -->\n'
+        '<owl:Class rdf:about="http://example.org/OTHER_CLASS">\n'
+        '    <rdfs:label>other class</rdfs:label>\n'
+        '</owl:Class>\n'
+        '<owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"/>\n'
+        '<!-- http://purl.obolibrary.org/obo/STATO_0000416 -->\n'
+        '<owl:Class rdf:about="http://purl.obolibrary.org/obo/STATO_0000416">\n'
+        '    <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/STATO_0000607"/>\n'
+        '</owl:Class>\n'
+    )
+
+    cleaned_path = ontology_instance._dedupe_punned_classes(str(owl_file))
+
+    assert cleaned_path != str(owl_file)
+    cleaned_content = open(cleaned_path).read()
+    assert 'owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"' in cleaned_content
+    assert 'owl:Class rdf:about="http://purl.obolibrary.org/obo/STATO_0000416"' not in cleaned_content
+    assert 'owl:Class rdf:about="http://example.org/OTHER_CLASS"' in cleaned_content
+    os.remove(cleaned_path)
+
+
+def test_to_key_sanitizes_illegal_arangodb_key_characters():
+    assert Ontology.sanitize_key('Wikipedia_Artery#Systemic_arteries') == \
+        'Wikipedia_Artery_Systemic_arteries'
+    assert Ontology.sanitize_key('safe-Key_1.2:3') == 'safe-Key_1.2:3'
+
+
+def test_process_edges_sanitizes_xref_key_with_hash(ontology_instance, mock_writers):
+    ontology_instance.outputs = {
+        'node': {'primary': mock_writers['node_primary_writer'], 'secondary': mock_writers['node_secondary_writer']},
+        'edge': {'primary': mock_writers['edge_primary_writer'], 'secondary': mock_writers['edge_secondary_writer']},
+    }
+    ontology_instance.collection_class = 'biological relationship'
+    ontology_instance.method = None
+    ontology_instance.file_accession = 'IGVFFI0000TEST'
+
+    from_node = URIRef('http://purl.obolibrary.org/obo/UBERON_0004573')
+    to_node = Literal('Wikipedia:Artery#Systemic_arteries')
+    ontology_instance.graph = MagicMock()
+    ontology_instance.graph.subject_objects.return_value = [
+        (from_node, to_node)]
+
+    ontology_instance.process_edges(Ontology.DB_XREF)
+
+    written_doc = json.loads(
+        mock_writers['edge_primary_writer'].write.call_args[0][0])
+    assert '#' not in written_doc['_key']
+    assert '#' not in written_doc['_to']
+    assert written_doc['_key'] == 'UBERON_0004573_oboInOwl.hasDbXref_Wikipedia_Artery_Systemic_arteries'
+    assert written_doc['_to'] == 'ontology_terms/Wikipedia_Artery_Systemic_arteries'
+
+
+def test_dedupe_punned_classes_noop_when_no_punning(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        '<owl:Class rdf:about="http://example.org/OTHER_CLASS">\n'
+        '    <rdfs:label>other class</rdfs:label>\n'
+        '</owl:Class>\n'
+        '<owl:AnnotationProperty rdf:about="http://example.org/SOME_PROPERTY"/>\n'
+    )
+
+    cleaned_path = ontology_instance._dedupe_punned_classes(str(owl_file))
+
+    assert cleaned_path == str(owl_file)
+
+
+def test_convert_functional_syntax_noop_for_rdfxml(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        '<?xml version="1.0"?>\n'
+        '<owl:Class rdf:about="http://example.org/OTHER_CLASS"/>\n'
+    )
+
+    result_path = ontology_instance._convert_functional_syntax_if_needed(
+        str(owl_file))
+
+    assert result_path == str(owl_file)
+
+
+def test_convert_functional_syntax_converts_to_rdfxml(ontology_instance, tmp_path):
+    owl_file = tmp_path / 'sample.owl'
+    owl_file.write_text(
+        'Prefix(:=<http://example.org/test.owl#>)\n'
+        'Prefix(owl:=<http://www.w3.org/2002/07/owl#>)\n'
+        'Ontology(<http://example.org/test.owl>\n'
+        'Declaration(Class(<http://example.org/test.owl#TestClass>))\n'
+        ')\n'
+    )
+
+    result_path = ontology_instance._convert_functional_syntax_if_needed(
+        str(owl_file))
+
+    try:
+        assert result_path != str(owl_file)
+        content = open(result_path).read()
+        assert content.lstrip().startswith('<')
+        assert 'TestClass' in content
+
+        onto = get_ontology(result_path).load()
+        assert any('TestClass' in str(c) for c in onto.classes())
+    finally:
+        os.remove(result_path)

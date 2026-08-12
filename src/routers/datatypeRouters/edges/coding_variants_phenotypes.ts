@@ -31,7 +31,7 @@ const codingVariantsPhenotypeAggregationFormat = z.object({
 const fromCodingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
-  protein_name: z.string().optional(),
+  uniprot_name: z.string().optional(),
   gene_name: z.string().optional(),
   amino_acid_position: z.number().optional(),
   transcript_id: z.string().optional(),
@@ -52,6 +52,7 @@ const scoreSummaryOutputFormat = z.object({
 const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
+  // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence)
   score: z.number().nullable(),
   method: z.string().nullish().optional(),
   class: z.string().nullish(),
@@ -69,7 +70,7 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneCollectionName = 'genes'
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id', 'method', 'files_fileset'] as const
+  const validKeys = ['coding_variant_name', 'hgvsp', 'uniprot_name', 'gene_name', 'transcript_id', 'method', 'files_fileset'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
@@ -77,7 +78,7 @@ function variantQueryValidation (input: paramsFormatType): void {
   if (definedKeysCount < 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one coding variant property is required.'
+      message: 'At least one of the following properties is required: coding_variant_name, hgvsp, uniprot_name, gene_name, transcript_id, method, files_fileset.'
     })
   }
 }
@@ -91,7 +92,7 @@ function phenotypeQueryValidation (input: paramsFormatType): void {
   if (definedKeysCount < 1) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one coding variant property is required.'
+      message: 'At least one of the following properties is required: phenotype_id, phenotype_name, method, files_fileset.'
     })
   }
 }
@@ -182,7 +183,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'variant': {
           ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
         },
-        'score': phenoEdges.score,
+        'score': phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
         'method': phenoEdges.method,
         'class': phenoEdges.class,
         'label': phenoEdges.label,
@@ -207,6 +208,11 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     // all name properties are copies of the _key property
     input._key = input.coding_variant_name as string
     delete input.coding_variant_name
+  }
+  if (input.uniprot_name !== undefined) {
+    // in collection coding_variants, protein uniprot name is stored in protein_name field, not uniprot_name
+    input.protein_name = input.uniprot_name
+    delete input.uniprot_name
   }
 
   let limit = QUERY_LIMIT
@@ -286,7 +292,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
       'class': phenoEdges.class,
       'label': phenoEdges.label,
       'files_filesets': phenoEdges.files_filesets,
-      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score,
+      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
       'source_url': phenoEdges.source_url
     }
   `
@@ -379,7 +385,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
         gene_name: cv.gene_name,
         transcript_id: cv.transcript_id,
         dataType: p.method,
-        score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+        score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score OR p.localization_score,
         portalLink: p.source_url
       }
   `

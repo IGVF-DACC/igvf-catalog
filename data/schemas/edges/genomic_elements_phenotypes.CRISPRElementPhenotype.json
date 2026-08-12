@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_phenotypes.CRISPRElementPhenotype.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the genomic element to phenotype edge",
+          "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477"
+        },
+        "_from": {
+          "example": "genomic_elements/CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/GO_0016477",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "z_score": {
+          "type": "number",
+          "description": "Average phenotype z-score across guides targeting the genomic element"
+        },
+        "p_value": {
+          "type": "number",
+          "description": "Phenotype association p-value for the genomic element"
+        },
+        "neg_log10_pvalue": {
+          "type": "number",
+          "description": "Negative log10 of the phenotype p-value"
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the genomic element met the significance threshold for the phenotype"
+        },
+        "num_guides": {
+          "type": "number",
+          "description": "Number of guides targeting the genomic element"
+        },
+        "num_guides_hit": {
+          "type": "number",
+          "description": "Number of guides that met hit thresholds"
+        },
+        "num_guides_nonhit": {
+          "type": "number",
+          "description": "Number of guides that did not meet hit thresholds"
+        },
+        "fraction_guides_hit": {
+          "type": "number",
+          "description": "Fraction of guides that met hit thresholds"
+        },
+        "method": {
+          "enum": [
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": "string",
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            "interference"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "regulatory element effect on phenotype"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the genomic element to phenotype edge",
+          "example": "files_filesets/IGVFFI5135QZCS",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the genomic element to phenotype edge",
+          "example": "human HFF-1 cell line from donor(s) IGVFDO0058YJWC"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the genomic element to phenotype edge",
+          "example": "ontology_terms/CLO_0003730",
+          "pattern": "^ontology_terms/"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The treatments term ids of the genomic element to phenotype edge"
+        },
+        "name": {
+          "enum": [
+            "associated with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "z_score",
+        "p_value",
+        "neg_log10_pvalue",
+        "significant",
+        "num_guides",
+        "num_guides_hit",
+        "num_guides_nonhit",
+        "fraction_guides_hit",
+        "files_filesets",
+        "crispr_modality",
+        "biological_context",
+        "biosample_term"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "z_score, p_value, neg_log10_pvalue",
+    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, num_guides_hit, num_guides_nonhit, fraction_guides_hit"
+  },
+  "db_collection_name": "genomic_elements_phenotypes"
+}

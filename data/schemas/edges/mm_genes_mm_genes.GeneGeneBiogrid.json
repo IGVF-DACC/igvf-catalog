@@ -132,22 +132,22 @@
         "method": {
           "enum": [
             "dosage rescue (sensu BioGRID)",
+            "dosage rescue (sensu BioGRID), synthetic haploinsufficiency (sensu BioGRID)",
             "negative genetic interaction (sensu BioGRID)",
             "negative genetic interaction (sensu BioGRID), synthetic lethality (sensu BioGRID)",
             "phenotypic enhancement (sensu BioGRID)",
             "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID), synthetic haploinsufficiency (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID), synthetic lethality (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), synthetic growth defect (sensu BioGRID)",
             "phenotypic enhancement (sensu BioGRID), synthetic lethality (sensu BioGRID)",
             "phenotypic suppression (sensu BioGRID)",
             "positive genetic interaction (sensu BioGRID)",
             "synthetic growth defect (sensu BioGRID)",
-            "synthetic growth defect (sensu BioGRID), phenotypic enhancement (sensu BioGRID)",
             "synthetic haploinsufficiency (sensu BioGRID)",
-            "synthetic haploinsufficiency (sensu BioGRID), dosage rescue (sensu BioGRID)",
-            "synthetic haploinsufficiency (sensu BioGRID), phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
             "synthetic lethality (sensu BioGRID)",
-            "synthetic lethality (sensu BioGRID), phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
             "synthetic rescue (sensu BioGRID)"
-        ]
+          ]
         },
         "label": {
           "enum": [
@@ -157,6 +157,15 @@
         "class": {
           "enum": [
             "observed data"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the mouse gene to gene edge",
+          "example": "files_filesets/IGVFFI1165YVBA",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
           ]
         },
         "source_url": {
@@ -175,14 +184,15 @@
         "confidence_value_intact",
         "pmids",
         "z_score",
-        "molecular_function"
+        "molecular_function",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
     "filter_by_range": "z_score",
-    "return": "z_score, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, label, method, class, source, pmids"
+    "return": "z_score, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, label, method, class, source, pmids, files_filesets, source_url"
   },
   "db_collection_name": "mm_genes_mm_genes"
 }

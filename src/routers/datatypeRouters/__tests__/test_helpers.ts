@@ -35,7 +35,7 @@ describe('verboseItems', () => {
     FOR record in genes_pathways
     FILTER record._id in ['id1','id2']
     RETURN {
-      'source': record['source'], 'source_url': record['source_url'], 'organism': record['organism']
+      'source': record['source'], 'source_url': record['source_url'], 'organism': record['organism'], 'class': record['class'], 'method': record['method'], 'label': record['label'], 'files_filesets': record['files_filesets']
     }`)
     expect(result).toEqual({
       id1: { _id: 'id1', name: 'Item 1' },
@@ -101,6 +101,27 @@ describe('getFilterStatements', () => {
     expect(result).toEqual(
       'record.start < 200 AND record.end > 100'
     )
+  })
+
+  it('should apply operators to range-filterable numeric fields', () => {
+    const result = getFilterStatements(GENES_SCHEMA, { start: 'gte:100' })
+
+    expect(result).toEqual("record['start'] >= 100")
+  })
+
+  it('should reject a non-numeric operand on a range-filterable field instead of injecting it into AQL', () => {
+    // Regression test: a bare non-numeric value used to be interpolated unquoted into AQL
+    // (e.g. `record['start'] == C5X2Cfnl1M75`), which ArangoDB parsed as a collection/view
+    // reference and failed with "collection or view not found: C5X2Cfnl1M75".
+    expect(() => getFilterStatements(GENES_SCHEMA, { start: 'C5X2Cfnl1M75' })).toThrow(TRPCError)
+  })
+
+  it('should reject a non-numeric operand after a range operator', () => {
+    expect(() => getFilterStatements(GENES_SCHEMA, { start: 'gte:C5X2Cfnl1M75' })).toThrow(TRPCError)
+  })
+
+  it('should reject a non-numeric bound in a "range:" filter', () => {
+    expect(() => getFilterStatements(GENES_SCHEMA, { start: 'range:100-abc' })).toThrow(TRPCError)
   })
 })
 

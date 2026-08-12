@@ -8,19 +8,32 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, motifsCommonQueryFormat, proteinsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
+
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'motifs_proteins', 'method')
 
 const motifsToProteinsFormat = z.object({
   source: z.string().optional(),
   protein: z.string().or(proteinFormat).optional(),
   complex: z.string().or(complexFormat).optional(),
   motif: z.string().or(motifFormat).optional(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish()
 })
 
-const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
+const proteinsQuery = proteinsCommonQueryFormat.merge(z.object({
+  files_fileset: z.string().optional(),
+  method: z.enum(METHODS).optional()
+})).merge(commonHumanEdgeParamsFormat)
+
+const motifsToProteinsQueryFormat = motifsCommonQueryFormat.merge(z.object({
+  files_fileset: z.string().optional(),
+  method: z.enum(METHODS).optional()
+})).merge(commonHumanEdgeParamsFormat)
 
 const motifProteinCollectionName = 'motifs_proteins'
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
@@ -42,6 +55,18 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
+  }
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = ` AND record.method == '${input.method as string}'`
+    delete input.method
   }
 
   let filterBy = ''
@@ -70,26 +95,32 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
     LET motifsProteins = (
 
     FOR record IN ${motifProteinCollectionName}
-      FILTER record._from IN sources and record._to LIKE 'proteins/%'
+      FILTER record._from IN sources and record._to LIKE 'proteins/%' ${filesetFilter} ${methodFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         motif: record._key,
         'source': record['source'],
         'protein': ${input.verbose === 'true' ? `(${verboseQueryProtein})[0]` : 'record._to'},
-        'name': record.name
+        'name': record.name,
+        'class': record.class,
+        'method': record.method,
+        'files_filesets': record.files_filesets
       }
    )
     LET motifsComplexes = (
       FOR record IN ${motifProteinCollectionName}
-        FILTER record._from IN sources and record._to LIKE 'complexes/%'
+        FILTER record._from IN sources and record._to LIKE 'complexes/%' ${filesetFilter} ${methodFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
           motif: record._key,
           'source': record['source'],
           'complex': ${input.verbose === 'true' ? `(${verboseQueryComplex})[0]` : 'record._to'},
-          'name': record.name
+          'name': record.name,
+          'class': record.class,
+          'method': record.method,
+          'files_filesets': record.files_filesets
         }
     )
     RETURN APPEND(motifsProteins, motifsComplexes)
@@ -108,6 +139,18 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = ` AND record.method == '${input.method as string}'`
+    delete input.method
+  }
+
   const verboseQuery = `
     FOR otherRecord IN ${motifCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
@@ -120,14 +163,17 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 
       LET proteinsMotifs = (
       FOR record IN ${motifProteinCollectionName}
-      FILTER record._to IN proteins
+      FILTER record._to IN proteins ${filesetFilter} ${methodFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         'protein': record._to,
         'source': record.source,
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+        'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+        'class': record.class,
+        'method': record.method,
+        'files_filesets': record.files_filesets
       }
       )
       LET complexes = (
@@ -139,14 +185,17 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET complexesMotifs = (
         FOR record IN ${motifProteinCollectionName}
-        FILTER record._to IN complexes
+        FILTER record._to IN complexes ${filesetFilter} ${methodFilter}
         SORT record._key
         LIMIT 0, ${limit}
         RETURN {
           'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
           'complex': record._to,
           'source': record.source,
-          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+          'class': record.class,
+          'method': record.method,
+          'files_filesets': record.files_filesets
         }
       )
       RETURN APPEND(proteinsMotifs, complexesMotifs)
@@ -180,26 +229,32 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       )
       LET motifsProteins = (
         FOR record IN ${motifProteinCollectionName}
-          FILTER record._to IN proteins
+          FILTER record._to IN proteins ${filesetFilter} ${methodFilter}
           SORT record._key
           LIMIT ${input.page as number * limit}, ${limit}
           RETURN {
             'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
             'protein': record._to,
             'source': record.source,
-            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+            'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+            'class': record.class,
+            'method': record.method,
+            'files_filesets': record.files_filesets
           }
       )
       LET motifsComplexes = (
         FOR record IN ${motifProteinCollectionName}
-          FILTER record._to IN complexes
+          FILTER record._to IN complexes ${filesetFilter} ${methodFilter}
           SORT record._key
           LIMIT ${input.page as number * limit}, ${limit}
           RETURN {
             'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
             'complex': record._to,
             'source': record.source,
-            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+            'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+            'class': record.class,
+            'method': record.method,
+            'files_filesets': record.files_filesets
           }
       )
       RETURN APPEND(motifsProteins, motifsComplexes)
@@ -220,7 +275,7 @@ const motifsFromProteins = publicProcedure
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
-  .input(motifsCommonQueryFormat.merge(commonHumanEdgeParamsFormat))
+  .input(motifsToProteinsQueryFormat)
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await proteinsFromMotifSearch(input))
 

@@ -1,4 +1,4 @@
-import { filesFilesetsRouters } from '../../../datatypeRouters/nodes/files_filesets'
+import { filesFilesetsRouters, filesFilesetsFormat } from '../../../datatypeRouters/nodes/files_filesets'
 import * as dbModule from '../../../../database'
 import * as helpers from '../../../datatypeRouters/_helpers'
 
@@ -26,13 +26,14 @@ describe('filesFilesetsRouters.filesFilesets', () => {
       donors: ['donors/D1'],
       source: 'IGVF',
       source_url: 'https://data.igvf.org/signal-files/IGVFFI8400FXRX/',
-      download_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig'
+      download_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig',
+      genome_browser_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig'
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('lab == "jesse-engreitz"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, file_set_id, lab, preferred_assay_titles, method, class, software, samples, donors, source, source_url, download_link')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, file_set_id, lab, preferred_assay_titles, method, class, software, samples, donors, source, source_url, download_link, genome_browser_link')
 
     const input = {
       lab: 'jesse-engreitz',
@@ -93,5 +94,32 @@ describe('filesFilesetsRouters.filesFilesets', () => {
     // The transformation should prepend the correct string
     // You can check the query string or rely on the mock to be called
     expect(dbModule.db.query).toHaveBeenCalled()
+  })
+})
+
+describe('filesFilesetsFormat', () => {
+  const baseRecord = {
+    _id: '1',
+    file_set_id: 'FS1',
+    lab: 'jesse-engreitz',
+    class: 'observed data',
+    source: 'IGVF',
+    download_link: 'https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig'
+  }
+
+  // Regression test: some real file_filesets records legitimately have method: null and/or
+  // source_url: null (per the JSON schema's ["string", "null"] type), but the output format
+  // previously declared these as required non-nullable strings, causing "Output validation
+  // failed" whenever such a record was returned (e.g. /files-filesets?limit=500&page=2).
+  it('accepts records with a null method', () => {
+    expect(() => filesFilesetsFormat.parse({ ...baseRecord, method: null, source_url: 'https://example.com' })).not.toThrow()
+  })
+
+  it('accepts records with a null source_url', () => {
+    expect(() => filesFilesetsFormat.parse({ ...baseRecord, method: 'MPRA', source_url: null })).not.toThrow()
+  })
+
+  it('accepts records with both method and source_url null', () => {
+    expect(() => filesFilesetsFormat.parse({ ...baseRecord, method: null, source_url: null })).not.toThrow()
   })
 })

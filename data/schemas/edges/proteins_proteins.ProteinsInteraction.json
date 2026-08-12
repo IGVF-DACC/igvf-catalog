@@ -217,7 +217,7 @@
             "x-ray fiber diffraction",
             "yeast display",
             "zymography"
-        ]
+          ]
         },
         "detection_method_code": {
           "type": "string",
@@ -299,8 +299,7 @@
           "enum": [
             "BioGRID",
             "BioGRID; IntAct",
-            "IntAct",
-            "IntAct; BioGRID"
+            "IntAct"
           ]
         },
         "pmids": {
@@ -345,23 +344,27 @@
             "ampylation reaction",
             "association",
             "association, colocalization",
+            "association, colocalization, direct interaction, physical association",
+            "association, colocalization, physical association",
+            "association, covalent binding",
             "association, direct interaction",
+            "association, direct interaction, physical association",
+            "association, direct interaction, protein cleavage",
+            "association, disulfide bond",
+            "association, hydroxylation reaction",
             "association, phosphorylation reaction",
             "association, physical association",
+            "association, ubiquitination reaction",
             "atpase reaction",
             "cleavage reaction",
             "cleavage reaction, direct interaction",
             "cleavage reaction, enzymatic reaction",
             "cleavage reaction, protein cleavage",
             "colocalization",
-            "colocalization, association",
-            "colocalization, association, physical association",
             "colocalization, direct interaction",
             "colocalization, direct interaction, physical association",
-            "colocalization, direct interaction, physical association, association",
             "colocalization, physical association",
             "covalent binding",
-            "covalent binding, association",
             "covalent binding, direct interaction",
             "de-ADP-ribosylation reaction",
             "deacetylation reaction",
@@ -373,18 +376,19 @@
             "dephosphorylation reaction, physical association",
             "deubiquitination reaction",
             "direct interaction",
-            "direct interaction, association",
-            "direct interaction, association, physical association",
-            "direct interaction, deacetylation reaction",
+            "direct interaction, disulfide bond",
             "direct interaction, enzymatic reaction",
             "direct interaction, glycosylation reaction",
             "direct interaction, methylation reaction",
+            "direct interaction, neddylation reaction",
             "direct interaction, phosphorylation reaction",
             "direct interaction, physical association",
-            "direct interaction, physical association, association",
+            "direct interaction, proline isomerization  reaction",
+            "direct interaction, protein cleavage",
+            "direct interaction, proximity",
+            "direct interaction, sumoylation reaction",
+            "direct interaction, ubiquitination reaction",
             "disulfide bond",
-            "disulfide bond, association",
-            "disulfide bond, direct interaction",
             "disulfide bond, physical association",
             "dna cleavage",
             "enzymatic reaction",
@@ -392,41 +396,28 @@
             "gtpase reaction",
             "guanine nucleotide exchange factor reaction",
             "hydroxylation reaction",
-            "hydroxylation reaction, association",
+            "lipid addition, myristoylation reaction",
             "lipoprotein cleavage reaction",
             "methylation reaction",
-            "myristoylation reaction, lipid addition",
             "neddylation reaction",
-            "neddylation reaction, direct interaction",
             "oxidoreductase activity electron transfer reaction",
             "palmitoylation reaction",
             "phosphorylation reaction",
+            "phosphorylation reaction, physical association",
+            "phosphorylation reaction, protein cleavage",
             "phosphotransfer reaction",
             "physical association",
-            "physical association, association",
-            "physical association, association, direct interaction",
-            "physical association, colocalization",
-            "physical association, direct interaction",
-            "physical association, phosphorylation reaction",
-            "proline isomerization  reaction, direct interaction",
+            "physical association, proximity",
+            "physical association, self interaction",
             "protein cleavage",
-            "protein cleavage, direct interaction",
-            "protein cleavage, direct interaction, association",
-            "protein cleavage, phosphorylation reaction",
             "proximity",
-            "proximity, direct interaction",
-            "proximity, physical association",
             "putative self interaction",
             "rna cleavage",
             "self interaction",
-            "self interaction, physical association",
             "sumoylation reaction",
-            "sumoylation reaction, direct interaction",
             "transglutamination reaction",
-            "ubiquitination reaction",
-            "ubiquitination reaction, association",
-            "ubiquitination reaction, direct interaction"
-        ]
+            "ubiquitination reaction"
+          ]
         },
         "label": {
           "enum": [
@@ -617,11 +608,20 @@
             "x-ray fiber diffraction",
             "yeast display",
             "zymography"
-        ]
+          ]
         },
         "class": {
           "enum": [
             "observed data"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the protein to protein edge",
+          "example": "files_filesets/IGVFFI4317VDGK",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
           ]
         },
         "source_url": {
@@ -641,13 +641,14 @@
         "confidence_value_intact",
         "pmids",
         "organism",
-        "molecular_function"
+        "molecular_function",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism, name, method, label, class, source_url"
+    "return": "_from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism, name, method, label, class, source_url, files_filesets"
   },
   "db_collection_name": "proteins_proteins"
 }

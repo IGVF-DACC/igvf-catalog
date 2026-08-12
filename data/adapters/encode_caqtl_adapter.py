@@ -63,12 +63,11 @@ class CAQtl(BaseAdapter):
         else:
             return 'variants_genomic_elements'
 
-    def process_file(self):
+    def parse(self):
         files_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.method = files_fileset['method']
         self.collection_class = files_fileset['class']
-        self.writer.open()
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 
@@ -132,4 +131,3 @@ class CAQtl(BaseAdapter):
                     self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
-        self.writer.close()

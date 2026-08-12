@@ -90,6 +90,33 @@
           "enum": [
             "https://www.ebi.ac.uk/complexportal/"
           ]
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the complex, from the associated files_filesets record"
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The method of the complex, from the associated files_filesets record"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The label of the complex, same value as method"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the complex",
+          "example": "files_filesets/IGVFFI1444TRQL",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
         }
       },
       "required": [
@@ -100,13 +127,17 @@
         "description",
         "complex_assembly",
         "complex_source",
-        "reactome_xref"
+        "reactome_xref",
+        "class",
+        "method",
+        "label",
+        "files_filesets"
       ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url"
+    "return": "_id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "complexes"
 }

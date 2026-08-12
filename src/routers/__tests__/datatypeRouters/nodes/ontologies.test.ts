@@ -57,24 +57,6 @@ describe('ontologyRouters.ontologyTerm', () => {
     expect(result).toEqual([{ uri: 'uri2', term_id: 'T2', name: 'Fuzzy Term' }])
   })
 
-  it('returns fuzzy results if no exact match and description is provided', async () => {
-    jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // exactMatchSearch returns []
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ uri: 'uri3', term_id: 'T3', name: 'Desc Term' }]) } as any) // fuzzyTextSearch returns result
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('uri, term_id, name')
-
-    const input = { description: 'desc', page: 0 }
-    const result = await ontologyRouters.ontologyTerm({
-      input,
-      ctx: {},
-      type: 'query',
-      path: '',
-      rawInput: input
-    })
-    expect(result).toEqual([{ uri: 'uri3', term_id: 'T3', name: 'Desc Term' }])
-  })
-
   it('caps limit to MAX_PAGE_SIZE', async () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([])
@@ -109,5 +91,26 @@ describe('ontologyRouters.ontologyTerm', () => {
       rawInput: input
     })
     expect(result).toEqual([])
+  })
+
+  it('transforms files_fileset input into a files_filesets filter', async () => {
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([])
+    } as any)
+    const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('uri, term_id')
+
+    const input = { files_fileset: 'IGVFFI7407XTPX', page: 0 }
+    await ontologyRouters.ontologyTerm({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    const passedInput = getFilterStatementsSpy.mock.calls[0][1]
+    expect(passedInput.files_filesets).toBe('files_filesets/IGVFFI7407XTPX')
+    expect(passedInput.files_fileset).toBeUndefined()
   })
 })

@@ -37,7 +37,7 @@ const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json
 const proteinCollectionName = proteinSchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -142,11 +142,11 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
   delete input.hgnc_id
   delete input.gene_name
-  delete input.alias
+  delete input.synonym
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
@@ -195,11 +195,11 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
   delete input.hgnc_id
   delete input.gene_name
-  delete input.alias
+  delete input.synonym
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)

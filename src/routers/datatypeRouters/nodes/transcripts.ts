@@ -4,7 +4,6 @@ import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat, transcriptsCommonQueryFormat } from '../params'
 import { getSchema } from '../schema'
 
@@ -35,16 +34,7 @@ async function findTranscriptByID (transcriptId: string, transcriptSchema: confi
     RETURN { ${getDBReturnStatements(transcriptSchema)} }
   `
 
-  const record = (await (await db.query(query)).all())[0]
-
-  if (record === undefined) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Record ${transcriptId} not found.`
-    })
-  }
-
-  return record
+  return (await (await db.query(query)).all())
 }
 
 async function findTranscripts (input: paramsFormatType, transcriptSchema: configType): Promise<any[]> {
@@ -90,7 +80,7 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
 const transcripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
   .input(transcriptsCommonQueryFormat.merge(commonNodesParamsFormat))
-  .output(z.array(transcriptFormat).or(transcriptFormat))
+  .output(z.array(transcriptFormat))
   .query(async ({ input }) => await transcriptSearch(input))
 
 export const transcriptsRouters = {

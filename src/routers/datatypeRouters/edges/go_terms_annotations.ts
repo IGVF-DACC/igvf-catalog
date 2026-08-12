@@ -40,7 +40,11 @@ const goAnnotationFormat = z.object({
   organism: z.string(),
   evidence: z.string(),
   go_id: z.string(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
+  files_filesets: z.string().nullish()
 }).optional()
 
 async function transcriptIds (id: string): Promise<any[]> {
@@ -161,7 +165,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
       RETURN DISTINCT {
         'name': record.inverse_name,
         'gene_product_id': sourceReturn._id OR dbxrefTargetReturn._id,
-        'gene_product_name': sourceReturn.name
+        'gene_product_name': sourceReturn.name,
         'go_term_name': targetReturn.name,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }

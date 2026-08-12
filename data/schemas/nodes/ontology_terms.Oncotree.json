@@ -34,11 +34,30 @@
           "enum": [
             "https://oncotree.mskcc.org/api/tumorTypes"
           ]
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the ontology term",
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The method of the ontology term",
+          "enum": [
+            null
+          ]
         }
       },
       "required": [
         "uri",
-        "term_id"
+        "term_id",
+        "class",
+        "method"
       ],
       "additionalProperties": false
     }

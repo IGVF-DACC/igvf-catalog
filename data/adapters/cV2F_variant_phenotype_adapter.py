@@ -108,10 +108,10 @@ class cV2F(BaseAdapter):
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
 
-    def process_file(self):
-        self.writer.open()
+    def parse(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
+            self.writer.add_tag('portal_accessions', self.file_accession)
             next(reader)
             headers = next(reader)
             chunk_size = 6500
@@ -133,5 +133,3 @@ class cV2F(BaseAdapter):
             elif self.label == 'variants_phenotypes':
                 self.process_variants_phenotypes_chunk(
                     chunk)
-
-        self.writer.close()

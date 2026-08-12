@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_genes.CRISPRVariantGene.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to gene edge"
+        },
+        "_from": {
+          "example": "variants/NC_000001.11:10000:T:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000187583.10",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "effect_size": {
+          "type": "number",
+          "description": "Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
+        },
+        "log2FC": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Estimated log2 fold-change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
+        },
+        "neg_log10_pvalue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of the p-value for the variant to gene edge"
+        },
+        "neg_log10_pvalue_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "FDR nlog10 for the variant to gene edge"
+        },
+        "power": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Power for the variant to gene edge"
+        },
+        "posterior_inclusion_probability": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Posterior inclusion probability from CRISPR-Millipede fine-mapping. The probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
+        },
+        "coefficient_stddev": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Standard deviation of the CRISPR-Millipede beta coefficient estimate. Reflects uncertainty in the effect size estimate."
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the variant-gene association is statistically significant. For Variant-EFFECTS, adjusted p-value < 0.05. For CRISPR-Millipede, posterior inclusion probability (PIP) > 0.1."
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "variant effect on gene expression"
+          ]
+        },
+        "name": {
+          "description": "Name for the variant to gene edge",
+          "enum": [
+            "modulates expression of"
+          ]
+        },
+        "inverse_name": {
+          "description": "Inverse name for the variant to gene edge",
+          "enum": [
+            "expression modulated by"
+          ]
+        },
+        "source": {
+          "description": "Source for the variant to gene edge",
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "description": "Source URL for the variant to gene edge",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI0524YUIL/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the variant to gene edge",
+          "example": "files_filesets/IGVFFI0332UGDD",
+          "pattern": "^files_filesets/"
+        },
+        "method": {
+          "description": "Method for the variant to gene edge, from the associated files_filesets record",
+          "enum": [
+            "Variant-EFFECTS",
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": [
+            "string"
+          ],
+          "description": "The CRISPR modality from the associated files_filesets record",
+          "enum": [
+            "prime editing",
+            "base editing"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context for the variant to gene edge",
+          "items": {
+            "type": "string"
+          },
+          "example": "THP-1"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term for the variant to gene edge",
+          "example": "ontology_terms/EFO_0002067",
+          "pattern": "^ontology_terms/"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Treatments term IDs for the variant to gene edge",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "_key",
+        "effect_size",
+        "log2FC",
+        "neg_log10_pvalue",
+        "neg_log10_pvalue_adj",
+        "power",
+        "posterior_inclusion_probability",
+        "coefficient_stddev",
+        "significant",
+        "label",
+        "source_url",
+        "files_filesets",
+        "crispr_modality",
+        "biological_context",
+        "biosample_term",
+        "treatments_term_ids"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants_genes",
+  "accessible_via": {
+    "filter_by_range": "effect_size",
+    "simplified_return": "label, source, effect_size, biological_context",
+    "return": "effect_size, log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, power, posterior_inclusion_probability, coefficient_stddev, significant, source, label, method, crispr_modality, class, source_url, files_filesets, biological_context, biosample_term"
+  }
+}
