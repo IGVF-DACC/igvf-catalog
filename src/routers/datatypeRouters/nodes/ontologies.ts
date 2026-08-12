@@ -10,7 +10,7 @@ import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 const MAX_PAGE_SIZE = 1000
 
 const ontologySchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyCollectionName = 'ontology_terms_QA' // TEMPORARY FOR QA! ontologySchema.db_collection_name as string
+const ontologyCollectionName = 'ontology_terms'
 
 const ontologySources = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'source')
 const subontologies = getCollectionEnumValuesOrThrow('nodes', 'ontology_terms', 'subontology')

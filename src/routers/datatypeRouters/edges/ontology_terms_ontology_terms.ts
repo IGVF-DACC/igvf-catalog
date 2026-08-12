@@ -10,7 +10,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const edgeCollectionName = 'ontology_terms_ontology_terms_QA' // TEMPORARY FOR QA! 'ontology_terms_ontology_terms'
+const edgeCollectionName = 'ontology_terms_ontology_terms'
 const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
 const ontologyTermCollectionName = ontologyTermSchema.db_collection_name as string
 
