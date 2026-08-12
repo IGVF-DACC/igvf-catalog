@@ -193,6 +193,7 @@ class GWAS(BaseAdapter):
         }
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
