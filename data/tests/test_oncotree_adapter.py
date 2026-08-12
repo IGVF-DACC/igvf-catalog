@@ -38,7 +38,7 @@ def test_oncotree_adapter(mock_get):
     mock_get.return_value.json.return_value = SAMPLE_RESPONSE
 
     writer = SpyWriter()
-    adapter = Oncotree(label='node', writer=writer)
+    adapter = Oncotree(label='node', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 1
     first_item = json.loads(writer.contents[0])
@@ -49,6 +49,8 @@ def test_oncotree_adapter(mock_get):
     assert 'uri' in first_item
     assert first_item['source'] == 'Oncotree'
     assert first_item['source_url'] == 'https://oncotree.mskcc.org/api/tumorTypes'
+    assert first_item['class'] == 'biological relationship'
+    assert first_item['method'] is None
 
 
 @patch('adapters.oncotree_adapter.requests.get')
@@ -56,7 +58,7 @@ def test_oncotree_adapter_edges(mock_get):
     mock_get.return_value.json.return_value = SAMPLE_RESPONSE
 
     writer = SpyWriter()
-    adapter = Oncotree(label='edge', writer=writer)
+    adapter = Oncotree(label='edge', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 1
     first_item = json.loads(writer.contents[0])
@@ -64,6 +66,8 @@ def test_oncotree_adapter_edges(mock_get):
     assert '_from' in first_item
     assert '_to' in first_item
     assert first_item['source'] == 'Oncotree'
+    assert first_item['class'] == 'biological relationship'
+    assert first_item['method'] is None
 
 
 @patch('adapters.oncotree_adapter.requests.get')

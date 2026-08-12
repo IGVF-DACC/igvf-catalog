@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
@@ -31,9 +32,11 @@ class Cellosaurus(BaseAdapter):
                   'originate from same individual as', 'derived from']
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
+    FILE_ACCESSION = 'IGVFFI9279GNOP'
 
     def __init__(self, filepath, label='ontology_term', species_filter=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.species_filter = species_filter
+        self.file_accession = Cellosaurus.FILE_ACCESSION
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -51,6 +54,13 @@ class Cellosaurus(BaseAdapter):
             return 'ontology_terms_ontology_terms'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
         graph = obonet.read_obo(self.filepath)
         same_individual_pairs = []
 
@@ -80,7 +90,10 @@ class Cellosaurus(BaseAdapter):
                     'synonyms': synonyms,
                     'source': Cellosaurus.SOURCE,
                     'source_url': Cellosaurus.SOURCE_URL_PREFIX,
-                    'subset': node_dict.get('subset', None)
+                    'subset': node_dict.get('subset', None),
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession
                 }
                 if self.validate:
                     self.validate_doc(props)
@@ -109,7 +122,10 @@ class Cellosaurus(BaseAdapter):
                             'name': edge_type,
                             'inverse_name': 'database cross-reference',
                             'source': Cellosaurus.SOURCE,
-                            'source_url': Cellosaurus.SOURCE_URL_PREFIX
+                            'source_url': Cellosaurus.SOURCE_URL_PREFIX,
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
 
                         if self.validate:
@@ -138,7 +154,10 @@ class Cellosaurus(BaseAdapter):
                             '_to': 'ontology_terms/' + to_node_key,
                             'name': edge_type.replace('_', ' '),
                             'source': Cellosaurus.SOURCE,
-                            'source_url': Cellosaurus.SOURCE_URL_PREFIX
+                            'source_url': Cellosaurus.SOURCE_URL_PREFIX,
+                            'class': self.collection_class,
+                            'method': self.method,
+                            'files_filesets': 'files_filesets/' + self.file_accession
                         }
 
                         inverse_name = 'type of'  # for name = subclass

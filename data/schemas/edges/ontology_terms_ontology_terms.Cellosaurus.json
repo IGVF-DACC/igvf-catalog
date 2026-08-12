@@ -52,6 +52,26 @@
       "enum": [
         "https://www.cellosaurus.org/"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the ontology term to ontology term edge, from the associated files_filesets record"
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The files filesets of the ontology term to ontology term edge",
+      "example": "files_filesets/IGVFFI9279GNOP",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
     }
   },
   "required": [
@@ -61,7 +81,10 @@
     "name",
     "inverse_name",
     "source",
-    "source_url"
+    "source_url",
+    "class",
+    "method",
+    "files_filesets"
   ],
   "additionalProperties": false,
   "db_collection_name": "ontology_terms_ontology_terms"

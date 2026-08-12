@@ -76,15 +76,15 @@ class CRISPRVariantPhenotype(BaseAdapter):
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
 
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.method = file_fileset['method']
+        self.collection_class = file_fileset.get('class')
         if label != 'ontology_term':
-            file_fileset = get_file_fileset_by_accession_in_arangodb(
-                self.file_accession)
-            self.method = file_fileset['method']
             self.simple_sample_summaries = file_fileset['simple_sample_summaries']
             self.biosample_term = file_fileset['samples'][0]
             self.treatments_term_ids = file_fileset.get('treatments_term_ids')
             self.crispr_modality = file_fileset.get('crispr_modality')
-            self.edge_class = file_fileset.get('class')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -244,7 +244,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
                         row, config.get('ci_upper_col')),
                     'method': self.method,
                     'crispr_modality': self.crispr_modality,
-                    'class': self.edge_class,
+                    'class': self.collection_class,
                     'label': self.COLLECTION_LABEL,
                     'name': 'associated with',
                     'inverse_name': 'associated with',
@@ -295,6 +295,9 @@ class CRISPRVariantPhenotype(BaseAdapter):
             'synonyms': synonyms,
             'source': self.SOURCE,
             'source_url': uri,
+            'class': self.collection_class,
+            'method': self.method,
+            'files_filesets': None,  # should not be associated with any datasets. See DSERV-1466
         }
         if self.validate:
             self.validate_doc(props)

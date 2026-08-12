@@ -56,6 +56,23 @@
       "enum": [
         "Oncotree"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "The class of the ontology term to ontology term edge",
+      "enum": [
+        "biological relationship"
+      ]
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The method of the ontology term to ontology term edge",
+      "enum": [
+        null
+      ]
     }
   },
   "required": [
@@ -65,7 +82,9 @@
     "name",
     "inverse_name",
     "type",
-    "source"
+    "source",
+    "class",
+    "method"
   ],
   "additionalProperties": false,
   "db_collection_name": "ontology_terms_ontology_terms"

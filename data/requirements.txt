@@ -6,6 +6,7 @@ pytest-mock
 biopython
 Owlready2==0.40
 rdflib
+funowl==0.2.3
 obonet==1.0.0
 hgvs==1.5.4
 pre-commit==3.8.0
