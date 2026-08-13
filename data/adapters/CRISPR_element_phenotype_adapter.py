@@ -63,14 +63,14 @@ class CRISPRElementPhenotype(BaseAdapter):
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
 
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.method = file_fileset['method']
-        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
-        self.biosample_term = file_fileset['samples'][0]
-        self.treatments_term_ids = file_fileset.get('treatments_term_ids')
-        self.crispr_modality = file_fileset.get('crispr_modality')
-        self.edge_class = file_fileset.get('class')
+        self.method = self.file_fileset['method']
+        self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
+        self.biosample_term = self.file_fileset['samples'][0]
+        self.treatments_term_ids = self.file_fileset.get('treatments_term_ids')
+        self.crispr_modality = self.file_fileset.get('crispr_modality')
+        self.edge_class = self.file_fileset.get('class')
 
         super().__init__(filepath, label, writer, validate)
 
