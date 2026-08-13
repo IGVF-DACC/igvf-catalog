@@ -69,9 +69,9 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
         if self.label == 'coding_variants_phenotypes':
-            self.igvf_metadata_props = get_file_fileset_by_accession_in_arangodb(
+            self.file_fileset = get_file_fileset_by_accession_in_arangodb(
                 self.file_accession)
-            file_set_accession = self.igvf_metadata_props.get('file_set_id')
+            file_set_accession = self.file_fileset.get('file_set_id')
             if file_set_accession:
                 self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as map_file:
@@ -170,11 +170,11 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
                             'pathogenicity_score': float(row['Mutpred2 score']),
                             'property_scores': mechanism_props,  # property scores passing threshold
                             'files_filesets': 'files_filesets/' + self.file_accession,
-                            'method': self.igvf_metadata_props.get('method'),
-                            'class': self.igvf_metadata_props.get('class'),
+                            'method': self.file_fileset.get('method'),
+                            'class': self.file_fileset.get('class'),
                             'label': 'predicted protein variant effect',
-                            'biological_context': self.igvf_metadata_props.get('simple_sample_summaries')[0] if self.igvf_metadata_props.get('simple_sample_summaries') else None,
-                            'biosample_term': self.igvf_metadata_props.get('samples')[0] if self.igvf_metadata_props.get('samples') else None,
+                            'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
+                            'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
                             'source': self.SOURCE,
                             'source_url': self.source_url
                         }

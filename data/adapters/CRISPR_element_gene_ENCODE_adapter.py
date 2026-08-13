@@ -29,6 +29,8 @@ class CRISPRElementGeneENCODE(BaseAdapter):
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.files_filesets = FileFileSet(self.FILE_ACCESSION)
         super().__init__(filepath, label, writer, validate)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.FILE_ACCESSION)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -45,8 +47,6 @@ class CRISPRElementGeneENCODE(BaseAdapter):
             return 'genomic_elements_genes'
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.FILE_ACCESSION)
         if self.label == 'genomic_element':
             self.logger.info('loading regulatory regions')
             self.load_genomic_element()
@@ -62,7 +62,7 @@ class CRISPRElementGeneENCODE(BaseAdapter):
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
-                    'method': file_fileset.get('method'),
+                    'method': self.file_fileset.get('method'),
                     'type': 'tested elements',
                     'source_annotation': region_type,
                     'source': self.SOURCE,
@@ -134,15 +134,15 @@ class CRISPRElementGeneENCODE(BaseAdapter):
                             'neg_log10_pvalue': neglog10pvalue,
                             'neg_log10_pvalue_adj': neglog10pvalue_adj,
                             'significant': significant == 'TRUE',
-                            'method': file_fileset.get('method'),
-                            'crispr_modality': file_fileset.get('crispr_modality'),
-                            'class': file_fileset.get('class'),
+                            'method': self.file_fileset.get('method'),
+                            'crispr_modality': self.file_fileset.get('crispr_modality'),
+                            'class': self.file_fileset.get('class'),
                             'label': self.COLLECTION_LABEL,
                             'source': self.SOURCE,
                             'source_url': self.SOURCE_URL,
                             'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
-                            'biological_context': file_fileset.get('simple_sample_summaries')[0],
-                            'biosample_term': file_fileset.get('samples')[0],
+                            'biological_context': self.file_fileset.get('simple_sample_summaries')[0],
+                            'biosample_term': self.file_fileset.get('samples')[0],
                             'name': 'regulates',
                             'inverse_name': 'regulated by'
                         }

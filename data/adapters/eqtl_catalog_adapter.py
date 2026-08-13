@@ -96,11 +96,11 @@ class EQTLCatalog(BaseAdapter):
 
     def process_qtl(self):
         # class/method come from catalog files_filesets (same pattern as other adapters)
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_fileset['class']
-        self.method = file_fileset['method']
-        file_set_accession = file_fileset.get('file_set_id')
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         if self.method == 'eQTL':

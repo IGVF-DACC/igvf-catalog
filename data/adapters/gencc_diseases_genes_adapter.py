@@ -24,11 +24,11 @@ class GenccDiseasesGenes(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
-        file_set_accession = file_metadata.get('file_set_id')
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.gene_map = get_gene_map_from_arangodb('hgnc')

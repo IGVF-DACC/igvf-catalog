@@ -33,7 +33,7 @@ class cV2F(BaseAdapter):
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
-        self.files_filesets = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
@@ -96,10 +96,10 @@ class cV2F(BaseAdapter):
                 'name': 'associated with',
                 'inverse_name': 'associated with',
                 'files_filesets': 'files_filesets/' + self.file_accession,
-                'biological_context': self.files_filesets.get('simple_sample_summaries')[0] if self.files_filesets.get('simple_sample_summaries') else None,
-                'biosample_term': self.files_filesets.get('samples')[0] if self.files_filesets.get('samples') else None,
-                'method': self.files_filesets.get('method'),
-                'class': self.files_filesets.get('class'),
+                'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
+                'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
+                'method': self.file_fileset.get('method'),
+                'class': self.file_fileset.get('class'),
                 'label': self.COLLECTION_LABEL,
 
             }
@@ -112,7 +112,7 @@ class cV2F(BaseAdapter):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             self.writer.add_tag('portal_accessions', self.file_accession)
-            file_set_accession = self.files_filesets.get('file_set_id')
+            file_set_accession = self.file_fileset.get('file_set_id')
             if file_set_accession:
                 self.writer.add_tag('portal_accessions', file_set_accession)
             next(reader)

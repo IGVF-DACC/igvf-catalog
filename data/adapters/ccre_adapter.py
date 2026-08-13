@@ -56,7 +56,7 @@ class CCRE(BaseAdapter):
             return 'genomic_elements'
 
     def parse(self):
-        encode_metadata_props = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.filename)
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -70,7 +70,7 @@ class CCRE(BaseAdapter):
                     'start': int(row[1]),
                     'end': int(row[2]),
                     'source_annotation': row[9] + ': ' + description,
-                    'method': encode_metadata_props.get('method'),
+                    'method': self.file_fileset.get('method'),
                     'type': 'candidate cis regulatory element',
                     'source': 'ENCODE',
                     'source_url': self.source_url,

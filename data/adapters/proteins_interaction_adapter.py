@@ -24,6 +24,8 @@ class ProteinsInteraction(BaseAdapter):
 
     def __init__(self, filepath, label='protein_protein_human', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
         if label == 'protein_protein_mouse':
             self.organism = 'Mus musculus'
@@ -51,11 +53,9 @@ class ProteinsInteraction(BaseAdapter):
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
-        self.collection_class = file_fileset['class']
+        self.collection_class = self.file_fileset['class']
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_set_accession = file_fileset.get('file_set_id')
+        file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.logger.info('Loading MI code mappings')

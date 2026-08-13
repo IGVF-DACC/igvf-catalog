@@ -66,14 +66,14 @@ class ESM1vCodingVariantsScores(BaseAdapter):
 
     def parse(self):
         if self.label == 'coding_variants_phenotypes':
-            self.igvf_metadata_props = get_file_fileset_by_accession_in_arangodb(
+            self.file_fileset = get_file_fileset_by_accession_in_arangodb(
                 self.file_accession)
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             self.writer.add_tag('portal_accessions', self.file_accession)
             if self.label == 'coding_variants_phenotypes':
-                file_set_accession = self.igvf_metadata_props.get(
+                file_set_accession = self.file_fileset.get(
                     'file_set_id')
                 if file_set_accession:
                     self.writer.add_tag(
@@ -171,11 +171,11 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                                 'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                                 'esm_1v_score': score,  # property scores passing threshold
                                 'files_filesets': 'files_filesets/' + self.file_accession,
-                                'method': self.igvf_metadata_props.get('method'),
+                                'method': self.file_fileset.get('method'),
                                 'label': self.COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES,
-                                'class': self.igvf_metadata_props.get('class'),
-                                'biosample_term': self.igvf_metadata_props.get('samples')[0] if self.igvf_metadata_props.get('samples') else None,
-                                'biological_context': self.igvf_metadata_props.get('simple_sample_summaries')[0] if self.igvf_metadata_props.get('simple_sample_summaries') else None,
+                                'class': self.file_fileset.get('class'),
+                                'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
+                                'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
                                 'source': self.SOURCE,
                                 'source_url': self.source_url
                             }

@@ -25,6 +25,11 @@ class VariantPaintingAdapter(BaseAdapter):
     def __init__(self, filepath, label='coding_variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        if self.file_fileset is None:
+            self.logger.warning(
+                f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -34,7 +39,7 @@ class VariantPaintingAdapter(BaseAdapter):
     def _get_collection_name(self):
         return 'coding_variants_phenotypes'
 
-    def process_coding_variant_phenotype_chunk(self, chunk, file_fileset_obj):
+    def process_coding_variant_phenotype_chunk(self, chunk):
         skipped_coding_variants = []
         # col 1 = spdi, col 4 = hgvs_protein e.g. ENSP00000483114.1:p.Pro135Thr
         mapped_coding_variants = bulk_query_coding_variants_from_spdi_in_arangodb(
@@ -63,11 +68,11 @@ class VariantPaintingAdapter(BaseAdapter):
                         'name': self.PHENOTYPE_EDGE_NAME,
                         'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'method': file_fileset_obj['method'] if file_fileset_obj else None,
-                        'class': file_fileset_obj['class'] if file_fileset_obj else None,
+                        'method': self.file_fileset['method'] if self.file_fileset else None,
+                        'class': self.file_fileset['class'] if self.file_fileset else None,
                         'label': VariantPaintingAdapter.LABEL,
-                        'biological_context': file_fileset_obj['simple_sample_summaries'][0] if file_fileset_obj else None,
-                        'biosample_term': file_fileset_obj['samples'][0] if file_fileset_obj else None,
+                        'biological_context': self.file_fileset['simple_sample_summaries'][0] if self.file_fileset else None,
+                        'biosample_term': self.file_fileset['samples'][0] if self.file_fileset else None,
                         'localization_score': float(row[3]) if row[3] else None,
                         'mislocalization_hit': row[2] == 'True',
                     }
@@ -85,13 +90,8 @@ class VariantPaintingAdapter(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
-        if file_fileset_obj is None:
-            self.logger.warning(
-                f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
-        file_set_accession = file_fileset_obj.get(
-            'file_set_id') if file_fileset_obj else None
+        file_set_accession = self.file_fileset.get(
+            'file_set_id') if self.file_fileset else None
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as vp_file:
@@ -104,10 +104,10 @@ class VariantPaintingAdapter(BaseAdapter):
                 if len(chunk) % self.CHUNK_SIZE == 0:
                     if self.label == 'coding_variants_phenotypes':
                         self.process_coding_variant_phenotype_chunk(
-                            chunk, file_fileset_obj)
+                            chunk)
                     chunk = []
 
             if chunk:
                 if self.label == 'coding_variants_phenotypes':
                     self.process_coding_variant_phenotype_chunk(
-                        chunk, file_fileset_obj)
+                        chunk)

@@ -58,15 +58,15 @@ class BlueSTARRVariantBiosample(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        file_set_accession = file_fileset_obj.get('file_set_id')
+        file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
-        self.method = file_fileset_obj['method']
-        self.collection_class = file_fileset_obj['class']
-        self.biosample_term = file_fileset_obj['samples'][0]
-        self.biological_context = file_fileset_obj['simple_sample_summaries'][0]
+        self.method = self.file_fileset['method']
+        self.collection_class = self.file_fileset['class']
+        self.biosample_term = self.file_fileset['samples'][0]
+        self.biological_context = self.file_fileset['simple_sample_summaries'][0]
 
         with open(self.filepath, 'r') as bluestarr_tsv:
             reader = csv.reader(bluestarr_tsv, delimiter='\t')
