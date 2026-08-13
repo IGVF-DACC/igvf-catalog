@@ -13,6 +13,7 @@ import { validateVariantInput } from './variants_genes'
 const MAX_PAGE_SIZE = 300
 
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_genomic_elements', 'method')
+const PREDICTION_METHODS = ['scE2G', 'ENCODE-rE2G'] as const
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'variants_genomic_elements', 'source')
 // need to drop candidate cis regulatory element and tested elements for this endpoint
 const GENOMIC_ELEMENT_TYPES = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'type').filter(type => type !== 'candidate cis regulatory element' && type !== 'tested elements') as [string, ...string[]]
@@ -31,7 +32,7 @@ const predictionFormat = z.object({
     start: z.number(),
     end: z.number()
   }),
-  score: z.number(),
+  score: z.number().nullish(),
   model: z.string(),
   dataset: z.string(),
   name: z.string(),
@@ -497,6 +498,12 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     delete input.files_fileset
   }
 
+  let methods = `['${PREDICTION_METHODS.join('\', \'')}']`
+  if (input.method !== undefined) {
+    methods = `['${input.method as string}']`
+    delete input.method
+  }
+
   const page = input.page as number
 
   input.page = 0 // for variants query
@@ -516,6 +523,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
         FOR record IN ${genomicElementToGeneCollectionName}
           FILTER record._from == ge._id ${filesetFilter}
+          FILTER record.method IN ${methods}
           LET targetGene = (${geneVerboseQuery})[0]
           FILTER targetGene != NULL
           SORT record._key
@@ -769,7 +777,7 @@ const genomicElementsFromVariantsCount = publicProcedure
 
 const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
-  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), method: z.enum(METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
