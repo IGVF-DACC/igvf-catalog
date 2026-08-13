@@ -154,8 +154,7 @@ class SGE(BaseAdapter):
                 self.logger.error(
                     f'Error: unable to get protein id from the file.')
                 return
-            file_fileset = get_file_fileset_by_accession_in_arangodb(
-                self.file_accession)
+            file_fileset = self.file_fileset
             with gzip.open(self.filepath, 'rt') as sge_file:
                 reader = csv.reader(sge_file, delimiter='\t')
                 headers = next(reader)

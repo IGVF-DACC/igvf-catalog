@@ -59,9 +59,6 @@ class VAMPAdapter(BaseAdapter):
             self.logger.error('Invalid type in bulk coding variants query.')
             return
 
-        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
-
         for row in chunk:
             query_pair = (row[0].split(':')[0].split('.')[
                 0], row[0].split(':')[1].strip())
@@ -110,6 +107,8 @@ class VAMPAdapter(BaseAdapter):
         hgvsc_rows = []
         met1_rows = []
         pattern_Met1 = re.compile(r'p\.Met1[A-Za-z]{3}')
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         with gzip.open(self.filepath, 'rt') as vamp_file:
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)

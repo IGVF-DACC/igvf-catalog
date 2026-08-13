@@ -47,7 +47,7 @@ COMPLETE_VARIANT = {
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=(COMPLETE_VARIANT, None))
 @patch('adapters.SGE_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=[])
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_variants(mock_gzip_open, mock_bulk_check, mock_load_variant):
+def test_process_file_variants(mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset):
     writer = SpyWriter()
     adapter = SGE('dummy_accession.tsv.gz', label='variants',
                   writer=writer, validate=True)
