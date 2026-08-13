@@ -71,6 +71,9 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
         if self.label == 'coding_variants_phenotypes':
             self.igvf_metadata_props = get_file_fileset_by_accession_in_arangodb(
                 self.file_accession)
+            file_set_accession = self.igvf_metadata_props.get('file_set_id')
+            if file_set_accession:
+                self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)

@@ -90,6 +90,10 @@ class VariantPaintingAdapter(BaseAdapter):
         if file_fileset_obj is None:
             self.logger.warning(
                 f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
+        file_set_accession = file_fileset_obj.get(
+            'file_set_id') if file_fileset_obj else None
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as vp_file:
             vp_csv = csv.reader(vp_file, delimiter='\t')
             self.header = next(vp_csv)

@@ -102,6 +102,9 @@ class scE2G(BaseAdapter):
         method = file_fileset.get('method')
         collection_class = file_fileset.get('class')
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as f:
             reader = csv.reader(f, delimiter='\t')
             header_map = self._read_header_map(reader)

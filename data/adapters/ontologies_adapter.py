@@ -179,12 +179,16 @@ class Ontology:
             self.process_ontology()
 
     def process_ontology(self):
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        file_set_accession = file_metadata.get(
+            'file_set_id') if file_metadata else None
         for writer in (self.node_primary_writer, self.node_secondary_writer,
                        self.edge_primary_writer, self.edge_secondary_writer):
             writer.add_tag('portal_accessions', self.file_accession)
+            if file_set_accession:
+                writer.add_tag('portal_accessions', file_set_accession)
 
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
 

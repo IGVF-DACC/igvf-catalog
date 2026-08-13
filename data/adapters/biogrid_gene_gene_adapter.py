@@ -56,6 +56,9 @@ class GeneGeneBiogrid(BaseAdapter):
             self.file_accession)
         self.collection_class = file_fileset['class']
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()

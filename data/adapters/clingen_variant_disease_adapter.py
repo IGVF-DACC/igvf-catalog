@@ -116,6 +116,9 @@ class ClinGen(BaseAdapter):
             self.file_accession)
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
+        file_set_accession = file_metadata.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         with open(self.filepath, 'r') as clingen_file:
             rows = list(csv.DictReader(clingen_file))

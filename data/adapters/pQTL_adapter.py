@@ -42,6 +42,9 @@ class pQTL(BaseAdapter):
         file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.collection_class = file_fileset['class']
         self.method = file_fileset['method']
         self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))

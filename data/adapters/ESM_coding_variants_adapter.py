@@ -72,6 +72,12 @@ class ESM1vCodingVariantsScores(BaseAdapter):
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             self.writer.add_tag('portal_accessions', self.file_accession)
+            if self.label == 'coding_variants_phenotypes':
+                file_set_accession = self.igvf_metadata_props.get(
+                    'file_set_id')
+                if file_set_accession:
+                    self.writer.add_tag(
+                        'portal_accessions', file_set_accession)
             for row in map_csv:
                 # trim version number in ENST
                 mutation_ids = [

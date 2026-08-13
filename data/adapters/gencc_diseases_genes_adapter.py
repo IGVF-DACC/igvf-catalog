@@ -28,6 +28,9 @@ class GenccDiseasesGenes(BaseAdapter):
             self.file_accession)
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
+        file_set_accession = file_metadata.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.gene_map = get_gene_map_from_arangodb('hgnc')
         # read the tsv file
         with open(self.filepath, 'r', encoding='utf-8', newline='') as f:
