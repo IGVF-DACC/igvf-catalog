@@ -120,6 +120,9 @@ class CRISPRElementPhenotype(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
+        fileset_accession = self.file_fileset.get('file_set_id')
+        if fileset_accession:
+            self.writer.add_tag('portal_accessions', fileset_accession)
         with self._open_file(self.filepath) as f:
             reader = csv.DictReader(f, delimiter='\t')
             if self.label == 'genomic_element':
