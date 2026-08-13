@@ -27,8 +27,6 @@ class GeneGeneBiogrid(BaseAdapter):
 
     def __init__(self, filepath, label='human_gene_gene_biogrid', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
-        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
         # Determine gene collection BEFORE calling super().__init__()
         # because _get_collection_name() needs it for schema loading
         if label == 'mouse_gene_gene_biogrid':
@@ -54,6 +52,8 @@ class GeneGeneBiogrid(BaseAdapter):
             return 'mm_genes_mm_genes'
 
     def parse(self):
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         self.collection_class = self.file_fileset['class']
         self.writer.add_tag('portal_accessions', self.file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')

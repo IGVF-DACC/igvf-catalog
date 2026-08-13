@@ -54,8 +54,6 @@ class scE2G(BaseAdapter):
         super().__init__(filepath, label, writer, validate)
         if label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
-        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -99,6 +97,8 @@ class scE2G(BaseAdapter):
         return float(value)
 
     def parse(self):
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         method = self.file_fileset.get('method')
         collection_class = self.file_fileset.get('class')
         self.writer.add_tag('portal_accessions', self.file_accession)

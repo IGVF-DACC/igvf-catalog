@@ -36,8 +36,6 @@ class ReactomePathway(BaseAdapter):
     def __init__(self, filepath=None, label='pathway', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
-        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -103,6 +101,8 @@ class ReactomePathway(BaseAdapter):
         raise last_error  # pragma: no cover
 
     def parse(self):
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         self.collection_class = self.file_fileset['class']
         self.method = self.file_fileset['method']
         self.writer.add_tag('portal_accessions', self.file_accession)

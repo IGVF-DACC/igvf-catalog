@@ -25,11 +25,6 @@ class VariantPaintingAdapter(BaseAdapter):
     def __init__(self, filepath, label='coding_variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
-        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
-        if self.file_fileset is None:
-            self.logger.warning(
-                f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -89,6 +84,11 @@ class VariantPaintingAdapter(BaseAdapter):
                     skipped_list.write(skipped + '\n')
 
     def parse(self):
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        if self.file_fileset is None:
+            self.logger.warning(
+                f'WARNING: file_fileset not found for {self.file_accession}, file_fileset fields will be None')
         self.writer.add_tag('portal_accessions', self.file_accession)
         file_set_accession = self.file_fileset.get(
             'file_set_id') if self.file_fileset else None
