@@ -37,6 +37,7 @@ class AFGREQtl(BaseAdapter):
         return 'variants_genes'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         with gzip.open(self.filepath, 'rt') as qtl_file:
