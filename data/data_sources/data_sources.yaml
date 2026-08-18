@@ -451,7 +451,7 @@ mouse transcript contains mouse gene structure:
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms/cellosaurus.jsonl
-# for oncotree: python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ' ' --label node
+# for oncotree: python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath oncotree_tumorTypes_latest_stable.json --label node
 # for ENCODE NTR:
 ontology term:
   collection: ontology_terms
@@ -461,7 +461,7 @@ ontology term:
   command:
     - python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --ontology {ontology_name}
     - python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms/cellosaurus.jsonl
-    - python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ' ' --label node
+    - python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath oncotree_tumorTypes_latest_stable.json --label node
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz # uberon
     - https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz # clo
@@ -481,7 +481,7 @@ ontology term:
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_relationships --label ontology_relationship --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
-# for oncotree: python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath ' ' --label edge
+# for oncotree: python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath oncotree_tumorTypes_latest_stable.json --label edge
 ontology relationship:
   collection: ontology_terms_ontology_terms
   params:
@@ -490,7 +490,7 @@ ontology relationship:
   command:
     - python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --ontology {ontology_name}
     - python3 data_parser.py --adapter cellosaurus_relationships --output-bucket igvf-catalog-parsed-collections --filepath {cellosaurus_datafile} --label ontology_relationship --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
-    - python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath ' ' --label edge
+    - python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath oncotree_tumorTypes_latest_stable.json --label edge
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz # uberon
     - https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz # clo
