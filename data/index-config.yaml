@@ -281,6 +281,10 @@ genomic_elements:
       - source
       - method, _key
       - promoter_of
+  mdi_prefixed:
+    fields:
+      - fields: start, end
+        prefixFields: chr
 
 genomic_elements_biosamples:
   persistent:
