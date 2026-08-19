@@ -70,6 +70,32 @@ export const singleVariantQueryFormat = z.object({
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens')
 })
 
+const variantSummaryQueryFormat = singleVariantQueryFormat.merge(z.object({
+  igvf_only: z.enum(['true', 'false']).default('false')
+}))
+
+const edgeMethodContextCountFormat = z.object({
+  method: z.string().nullable(),
+  biological_context: z.string().nullable(),
+  count: z.number()
+})
+
+const edgeSummaryFormat = z.object({
+  total: z.number(),
+  methods_and_contexts: z.array(edgeMethodContextCountFormat)
+})
+
+const annotationsSummaryFormat = z.object({
+  genes: edgeSummaryFormat,
+  drugs: edgeSummaryFormat,
+  proteins: edgeSummaryFormat,
+  diseases: edgeSummaryFormat,
+  phenotypes: edgeSummaryFormat,
+  biosamples: edgeSummaryFormat,
+  genomic_elements: edgeSummaryFormat,
+  total: z.number()
+})
+
 const variantsSummaryFormat = z.object({
   summary: z.object({
     rsid: z.array(z.string()).nullish(),
@@ -100,7 +126,8 @@ const variantsSummaryFormat = z.object({
       end: z.number(),
       distance: z.number()
     })
-  })
+  }),
+  annotations: annotationsSummaryFormat
 })
 
 const variantsQueryFormat = variantsCommonQueryFormat.merge(z.object({
@@ -365,8 +392,52 @@ async function nearestGenes (variant: variantType): Promise<any> {
   }
 }
 
+const ANNOTATION_EDGE_COLLECTIONS: Array<{ key: string, collection: string, contextExpr: string }> = [
+  { key: 'genes', collection: 'variants_genes', contextExpr: 'record.biological_context' },
+  { key: 'drugs', collection: 'variants_drugs', contextExpr: 'null' },
+  { key: 'proteins', collection: 'variants_proteins', contextExpr: 'record.biological_context' },
+  { key: 'diseases', collection: 'variants_diseases', contextExpr: 'null' },
+  { key: 'phenotypes', collection: 'variants_phenotypes', contextExpr: 'record.biological_context' },
+  // variants_biosamples has no biological_context field: the target of the edge is itself the biosample/context
+  { key: 'biosamples', collection: 'variants_biosamples', contextExpr: 'DOCUMENT(record._to).name' },
+  { key: 'genomic_elements', collection: 'variants_genomic_elements', contextExpr: 'record.biological_context' }
+]
+
+async function findVariantAnnotationsSummary (variantId: string, igvfOnly: boolean): Promise<any> {
+  const igvfFilter = igvfOnly ? " AND record.source == 'IGVF'" : ''
+
+  const letBlocks = ANNOTATION_EDGE_COLLECTIONS.map(({ key, collection, contextExpr }) => `
+    LET ${key}_methods_and_contexts = (
+      FOR record IN ${collection}
+        FILTER record._from == @variantId${igvfFilter}
+        COLLECT method = record.method, biological_context = ${contextExpr} WITH COUNT INTO count
+        RETURN { method, biological_context, count }
+    )
+  `).join('\n')
+
+  const returnFields = ANNOTATION_EDGE_COLLECTIONS.map(({ key }) => `
+      ${key}: {
+        total: SUM(${key}_methods_and_contexts[*].count),
+        methods_and_contexts: ${key}_methods_and_contexts
+      }`).join(',')
+
+  const totalExpr = ANNOTATION_EDGE_COLLECTIONS.map(({ key }) => `SUM(${key}_methods_and_contexts[*].count)`).join(' + ')
+
+  const query = `
+    ${letBlocks}
+    RETURN {
+      ${returnFields},
+      total: ${totalExpr}
+    }
+  `
+
+  return (await (await db.query(query, { variantId })).all())[0]
+}
+
 async function variantSummarySearch (input: paramsFormatType): Promise<any> {
   input.page = 0
+  const igvfOnly = input.igvf_only === 'true'
+  delete input.igvf_only
   const variant = (await variantSearch(input))[0]
 
   if (variant === undefined) {
@@ -442,7 +513,8 @@ async function variantSummarySearch (input: paramsFormatType): Promise<any> {
       raw: variant.annotations.cadd_rawscore,
       phread: variant.annotations.cadd_phred
     },
-    nearest_genes: await nearestGenes(variant)
+    nearest_genes: await nearestGenes(variant),
+    annotations: await findVariantAnnotationsSummary(`${humanVariantSchema.db_collection_name as string}/${variant._id as string}`, igvfOnly)
   }
 }
 
@@ -585,7 +657,7 @@ const variantByFrequencySource = publicProcedure
 
 const variantSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/summary', description: descriptions.variants_summary } })
-  .input(singleVariantQueryFormat)
+  .input(variantSummaryQueryFormat)
   .output(variantsSummaryFormat)
   .query(async ({ input }) => await variantSummarySearch(input))
 
