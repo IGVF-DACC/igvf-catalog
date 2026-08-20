@@ -813,9 +813,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.gene_validator = GeneValidator()
-
         super().__init__(filepath, label, writer, validate)
-
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
         if not self.file_config:
             self.logger.warning(
@@ -855,12 +853,14 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             return 'genomic_elements_genes'
 
     def parse(self):
-        self.writer.add_tag('portal_accessions', self.file_accession)
-
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        method = file_fileset['method']
-        crispr_modality = file_fileset.get('crispr_modality')
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
+        method = self.file_fileset['method']
+        crispr_modality = self.file_fileset.get('crispr_modality')
         layout_name = self.file_config.get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
@@ -976,7 +976,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         readout_gene=readout_gene,
                         source_url=self.source_url,
                         file_accession=self.file_accession,
-                        file_fileset=file_fileset,
+                        file_fileset=self.file_fileset,
                         method=method,
                         crispr_modality=crispr_modality,
                         metrics=metrics,
