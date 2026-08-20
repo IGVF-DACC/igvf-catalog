@@ -69,13 +69,16 @@ class STARRseqVariantBiosample(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
-        self.biosample_term = file_fileset['samples']
-        self.treatments_term_ids = file_fileset['treatments_term_ids']
-        self.method = file_fileset['method']
-        self.collection_class = file_fileset['class']
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
+        self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
+        self.biosample_term = self.file_fileset['samples']
+        self.treatments_term_ids = self.file_fileset['treatments_term_ids']
+        self.method = self.file_fileset['method']
+        self.collection_class = self.file_fileset['class']
 
         open_file = gzip.open(self.filepath, 'rt') if self.filepath.endswith(
             '.gz') else open(self.filepath, 'r')

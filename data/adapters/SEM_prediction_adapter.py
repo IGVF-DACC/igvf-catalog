@@ -73,7 +73,9 @@ class SEMPred(BaseAdapter):
         self.ensembls = pickle.load(open(self.ENSEMBL_MAPPING, 'rb'))
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as sem_file:
             sem_csv = csv.reader(sem_file, delimiter='\t')
             tf_name = None

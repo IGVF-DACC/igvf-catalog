@@ -97,11 +97,14 @@ class scE2G(BaseAdapter):
         return float(value)
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        method = file_fileset.get('method')
-        collection_class = file_fileset.get('class')
+        method = self.file_fileset.get('method')
+        collection_class = self.file_fileset.get('class')
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as f:
             reader = csv.reader(f, delimiter='\t')
             header_map = self._read_header_map(reader)
@@ -117,7 +120,7 @@ class scE2G(BaseAdapter):
 
                 if self.label == 'genomic_element_gene':
                     # IGVFFI4048DVFE needs sample info from file, but it may be missing
-                    if not file_fileset.get('simple_sample_summaries'):
+                    if not self.file_fileset.get('simple_sample_summaries'):
                         biological_context = row[self.INDEX_EXTERNAL_FILE['SampleOntologyTermName']]
                         if biological_context == '':
                             biological_context = None
@@ -129,17 +132,17 @@ class scE2G(BaseAdapter):
                         else:
                             biosample_term_endpoint = f'ontology_terms/{biosample_term}'
                     else:
-                        biological_context = file_fileset.get(
+                        biological_context = self.file_fileset.get(
                             'simple_sample_summaries')[0]
-                        biosample_term_endpoint = file_fileset.get('samples')[
+                        biosample_term_endpoint = self.file_fileset.get('samples')[
                             0]
                         biosample_term = biosample_term_endpoint.split(
                             '/')[-1]
                     # IGVFFI4048DVFE, IGVFFI8252JBBA, IGVFFI8813VARU need cell annotation info from file
-                    if not file_fileset.get('cell_annotation'):
+                    if not self.file_fileset.get('cell_annotation'):
                         qualifier = row[self.INDEX_EXTERNAL_FILE['Qualifier']]
                         cell_type_name = row[self.INDEX_EXTERNAL_FILE['CellTypeOntologyTermName']]
-                        if not file_fileset.get('simple_sample_summaries'):
+                        if not self.file_fileset.get('simple_sample_summaries'):
                             # IGVFFI4048DVFE: Qualifier + CellTypeOntologyTermName
                             # [+ " from " + SampleOntologyTermName when sample name is present]
                             sample_name = row[self.INDEX_EXTERNAL_FILE['SampleOntologyTermName']]
@@ -175,8 +178,9 @@ class scE2G(BaseAdapter):
                             ':', '_')
                         cell_annotation_term_endpoint = f'ontology_terms/{cell_annotation_term}'
                     else:
-                        cell_annotation = file_fileset.get('cell_annotation')
-                        cell_annotation_term_endpoint = file_fileset.get(
+                        cell_annotation = self.file_fileset.get(
+                            'cell_annotation')
+                        cell_annotation_term_endpoint = self.file_fileset.get(
                             'cell_annotation_term')
                         cell_annotation_term = cell_annotation_term_endpoint.split(
                             '/')[-1]

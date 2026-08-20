@@ -137,10 +137,13 @@ class SEMMotif(BaseAdapter):
         self.load_tf_id_mapping()
         self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
 
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
 
         with gzip.open(self.filepath, 'rt') as sem_file:
             baseline = next(sem_file).strip().split(':')[1]
