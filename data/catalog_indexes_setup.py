@@ -19,10 +19,29 @@ args = parser.parse_args()
 collections_to_index = args.collection or collections_in_config
 
 
+def create_mdi_prefixed_indexes(fields_list, collection):
+    for entry in fields_list:
+        fields = [f.strip() for f in entry['fields'].split(',')]
+        prefix_fields = [f.strip() for f in entry['prefixFields'].split(',')]
+        index_name = 'idx_mdi_prefix_{}_{}'.format(
+            '_'.join(prefix_fields), '_'.join(fields))
+        ArangoDB().create_index(
+            collection,
+            'mdi-prefixed',
+            fields,
+            name=index_name,
+            opts={'prefixFields': prefix_fields}
+        )
+
+
 def create_indexes(indexes, collection):
     for index in indexes:
         if index == 'inverted':
             continue  # it's already handled by aliases
+
+        if index == 'mdi_prefixed':
+            create_mdi_prefixed_indexes(indexes[index]['fields'], collection)
+            continue
 
         sparse = False
         fields_list = indexes[index]['fields']
