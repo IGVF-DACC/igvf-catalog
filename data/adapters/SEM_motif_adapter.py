@@ -2,11 +2,13 @@ import csv
 import json
 import os
 import gzip
-import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
 
 # Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
@@ -31,7 +33,6 @@ from adapters.writer import Writer
 
 class SEMMotif(BaseAdapter):
     ALLOWED_LABELS = ['motif', 'motif_protein', 'complex', 'complex_protein']
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
@@ -79,7 +80,8 @@ class SEMMotif(BaseAdapter):
 
     def load_complexes(self):
         if self.label == 'complex_protein':
-            self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
+            self.ensembl = get_protein_map_from_arangodb(
+                organism='Homo sapiens')
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
@@ -135,7 +137,7 @@ class SEMMotif(BaseAdapter):
             return
 
         self.load_tf_id_mapping()
-        self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
+        self.ensembl = get_protein_map_from_arangodb(organism='Homo sapiens')
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
