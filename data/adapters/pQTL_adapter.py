@@ -48,7 +48,7 @@ class pQTL(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.collection_class = self.file_fileset['class']
         self.method = self.file_fileset['method']
-        self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
+        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
         ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as pqtl_file:
