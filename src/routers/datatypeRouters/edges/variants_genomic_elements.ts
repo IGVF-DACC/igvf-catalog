@@ -534,7 +534,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
           RETURN {
             'id': record._from,
-            'cell_type': record.biological_context != null ? record.biological_context : record.cell_annotation,
+            'cell_type': record.cell_annotation != null ? record.cell_annotation : record.biological_context,
             'target_gene': targetGene,
             'score': record.score,
             'model': record.source,
