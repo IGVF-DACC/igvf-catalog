@@ -398,8 +398,7 @@ const ANNOTATION_EDGE_COLLECTIONS: Array<{ key: string, collection: string, cont
   { key: 'proteins', collection: 'variants_proteins', contextExpr: 'record.biological_context' },
   { key: 'diseases', collection: 'variants_diseases', contextExpr: 'null' },
   { key: 'phenotypes', collection: 'variants_phenotypes', contextExpr: 'record.biological_context' },
-  // variants_biosamples has no biological_context field: the target of the edge is itself the biosample/context
-  { key: 'biosamples', collection: 'variants_biosamples', contextExpr: 'DOCUMENT(record._to).name' },
+  { key: 'biosamples', collection: 'variants_biosamples', contextExpr: 'record.biological_context' },
   { key: 'genomic_elements', collection: 'variants_genomic_elements', contextExpr: 'record.biological_context' }
 ]
 
