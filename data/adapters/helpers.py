@@ -953,3 +953,50 @@ def get_gene_map_from_arangodb(field, collection='genes'):
             if hgnc_id not in gene_map:
                 gene_map[hgnc_id] = gene_keys
     return gene_map
+
+
+def get_protein_map_from_arangodb(field='uniprot_ids', organism=None, collection='proteins'):
+    """Return {field_value: [protein._key, ...]} from the proteins collection.
+
+    ``uniprot_ids`` is an array on each protein. Isoform accessions (e.g.
+    ``P62258-1``) are also indexed under the canonical accession (``P62258``)
+    so callers can look up either form.
+    """
+    db = ArangoDB().get_igvf_connection()
+    bind_vars = {}
+    filter_clause = ''
+    if organism:
+        filter_clause = 'FILTER protein.organism == @organism'
+        bind_vars['organism'] = organism
+    cursor = db.aql.execute(
+        f'''
+        FOR protein IN {collection}
+          {filter_clause}
+          RETURN {{ key: protein._key, value: protein.{field} }}
+        ''',
+        bind_vars=bind_vars
+    )
+    protein_map = {}
+    for record in cursor:
+        protein_key = record['key']
+        field_value = record['value']
+        if not field_value:
+            continue
+        values = field_value if isinstance(
+            field_value, list) else [field_value]
+        for value in values:
+            if not value:
+                continue
+            _add_protein_map_entry(protein_map, value, protein_key)
+            if field == 'uniprot_ids' and '-' in value:
+                canonical = value.split('-')[0]
+                if canonical:
+                    _add_protein_map_entry(protein_map, canonical, protein_key)
+    return protein_map
+
+
+def _add_protein_map_entry(protein_map, value, protein_key):
+    if value not in protein_map:
+        protein_map[value] = [protein_key]
+    elif protein_key not in protein_map[value]:
+        protein_map[value].append(protein_key)

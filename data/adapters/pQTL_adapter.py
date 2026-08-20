@@ -1,11 +1,14 @@
 import csv
 import json
-import pickle
 from typing import Optional
 import os
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    build_variant_id,
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -20,7 +23,6 @@ class pQTL(BaseAdapter):
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
     BIOSAMPLE_TERM = 'UBERON_0001969'
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
@@ -46,7 +48,7 @@ class pQTL(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.collection_class = self.file_fileset['class']
         self.method = self.file_fileset['method']
-        self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
+        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
         ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as pqtl_file:
@@ -107,4 +109,7 @@ class pQTL(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
+        if ensembl_unmatched != 0:
+            self.logger.warning(
+                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
         self.gene_validator.log()
