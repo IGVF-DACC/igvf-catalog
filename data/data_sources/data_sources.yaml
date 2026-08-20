@@ -2150,6 +2150,28 @@ coding variant to phenotype Variant painting:
     - https://api.data.igvf.org/tabular-files/IGVFFI9499PJFU/@@download/IGVFFI9499PJFU.tsv.gz
   source: IGVF
 
+# Example: python3 data_parser.py --adapter semi_qy2h_protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1611ZIBI.tsv.gz --output-bucket-key proteins_proteins/proteins_proteins_semi_qY2H_IGVFFI1611ZIBI.jsonl --label proteins_proteins
+protein to protein semi-qY2H:
+  collection: proteins_proteins
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter semi_qy2h_protein_protein --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins_proteins/proteins_proteins_semi_qY2H_{datafile}.jsonl --label proteins_proteins
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1611ZIBI/@@download/IGVFFI1611ZIBI.tsv.gz
+  source: IGVF
+
+# Example: python3 data_parser.py --adapter semi_qy2h_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI0709BESF.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_semi_qY2H_IGVFFI0709BESF.jsonl --label coding_variants_phenotypes
+coding variant to phenotype semi-qY2H:
+  collection: coding_variants_phenotypes
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter semi_qy2h_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_semi_qY2H_{datafile}.jsonl --label coding_variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI0709BESF/@@download/IGVFFI0709BESF.tsv.gz
+  source: IGVF
+
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants
 variants SGE:
   collection: variants
