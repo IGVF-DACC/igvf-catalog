@@ -51,10 +51,13 @@ class ProteinsInteraction(BaseAdapter):
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_fileset['class']
+        self.collection_class = self.file_fileset['class']
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
         ensembl_unmatched = 0
