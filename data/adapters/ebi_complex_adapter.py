@@ -5,7 +5,10 @@ import pickle
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
@@ -32,7 +35,6 @@ class EBIComplex(BaseAdapter):
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='complex', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
@@ -64,6 +66,10 @@ class EBIComplex(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.load_subontologies()
+        if self.label == 'complex_protein':
+            self.ensembls = get_protein_map_from_arangodb(
+                organism='Homo sapiens')
+            self.load_linked_features_dict()
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
@@ -129,9 +135,7 @@ class EBIComplex(BaseAdapter):
                     self.save_props(props)
 
                 elif self.label == 'complex_protein':
-                    # pre-calculated dict containing binding regions pulled from api and uniprot -> ensembl mappings
-                    self.load_linked_features_dict()
-                    # the last column only conteins uniprot ids, and expanded for participant in column 5th if it's a complex
+                    # the last column only contains uniprot ids, and expanded for participant in column 5th if it's a complex
                     for protein_str in complex_row[-1].split('|'):
                         proteins = []
                         stoichiometry = int(
@@ -149,7 +153,7 @@ class EBIComplex(BaseAdapter):
 
                         for protein_id in proteins:
                             ensembl_ids = self.ensembls.get(
-                                protein_id.split('-')[0]) or self.ensembls.get(protein_id.split('-')[0])
+                                protein_id) or self.ensembls.get(protein_id.split('-')[0])
                             if ensembl_ids is None:
                                 ignored_ensembl_rows += 1
                                 continue
@@ -301,8 +305,6 @@ class EBIComplex(BaseAdapter):
         return None
 
     def load_linked_features_dict(self):
-        self.ensembls = pickle.load(open(EBIComplex.ENSEMBL_MAPPING, 'rb'))
-
         self.linked_features_dict = {}
 
         linked_features_dict_uniprot = {}
