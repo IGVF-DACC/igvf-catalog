@@ -7,6 +7,14 @@ from adapters.writer import SpyWriter
 
 FILE_ACCESSION = 'EBI_complex_example'
 
+SAMPLE_PROTEIN_MAP = {
+    'P84022': ['ENSP00000341551'],
+    'Q13485': ['ENSP00000341551'],
+    'Q15796': ['ENSP00000341551'],
+    'P16220': ['ENSP00000341551'],
+    'P18848': ['ENSP00000341551'],
+}
+
 
 @pytest.fixture
 def mock_file_fileset():
@@ -17,6 +25,13 @@ def mock_file_fileset():
             'method': None
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_protein_map():
+    with patch('adapters.ebi_complex_adapter.get_protein_map_from_arangodb') as mock_get:
+        mock_get.return_value = SAMPLE_PROTEIN_MAP
+        yield mock_get
 
 
 def test_ebi_complex_initialization():
@@ -37,7 +52,7 @@ def test_ebi_complex_invalid_label():
         EBIComplex(sample_filepath, label='invalid_label', writer=writer)
 
 
-def test_ebi_complex_process_file(mock_file_fileset):
+def test_ebi_complex_process_file(mock_file_fileset, mock_protein_map):
     sample_filepath = './samples/EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()
@@ -58,9 +73,9 @@ def test_ebi_complex_process_file(mock_file_fileset):
             assert '_key' in first_item
             assert 'name' in first_item
         elif label == 'complex_protein':
-            assert '_key' in first_item
-            assert '_from' in first_item
-            assert '_to' in first_item
+            mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+            assert first_item['_from'] == 'complexes/CPX-1'
+            assert first_item['_to'] == 'proteins/ENSP00000341551'
         elif label == 'complex_term':
             assert '_key' in first_item
             assert '_from' in first_item
@@ -88,6 +103,7 @@ def test_ebi_complex_load_linked_features_dict():
     writer = SpyWriter()
     adapter = EBIComplex(
         sample_filepath, label='complex_protein', writer=writer)
+    adapter.ensembls = SAMPLE_PROTEIN_MAP
     adapter.load_linked_features_dict()
     assert hasattr(adapter, 'linked_features_dict')
     assert isinstance(adapter.linked_features_dict, dict)
