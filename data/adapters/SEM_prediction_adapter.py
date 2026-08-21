@@ -1,13 +1,15 @@
 import csv
 import json
 import os
-import pickle
 import gzip
 from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
 # #Description: Predictions of variant effects on transcription factor binding
@@ -28,7 +30,6 @@ from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 class SEMPred(BaseAdapter):
     ALLOWED_LABELS = ['sem_predicted_asb']
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
@@ -70,7 +71,7 @@ class SEMPred(BaseAdapter):
         self.writer.add_tag('portal_accessions', self.file_accession)
         self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
         self.load_tf_id_mapping()
-        self.ensembls = pickle.load(open(self.ENSEMBL_MAPPING, 'rb'))
+        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
