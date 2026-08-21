@@ -4,6 +4,11 @@ from adapters.SEM_prediction_adapter import SEMPred
 from adapters.writer import SpyWriter
 from unittest.mock import patch
 
+# real uniprot -> ENSP mapping for P20226 (TBP), used by the sample prediction file
+SAMPLE_PROTEIN_MAP = {
+    'P20226': ['ENSP00000230354', 'ENSP00000375942', 'ENSP00000442132']
+}
+
 
 # mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
 @pytest.fixture
@@ -19,16 +24,26 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
-def test_sem_pred_adapter(mock_file_fileset):
+@pytest.fixture
+def mock_protein_map():
+    """Fixture to mock get_protein_map_from_arangodb so ArangoDB is not required."""
+    with patch('adapters.SEM_prediction_adapter.get_protein_map_from_arangodb') as mock_get_protein_map:
+        mock_get_protein_map.return_value = SAMPLE_PROTEIN_MAP
+        yield mock_get_protein_map
+
+
+def test_sem_pred_adapter(mock_file_fileset, mock_protein_map):
     writer = SpyWriter()
     adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
                       label='sem_predicted_asb', writer=writer, validate=True)
     adapter.process_file()
+    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
+    assert first_item['_to'] == 'proteins/ENSP00000230354'
     assert 'motif' in first_item
     assert 'ref_seq_context' in first_item
     assert 'alt_seq_context' in first_item
@@ -67,7 +82,7 @@ def p():
     assert len(adapter.tf_id_mapping) > 0
 
 
-def test_sem_pred_adapter_binding_effect_filtering(mock_file_fileset):
+def test_sem_pred_adapter_binding_effect_filtering(mock_file_fileset, mock_protein_map):
     writer = SpyWriter()
     adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
                       label='sem_predicted_asb', writer=writer)
