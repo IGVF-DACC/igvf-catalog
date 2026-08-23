@@ -29,7 +29,7 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
 """
 
 # Example rows from ENCODE lenti-MPRA bed file ENCFF802FUV.bed: (the last two columns are the same for all rows)
-# Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: DNA count; Column 9: RNA count
+# Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: inputCount; Column 9: outputCount
 # chr1	10410	10610	HepG2_DNasePeakNoPromoter1	212	+	-0.843	0.307	0.171	-1	-1
 
 # Example rows from IGVFFI4914OUJH - MPRA sequence designs
@@ -561,8 +561,8 @@ class MPRAAdapter(BaseAdapter):
                         'strand': strand,
                         'log2FC': self.safe_float(row[6]),
                         'bed_score': self.safe_int(row[4]),
-                        'DNA_count': self.safe_float(row[7]),
-                        'RNA_count': self.safe_float(row[8]),
+                        'inputCount': self.safe_float(row[7]),
+                        'outputCount': self.safe_float(row[8]),
                         'neg_log10_pvalue': minus_p,
                         'neg_log10_pvalue_adj': minus_q_edge,
                         'significant': significant,
@@ -717,10 +717,10 @@ class MPRAAdapter(BaseAdapter):
                     'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
                     'bed_score': self.safe_int(row[4]),
-                    'DNA_count_ref': self.safe_float(row[7]),
-                    'RNA_count_ref': self.safe_float(row[8]),
-                    'DNA_count_alt': self.safe_float(row[9]),
-                    'RNA_count_alt': self.safe_float(row[10]),
+                    'inputCountRef': self.safe_float(row[7]),
+                    'outputCountRef': self.safe_float(row[8]),
+                    'inputCountAlt': self.safe_float(row[9]),
+                    'outputCountAlt': self.safe_float(row[10]),
                     'neg_log10_pvalue': self.safe_float(row[11]),
                     'neg_log10_pvalue_adj': minus_q,
                     'significant': minus_q is not None and minus_q >= self.THRESHOLD,

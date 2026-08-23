@@ -88,8 +88,8 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset, mock
         assert 'strand' in first_item
         assert 'log2FC' in first_item
         assert 'bed_score' in first_item
-        assert 'DNA_count' in first_item
-        assert 'RNA_count' in first_item
+        assert 'inputCount' in first_item
+        assert 'outputCount' in first_item
         assert first_item['method'] == 'MPRA'
         assert first_item['class'] == 'observed data'
         assert first_item['label'] == 'regulatory reference element activity'
