@@ -594,7 +594,7 @@ igvf_file_accessions:
       - IGVFFI3476PDCJ
       - IGVFFI0625ESRH
       - IGVFFI3707KDGP
-      - IGVFFI3916WDKO
+      - IGVFFI0817MJYD
     reporter genomic variant effects:
       - IGVFFI3297TOZX
       - IGVFFI8556YSBO
@@ -611,7 +611,7 @@ igvf_file_accessions:
       - IGVFFI1436TRIH
       - IGVFFI7237HYCA
       - IGVFFI7056NAXT
-      - IGVFFI5172VOJF
+      - IGVFFI0358RUFK
       - IGVFFI9852HQHD
   VAMP-seq:
     - IGVFFI0629IIQU

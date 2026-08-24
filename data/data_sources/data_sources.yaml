@@ -1554,8 +1554,8 @@ genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3707KDGP/@@download/IGVFFI3707KDGP.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3916WDKO/@@download/IGVFFI3916WDKO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0817MJYD/@@download/IGVFFI0817MJYD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0358RUFK/@@download/IGVFFI0358RUFK.tsv.gz
 
   source: IGVF
   threshold: 1
@@ -1592,8 +1592,8 @@ genomic element to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3707KDGP/@@download/IGVFFI3707KDGP.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3916WDKO/@@download/IGVFFI3916WDKO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0817MJYD/@@download/IGVFFI0817MJYD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0358RUFK/@@download/IGVFFI0358RUFK.tsv.gz
 
   source: IGVF
   threshold: 1
@@ -1629,7 +1629,7 @@ genomic element from variants igvf mpra:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6765JJXI/@@download/IGVFFI6765JJXI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0358RUFK/@@download/IGVFFI0358RUFK.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
 
@@ -1668,7 +1668,7 @@ variant igvf mpra:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6765JJXI/@@download/IGVFFI6765JJXI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0358RUFK/@@download/IGVFFI0358RUFK.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
 
@@ -1705,7 +1705,7 @@ variant to biosample igvf mpra:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6765JJXI/@@download/IGVFFI6765JJXI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0358RUFK/@@download/IGVFFI0358RUFK.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
 
