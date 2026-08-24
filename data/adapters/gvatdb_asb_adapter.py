@@ -6,7 +6,10 @@ from typing import Optional
 import os
 
 from adapters.base import BaseAdapter
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
 
 
@@ -21,7 +24,6 @@ class ASB_GVATDB(BaseAdapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     # smallest pvalue in this file is 0, the second smallest pvalue is 1e-05, so we will replace 0 with 1e-05 to calculate log10pvalue
     # so the max log10pvalue is 5.
     MAX_LOG10_PVALUE = 5
@@ -49,7 +51,7 @@ class ASB_GVATDB(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.load_tf_uniprot_id_mapping()
-        self.ensembls = pickle.load(open(ASB_GVATDB.ENSEMBL_MAPPING, 'rb'))
+        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
         ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as input_file:
