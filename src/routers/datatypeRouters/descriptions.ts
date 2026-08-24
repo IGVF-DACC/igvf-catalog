@@ -281,7 +281,9 @@ export const descriptions = {
    Example: variant_id = NC_000020.11:3658947:A:G, <br> \
    spdi = NC_000020.11:3658947:A:G, <br> \
    hgvs = NC_000020.11:g.3658948A>G. <br> \
-   ca_id = CA739473472',
+   ca_id = CA739473472. <br> \
+   The response includes an "annotations" field summarizing everything known about the variant across genes, drugs, proteins, diseases, phenotypes, biosamples and genomic elements: for each data type, a total edge count and a breakdown of counts by method and biological context (when available). <br> \
+   Set igvf_only = true to restrict the "annotations" counts to records sourced from IGVF only.',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
    Example: region = chr1:1157520-1158520 (maximum length: 10kb).<br> \
