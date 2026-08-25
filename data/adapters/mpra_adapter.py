@@ -117,6 +117,7 @@ class MPRAAdapter(BaseAdapter):
         reference_filepath: Optional[str] = None,
         reference_source_url: Optional[str] = None,
         validate=False,
+        excluded_file_accessions=None,
         **kwargs
     ):
         # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
@@ -130,6 +131,9 @@ class MPRAAdapter(BaseAdapter):
         super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.rstrip('/').split('/')[-1]
+        # Optional list of file accessions whose previously-loaded variants should
+        # NOT be considered "already loaded" for this run (e.g. revoked replacements).
+        self.excluded_file_accessions = excluded_file_accessions or []
 
         if 'encodeproject.org' in source_url:
             self.source = 'ENCODE'
@@ -598,8 +602,11 @@ class MPRAAdapter(BaseAdapter):
 
     def _process_variant_chunk(self, chunk):
         spdis = [row[3] for row in chunk]
+        excluded_files_filesets = [
+            f'files_filesets/{acc}' for acc in self.excluded_file_accessions
+        ] + [f'files_filesets/{self.file_accession}']
         loaded_spdis = bulk_check_variants_in_arangodb(
-            spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}')
+            spdis, check_by='spdi', excluded_files_filesets=excluded_files_filesets)
         for row in chunk:
             spdi = row[3]
             if spdi in loaded_spdis:
@@ -700,7 +707,6 @@ class MPRAAdapter(BaseAdapter):
                 edge_key = '_'.join([
                     variant_id,
                     element_id,
-                    self.strand_token(element_strand),
                     biosample_term_key,
                     self.file_accession,
                 ])

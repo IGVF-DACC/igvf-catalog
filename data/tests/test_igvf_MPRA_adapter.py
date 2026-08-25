@@ -45,6 +45,36 @@ def test_variant(mock_load_variant, mock_check, mock_file_fileset):
     adapter.process_file()
     assert any(
         '"spdi": "NC_000009.12:135961939:C:T"' in entry for entry in writer.contents)
+    assert mock_check.call_args.kwargs['excluded_files_filesets'] == [
+        'files_filesets/IGVFFI1323RCIE']
+
+
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set())
+@patch('adapters.mpra_adapter.load_variant')
+def test_variant_excludes_replaced_file_accessions(mock_load_variant, mock_check, mock_file_fileset):
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000009.12:135961939:C:T',
+        'spdi': 'NC_000009.12:135961939:C:T',
+        'hgvs': 'NC_000009.12:g.135961940C>T',
+        'variation_type': 'SNP',
+    }, None)
+
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath='./samples/igvf_mpra_variant_effects.example.tsv',
+        label='variant',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI3297TOZX/',
+        reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
+        writer=writer,
+        validate=True,
+        excluded_file_accessions=['IGVFFI1323RCIE'],
+    )
+    adapter.process_file()
+    assert mock_check.call_args.kwargs['excluded_files_filesets'] == [
+        'files_filesets/IGVFFI1323RCIE',
+        'files_filesets/IGVFFI3297TOZX',
+    ]
 
 
 def test_genomic_element_uses_ref_name_when_ref_and_alt_share_coords(
@@ -224,7 +254,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
     biosample_term_key = 'CL_0000679'
-    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_plus_{biosample_term_key}_IGVFFI1323RCIE'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
