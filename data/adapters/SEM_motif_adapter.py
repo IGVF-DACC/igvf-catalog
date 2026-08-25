@@ -150,8 +150,15 @@ class SEMMotif(BaseAdapter):
         self.method = self.file_fileset['method']
 
         with gzip.open(self.filepath, 'rt') as sem_file:
-            baseline = next(sem_file).strip().split(':')[1]
-            tf_name = next(sem_file).strip().split()[0]
+            baseline = None
+            tf_name = None
+            for line in sem_file:
+                line = line.strip()
+                if not line.startswith('#'):
+                    tf_name = line.split()[0]
+                    break
+                if line.startswith('#BASELINE:'):
+                    baseline = line.split(':')[1]
             motif_key = tf_name + '_SEMpl'
 
             if self.label == 'motif':

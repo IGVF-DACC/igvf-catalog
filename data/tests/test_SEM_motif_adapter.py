@@ -1,3 +1,4 @@
+import gzip
 import json
 import pytest
 from unittest.mock import patch
@@ -51,6 +52,30 @@ def test_sem_motif_adapter_motif(mock_file_fileset, mock_protein_map):
     assert first_item['class'] == 'observed data'
     assert first_item['method'] == 'SEMpl'
     assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
+
+
+def test_sem_motif_adapter_motif_with_description_header(mock_file_fileset, mock_protein_map, tmp_path):
+    # regression test: some real SEMpl model files include a leading
+    # '#Description: ...' line before '#BASELINE:', which used to break
+    # the naive two-line header parsing (see: ValueError could not convert
+    # string to float when 'baseline' picked up the description text)
+    model_file = tmp_path / 'SEM_model_file_with_description.tsv.gz'
+    with gzip.open(model_file, 'wt') as f:
+        f.write(
+            '#Description: Predictions of variant effects on transcription factor binding\n')
+        f.write('#BASELINE:-1.5347609999406169\n')
+        f.write('TCF3\tA\tC\tG\tT\n')
+        f.write('1\t-0.525692\t0.146994\t-0.162952\t-0.298346\n')
+        f.write('2\t-0.800987\t-0.703454\t-1.167276\t0.016788\n')
+
+    writer = SpyWriter()
+    adapter = SEMMotif(filepath=str(model_file),
+                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item['tf_name'] == 'TCF3'
+    assert first_item['baseline'] == -1.5347609999406169
+    assert len(first_item['pwm']) == 2
 
 
 def test_sem_motif_adapter_motif_protein_link(mock_file_fileset, mock_protein_map):
