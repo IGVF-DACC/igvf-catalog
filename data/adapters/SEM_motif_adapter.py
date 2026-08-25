@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import gzip
+from functools import cached_property
 from typing import Optional
 
 from adapters.base import BaseAdapter
@@ -62,6 +63,11 @@ class SEMMotif(BaseAdapter):
         elif self.label == 'complex_protein':
             return 'complexes_proteins'
 
+    @cached_property
+    def ensembl(self):
+        """Uniprot -> ENSP mapping, fetched from ArangoDB at most once per adapter instance."""
+        return get_protein_map_from_arangodb(organism='Homo sapiens')
+
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
         with gzip.open(self.sem_provenance_path, 'rt') as map_file:
@@ -79,9 +85,6 @@ class SEMMotif(BaseAdapter):
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
     def load_complexes(self):
-        if self.label == 'complex_protein':
-            self.ensembl = get_protein_map_from_arangodb(
-                organism='Homo sapiens')
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
@@ -137,7 +140,6 @@ class SEMMotif(BaseAdapter):
             return
 
         self.load_tf_id_mapping()
-        self.ensembl = get_protein_map_from_arangodb(organism='Homo sapiens')
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
