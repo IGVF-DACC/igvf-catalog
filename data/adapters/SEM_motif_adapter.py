@@ -37,9 +37,13 @@ class SEMMotif(BaseAdapter):
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
-        # assumes that both sem_provenance_path and filepath have accession as prefix
-        self.sem_provenance_accession = os.path.basename(
-            sem_provenance_path).split('.')[0]
+        # sem_provenance_path is only used by the 'motif'/'motif_protein' labels
+        # (see load_tf_id_mapping); 'complex'/'complex_protein' don't require it.
+        self.sem_provenance_accession = None
+        if sem_provenance_path is not None:
+            # assumes both sem_provenance_path and filepath have accession as prefix
+            self.sem_provenance_accession = os.path.basename(
+                sem_provenance_path).split('.')[0]
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
 
@@ -134,7 +138,9 @@ class SEMMotif(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
+        if self.sem_provenance_accession is not None:
+            self.writer.add_tag('portal_accessions',
+                                self.sem_provenance_accession)
         if self.label in ['complex', 'complex_protein']:
             self.load_complexes()
             return

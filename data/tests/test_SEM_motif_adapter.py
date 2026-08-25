@@ -95,6 +95,20 @@ def test_sem_motif_adapter_raises_clear_error_for_non_model_file(mock_file_files
         adapter.process_file()
 
 
+def test_sem_motif_adapter_complex_protein_without_sem_provenance_path(mock_protein_map):
+    # regression test: 'complex'/'complex_protein' labels don't use
+    # sem_provenance_path (see load_complexes/load_tf_id_mapping), and the
+    # documented CLI usage for them omits --sem_provenance_path entirely.
+    # The adapter must not require it.
+    writer = SpyWriter()
+    adapter = SEMMotif(filepath='./samples/SEM/provenance_file.tsv.gz',
+                       label='complex_protein', writer=writer)
+    adapter.process_file()
+    assert adapter.sem_provenance_path is None
+    assert adapter.sem_provenance_accession is None
+    assert len(writer.contents) > 0
+
+
 def test_sem_motif_adapter_motif_protein_link(mock_file_fileset, mock_protein_map):
     writer = SpyWriter()
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
