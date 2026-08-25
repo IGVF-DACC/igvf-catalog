@@ -159,6 +159,12 @@ class SEMMotif(BaseAdapter):
                     break
                 if line.startswith('#BASELINE:'):
                     baseline = line.split(':')[1]
+
+            if baseline is None or tf_name is None:
+                raise ValueError(
+                    f"'{self.filepath}' does not look like a SEMpl motif model file "
+                    "(expected a '#BASELINE:' header line followed by a TF name row).")
+
             motif_key = tf_name + '_SEMpl'
 
             if self.label == 'motif':

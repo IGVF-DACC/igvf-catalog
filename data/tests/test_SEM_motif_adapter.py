@@ -78,6 +78,23 @@ def test_sem_motif_adapter_motif_with_description_header(mock_file_fileset, mock
     assert len(first_item['pwm']) == 2
 
 
+def test_sem_motif_adapter_raises_clear_error_for_non_model_file(mock_file_fileset, mock_protein_map, tmp_path):
+    # regression test: if the wrong file (e.g. the provenance file, which has
+    # no '#BASELINE:' header at all) is mistakenly passed as the model file,
+    # the adapter should fail with a clear message instead of a TypeError
+    # from float(None) deep inside parse()
+    not_a_model_file = tmp_path / 'not_a_model_file.tsv.gz'
+    with gzip.open(not_a_model_file, 'wt') as f:
+        f.write('transcription_factor\tensembl_id\tebi_complex_ac\tuniprot_ac\n')
+        f.write('AHR\tENSG00000106546\t\tP35869\n')
+
+    writer = SpyWriter()
+    adapter = SEMMotif(filepath=str(not_a_model_file),
+                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+    with pytest.raises(ValueError, match='does not look like a SEMpl motif model file'):
+        adapter.process_file()
+
+
 def test_sem_motif_adapter_motif_protein_link(mock_file_fileset, mock_protein_map):
     writer = SpyWriter()
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
