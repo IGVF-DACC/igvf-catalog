@@ -77,8 +77,7 @@ def test_gaf_adapter_rna(mock_file_fileset):
     mock_file_fileset.assert_called_once_with('IGVFFI6501YXMX')
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
-    assert '_key' in first_item
-    assert '_from' in first_item
+    assert first_item['_from'].startswith('transcripts/')
     assert '_to' in first_item
     assert first_item['organism'] == 'Homo sapiens'
     assert first_item['source'] == 'Gene Ontology'

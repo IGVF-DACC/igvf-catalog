@@ -89,16 +89,14 @@ class GAF(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
 
         ensembl_unmatched = 0
-
+        self.organism = 'Homo sapiens'
         if self.label == 'rna':
             self.load_rnacentral_mapping()
-
-        self.organism = 'Homo sapiens'
-        if self.label == 'mouse':
+        elif self.label == 'mouse':
             self.organism = 'Mus musculus'
             self.ensembls = get_protein_map_from_arangodb(
                 dbxref_name='MGI', organism=self.organism)
-        elif self.label != 'rna':
+        else:
             self.ensembls = get_protein_map_from_arangodb(
                 organism=self.organism)
 
@@ -106,27 +104,25 @@ class GAF(BaseAdapter):
             for annotation in gafiterator(input_file):
                 _to = 'ontology_terms/' + \
                     annotation['GO_ID'].replace(':', '_')
-                protein_id = annotation['DB_Object_ID']
 
-                if self.label != 'rna':
+                if self.label == 'rna':
+                    transcript_id = self.rnacentral_mapping.get(
+                        annotation['DB_Object_ID'])
+                    if transcript_id is None:
+                        ensembl_unmatched += 1
+                        continue
+                    from_ids = ['transcripts/' + transcript_id]
+                else:
+                    protein_id = annotation['DB_Object_ID']
                     ensembl_ids = self.ensembls.get(
                         protein_id) or self.ensembls.get(protein_id.split('-')[0])
                     if ensembl_ids is None:
                         ensembl_unmatched += 1
                         continue
-                else:
-                    ensembl_ids = [protein_id]
+                    from_ids = ['proteins/' +
+                                ensembl_id for ensembl_id in ensembl_ids]
 
-                for ensembl_id in ensembl_ids:
-                    _from = 'proteins/' + ensembl_id
-
-                    if self.label == 'rna':
-                        transcript_id = self.rnacentral_mapping.get(
-                            annotation['DB_Object_ID'])
-                        if transcript_id is None:
-                            continue
-                        _from = 'transcripts/' + transcript_id
-
+                for _from in from_ids:
                     props = {
                         '_key': hashlib.sha256((str(annotation) + _from).encode()).hexdigest(),
                         '_from': _from,
@@ -176,4 +172,4 @@ class GAF(BaseAdapter):
 
         if ensembl_unmatched != 0:
             self.logger.info(
-                f'{ensembl_unmatched} unmatched ids -> ensembl protein keys')
+                f'{ensembl_unmatched} unmatched ids for label: {self.label}')
