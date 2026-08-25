@@ -1,6 +1,5 @@
 import gzip
 import json
-import pickle
 import hashlib
 import os
 from typing import Optional
@@ -9,7 +8,10 @@ from Bio.UniProt.GOA import gafiterator
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
 #
@@ -48,9 +50,6 @@ from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 class GAF(BaseAdapter):
     # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
-
-    # generated from current proteins collection in the Catalog
-    MOUSE_MGI_TO_UNIPROT_PATH = './data_loading_support_files/mgi_to_ensembl.pkl'
     SOURCES = {
         'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
         'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
@@ -58,8 +57,6 @@ class GAF(BaseAdapter):
         'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
     }
     ALLOWED_LABELS = list(SOURCES.keys())
-    HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
-    MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
 
     def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
@@ -81,10 +78,6 @@ class GAF(BaseAdapter):
                 self.rnacentral_mapping[mapping[0] +
                                         '_' + mapping[3]] = mapping[2]
 
-    def load_mouse_mgi_to_uniprot(self):
-        self.mouse_mgi_mapping = pickle.load(
-            open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rb'))
-
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -101,25 +94,19 @@ class GAF(BaseAdapter):
             self.load_rnacentral_mapping()
 
         self.organism = 'Homo sapiens'
-        self.ensembls = pickle.load(open(GAF.HUMAN_ENSEMBL_MAPPING, 'rb'))
-
         if self.label == 'mouse':
             self.organism = 'Mus musculus'
-            self.load_mouse_mgi_to_uniprot()
-            self.ensembls = pickle.load(open(GAF.MOUSE_ENSEMBL_MAPPING, 'rb'))
+            self.ensembls = get_protein_map_from_arangodb(
+                dbxref_name='MGI', organism=self.organism)
+        elif self.label != 'rna':
+            self.ensembls = get_protein_map_from_arangodb(
+                organism=self.organism)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 _to = 'ontology_terms/' + \
                     annotation['GO_ID'].replace(':', '_')
                 protein_id = annotation['DB_Object_ID']
-
-                if self.label == 'mouse':
-                    protein_id = self.mouse_mgi_mapping.get(
-                        annotation['DB_Object_ID'])
-                    if protein_id is None:
-                        continue
-                    protein_id = protein_id.replace('UniProtKB:', '')
 
                 if self.label != 'rna':
                     ensembl_ids = self.ensembls.get(
@@ -189,4 +176,4 @@ class GAF(BaseAdapter):
 
         if ensembl_unmatched != 0:
             self.logger.info(
-                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+                f'{ensembl_unmatched} unmatched ids -> ensembl protein keys')

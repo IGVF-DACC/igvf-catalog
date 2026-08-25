@@ -955,12 +955,15 @@ def get_gene_map_from_arangodb(field, collection='genes'):
     return gene_map
 
 
-def get_protein_map_from_arangodb(field='uniprot_ids', organism=None, collection='proteins'):
-    """Return {field_value: [protein._key, ...]} from the proteins collection.
+def get_protein_map_from_arangodb(field='uniprot_ids', organism=None, collection='proteins', dbxref_name=None):
+    """Return {id: [protein._key, ...]} from the proteins collection.
 
     ``uniprot_ids`` is an array on each protein. Isoform accessions (e.g.
     ``P62258-1``) are also indexed under the canonical accession (``P62258``)
     so callers can look up either form.
+
+    Use ``dbxref_name`` (e.g. ``'MGI'``) to invert ``protein.dbxrefs`` entries
+    with that name instead of a top-level field.
     """
     db = ArangoDB().get_igvf_connection()
     bind_vars = {}
@@ -968,11 +971,22 @@ def get_protein_map_from_arangodb(field='uniprot_ids', organism=None, collection
     if organism:
         filter_clause = 'FILTER protein.organism == @organism'
         bind_vars['organism'] = organism
+
+    if dbxref_name:
+        bind_vars['dbxref_name'] = dbxref_name
+        value_expr = '''UNIQUE(
+            FOR xref IN protein.dbxrefs || []
+              FILTER xref.name == @dbxref_name AND xref.id != null
+              RETURN xref.id
+        )'''
+    else:
+        value_expr = f'protein.{field}'
+
     cursor = db.aql.execute(
         f'''
         FOR protein IN {collection}
           {filter_clause}
-          RETURN {{ key: protein._key, value: protein.{field} }}
+          RETURN {{ key: protein._key, value: {value_expr} }}
         ''',
         bind_vars=bind_vars
     )
@@ -988,7 +1002,7 @@ def get_protein_map_from_arangodb(field='uniprot_ids', organism=None, collection
             if not value:
                 continue
             _add_protein_map_entry(protein_map, value, protein_key)
-            if field == 'uniprot_ids' and '-' in value:
+            if not dbxref_name and field == 'uniprot_ids' and '-' in value:
                 canonical = value.split('-')[0]
                 if canonical:
                     _add_protein_map_entry(protein_map, canonical, protein_key)
