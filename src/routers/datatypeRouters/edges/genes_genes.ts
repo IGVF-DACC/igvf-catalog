@@ -201,7 +201,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 }
 
 const genesGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/genes', description: descriptions.genes_genes } })
+  .meta({ openapi: { method: 'GET', path: '/genes/genes', description: descriptions.genes_genes, tags: ['Biological Context Data'] } })
   .input(genesGenesQueryFormat)
   .output(z.array(genesGenesRelativeFormat))
   .query(async ({ input }) => await findGenesGenes(input))

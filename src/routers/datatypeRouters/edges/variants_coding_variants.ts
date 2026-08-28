@@ -131,13 +131,13 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
 }
 
 const codingVariantsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants, tags: ['Biological Context Data'] } })
   .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
   .output(z.array(codingVariantsFormat))
   .query(async ({ input }) => await findCodingVariants(input))
 
 const variantsFromCodingVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.coding_variants_variants } })
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.coding_variants_variants, tags: ['Biological Context Data'] } })
   .input(variantsFromCodingVariantsQueryFormat)
   .output(z.array(variantSimplifiedFormat.merge(z.object({ _id: z.string() }))))
   .query(async ({ input }) => await findVariantsFromCodingVariants(input))

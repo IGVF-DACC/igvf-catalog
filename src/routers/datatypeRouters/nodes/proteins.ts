@@ -202,7 +202,7 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const proteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins', description: descriptions.proteins } })
+  .meta({ openapi: { method: 'GET', path: '/proteins', description: descriptions.proteins, tags: ['Nodes'] } })
   .input(proteinsQueryFormat)
   .output(z.array(proteinFormat))
   .query(async ({ input }) => await proteinSearch(input))

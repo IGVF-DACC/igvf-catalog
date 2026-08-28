@@ -116,7 +116,7 @@ async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const filesFilesets = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/files-filesets', description: descriptions.files_fileset } })
+  .meta({ openapi: { method: 'GET', path: '/files-filesets', description: descriptions.files_fileset, tags: ['Utility Endpoints'] } })
   .input(filesFilesetsQueryFormat)
   .output(z.array(filesFilesetsFormat))
   .query(async ({ input }) => await filesFilesetsSearch(input))

@@ -12,7 +12,8 @@ const health = publicProcedure
     openapi: {
       method: 'GET',
       path: '/health',
-      description: 'Health check endpoint for the API service'
+      description: 'Health check endpoint for the API service',
+      tags: ['Utility Endpoints']
     }
   })
   .input(z.void())

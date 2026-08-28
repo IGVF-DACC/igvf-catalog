@@ -65,7 +65,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const motifs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs } })
+  .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs, tags: ['Nodes'] } })
   .input(motifsQueryFormat.merge(commonHumanNodesParamsFormat))
   .output(z.array(motifFormat))
   .query(async ({ input }) => await motifSearch(input))

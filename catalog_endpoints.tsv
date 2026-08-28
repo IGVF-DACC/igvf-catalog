@@ -1,0 +1,87 @@
+type	endpoint
+Nodes	variants
+Nodes	coding-variants
+Nodes	genomic-elements
+Nodes	genes
+Nodes	genes-structure
+Nodes	transcripts
+Nodes	proteins
+Nodes	complexes
+Nodes	pathways
+Nodes	motifs
+Nodes	drugs
+Nodes	ontology-terms
+Nodes	studies
+IGVF Data	variants/genomic-elements
+IGVF Data	variants/genes
+IGVF Data	variants/proteins
+IGVF Data	variants/phenotypes
+IGVF Data	variants/biosamples
+IGVF Data	proteins/variants
+IGVF Data	proteins/proteins
+IGVF Data	phenotypes/variants
+IGVF Data	phenotypes/coding-variants
+IGVF Data	phenotypes/genomic-elements
+IGVF Data	genomic-elements/variants
+IGVF Data	genomic-elements/genes
+IGVF Data	genomic-elements/phenotypes
+IGVF Data	genomic-elements/biosamples
+IGVF Data	genes/variants
+IGVF Data	genes/genomic-elements
+IGVF Data	coding-variants/phenotypes
+IGVF Data	biosamples/variants
+IGVF Data	biosamples/genomic-elements
+Bespoke Endpoints	variants/freq
+Bespoke Endpoints	gene-regulatory-network
+Bespoke Endpoints	enhancer-gene-predictions
+Bespoke Endpoints	qtls
+Bespoke Endpoints	variants/summary
+Bespoke Endpoints	variants/variant-ld/summary
+Bespoke Endpoints	variants/region-summary
+Bespoke Endpoints	variants/genes/summary
+Bespoke Endpoints	variants/predictions-count
+Bespoke Endpoints	variants/predictions
+Bespoke Endpoints	variants/phenotypes/score-summary
+Bespoke Endpoints	variants/nearest-genes
+Bespoke Endpoints	variants/gnomad-alleles
+Bespoke Endpoints	variants/genomic-elements/genes
+Bespoke Endpoints	variants/genomic-elements/cell-gene-predictions
+Bespoke Endpoints	variants/genes-proteins
+Bespoke Endpoints	genes/coding-variants/scores
+Bespoke Endpoints	genes/coding-variants/all-scores
+Bespoke Endpoints	genes-proteins/variants
+Bespoke Endpoints	genes-proteins/genes-proteins
+Bespoke Endpoints	coding-variants/phenotypes/score-summary
+Bespoke Endpoints	coding-variants/phenotypes-count
+Bespoke Endpoints	ontology-terms/{ontology_term_id}/parents
+Bespoke Endpoints	ontology-terms/{ontology_term_id}/children
+Bespoke Endpoints	ontology-terms/{ontology_term_id_start}/transitive-closure/{ontology_term_id_end}
+Biological Context Data	variants/variant-ld
+Biological Context Data	variants/coding-variants
+Biological Context Data	variants/drugs
+Biological Context Data	variants/diseases
+Biological Context Data	coding-variants/variants
+Biological Context Data	genes/transcripts
+Biological Context Data	genes/proteins
+Biological Context Data	genes/pathways
+Biological Context Data	genes/genes
+Biological Context Data	genes/diseases
+Biological Context Data	transcripts/genes
+Biological Context Data	transcripts/proteins
+Biological Context Data	proteins/transcripts
+Biological Context Data	proteins/genes
+Biological Context Data	proteins/complexes
+Biological Context Data	complexes/proteins
+Biological Context Data	proteins/motifs
+Biological Context Data	motifs/proteins
+Biological Context Data	pathways/genes
+Biological Context Data	pathways/pathways
+Biological Context Data	go-terms/gene-products
+Biological Context Data	gene-products/go-terms
+Biological Context Data	diseases/variants
+Biological Context Data	diseases/genes
+Biological Context Data	drugs/variants
+Utility Endpoints	files-filesets
+Utility Endpoints	llm-query
+Utility Endpoints	autocomplete
+Utility Endpoints	health

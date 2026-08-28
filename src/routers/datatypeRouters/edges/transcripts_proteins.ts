@@ -159,13 +159,13 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
 }
 
 const proteinsFromTranscripts = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins, tags: ['Biological Context Data'] } })
   .input(transcriptsCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await findProteinsFromTranscriptSearch(input))
 
 const transcriptsFromProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts, tags: ['Biological Context Data'] } })
   .input(proteinsCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await findTranscriptsFromProteinSearch(input))
