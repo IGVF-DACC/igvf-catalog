@@ -213,13 +213,13 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
 }
 
 const variantsFromDiseases = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/variants', description: descriptions.diseases_variants } })
+  .meta({ openapi: { method: 'GET', path: '/diseases/variants', description: descriptions.diseases_variants, tags: ['Biological Context Data'] } })
   .input(diseasessCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await variantFromDiseaseSearch(input))
 
 const diseaseFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
+  .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases, tags: ['Biological Context Data'] } })
   .input(variantsCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))

@@ -708,25 +708,25 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const genesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes, tags: ['IGVF Data'] } })
   .input(variantsQueryFormat)
   .output(z.array(completeQtlsFormat))
   .query(async ({ input }) => await getGeneFromVariant(input))
 
 const variantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants, tags: ['IGVF Data'] } })
   .input(genesQueryFormat)
   .output(z.array(completeQtlsFormat))
   .query(async ({ input }) => await getVariantFromGene(input))
 
 const nearestGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })
+  .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes, tags: ['Bespoke Endpoints'] } })
   .input(z.object({ region: z.string().trim() }))
   .output(z.array(geneFormat))
   .query(async ({ input }) => await nearestGeneSearch(input))
 
 const qtlSummaryEndpoint = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary, tags: ['Bespoke Endpoints'] } })
   .input(singleVariantQueryFormat.merge(z.object({ page: z.number().optional().default(0), limit: z.number().optional(), files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))

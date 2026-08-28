@@ -54,7 +54,7 @@ async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
 }
 
 const autocomplete = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/autocomplete', description: descriptions.autocomplete } })
+  .meta({ openapi: { method: 'GET', path: '/autocomplete', description: descriptions.autocomplete, tags: ['Utility Endpoints'] } })
   .input(autocompleteQueryFormat)
   .output(z.array(autocompleteFormat))
   .query(async ({ input }) => await autocompleteQuery(input))

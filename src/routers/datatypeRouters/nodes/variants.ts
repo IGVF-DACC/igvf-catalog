@@ -643,25 +643,25 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
 }
 
 const variants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
+  .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants, tags: ['Nodes'] } })
   .input(variantsQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 const variantByFrequencySource = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
+  .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq, tags: ['Bespoke Endpoints'] } })
   .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 const variantSummary = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/summary', description: descriptions.variants_summary } })
+  .meta({ openapi: { method: 'GET', path: '/variants/summary', description: descriptions.variants_summary, tags: ['Bespoke Endpoints'] } })
   .input(variantSummaryQueryFormat)
   .output(variantsSummaryFormat)
   .query(async ({ input }) => await variantSummarySearch(input))
 
 const variantsAlleles = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles } })
+  .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles, tags: ['Bespoke Endpoints'] } })
   .input(variantsFromRegionsFormat)
   .output(z.array(z.array(z.string().or(z.number()).nullish())))
   .query(async ({ input }) => await variantsAllelesAggregation(input))

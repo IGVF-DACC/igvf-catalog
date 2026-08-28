@@ -149,13 +149,13 @@ const complexQuery = commonComplexQueryFormat.merge(commonHumanEdgeParamsFormat)
 }))
 
 const proteinsFromComplexes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins, tags: ['Biological Context Data'] } })
   .input(complexQuery)
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await proteinsFromComplexesSearch(input))
 
 const complexesFromProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes, tags: ['Biological Context Data'] } })
   .input(proteinsQuery)
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await complexesFromProteinSearch(input))

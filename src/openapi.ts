@@ -1,6 +1,7 @@
 import { generateOpenApiDocument } from 'trpc-openapi'
 import { appRouter } from './routers/_app'
 import { envData } from './env'
+import { CATALOG_ENDPOINTS, OPENAPI_TAG_ORDER, PATH_TO_TAG } from './catalogEndpoints'
 
 let baseUrl = `${envData.host.protocol}://${envData.host.hostname}:${envData.host.port}/api`
 // prevents production SSL cert mismatch and use default ports
@@ -141,7 +142,8 @@ let openApiConfig = {
   description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
   version: '2.0 - DEV',
   docsUrl: 'https://api-dev.catalog.igvf.org/openapi',
-  baseUrl
+  baseUrl,
+  tags: [...OPENAPI_TAG_ORDER]
 }
 
 if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
@@ -150,50 +152,46 @@ if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
     description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
     version: '1.2.0',
     docsUrl: 'https://api.catalog.igvf.org/openapi',
-    baseUrl
+    baseUrl,
+    tags: [...OPENAPI_TAG_ORDER]
   }
 }
 
-// Order defined by endpoints that have the following prefixes
-const endpointsOrder = [
-  '/variants',
-  '/coding-variants',
-  '/genes',
-  '/gene-products',
-  '/transcripts',
-  '/proteins',
-  '/genomic-elements',
-  '/diseases',
-  '/phenotypes',
-  '/ontology-terms',
-  '/go',
-  '/motifs',
-  '/studies',
-  '/complex',
-  '/drugs',
-  '/'
-]
-
 export const openApiDocument = generateOpenApiDocument(appRouter, openApiConfig)
 
-const endpoints = Object.keys(openApiDocument.paths).sort((a, b) => { return a.length - b.length })
-const endpointsCheck = endpoints.map((endpoint) => [endpoint, false])
+// Assign Swagger section tags and reorder paths per catalog_endpoints.tsv.
+// Endpoint descriptions and other OpenAPI metadata are left unchanged.
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'] as const
 
-const orderedList: string[] = []
-
-endpointsOrder.forEach(prefix => {
-  endpointsCheck.forEach(endpointMap => {
-    if (endpointMap[1] === false && (endpointMap[0] as string).startsWith(prefix)) {
-      orderedList.push(endpointMap[0] as string)
-
-      endpointMap[1] = true
+Object.entries(openApiDocument.paths).forEach(([path, pathItem]) => {
+  if (pathItem === undefined) {
+    return
+  }
+  const tag = PATH_TO_TAG[path]
+  if (tag === undefined) {
+    throw new Error(`OpenAPI path missing from catalog endpoint tag map: ${path}`)
+  }
+  HTTP_METHODS.forEach((method) => {
+    const operation = pathItem[method]
+    if (operation !== undefined) {
+      operation.tags = [tag]
     }
   })
 })
 
 const newPath: typeof openApiDocument.paths = {}
-orderedList.forEach((endpoint) => {
-  newPath[endpoint] = openApiDocument.paths[endpoint]
+const remainingPaths = new Set(Object.keys(openApiDocument.paths))
+
+CATALOG_ENDPOINTS.forEach(({ path }) => {
+  if (openApiDocument.paths[path] === undefined) {
+    throw new Error(`Catalog endpoint not found in OpenAPI document: ${path}`)
+  }
+  newPath[path] = openApiDocument.paths[path]
+  remainingPaths.delete(path)
 })
+
+if (remainingPaths.size > 0) {
+  throw new Error(`OpenAPI paths not listed in catalog endpoints: ${Array.from(remainingPaths).join(', ')}`)
+}
 
 openApiDocument.paths = newPath

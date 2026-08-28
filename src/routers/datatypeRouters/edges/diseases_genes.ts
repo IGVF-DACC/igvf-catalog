@@ -327,13 +327,13 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 const diseasesFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
+  .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases, tags: ['Biological Context Data'] } })
   .input(geneQuery)
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await diseasesFromGeneSearch(input))
 
 const genesFromDiseases = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
+  .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes, tags: ['Biological Context Data'] } })
   .input(diseaseQuery)
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await genesFromDiseaseSearch(input))

@@ -69,7 +69,7 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const studies = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/studies', description: descriptions.studies } })
+  .meta({ openapi: { method: 'GET', path: '/studies', description: descriptions.studies, tags: ['Nodes'] } })
   .input(studyQueryFormat)
   .output(z.array(studyFormat))
   .query(async ({ input }) => await studiesSearch(input))

@@ -387,7 +387,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const qtls = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/qtls', description: descriptions.qtls } })
+  .meta({ openapi: { method: 'GET', path: '/qtls', description: descriptions.qtls, tags: ['Bespoke Endpoints'] } })
   .input(inputFormat)
   .output(z.array(outputFormat))
   .query(async ({ input }) => await qtlSearch(input))

@@ -297,25 +297,25 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
 }
 
 const transcriptsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts } })
+  .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts, tags: ['Biological Context Data'] } })
   .input(genesCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await findTranscriptsFromGeneSearch(input))
 
 const genesFromTranscripts = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes } })
+  .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes, tags: ['Biological Context Data'] } })
   .input(transcriptsCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await findGenesFromTranscriptSearch(input))
 
 const proteinsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins, tags: ['Biological Context Data'] } })
   .input(genesCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(genesProteinsFormat))
   .query(async ({ input }) => await findProteinsFromGenesSearch(input))
 
 const genesFromProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes, tags: ['Biological Context Data'] } })
   .input(proteinsCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(genesProteinsFormat))
   .query(async ({ input }) => await findGenesFromProteins(input))

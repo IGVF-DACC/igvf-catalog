@@ -246,13 +246,13 @@ const biosamplesGenomicElementsQuery = commonBiosamplesQueryFormat.merge(z.objec
 }))
 
 const biosamplesFromGenomicElements = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genomic-elements/biosamples', description: descriptions.genomic_elements_biosamples } })
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements/biosamples', description: descriptions.genomic_elements_biosamples, tags: ['IGVF Data'] } })
   .input(genomicBiosamplesQuery)
   .output(z.array(genomicElementsToBiosampleFormat))
   .query(async ({ input }) => await findBiosamplesFromGenomicElementsQuery(input))
 
 const genomicElementsFromBiosamples = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements } })
+  .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements, tags: ['IGVF Data'] } })
   .input(biosamplesGenomicElementsQuery)
   .output(z.array(genomicElementsToBiosampleFormat))
   .query(async ({ input }) => await findGenomicElementsFromBiosamplesQuery(input))

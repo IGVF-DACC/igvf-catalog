@@ -328,13 +328,13 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 }
 
 const codingVariantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/scores', description: descriptions.genes_coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/scores', description: descriptions.genes_coding_variants, tags: ['Bespoke Endpoints'] } })
   .input(geneQueryFormat)
   .output(z.array(codingVariantsScoresFormat))
   .query(async ({ input }) => await findCodingVariantsFromGenes(input))
 
 const allCodingVariantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants_all_scores } })
+  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants_all_scores, tags: ['Bespoke Endpoints'] } })
   .input(allVariantsQueryFormat)
   .output(z.array(z.number().optional()))
   .query(async ({ input }) => await findAllCodingVariantsFromGenes(input))

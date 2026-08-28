@@ -144,7 +144,7 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const pathways = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/pathways', description: descriptions.pathways } })
+  .meta({ openapi: { method: 'GET', path: '/pathways', description: descriptions.pathways, tags: ['Nodes'] } })
   .input(QueryFormat)
   .output(z.array(pathwayFormat))
   .query(async ({ input }) => await pathwaySearch(input))

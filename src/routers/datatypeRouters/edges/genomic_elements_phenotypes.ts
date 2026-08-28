@@ -253,13 +253,13 @@ async function findGenomicElementsFromPhenotypes (input: paramsFormatType): Prom
 }
 
 const phenotypesFromGenomicElements = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genomic-elements/phenotypes', description: descriptions.genomic_elements_phenotypes } })
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements/phenotypes', description: descriptions.genomic_elements_phenotypes, tags: ['IGVF Data'] } })
   .input(genomicElementQueryFormat)
   .output(outputFormat)
   .query(async ({ input }) => await findPhenotypesFromGenomicElements(input))
 
 const genomicElementsFromPhenotypes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/phenotypes/genomic-elements', description: descriptions.phenotypes_genomic_elements } })
+  .meta({ openapi: { method: 'GET', path: '/phenotypes/genomic-elements', description: descriptions.phenotypes_genomic_elements, tags: ['IGVF Data'] } })
   .input(phenotypeQueryFormat)
   .output(outputFormat)
   .query(async ({ input }) => await findGenomicElementsFromPhenotypes(input))

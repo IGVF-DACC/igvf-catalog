@@ -491,19 +491,19 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
 }
 
 const variantsFromGeneProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants', description: descriptions.genes_proteins_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants', description: descriptions.genes_proteins_variants, tags: ['Bespoke Endpoints'] } })
   .input(queryFormat)
   .output(z.array(sequenceVariantRelatedFormat))
   .query(async ({ input }) => await findVariantsFromGenesProteinsSearch(input))
 
 const genesProteinsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins', description: descriptions.variants_genes_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins', description: descriptions.variants_genes_proteins, tags: ['Bespoke Endpoints'] } })
   .input(variantQueryFormat)
   .output(z.array(sequenceVariantRelatedFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 const genesProteinsGenesProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins', description: descriptions.genes_proteins_genes_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins', description: descriptions.genes_proteins_genes_proteins, tags: ['Bespoke Endpoints'] } })
   .input(queryFormat)
   .output(z.array(geneProteinRelatedFormat))
   .query(async ({ input }) => await geneProteinGeneProtein(input))

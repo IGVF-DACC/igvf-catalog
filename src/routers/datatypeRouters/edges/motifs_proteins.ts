@@ -267,14 +267,14 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 }
 
 const motifsFromProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs, tags: ['Biological Context Data'] } })
   .input(proteinsQuery)
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await motifsFromProteinSearch(input))
 
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins, tags: ['Biological Context Data'] } })
   .input(motifsToProteinsQueryFormat)
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await proteinsFromMotifSearch(input))

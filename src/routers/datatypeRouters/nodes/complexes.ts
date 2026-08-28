@@ -76,7 +76,7 @@ export async function complexSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 export const complexes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes', description: descriptions.complex } })
+  .meta({ openapi: { method: 'GET', path: '/complexes', description: descriptions.complex, tags: ['Nodes'] } })
   .input(complexQueryFormat)
   .output(z.array(complexFormat))
   .query(async ({ input }) => await complexSearch(input))

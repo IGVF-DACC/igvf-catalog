@@ -780,37 +780,37 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
 }
 
 const genomicElementsFromVariantsCount = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count, tags: ['Bespoke Endpoints'] } })
   .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
 const predictionsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements, tags: ['Bespoke Endpoints'] } })
   .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
 const variantsRegionSummary = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/region-summary', description: descriptions.variants_region_summary } })
+  .meta({ openapi: { method: 'GET', path: '/variants/region-summary', description: descriptions.variants_region_summary, tags: ['Bespoke Endpoints'] } })
   .input(z.object({ region: z.string() }))
   .output(regionSummaryFormat)
   .query(async ({ input }) => await findVariantsRegionSummary(input))
 
 const genomicElementsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge, tags: ['IGVF Data'] } })
   .input(variantsQueryFormat)
   .output(genomicElementsFromVariantsOutputFormat)
   .query(async ({ input }) => await findGenomicElementsFromVariantsQuery(input))
 
 const variantsFromGenomicElements = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genomic-elements/variants', description: descriptions.genomic_elements_variants_edge } })
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements/variants', description: descriptions.genomic_elements_variants_edge, tags: ['IGVF Data'] } })
   .input(genomicBiosamplesQuery)
   .output(genomicElementsFromVariantsOutputFormat)
   .query(async ({ input }) => await findVariantsFromGenomicElementsQuery(input))
 
 const genomicElementsPredictionsFromVariant = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/cell-gene-predictions', description: descriptions.cell_gene_genomic_elements } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/cell-gene-predictions', description: descriptions.cell_gene_genomic_elements, tags: ['Bespoke Endpoints'] } })
   .input(variantsCommonQueryFormat)
   .output(genomicElementsPredictionsFormat)
   .query(async ({ input }) => await findGenomicElementsPredictionsFromVariantsQuery(input))

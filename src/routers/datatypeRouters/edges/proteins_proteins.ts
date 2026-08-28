@@ -203,7 +203,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const proteinsProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins, tags: ['IGVF Data'] } })
   .input(proteinsProteinsQueryFormat)
   .output(z.array(proteinsProteinsFormat))
   .query(async ({ input }) => await proteinProteinSearch(input))
