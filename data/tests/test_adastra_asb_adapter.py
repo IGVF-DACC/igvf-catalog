@@ -10,6 +10,10 @@ from adapters.writer import SpyWriter
 
 FILE_ACCESSION = 'IGVFFI5943XCOS'
 SAMPLE_DIR = './samples/allele_specific_binding'
+SAMPLE_PROTEIN_MAP = {
+    'P18846': ['ENSP00000262053'],  # ATF1_HUMAN
+    'P17098': ['ENSP00000262317'],  # ZNF8_HUMAN
+}
 
 
 @pytest.fixture
@@ -31,6 +35,13 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+@pytest.fixture
+def mock_protein_map():
+    with patch('adapters.adastra_asb_adapter.get_protein_map_from_arangodb') as mock_get:
+        mock_get.return_value = SAMPLE_PROTEIN_MAP
+        yield mock_get
+
+
 def test_adastra_asb_adapter_invalid_label(sample_archive):
     """Test invalid label handling"""
     with pytest.raises(ValueError, match='Invalid label'):
@@ -38,7 +49,7 @@ def test_adastra_asb_adapter_invalid_label(sample_archive):
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, sample_archive):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
     """Test processing file with asb label"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -49,6 +60,7 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
     # Actually call process_file to test the full functionality
     adapter.process_file()
 
+    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
     # Verify that some output was generated
     assert len(adapter.writer.contents) > 0
     assert adapter.file_accession == FILE_ACCESSION
@@ -97,42 +109,41 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, sample_archive):
-    """Test process_file method with mocked ensembl mapping"""
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
+    """Test process_file method with mocked protein mapping"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
-
-    # Mock the ensembl mapping to return specific protein IDs
-    mock_ensembl_mapping = {
+    mock_protein_map.return_value = {
         'P18846': ['ENSP00000383070', 'ENSP00000412345']  # ATF1_HUMAN
     }
 
-    with patch('adapters.adastra_asb_adapter.pickle.load', return_value=mock_ensembl_mapping):
-        adapter = ASB(filepath=sample_archive,
-                      label='asb', writer=SpyWriter())
+    adapter = ASB(filepath=sample_archive,
+                  label='asb', writer=SpyWriter())
 
-        # Call process_file
-        adapter.process_file()
+    # Call process_file
+    adapter.process_file()
 
-        # Filter out empty lines and verify output was generated
-        non_empty_contents = [
-            content for content in adapter.writer.contents if content.strip()]
-        assert len(non_empty_contents) > 0
+    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    # Filter out empty lines and verify output was generated
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) > 0
 
-        # Verify the structure of outputs
-        for content in non_empty_contents:
-            item = json.loads(content)
-            assert '_key' in item
-            assert '_from' in item
-            assert '_to' in item
-            assert item['_from'] == 'variants/NC_000019.10:9435653:C:A'
-            assert item['_to'].startswith('proteins/ENSP')
-            assert item['source'] == ASB.SOURCE
-            assert item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
+    # Verify the structure of outputs
+    for content in non_empty_contents:
+        item = json.loads(content)
+        assert '_key' in item
+        assert '_from' in item
+        assert '_to' in item
+        assert item['_from'] == 'variants/NC_000019.10:9435653:C:A'
+        assert item['_to'] in (
+            'proteins/ENSP00000383070', 'proteins/ENSP00000412345')
+        assert item['source'] == ASB.SOURCE
+        assert item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_file_fileset, sample_archive, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive, caplog):
     """Test process_file skips files with unmatched TF uniprot ID"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -161,7 +172,7 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_file_fileset, sample_archive, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
