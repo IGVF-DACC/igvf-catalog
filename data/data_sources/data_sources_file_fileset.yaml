@@ -1255,6 +1255,7 @@ igvf_file_accessions:
     - IGVFFI6726JWOJ
     - IGVFFI0416NIIE
     - IGVFFI6667HMZF
+    - IGVFFI4975UFZM
 # Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:
   collection: file_fileset

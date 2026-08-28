@@ -1,14 +1,15 @@
 import json
-import os
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Tumor types are downloaded from the OncoTree API as a flat JSON array and
 # uploaded to the IGVF portal as a reference file:
-# https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable
+#   https://data.igvf.org/reference-files/IGVFFI4975UFZM/
+# Original API: https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable
 # Example for one tumor type node:
 # {'code': 'MMB',
 #  'color': 'Gray',
@@ -46,7 +47,7 @@ class Oncotree(BaseAdapter):
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         if self.label == 'node':
@@ -65,8 +66,10 @@ class Oncotree(BaseAdapter):
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
 
-        with open(self.filepath) as input_file:
-            oncotree_json = json.load(input_file)
+        for member in get_files_from_folder(self.filepath):
+            with member.open() as input_file:
+                oncotree_json = json.load(input_file)
+            break
 
         if not any(node.get('code') == 'TISSUE' for node in oncotree_json):
             oncotree_json = [Oncotree.ROOT_NODE] + oncotree_json

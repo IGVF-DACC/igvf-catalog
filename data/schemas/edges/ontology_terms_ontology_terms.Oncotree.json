@@ -74,7 +74,7 @@
     "files_filesets": {
       "type": "string",
       "description": "The files filesets of the ontology term to ontology term edge",
-      "example": "files_filesets/IGVFFI0000ONCO",
+      "example": "files_filesets/IGVFFI4975UFZM",
       "pattern": "^files_filesets/",
       "collections": [
         "files_filesets"

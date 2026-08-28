@@ -5,8 +5,8 @@ import pytest
 from adapters.oncotree_adapter import Oncotree
 from adapters.writer import SpyWriter
 
-SAMPLE_FILEPATH = './samples/oncotree_example.json'
-SAMPLE_ACCESSION = 'oncotree_example'
+SAMPLE_FILEPATH = './samples/IGVFFI4975UFZM.example.tar.gz'
+SAMPLE_ACCESSION = 'IGVFFI4975UFZM'
 
 
 @pytest.fixture
@@ -30,6 +30,7 @@ def test_oncotree_adapter(mock_file_fileset):
         filepath=SAMPLE_FILEPATH, label='node', writer=writer, validate=True)
     adapter.process_file()
     docs = _docs(writer)
+    assert adapter.file_accession == SAMPLE_ACCESSION
     assert len(docs) == 4
     mock_file_fileset.assert_called_once_with(SAMPLE_ACCESSION)
 
