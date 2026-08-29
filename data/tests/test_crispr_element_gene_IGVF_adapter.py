@@ -1490,3 +1490,114 @@ def test_igvf_e2g_ccr_perturb_seq_drops_failing_qc_and_labels_mixed_types(
     assert 'promoter_of' not in distal_ge
     assert promoter_ge['source_annotation'] == 'promoter'
     assert promoter_ge['promoter_of'] == 'genes/ENSG00000163508'
+
+
+def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
+        mock_file_fileset_perturb_seq, tmp_path):
+    """IGVFFI2104BKIF: promoter TF Perturb-seq; effect_score is z_score, not log2FC."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'crispr_element_gene_igvf_hs27_tf_perturb_seq.tsv.gz'
+    header = (
+        'effect_score\tp_val\tp_val_adj\tguide_id\ttarget_gene\t'
+        'intended_target_name\tintended_target_chr\t'
+        'intended_target_start\tintended_target_end\n'
+    )
+    rows = (
+        '1.85\t1.2e-8\t3.4e-6\tFOXL1-3\tENSG00000139618\t'
+        'ENSG00000176678\tchr16\t86611420\t86612920\n'
+        '0.12\t0.41\t0.88\tFOXL1-3\tENSG00000157764\t'
+        'ENSG00000176678\tchr16\t86611420\t86612920\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = (
+            lambda x: x.startswith('ENSG')
+        )
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI2104BKIF/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    edges = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(edges) == 2
+    hit = [e for e in edges if e['_to'] == 'genes/ENSG00000139618'][0]
+    miss = [e for e in edges if e['_to'] == 'genes/ENSG00000157764'][0]
+
+    assert hit['z_score'] == pytest.approx(1.85)
+    assert hit['p_value'] == pytest.approx(1.2e-8)
+    assert hit['p_value_adj'] == pytest.approx(3.4e-6)
+    assert hit['significant'] is True
+    assert 'log2FC' not in hit
+
+    assert miss['z_score'] == pytest.approx(0.12)
+    assert miss['significant'] is False
+
+    writer_ge = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = (
+            lambda x: x.startswith('ENSG')
+        )
+        adapter_ge = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI2104BKIF/',
+            label='genomic_element',
+            writer=writer_ge,
+            validate=True,
+        )
+        adapter_ge.process_file()
+
+    elements = [json.loads(line)
+                for line in writer_ge.contents if line.strip()]
+    assert len(elements) == 1
+    element = elements[0]
+    assert element['chr'] == 'chr16'
+    assert element['start'] == 86611420
+    assert element['end'] == 86612920
+    assert element['source_annotation'] == 'promoter'
+    assert element['promoter_of'] == 'genes/ENSG00000176678'
+
+
+def test_igvf_e2g_0192_configured_skip_row_omits_missing_target_gene(
+        mock_file_fileset_perturb_seq, tmp_path):
+    """IGVFFI0192YMEY: empty target_gene rows are listed in skip_rows."""
+    writer = SpyWriter()
+    test_file = tmp_path / 'crispr_element_gene_igvf_0192_skip.tsv.gz'
+    header = (
+        'effect_score\tp_val\tp_val_adj\tguide_id\ttarget_gene\t'
+        'intended_target_name\tintended_target_chr\t'
+        'intended_target_start\tintended_target_end\n'
+    )
+    rows = (
+        '1.85\t1.2e-8\t3.4e-6\tACTL6A_GCCCACCTCAGGCAACAAAG\t'
+        'ENSG00000139618\tENSG00000136518\tchr3\t179561926\t179562936\n'
+        '0.0433734312333153\t0.00015981522644701901\t0.012181054665708319\t'
+        'ACTL6A_GCCCACCTCAGGCAACAAAG\t\tENSG00000136518\t'
+        'chr3\t179561926\t179562936\n'
+    )
+    with gzip.open(test_file, 'wt') as out:
+        out.write(header)
+        out.write(rows)
+
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
+        MockGeneValidator.return_value.validate.side_effect = (
+            lambda x: x.startswith('ENSG')
+        )
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file),
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0192YMEY/',
+            label='genomic_element_gene',
+            writer=writer,
+            validate=True,
+        )
+        adapter.process_file()
+
+    parsed = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(parsed) == 1
+    assert parsed[0]['_to'] == 'genes/ENSG00000139618'
