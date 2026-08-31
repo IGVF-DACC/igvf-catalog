@@ -6,6 +6,9 @@ from unittest.mock import patch
 
 
 FILE_ACCESSION = 'GVATdb_sample'
+SAMPLE_PROTEIN_MAP = {
+    'Q15699': ['ENSP00000320447'],  # ALX1
+}
 
 
 @pytest.fixture
@@ -19,16 +22,23 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
-def test_asb_gvatdb_adapter_process(mock_file_fileset, mocker):
+@pytest.fixture
+def mock_protein_map():
+    with patch('adapters.gvatdb_asb_adapter.get_protein_map_from_arangodb') as mock_get:
+        mock_get.return_value = SAMPLE_PROTEIN_MAP
+        yield mock_get
+
+
+def test_asb_gvatdb_adapter_process(mock_file_fileset, mock_protein_map, mocker):
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
                          writer=writer, validate=True)
     adapter.process_file()
+    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
-    assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
+    assert first_item['_from'] == 'variants/NC_000010.11:112626979:C:T'
+    assert first_item['_to'] == 'proteins/ENSP00000320447'
     assert 'neg_log10_pvalue' in first_item
     assert 'p_value' in first_item
     assert 'hg19_coordinate' in first_item
