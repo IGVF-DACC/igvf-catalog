@@ -2031,11 +2031,12 @@ export const descriptions = {
 
   genomic_elements_phenotypes:
     'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
-    At least one of these properties must be defined: region, files_fileset, phenotype_id, or phenotype_name. <br> \
+    At least one of these properties must be defined: region, files_fileset, phenotype_id, phenotype_name, or method. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
     Example: phenotype_id = GO_0016477, <br> \
     phenotype_name = cell migration, <br> \
+    method = CRISPR screen, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI5135QZCS, <br> \
     region = chr1:101174581-101175330 (maximum length: 10kb). <br> \
@@ -2044,11 +2045,12 @@ export const descriptions = {
 
   phenotypes_genomic_elements:
     'Retrieve genomic elements associated with phenotypes.<br> \
-    At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
+    At least one of these properties must be defined: phenotype_id, phenotype_name, files_fileset, or method. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
     Example: phenotype_id = GO_0008283, <br> \
     phenotype_name = cell population proliferation, <br> \
+    method = CRISPR screen, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI9584UDAS. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
