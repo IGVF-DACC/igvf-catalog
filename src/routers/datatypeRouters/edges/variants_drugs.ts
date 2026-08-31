@@ -187,13 +187,13 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
 }
 
 const variantsFromDrugs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
+  .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants, tags: ['Biological Context Data'] } })
   .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(drugsToVariantsFormat))
   .query(async ({ input }) => await variantsFromDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
+  .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs, tags: ['Biological Context Data'] } })
   .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await drugsFromVariantSearch(input))

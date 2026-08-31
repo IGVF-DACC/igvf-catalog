@@ -135,13 +135,13 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
 }
 
 const pathwaysFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/pathways', description: descriptions.genes_pathways } })
+  .meta({ openapi: { method: 'GET', path: '/genes/pathways', description: descriptions.genes_pathways, tags: ['Biological Context Data'] } })
   .input(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat))
   .output(z.array(genesPathwaysFormat))
   .query(async ({ input }) => await findPathwaysFromGeneSearch(input))
 
 const genesFromPathways = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/pathways/genes', description: descriptions.pathways_genes } })
+  .meta({ openapi: { method: 'GET', path: '/pathways/genes', description: descriptions.pathways_genes, tags: ['Biological Context Data'] } })
   .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat))
   .output(z.array(genesPathwaysFormat))
   .query(async ({ input }) => await findGenesFromPathways(input))

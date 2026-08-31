@@ -402,32 +402,32 @@ const phenotypesCodingVariantsInput = z.object({
 })
 
 const codingVariantsFromPhenotypes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants, tags: ['IGVF Data'] } })
   .input(phenotypesCodingVariantsInput.merge(commonHumanEdgeParamsFormat).omit({ verbose: true, organism: true }))
   .output(z.array(outputFormat))
   .query(async ({ input }) => await findCodingVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromCodingVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes', description: descriptions.coding_variants_phenotypes } })
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes', description: descriptions.coding_variants_phenotypes, tags: ['IGVF Data'] } })
   .input(fromCodingVariantsQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ verbose: true, organism: true }))
   .output(z.array(outputFormat))
   .query(async ({ input }) => await findPhenotypesFromCodingVariantSearch(input))
 
 const codingVariantsCountFromGene = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes-count', description: descriptions.coding_variants_phenotypes_count } })
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes-count', description: descriptions.coding_variants_phenotypes_count, tags: ['Bespoke Endpoints'] } })
   .input(geneQueryFormat)
   .output(z.array(codingVariantsPhenotypeAggregationFormat))
   .query(async ({ input }) => await countCodingVariantsFromGene(input))
 
 // deprecated -> copied over to codingVariantsSummary
 const deprecatedCodingVariantsSummary = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary_deprecated } })
+  .meta({ openapi: { method: 'GET', path: '/variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary_deprecated, tags: ['Bespoke Endpoints'] } })
   .input(variantQueryFormat)
   .output(z.array(scoreSummaryOutputFormat))
   .query(async ({ input }) => await phenotypeScoresFromVariant(input))
 
 const codingVariantsSummary = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary } })
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary, tags: ['Bespoke Endpoints'] } })
   .input(variantQueryFormat)
   .output(z.array(scoreSummaryOutputFormat))
   .query(async ({ input }) => await phenotypeScoresFromVariant(input))

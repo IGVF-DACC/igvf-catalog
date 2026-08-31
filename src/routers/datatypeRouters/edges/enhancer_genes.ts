@@ -141,7 +141,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
 }
 
 const enhancerGenePredictions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/enhancer-gene-predictions', description: descriptions.enhancer_gene_predictions } })
+  .meta({ openapi: { method: 'GET', path: '/enhancer-gene-predictions', description: descriptions.enhancer_gene_predictions, tags: ['Bespoke Endpoints'] } })
   .input(genesGenomicElementsInputFormat)
   .output(genesGenomicElementsOutputFormat)
   .query(async ({ input }) => await findGenomicElementsFromGene(input))
