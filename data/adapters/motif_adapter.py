@@ -3,10 +3,11 @@ from typing import Optional
 
 from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
-
-# ENSEMBL Mapping extracted from https://www.uniprot.org/id-mapping
 
 # Example TF motif file from HOCOMOCO (e.g. ATF1_HUMAN.H11MO.0.B.pwm), which adastra used.
 # Each pwm (position weight matrix) is a N x 4 matrix, where N is the length of the TF motif.
@@ -29,7 +30,11 @@ class Motif(BaseAdapter):
     SOURCE = 'HOCOMOCOv11'
     SOURCE_URL = 'hocomoco11.autosome.org/motif/'
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_motifs.tsv'
+    # UniProt ACs missing from proteins.uniprot_ids at load time.
+    # P49639 is Swiss-Prot HOXA1; catalog proteins still use Trembl IDs.
+    UNIPROT_TO_ENSP_OVERRIDES = {
+        'P49639': ['ENSP00000347851', 'ENSP00000494260'],
+    }
 
     def __init__(
         self,
@@ -39,7 +44,6 @@ class Motif(BaseAdapter):
         validate=False,
         **kwargs
     ):
-        self.tf_ids = Motif.TF_ID_MAPPING_PATH
         self.source = Motif.SOURCE
         self.source_url = Motif.SOURCE_URL
 
@@ -60,28 +64,15 @@ class Motif(BaseAdapter):
         else:
             return 'motifs_proteins'
 
-    def load_tf_ensembl_id_mapping(self):
-        ensembls = {}
-        with open(Motif.ENSEMBL_MAPPING, 'r') as ensembl_tsv:
-            for row in ensembl_tsv:
-                row = row.strip().split('\t')
-                ensembl_id = row[1].split('.')[0]
-                if row[0] in ensembls:
-                    ensembls[row[0]].append(ensembl_id)
-                else:
-                    ensembls[row[0]] = [ensembl_id]
-
-        # e.g. key: 'ANDR_HUMAN'; value: ['ENSP00000301310.3', 'ENSP00000465619.1']
-        self.tf_ensembl_id_mapping = {}
+    def load_tf_uniprot_id_mapping(self):
+        # e.g. key: 'ANDR_HUMAN' (HOCOMOCO / UniProt ID); value: 'P10275' (UniProt AC)
+        self.tf_uniprot_id_mapping = {}
         with open(Motif.TF_ID_MAPPING_PATH, 'r') as tf_uniprot_id_mapfile:
             for row in tf_uniprot_id_mapfile:
                 if row.startswith('Model'):
                     continue
                 mapping = row.strip().split('\t')
-                self.tf_ensembl_id_mapping[mapping[-2]] = ensembls[mapping[-1]]
-                if len(self.tf_ensembl_id_mapping[mapping[-2]]) == 0:
-                    import pdb
-                    pdb.set_trace()
+                self.tf_uniprot_id_mapping[mapping[-2]] = mapping[-1]
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
@@ -93,6 +84,14 @@ class Motif(BaseAdapter):
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
+
+        if self.label == 'motif_protein_link':
+            self.load_tf_uniprot_id_mapping()
+            self.ensembls = get_protein_map_from_arangodb(
+                organism='Homo sapiens')
+            for uniprot_id, ensps in Motif.UNIPROT_TO_ENSP_OVERRIDES.items():
+                if uniprot_id not in self.ensembls:
+                    self.ensembls[uniprot_id] = ensps
 
         for input_filepath in get_files_from_folder(self.filepath):
             filename = input_filepath.name
@@ -132,9 +131,14 @@ class Motif(BaseAdapter):
                     self.writer.write('\n')
 
                 elif self.label == 'motif_protein_link':
-                    self.load_tf_ensembl_id_mapping()
-                    tf_ensembl_ids = self.tf_ensembl_id_mapping.get(tf_name)
-                    if tf_ensembl_ids is None:
+                    tf_uniprot_id = self.tf_uniprot_id_mapping.get(tf_name)
+                    if tf_uniprot_id is None:
+                        self.logger.warning(
+                            'TF uniprot id unavailable, skipping motif_protein_link: ' + tf_name)
+                        continue
+
+                    tf_ensembl_ids = self.ensembls.get(tf_uniprot_id)
+                    if not tf_ensembl_ids:
                         self.logger.warning(
                             'TF ensembl ids unavailable, skipping motif_protein_link: ' + tf_name)
                         continue
