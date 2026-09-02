@@ -482,7 +482,7 @@ SEM complex:
     - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
   source: IGVF
 
-# Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complexe_protein --filepath ~/datasets/IGVFFI4892QCRR.tsv.gz --output-bucket-key complexes_proteins/SEMpl_IGVFFI4892QCRR.jsonl
+# Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex_protein --filepath ~/datasets/IGVFFI4892QCRR.tsv.gz --output-bucket-key complexes_proteins/SEMpl_IGVFFI4892QCRR.jsonl
 SEM complex to protein:
   collection: complexes_proteins
   pypy3: true
