@@ -37,7 +37,7 @@ def mock_file_fileset():
 
 @pytest.fixture
 def mock_protein_map():
-    with patch('adapters.adastra_asb_adapter.get_protein_map_from_arangodb') as mock_get:
+    with patch('adapters.protein_map.get_protein_map_from_arangodb') as mock_get:
         mock_get.return_value = SAMPLE_PROTEIN_MAP
         yield mock_get
 
@@ -60,7 +60,11 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
     # Actually call process_file to test the full functionality
     adapter.process_file()
 
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     # Verify that some output was generated
     assert len(adapter.writer.contents) > 0
     assert adapter.file_accession == FILE_ACCESSION
@@ -123,7 +127,11 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
     # Call process_file
     adapter.process_file()
 
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     # Filter out empty lines and verify output was generated
     non_empty_contents = [
         content for content in adapter.writer.contents if content.strip()]

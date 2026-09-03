@@ -8,10 +8,8 @@ from Bio.UniProt.GOA import gafiterator
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import (
-    get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
-)
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.protein_map import ProteinMap
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
 #
@@ -88,17 +86,16 @@ class GAF(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
 
-        ensembl_unmatched = 0
+        unmatched_transcripts = 0
         self.organism = 'Homo sapiens'
         if self.label == 'rna':
             self.load_rnacentral_mapping()
         elif self.label == 'mouse':
             self.organism = 'Mus musculus'
-            self.ensembls = get_protein_map_from_arangodb(
+            self.protein_map = ProteinMap(
                 dbxref_name='MGI', organism=self.organism)
         else:
-            self.ensembls = get_protein_map_from_arangodb(
-                organism=self.organism)
+            self.protein_map = ProteinMap(organism=self.organism)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
@@ -109,15 +106,13 @@ class GAF(BaseAdapter):
                     transcript_id = self.rnacentral_mapping.get(
                         annotation['DB_Object_ID'])
                     if transcript_id is None:
-                        ensembl_unmatched += 1
+                        unmatched_transcripts += 1
                         continue
                     from_ids = ['transcripts/' + transcript_id]
                 else:
                     protein_id = annotation['DB_Object_ID']
-                    ensembl_ids = self.ensembls.get(
-                        protein_id) or self.ensembls.get(protein_id.split('-')[0])
+                    ensembl_ids = self.protein_map.get(protein_id)
                     if ensembl_ids is None:
-                        ensembl_unmatched += 1
                         continue
                     from_ids = ['proteins/' +
                                 ensembl_id for ensembl_id in ensembl_ids]
@@ -170,6 +165,9 @@ class GAF(BaseAdapter):
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
 
-        if ensembl_unmatched != 0:
-            self.logger.info(
-                f'{ensembl_unmatched} unmatched ids for label: {self.label}')
+        if self.label == 'rna':
+            if unmatched_transcripts != 0:
+                self.logger.info(
+                    f'{unmatched_transcripts} unmatched ids for label: {self.label}')
+        else:
+            self.protein_map.log(self.logger)

@@ -45,7 +45,7 @@ def mock_file_fileset():
 
 @pytest.fixture
 def mock_protein_map():
-    with patch('adapters.motif_adapter.get_protein_map_from_arangodb') as mock_get:
+    with patch('adapters.protein_map.get_protein_map_from_arangodb') as mock_get:
         mock_get.return_value = SAMPLE_PROTEIN_MAP
         yield mock_get
 
@@ -94,7 +94,11 @@ def test_motif_protein_link(sample_archive, spy_writer, mock_file_fileset, mock_
                   writer=spy_writer, validate=True)
     motif.process_file()
 
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     assert len(spy_writer.contents) > 0
     data = json.loads(spy_writer.contents[0])
     assert '_key' in data

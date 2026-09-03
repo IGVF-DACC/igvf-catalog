@@ -6,10 +6,8 @@ from functools import cached_property
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import (
-    get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
-)
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
 
 # Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
@@ -68,9 +66,9 @@ class SEMMotif(BaseAdapter):
             return 'complexes_proteins'
 
     @cached_property
-    def ensembl(self):
+    def protein_map(self):
         """Uniprot -> ENSP mapping, fetched from ArangoDB at most once per adapter instance."""
-        return get_protein_map_from_arangodb(organism='Homo sapiens')
+        return ProteinMap(organism='Homo sapiens')
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -110,31 +108,26 @@ class SEMMotif(BaseAdapter):
                             uniprot_ids = row[3].strip().split(';')
                             ensembl_ids = []
                             for uniprot_id in uniprot_ids:
-                                if uniprot_id not in self.ensembl:
-                                    self.logger.warning('Unable to map ' +
-                                                        uniprot_id + ' to ensembl ids')
-                                else:
-                                    ensembl_ids.extend(
-                                        self.ensembl.get(uniprot_id))
+                                mapped_ids = self.protein_map.get(uniprot_id)
+                                if mapped_ids is None:
+                                    continue
+                                ensembl_ids.extend(mapped_ids)
                             for ensembl_id in ensembl_ids:
-                                if ensembl_id is None:
-                                    self.logger.warning('Unable to map ' +
-                                                        row[3] + ' to ensembl ids')
-                                    return
-                                else:
-                                    _props = {
-                                        '_key': 'SEMpl_' + row[0] + '_' + ensembl_id,
-                                        '_from': 'complexes/' + 'SEMpl_' + row[0],
-                                        '_to': 'proteins/' + ensembl_id,
-                                        'name': 'contains',
-                                        'inverse_name': 'belongs to',
-                                        'source': 'IGVF',
-                                        'source_url': 'https://data.igvf.org/tabular-files/' + self.file_accession
-                                    }
+                                _props = {
+                                    '_key': 'SEMpl_' + row[0] + '_' + ensembl_id,
+                                    '_from': 'complexes/' + 'SEMpl_' + row[0],
+                                    '_to': 'proteins/' + ensembl_id,
+                                    'name': 'contains',
+                                    'inverse_name': 'belongs to',
+                                    'source': 'IGVF',
+                                    'source_url': 'https://data.igvf.org/tabular-files/' + self.file_accession
+                                }
                                 if self.validate:
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
+        if self.label == 'complex_protein':
+            self.protein_map.log(self.logger)
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
@@ -204,10 +197,9 @@ class SEMMotif(BaseAdapter):
 
                 if tf_id.startswith('proteins'):
                     # convert uniprot to ENSP
-                    ensembl_ids = self.ensembl.get(tf_id.split('/')[1])
+                    ensembl_ids = self.protein_map.get(tf_id.split('/')[1])
                     if ensembl_ids is None:
-                        self.logger.warning(
-                            'Unable to map ' + tf_name + ' to ensembl id')
+                        self.protein_map.log(self.logger)
                         return
                     else:
                         tf_keys = ['proteins/' +
@@ -236,3 +228,6 @@ class SEMMotif(BaseAdapter):
                         self.validate_doc(props)
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
+
+        if self.label == 'motif_protein':
+            self.protein_map.log(self.logger)
