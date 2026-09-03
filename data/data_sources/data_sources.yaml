@@ -1202,6 +1202,8 @@ genomic element IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI9246AJEK/@@download/IGVFFI9246AJEK.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3434YAPX/@@download/IGVFFI3434YAPX.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1168JUYR/@@download/IGVFFI1168JUYR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4773CPYN/@@download/IGVFFI4773CPYN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0957PYTA/@@download/IGVFFI0957PYTA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/@@download/IGVFFI5903QAWP.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/@@download/IGVFFI7280ZZFA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5288BRAZ/@@download/IGVFFI5288BRAZ.tsv.gz
@@ -1231,6 +1233,8 @@ genomic element IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/@@download/IGVFFI7368COWA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9322VVTR/@@download/IGVFFI9322VVTR.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/@@download/IGVFFI4081AUXT.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2104BKIF/@@download/IGVFFI2104BKIF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0192YMEY/@@download/IGVFFI0192YMEY.tsv.gz
   source: IGVF
   type: tested elements
 
@@ -1253,6 +1257,8 @@ genomic element to gene IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI9246AJEK/@@download/IGVFFI9246AJEK.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3434YAPX/@@download/IGVFFI3434YAPX.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1168JUYR/@@download/IGVFFI1168JUYR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4773CPYN/@@download/IGVFFI4773CPYN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0957PYTA/@@download/IGVFFI0957PYTA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5903QAWP/@@download/IGVFFI5903QAWP.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI7280ZZFA/@@download/IGVFFI7280ZZFA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5288BRAZ/@@download/IGVFFI5288BRAZ.tsv.gz
@@ -1282,6 +1288,8 @@ genomic element to gene IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/@@download/IGVFFI7368COWA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9322VVTR/@@download/IGVFFI9322VVTR.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/@@download/IGVFFI4081AUXT.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2104BKIF/@@download/IGVFFI2104BKIF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0192YMEY/@@download/IGVFFI0192YMEY.tsv.gz
   source: IGVF
   label: str # element effect on gene expression of {readout_gene}
 

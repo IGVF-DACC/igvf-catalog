@@ -413,6 +413,52 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
     assert props['method'] == 'CRISPR screen'
 
 
+def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq():
+    file_object = {
+        '@id': '/tabular-files/IGVFFI0000MULT/',
+        'accession': 'IGVFFI0000MULT',
+        'catalog_class': 'observed data',
+        'catalog_collections': ['genomic_elements'],
+        'file_set': {
+            '@id': '/analysis-sets/IGVFDS0000MULT/'
+        },
+        'href': '/tabular-files/IGVFFI0000MULT/@@download/IGVFFI0000MULT.tsv.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS0000MULT',
+        '@type': ['AnalysisSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/tom-norman/'},
+        'samples': [{'accession': 'IGVFSM0000TEST'}],
+        'publications': [],
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000MULT/'}],
+        'sample_summary': 'RPE-1',
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        with patch.object(FileFileSet, 'get_software_igvf', return_value={'SciPy'}):
+            with patch.object(
+                    FileFileSet,
+                    'parse_analysis_set_igvf',
+                    return_value=({'Multiome Perturb-seq'}, {'OBI:0002629'})):
+                with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
+                    with patch.object(
+                        FileFileSet,
+                        'parse_sample_donor_treatment_igvf',
+                        return_value=(
+                            {'IGVFSM0000TEST'},
+                            {'IGVFDO0000TEST'},
+                            {'EFO:0005741'},
+                            {'RPE-1'},
+                            set(),
+                            'interference'
+                        )
+                    ):
+                        props, _, _ = FileFileSet.query_fileset_files_props_igvf(
+                            file_object)
+    assert props['preferred_assay_titles'] == ['Multiome Perturb-seq']
+    assert props['method'] == 'Perturb-seq'
+    assert props['software'] == ['SciPy']
+
+
 def test_query_fileset_files_props_igvf_community_curated_set():
     file_object = {
         '@id': '/reference-files/IGVFFI6501YXMX/',
