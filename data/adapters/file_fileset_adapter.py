@@ -767,7 +767,13 @@ class FileFileSet:
             method = 'MPRA'
 
         if preferred_assay_titles:
-            if set(preferred_assay_titles).issubset({'Perturb-seq', 'TAP-seq', 'Parse Perturb-seq', 'scCRISPR screen'}):
+            if set(preferred_assay_titles).issubset({
+                'Perturb-seq',
+                'TAP-seq',
+                'Parse Perturb-seq',
+                'scCRISPR screen',
+                'Multiome Perturb-seq',
+            }):
                 method = 'Perturb-seq'
             elif set(preferred_assay_titles).issubset({
                 'CRISPR FACS screen',
