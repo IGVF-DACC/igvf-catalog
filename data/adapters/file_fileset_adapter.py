@@ -791,7 +791,9 @@ class FileFileSet:
             method)
 
         if fileset_object_type == 'AnalysisSet':
-            simple_sample_summaries = [fileset_object['sample_summary']]
+            simple_sample_summaries = [
+                fileset_object['simplified_sample_summary']
+            ]
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]

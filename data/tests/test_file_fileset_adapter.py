@@ -342,7 +342,7 @@ def test_query_fileset_files_props_igvf_with_crispr_modality():
         'samples': [{'accession': 'IGVFSM0000TEST'}],
         'publications': [],
         'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000TEST/'}],
-        'sample_summary': 'K562 cell line treated with drug a, drug b'
+        'simplified_sample_summary': 'K562 cell line treated with drug a, drug b'
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
         with patch.object(FileFileSet, 'get_software_igvf', return_value={'Sceptre'}):
@@ -386,7 +386,7 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
         'samples': [{'accession': 'IGVFSM0000TEST'}],
         'publications': [],
         'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000FLOW/'}],
-        'sample_summary': 'HCT116',
+        'simplified_sample_summary': 'HCT116',
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
         with patch.object(FileFileSet, 'get_software_igvf', return_value={'pandas'}):
@@ -431,7 +431,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
         'samples': [{'accession': 'IGVFSM0000TEST'}],
         'publications': [],
         'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000MULT/'}],
-        'sample_summary': 'RPE-1',
+        'simplified_sample_summary': 'RPE-1',
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
         with patch.object(FileFileSet, 'get_software_igvf', return_value={'SciPy'}):

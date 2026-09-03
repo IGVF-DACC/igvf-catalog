@@ -927,7 +927,7 @@
     "protocols": [
       "https://www.protocols.io/view/scqers-library-preparation-ewov11qpyvr2/v1"
     ],
-    "sample_summary": "Mus musculus mouse embryonic stem differentiated cell specimen induced to embryoid body, at 21 day(s) post change, cellular sub pool(s): 10XlaneA, 10XlaneB",
+    "simplified_sample_summary": "Mus musculus mouse embryonic stem differentiated cell specimen induced to embryoid body, at 21 day(s) post change, cellular sub pool(s): 10XlaneA, 10XlaneB",
     "workflows": [
       {
         "name": "Shendure scATAC-seq Pipeline",
@@ -6289,7 +6289,7 @@
     "protocols": [
       "https://www.protocols.io/view/whole-genome-starr-seq-protocol-reddy-lab-2023-d7ed9ja6"
     ],
-    "sample_summary": "Homo sapiens K562 cell line, transfected with a reporter library",
+    "simplified_sample_summary": "Homo sapiens K562 cell line, transfected with a reporter library",
     "workflows": [
       {
         "name": "SUPERSTARR Pipeline",
