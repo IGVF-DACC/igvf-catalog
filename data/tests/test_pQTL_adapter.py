@@ -35,7 +35,7 @@ SAMPLE_PROTEIN_MAP = {
 }
 
 
-@patch('adapters.pQTL_adapter.get_protein_map_from_arangodb')
+@patch('adapters.protein_map.get_protein_map_from_arangodb')
 @patch('adapters.pQTL_adapter.get_file_fileset_by_accession_in_arangodb')
 def test_pQTL_adapter(mock_get_file_fileset, mock_get_protein_map, mocker):
     mock_get_file_fileset.return_value = {
@@ -54,7 +54,11 @@ def test_pQTL_adapter(mock_get_file_fileset, mock_get_protein_map, mocker):
         adapter.file_accession = 'IGVFFI0000TEST'
         adapter.process_file()
         mock_get_file_fileset.assert_called_once_with('IGVFFI0000TEST')
-        mock_get_protein_map.assert_called_once_with(organism='Homo sapiens')
+        mock_get_protein_map.assert_called_once_with(
+            field='uniprot_ids',
+            organism='Homo sapiens',
+            dbxref_name=None,
+        )
         docs = [json.loads(item) for item in writer.contents if item.strip()]
         assert len(docs) == 100
         first_item = docs[0]

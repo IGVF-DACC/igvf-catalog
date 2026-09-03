@@ -5,8 +5,8 @@ from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
 )
+from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
 
 # Example TF motif file from HOCOMOCO (e.g. ATF1_HUMAN.H11MO.0.B.pwm), which adastra used.
@@ -87,11 +87,10 @@ class Motif(BaseAdapter):
 
         if self.label == 'motif_protein_link':
             self.load_tf_uniprot_id_mapping()
-            self.ensembls = get_protein_map_from_arangodb(
-                organism='Homo sapiens')
-            for uniprot_id, ensps in Motif.UNIPROT_TO_ENSP_OVERRIDES.items():
-                if uniprot_id not in self.ensembls:
-                    self.ensembls[uniprot_id] = ensps
+            self.protein_map = ProteinMap(
+                organism='Homo sapiens',
+                overrides=Motif.UNIPROT_TO_ENSP_OVERRIDES,
+            )
 
         for input_filepath in get_files_from_folder(self.filepath):
             filename = input_filepath.name
@@ -137,10 +136,8 @@ class Motif(BaseAdapter):
                             'TF uniprot id unavailable, skipping motif_protein_link: ' + tf_name)
                         continue
 
-                    tf_ensembl_ids = self.ensembls.get(tf_uniprot_id)
+                    tf_ensembl_ids = self.protein_map.get(tf_uniprot_id)
                     if not tf_ensembl_ids:
-                        self.logger.warning(
-                            'TF ensembl ids unavailable, skipping motif_protein_link: ' + tf_name)
                         continue
 
                     for ensembl_id in tf_ensembl_ids:
@@ -162,3 +159,6 @@ class Motif(BaseAdapter):
 
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
+
+        if self.label == 'motif_protein_link':
+            self.protein_map.log(self.logger)
