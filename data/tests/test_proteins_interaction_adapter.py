@@ -25,17 +25,29 @@ def mock_file_fileset():
         yield mock_get
 
 
-def test_proteins_interaction_adapter(filepath, spy_writer, mock_file_fileset):
+@pytest.fixture
+def mock_protein_map():
+    with patch('adapters.proteins_interaction_adapter.get_protein_map_from_arangodb') as mock_get:
+        mock_get.return_value = {
+            'Q9Y243': ['ENSP00000263816'],
+            'Q9Y6H6': ['ENSP00000357431'],
+            'P24844': ['ENSP00000261741'],
+        }
+        yield mock_get
+
+
+def test_proteins_interaction_adapter(filepath, spy_writer, mock_file_fileset, mock_protein_map):
     adapter = ProteinsInteraction(
         filepath=filepath, label='protein_protein_human', writer=spy_writer, validate=True)
     adapter.process_file()
 
+    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
     assert len(spy_writer.contents) > 0
     first_item = json.loads(spy_writer.contents[0])
 
     assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
+    assert first_item['_from'] == 'proteins/ENSP00000263816'
+    assert first_item['_to'] == 'proteins/ENSP00000357431'
     assert 'detection_method' in first_item
     assert 'detection_method_code' in first_item
     assert 'interaction_type' in first_item

@@ -53,8 +53,8 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_fi
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
         SAMPLE_FILEPATH, label='variants_coding_variants', writer=writer, validate=True)
-    # Initialize igvf_metadata_props for variants_coding_variants label
-    adapter.igvf_metadata_props = mock_file_fileset.return_value
+    # Initialize file_fileset for variants_coding_variants label
+    adapter.file_fileset = mock_file_fileset.return_value
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])

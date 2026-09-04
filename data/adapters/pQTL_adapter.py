@@ -1,11 +1,14 @@
 import csv
 import json
-import pickle
 from typing import Optional
 import os
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    build_variant_id,
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -20,13 +23,10 @@ class pQTL(BaseAdapter):
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
     BIOSAMPLE_TERM = 'UBERON_0001969'
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-        self.file_accession = os.path.basename(filepath).split('.')[
-            0] or pQTL.DEFAULT_ACCESSION
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -39,12 +39,16 @@ class pQTL(BaseAdapter):
         return 'variants_proteins'
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
+
         self.writer.add_tag('portal_accessions', self.file_accession)
-        self.collection_class = file_fileset['class']
-        self.method = file_fileset['method']
-        self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
+        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
         ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as pqtl_file:
@@ -105,4 +109,7 @@ class pQTL(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
+        if ensembl_unmatched != 0:
+            self.logger.warning(
+                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
         self.gene_validator.log()

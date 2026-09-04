@@ -36,6 +36,7 @@ const predictionFormat = z.object({
   model: z.string(),
   dataset: z.string(),
   name: z.string(),
+  method: z.string().nullish(),
   files_filesets: z.string().nullish()
 })
 
@@ -406,9 +407,17 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
       RETURN { gene_name: record.name, id: record._id }
     )
 
+    LET methods = (
+      FOR record IN ${genomicElementToGeneCollectionName}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} ${filesetFilter}
+      COLLECT method = record.method WITH COUNT INTO count
+      RETURN { method, count }
+    )
+
     RETURN {
       cell_types: cellTypes,
       genes: uniqueGenes,
+      methods: methods,
       name: 'regulates'
     }
   `
@@ -534,12 +543,13 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
           RETURN {
             'id': record._from,
-            'cell_type': record.biological_context != null ? record.biological_context : record.cell_annotation,
+            'cell_type': record.cell_annotation != null ? record.cell_annotation : record.biological_context,
             'target_gene': targetGene,
             'score': record.score,
             'model': record.source,
             'dataset': record.source_url,
             'name': record.name,
+            'method': record.method,
             'distance_gene_variant': MIN([distToStart, distToEnd]),
             'element_chr': ge.chr,
             'element_start': ge.start,

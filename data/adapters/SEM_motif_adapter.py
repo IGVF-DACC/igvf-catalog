@@ -2,11 +2,14 @@ import csv
 import json
 import os
 import gzip
-import pickle
+from functools import cached_property
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_protein_map_from_arangodb,
+)
 from adapters.writer import Writer
 
 # Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
@@ -31,13 +34,16 @@ from adapters.writer import Writer
 
 class SEMMotif(BaseAdapter):
     ALLOWED_LABELS = ['motif', 'motif_protein', 'complex', 'complex_protein']
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
-        # assumes that both sem_provenance_path and filepath have accession as prefix
-        self.sem_provenance_accession = os.path.basename(
-            sem_provenance_path).split('.')[0]
+        # sem_provenance_path is only used by the 'motif'/'motif_protein' labels
+        # (see load_tf_id_mapping); 'complex'/'complex_protein' don't require it.
+        self.sem_provenance_accession = None
+        if sem_provenance_path is not None:
+            # assumes both sem_provenance_path and filepath have accession as prefix
+            self.sem_provenance_accession = os.path.basename(
+                sem_provenance_path).split('.')[0]
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
 
@@ -61,6 +67,11 @@ class SEMMotif(BaseAdapter):
         elif self.label == 'complex_protein':
             return 'complexes_proteins'
 
+    @cached_property
+    def ensembl(self):
+        """Uniprot -> ENSP mapping, fetched from ArangoDB at most once per adapter instance."""
+        return get_protein_map_from_arangodb(organism='Homo sapiens')
+
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
         with gzip.open(self.sem_provenance_path, 'rt') as map_file:
@@ -78,8 +89,6 @@ class SEMMotif(BaseAdapter):
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
     def load_complexes(self):
-        if self.label == 'complex_protein':
-            self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
@@ -129,22 +138,39 @@ class SEMMotif(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
+        if self.sem_provenance_accession is not None:
+            self.writer.add_tag('portal_accessions',
+                                self.sem_provenance_accession)
         if self.label in ['complex', 'complex_protein']:
             self.load_complexes()
             return
 
         self.load_tf_id_mapping()
-        self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
 
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
 
         with gzip.open(self.filepath, 'rt') as sem_file:
-            baseline = next(sem_file).strip().split(':')[1]
-            tf_name = next(sem_file).strip().split()[0]
+            baseline = None
+            tf_name = None
+            for line in sem_file:
+                line = line.strip()
+                if not line.startswith('#'):
+                    tf_name = line.split()[0]
+                    break
+                if line.startswith('#BASELINE:'):
+                    baseline = line.split(':')[1]
+
+            if baseline is None or tf_name is None:
+                raise ValueError(
+                    f"'{self.filepath}' does not look like a SEMpl motif model file "
+                    "(expected a '#BASELINE:' header line followed by a TF name row).")
+
             motif_key = tf_name + '_SEMpl'
 
             if self.label == 'motif':

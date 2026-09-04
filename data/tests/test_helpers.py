@@ -2,7 +2,7 @@ import pytest
 import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1
 from unittest.mock import patch, MagicMock
-from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
+from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb, get_protein_map_from_arangodb
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -428,3 +428,89 @@ def test_get_gene_map_from_arangodb_flattens_array_fields():
         assert result['FOO'] == ['ENSG00000000001']
         assert result['BAR'] == ['ENSG00000000001', 'ENSG00000000002']
         assert not any('ENSG00000000003' in ids for ids in result.values())
+
+
+def test_get_protein_map_from_arangodb_flattens_uniprot_ids():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSP00000000001', 'value': ['P04217', 'Q9H7C9']},
+        {'key': 'ENSP00000000002', 'value': ['Q9H7C9']},
+        {'key': 'ENSP00000000003', 'value': []},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_protein_map_from_arangodb()
+
+        assert result['P04217'] == ['ENSP00000000001']
+        assert result['Q9H7C9'] == ['ENSP00000000001', 'ENSP00000000002']
+        assert not any('ENSP00000000003' in ids for ids in result.values())
+        mock_db.aql.execute.assert_called_once()
+        _, kwargs = mock_db.aql.execute.call_args
+        assert kwargs['bind_vars'] == {}
+
+
+def test_get_protein_map_from_arangodb_indexes_isoform_canonical():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSP00000000001', 'value': ['P62258-1']},
+        {'key': 'ENSP00000000002', 'value': ['P62258-2']},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_protein_map_from_arangodb()
+
+        assert result['P62258-1'] == ['ENSP00000000001']
+        assert result['P62258-2'] == ['ENSP00000000002']
+        assert result['P62258'] == ['ENSP00000000001', 'ENSP00000000002']
+
+
+def test_get_protein_map_from_arangodb_filters_organism():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        get_protein_map_from_arangodb(organism='Homo sapiens')
+
+        query, kwargs = mock_db.aql.execute.call_args
+        assert 'FILTER protein.organism == @organism' in query[0]
+        assert kwargs['bind_vars'] == {'organism': 'Homo sapiens'}
+
+
+def test_get_protein_map_from_arangodb_dbxref_name():
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter([
+        {'key': 'ENSMUSP00000000001', 'value': ['MGI:1915609']},
+        {'key': 'ENSMUSP00000000002', 'value': ['MGI:1915609']},
+        {'key': 'ENSMUSP00000000003', 'value': ['MGI:1915609']},
+        {'key': 'ENSMUSP00000000004', 'value': []},
+    ])
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = get_protein_map_from_arangodb(
+            dbxref_name='MGI', organism='Mus musculus')
+
+        assert result['MGI:1915609'] == [
+            'ENSMUSP00000000001',
+            'ENSMUSP00000000002',
+            'ENSMUSP00000000003',
+        ]
+        assert 'ENSMUSP00000000004' not in result.get('MGI:1915609', [])
+        query, kwargs = mock_db.aql.execute.call_args
+        assert 'protein.dbxrefs' in query[0]
+        assert 'xref.name == @dbxref_name' in query[0]
+        assert kwargs['bind_vars'] == {
+            'organism': 'Mus musculus',
+            'dbxref_name': 'MGI',
+        }

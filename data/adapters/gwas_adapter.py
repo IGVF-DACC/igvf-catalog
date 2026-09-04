@@ -194,6 +194,11 @@ class GWAS(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
@@ -202,8 +207,6 @@ class GWAS(BaseAdapter):
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()
 
-            self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-                self.file_accession)
         header = None
         trying_to_complete_line = None
 

@@ -463,18 +463,24 @@ ontology term:
     - python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms/cellosaurus.jsonl
     - python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree_IGVFFI4975UFZM.jsonl --filepath ~/dataset/IGVFFI4975UFZM.tar.gz --label node
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz # uberon
-    - https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz # clo
-    - https://api.data.igvf.org/reference-files/IGVFFI0402TNDW/@@download/IGVFFI0402TNDW.owl.gz # cl
-    - https://api.data.igvf.org/reference-files/IGVFFI1298JRGV/@@download/IGVFFI1298JRGV.owl.gz # hpo
-    - https://api.data.igvf.org/reference-files/IGVFFI9789TIWM/@@download/IGVFFI9789TIWM.owl.gz # mondo
-    - https://api.data.igvf.org/reference-files/IGVFFI8306RHIV/@@download/IGVFFI8306RHIV.owl.gz # go
-    - https://api.data.igvf.org/reference-files/IGVFFI0719VRZV/@@download/IGVFFI0719VRZV.owl.gz # efo
-    - https://api.data.igvf.org/reference-files/IGVFFI6182DQZM/@@download/IGVFFI6182DQZM.owl.gz # chebi
-    - https://api.data.igvf.org/reference-files/IGVFFI4219OZTA/@@download/IGVFFI4219OZTA.owl.gz # vario
-    - https://api.data.igvf.org/reference-files/IGVFFI8953HXRQ/@@download/IGVFFI8953HXRQ.owl.gz # orphanet
-    - https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz # ncit
-    - https://api.data.igvf.org/reference-files/IGVFFI4854HJDG/@@download/IGVFFI4854HJDG.obo.gz # cellosaurus - adapter: cellosaurus_terms
+    # Kept in sync with adapters/ontologies_adapter.py's Ontology.ONTOLOGIES dict,
+    # which is the source of truth the pipeline actually runs with.
+    - https://api.data.igvf.org/reference-files/IGVFFI7407XTPX/@@download/IGVFFI7407XTPX.owl.gz # uberon
+    - https://api.data.igvf.org/reference-files/IGVFFI0354CFDI/@@download/IGVFFI0354CFDI.owl.gz # clo
+    - https://api.data.igvf.org/reference-files/IGVFFI1876TWNM/@@download/IGVFFI1876TWNM.owl.gz # cl
+    - https://api.data.igvf.org/reference-files/IGVFFI5988GBLY/@@download/IGVFFI5988GBLY.owl.gz # pcl
+    - https://api.data.igvf.org/reference-files/IGVFFI0664IPKB/@@download/IGVFFI0664IPKB.owl.gz # hpo
+    - https://api.data.igvf.org/reference-files/IGVFFI7520SEBS/@@download/IGVFFI7520SEBS.owl.gz # mondo
+    - https://api.data.igvf.org/reference-files/IGVFFI7433WATG/@@download/IGVFFI7433WATG.owl.gz # go
+    - https://api.data.igvf.org/reference-files/IGVFFI8049QQIN/@@download/IGVFFI8049QQIN.owl.gz # efo
+    - https://api.data.igvf.org/reference-files/IGVFFI6667HMZF/@@download/IGVFFI6667HMZF.owl.gz # chebi
+    - https://api.data.igvf.org/reference-files/IGVFFI6726JWOJ/@@download/IGVFFI6726JWOJ.owl.gz # vario
+    - https://api.data.igvf.org/reference-files/IGVFFI4620DCPC/@@download/IGVFFI4620DCPC.owl.gz # orphanet
+    - https://api.data.igvf.org/reference-files/IGVFFI3556AFVR/@@download/IGVFFI3556AFVR.owl.gz # ncit
+    - https://api.data.igvf.org/reference-files/IGVFFI0656AUEU/@@download/IGVFFI0656AUEU.owl.gz # oba
+    - https://api.data.igvf.org/reference-files/IGVFFI6329ZTOH/@@download/IGVFFI6329ZTOH.owl.gz # doid
+    - https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz # obi
+    - https://api.data.igvf.org/reference-files/IGVFFI9279GNOP/@@download/IGVFFI9279GNOP.obo.gz # cellosaurus - adapter: cellosaurus_terms (see adapters/cellosaurus_ontology_adapter.py's Cellosaurus.FILE_ACCESSION)
     - https://api.data.igvf.org/reference-files/IGVFFI4975UFZM/@@download/IGVFFI4975UFZM.tar.gz # oncotree - adapter: oncotree_terms
     # ENCODE NTR terms need to be run separately. It does not have datafiles (data fetched from ENCODE API).
     # Two data support files must be also loaded individually: data_loading_support_files/DUAL_IPA/protein_abundance_method_term.jsonl and AFGR/chromatin_acessibility_method_term.jsonl
@@ -492,17 +498,24 @@ ontology relationship:
     - python3 data_parser.py --adapter cellosaurus_relationships --output-bucket igvf-catalog-parsed-collections --filepath {cellosaurus_datafile} --label ontology_relationship --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
     - python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree_IGVFFI4975UFZM.jsonl --filepath ~/dataset/IGVFFI4975UFZM.tar.gz --label edge
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz # uberon
-    - https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz # clo
-    - https://api.data.igvf.org/reference-files/IGVFFI0402TNDW/@@download/IGVFFI0402TNDW.owl.gz # cl
-    - https://api.data.igvf.org/reference-files/IGVFFI1298JRGV/@@download/IGVFFI1298JRGV.owl.gz # hpo
-    - https://api.data.igvf.org/reference-files/IGVFFI9789TIWM/@@download/IGVFFI9789TIWM.owl.gz # mondo
-    - https://api.data.igvf.org/reference-files/IGVFFI8306RHIV/@@download/IGVFFI8306RHIV.owl.gz # go
-    - https://api.data.igvf.org/reference-files/IGVFFI0719VRZV/@@download/IGVFFI0719VRZV.owl.gz # efo
-    - https://api.data.igvf.org/reference-files/IGVFFI6182DQZM/@@download/IGVFFI6182DQZM.owl.gz # chebi
-    - https://api.data.igvf.org/reference-files/IGVFFI4219OZTA/@@download/IGVFFI4219OZTA.owl.gz # vario
-    - https://api.data.igvf.org/reference-files/IGVFFI8953HXRQ/@@download/IGVFFI8953HXRQ.owl.gz # orphanet
-    - https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz # ncit
+    # Kept in sync with adapters/ontologies_adapter.py's Ontology.ONTOLOGIES dict,
+    # which is the source of truth the pipeline actually runs with.
+    - https://api.data.igvf.org/reference-files/IGVFFI7407XTPX/@@download/IGVFFI7407XTPX.owl.gz # uberon
+    - https://api.data.igvf.org/reference-files/IGVFFI0354CFDI/@@download/IGVFFI0354CFDI.owl.gz # clo
+    - https://api.data.igvf.org/reference-files/IGVFFI1876TWNM/@@download/IGVFFI1876TWNM.owl.gz # cl
+    - https://api.data.igvf.org/reference-files/IGVFFI5988GBLY/@@download/IGVFFI5988GBLY.owl.gz # pcl
+    - https://api.data.igvf.org/reference-files/IGVFFI0664IPKB/@@download/IGVFFI0664IPKB.owl.gz # hpo
+    - https://api.data.igvf.org/reference-files/IGVFFI7520SEBS/@@download/IGVFFI7520SEBS.owl.gz # mondo
+    - https://api.data.igvf.org/reference-files/IGVFFI7433WATG/@@download/IGVFFI7433WATG.owl.gz # go
+    - https://api.data.igvf.org/reference-files/IGVFFI8049QQIN/@@download/IGVFFI8049QQIN.owl.gz # efo
+    - https://api.data.igvf.org/reference-files/IGVFFI6667HMZF/@@download/IGVFFI6667HMZF.owl.gz # chebi
+    - https://api.data.igvf.org/reference-files/IGVFFI6726JWOJ/@@download/IGVFFI6726JWOJ.owl.gz # vario
+    - https://api.data.igvf.org/reference-files/IGVFFI4620DCPC/@@download/IGVFFI4620DCPC.owl.gz # orphanet
+    - https://api.data.igvf.org/reference-files/IGVFFI3556AFVR/@@download/IGVFFI3556AFVR.owl.gz # ncit
+    - https://api.data.igvf.org/reference-files/IGVFFI0656AUEU/@@download/IGVFFI0656AUEU.owl.gz # oba
+    - https://api.data.igvf.org/reference-files/IGVFFI6329ZTOH/@@download/IGVFFI6329ZTOH.owl.gz # doid
+    - https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz # obi
+    - https://api.data.igvf.org/reference-files/IGVFFI9279GNOP/@@download/IGVFFI9279GNOP.obo.gz # cellosaurus - adapter: cellosaurus_relationships (see adapters/cellosaurus_ontology_adapter.py's Cellosaurus.FILE_ACCESSION)
     - https://api.data.igvf.org/reference-files/IGVFFI4975UFZM/@@download/IGVFFI4975UFZM.tar.gz # oncotree - adapter: oncotree_relationships
 
 # Examples:

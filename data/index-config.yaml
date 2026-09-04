@@ -281,6 +281,11 @@ genomic_elements:
       - source
       - method, _key
       - promoter_of
+      - source, files_filesets
+  mdi_prefixed:
+    fields:
+      - fields: start, end
+        prefixFields: chr
 
 genomic_elements_biosamples:
   persistent:
@@ -356,6 +361,13 @@ variants:
     fields:
       - pos
 
+variants_IGVF:
+  persistent:
+    fields:
+      - gwas_results
+      - gwas_results[*].neg_log10_pvalue
+      - gwas_results[*].phenotype_term
+
 variants_biosamples:
   persistent:
     fields:
@@ -365,12 +377,14 @@ variants_biosamples:
       - files_filesets
       - method, _key
       - files_filesets, _key
+      - source, files_filesets, method
+      - source, class, files_filesets, method
 
 variants_coding_variants:
   persistent:
     fields:
       - source
-
+      - source, source_url
 
 variants_diseases:
   persistent:
@@ -413,6 +427,8 @@ variants_genes:
       - files_filesets
       - effect_size
       - method
+      - source, files_filesets, method
+      - source, class, files_filesets, method
       - method, _key
   inverted:
     fields: biological_context
@@ -449,6 +465,8 @@ variants_phenotypes:
       - files_filesets, _key
       - _to, _key
       - source, files_filesets
+      - source, files_filesets, method
+      - source, class, files_filesets, method
 
 variants_phenotypes_coding_variants:
   persistent:
@@ -477,7 +495,9 @@ variants_proteins:
       - files_filesets
       - method
       - gene, method, source, biological_context, _key
+      - source, files_filesets, method
       - gene, method, _key
+      - source, class, files_filesets, method
 
 variants_variants:
   persistent:
