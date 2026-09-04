@@ -451,7 +451,7 @@ mouse transcript contains mouse gene structure:
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms/cellosaurus.jsonl
-# for oncotree: python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ' ' --label node
+# for oncotree: python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree_IGVFFI4975UFZM.jsonl --filepath ~/dataset/IGVFFI4975UFZM.tar.gz --label node
 # for ENCODE NTR:
 ontology term:
   collection: ontology_terms
@@ -461,7 +461,7 @@ ontology term:
   command:
     - python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --ontology {ontology_name}
     - python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms/cellosaurus.jsonl
-    - python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ' ' --label node
+    - python3 data_parser.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree_IGVFFI4975UFZM.jsonl --filepath ~/dataset/IGVFFI4975UFZM.tar.gz --label node
   datafiles:
     # Kept in sync with adapters/ontologies_adapter.py's Ontology.ONTOLOGIES dict,
     # which is the source of truth the pipeline actually runs with.
@@ -481,13 +481,13 @@ ontology term:
     - https://api.data.igvf.org/reference-files/IGVFFI6329ZTOH/@@download/IGVFFI6329ZTOH.owl.gz # doid
     - https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz # obi
     - https://api.data.igvf.org/reference-files/IGVFFI9279GNOP/@@download/IGVFFI9279GNOP.obo.gz # cellosaurus - adapter: cellosaurus_terms (see adapters/cellosaurus_ontology_adapter.py's Cellosaurus.FILE_ACCESSION)
-    # Oncotree needs to be run separately. It does not have datafiles (data fetched from Oncotree API).
+    - https://api.data.igvf.org/reference-files/IGVFFI4975UFZM/@@download/IGVFFI4975UFZM.tar.gz # oncotree - adapter: oncotree_terms
     # ENCODE NTR terms need to be run separately. It does not have datafiles (data fetched from ENCODE API).
     # Two data support files must be also loaded individually: data_loading_support_files/DUAL_IPA/protein_abundance_method_term.jsonl and AFGR/chromatin_acessibility_method_term.jsonl
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_relationships --label ontology_relationship --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
-# for oncotree: python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath ' ' --label edge
+# for oncotree: python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree_IGVFFI4975UFZM.jsonl --filepath ~/dataset/IGVFFI4975UFZM.tar.gz --label edge
 ontology relationship:
   collection: ontology_terms_ontology_terms
   params:
@@ -496,7 +496,7 @@ ontology relationship:
   command:
     - python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --ontology {ontology_name}
     - python3 data_parser.py --adapter cellosaurus_relationships --output-bucket igvf-catalog-parsed-collections --filepath {cellosaurus_datafile} --label ontology_relationship --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
-    - python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath ' ' --label edge
+    - python3 data_parser.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree_IGVFFI4975UFZM.jsonl --filepath ~/dataset/IGVFFI4975UFZM.tar.gz --label edge
   datafiles:
     # Kept in sync with adapters/ontologies_adapter.py's Ontology.ONTOLOGIES dict,
     # which is the source of truth the pipeline actually runs with.
@@ -516,6 +516,7 @@ ontology relationship:
     - https://api.data.igvf.org/reference-files/IGVFFI6329ZTOH/@@download/IGVFFI6329ZTOH.owl.gz # doid
     - https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz # obi
     - https://api.data.igvf.org/reference-files/IGVFFI9279GNOP/@@download/IGVFFI9279GNOP.obo.gz # cellosaurus - adapter: cellosaurus_relationships (see adapters/cellosaurus_ontology_adapter.py's Cellosaurus.FILE_ACCESSION)
+    - https://api.data.igvf.org/reference-files/IGVFFI4975UFZM/@@download/IGVFFI4975UFZM.tar.gz # oncotree - adapter: oncotree_relationships
 
 # Examples:
 ## Note we switched loading from uniprot dat files to gencode gtf files

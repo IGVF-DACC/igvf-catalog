@@ -1,13 +1,15 @@
 import json
-import requests
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
-from schemas.registry import get_schema
-
+from adapters.archive_utils import get_file_accession, get_files_from_folder
+from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
-# The tumor types are available from oncotree api: https://oncotree.mskcc.org:443/api/tumorTypes
+# Tumor types are downloaded from the OncoTree API as a flat JSON array and
+# uploaded to the IGVF portal as a reference file:
+#   https://data.igvf.org/reference-files/IGVFFI4975UFZM/
+# Original API: https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable
 # Example for one tumor type node:
 # {'code': 'MMB',
 #  'color': 'Gray',
@@ -21,46 +23,57 @@ from adapters.writer import Writer
 #  'level': 3,
 #  'revocations': [],
 #  'precursors': []},
+#
+# The flattened API omits the root TISSUE node; this adapter injects it so
+# level-1 subclass edges (e.g. SKIN → TISSUE) have a target term.
+# The hierarchical classification tree can also be explored from:
+# https://oncotree.mskcc.org/
 
-# The hierarchical classification tree can also be explored from: https://oncotree.mskcc.org/
 
-
-class Oncotree:
+class Oncotree(BaseAdapter):
     SOURCE = 'Oncotree'
     URI = 'https://oncotree.mskcc.org/'
-    API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
     SOURCE_URL = 'https://oncotree.mskcc.org/api/tumorTypes'
     ALLOWED_LABELS = ['node', 'edge']
-    # Oncotree is fetched live from its own API rather than an IGVF/ENCODE reference
-    # file, so there's no files_fileset record to source these from like other adapters.
-    CLASS = 'biological relationship'
-    METHOD = None
+    ROOT_NODE = {
+        'code': 'TISSUE',
+        'name': 'Tissue',
+        'parent': None,
+        'externalReferences': {
+            'NCI': ['C12801'],
+            'UMLS': ['C0040300'],
+        },
+    }
 
-    def __init__(self, label, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.label = label
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'node':
-                self.schema = get_schema(
-                    'nodes', 'ontology_terms', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'ontology_terms_ontology_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
+        self.file_accession = get_file_accession(filepath)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        if self.label == 'node':
+            return 'nodes'
+        return 'edges'
 
-    def process_file(self):
-        with self.writer:
-            self.parse()
+    def _get_collection_name(self):
+        if self.label == 'node':
+            return 'ontology_terms'
+        return 'ontology_terms_ontology_terms'
 
     def parse(self):
-        oncotree_json = requests.get(Oncotree.API_URL).json()
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_metadata = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.collection_class = file_metadata['class']
+        self.method = file_metadata['method']
+
+        for member in get_files_from_folder(self.filepath):
+            with member.open() as input_file:
+                oncotree_json = json.load(input_file)
+            break
+
+        if not any(node.get('code') == 'TISSUE' for node in oncotree_json):
+            oncotree_json = [Oncotree.ROOT_NODE] + oncotree_json
+
         for node in oncotree_json:
             # reformating for one illegal term: MDS/MPN
             key = node['code'].replace('/', '_')
@@ -78,8 +91,9 @@ class Oncotree:
                     # didn't find individual uri for each node so not sure if this is appropriate
                     'uri': Oncotree.URI,
                     'source_url': Oncotree.SOURCE_URL,
-                    'class': Oncotree.CLASS,
-                    'method': Oncotree.METHOD,
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                 }
 
                 if self.validate:
@@ -107,8 +121,9 @@ class Oncotree:
                         '_to': _target,
                         'type': type,
                         'source': Oncotree.SOURCE,
-                        'class': Oncotree.CLASS,
-                        'method': Oncotree.METHOD
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
 
                     if self.validate:
@@ -134,8 +149,9 @@ class Oncotree:
                                 '_to': _target,
                                 'type': type,
                                 'source': Oncotree.SOURCE,
-                                'class': Oncotree.CLASS,
-                                'method': Oncotree.METHOD
+                                'class': self.collection_class,
+                                'method': self.method,
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                             }
 
                             if self.validate:

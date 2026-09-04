@@ -47,9 +47,15 @@
             "string",
             "null"
           ],
-          "description": "The method of the ontology term",
-          "enum": [
-            null
+          "description": "The method of the ontology term, from the associated files_filesets record"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the ontology term",
+          "example": "files_filesets/IGVFFI4975UFZM",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
           ]
         }
       },
@@ -57,7 +63,8 @@
         "uri",
         "term_id",
         "class",
-        "method"
+        "method",
+        "files_filesets"
       ],
       "additionalProperties": false
     }
