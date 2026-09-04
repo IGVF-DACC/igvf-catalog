@@ -620,7 +620,67 @@
     },
     "require_pass_qc": true
   },
-
+  "hs27_tf_perturb_seq": {
+    "uuid": "afd34fb5-0aed-46fb-aa66-f23108bee376",
+    "title": "Norman CRISPRa Perturb-seq — File Format Specifications",
+    "lab": "tom-norman",
+    "columns": {
+      "effect_score": "Mean-population model coefficient (adata default layer). zscore units: standard deviations of change relative to control cells. Positive = upregulated; negative = downregulated.",
+      "p_val": "Nominal p-value from t-test on regression coefficient (adata layer: 'p').",
+      "p_val_adj": "Benjamini–Hochberg-adjusted p-value (adata layer: 'adj_p'). Pairs with p_val_adj ≥ 0.05 are excluded.",
+      "guide_id": "Representative guide for this promoter element: the hit guide with the highest de_genes_fibro (number of significantly DE genes in fibroblasts, from adata.obs). One guide_id per unique promoter element. Hit guides are filtered to active_fibro or expanded_active_fibro (high-confidence transcriptional phenotypes).",
+      "target_gene": "Ensembl ID of the readout gene. Mapped from gene symbol via adata.var['gene_id']; version suffix stripped.",
+      "intended_target_name": "Ensembl ID of the regulated gene (per IGVF spec for promoter elements). Sourced from the ensembl column in merged_guides_promoters_UPSTREAM_PRIORITIZED.csv.",
+      "intended_target_chr": "Chromosome of the targeted promoter. Source: Chromosome column.",
+      "intended_target_start": "Promoter window start, 0-based half-open (BED). Source: promoter_start.",
+      "intended_target_end": "Promoter window end, exclusive (BED). Source: promoter_end."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "target_gene",
+      "perturbed_gene": "intended_target_name",
+      "metrics": {
+        "z_score": "effect_score",
+        "p_value": "p_val",
+        "p_value_adj": "p_val_adj"
+      }
+    },
+    "notes": "effect_score is a z-score (SD of expression change vs control), not log2FC. File already excludes pairs with p_val_adj ≥ 0.05."
+  },
+  "multiome_perturb_seq": {
+    "uuid": "39838370-42c3-432a-b717-6d268049ad17",
+    "title": "Norman CRISPRi Multiome Perturb-seq — File Format Specification",
+    "lab": "tom-norman",
+    "columns": {
+      "effect_score": "Mean z-scored expression of target_gene across the cells carrying guide_id, in standard deviations relative to control cells. Negative = downregulated. Note this is a z-score; the companion accessibility file reports a log2 fold change under the same column name.",
+      "p_val": "Nominal p-value, two-sided Kolmogorov–Smirnov test against non-targeting-control cells.",
+      "p_val_adj": "Benjamini–Hochberg-adjusted p-value (adata layer: 'adj_p'). Pairs with p_val_adj ≥ 0.05 are excluded.",
+      "guide_id": "Guide identifier, {gene symbol}_{20 nt spacer}, e.g. ACTL6A_GCCCACCTCAGGCAACAAAG. Matches guide_id in the construct library’s guide table. 13 distinct values.",
+      "target_gene": "Unversioned Ensembl ID of the readout gene — the gene whose expression changed. Empty in 5 of the 14,868 rows, where the symbol-to-Ensembl lookup did not resolve a de-duplicated gene symbol.",
+      "intended_target_name": "Unversioned Ensembl ID of the regulated gene, per IGVF spec for promoter elements.",
+      "intended_target_chr": "Chromosome of the targeted promoter, UCSC-style.",
+      "intended_target_start": "Promoter window start, 0-based half-open (BED), GRCh38.",
+      "intended_target_end": "Promoter window end, exclusive, GRCh38."
+    },
+    "semantic_columns": {
+      "element_coordinates": [
+        "intended_target_chr",
+        "intended_target_start",
+        "intended_target_end"
+      ],
+      "readout_gene": "target_gene",
+      "perturbed_gene": "intended_target_name",
+      "metrics": {
+        "z_score": "effect_score",
+        "p_value": "p_val",
+        "p_value_adj": "p_val_adj"
+      }
+    }
+  },
   "files": {
     "IGVFFI3069QCRA": {
       "layout": "t_cell",
@@ -689,38 +749,7 @@
     "IGVFFI0830FXFI": {
       "layout": "pySpade",
       "targeted_element_types": [
-        "promoter",
-        "enhancer"
-      ],
-      "skip_rows": [
-        {
-          "gene_name_ensembl": "ENSG00000112096",
-          "notes": "ENSG00000112096 is not valid ENSEMBL for GENCODE v43."
-        },
-        {
-          "gene_name_ensembl": "ENSG00000215271",
-          "notes": "ENSG00000215271 is not valid ENSEMBL for GENCODE v43."
-        },
-        {
-          "gene_name_ensembl": "ENSG00000285106",
-          "notes": "ENSG00000285106 is not valid ENSEMBL for GENCODE v43."
-        },
-        {
-          "gene_name_ensembl": "ENSG00000273888",
-          "notes": "ENSG00000273888 is not valid ENSEMBL for GENCODE v43."
-        },
-        {
-          "gene_name_ensembl": "ENSG00000285447",
-          "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
-        },
-        {
-          "gene_name_ensembl": "ENSG00000130723",
-          "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
-        },
-        {
-          "gene_name_ensembl": "ENSG00000182230",
-          "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
-        }
+        "promoter"
       ]
     },
     "IGVFFI5903QAWP": {
@@ -880,6 +909,61 @@
       "layout": "tap_seq_sceptre_power_XX",
       "targeted_element_types": [
         "enhancer"
+      ]
+    },
+    "IGVFFI4773CPYN": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "distal element",
+        "promoter"
+      ],
+      "notes": "Additional fields undefined in file format specifications were added from guide RNA sequences to map to promoter gene & element type."
+    },
+    "IGVFFI0957PYTA": {
+      "layout": "tap_seq_sceptre_power_XX",
+      "targeted_element_types": [
+        "distal element",
+        "promoter"
+      ],
+      "notes": "Additional fields undefined in file format specifications were added from guide RNA sequences to map to promoter gene & element type."
+    },
+    "IGVFFI2104BKIF": {
+      "layout": "hs27_tf_perturb_seq",
+      "targeted_element_types": [
+        "promoter"
+      ]
+    },
+    "IGVFFI0192YMEY": {
+      "layout": "multiome_perturb_seq",
+      "targeted_element_types": [
+        "promoter"
+      ],
+      "skip_rows": [
+        {
+          "target_gene": "",
+          "p_val": "0.00015981522644701901",
+          "notes": "File line 917. Empty target_gene (no readout Ensembl ID)."
+        },
+        {
+          "target_gene": "",
+          "p_val": "0.0012030335262633541",
+          "notes": "File line 1488. Empty target_gene (no readout Ensembl ID)."
+        },
+        {
+          "target_gene": "",
+          "p_val": "0.0018979088076841904",
+          "notes": "File line 3940. Empty target_gene (no readout Ensembl ID)."
+        },
+        {
+          "target_gene": "",
+          "p_val": "0.0020157176051102234",
+          "notes": "File line 7664. Empty target_gene (no readout Ensembl ID)."
+        },
+        {
+          "target_gene": "",
+          "p_val": "0.00019434148099295662",
+          "notes": "File line 8582. Empty target_gene (no readout Ensembl ID)."
+        }
       ]
     },
     "IGVFFI9100GKNS": {
