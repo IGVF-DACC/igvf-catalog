@@ -5,27 +5,27 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome of the genomic element"
+      "description": "Chromosome the element lies on, prefixed with 'chr', for example chr1."
     },
     "start": {
       "type": "number",
-      "description": "Start position of the genomic element"
+      "description": "Start of the element, 0-based and inclusive."
     },
     "end": {
       "type": "number",
-      "description": "End position of the genomic element"
+      "description": "End of the element, 0-based and exclusive."
     },
     "strand": {
       "type": "string",
-      "description": "Strand of the genomic element when applicable"
+      "description": "Strand the element is annotated on: + for forward, - for reverse, or . where strand does not apply."
     },
     "type": {
       "type": "string",
-      "description": "Type of the genomic element"
+      "description": "Category of element, such as accessible dna elements, candidate cis regulatory element, or tested elements."
     },
     "method": {
       "type": "string",
-      "description": "Method of the genomic element"
+      "description": "The assay or pipeline that defined the element, such as MPRA, CRISPR screen, caQTL, or scE2G."
     }
   },
   "required": [

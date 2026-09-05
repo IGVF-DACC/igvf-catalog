@@ -5,11 +5,11 @@
   "properties": {
     "tf_name": {
       "type": "string",
-      "description": "The name of the TF"
+      "description": "Name of the transcription factor whose binding preference the motif describes, as given by the source, for example ATF1_HUMAN in HOCOMOCO."
     },
     "pwm": {
       "type": "array",
-      "description": "The PWM of the motif",
+      "description": "Position weight matrix for the motif: an N-by-4 matrix with one row per motif position and one score per nucleotide. Scores are stored as strings.",
       "items": {
         "type": "array",
         "items": {
@@ -19,7 +19,7 @@
     },
     "length": {
       "type": "number",
-      "description": "The length of the motif"
+      "description": "Number of positions in the motif, equal to the number of rows in pwm."
     }
   },
   "required": [
