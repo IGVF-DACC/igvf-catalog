@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variants to phenotypes edge"
+          "description": "Variant key, phenotype ontology term and source file accession joined by underscores."
         },
         "_from": {
           "pattern": "^variants/",
@@ -26,7 +26,7 @@
         },
         "protein_id": {
           "type": "string",
-          "description": "Protein ID for the variants to phenotypes edge",
+          "description": "Ensembl protein ID of the protein the assayed exons belong to, taken from the hgvs_p column with its version suffix removed. Every row in one SGE file shares this protein.",
           "example": "ENSP00000261584"
         },
         "source": {
@@ -40,7 +40,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the variants to phenotypes edge",
+          "description": "Handle of the files_filesets record for the IGVF file this measurement was read from.",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/",
           "collections": [
@@ -49,7 +49,7 @@
         },
         "biosample_term": {
           "type": ["string", "null"],
-          "description": "Biosample term for the variants to phenotypes edge",
+          "description": "Ontology term for the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
           "example": "ontology_terms/EFO_0007598",
           "pattern": "^ontology_terms/"
         },
@@ -73,7 +73,7 @@
             "string",
             "null"
           ],
-          "description": "Biological context for the variants to phenotypes edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
           "example": "lung"
         },
         "name": {
@@ -91,170 +91,170 @@
             "string",
             "null"
           ],
-          "description": "Exon for the variants to phenotypes edge"
+          "description": "Exon of the target gene the variant lies in, written as GENE_X followed by the exon number, for example PALB2_X13. A non-exonic variant carries the exon of the SGE target whose genomic context includes it."
         },
         "target": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Target for the variants to phenotypes edge"
+          "description": "SGE library the variant was assayed in, for example PALB2_X13A. Equal to exon where a single library covers the whole exon; where an exon is tiled by several libraries, a letter is appended, so SFPQ_X7B is the second tile of exon 7 of SFPQ."
         },
         "consequence": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Consequence for the variants to phenotypes edge"
+          "description": "Most severe consequence VEP annotates for the variant against the MANE Select transcript, for example missense_variant."
         },
         "score": {
           "type": "number",
-          "description": "Score for the variants to phenotypes edge"
+          "description": "SGE score: the change in variant frequency over time, as log2 fold change per day. Normalized so that the median synonymous variant scores 0, so lower scores mean reduced cell fitness."
         },
         "standard_error": {
           "type": "number",
-          "description": "Standard error for the variants to phenotypes edge"
+          "description": "Standard error of the score estimate."
         },
         "95_ci_upper": {
           "type": "number",
-          "description": "95% confidence interval upper bound for the variants to phenotypes edge"
+          "description": "Upper bound of the 95% confidence interval on score."
         },
         "95_ci_lower": {
           "type": "number",
-          "description": "95% confidence interval lower bound for the variants to phenotypes edge"
+          "description": "Lower bound of the 95% confidence interval on score."
         },
         "amino_acid_change": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Amino acid change for the variants to phenotypes edge"
+          "description": "Amino acid change the variant introduces into the reference sequence, in one-letter form, for example P1153L."
         },
         "hgvs_p": {
           "type": [
             "string",
             "null"
           ],
-          "description": "HGVS p for the variants to phenotypes edge"
+          "description": "HGVS protein-level description of the variant against its Ensembl protein, for example ENSP00000261584.4:p.Pro1153Leu."
         },
         "functional_consequence": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Functional consequence for the variants to phenotypes edge"
+          "description": "Functional consequence assigned to the variant from its z-score: functionally_normal, indeterminate, or functionally_abnormal."
         },
         "functional_consequence_zscore": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Functional consequence zscore for the variants to phenotypes edge"
+          "description": "Z-score of the variant's score against the distribution of expected neutral variant scores. Thresholds on this value assign functional_consequence."
         },
         "variant_qc_flag": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Variant QC flag for the variants to phenotypes edge"
+          "description": "Whether the variant passes the assay QC metrics: PASS, FAIL, or LOWCOV for low coverage."
         },
         "snvlib_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "SNVlib library 1 for the variants to phenotypes edge"
+          "description": "Count of the variant in the plasmid library before transfection and selection, from amplicon sequencing of the targeted region."
         },
         "snvlib_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "SNVlib library 2 for the variants to phenotypes edge"
+          "description": "Count of the variant in the second plasmid library before transfection and selection. Null unless two targets overlap and the variant was assayed in both."
         },
         "D05_R1_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D05_R1_lib1 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 5 in replicate 1."
         },
         "D05_R1_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D05_R1_lib2 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 5 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D05_R2_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D05_R2_lib1 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 5 in replicate 2."
         },
         "D05_R2_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D05_R2_lib2 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 5 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D05_R3_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D05_R3_lib1 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 5 in replicate 3. Null when only two replicates passed QC."
         },
         "D05_R3_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D05_R3_lib2 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 5 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC."
         },
         "D13_R1_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D13_R1_lib1 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 13 in replicate 1."
         },
         "D13_R1_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D13_R1_lib2 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 13 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D13_R2_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D13_R2_lib1 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 13 in replicate 2."
         },
         "D13_R2_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D13_R2_lib2 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 13 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D13_R3_lib1": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D13_R3_lib1 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 13 in replicate 3. Null when only two replicates passed QC."
         },
         "D13_R3_lib2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "D13_R3_lib2 for the variants to phenotypes edge"
+          "description": "Count of the variant at day 13 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC."
         }
       },
       "required": [

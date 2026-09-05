@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores. For example CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA.",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
         "_from": {
@@ -37,7 +37,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         },
@@ -80,12 +80,12 @@
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "ontology_terms/EFO_0002067"
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "K562"
         },
         "treatments_term_ids": {
@@ -93,7 +93,7 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the genomic element to gene edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
         },
         "p_value": {
           "type": [
@@ -114,11 +114,11 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of p-value."
+          "description": "-log10 of the uncorrected P-value for the element-gene pair. Which test produced it follows the submitting lab's pipeline: MAST, FRACTEL, SCEPTRE, or a t-test. Absent where the file reports no uncorrected P-value."
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Negative log10 of adjusted p-value."
+          "description": "-log10 of the same P-value after correction for multiple testing, by Benjamini-Hochberg except in the Seurat/MAST screens, which correct by Bonferroni across all genes in the dataset. Absent where the file reports no corrected P-value."
         },
         "log2FC": {
           "type": [

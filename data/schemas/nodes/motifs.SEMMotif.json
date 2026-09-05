@@ -22,26 +22,26 @@
         },
         "baseline": {
           "type": "number",
-          "description": "The baseline of the motif",
+          "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers: a baseline where binding is not expected to occur. Binding is called only for scores above 2 raised to this value. Constant across every variant scored with the same SNP Effect Matrix.",
           "example": -0.671761
         },
         "class": {
           "type": "string",
-          "description": "The class of the motif, from the associated files_filesets record",
+          "description": "Evidence tier for the underlying data, taken from the file's fileset metadata: 'observed data' for a direct experimental measurement.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
           "type": "string",
-          "description": "The method of the motif, from the associated files_filesets record",
+          "description": "Model or pipeline that produced this record, taken from the file's fileset metadata.",
           "enum": [
             "SEMpl"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the motif",
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
           "example": "files_filesets/IGVFFI5279OTVZ",
           "pattern": "^files_filesets/",
           "collections": [

@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the disease to gene edge",
+      "description": "Orphanet disease term key and Ensembl gene ID joined by an underscore, for example Orphanet_100000_ENSG00000171759.",
       "example": "Orphanet_100000_ENSG00000171759"
     },
     "_from": {

@@ -16,12 +16,12 @@
         },
         "file_set_id": {
           "type": "string",
-          "description": "The file set id of the file set",
-          "example": "ENCFF004PFU"
+          "description": "Accession of the file set that contains this file: the unique identifier used to reference that file set on the source portal.",
+          "example": "ENCSR359DFW"
         },
         "lab": {
           "type": "string",
-          "description": "The lab of the file set",
+          "description": "Lab associated with the submission, as the portal's short lab name: lower-cased and hyphen-delimited from the PI's first and last name, for example jesse-engreitz.",
           "enum": [
             "alan-boyle",
             "bill-majoros",
@@ -52,7 +52,7 @@
             "array",
             "null"
           ],
-          "description": "The preferred assay titles of the file set",
+          "description": "The lab's preferred label for the assay that produced the data, for example lentiMPRA or SGE. For an analysis set, the preferred assay titles of the assays whose data it analyzes. Null when the portal records none.",
           "items": {
             "type": "string",
             "enum": [
@@ -84,7 +84,7 @@
             "array",
             "null"
           ],
-          "description": "The assay term ids of the file set",
+          "description": "Ontology term identifiers for the assays used to produce the data, for example OBI:0002440.",
           "example": [
             "OBI:0002440"
           ],
@@ -97,7 +97,7 @@
             "string",
             "null"
           ],
-          "description": "The method of the file set",
+          "description": "The method the data is curated under in the catalog. Taken from the software title for prediction sets, from the preferred assay title for analysis and pseudobulk sets, and from the curated catalog method for externally sourced community data.",
           "enum": [
             "ADASTRA",
             "BlueSTARR",
@@ -142,7 +142,7 @@
         },
         "class": {
           "type": "string",
-          "description": "The class of the file set",
+          "description": "The class curated in the IGVF catalog that the data in this file belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship",
             "observed data",
@@ -154,7 +154,7 @@
             "array",
             "null"
           ],
-          "description": "The software of the file set",
+          "description": "Software packages used to produce the file, under their preferred viewable names.",
           "items": {
             "type": "string",
             "enum": [
@@ -212,7 +212,7 @@
             "array",
             "null"
           ],
-          "description": "The samples of the file set",
+          "description": "Ontology terms identifying the biosamples the data was produced from, as handles into ontology_terms. Where a sample is an in vitro system with a differentiation endpoint, the targeted endpoint term is used in place of its starting term.",
           "example": [
             "ontology_terms/UBERON_0002048"
           ],
@@ -226,7 +226,7 @@
             "array",
             "null"
           ],
-          "description": "The sample ids of the file set",
+          "description": "Accessions of the samples the data was produced from, as used to reference those samples on the source portal.",
           "example": [
             "ENCBS160ZPI",
             "ENCBS659PKW",
@@ -241,7 +241,7 @@
             "array",
             "null"
           ],
-          "description": "The simple sample summaries of the file set",
+          "description": "Short readable summary of each sample, assembled by the catalog from the sample's ontology term names, followed by 'induced to' and the targeted endpoint term for differentiated systems, 'from' and the donor accessions for organoid and specimen classifications, and 'treated with' and the treatment term names where treatments were applied.",
           "example": [
             "GM12878"
           ]
@@ -251,7 +251,7 @@
             "array",
             "null"
           ],
-          "description": "The donors of the file set",
+          "description": "Donors the samples were derived from, as handles into the donors collection.",
           "example": [
             "donors/ENCDO000AAK"
           ],
@@ -265,7 +265,7 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the file set",
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, for example CHEBI:15367.",
           "example": [
             "CHEBI:15367"
           ]
@@ -275,7 +275,7 @@
             "string",
             "null"
           ],
-          "description": "The publication of the file set",
+          "description": "Publication identifier associated with the file set, for example PMID:34017130. Only one publication per file is supported.",
           "example": "PMID:34017130"
         },
         "collections": {
@@ -284,7 +284,7 @@
             "type": "string",
             "minItems": 1
           },
-          "description": "The collections of the file set",
+          "description": "The collections in the IGVF catalog that contain the data in this file, for example genomic_elements.",
           "example": [
             "genomic_elements"
           ]
@@ -305,7 +305,7 @@
         },
         "download_link": {
           "type": "string",
-          "description": "The download link of the file",
+          "description": "The download path to obtain the file from the source portal.",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "cell_annotation": {
@@ -313,7 +313,7 @@
             "string",
             "null"
           ],
-          "description": "The cell annotation of the file set",
+          "description": "The cell annotation of the file set, recorded for most scE2G file sets and all pseudobulk sets.",
           "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
@@ -321,7 +321,7 @@
             "string",
             "null"
           ],
-          "description": "Ontology term id for the cell annotation (from fileset cell_type.term_id)",
+          "description": "Ontology term describing the cell type of the cells in this pseudobulk or pseudobulk-derived prediction, as a handle into ontology_terms.",
           "example": "ontology_terms/CL_0000352",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
@@ -330,7 +330,7 @@
             "string",
             "null"
           ],
-          "description": "The genome browser link of the file set",
+          "description": "Link to a file that can be rendered in a genome browser: the file set's bigInteract, bigBed, bigWig, or bedpe file where one exists, or the file itself for a pseudobulk set.",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "browser_index_file": {
@@ -346,7 +346,7 @@
             "string",
             "null"
           ],
-          "description": "The CRISPR modality of the file set",
+          "description": "The purpose or intended effect of the CRISPR modification applied to the samples, for example interference or knockout. Null when no sample carries a CRISPR modification.",
           "enum": [
             null,
             "interference",
@@ -361,7 +361,7 @@
             "string",
             "null"
           ],
-          "description": "The version string of the external data source",
+          "description": "Version of the external data source, recorded only for community-curated files loaded into the catalog from outside IGVF and ENCODE.",
           "example": "File generated on 2023-10-10"
         }
       },

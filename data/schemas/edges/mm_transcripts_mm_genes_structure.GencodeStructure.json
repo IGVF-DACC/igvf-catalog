@@ -6,8 +6,8 @@
   "properties": {
     "_from": {
       "type": "string",
-      "description": "The from node of the gene structure",
-      "example": "mm_transcripts/ENSMUST00000456328",
+      "description": "Document handle of the transcript that contains the feature, for example mm_transcripts/ENSMUST00000192972.",
+      "example": "mm_transcripts/ENSMUST00000193812",
       "pattern": "^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
         "mm_transcripts"
@@ -15,8 +15,8 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the gene structure",
-      "example": "mm_genes_structure/ENSMUSG00000094271_ENSE00000094271_exon",
+      "description": "Document handle of the sub-transcript feature, for example mm_genes_structure/ENSMUST00000192972_ENSMUSE00001343744_exon.",
+      "example": "mm_genes_structure/ENSMUST00000193812_ENSMUSE00001343744_exon",
       "pattern": "^mm_genes_structure/",
       "collections": [
         "mm_genes_structure"
@@ -24,42 +24,42 @@
     },
     "source": {
       "type": "string",
-      "description": "The source of the gene structure",
+      "description": "The dataset this edge was loaded from.",
       "enum": [
         "GENCODE"
       ]
     },
     "version": {
       "type": "string",
-      "description": "The version of the gene structure annotation",
+      "description": "GENCODE release the annotation was taken from.",
       "enum": [
         "vM36"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "The source URL of the gene structure annotation",
+      "description": "Link to the GENCODE annotation file this edge was derived from.",
       "enum": [
         "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
       ]
     },
     "organism": {
       "type": "string",
-      "description": "The organism of the gene structure",
+      "description": "Species this annotation describes.",
       "enum": [
         "Mus musculus"
       ]
     },
     "name": {
       "type": "string",
-      "description": "The name of the gene structure",
+      "description": "Predicate describing the relationship in the _from to _to direction: the transcript contains this feature.",
       "enum": [
         "contains"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the gene structure",
+      "description": "Predicate describing the same relationship in the _to to _from direction: the feature is contained in the transcript.",
       "enum": [
         "contained in"
       ]

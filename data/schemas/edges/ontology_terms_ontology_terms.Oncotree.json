@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the ontology term to ontology term edge",
+      "description": "Source term key, the relationship predicate and the target term key, joined by underscores. For example Oncotree_ASM_rdf-schema.subClassOf_Oncotree_SM.",
       "example": "Oncotree_ASM_rdf-schema.subClassOf_Oncotree_SM"
     },
     "_from": {

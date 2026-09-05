@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "pattern": "^coding_variants/",
@@ -36,28 +36,28 @@
         },
         "pathogenicity_score": {
           "type": "number",
-          "description": "Pathogenicity score for the coding variant phenotype edge"
+          "description": "MutPred2 pathogenicity score for the substitution, between 0 and 1. Higher values indicate greater predicted pathogenicity."
         },
         "property_scores": {
           "type": "array",
-          "description": "Property scores for the coding variant phenotype edge",
+          "description": "Molecular mechanisms MutPred2 predicts the substitution to disrupt, drawn from its 58 structural, functional, and post-translational-modification properties. Only mechanisms reaching a posterior probability of 0.25 or higher with a p-value below 0.05 are retained. Each entry carries the property, its posterior probability, p-value, affected position, and whether the property is Lost, Gained, or Altered; the affected position is \"-\" for properties that describe a whole region rather than a residue.",
           "items": {
             "type": "object"
           }
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the coding variant phenotype edge",
+          "description": "Handle of the files_filesets record for the IGVF file this measurement was read from.",
           "pattern": "^files_filesets/"
         },
         "biosample_term": {
           "type": ["string", "null"],
-          "description": "Biosample term for the coding variant phenotype edge",
+          "description": "Ontology term for the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
           "pattern": "^ontology_terms/"
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "Biological context for the coding variant phenotype edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell"
         },
         "method": {

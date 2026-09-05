@@ -10,7 +10,7 @@
             "properties": {
             "_key": {
                 "type": "string",
-                "description": "Unique identifier for the variant to protein edge",
+                "description": "Variant key, Ensembl protein ID and the source name joined by underscores. For example NC_000017.11:7166092:G:A_ENSP00000491556_UKB.",
                 "example": "NC_000017.11:7166092:G:A_ENSP00000491556_UKB"
             },
             "_from": {

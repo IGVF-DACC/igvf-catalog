@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edges between coding variants and phenotypes"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
@@ -38,11 +38,11 @@
         },
         "esm_1v_score": {
           "type": "number",
-          "description": "Score for the edges between coding variants and phenotypes"
+          "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Where a protein longer than 1022 amino acids was split into overlapping segments, the two segment means are blended across the overlap with a cosine sigmoid. More negative scores indicate greater predicted deleteriousness. Only substitutions scoring below log(0.5) are loaded."
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filefileset for the edges between coding variants and phenotypes",
+          "description": "Handle of the files_filesets record for the IGVF file this measurement was read from.",
           "enum": [
             "files_filesets/IGVFFI8105TNNO"
           ]
@@ -75,84 +75,84 @@
         },
         "esm1v_t33_650M_UR90S_1": {
           "type": "number",
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_1 model, one of the five ESM-1v models. Where the position falls in an overlap between two segments of a long protein, this is the score from the earlier segment."
         },
         "esm1v_t33_650M_UR90S_2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_2 model, one of the five ESM-1v models. Where the position falls in an overlap between two segments of a long protein, this is the score from the earlier segment."
         },
         "esm1v_t33_650M_UR90S_3": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_3 model, one of the five ESM-1v models. Where the position falls in an overlap between two segments of a long protein, this is the score from the earlier segment."
         },
         "esm1v_t33_650M_UR90S_4": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_4 model, one of the five ESM-1v models. Where the position falls in an overlap between two segments of a long protein, this is the score from the earlier segment."
         },
         "esm1v_t33_650M_UR90S_5": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_5 model, one of the five ESM-1v models. Where the position falls in an overlap between two segments of a long protein, this is the score from the earlier segment."
         },
         "esm1v_t33_650M_UR90S_1_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_1 model for the later segment of an overlap. Present only for proteins longer than 1022 amino acids, and populated only at positions that fall inside an overlap."
         },
         "esm1v_t33_650M_UR90S_2_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_2 model for the later segment of an overlap. Present only for proteins longer than 1022 amino acids, and populated only at positions that fall inside an overlap."
         },
         "esm1v_t33_650M_UR90S_3_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_3 model for the later segment of an overlap. Present only for proteins longer than 1022 amino acids, and populated only at positions that fall inside an overlap."
         },
         "esm1v_t33_650M_UR90S_4_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the coding variant-phenotype edge"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_4 model for the later segment of an overlap. Present only for proteins longer than 1022 amino acids, and populated only at positions that fall inside an overlap."
         },
         "esm1v_t33_650M_UR90S_5_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_5 model for the later segment of an overlap. Present only for proteins longer than 1022 amino acids, and populated only at positions that fall inside an overlap."
         },
         "biosample_term": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Biosample term for the edges between coding variants and phenotypes"
+          "description": "Ontology term for the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample."
         },
         "biological_context": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Biological context for the edges between coding variants and phenotypes"
+          "description": "Plain-language summary of the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary."
         }
       },
       "required": [

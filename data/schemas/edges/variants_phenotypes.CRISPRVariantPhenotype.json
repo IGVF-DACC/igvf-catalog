@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to phenotype edge",
+          "description": "Variant key, phenotype ontology term and source file accession joined by underscores. For example NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP.",
           "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP"
         },
         "_from": {
@@ -33,7 +33,7 @@
         },
         "z_score": {
           "type": "number",
-          "description": "Phenotype association z-score"
+          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
         },
         "significant": {
           "type": "boolean",
@@ -44,14 +44,14 @@
             "number",
             "null"
           ],
-          "description": "Number of guides targeting the variant."
+          "description": "Number of guides aggregated for the variant in the screen."
         },
         "edit_rate_mean": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Mean editing rate."
+          "description": "Mean effective prime-editing rate across the variant's guides: the fraction of cells edited, from 0 to 1. Reported only by reporter-readout files."
         },
         "effect_size_ci95_lower": {
           "type": [
@@ -100,7 +100,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to phenotype edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [
@@ -109,12 +109,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the variant to phenotype edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "human HCT116 cell line from donor(s) IGVFDO0384OZRW"
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the variant to phenotype edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "ontology_terms/EFO_0002824",
           "pattern": "^ontology_terms/"
         },
@@ -123,7 +123,7 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the variant to phenotype edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
         },
         "name": {
           "enum": [

@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to biosample edge"
+          "description": "Genomic element key, strand token, source file accession and biosample term joined by underscores."
         },
         "_from": {
           "example": "genomic_elements/MPRA_chr1_10410_10610_GRCh38_ENCFF769REH",
@@ -28,35 +28,35 @@
         },
         "bed_score": {
           "type": "integer",
-          "description": "The bed score of the genomic element to biosample edge"
+          "description": "Score column of the source BED file, which sets how dark the feature is drawn in a genome browser, on a scale of 0 to 1000."
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the genomic element to biosample edge"
+          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one."
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2FC of the genomic element to biosample edge"
+          "description": "Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio, in log2 space."
         },
         "DNA_count": {
           "type": "number",
-          "description": "The DNA count of the genomic element to biosample edge"
+          "description": "Input count (DNA), normalized to counts per million and averaged across replicates."
         },
         "RNA_count": {
           "type": "number",
-          "description": "The RNA count of the genomic element to biosample edge"
+          "description": "Output count (RNA), normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
           "type": ["number", "null"],
-          "description": "The minus log10 P value (null when not available)."
+          "description": "-log10 of the P-value for the element's activity. Null when the source file does not report one."
         },
         "neg_log10_pvalue_adj": {
           "type": ["number", "null"],
-          "description": "The minus log10 adjusted P value (null when not available)."
+          "description": "-log10 of the FDR-adjusted P-value (Q-value) for the element's activity. Null when the source file does not report one."
         },
         "significant": {
           "type": "boolean",
-          "description": "True if this edge met the significance threshold (e.g. neg_log10_pvalue_adj >= 1)."
+          "description": "Whether the element's activity passes the significance threshold applied at load time: a neg_log10_pvalue_adj of 1 or more, equivalent to an FDR of 0.1 or lower. False when no adjusted P-value is available."
         },
         "label": {
           "description": "Reference-tile (REF) MPRA activity; not alternate-allele–specific element effects.",
@@ -95,7 +95,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to biosample edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI1323RCIE",
           "pattern": "^files_filesets/",
           "collections": [
@@ -104,12 +104,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to biosample edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to biosample edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
           "example": "ontology_terms/UBERON_0002048",
           "pattern": "^ontology_terms/"
         },
@@ -121,7 +121,7 @@
           "items": {
             "type": "string"
           },
-          "description": "The treatments term ids of the genomic element to biosample edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
         }
       },
       "required": [

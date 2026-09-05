@@ -8,37 +8,38 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "ENSMUSG00000094271_ENSE00000094271_exon"
+          "example": "ENSMUST00000193812_ENSMUSE00001343744_exon"
         },
         "name": {
-          "example": "Gm13290_exon_1_exon"
+          "example": "4933401J01Rik-201_exon_1_exon"
         },
         "chr": {
           "type": "string",
-          "description": "The chromosome of the gene structure",
-          "example": "chr9"
+          "description": "Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names such as chr8_KZ208915v1_fix.",
+          "example": "chr1"
         },
         "start": {
           "type": "number",
-          "description": "The start position of the gene structure",
-          "example": 11869
+          "description": "Start of the feature, 0-based and inclusive.",
+          "example": 3143475
         },
         "end": {
           "type": "number",
-          "description": "The end position of the gene structure",
-          "example": 14409
+          "description": "End of the feature, 0-based and exclusive.",
+          "example": 3144545
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the gene structure",
+          "description": "Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
             "+",
             "-"
-          ]
+          ],
+          "example": "+"
         },
         "type": {
           "type": "string",
-          "description": "The type of the gene structure",
+          "description": "Kind of sub-transcript feature. Exons and their CDS, UTR, start_codon, and stop_codon sub-features are taken from the GENCODE annotation, and the sub-features share the exon_id of the exon they fall in. Introns are not annotated by GENCODE and are derived from the gaps between consecutive exons of a transcript.",
           "enum": [
             "CDS",
             "UTR",
@@ -50,33 +51,33 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "The ensembl gene ID of the gene structure",
-          "example": "ENSMUSG00000094271"
+          "description": "Ensembl gene ID of the gene this feature belongs to, with the version suffix removed, for example ENSMUSG00000094271. Genes in the pseudoautosomal region keep a _PAR_Y suffix.",
+          "example": "ENSMUSG00000102693"
         },
         "gene_name": {
           "type": "string",
-          "description": "The gene name of the gene structure",
-          "example": "Gm13290"
+          "description": "GENCODE gene symbol, for example Gm13290.",
+          "example": "4933401J01Rik"
         },
         "transcript_id": {
           "type": "string",
-          "description": "The ensembl transcript ID of the gene structure",
-          "example": "ENSMUST00000094271"
+          "description": "Ensembl transcript ID of the transcript this feature belongs to, with the version suffix removed, for example ENSMUST00000192972.",
+          "example": "ENSMUST00000193812"
         },
         "transcript_name": {
           "type": "string",
-          "description": "The transcript name of the gene structure",
-          "example": "Gm13290-202"
+          "description": "GENCODE transcript name, which is the gene symbol followed by a transcript index, for example Gm13290-202.",
+          "example": "4933401J01Rik-201"
         },
         "exon_number": {
           "type": "string",
-          "description": "The exon number of the gene structure",
+          "description": "1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, for example 1_2 for the intron between exons 1 and 2.",
           "example": "1"
         },
         "exon_id": {
           "type": "string",
-          "description": "The ensembl exon ID of the gene structure",
-          "example": "ENSMUSE00001343744.1"
+          "description": "Ensembl exon ID, including its version suffix, for example ENSMUSE00001343744.1. The same exon ID recurs in every transcript that contains that exon, so it is not unique within the collection.",
+          "example": "ENSMUSE00001343744.2"
         },
         "source": {
           "enum": [
@@ -85,7 +86,7 @@
         },
         "version": {
           "type": "string",
-          "description": "The version of the gene structure annotation",
+          "description": "GENCODE release the annotation was taken from.",
           "enum": [
             "vM36"
           ]
@@ -97,7 +98,7 @@
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the gene structure",
+          "description": "Species this annotation describes.",
           "enum": [
             "Mus musculus"
           ]

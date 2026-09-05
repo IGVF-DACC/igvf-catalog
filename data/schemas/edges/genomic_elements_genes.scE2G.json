@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge, including biosample and cell annotation ontology term ID suffixes",
+          "description": "Genomic element key, Ensembl gene ID, biosample term and cell annotation term joined by underscores.",
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX_ENSG00000000457_CL_0000336_CL_0000336"
         },
         "_from": {
@@ -48,7 +48,7 @@
         },
         "transcription_start_site": {
           "type": "integer",
-          "description": "Transcription start site of the target gene (GeneTSS)"
+          "description": "Transcription start site of the target gene used by the model, as a 0-based coordinate."
         },
         "rna_pseudobulk_tpm": {
           "type": [
@@ -70,7 +70,7 @@
             "string",
             "null"
           ],
-          "description": "Ontology term for the biosample",
+          "description": "Ontology term for the biosample the prediction applies to, taken from the file's fileset metadata.",
           "example": "ontology_terms/CL_0000336",
           "pattern": "^ontology_terms/"
         },
@@ -81,7 +81,7 @@
         },
         "cell_annotation_term": {
           "type": "string",
-          "description": "Ontology term for the cell annotation",
+          "description": "Ontology term for the cell type the prediction applies to, taken from the file's fileset metadata.",
           "example": "ontology_terms/CL_0000336",
           "pattern": "^ontology_terms/"
         },
@@ -96,7 +96,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
+          "description": "Handle of the files_filesets record for the prediction file this link was read from.",
           "example": "files_filesets/IGVFFI5648GWQX",
           "pattern": "^files_filesets/"
         },
