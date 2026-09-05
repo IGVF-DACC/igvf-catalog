@@ -20,8 +20,8 @@ const genomicElementsToBiosampleFormat = z.object({
   strand: z.string().nullable(),
   neg_log10_pvalue: z.number().nullable(),
   neg_log10_pvalue_adj: z.number().nullable(), // neg_log10_qvalue
-  DNA_count: z.number().nullish(),
-  RNA_count: z.number().nullish(),
+  inputCount: z.number().nullish(),
+  outputCount: z.number().nullish(),
   significant: z.boolean().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),

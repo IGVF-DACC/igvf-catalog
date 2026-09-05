@@ -29,7 +29,7 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
 """
 
 # Example rows from ENCODE lenti-MPRA bed file ENCFF802FUV.bed: (the last two columns are the same for all rows)
-# Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: DNA count; Column 9: RNA count
+# Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: inputCount; Column 9: outputCount
 # chr1	10410	10610	HepG2_DNasePeakNoPromoter1	212	+	-0.843	0.307	0.171	-1	-1
 
 # Example rows from IGVFFI4914OUJH - MPRA sequence designs
@@ -117,6 +117,7 @@ class MPRAAdapter(BaseAdapter):
         reference_filepath: Optional[str] = None,
         reference_source_url: Optional[str] = None,
         validate=False,
+        excluded_file_accessions=None,
         **kwargs
     ):
         # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
@@ -130,6 +131,9 @@ class MPRAAdapter(BaseAdapter):
         super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.rstrip('/').split('/')[-1]
+        # Optional list of file accessions whose previously-loaded variants should
+        # NOT be considered "already loaded" for this run (e.g. revoked replacements).
+        self.excluded_file_accessions = excluded_file_accessions or []
 
         if 'encodeproject.org' in source_url:
             self.source = 'ENCODE'
@@ -561,8 +565,8 @@ class MPRAAdapter(BaseAdapter):
                         'strand': strand,
                         'log2FC': self.safe_float(row[6]),
                         'bed_score': self.safe_int(row[4]),
-                        'DNA_count': self.safe_float(row[7]),
-                        'RNA_count': self.safe_float(row[8]),
+                        'inputCount': self.safe_float(row[7]),
+                        'outputCount': self.safe_float(row[8]),
                         'neg_log10_pvalue': minus_p,
                         'neg_log10_pvalue_adj': minus_q_edge,
                         'significant': significant,
@@ -598,8 +602,11 @@ class MPRAAdapter(BaseAdapter):
 
     def _process_variant_chunk(self, chunk):
         spdis = [row[3] for row in chunk]
+        excluded_files_filesets = [
+            f'files_filesets/{acc}' for acc in self.excluded_file_accessions
+        ] + [f'files_filesets/{self.file_accession}']
         loaded_spdis = bulk_check_variants_in_arangodb(
-            spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}')
+            spdis, check_by='spdi', excluded_files_filesets=excluded_files_filesets)
         for row in chunk:
             spdi = row[3]
             if spdi in loaded_spdis:
@@ -700,7 +707,6 @@ class MPRAAdapter(BaseAdapter):
                 edge_key = '_'.join([
                     variant_id,
                     element_id,
-                    self.strand_token(element_strand),
                     biosample_term_key,
                     self.file_accession,
                 ])
@@ -717,10 +723,10 @@ class MPRAAdapter(BaseAdapter):
                     'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
                     'bed_score': self.safe_int(row[4]),
-                    'DNA_count_ref': self.safe_float(row[7]),
-                    'RNA_count_ref': self.safe_float(row[8]),
-                    'DNA_count_alt': self.safe_float(row[9]),
-                    'RNA_count_alt': self.safe_float(row[10]),
+                    'inputCountRef': self.safe_float(row[7]),
+                    'outputCountRef': self.safe_float(row[8]),
+                    'inputCountAlt': self.safe_float(row[9]),
+                    'outputCountAlt': self.safe_float(row[10]),
                     'neg_log10_pvalue': self.safe_float(row[11]),
                     'neg_log10_pvalue_adj': minus_q,
                     'significant': minus_q is not None and minus_q >= self.THRESHOLD,

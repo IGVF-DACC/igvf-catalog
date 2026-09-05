@@ -38,13 +38,13 @@
           "type": "number",
           "description": "Log2FC of the genomic element to biosample edge"
         },
-        "DNA_count": {
+        "inputCount": {
           "type": "number",
-          "description": "The DNA count of the genomic element to biosample edge"
+          "description": "Input count (DNA), normalized (CPM), mean across replicates."
         },
-        "RNA_count": {
+        "outputCount": {
           "type": "number",
-          "description": "The RNA count of the genomic element to biosample edge"
+          "description": "Output count (RNA), normalized (CPM), mean across replicates."
         },
         "neg_log10_pvalue": {
           "type": ["number", "null"],
@@ -129,8 +129,8 @@
         "bed_score",
         "strand",
         "log2FC",
-        "DNA_count",
-        "RNA_count",
+        "inputCount",
+        "outputCount",
         "significant",
         "neg_log10_pvalue",
         "neg_log10_pvalue_adj",
@@ -143,7 +143,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
+    "return": "_id, strand, log2FC, bed_score, inputCount, outputCount, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }
