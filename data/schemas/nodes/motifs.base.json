@@ -5,7 +5,8 @@
   "properties": {
     "tf_name": {
       "type": "string",
-      "description": "Name of the transcription factor whose binding preference the motif describes, as given by the source, for example ATF1_HUMAN in HOCOMOCO."
+      "description": "Name of the transcription factor whose binding preference the motif describes, in the form the source uses: HOCOMOCO appends a species suffix, while SEMpl carries the bare HGNC symbol, colon-joined for a complex.",
+      "example": "ATF1_HUMAN"
     },
     "pwm": {
       "type": "array",

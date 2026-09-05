@@ -14,13 +14,13 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "Ensembl gene ID including its version suffix, for example ENSG00000290825.1. The _key of this record is the same ID with the version removed.",
+          "description": "Ensembl gene ID including its version suffix. The _key of this record is the same ID with the version removed.",
           "example": "ENSG00000290825.1",
           "pattern": "^ENSG[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "gene_type": {
           "type": "string",
-          "description": "Biotype GENCODE assigns to the gene, such as protein_coding, lncRNA, or processed_pseudogene.",
+          "description": "Biotype GENCODE assigns to the gene.",
           "enum": [
             "artifact",
             "IG_C_gene",
@@ -62,11 +62,12 @@
             "unitary_pseudogene",
             "unprocessed_pseudogene",
             "vault_RNA"
-          ]
+          ],
+          "example": "protein_coding"
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names such as chr8_KZ208915v1_fix.",
+          "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
@@ -93,7 +94,7 @@
         },
         "symbol": {
           "type": "string",
-          "description": "GENCODE gene symbol, for example DDX11L2. Carries the same value as name.",
+          "description": "GENCODE gene symbol. Carries the same value as name.",
           "example": "DDX11L2"
         },
         "source": {
@@ -163,7 +164,7 @@
             "array",
             "null"
           ],
-          "description": "Curated gene collections that include this gene, read from the IGVF portal at load time, such as ACMG73 or GREGoR. Null for genes in no collection.",
+          "description": "Curated gene collections that include this gene, read from the IGVF portal at load time. Null for genes in no collection.",
           "items": {
             "type": "string",
             "enum": [
@@ -172,16 +173,17 @@
               "Morphic",
               "StanfordFCC"
             ]
-          }
+          },
+          "example": ["ACMG73"]
         },
         "version_number": {
           "type": "string",
-          "description": "Version suffix of the Ensembl gene ID, for example 1 for ENSG00000290825.1.",
+          "description": "Version suffix of the Ensembl gene ID.",
           "example": "1"
         },
         "hgnc": {
           "type": "string",
-          "description": "HGNC ID for the gene, taken from the GENCODE annotation where present, otherwise resolved through the NCBI gene info file, for example HGNC:37102.",
+          "description": "HGNC ID for the gene, taken from the GENCODE annotation where present, otherwise resolved through the NCBI gene info file.",
           "example": "HGNC:100000",
           "pattern": "^HGNC:[0-9]+$"
         },
@@ -194,7 +196,7 @@
         },
         "entrez": {
           "type": "string",
-          "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:', for example ENTREZ:100287102.",
+          "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:'.",
           "example": "ENTREZ:100287102",
           "pattern": "^ENTREZ:[0-9]+$"
         }

@@ -13,7 +13,7 @@
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID including its version suffix, for example ENST00000456328.2. The _key of this record is the same ID with the version removed.",
+          "description": "Ensembl transcript ID including its version suffix. The _key of this record is the same ID with the version removed.",
           "example": "ENST00000456328.2",
           "pattern": "^ENST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
@@ -22,7 +22,7 @@
         },
         "transcript_type": {
           "type": "string",
-          "description": "Biotype GENCODE assigns to the transcript, such as protein_coding, lncRNA, or retained_intron.",
+          "description": "Biotype GENCODE assigns to the transcript.",
           "enum": [
             "artifact",
             "IG_C_gene",
@@ -70,11 +70,12 @@
             "unitary_pseudogene",
             "unprocessed_pseudogene",
             "vault_RNA"
-          ]
+          ],
+          "example": "lncRNA"
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names such as chr8_KZ208915v1_fix.",
+          "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
@@ -98,7 +99,7 @@
         },
         "gene_name": {
           "type": "string",
-          "description": "GENCODE symbol of the gene this transcript belongs to, for example DDX11L2.",
+          "description": "GENCODE symbol of the gene this transcript belongs to.",
           "example": "DDX11L2"
         },
         "MANE_Select": {

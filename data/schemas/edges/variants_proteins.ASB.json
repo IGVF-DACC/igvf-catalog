@@ -11,7 +11,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Variant key, Ensembl protein ID, the concordance call and the ADASTRA cell type identifier, joined by underscores. For example NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520.",
+          "description": "Variant key, Ensembl protein ID, the concordance call and the ADASTRA cell type identifier, joined by underscores.",
           "example": "NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520"
         },
         "_from": {

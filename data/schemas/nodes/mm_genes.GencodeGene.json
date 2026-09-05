@@ -13,18 +13,18 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "Ensembl gene ID including its version suffix, for example ENSMUSG00000094271.1. The _key of this record is the same ID with the version removed.",
+          "description": "Ensembl gene ID including its version suffix. The _key of this record is the same ID with the version removed.",
           "example": "ENSMUSG00000094271.1",
           "pattern": "^ENSMUSG[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "gene_type": {
           "type": "string",
-          "description": "Biotype GENCODE assigns to the gene, such as protein_coding, lncRNA, or processed_pseudogene.",
+          "description": "Biotype GENCODE assigns to the gene.",
           "example": "protein_coding"
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names such as chr8_KZ208915v1_fix.",
+          "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
@@ -51,7 +51,7 @@
         },
         "symbol": {
           "type": "string",
-          "description": "GENCODE gene symbol, for example Gm13290. Carries the same value as name.",
+          "description": "GENCODE gene symbol. Carries the same value as name.",
           "example": "Gm13290"
         },
         "source": {
@@ -100,12 +100,12 @@
         },
         "version_number": {
           "type": "string",
-          "description": "Version suffix of the Ensembl gene ID, for example 1 for ENSMUSG00000094271.1.",
+          "description": "Version suffix of the Ensembl gene ID.",
           "example": "1"
         },
         "mgi": {
           "type": "string",
-          "description": "MGI ID for the gene, taken from the GENCODE annotation where present, otherwise resolved through the NCBI gene info file, for example MGI:3650357.",
+          "description": "MGI ID for the gene, taken from the GENCODE annotation where present, otherwise resolved through the NCBI gene info file.",
           "example": "MGI:3701990",
           "pattern": "^MGI:[0-9]+$"
         },
@@ -118,7 +118,7 @@
         },
         "entrez": {
           "type": "string",
-          "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:', for example ENTREZ:100287102.",
+          "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:'.",
           "example": "ENTREZ:100287102",
           "pattern": "^ENTREZ:[0-9]+$"
         }

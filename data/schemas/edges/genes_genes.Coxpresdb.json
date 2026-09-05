@@ -8,7 +8,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "The two NCBI Entrez gene IDs and the source name, joined by underscores, for example 80185_2222_coxpresdb.",
+          "description": "The two NCBI Entrez gene IDs and the source name, joined by underscores.",
           "example": "80185_2222_coxpresdb"
         },
         "_from": {

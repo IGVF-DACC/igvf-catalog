@@ -13,7 +13,7 @@
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID including its version suffix, for example ENSMUST00000192972.2. The _key of this record is the same ID with the version removed.",
+          "description": "Ensembl transcript ID including its version suffix. The _key of this record is the same ID with the version removed.",
           "example": "ENSMUST00000161581.2",
           "pattern": "^ENSMUST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
@@ -22,12 +22,12 @@
         },
         "transcript_type": {
           "type": "string",
-          "description": "Biotype GENCODE assigns to the transcript, such as protein_coding, lncRNA, or retained_intron.",
+          "description": "Biotype GENCODE assigns to the transcript.",
           "example": "lncRNA"
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names such as chr8_KZ208915v1_fix.",
+          "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1",
           "pattern": "^chr"
         },
@@ -52,7 +52,7 @@
         },
         "gene_name": {
           "type": "string",
-          "description": "GENCODE symbol of the gene this transcript belongs to, for example Gm13290.",
+          "description": "GENCODE symbol of the gene this transcript belongs to.",
           "example": "Gm1992"
         },
         "source": {

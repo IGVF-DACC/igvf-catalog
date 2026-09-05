@@ -9,7 +9,7 @@
     },
     "_from": {
       "type": "string",
-      "description": "Document handle of the genomic variant, for example variants/NC_000001.11:10202:C:A.",
+      "description": "Document handle of the genomic variant.",
       "example": "variants/NC_000001.11:10202:C:A",
       "pattern": "^variants/",
       "collections": [
@@ -18,7 +18,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Document handle of the coding variant this genomic variant produces, for example coding_variants/OR4F5_ENST00000641515_p.Met1Ala_c.1_3delinsGCA.",
+      "description": "Document handle of the coding variant this genomic variant produces.",
       "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
       "pattern": "^coding_variants/",
       "collections": [
@@ -50,12 +50,12 @@
     },
     "ref": {
       "type": "string",
-      "description": "Reference allele of the genomic variant, on the forward strand, for example CA.",
+      "description": "Reference allele of the genomic variant, on the forward strand.",
       "example": "CA"
     },
     "alt": {
       "type": "string",
-      "description": "Alternate allele of the genomic variant, on the forward strand, for example AC.",
+      "description": "Alternate allele of the genomic variant, on the forward strand.",
       "example": "AC"
     },
     "label": {

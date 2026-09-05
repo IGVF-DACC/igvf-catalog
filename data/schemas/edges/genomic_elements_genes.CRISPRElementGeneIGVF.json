@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores. For example CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA.",
+          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
         "_from": {

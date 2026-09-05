@@ -17,7 +17,7 @@
         },
         "uri": {
           "type": "string",
-          "description": "Link to the term's page on the source portal, for example an ENCODE biosample type.",
+          "description": "Link to the term's page on the source portal.",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         },
         "term_id": {

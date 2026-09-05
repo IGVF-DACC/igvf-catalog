@@ -37,8 +37,9 @@
         },
         "strand": {
           "type": "string",
-          "description": "Strand of the MPRA tile in the reference sequence design (e.g. +, -, or . when unknown). Distinguishes same coordinates on opposite strands.",
-          "enum": ["+", "-", "."]
+          "description": "Strand of the MPRA tile in the reference sequence design. Distinguishes same coordinates on opposite strands.",
+          "enum": ["+", "-", "."],
+          "example": "+"
         },
         "bed_score": {
           "type": "number",

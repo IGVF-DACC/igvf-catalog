@@ -6,7 +6,7 @@
   "properties": {
     "_from": {
       "type": "string",
-      "description": "Document handle of the transcript, for example transcripts/ENST00000641515.",
+      "description": "Document handle of the transcript.",
       "example": "transcripts/ENST00000456328 or transcripts/ENSMUST00000456328",
       "pattern": "^transcripts/ENST[0-9]{11}(?:_PAR_Y)?$|transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
@@ -16,7 +16,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Document handle of the protein the transcript encodes, for example proteins/ENSP00000493376.",
+      "description": "Document handle of the protein the transcript encodes.",
       "example": "proteins/ENSP00000456328",
       "pattern": "^proteins/ENSP[0-9]{11}$",
       "collections": [

@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Motif key and Ensembl protein ID joined by an underscore, for example TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519.",
+      "description": "Motif key and Ensembl protein ID joined by an underscore.",
       "example": "TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519"
     },
     "_from": {

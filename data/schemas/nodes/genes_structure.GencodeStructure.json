@@ -15,7 +15,7 @@
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names such as chr8_KZ208915v1_fix.",
+          "description": "Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "start": {
@@ -48,32 +48,32 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "Ensembl gene ID of the gene this feature belongs to, with the version suffix removed, for example ENSG00000290825. Genes in the pseudoautosomal region keep a _PAR_Y suffix.",
+          "description": "Ensembl gene ID of the gene this feature belongs to, with the version suffix removed. Genes in the pseudoautosomal region keep a _PAR_Y suffix.",
           "example": "ENSG00000290825"
         },
         "gene_name": {
           "type": "string",
-          "description": "GENCODE gene symbol, for example DDX11L2.",
+          "description": "GENCODE gene symbol.",
           "example": "DDX11L2"
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID of the transcript this feature belongs to, with the version suffix removed, for example ENST00000456328.",
+          "description": "Ensembl transcript ID of the transcript this feature belongs to, with the version suffix removed.",
           "example": "ENST00000456328"
         },
         "transcript_name": {
           "type": "string",
-          "description": "GENCODE transcript name, which is the gene symbol followed by a transcript index, for example DDX11L2-202.",
+          "description": "GENCODE transcript name, which is the gene symbol followed by a transcript index.",
           "example": "DDX11L2-202"
         },
         "exon_number": {
           "type": "string",
-          "description": "1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, for example 1_2 for the intron between exons 1 and 2.",
+          "description": "1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, joined by an underscore.",
           "example": "1"
         },
         "exon_id": {
           "type": "string",
-          "description": "Ensembl exon ID, including its version suffix, for example ENSE00002234944.1. The same exon ID recurs in every transcript that contains that exon, so it is not unique within the collection.",
+          "description": "Ensembl exon ID, including its version suffix. The same exon ID recurs in every transcript that contains that exon, so it is not unique within the collection.",
           "example": "ENSE00002234944.1"
         },
         "source": {

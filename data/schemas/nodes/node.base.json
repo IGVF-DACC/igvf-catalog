@@ -7,19 +7,21 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists (for example the Ensembl gene ID ENSG00000197976 for genes), otherwise a composite of the fields that make the record unique (for example chr_pos_ref_alt_assembly for a variant)."
+      "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists, otherwise a composite of the fields that make the record unique."
     },
     "name": {
       "type": "string",
-      "description": "Human-readable display label for this record, such as a gene symbol, ontology term name, or drug name. Not guaranteed to be unique."
+      "description": "Human-readable display label for this record. Not guaranteed to be unique.",
+      "example": "TP53"
     },
     "source": {
       "type": "string",
-      "description": "The source of this record, such as IGVF, ENCODE, GENCODE, or Cellosaurus."
+      "description": "The source of this record.",
+      "example": "IGVF"
     },
     "source_url": {
       "type": "string",
-      "description": "Link to the specific upstream record or file this data was loaded from, for example https://data.igvf.org/tabular-files/IGVFFI0332UGDD/."
+      "description": "Link to the specific upstream record or file this data was loaded from."
     }
   },
   "required": [

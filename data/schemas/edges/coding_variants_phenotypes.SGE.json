@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores. For example PALB2_ENST00000261584_p.Met1!_c.1A-C_NCIT_C16407_IGVFFI9974PZRX.",
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores.",
           "example": "PALB2_ENST00000261584_p.Met1!_c.1A-C_NCIT_C16407_IGVFFI9974PZRX"
         },
         "_from": {
@@ -27,11 +27,12 @@
         },
         "variants": {
           "type": "string",
-          "description": "Handle of the variants record for the genomic variant this coding variant was called from, for example variants/NC_000016.10:23603561:G:A.",
+          "description": "Handle of the variants record for the genomic variant this coding variant was called from.",
           "pattern": "^variants/",
           "collections": [
             "variants"
-          ]
+          ],
+          "example": "variants/NC_000016.10:23603561:G:A"
         },
         "source": {
           "enum": [
@@ -97,21 +98,24 @@
             "string",
             "null"
           ],
-          "description": "Exon of the target gene the variant lies in, written as GENE_X followed by the exon number, for example PALB2_X13. A non-exonic variant carries the exon of the SGE target whose genomic context includes it."
+          "description": "Exon of the target gene the variant lies in, written as GENE_X followed by the exon number. A non-exonic variant carries the exon of the SGE target whose genomic context includes it.",
+          "example": "PALB2_X13"
         },
         "target": {
           "type": [
             "string",
             "null"
           ],
-          "description": "SGE library the variant was assayed in, for example PALB2_X13A. Equal to exon where a single library covers the whole exon; where an exon is tiled by several libraries, a letter is appended, so SFPQ_X7B is the second tile of exon 7 of SFPQ."
+          "description": "SGE library the variant was assayed in. Equal to exon where a single library covers the whole exon; where an exon is tiled by several libraries, a letter is appended, so SFPQ_X7B is the second tile of exon 7 of SFPQ.",
+          "example": "PALB2_X13A"
         },
         "consequence": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Most severe consequence VEP annotates for the variant against the MANE Select transcript, for example missense_variant."
+          "description": "Most severe consequence VEP annotates for the variant against the MANE Select transcript.",
+          "example": "missense_variant"
         },
         "score": {
           "type": "number",
@@ -134,14 +138,16 @@
             "string",
             "null"
           ],
-          "description": "Amino acid change the variant introduces into the reference sequence, in one-letter form, for example P1153L."
+          "description": "Amino acid change the variant introduces into the reference sequence, in one-letter form.",
+          "example": "P1153L"
         },
         "hgvs_p": {
           "type": [
             "string",
             "null"
           ],
-          "description": "HGVS protein-level description of the variant against its Ensembl protein, for example ENSP00000261584.4:p.Pro1153Leu."
+          "description": "HGVS protein-level description of the variant against its Ensembl protein.",
+          "example": "ENSP00000261584.4:p.Pro1153Leu"
         },
         "functional_consequence": {
           "type": [
