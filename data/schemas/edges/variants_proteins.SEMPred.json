@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variants to proteins edge",
+          "description": "Variant key, Ensembl protein ID and source file accession joined by underscores.",
           "example": "NC_000010.11:28801840:T:C_ENSP00000368867_IGVFFI0005WRQP"
         },
         "_from": {
@@ -43,15 +43,15 @@
         },
         "biosample_term": {
           "type": ["string", "null"],
-          "description": "The biosample term of the variants to proteins edge"
+          "description": "Ontology term for the sample this applies to, taken from the file's fileset metadata. Null when the fileset lists no sample. SEMpl predictions are biosample-agnostic."
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "The biological context of the variants to proteins edge"
+          "description": "Plain-language summary of the sample this applies to, taken from the file's fileset metadata. Null when the fileset carries no summary. SEMpl predictions are biosample-agnostic."
         },
         "motif": {
           "type": "string",
-          "description": "The motif of the variants to proteins edge",
+          "description": "Handle of the motifs record for the SNP Effect Matrix this prediction was made with. Its key is the transcription factor name followed by _SEMpl.",
           "pattern": "^motifs/",
           "collections": [
             "motifs"
@@ -59,38 +59,38 @@
         },
         "ref_seq_context": {
           "type": "string",
-          "description": "The ref seq context of the variants to proteins edge",
+          "description": "Coordinate range on the reference genome holding the highest SEM score with the reference allele.",
           "example": "chr10:28801830-28801840"
         },
         "alt_seq_context": {
           "type": "string",
-          "description": "The alt seq context of the variants to proteins edge",
+          "description": "Coordinate range on the reference genome holding the highest SEM score with the alternate allele. For an indel, apply the change described by the variant identifier to this reference range to recreate the alternate sequence.",
           "example": "chr10:28801830-28801840"
         },
         "ref_score": {
           "type": "number",
-          "description": "The ref score of the variants to proteins edge"
+          "description": "Predicted binding score at the reference allele: the transcription factor's affinity for the reference sequence, relative to its average binding affinity."
         },
         "alt_score": {
           "type": "number",
-          "description": "The alt score of the variants to proteins edge"
+          "description": "Predicted binding score at the alternate allele, on the same scale as ref_score."
         },
         "variant_effect_score": {
           "type": "number",
-          "description": "The variant effect score of the variants to proteins edge"
+          "description": "log2 ratio of alt_score to ref_score. Positive values mean increased preference for the alternate allele, negative values increased preference for the reference allele."
         },
         "SEMpl_annotation": {
           "type": "string",
-          "description": "The SEMpl annotation of the variants to proteins edge",
+          "description": "Predicted effect of the variant on binding, assigned by comparing ref_score and alt_score against 2 raised to SEMpl_baseline: no_binding when neither allele binds, binding_unchanged, binding_increased, binding_decreased, binding_created when only the alternate allele binds, or binding_ablated when only the reference allele binds.",
           "example": "binding_created"
         },
         "SEMpl_baseline": {
           "type": "number",
-          "description": "The SEMpl baseline of the variants to proteins edge"
+          "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers: a baseline where binding is not expected to occur. Binding is called only for scores above 2 raised to this value. Constant across every variant scored with the same SNP Effect Matrix."
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the variants to proteins edge",
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"
@@ -108,7 +108,7 @@
         },
         "biological_process": {
           "type": "string",
-          "description": "The biological process of the variants to proteins edge",
+          "description": "Gene Ontology term for the process this edge represents, as a handle into ontology_terms. GO_0051101 is 'regulation of DNA binding'.",
           "enum": [
             "ontology_terms/GO_0051101"
           ]

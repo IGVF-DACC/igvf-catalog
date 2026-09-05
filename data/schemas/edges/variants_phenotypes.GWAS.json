@@ -159,7 +159,7 @@
         },
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edge, generated as a hash of the source and target node IDs",
+          "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
         "study": {

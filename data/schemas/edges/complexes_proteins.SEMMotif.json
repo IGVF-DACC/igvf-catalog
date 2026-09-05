@@ -5,19 +5,20 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the complexes to proteins edge"
+      "description": "The 'SEMpl_'-prefixed complex key and the Ensembl protein ID, joined by an underscore."
     },
     "_from": {
       "type": "string",
-      "description": "The from node of the complexes to proteins edge",
+      "description": "Document handle of the transcription factor complex.",
       "pattern": "^complexes/SEMpl_",
       "collections": [
         "complexes"
-      ]
+      ],
+      "example": "complexes/SEMpl_TAL1:TCF4"
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the complexes to proteins edge",
+      "description": "Document handle of one protein subunit of that complex.",
       "pattern": "^proteins/",
       "collections": [
         "proteins"
@@ -25,28 +26,28 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the complexes to proteins edge",
+      "description": "Predicate describing the relationship in the _from to _to direction: the complex contains this protein.",
       "enum": [
         "contains"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the complexes to proteins edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction: the protein belongs to this complex.",
       "enum": [
         "belongs to"
       ]
     },
     "source": {
       "type": "string",
-      "description": "The source of the complexes to proteins edge",
+      "description": "The dataset this edge was loaded from.",
       "enum": [
         "IGVF"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "The source url of the complexes to proteins edge",
+      "description": "Link to the IGVF model file this edge was derived from.",
       "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
       "pattern": "^https://data.igvf.org/model-files/"
     }

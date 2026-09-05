@@ -5,7 +5,8 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the variant to drug edge"
+      "description": "PharmGKB variant annotation ID and drug accession joined by an underscore.",
+      "example": "1450377668_PA450373"
     },
     "_from": {
       "type": "string",

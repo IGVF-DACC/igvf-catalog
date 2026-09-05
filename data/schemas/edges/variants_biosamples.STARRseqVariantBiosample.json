@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variants to biosamples edge",
+          "description": "Variant key, biosample ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:14772:C:T_EFO_0002067_IGVFFI0099XJHU"
         },
         "_from": {
@@ -57,7 +57,7 @@
         },
         "postProbEffect": {
           "type": "number",
-          "description": "PostProbEffect for the variants to biosamples edge"
+          "description": "Posterior probability that the variant has a regulatory effect."
         },
         "significant": {
           "type": "boolean",
@@ -65,11 +65,11 @@
         },
         "CI_lower_95": {
           "type": "number",
-          "description": "CI lower 95 for the variants to biosamples edge"
+          "description": "Lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
           "type": "number",
-          "description": "CI upper 95 for the variants to biosamples edge"
+          "description": "Upper bound of a 95% interval for the variant effect."
         },
         "label": {
           "enum": [
@@ -97,7 +97,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the variants to biosamples edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI7664HHXI",
           "pattern": "^files_filesets/",
           "collections": [
@@ -106,12 +106,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the variants to biosamples edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the variants to biosamples edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "ontology_terms/EFO_0002067",
           "pattern": "^ontology_terms/"
         },
@@ -123,7 +123,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Treatments term ids for the variants to biosamples edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
         }
       },
       "required": [

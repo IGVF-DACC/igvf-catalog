@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edge"
+          "description": "Variant key, genomic element key, strand token, biosample term and source file accession joined by underscores, hashed with SHA-256 when the composite would exceed the key length limit."
         },
         "_from": {
           "example": "variants/NC_000009.12:136248440:T:C",
@@ -37,56 +37,57 @@
         },
         "strand": {
           "type": "string",
-          "description": "Strand of the MPRA tile in the reference sequence design (e.g. +, -, or . when unknown). Distinguishes same coordinates on opposite strands.",
-          "enum": ["+", "-", "."]
+          "description": "Strand of the MPRA tile in the reference sequence design. Distinguishes same coordinates on opposite strands.",
+          "enum": ["+", "-", "."],
+          "example": "+"
         },
         "bed_score": {
           "type": "number",
-          "description": "Bed score for the edge"
+          "description": "Score column of the source BED file, which sets how dark the feature is drawn in a genome browser, on a scale of 0 to 1000."
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2FC for the edge"
+          "description": "Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space."
         },
         "DNA_count_ref": {
           "type": "number",
-          "description": "DNA count ref for the edge"
+          "description": "Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
         "RNA_count_ref": {
           "type": "number",
-          "description": "RNA count ref for the edge"
+          "description": "Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
         "DNA_count_alt": {
           "type": "number",
-          "description": "DNA count alt for the edge"
+          "description": "Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "RNA_count_alt": {
           "type": "number",
-          "description": "RNA count alt for the edge"
+          "description": "Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Minus log10 P value for the edge"
+          "description": "-log10 of the P-value for the variant effect. Null when the source file does not report one."
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Minus log10 Q value for the edge"
+          "description": "-log10 of the FDR-adjusted P-value (Q-value) for the variant effect. Null when the source file does not report one."
         },
         "significant": {
           "type": "boolean",
-          "description": "True if this edge met the significance threshold (e.g. neg_log10_pvalue_adj >= 1)."
+          "description": "Whether the variant effect passes the significance threshold applied at load time: a neg_log10_pvalue_adj of 1 or more, equivalent to an FDR of 0.1 or lower. False when no adjusted P-value is available."
         },
         "postProbEffect": {
           "type": "number",
-          "description": "Post probability effect for the edge"
+          "description": "Posterior probability that the variant has a regulatory effect."
         },
         "CI_lower_95": {
           "type": "number",
-          "description": "CI lower 95 for the edge"
+          "description": "Lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
           "type": "number",
-          "description": "CI upper 95 for the edge"
+          "description": "Upper bound of a 95% interval for the variant effect."
         },
         "class": {
           "enum": [
@@ -124,7 +125,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI1323RCIE",
           "pattern": "^files_filesets/",
           "collections": [
@@ -133,12 +134,12 @@
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "Biological context for the edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
           "example": "ontology_terms/UBERON_0002048"
         },
         "treatments_term_ids": {
@@ -149,7 +150,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Treatments term ids for the edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
         }
       },
       "required": [

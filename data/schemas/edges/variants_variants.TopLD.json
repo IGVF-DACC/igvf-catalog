@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique key for the variant to variant edge",
+      "description": "SHA-256 hash of the two variant keys, each followed by its allele pair, together with the ancestry group.",
       "example": "NC_000001.11:911847:C:T_C:T_NC_000001.11:929838:G:A_G:A_EAS"
     },
     "_from": {

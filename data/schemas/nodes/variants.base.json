@@ -5,55 +5,62 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome of the variant"
+      "description": "Chromosome the variant lies on, prefixed with 'chr'.",
+      "example": "chr1"
     },
     "pos": {
       "type": "number",
-      "description": "Position of the variant"
+      "description": "Position of the variant on the chromosome, 0-based."
     },
     "rsid": {
       "type": "array",
-      "description": "RSID of the variant"
+      "description": "dbSNP reference SNP identifiers for this allele. An array because several rsIDs can normalize to the same allele.",
+      "example": [
+        "rs6054257"
+      ]
     },
     "ref": {
       "type": "string",
-      "description": "Reference allele of the variant"
+      "description": "Reference allele sequence at this position, empty for a pure insertion."
     },
     "alt": {
       "type": "string",
-      "description": "Alternate allele of the variant"
+      "description": "Alternate allele sequence, empty for a pure deletion."
     },
     "qual": {
       "type": "string",
-      "description": "Quality of the variant"
+      "description": "Variant call quality score carried over from the QUAL column of the source VCF.",
+      "example": "50110.4"
     },
     "variation_type": {
       "type": "string",
-      "description": "Variation type of the variant"
+      "description": "Class of sequence change, derived by comparing the reference and alternate allele lengths: SNP, insertion, deletion, or deletion-insertion."
     },
     "annotations": {
       "type": "object",
-      "description": "Annotations of the variant"
+      "description": "Source-specific annotations parsed from the INFO column of the source VCF, including population allele frequencies keyed by cohort."
     },
     "spdi": {
       "type": "string",
-      "description": "SPDI of the variant"
+      "description": "Normalized SPDI expression identifying the allele, written as RefSeq accession, 0-based position, deleted sequence and inserted sequence.",
+      "example": "NC_000001.11:10887495:C:T"
     },
     "hgvs": {
       "type": "string",
-      "description": "HGVS of the variant"
+      "description": "HGVS genomic expression for the allele.",
+      "example": "NC_000067.7:g.3050715_3050716insG"
     },
     "vrs_digest": {
       "type": "string",
-      "description": "VRS digest of the variant"
+      "description": "GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele."
     },
     "ca_id": {
       "type": "string",
-      "description": "CA ID of the variant"
+      "description": "Canonical allele identifier assigned by the ClinGen Allele Registry."
     },
     "organism": {
       "type": "string",
-      "description": "Organism of the variant"
+      "description": "Species the variant was called in, either Homo sapiens against GRCh38 or Mus musculus against GRCm39."
     }
   },
   "required": [

@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the variant to coding variant edge",
+      "description": "Variant key and coding variant key joined by an underscore. Hashed with SHA-256 when the composite would exceed the 254-character key limit.",
       "example": "NC_000001.11:10202:C:A_OR4F5_ENST00000641515_p.Met1!_c.1A-C"
     },
     "_from": {

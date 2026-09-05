@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to gene edge"
+          "description": "Variant key, Ensembl gene ID and source file accession joined by underscores."
         },
         "_from": {
           "example": "variants/NC_000001.11:10000:T:A",
@@ -20,7 +20,7 @@
           ]
         },
         "_to": {
-          "example": "genes/ENSG00000187583.10",
+          "example": "genes/ENSG00000187583",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
@@ -42,21 +42,21 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of the p-value for the variant to gene edge"
+          "description": "-log10 of the uncorrected nominal P-value for the variant's effect on the gene. Null for the CRISPR-Millipede base-editing files, which report a posterior inclusion probability instead."
         },
         "neg_log10_pvalue_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "FDR nlog10 for the variant to gene edge"
+          "description": "-log10 of the P-value after correction for multiple testing, by the method the source file names. Null for the CRISPR-Millipede base-editing files, which report a posterior inclusion probability instead."
         },
         "power": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Power for the variant to gene edge"
+          "description": "Power to detect an effect of the size observed, from 0 to 1. Null for the CRISPR-Millipede base-editing files, which report a posterior inclusion probability instead."
         },
         "posterior_inclusion_probability": {
           "type": [
@@ -87,30 +87,30 @@
           ]
         },
         "name": {
-          "description": "Name for the variant to gene edge",
+          "description": "Predicate describing the relationship in the _from to _to direction; always 'modulates expression of' for these CRISPR variant-to-gene measurements.",
           "enum": [
             "modulates expression of"
           ]
         },
         "inverse_name": {
-          "description": "Inverse name for the variant to gene edge",
+          "description": "Predicate describing the same relationship in the _to to _from direction; always 'expression modulated by'.",
           "enum": [
             "expression modulated by"
           ]
         },
         "source": {
-          "description": "Source for the variant to gene edge",
+          "description": "The dataset this measurement was loaded from; always IGVF for these CRISPR screens.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "Source URL for the variant to gene edge",
+          "description": "Link to the IGVF tabular file this measurement was read from.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0524YUIL/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the variant to gene edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/"
         },
@@ -133,7 +133,7 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the variant to gene edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
           "items": {
             "type": "string"
           },
@@ -141,7 +141,7 @@
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the variant to gene edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "ontology_terms/EFO_0002067",
           "pattern": "^ontology_terms/"
         },
@@ -150,7 +150,7 @@
             "array",
             "null"
           ],
-          "description": "Treatments term IDs for the variant to gene edge",
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied.",
           "items": {
             "type": "string"
           }

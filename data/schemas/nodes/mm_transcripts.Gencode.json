@@ -9,50 +9,51 @@
       "properties": {
         "_key": {
           "pattern": "^ENSMUST[0-9]{11}(?:_PAR_Y)?$",
-          "example": "ENSMUST00000456328"
+          "example": "ENSMUST00000161581"
         },
         "transcript_id": {
           "type": "string",
-          "description": "The unique ENSEMBL transcript ID with version number",
-          "example": "ENSMUST00000456328.2",
+          "description": "Ensembl transcript ID including its version suffix. The _key of this record is the same ID with the version removed.",
+          "example": "ENSMUST00000161581.2",
           "pattern": "^ENSMUST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "name": {
-          "example": "DDX11L2-202"
+          "example": "Gm1992-201"
         },
         "transcript_type": {
           "type": "string",
-          "description": "The type of transcript",
+          "description": "Biotype GENCODE assigns to the transcript.",
           "example": "lncRNA"
         },
         "chr": {
           "type": "string",
-          "description": "The chromosome name",
-          "example": "chr9",
+          "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
+          "example": "chr1",
           "pattern": "^chr"
         },
         "start": {
           "type": "number",
-          "description": "The start position of the transcript",
-          "example": 11869
+          "description": "Start of the transcript, 0-based and inclusive.",
+          "example": 3536809
         },
         "end": {
           "type": "number",
-          "description": "The end position of the transcript",
-          "example": 14409
+          "description": "End of the transcript, 0-based and exclusive.",
+          "example": 3583776
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the transcript",
+          "description": "Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
             "+",
             "-"
-          ]
+          ],
+          "example": "+"
         },
         "gene_name": {
           "type": "string",
-          "description": "The name of the gene",
-          "example": "DDX11L2"
+          "description": "GENCODE symbol of the gene this transcript belongs to.",
+          "example": "Gm1992"
         },
         "source": {
           "enum": [
@@ -61,7 +62,7 @@
         },
         "version": {
           "type": "string",
-          "description": "The version of the transcript annotation",
+          "description": "GENCODE release the annotation was taken from.",
           "enum": [
             "vM36"
           ]
@@ -73,7 +74,7 @@
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the transcript",
+          "description": "Species this annotation describes.",
           "enum": [
             "Mus musculus"
           ]
