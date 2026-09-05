@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to phenotype edge",
+          "description": "Variant key, phenotype ontology term and source file accession joined by underscores. For example NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD.",
           "example": "NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD"
         },
         "_from": {
@@ -29,7 +29,7 @@
         },
         "score": {
           "type": "number",
-          "description": "Score for the variant to phenotype edge"
+          "description": "cV2F prediction value for the variant, a continuous score for how likely the variant is to be functional. Only variants passing the 0.75 threshold are loaded."
         },
         "source": {
           "enum": [
@@ -52,7 +52,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the variant to phenotype edge",
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/",
           "collections": [
@@ -64,7 +64,7 @@
             "string",
             "null"
           ],
-          "description": "Biosample term for the variant to phenotype edge",
+          "description": "Ontology term for the sample this applies to, taken from the file's fileset metadata. Null when the fileset lists no sample. Null for the sample-agnostic prediction file.",
           "example": "ontology_terms/UBERON_0002048",
           "pattern": "^ontology_terms/"
         },
@@ -88,7 +88,7 @@
             "string",
             "null"
           ],
-          "description": "Biological context for the variant to phenotype edge",
+          "description": "Plain-language summary of the sample this applies to, taken from the file's fileset metadata. Null when the fileset carries no summary. Null for the sample-agnostic prediction file.",
           "example": "lung"
         }
       },

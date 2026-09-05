@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for variants_diseases_genes edge"
+      "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
     },
     "_from": {
       "type": "string",

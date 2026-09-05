@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to phenotype edge",
+          "description": "Genomic element key and phenotype ontology term joined by an underscore, for example CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477.",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477"
         },
         "_from": {
@@ -33,11 +33,11 @@
         },
         "p_value": {
           "type": "number",
-          "description": "Phenotype association p-value for the genomic element"
+          "description": "P-value for the element's association with the screened phenotype."
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the phenotype p-value"
+          "description": "-log10 of p_value, capped at 240 where the source file reports a p-value of exactly 0."
         },
         "significant": {
           "type": "boolean",
@@ -45,7 +45,7 @@
         },
         "num_guides": {
           "type": "number",
-          "description": "Number of guides targeting the genomic element"
+          "description": "Number of guides targeting the element in the screen."
         },
         "num_guides_hit": {
           "type": "number",
@@ -92,7 +92,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to phenotype edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI5135QZCS",
           "pattern": "^files_filesets/",
           "collections": [
@@ -101,12 +101,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to phenotype edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "human HFF-1 cell line from donor(s) IGVFDO0058YJWC"
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to phenotype edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "ontology_terms/CLO_0003730",
           "pattern": "^ontology_terms/"
         },
@@ -115,7 +115,7 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the genomic element to phenotype edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
         },
         "name": {
           "enum": [

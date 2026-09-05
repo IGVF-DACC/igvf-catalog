@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "The unique key of the gene gene edge"
+          "description": "SHA-256 hash of the two Ensembl gene IDs together with the supporting PubMed IDs."
         },
         "_from": {
           "example": "genes/ENSG00000129696",

@@ -29,7 +29,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Class of the element as reported by the model: a promoter, genic where it falls inside a gene body, or intergenic.",
           "enum": [
             "genic",
             "intergenic",
@@ -48,7 +48,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Handle of the files_filesets record for the prediction file this element was read from.",
           "example": "files_filesets/IGVFFI5648GWQX",
           "pattern": "^files_filesets/"
         }

@@ -245,8 +245,8 @@
         },
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edge, generated as a SHA-256 hash of the variant id, phenotype ontology term, study id, and source",
-          "example": "ab5073743b11599ecf8be46414f800eb1ff7b3b5868b011f10d38d125f2f93ee"
+          "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
         "study": {
           "type": "string",

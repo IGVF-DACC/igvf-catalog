@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/coding_var_1",
@@ -47,7 +47,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the coding variant to phenotype edge",
+          "description": "Handle of the files_filesets record for the IGVF file this measurement was read from.",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/",
           "collections": [
@@ -56,7 +56,7 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the coding variant to phenotype edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
           "items": {
             "type": "string"
           },
@@ -64,7 +64,7 @@
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the coding variant to phenotype edge",
+          "description": "Ontology term for the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
           "items": {
             "type": "string"
           },
@@ -90,35 +90,35 @@
             "number",
             "null"
           ],
-          "description": "Score for the coding variant to phenotype edge"
+          "description": "Overall VAMP-seq abundance score for the variant, the mean of its replicate measurements. Normalized so that the median synonymous variant scores 1 and the median nonsense variant scores 0, so lower scores mean reduced abundance of the variant protein."
         },
         "standard_error": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Standard error for the coding variant to phenotype edge"
+          "description": "Standard error of the overall score."
         },
         "rep1_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Rep1 score for the coding variant to phenotype edge"
+          "description": "Abundance score calculated for replicate 1."
         },
         "rep2_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Rep2 score for the coding variant to phenotype edge"
+          "description": "Abundance score calculated for replicate 2."
         },
         "rep3_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Rep3 score for the coding variant to phenotype edge"
+          "description": "Abundance score calculated for replicate 3."
         }
       },
       "required": [

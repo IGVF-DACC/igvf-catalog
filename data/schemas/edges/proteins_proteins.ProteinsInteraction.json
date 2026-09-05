@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the proteins interaction edge"
+          "description": "SHA-256 hash of the two Ensembl protein IDs, the PSI-MI detection method code and the supporting PubMed IDs."
         },
         "_from": {
           "example": "proteins/ENSP00000340898",

@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/coding_var_1",
@@ -47,7 +47,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the coding variant to phenotype edge",
+          "description": "Handle of the files_filesets record for the file this measurement was read from.",
           "example": "files_filesets/IGVFFI9499PJFU",
           "pattern": "^files_filesets/",
           "collections": [
@@ -56,12 +56,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the coding variant to phenotype edge",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "U2OS"
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the coding variant to phenotype edge",
+          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
           "example": "ontology_terms/EFO_0002869"
         },
         "method": {

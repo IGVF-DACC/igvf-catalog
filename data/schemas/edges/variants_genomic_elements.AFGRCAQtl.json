@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to genomic element edge",
+          "description": "Variant key, genomic element key and the source name AFGR joined by underscores. For example NC_000001.11:903006:T:C_accessible_dna_element_1_906596_907043_GRCh38_AFGR.",
           "example": "NC_000001.11:903006:T:C_accessible_dna_element_1_906596_907043_GRCh38_AFGR"
         },
         "_from": {

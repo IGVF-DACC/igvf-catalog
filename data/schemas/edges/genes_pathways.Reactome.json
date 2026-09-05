@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "The unique key of the gene pathway edge",
+      "description": "Ensembl gene ID and Reactome pathway ID joined by an underscore, for example ENSG00000290825_R-HSA-1971475.",
       "example": "ENSG00000290825_R-HSA-1971475"
     },
     "_from": {

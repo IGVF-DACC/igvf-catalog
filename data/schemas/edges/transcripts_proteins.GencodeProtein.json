@@ -6,7 +6,7 @@
   "properties": {
     "_from": {
       "type": "string",
-      "description": "The from node of the transcript protein edge",
+      "description": "Document handle of the transcript, for example transcripts/ENST00000641515.",
       "example": "transcripts/ENST00000456328 or transcripts/ENSMUST00000456328",
       "pattern": "^transcripts/ENST[0-9]{11}(?:_PAR_Y)?$|transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
@@ -16,7 +16,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the transcript protein edge",
+      "description": "Document handle of the protein the transcript encodes, for example proteins/ENSP00000493376.",
       "example": "proteins/ENSP00000456328",
       "pattern": "^proteins/ENSP[0-9]{11}$",
       "collections": [
@@ -25,14 +25,14 @@
     },
     "source": {
       "type": "string",
-      "description": "The source of the transcript protein edge",
+      "description": "The dataset this edge was loaded from.",
       "enum": [
         "GENCODE"
       ]
     },
     "version": {
       "type": "string",
-      "description": "The version of the transcript protein edge",
+      "description": "GENCODE release the annotation was taken from.",
       "enum": [
         "v43",
         "vM36"
@@ -40,7 +40,7 @@
     },
     "source_url": {
       "type": "string",
-      "description": "The source URL of the transcript protein edge",
+      "description": "Link to the GENCODE annotation file this edge was derived from.",
       "enum": [
         "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz",
         "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
@@ -48,7 +48,7 @@
     },
     "organism": {
       "type": "string",
-      "description": "The organism of the transcript protein edge",
+      "description": "Species this annotation describes.",
       "enum": [
         "Homo sapiens",
         "Mus musculus"
@@ -56,21 +56,21 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the transcript protein edge",
+      "description": "Predicate describing the relationship in the _from to _to direction: the transcript translates to this protein.",
       "enum": [
         "translates to"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the transcript protein edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction: the protein is translated from this transcript.",
       "enum": [
         "translated from"
       ]
     },
     "biological_process": {
       "type": "string",
-      "description": "The biological process of the transcript protein edge",
+      "description": "Gene Ontology term for the process this edge represents, as a handle into ontology_terms. GO_0006412 is 'translation'.",
       "enum": [
         "ontology_terms/GO_0006412"
       ]

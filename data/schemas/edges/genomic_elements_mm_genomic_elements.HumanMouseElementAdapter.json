@@ -6,7 +6,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the genomic element"
+      "description": "The human and mouse genomic element keys joined by an underscore."
     },
     "_from": {
       "type": "string",

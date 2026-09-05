@@ -14,12 +14,12 @@
         },
         "MANE_Select": {
           "type": "boolean",
-          "description": "Whether the protein is a MANE Select protein",
+          "description": "Whether GENCODE tags the transcript this protein is translated from as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.",
           "example": true
         },
         "protein_id": {
           "type": "string",
-          "description": "The unique ENSEMBL protein ID with version number",
+          "description": "Ensembl protein ID including its version suffix, for example ENSP00000493376.2. The _key of this record is the same ID with the version removed.",
           "example": "ENSP00000493376.2 or ENSMUSP00000077785.1",
           "pattern": "^ENSP[0-9]{11}\\.[0-9]+|ENSMUSP[0-9]{11}\\.[0-9]+$"
         },
@@ -30,7 +30,7 @@
         },
         "version": {
           "type": "string",
-          "description": "The version of the protein annotation",
+          "description": "GENCODE release the annotation was taken from.",
           "enum": [
             "v43",
             "vM36"
@@ -44,7 +44,7 @@
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the protein",
+          "description": "Species this annotation describes.",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
@@ -52,7 +52,7 @@
         },
         "uniprot_collection": {
           "type": "string",
-          "description": "The uniprot collection of the protein",
+          "description": "Which section of UniProtKB the mapped entries come from: Swiss-Prot for manually reviewed entries, TrEMBL for automatically annotated ones. Swiss-Prot wins when a protein maps into both.",
           "enum": [
             "Swiss-Prot",
             "TrEMBL"
@@ -60,32 +60,32 @@
         },
         "uniprot_ids": {
           "type": "array",
-          "description": "The uniprot ids of the protein",
+          "description": "UniProtKB accessions mapped to this Ensembl protein, which may carry an isoform suffix such as Q6UWL6-5. Usually a single accession; mouse proteins sometimes map to several.",
           "items": {
             "type": "string"
           }
         },
         "uniprot_names": {
           "type": "array",
-          "description": "The names of the protein from UniProt",
+          "description": "UniProtKB entry names of the mapped accessions, for example CDK2_HUMAN.",
           "items": {
             "type": "string"
           }
         },
         "dbxrefs": {
           "type": "array",
-          "description": "The dbxrefs of the protein",
+          "description": "Cross-references to other databases, taken from the mapped UniProtKB entries, deduplicated across them and sorted by database name.",
           "items": {
             "type": "object",
             "properties": {
               "name": {
                 "type": "string",
-                "description": "The name of the dbxref",
+                "description": "Database the cross-reference points to, for example Ensembl, RefSeq, or PDB.",
                 "example": "Ensembl"
               },
               "id": {
                 "type": "string",
-                "description": "The id of the dbxref",
+                "description": "Identifier of this protein in that database.",
                 "example": "ENST00000641515.2"
               }
             }
@@ -93,7 +93,7 @@
         },
         "uniprot_full_names": {
           "type": "array",
-          "description": "The uniprot full names of the protein",
+          "description": "Recommended full protein names from the mapped UniProtKB entries, falling back to the submitted name where no recommended name exists.",
           "items": {
             "type": "string"
           }

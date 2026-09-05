@@ -5,11 +5,11 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the motif protein edge"
+      "description": "Motif key and Ensembl protein ID joined by an underscore."
     },
     "_from": {
       "type": "string",
-      "description": "The from node of the motif protein edge",
+      "description": "Document handle of the motif, whose key is the transcription factor name followed by _SEMpl.",
       "pattern": "^motifs/",
       "collections": [
         "motifs"
@@ -17,7 +17,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the motif protein edge",
+      "description": "Document handle of the transcription factor protein the motif models binding for.",
       "pattern": "^proteins/",
       "collections": [
         "proteins"
@@ -25,55 +25,55 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the motif protein edge",
+      "description": "Predicate describing the relationship in the _from to _to direction: the motif is used by this protein.",
       "enum": [
         "is used by"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the motif protein edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction: the protein uses this motif.",
       "enum": [
         "uses"
       ]
     },
     "biological_process": {
       "type": "string",
-      "description": "The biological process of the motif protein edge",
+      "description": "Gene Ontology term for the process this edge represents, as a handle into ontology_terms. GO_0003677 is 'DNA binding'.",
       "enum": [
         "ontology_terms/GO_0003677"
       ]
     },
     "source": {
       "type": "string",
-      "description": "The source of the motif protein edge",
+      "description": "The dataset this edge was loaded from.",
       "enum": [
         "IGVF"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "The source url of the motif protein edge",
+      "description": "Link to the IGVF model file this edge was derived from.",
       "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
       "pattern": "^https://data.igvf.org/model-files/"
     },
     "class": {
       "type": "string",
-      "description": "The class of the motif protein edge, from the associated files_filesets record",
+      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata: 'observed data' for a direct experimental measurement.",
       "enum": [
         "observed data"
       ]
     },
     "method": {
       "type": "string",
-      "description": "The method of the motif protein edge, from the associated files_filesets record",
+      "description": "Model or pipeline that produced this record, taken from the file's fileset metadata.",
       "enum": [
         "SEMpl"
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the motif protein edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI5279OTVZ",
       "pattern": "^files_filesets/",
       "collections": [
