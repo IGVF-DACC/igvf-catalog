@@ -5,7 +5,8 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome the element lies on, prefixed with 'chr', for example chr1."
+      "description": "Chromosome the element lies on, prefixed with 'chr'.",
+      "example": "chr1"
     },
     "start": {
       "type": "number",
@@ -21,11 +22,13 @@
     },
     "type": {
       "type": "string",
-      "description": "Category of element, such as accessible dna elements, candidate cis regulatory element, or tested elements."
+      "description": "Category of element.",
+      "example": "tested elements"
     },
     "method": {
       "type": "string",
-      "description": "The assay or pipeline that defined the element, such as MPRA, CRISPR screen, caQTL, or scE2G."
+      "description": "The assay or pipeline that defined the element.",
+      "example": "MPRA"
     }
   },
   "required": [

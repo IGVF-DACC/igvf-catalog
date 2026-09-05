@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Complex accession and ontology term key joined by an underscore, for example CPX-1_GO_0071144.",
+      "description": "Complex accession and ontology term key joined by an underscore.",
       "example": "CPX-1_GO_0071144"
     },
     "_from": {

@@ -5,7 +5,8 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome the variant lies on, prefixed with 'chr', for example chr1."
+      "description": "Chromosome the variant lies on, prefixed with 'chr'.",
+      "example": "chr1"
     },
     "pos": {
       "type": "number",
@@ -13,7 +14,10 @@
     },
     "rsid": {
       "type": "array",
-      "description": "dbSNP reference SNP identifiers for this allele, for example rs6054257. An array because several rsIDs can normalize to the same allele."
+      "description": "dbSNP reference SNP identifiers for this allele. An array because several rsIDs can normalize to the same allele.",
+      "example": [
+        "rs6054257"
+      ]
     },
     "ref": {
       "type": "string",
@@ -25,7 +29,8 @@
     },
     "qual": {
       "type": "string",
-      "description": "Variant call quality score carried over from the QUAL column of the source VCF, for example 50110.4."
+      "description": "Variant call quality score carried over from the QUAL column of the source VCF.",
+      "example": "50110.4"
     },
     "variation_type": {
       "type": "string",
@@ -33,15 +38,17 @@
     },
     "annotations": {
       "type": "object",
-      "description": "Source-specific annotations parsed from the INFO column of the source VCF, including population allele frequencies keyed by cohort such as topmed and korea1k."
+      "description": "Source-specific annotations parsed from the INFO column of the source VCF, including population allele frequencies keyed by cohort."
     },
     "spdi": {
       "type": "string",
-      "description": "Normalized SPDI expression identifying the allele, written as RefSeq accession, 0-based position, deleted sequence and inserted sequence, for example NC_000001.11:10887495:C:T."
+      "description": "Normalized SPDI expression identifying the allele, written as RefSeq accession, 0-based position, deleted sequence and inserted sequence.",
+      "example": "NC_000001.11:10887495:C:T"
     },
     "hgvs": {
       "type": "string",
-      "description": "HGVS genomic expression for the allele, for example NC_000067.7:g.3050715_3050716insG."
+      "description": "HGVS genomic expression for the allele.",
+      "example": "NC_000067.7:g.3050715_3050716insG"
     },
     "vrs_digest": {
       "type": "string",

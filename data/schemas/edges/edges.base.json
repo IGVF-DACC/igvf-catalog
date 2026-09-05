@@ -7,15 +7,16 @@
     "properties": {
       "_from": {
         "type": "string",
-        "description": "Document handle of the source node, in collection/key form, for example variants/NC_000001.11:10000:T:A."
+        "description": "Document handle of the source node, in collection/key form."
       },
       "_to": {
         "type": "string",
-        "description": "Document handle of the target node, in collection/key form, for example genes/ENSG00000129696."
+        "description": "Document handle of the target node, in collection/key form."
       },
       "label": {
         "type": "string",
-        "description": "The specific assay or relationship this edge represents, phrased for display, such as eQTL, allele-specific binding, or regulatory element effect on gene expression. Predicted edges carry a 'predicted' prefix, for example predicted allele-specific binding."
+        "description": "The specific assay or relationship this edge represents, phrased for display. Predicted edges carry a 'predicted' prefix.",
+        "example": "eQTL"
       },
       "class": {
         "type": "string",
@@ -23,23 +24,27 @@
       },
       "method": {
         "type": "string",
-        "description": "The assay, algorithm, or pipeline that generated the edge, such as MPRA, CRISPR screen, scE2G, or SEMVAR."
+        "description": "The assay, algorithm, or pipeline that generated the edge.",
+        "example": "MPRA"
       },
       "name": {
         "type": "string",
-        "description": "Predicate describing the relationship in the _from to _to direction, such as 'modulates expression of' or 'physically interacts with'."
+        "description": "Predicate describing the relationship in the _from to _to direction.",
+        "example": "modulates expression of"
       },
       "inverse_name": {
         "type": "string",
-        "description": "Predicate describing the same relationship in the _to to _from direction, such as 'expression modulated by'. Identical to name for symmetric relationships such as 'physically interacts with'."
+        "description": "Predicate describing the same relationship in the _to to _from direction. Identical to name for symmetric relationships.",
+        "example": "expression modulated by"
       },
       "source": {
         "type": "string",
-        "description": "The dataset or consortium this edge was loaded from, such as IGVF, ENCODE, or BioGRID."
+        "description": "The dataset or consortium this edge was loaded from.",
+        "example": "IGVF"
       },
       "source_url": {
         "type": "string",
-        "description": "Link to the specific upstream record or file this edge was derived from, for example https://data.igvf.org/tabular-files/IGVFFI0332UGDD."
+        "description": "Link to the specific upstream record or file this edge was derived from."
       }
     },
     "required": [

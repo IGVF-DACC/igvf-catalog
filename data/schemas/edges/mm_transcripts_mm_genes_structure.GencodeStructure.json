@@ -6,7 +6,7 @@
   "properties": {
     "_from": {
       "type": "string",
-      "description": "Document handle of the transcript that contains the feature, for example mm_transcripts/ENSMUST00000192972.",
+      "description": "Document handle of the transcript that contains the feature.",
       "example": "mm_transcripts/ENSMUST00000193812",
       "pattern": "^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
@@ -15,7 +15,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Document handle of the sub-transcript feature, for example mm_genes_structure/ENSMUST00000192972_ENSMUSE00001343744_exon.",
+      "description": "Document handle of the sub-transcript feature.",
       "example": "mm_genes_structure/ENSMUST00000193812_ENSMUSE00001343744_exon",
       "pattern": "^mm_genes_structure/",
       "collections": [

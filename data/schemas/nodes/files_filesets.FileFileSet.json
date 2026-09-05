@@ -21,7 +21,7 @@
         },
         "lab": {
           "type": "string",
-          "description": "Lab associated with the submission, as the portal's short lab name: lower-cased and hyphen-delimited from the PI's first and last name, for example jesse-engreitz.",
+          "description": "Lab associated with the submission, as the portal's short lab name: lower-cased and hyphen-delimited from the PI's first and last name.",
           "enum": [
             "alan-boyle",
             "bill-majoros",
@@ -45,14 +45,15 @@
             "thomas-quertermous",
             "tim-reddy",
             "zhiping-weng"
-          ]
+          ],
+          "example": "jesse-engreitz"
         },
         "preferred_assay_titles": {
           "type": [
             "array",
             "null"
           ],
-          "description": "The lab's preferred label for the assay that produced the data, for example lentiMPRA or SGE. For an analysis set, the preferred assay titles of the assays whose data it analyzes. Null when the portal records none.",
+          "description": "The lab's preferred label for the assay that produced the data. For an analysis set, the preferred assay titles of the assays whose data it analyzes. Null when the portal records none.",
           "items": {
             "type": "string",
             "enum": [
@@ -77,14 +78,17 @@
               "Variant painting via fluorescence",
               "Variant-EFFECTS"
             ]
-          }
+          },
+          "example": [
+            "lentiMPRA"
+          ]
         },
         "assay_term_ids": {
           "type": [
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the assays used to produce the data, for example OBI:0002440.",
+          "description": "Ontology term identifiers for the assays used to produce the data.",
           "example": [
             "OBI:0002440"
           ],
@@ -265,7 +269,7 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, for example CHEBI:15367.",
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
           "example": [
             "CHEBI:15367"
           ]
@@ -275,7 +279,7 @@
             "string",
             "null"
           ],
-          "description": "Publication identifier associated with the file set, for example PMID:34017130. Only one publication per file is supported.",
+          "description": "Publication identifier associated with the file set. Only one publication per file is supported.",
           "example": "PMID:34017130"
         },
         "collections": {
@@ -284,7 +288,7 @@
             "type": "string",
             "minItems": 1
           },
-          "description": "The collections in the IGVF catalog that contain the data in this file, for example genomic_elements.",
+          "description": "The collections in the IGVF catalog that contain the data in this file.",
           "example": [
             "genomic_elements"
           ]
@@ -346,7 +350,7 @@
             "string",
             "null"
           ],
-          "description": "The purpose or intended effect of the CRISPR modification applied to the samples, for example interference or knockout. Null when no sample carries a CRISPR modification.",
+          "description": "The purpose or intended effect of the CRISPR modification applied to the samples. Null when no sample carries a CRISPR modification.",
           "enum": [
             null,
             "interference",
@@ -354,7 +358,8 @@
             "base editing",
             "prime editing",
             "knockout"
-          ]
+          ],
+          "example": "interference"
         },
         "version": {
           "type": [

@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Ensembl gene ID and Ensembl transcript ID joined by an underscore, for example ENSG00000290825_ENST00000456328.",
+      "description": "Ensembl gene ID and Ensembl transcript ID joined by an underscore.",
       "example": "ENSG00000290825_ENST00000456328"
     },
     "_from": {
       "type": "string",
-      "description": "Document handle of the gene, for example genes/ENSG00000290825.",
+      "description": "Document handle of the gene.",
       "example": "genes/ENSG00000290825",
       "pattern": "^(genes/ENSG[0-9]{11}(?:_PAR_Y)?|mm_genes/ENSMUSG[0-9]{11}(?:_PAR_Y)?)$",
       "collections": [
@@ -20,7 +20,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Document handle of a transcript of that gene, for example transcripts/ENST00000456328.",
+      "description": "Document handle of a transcript of that gene.",
       "example": "transcripts/ENST00000456328",
       "pattern": "^(transcripts/ENST[0-9]{11}(?:_PAR_Y)?|mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?)$",
       "collections": [

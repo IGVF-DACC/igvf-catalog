@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Genomic element key and phenotype ontology term joined by an underscore, for example CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477.",
+          "description": "Genomic element key and phenotype ontology term joined by an underscore.",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477"
         },
         "_from": {

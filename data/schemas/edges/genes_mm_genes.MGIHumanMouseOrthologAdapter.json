@@ -5,7 +5,7 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "The mouse and human node handles with slashes rewritten to underscores, for example mm_genes_ENSMUSG00000024844_genes_ENSG00000175334.",
+      "description": "The mouse and human node handles with slashes rewritten to underscores.",
       "example": "mm_genes_ENSMUSG00000024844_genes_ENSG00000175334"
     },
     "_from": {

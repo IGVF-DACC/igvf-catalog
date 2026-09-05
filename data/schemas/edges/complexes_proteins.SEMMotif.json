@@ -9,11 +9,12 @@
     },
     "_from": {
       "type": "string",
-      "description": "Document handle of the transcription factor complex, for example complexes/SEMpl_TAL1:TCF4.",
+      "description": "Document handle of the transcription factor complex.",
       "pattern": "^complexes/SEMpl_",
       "collections": [
         "complexes"
-      ]
+      ],
+      "example": "complexes/SEMpl_TAL1:TCF4"
     },
     "_to": {
       "type": "string",
