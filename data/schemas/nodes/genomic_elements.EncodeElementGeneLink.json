@@ -56,7 +56,7 @@
             "array",
             "null"
           ],
-          "description": "Short readable summaries of the samples the prediction was made in, copied from the file's fileset metadata.",
+          "description": "Short readable summaries of the samples the prediction was made in, copied from the associated files_filesets record.",
           "example": [
             "head of caudate nucleus from ENCDO948PMW"
           ]
@@ -66,7 +66,7 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the file's fileset metadata. Null when none were applied.",
+          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the associated files_filesets record. Null when none were applied.",
           "example": [
             "UniProtKB:P05112"
           ]

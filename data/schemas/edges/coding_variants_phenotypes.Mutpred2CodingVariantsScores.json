@@ -52,12 +52,12 @@
         },
         "biosample_term": {
           "type": ["string", "null"],
-          "description": "Ontology term for the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
+          "description": "Ontology term for the sample the assay was run in, taken from the associated files_filesets record. Null when the fileset lists no sample.",
           "pattern": "^ontology_terms/"
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record. Null when the fileset carries no summary.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell"
         },
         "method": {

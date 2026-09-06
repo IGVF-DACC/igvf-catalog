@@ -23,14 +23,14 @@
         },
         "class": {
           "type": "string",
-          "description": "Evidence tier for the underlying data, taken from the file's fileset metadata.",
+          "description": "Evidence tier for the underlying data, taken from the associated files_filesets record.",
           "enum": [
             "biological relationship"
           ]
         },
         "method": {
           "type": ["string", "null"],
-          "description": "Model or pipeline that produced this record, taken from the file's fileset metadata."
+          "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
         },
         "label": {
           "type": ["string", "null"],

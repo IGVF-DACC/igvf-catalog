@@ -63,12 +63,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the prediction was made in, taken from the first entry of the file's fileset simple_sample_summaries.",
+          "description": "Plain-language summary of the biosample the prediction was made in, taken from the first entry of simple_sample_summaries on the associated files_filesets record.",
           "example": "head of caudate nucleus from ENCDO948PMW"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the prediction was made in, taken from the file's fileset metadata.",
+          "description": "Ontology term for the biosample the prediction was made in, taken from the associated files_filesets record.",
           "example": "ontology_terms/UBERON_0002626",
           "pattern": "^ontology_terms/"
         },
@@ -77,7 +77,7 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the file's fileset metadata. Null when none were applied.",
+          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the associated files_filesets record. Null when none were applied.",
           "example": [
             "UniProtKB:P05112"
           ]

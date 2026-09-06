@@ -80,12 +80,12 @@
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
+          "description": "Ontology term for the biosample the assay was run in, taken from the associated files_filesets record.",
           "example": "ontology_terms/EFO_0002067"
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the associated files_filesets record.",
           "example": "K562"
         },
         "treatments_term_ids": {
@@ -93,7 +93,7 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the associated files_filesets record. Null when none were applied."
         },
         "p_value": {
           "type": [

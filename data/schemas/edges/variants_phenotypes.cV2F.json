@@ -64,7 +64,7 @@
             "string",
             "null"
           ],
-          "description": "Ontology term for the sample this applies to, taken from the file's fileset metadata. Null when the fileset lists no sample. Null for the sample-agnostic prediction file.",
+          "description": "Ontology term for the sample this applies to, taken from the associated files_filesets record. Null when the fileset lists no sample. Null for the sample-agnostic prediction file.",
           "example": "ontology_terms/UBERON_0002048",
           "pattern": "^ontology_terms/"
         },
@@ -88,7 +88,7 @@
             "string",
             "null"
           ],
-          "description": "Plain-language summary of the sample this applies to, taken from the file's fileset metadata. Null when the fileset carries no summary. Null for the sample-agnostic prediction file.",
+          "description": "Plain-language summary of the sample this applies to, taken from the associated files_filesets record. Null when the fileset carries no summary. Null for the sample-agnostic prediction file.",
           "example": "lung"
         }
       },

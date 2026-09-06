@@ -59,11 +59,11 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the prediction applies to, taken from the file's fileset metadata."
+          "description": "Plain-language summary of the biosample the prediction applies to, taken from the associated files_filesets record."
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the prediction applies to, taken from the file's fileset metadata."
+          "description": "Ontology term for the biosample the prediction applies to, taken from the associated files_filesets record."
         },
         "name": {
           "enum": [
