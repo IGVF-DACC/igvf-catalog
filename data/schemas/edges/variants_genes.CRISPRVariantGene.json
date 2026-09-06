@@ -42,39 +42,39 @@
             "number",
             "null"
           ],
-          "description": "-log10 of the uncorrected nominal P-value for the variant's effect on the gene. Null for the CRISPR-Millipede base-editing files, which report a posterior inclusion probability instead."
+          "description": "-log10 of the uncorrected nominal P-value for the variant's effect on the gene."
         },
         "neg_log10_pvalue_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "-log10 of the P-value after correction for multiple testing, by the method the source file names. Null for the CRISPR-Millipede base-editing files, which report a posterior inclusion probability instead."
+          "description": "-log10 of the P-value after correction for multiple testing, by the method the source file names."
         },
         "power": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Power to detect an effect of the size observed, from 0 to 1. Null for the CRISPR-Millipede base-editing files, which report a posterior inclusion probability instead."
+          "description": "Power to detect an effect of the size observed, from 0 to 1."
         },
         "posterior_inclusion_probability": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Posterior inclusion probability from CRISPR-Millipede fine-mapping. The probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
+          "description": "Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
         },
         "coefficient_stddev": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Standard deviation of the CRISPR-Millipede beta coefficient estimate. Reflects uncertainty in the effect size estimate."
+          "description": "Standard deviation of the effect size estimate."
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the variant-gene association is statistically significant. For Variant-EFFECTS, adjusted p-value < 0.05. For CRISPR-Millipede, posterior inclusion probability (PIP) > 0.1."
+          "description": "Whether the variant-gene association is statistically significant."
         },
         "class": {
           "enum": [
