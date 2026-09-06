@@ -17,32 +17,34 @@
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
-          ]
+          ],
+          "description": "Handle of one gene in the genetic interaction."
         },
         "_to": {
           "example": "genes/ENSG00000129696",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
-          ]
+          ],
+          "description": "Handle of the other gene in the genetic interaction."
         },
         "detection_method": {
           "type": "string",
-          "description": "The detection method of the gene gene edge",
+          "description": "PSI-MI detection method. This adapter only loads genetic interference.",
           "enum": [
             "genetic interference"
           ]
         },
         "detection_method_code": {
           "type": "string",
-          "description": "The detection method code of the gene gene edge",
+          "description": "PSI-MI identifier of that detection method.",
           "enum": [
             "MI:0254"
           ]
         },
         "interaction_type": {
           "type": "array",
-          "description": "The interaction type of the gene gene edge",
+          "description": "BioGRID genetic-interaction classes for the pair, looked up from the PSI-MI ontology.",
           "example": [
             "positive genetic interaction (sensu BioGRID)",
             "synthetic rescue (sensu BioGRID)"
@@ -65,7 +67,7 @@
         },
         "interaction_type_code": {
           "type": "array",
-          "description": "The interaction type code of the gene gene edge",
+          "description": "PSI-MI identifiers of those genetic-interaction classes.",
           "items": {
             "type": "string",
             "enum": [
@@ -87,14 +89,14 @@
             "number",
             "null"
           ],
-          "description": "The confidence value of the gene gene edge"
+          "description": "BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence."
         },
         "confidence_value_intact": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The confidence value of the gene gene edge"
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
           "enum": [
@@ -103,7 +105,7 @@
         },
         "pmids": {
           "type": "array",
-          "description": "The pmids of the gene gene edge",
+          "description": "PubMed pages cited as evidence for this interaction.",
           "example": [
             "http://pubmed.ncbi.nlm.nih.gov/33660365"
           ],
@@ -113,7 +115,7 @@
         },
         "z_score": {
           "type": "number",
-          "description": "The z score of the gene gene edge",
+          "description": "Placeholder value of 0 so this collection can share a z_score index with COXPRESdb. Not a coexpression score.",
           "enum": [
             0
           ]
@@ -130,7 +132,7 @@
         },
         "molecular_function": {
           "type": "string",
-          "description": "The molecular function of the gene gene edge",
+          "description": "Gene Ontology term for protein binding, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0005515"
           ]
@@ -177,7 +179,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the gene to gene edge",
+          "description": "Handle of the files_filesets record for the merged interaction table this edge was read from.",
           "example": "files_filesets/IGVFFI4317VDGK",
           "pattern": "^files_filesets/",
           "collections": [
