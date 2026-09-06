@@ -56,7 +56,7 @@
             "string",
             "null"
           ],
-          "description": "Ontology term for the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset lists no sample.",
+          "description": "Ontology term for the sample the assay was run in, taken from the associated files_filesets record. Null when the fileset lists no sample.",
           "example": "ontology_terms/EFO_0007598",
           "pattern": "^ontology_terms/"
         },
@@ -65,7 +65,7 @@
             "string",
             "null"
           ],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the file's fileset metadata. Null when the fileset carries no summary.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record. Null when the fileset carries no summary.",
           "example": "lung"
         },
         "method": {

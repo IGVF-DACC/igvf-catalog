@@ -43,11 +43,11 @@
         },
         "biosample_term": {
           "type": ["string", "null"],
-          "description": "Ontology term for the sample this applies to, taken from the file's fileset metadata. Null when the fileset lists no sample. SEMpl predictions are biosample-agnostic."
+          "description": "Ontology term for the sample this applies to, taken from the associated files_filesets record. Null when the fileset lists no sample. SEMpl predictions are biosample-agnostic."
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "Plain-language summary of the sample this applies to, taken from the file's fileset metadata. Null when the fileset carries no summary. SEMpl predictions are biosample-agnostic."
+          "description": "Plain-language summary of the sample this applies to, taken from the associated files_filesets record. Null when the fileset carries no summary. SEMpl predictions are biosample-agnostic."
         },
         "motif": {
           "type": "string",

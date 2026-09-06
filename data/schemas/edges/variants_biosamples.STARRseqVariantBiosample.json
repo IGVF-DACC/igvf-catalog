@@ -106,12 +106,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the associated files_filesets record.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
+          "description": "Ontology term for the biosample the assay was run in, taken from the associated files_filesets record.",
           "example": "ontology_terms/EFO_0002067",
           "pattern": "^ontology_terms/"
         },
@@ -123,7 +123,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the file's fileset metadata. Null when none were applied."
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the associated files_filesets record. Null when none were applied."
         }
       },
       "required": [

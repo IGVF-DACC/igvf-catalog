@@ -56,14 +56,14 @@
     },
     "class": {
       "type": "string",
-      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata: 'observed data' for a motif derived from ChIP-seq.",
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record: 'observed data' for a motif derived from ChIP-seq.",
       "enum": [
         "observed data"
       ]
     },
     "method": {
       "type": "string",
-      "description": "Model collection that produced this motif, taken from the file's fileset metadata.",
+      "description": "Model collection that produced this motif, taken from the associated files_filesets record.",
       "enum": [
         "HOCOMOCO"
       ]

@@ -89,12 +89,12 @@
     "class": {
       "type": "string",
       "enum": ["observed data"],
-      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata."
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
     },
     "method": {
       "type": "string",
       "enum": ["DepMap"],
-      "description": "Model or pipeline that produced this record, taken from the file's fileset metadata."
+      "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
     },
     "label": {
       "type": "string",

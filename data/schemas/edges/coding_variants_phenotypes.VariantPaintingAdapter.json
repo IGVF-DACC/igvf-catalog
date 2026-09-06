@@ -56,12 +56,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the assay was run in, taken from the file's fileset metadata.",
+          "description": "Plain-language summary of the biosample the assay was run in, taken from the associated files_filesets record.",
           "example": "U2OS"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the assay was run in, taken from the file's fileset metadata.",
+          "description": "Ontology term for the biosample the assay was run in, taken from the associated files_filesets record.",
           "example": "ontology_terms/EFO_0002869"
         },
         "method": {
