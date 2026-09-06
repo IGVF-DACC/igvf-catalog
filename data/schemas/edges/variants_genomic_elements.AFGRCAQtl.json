@@ -34,15 +34,15 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to genomic element edge"
+          "description": "Negative log10 of the nominal association p-value."
         },
         "p_value": {
           "type": "number",
-          "description": "Pvalue of the variant to genomic element edge"
+          "description": "Nominal p-value of association between the variant and chromatin accessibility of the peak."
         },
         "beta": {
           "type": "number",
-          "description": "Beta of the variant to genomic element edge"
+          "description": "Regression coefficient of the alternate allele on chromatin accessibility."
         },
         "source": {
           "enum": [
@@ -56,18 +56,18 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to genomic element edge"
+          "description": "Handle of the files_filesets record for the IGVF file this QTL was read from."
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context of the variant to genomic element edge",
+          "description": "Tissue the QTL was measured in. AFGR used lymphoblastoid cell lines.",
           "enum": [
             "lymphoblastoid cell line"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term of the variant to genomic element edge",
+          "description": "Ontology term for lymphoblastoid cell line, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/EFO_0005292"
           ]

@@ -9,7 +9,7 @@
     },
     "_from": {
       "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
+      "description": "Handle of the source cell-line term.",
       "example": "ontology_terms/CVCL_JJ44",
       "pattern": "^ontology_terms/",
       "collections": [
@@ -18,7 +18,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the ontology term to ontology term edge",
+      "description": "Handle of the cross-referenced term, parent cell line, or sister cell line.",
       "example": "ontology_terms/CVCL_B854",
       "pattern": "^ontology_terms/",
       "collections": [
@@ -27,28 +27,28 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the ontology term to ontology term edge",
+      "description": "Relationship between the two terms.",
       "enum": [
         "database cross-reference"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the ontology term to ontology term edge",
+      "description": "The same relationship in the opposite direction.",
       "enum": [
         "database cross-reference"
       ]
     },
     "source": {
       "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
+      "description": "Dataset this edge was loaded from.",
       "enum": [
         "Cellosaurus"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the ontology term to ontology term edge",
+      "description": "Cellosaurus homepage.",
       "enum": [
         "https://www.cellosaurus.org/"
       ]
@@ -66,7 +66,7 @@
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the ontology term to ontology term edge",
+      "description": "Handle of the files_filesets record for the Cellosaurus OBO file this edge was read from.",
       "example": "files_filesets/IGVFFI9279GNOP",
       "pattern": "^files_filesets/",
       "collections": [

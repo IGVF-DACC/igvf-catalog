@@ -5,7 +5,7 @@
   "properties": {
     "_from": {
       "type": "string",
-      "description": "Source for the coding variant to protein edge",
+      "description": "Handle of the coding consequence.",
       "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
       "pattern": "^coding_variants/",
       "collections": [
@@ -14,7 +14,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the coding variant to protein edge",
+      "description": "Handle of the protein. The adapter writes the Ensembl protein ID from dbNSFP; isoform suffixes are stripped if present.",
       "example": "proteins/ENSP00000493376",
       "pattern": "^proteins/",
       "collections": [
@@ -23,7 +23,7 @@
     },
     "type": {
       "type": "string",
-      "description": "Type for the coding variant to protein edge",
+      "description": "Whether the consequence is a protein-coding amino-acid change or a splice-site SNP (aapos = -1).",
       "enum": [
         "protein coding",
         "splicing"
@@ -31,28 +31,28 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the coding variant to protein edge",
+      "description": "Predicate for the coding-variant to protein direction.",
       "enum": [
         "variant of"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the coding variant to protein edge",
+      "description": "Predicate for the protein to coding-variant direction.",
       "enum": [
         "has variant"
       ]
     },
     "source": {
       "type": "string",
-      "description": "Source for the coding variant to protein edge",
+      "description": "dbNSFP release this record was read from.",
       "enum": [
         "dbNSFP 5.1a"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the coding variant to protein edge",
+      "description": "dbNSFP project page.",
       "enum": [
         "http://database.liulab.science/dbNSFP"
       ]

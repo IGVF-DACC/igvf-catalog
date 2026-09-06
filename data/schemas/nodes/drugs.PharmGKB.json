@@ -9,14 +9,15 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "PA166238901"
+          "example": "PA166238901",
+          "description": "PharmGKB chemical accession."
         },
         "name": {
           "example": "17-alpha-dihydroequilenin sulfate"
         },
         "drug_ontology_terms": {
           "type": "array",
-          "description": "The drug ontology terms of the drug",
+          "description": "ChEBI ontology terms for this chemical, as handles into ontology_terms. Only ChEBI cross-references from PharmGKB are loaded.",
           "example": [
             "ontology_terms/CHEBI_15956"
           ],
@@ -36,21 +37,21 @@
         },
         "class": {
           "type": "string",
-          "description": "The class of the drug, from the associated files_filesets record",
+          "description": "Evidence tier for the underlying data, taken from the file's fileset metadata.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
           "type": "string",
-          "description": "The method of the drug, from the associated files_filesets record",
+          "description": "Model or pipeline that produced this record, taken from the file's fileset metadata.",
           "enum": [
             "PharmGKB"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the drug",
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
           "example": "files_filesets/IGVFFI2997DUKO",
           "pattern": "^files_filesets/",
           "collections": [

@@ -29,7 +29,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Class of the element as reported by ENCODE-rE2G: a promoter, genic where it falls inside a gene body, or intergenic.",
           "enum": [
             "genic",
             "intergenic",
@@ -47,7 +47,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Handle of the files_filesets record for the ENCODE thresholded element-gene file this element was read from.",
           "example": "files_filesets/ENCFF003BKC",
           "pattern": "^files_filesets/"
         },
@@ -56,7 +56,7 @@
             "array",
             "null"
           ],
-          "description": "Simple sample summaries for the genomic element",
+          "description": "Short readable summaries of the samples the prediction was made in, copied from the file's fileset metadata.",
           "example": [
             "head of caudate nucleus from ENCDO948PMW"
           ]
@@ -66,7 +66,7 @@
             "array",
             "null"
           ],
-          "description": "Treatments term ids for the genomic element",
+          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the file's fileset metadata. Null when none were applied.",
           "example": [
             "UniProtKB:P05112"
           ]

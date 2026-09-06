@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "SHA-256 hash of the two variant keys, each followed by its allele pair, together with the ancestry group.",
+      "description": "The two variant keys, each followed by its allele pair, together with the ancestry group. SHA-256 hashed when that string is 254 characters or longer.",
       "example": "NC_000001.11:911847:C:T_C:T_NC_000001.11:929838:G:A_G:A_EAS"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the variant to variant edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "variants/NC_000001.11:10000:T:A",
       "pattern": "^variants/",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the variant to variant edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "example": "variants/NC_000001.11:10000:T:A",
       "pattern": "^variants/",
       "collections": [
@@ -28,47 +28,47 @@
     },
     "chr": {
       "type": "string",
-      "description": "Chromosome for the variant to variant edge",
+      "description": "Chromosome the pair of variants lies on.",
       "example": "chr1"
     },
     "negated": {
       "type": "boolean",
-      "description": "Negated for the variant to variant edge",
+      "description": "Sign of the Pearson correlation between the two reference alleles, as written by the adapter: true when TopLD reports +, false when it reports -.",
       "example": false
     },
     "variant_1_base_pair": {
       "type": "string",
-      "description": "Variant 1 base pair for the variant to variant edge",
+      "description": "Reference and alternate alleles of the first variant.",
       "example": "G:A"
     },
     "variant_2_base_pair": {
       "type": "string",
-      "description": "Variant 2 base pair for the variant to variant edge",
+      "description": "Reference and alternate alleles of the second variant.",
       "example": "T:C"
     },
     "variant_1_rsid": {
       "type": "string",
-      "description": "Variant 1 rsID for the variant to variant edge",
+      "description": "dbSNP identifier of the first variant.",
       "example": "rs1234567890"
     },
     "variant_2_rsid": {
       "type": "string",
-      "description": "Variant 2 rsID for the variant to variant edge",
+      "description": "dbSNP identifier of the second variant.",
       "example": "rs1234567890"
     },
     "r2": {
       "type": "number",
-      "description": "R2 for the variant to variant edge",
+      "description": "Squared Pearson correlation of the two variants on phased haplotypes, from TOPMed ancestry-specific LD.",
       "example": 0.8
     },
     "d_prime": {
       "type": "number",
-      "description": "D prime for the variant to variant edge",
+      "description": "Lewontin's D' between the two variants, from TOPMed ancestry-specific LD.",
       "example": 0.8
     },
     "ancestry": {
       "type": "string",
-      "description": "Ancestry for the variant to variant edge",
+      "description": "Ancestry group the LD estimate was computed in.",
       "enum": [
         "AFR",
         "EAS",
@@ -78,35 +78,35 @@
     },
     "label": {
       "type": "string",
-      "description": "Label for the variant to variant edge",
+      "description": "Relationship this edge represents.",
       "enum": [
         "linkage disequilibrum"
       ]
     },
     "name": {
       "type": "string",
-      "description": "Name for the variant to variant edge",
+      "description": "Predicate describing the relationship in the _from to _to direction.",
       "enum": [
         "correlated with"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the variant to variant edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "enum": [
         "correlated with"
       ]
     },
     "source": {
       "type": "string",
-      "description": "Source for the variant to variant edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "TopLD"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the variant to variant edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "enum": [
         "http://topld.genetics.unc.edu/"
       ]

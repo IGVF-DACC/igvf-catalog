@@ -9,7 +9,7 @@
     },
     "_from": {
       "type": "string",
-      "description": "Source for the variant to disease edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "variants/NC_000005.10:1779518:G:A",
       "pattern": "^variants/",
       "collections": [
@@ -18,8 +18,8 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the variant to disease edge",
-      "example": "ontology_terms/MONDO:0009861",
+      "description": "Document handle of the target node, in collection/key form.",
+      "example": "ontology_terms/MONDO_0009861",
       "pattern": "^ontology_terms/",
       "collections": [
         "ontology_terms"
@@ -27,13 +27,13 @@
     },
     "gene_id": {
       "type": "string",
-      "description": "Gene ID for the variant to disease edge",
+      "description": "Handle of the gene the assertion is about.",
       "example": "genes/ENSG00000171759",
       "pattern": "^genes/"
     },
     "assertion": {
       "type": "string",
-      "description": "Assertion for the variant to disease edge",
+      "description": "ACMG/AMP pathogenicity classification assigned by a ClinGen Variant Curation Expert Panel.",
       "enum": [
         "Benign",
         "Likely Benign",
@@ -44,7 +44,7 @@
     },
     "pmids": {
       "type": "array",
-      "description": "PMIDs for the variant to disease edge",
+      "description": "PubMed links for the articles cited in the interpretation.",
       "example": [
         "http://pubmed.ncbi.nlm.nih.gov/2574002",
         "http://pubmed.ncbi.nlm.nih.gov/2574002",
@@ -53,47 +53,47 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the variant to disease edge",
+      "description": "Predicate describing the relationship in the _from to _to direction.",
       "enum": [
         "associated with"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the variant to disease edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "enum": [
         "associated with"
       ]
     },
     "source": {
       "type": "string",
-      "description": "Source for the variant to disease edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "ClinGen"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the variant to disease edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "enum": [
         "https://search.clinicalgenome.org/kb/downloads"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the variant to disease edge, from the associated files_filesets record"
+      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata."
     },
     "method": {
       "type": "string",
-      "description": "The method of the variant to disease edge, from the associated files_filesets record"
+      "description": "Model or pipeline that produced this record, taken from the file's fileset metadata."
     },
     "label": {
       "type": "string",
-      "description": "The label of the variant to disease edge; same value as method"
+      "description": "Same value as method."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the variant to disease edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI5852GYTT",
       "pattern": "^files_filesets/",
       "collections": [

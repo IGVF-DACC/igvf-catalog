@@ -10,8 +10,8 @@
     },
     "_from": {
       "type": "string",
-      "description": "The from node of the motifs to proteins edge",
-      "example": "motifs/RXRA_HUMAN_HOCOMOCOv11",
+      "description": "Handle of the HOCOMOCO motif.",
+      "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
       "pattern": "^motifs/",
       "collections": [
         "motifs"
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the motifs to proteins edge",
+      "description": "Handle of the Ensembl protein for the transcription factor the motif models.",
       "example": "proteins/ENSP00000364519",
       "pattern": "^proteins/ENSP[0-9]{11}$",
       "collections": [
@@ -28,49 +28,49 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the motifs to proteins edge",
+      "description": "Predicate for the motif-to-protein direction.",
       "enum": [
         "is used by"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the motifs to proteins edge",
+      "description": "Predicate for the protein-to-motif direction.",
       "enum": [
         "uses"
       ]
     },
     "biological_process": {
       "type": "string",
-      "description": "The biological process of the motifs to proteins edge",
+      "description": "Gene Ontology term GO:0003677 (DNA binding), as a handle into ontology_terms. The identifier is a molecular function, not a biological process.",
       "enum": [
         "ontology_terms/GO_0003677"
       ]
     },
     "source": {
       "type": "string",
-      "description": "The source of the motifs to proteins edge",
+      "description": "HOCOMOCO version the motif was taken from.",
       "enum": [
         "HOCOMOCOv11"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the motifs to proteins edge, from the associated files_filesets record",
+      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata: 'observed data' for a motif derived from ChIP-seq.",
       "enum": [
         "observed data"
       ]
     },
     "method": {
       "type": "string",
-      "description": "The method of the motifs to proteins edge, from the associated files_filesets record",
+      "description": "Model collection that produced this motif, taken from the file's fileset metadata.",
       "enum": [
         "HOCOMOCO"
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the motifs to proteins edge",
+      "description": "Handle of the files_filesets record for the IGVF file the HOCOMOCO PWM bundle was read from.",
       "example": "files_filesets/IGVFFI1444TRQL",
       "pattern": "^files_filesets/",
       "collections": [
