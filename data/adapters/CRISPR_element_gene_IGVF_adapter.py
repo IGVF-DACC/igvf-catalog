@@ -130,7 +130,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     def _write_doc(self, props: dict) -> None:
         if self.validate:
             self.validate_doc(props)
-        self.writer.write(json.dumps(props))
+        self.writer.write(json.dumps(props, allow_nan=False))
         self.writer.write('\n')
 
     def _require_valid_promoter_gene(
@@ -180,7 +180,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         cell: str,
         expected: str,
     ) -> bool:
-        if column in ('ensembl_id', 'TargetGeneID', 'gene_id', 'target_gene'):
+        if column in ('ensembl_id', 'TargetGeneID', 'gene_id', 'target_gene', 'intended_target_name'):
             return (
                 self._normalize_ensembl_gene_id(cell)
                 == self._normalize_ensembl_gene_id(expected)
@@ -552,7 +552,16 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 )
         self._apply_standard_neg_log10_fields(metrics)
         self._apply_standard_significant_field(metrics)
-        return metrics
+        return self._drop_nonfinite_metrics(metrics)
+
+    @staticmethod
+    def _drop_nonfinite_metrics(metrics: dict) -> dict:
+        """Omit NaN/±Infinity so json.dumps(allow_nan=False) stays valid JSON."""
+        return {
+            key: value
+            for key, value in metrics.items()
+            if not (isinstance(value, float) and not math.isfinite(value))
+        }
 
     def _apply_neg_log10_rule(self, rule: dict, metrics: dict) -> None:
         source_value = metrics.get(rule['from'])

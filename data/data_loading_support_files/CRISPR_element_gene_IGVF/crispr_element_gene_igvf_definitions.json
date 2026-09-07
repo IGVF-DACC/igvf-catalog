@@ -750,6 +750,36 @@
       "layout": "pySpade",
       "targeted_element_types": [
         "promoter"
+      ],
+      "skip_rows": [
+        {
+          "gene_name_ensembl": "ENSG00000112096",
+          "notes": "ENSG00000112096 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000215271",
+          "notes": "ENSG00000215271 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000285106",
+          "notes": "ENSG00000285106 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000273888",
+          "notes": "ENSG00000273888 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000285447",
+          "notes": "ENSG00000285447 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000130723",
+          "notes": "ENSG00000130723 is not valid ENSEMBL for GENCODE v43."
+        },
+        {
+          "gene_name_ensembl": "ENSG00000182230",
+          "notes": "ENSG00000182230 is not valid ENSEMBL for GENCODE v43."
+        }
       ]
     },
     "IGVFFI5903QAWP": {
@@ -931,6 +961,24 @@
       "layout": "hs27_tf_perturb_seq",
       "targeted_element_types": [
         "promoter"
+      ],
+      "skip_rows": [
+        {
+          "intended_target_name": "ENSG00000292149",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "intended_target_name": "ENSG00000288335",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000112096",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000130723",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        }
       ]
     },
     "IGVFFI0192YMEY": {
@@ -963,6 +1011,46 @@
           "target_gene": "",
           "p_val": "0.00019434148099295662",
           "notes": "File line 8582. Empty target_gene (no readout Ensembl ID)."
+        },
+        {
+          "target_gene": "ENSG00000285399",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000269028",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000275560",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000226380",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000228106",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000237838",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000112096",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000130723",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000239665",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
+        },
+        {
+          "target_gene": "ENSG00000273888",
+          "notes": "Not a valid gene after normalization against GENCODE v43."
         }
       ]
     },
