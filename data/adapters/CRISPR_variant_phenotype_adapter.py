@@ -17,13 +17,13 @@ from adapters.writer import Writer
 # Variant-level CRISPR screens linking variants to cellular phenotypes.
 #
 # IGVFFI2014OOZP (Sherwood / IGVFDS2873IRMJ) – LDL-C uptake (NTR:0001118); prime editing
-#   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
+#   variant_id is SPDI (0-based)
 # IGVFFI6803HZJG (Sherwood / IGVFDS9278NUAZ) – LDL-C uptake (NTR:0001118); prime editing
-#   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
+#   variant_id is SPDI (0-based)
 # IGVFFI9726GFTC (Sherwood / IGVFDS6504OLWV) – LDL-C uptake (NTR:0001118); CRISPRi
-#   supersedes IGVFFI7659OTOX; target_id is 1-based chr_pos_hg38_ref_alt.
+#   target_id is 1-based chr_pos_hg38_ref_alt.
 # IGVFFI1678CDBR (Sherwood / IGVFDS0021NCLH) – LDL-C uptake (NTR:0001118); ABE
-#   supersedes IGVFFI7160EKDK; target_id is 1-based chr_pos_hg38_ref_alt.
+#   target_id is 1-based chr_pos_hg38_ref_alt.
 #
 # NTR phenotype terms are not loaded by the standard ontology adapter, so this
 # adapter also writes ontology_terms for NTR phenotypes (e.g. NTR_0001118).
