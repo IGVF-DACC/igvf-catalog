@@ -37,17 +37,24 @@ def mock_file_fileset():
 
 
 def _mock_load_variant(variant_id, **kwargs):
-    if not variant_id.startswith('NC_'):
+    if variant_id.startswith('NC_') and len(variant_id.split(':')) == 4:
+        _chr, pos, ref, alt = variant_id.split(':')
+        spdi = variant_id
+        pos = int(pos)
+    elif len(variant_id.split('-')) == 4:
+        _chrom, pos, ref, alt = variant_id.split('-')
+        pos = int(pos) - 1
+        spdi = f'NC_MOCK:{pos}:{ref}:{alt}'
+    else:
         return None, {'variant_id': variant_id, 'reason': 'unrecognized'}
 
     variant = dict(MOCK_VARIANT)
-    variant['_key'] = variant_id
-    variant['name'] = variant_id
-    variant['spdi'] = variant_id
-    parts = variant_id.split(':')
-    variant['ref'] = parts[2]
-    variant['alt'] = parts[3]
-    variant['pos'] = int(parts[1])
+    variant['_key'] = spdi
+    variant['name'] = spdi
+    variant['spdi'] = spdi
+    variant['ref'] = ref
+    variant['alt'] = alt
+    variant['pos'] = pos
     return variant, None
 
 
@@ -141,6 +148,8 @@ def test_variant_phenotype_sherwood_prime(mock_load, mock_bulk, mock_file_filese
     assert first['crispr_modality'] == 'prime editing'
     assert first['significant'] is True
     assert first['num_guides'] == 1
+    assert first['p_value_adj'] is None
+    assert first['neg_log10_pvalue_adj'] is None
     assert first['_key'] == (
         'NC_000019.10:11105541:CAGC:GCTG_NTR_0001118_IGVFFI2014OOZP'
     )
@@ -180,3 +189,156 @@ def test_ontology_term_ntr(mock_get, mock_file_fileset):
     assert term['method'] == 'CRISPR screen'
     # NTR phenotype terms are shared vocabulary, not tied to a single dataset. See DSERV-1466.
     assert term['files_filesets'] is None
+
+
+def test_to_loadable_variant_id_converts_hg38_ids():
+    assert CRISPRVariantPhenotype._to_loadable_variant_id(
+        '19_11091518_hg38_GC_G'
+    ) == '19-11091518-GC-G'
+    assert CRISPRVariantPhenotype._to_loadable_variant_id(
+        '1_25253604_hg38_G_A'
+    ) == '1-25253604-G-A'
+    assert CRISPRVariantPhenotype._to_loadable_variant_id(
+        'NC_000019.10:11105541:CAGC:GCTG'
+    ) == 'NC_000019.10:11105541:CAGC:GCTG'
+
+
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb',
+    return_value=set(),
+)
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.load_variant',
+    side_effect=_mock_load_variant,
+)
+def test_variant_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
+    mock_file_fileset.return_value['crispr_modality'] = 'interference'
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath='./samples/crispr_variant_phenotype_sherwood_crispri.example.csv',
+        label='variant',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/',
+        writer=writer,
+        validate=True,
+    )
+    adapter.process_file()
+
+    assert len(writer.contents) == 2
+    first = json.loads(writer.contents[0])
+    assert first['files_filesets'] == 'files_filesets/IGVFFI9726GFTC'
+    assert first['source'] == 'IGVF'
+    assert first['spdi'] == 'NC_MOCK:11091517:GC:G'
+    mock_load.assert_any_call('19-11091518-GC-G')
+    loaded_ids = [call.args[0] for call in mock_load.call_args_list]
+    assert 'LDLR' not in loaded_ids
+
+
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb',
+    return_value={
+        'NC_MOCK:11091517:GC:G',
+        'NC_MOCK:26915517:G:A',
+    },
+)
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.load_variant',
+    side_effect=_mock_load_variant,
+)
+def test_variant_phenotype_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
+    mock_file_fileset.return_value['crispr_modality'] = 'interference'
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath='./samples/crispr_variant_phenotype_sherwood_crispri.example.csv',
+        label='variant_phenotype',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/',
+        writer=writer,
+        validate=True,
+    )
+    adapter.process_file()
+
+    assert len(writer.contents) == 2
+    docs = [json.loads(line) for line in writer.contents]
+    by_key = {doc['_key']: doc for doc in docs}
+    sig = by_key['NC_MOCK:11091517:GC:G_NTR_0001118_IGVFFI9726GFTC']
+    nonsig = by_key['NC_MOCK:26915517:G:A_NTR_0001118_IGVFFI9726GFTC']
+    assert sig['crispr_modality'] == 'interference'
+    assert sig['significant'] is True
+    assert sig['num_guides'] == 5
+    assert sig['effect_size'] == pytest.approx(-0.14773342)
+    assert sig['p_value_adj'] is None
+    assert sig['neg_log10_pvalue_adj'] is None
+    assert nonsig['significant'] is False
+
+
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb',
+    return_value=set(),
+)
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.load_variant',
+    side_effect=_mock_load_variant,
+)
+def test_variant_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
+    mock_file_fileset.return_value['crispr_modality'] = 'base editing'
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath='./samples/crispr_variant_phenotype_sherwood_abe.example.csv',
+        label='variant',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/',
+        writer=writer,
+        validate=True,
+    )
+    adapter.process_file()
+
+    assert len(writer.contents) == 2
+    first = json.loads(writer.contents[0])
+    assert first['files_filesets'] == 'files_filesets/IGVFFI1678CDBR'
+    mock_load.assert_any_call('1-25395599-A-G')
+    loaded_ids = [call.args[0] for call in mock_load.call_args_list]
+    assert 'ABCA1_1_donorT' not in loaded_ids
+
+
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb',
+    return_value={
+        'NC_MOCK:25395598:A:G',
+        'NC_MOCK:25253603:G:A',
+    },
+)
+@patch(
+    'adapters.CRISPR_variant_phenotype_adapter.load_variant',
+    side_effect=_mock_load_variant,
+)
+def test_variant_phenotype_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
+    mock_file_fileset.return_value['crispr_modality'] = 'base editing'
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath='./samples/crispr_variant_phenotype_sherwood_abe.example.csv',
+        label='variant_phenotype',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/',
+        writer=writer,
+        validate=True,
+    )
+    adapter.process_file()
+
+    assert len(writer.contents) == 2
+    docs = [json.loads(line) for line in writer.contents]
+    by_key = {doc['_key']: doc for doc in docs}
+    sig = by_key['NC_MOCK:25395598:A:G_NTR_0001118_IGVFFI1678CDBR']
+    nonsig = by_key['NC_MOCK:25253603:G:A_NTR_0001118_IGVFFI1678CDBR']
+    assert sig['crispr_modality'] == 'base editing'
+    assert sig['significant'] is True
+    assert sig['num_guides'] is None
+    assert sig['edit_rate_mean'] == pytest.approx(0.515483206)
+    assert sig['effect_size'] == pytest.approx(1.2640903)
+    assert sig['z_score'] == pytest.approx(3.0179524)
+    assert sig['effect_size_ci95_lower'] == pytest.approx(
+        1.2640903 - 1.96 * 0.41885692
+    )
+    assert sig['effect_size_ci95_upper'] == pytest.approx(
+        1.2640903 + 1.96 * 0.41885692
+    )
+    assert sig['p_value_adj'] == pytest.approx(0.038130911)
+    assert sig['neg_log10_pvalue_adj'] == pytest.approx(1.418722818)
+    assert nonsig['significant'] is False
+    assert nonsig['p_value_adj'] == pytest.approx(0.866342209)
