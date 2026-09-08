@@ -58,14 +58,28 @@
             "number",
             "null"
           ],
-          "description": "Lower bound of the 95% confidence interval for effect size."
+          "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
         },
         "effect_size_ci95_upper": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Upper bound of the 95% confidence interval for effect size."
+          "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
+        },
+        "p_value_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source."
+        },
+        "neg_log10_pvalue_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of the multiple-testing-adjusted p-value when reported by the source."
         },
         "method": {
           "enum": [
@@ -76,7 +90,9 @@
           "type": "string",
           "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
-            "prime editing"
+            "prime editing",
+            "interference",
+            "base editing"
           ]
         },
         "class": {
@@ -145,6 +161,8 @@
         "edit_rate_mean",
         "effect_size_ci95_lower",
         "effect_size_ci95_upper",
+        "p_value_adj",
+        "neg_log10_pvalue_adj",
         "files_filesets",
         "crispr_modality",
         "biological_context",
@@ -154,8 +172,8 @@
     }
   ],
   "accessible_via": {
-    "filter_by_range": "effect_size, z_score",
-    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper"
+    "filter_by_range": "effect_size, z_score, p_value_adj, neg_log10_pvalue_adj",
+    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
   },
   "db_collection_name": "variants_phenotypes"
 }

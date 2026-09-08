@@ -78,6 +78,8 @@ const igvfVariantPhenotypeFormat = z.object({
   edit_rate_mean: z.number().nullish(),
   effect_size_ci95_lower: z.number().nullish(),
   effect_size_ci95_upper: z.number().nullish(),
+  p_value_adj: z.number().nullish(),
+  neg_log10_pvalue_adj: z.number().nullish(),
   crispr_modality: z.string().nullish(),
   method: z.string().nullable(),
   class: z.string().nullish(),
@@ -234,6 +236,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       edit_rate_mean:     record.method == 'CRISPR screen' ? record.edit_rate_mean     : null,
       effect_size_ci95_lower: record.method == 'CRISPR screen' ? record.effect_size_ci95_lower : null,
       effect_size_ci95_upper: record.method == 'CRISPR screen' ? record.effect_size_ci95_upper : null,
+      p_value_adj:        record.method == 'CRISPR screen' ? record.p_value_adj        : null,
+      neg_log10_pvalue_adj: record.method == 'CRISPR screen' ? record.neg_log10_pvalue_adj : null,
       crispr_modality:    record.method == 'CRISPR screen' ? record.crispr_modality    : null
     }
   `
