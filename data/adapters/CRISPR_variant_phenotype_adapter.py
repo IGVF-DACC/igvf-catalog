@@ -22,7 +22,7 @@ from adapters.writer import Writer
 #   variant_id is SPDI (0-based)
 # IGVFFI9726GFTC (Sherwood / IGVFDS6504OLWV) – LDL-C uptake (NTR:0001118); CRISPRi
 #   target_id is 1-based chr_pos_hg38_ref_alt.
-# IGVFFI1678CDBR (Sherwood / IGVFDS0021NCLH) – LDL-C uptake (NTR:0001118); ABE
+# IGVFFI1678CDBR (Sherwood / IGVFDS0021NCLH) – LDL-C uptake (NTR:0001118); base editing
 #   target_id is 1-based chr_pos_hg38_ref_alt.
 #
 # NTR phenotype terms are not loaded by the standard ontology adapter, so this
