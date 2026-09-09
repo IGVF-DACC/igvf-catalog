@@ -17,7 +17,7 @@ def mock_file_fileset():
 
 @pytest.fixture
 def mock_protein_map():
-    with patch('adapters.gaf_adapter.get_protein_map_from_arangodb') as mock_get:
+    with patch('adapters.protein_map.get_protein_map_from_arangodb') as mock_get:
         mock_get.return_value = {
             'A0A024RBG1': ['ENSP00000263100'],
             'MGI:1915609': ['ENSMUSP00000000001'],
@@ -32,7 +32,11 @@ def test_gaf_adapter_human(mock_file_fileset, mock_protein_map):
     adapter.file_accession = 'IGVFFI1490WZCV'
     adapter.process_file()
     mock_file_fileset.assert_called_once_with('IGVFFI1490WZCV')
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_from'] == 'proteins/ENSP00000263100'
@@ -54,7 +58,10 @@ def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map):
     adapter.process_file()
     mock_file_fileset.assert_called_once_with('IGVFFI9807JOKT')
     mock_protein_map.assert_called_once_with(
-        dbxref_name='MGI', organism='Mus musculus')
+        field='uniprot_ids',
+        organism='Mus musculus',
+        dbxref_name='MGI',
+    )
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_from'] == 'proteins/ENSMUSP00000000001'

@@ -7,10 +7,8 @@ import os
 import obonet
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import (
-    get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
-)
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.protein_map import ProteinMap
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
@@ -56,8 +54,7 @@ class ProteinsInteraction(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
-        self.ensembls = get_protein_map_from_arangodb(organism=self.organism)
-        ensembl_unmatched = 0
+        self.protein_map = ProteinMap(organism=self.organism)
 
         with open(self.filepath, 'r') as interaction_file:
             interaction_csv = csv.reader(interaction_file)
@@ -70,13 +67,10 @@ class ProteinsInteraction(BaseAdapter):
                 protein_from = row[0]
                 protein_to = row[1]
 
-                ensembl_ids_from = self.ensembls.get(
-                    protein_from) or self.ensembls.get(protein_from.split('-')[0])
-                ensembl_ids_to = self.ensembls.get(
-                    protein_to) or self.ensembls.get(protein_to.split('-')[0])
+                ensembl_ids_from = self.protein_map.get(protein_from)
+                ensembl_ids_to = self.protein_map.get(protein_to)
 
                 if ensembl_ids_from is None or ensembl_ids_to is None:
-                    ensembl_unmatched += 1
                     continue
 
                 for protein_from_ensembl in ensembl_ids_from:
@@ -126,6 +120,4 @@ class ProteinsInteraction(BaseAdapter):
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
 
-        if ensembl_unmatched != 0:
-            self.logger.warning(
-                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+        self.protein_map.log(self.logger)

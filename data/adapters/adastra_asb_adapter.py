@@ -8,8 +8,8 @@ from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
     get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
 )
+from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
 
 # ADASTRA allele-specific binding (ASB) file downloaded from: https://adastra.autosome.org/assets/cltfdata/adastra.cltf.bill_cipher.zip
@@ -82,9 +82,8 @@ class ASB(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
-        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
+        self.protein_map = ProteinMap(organism='Homo sapiens')
 
-        ensembl_unmatched = 0
         for input_filepath in get_files_from_folder(self.filepath):
             filename = input_filepath.name
             # ignore test files
@@ -121,10 +120,8 @@ class ASB(BaseAdapter):
                         chr, pos, ref, alt, 'GRCh38'
                     )
 
-                    ensembl_ids = self.ensembls.get(
-                        tf_uniprot_id) or self.ensembls.get(tf_uniprot_id.split('-')[0])
+                    ensembl_ids = self.protein_map.get(tf_uniprot_id)
                     if ensembl_ids is None:
-                        ensembl_unmatched += 1
                         continue
 
                     for ensembl_id in ensembl_ids:
@@ -184,6 +181,4 @@ class ASB(BaseAdapter):
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
 
-        if ensembl_unmatched != 0:
-            self.logger.warning(
-                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+        self.protein_map.log(self.logger)

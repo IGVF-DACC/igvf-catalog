@@ -6,10 +6,8 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import (
-    get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
-)
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.protein_map import ProteinMap
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
 # #Description: Predictions of variant effects on transcription factor binding
@@ -71,7 +69,7 @@ class SEMPred(BaseAdapter):
         self.writer.add_tag('portal_accessions', self.file_accession)
         self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
         self.load_tf_id_mapping()
-        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
+        self.protein_map = ProteinMap(organism='Homo sapiens')
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
@@ -89,11 +87,10 @@ class SEMPred(BaseAdapter):
                         tf_keys = [tf_id]
                         if tf_id.startswith('proteins'):
                             # convert uniprot to ENSP
-                            ensembl_ids = self.ensembls.get(
+                            ensembl_ids = self.protein_map.get(
                                 tf_id.split('/')[1])
                             if ensembl_ids is None:
-                                self.logger.warning('Unable to map ' +
-                                                    tf_name + ' to ensembl id')
+                                self.protein_map.log(self.logger)
                                 return
                             else:
                                 tf_keys = [
@@ -142,3 +139,4 @@ class SEMPred(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
+        self.protein_map.log(self.logger)

@@ -7,10 +7,10 @@ from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
     get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
 )
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from adapters.protein_map import ProteinMap
 
 # Example rows from pQTL file (Supplementary Table 9)
 # Variant ID (CHROM:GENPOS (hg37):A0:A1:imp:v1)	CHROM	GENPOS (hg38)	Region ID	Region Start	Region End	MHC	UKBPPP ProteinID	Assay Target	Target UniProt	rsID	A1FREQ (discovery)	BETA (discovery, wrt. A1)	SE (discovery)	log10(p) (discovery)	A1FREQ (replication)	BETA (replication)	SE (replication)	log10(p) (replication)	cis/trans	cis gene	Bioinfomatic annotated gene	Ensembl gene ID	Annotated gene consequence	Biotype	Distance to gene	CADD_phred	SIFT	PolyPhen	PHAST Phylop_score	FitCons_score	IMPACT
@@ -27,6 +27,7 @@ class pQTL(BaseAdapter):
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
+        self.protein_map = ProteinMap(organism='Homo sapiens')
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -48,8 +49,6 @@ class pQTL(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.collection_class = self.file_fileset['class']
         self.method = self.file_fileset['method']
-        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
-        ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as pqtl_file:
             pqtl_csv = csv.reader(pqtl_file)
@@ -73,10 +72,8 @@ class pQTL(BaseAdapter):
                     if not is_valid_gene_id:
                         gene_id = None
                 for protein_id in protein_ids:
-                    ensembl_ids = self.ensembls.get(
-                        protein_id) or self.ensembls.get(protein_id.split('-')[0])
+                    ensembl_ids = self.protein_map.get(protein_id)
                     if ensembl_ids is None:
-                        ensembl_unmatched += 1
                         continue
                     for ensembl_id in ensembl_ids:
                         _id = variant_id + '_' + ensembl_id + '_' + pQTL.SOURCE
@@ -109,7 +106,5 @@ class pQTL(BaseAdapter):
                             self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        if ensembl_unmatched != 0:
-            self.logger.warning(
-                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+        self.protein_map.log(self.logger)
         self.gene_validator.log()

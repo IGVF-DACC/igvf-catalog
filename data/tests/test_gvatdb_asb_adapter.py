@@ -24,7 +24,7 @@ def mock_file_fileset():
 
 @pytest.fixture
 def mock_protein_map():
-    with patch('adapters.gvatdb_asb_adapter.get_protein_map_from_arangodb') as mock_get:
+    with patch('adapters.protein_map.get_protein_map_from_arangodb') as mock_get:
         mock_get.return_value = SAMPLE_PROTEIN_MAP
         yield mock_get
 
@@ -34,7 +34,11 @@ def test_asb_gvatdb_adapter_process(mock_file_fileset, mock_protein_map, mocker)
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
                          writer=writer, validate=True)
     adapter.process_file()
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_from'] == 'variants/NC_000010.11:112626979:C:T'

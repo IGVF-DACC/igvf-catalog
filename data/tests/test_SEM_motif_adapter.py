@@ -28,7 +28,7 @@ def mock_file_fileset():
 @pytest.fixture
 def mock_protein_map():
     """Mock get_protein_map_from_arangodb so ArangoDB is not required."""
-    with patch('adapters.SEM_motif_adapter.get_protein_map_from_arangodb') as mock_get_protein_map:
+    with patch('adapters.protein_map.get_protein_map_from_arangodb') as mock_get_protein_map:
         mock_get_protein_map.return_value = SAMPLE_PROTEIN_MAP
         yield mock_get_protein_map
 
@@ -38,7 +38,7 @@ def test_sem_motif_adapter_motif(mock_file_fileset, mock_protein_map):
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
                        sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
     adapter.process_file()
-    # the 'motif' label never touches self.ensembl, so the protein map should not be fetched
+    # the 'motif' label never touches self.protein_map, so the protein map should not be fetched
     mock_protein_map.assert_not_called()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -114,7 +114,11 @@ def test_sem_motif_adapter_motif_protein_link(mock_file_fileset, mock_protein_ma
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
                        label='motif_protein', writer=writer, validate=True)
     adapter.process_file()
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
@@ -150,13 +154,16 @@ def test_sem_motif_adapter_load_tf_id_mapping():
     assert len(adapter.tf_id_mapping) > 0
 
 
-def test_ensembl_is_fetched_only_once(mock_protein_map):
+def test_protein_map_is_fetched_only_once(mock_protein_map):
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
                        sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif_protein')
-    # accessing self.ensembl multiple times should only hit get_protein_map_from_arangodb once
-    assert adapter.ensembl == SAMPLE_PROTEIN_MAP
-    assert adapter.ensembl == SAMPLE_PROTEIN_MAP
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    assert adapter.protein_map.get('P15923') == SAMPLE_PROTEIN_MAP['P15923']
+    assert adapter.protein_map.get('P15923') == SAMPLE_PROTEIN_MAP['P15923']
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
 
 
 def test_validate_doc_invalid():

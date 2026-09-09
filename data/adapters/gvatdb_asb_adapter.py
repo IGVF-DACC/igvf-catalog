@@ -6,10 +6,8 @@ from typing import Optional
 import os
 
 from adapters.base import BaseAdapter
-from adapters.helpers import (
-    get_file_fileset_by_accession_in_arangodb,
-    get_protein_map_from_arangodb,
-)
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
 
 
@@ -51,8 +49,7 @@ class ASB_GVATDB(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.load_tf_uniprot_id_mapping()
-        self.ensembls = get_protein_map_from_arangodb(organism='Homo sapiens')
-        ensembl_unmatched = 0
+        self.protein_map = ProteinMap(organism='Homo sapiens')
 
         with open(self.filepath, 'r') as input_file:
             rows = csv.reader(input_file, delimiter='\t')
@@ -69,10 +66,8 @@ class ASB_GVATDB(BaseAdapter):
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
                     continue
 
-                ensembl_ids = self.ensembls.get(tf_uniprot_id[0]) or self.ensembls.get(
-                    tf_uniprot_id[0].split('-')[0])
+                ensembl_ids = self.protein_map.get(tf_uniprot_id[0])
                 if ensembl_ids is None:
-                    ensembl_unmatched += 1
                     continue
                 experiment = row[7]
 
@@ -121,9 +116,7 @@ class ASB_GVATDB(BaseAdapter):
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
-        if ensembl_unmatched != 0:
-            self.logger.warning(
-                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+        self.protein_map.log(self.logger)
 
     def load_tf_uniprot_id_mapping(self):
         # map tf names to uniprot ids

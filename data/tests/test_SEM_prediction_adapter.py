@@ -27,7 +27,7 @@ def mock_file_fileset():
 @pytest.fixture
 def mock_protein_map():
     """Fixture to mock get_protein_map_from_arangodb so ArangoDB is not required."""
-    with patch('adapters.SEM_prediction_adapter.get_protein_map_from_arangodb') as mock_get_protein_map:
+    with patch('adapters.protein_map.get_protein_map_from_arangodb') as mock_get_protein_map:
         mock_get_protein_map.return_value = SAMPLE_PROTEIN_MAP
         yield mock_get_protein_map
 
@@ -37,7 +37,11 @@ def test_sem_pred_adapter(mock_file_fileset, mock_protein_map):
     adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
                       label='sem_predicted_asb', writer=writer, validate=True)
     adapter.process_file()
-    mock_protein_map.assert_called_once_with(organism='Homo sapiens')
+    mock_protein_map.assert_called_once_with(
+        field='uniprot_ids',
+        organism='Homo sapiens',
+        dbxref_name=None,
+    )
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
