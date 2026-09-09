@@ -81,7 +81,7 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const genomicElements = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genomic-elements', description: descriptions.genomic_elements, tags: ['Nodes'] } })
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements', description: descriptions.genomic_elements } })
   .input(genomicElementsQueryFormat.merge(z.object({ files_fileset: z.string().optional(), limit: z.number().optional() })))
   .output(z.array(genomicElementFormat))
   .query(async ({ input }) => await genomicElementSearch(input))

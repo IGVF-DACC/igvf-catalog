@@ -368,13 +368,13 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
 }
 
 const variantsFromProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants, tags: ['IGVF Data'] } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants } })
   .input(proteinsQuery)
   .output(z.array(outputFormat))
   .query(async ({ input }) => await variantsFromProteinSearch(input))
 
 const proteinsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins, tags: ['IGVF Data'] } })
+  .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
   .input(variantsQuery)
   .output(z.array(outputFormat))
   .query(async ({ input }) => await proteinsFromVariantSearch(input))

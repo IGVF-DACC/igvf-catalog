@@ -734,19 +734,19 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
 }
 
 const genomicElementsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_genomic_elements, tags: ['IGVF Data'] } })
+  .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_genomic_elements } })
   .input(geneQueryFormat)
   .output(outputFormat)
   .query(async ({ input }) => await findGenomicElementsFromGene(input))
 
 const genesFromGenomicElements = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes, tags: ['IGVF Data'] } })
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes } })
   .input(genomicElementQueryFormat)
   .output(outputFormat)
   .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
 const grn = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn, tags: ['Bespoke Endpoints'] } })
+  .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn } })
   .input(gnrGeneQueryFormat)
   .output(z.array(grnOutputFormat))
   .query(async ({ input }) => await grnSearch(input))

@@ -133,7 +133,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
 }
 
 const genesStructure = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes-structure', description: descriptions.genes_structure, tags: ['Nodes'] } })
+  .meta({ openapi: { method: 'GET', path: '/genes-structure', description: descriptions.genes_structure } })
   .input(QueryFormat)
   .output(z.array(GeneStructureFormat))
   .query(async ({ input }) => await geneStructureSearch(input))

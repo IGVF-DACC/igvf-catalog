@@ -237,13 +237,13 @@ async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promis
 }
 
 const variantsFromBiosamples = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/biosamples/variants', description: descriptions.biosamples_variants, tags: ['IGVF Data'] } })
+  .meta({ openapi: { method: 'GET', path: '/biosamples/variants', description: descriptions.biosamples_variants } })
   .input(biosamplesQueryFormat)
   .output(z.array(returnFormat))
   .query(async ({ input }) => await findVariantsFromBiosamplesSearch(input))
 
 const biosamplesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/biosamples', description: descriptions.variants_biosamples, tags: ['IGVF Data'] } })
+  .meta({ openapi: { method: 'GET', path: '/variants/biosamples', description: descriptions.variants_biosamples } })
   .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(returnFormat))
   .query(async ({ input }) => await findBiosamplesFromVariantSearch(input))

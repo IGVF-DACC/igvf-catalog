@@ -82,7 +82,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const drugs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/drugs', description: descriptions.drugs, tags: ['Nodes'] } })
+  .meta({ openapi: { method: 'GET', path: '/drugs', description: descriptions.drugs } })
   .input(drugsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(drugFormat))
   .query(async ({ input }) => await drugSearch(input))

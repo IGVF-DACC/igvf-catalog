@@ -256,7 +256,7 @@ async function findGenesFromVariantViaElements (input: paramsFormatType): Promis
 }
 
 const variantsGenomicElementsGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/genes', description: descriptions.variants_genomic_elements_genes, tags: ['Bespoke Endpoints'] } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/genes', description: descriptions.variants_genomic_elements_genes } })
   .input(inputFormat)
   .output(outputFormat)
   .query(async ({ input }) => await findGenesFromVariantViaElements(input))

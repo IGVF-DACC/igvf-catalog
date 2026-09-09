@@ -78,7 +78,7 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const transcripts = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts, tags: ['Nodes'] } })
+  .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
   .input(transcriptsCommonQueryFormat.merge(commonNodesParamsFormat))
   .output(z.array(transcriptFormat))
   .query(async ({ input }) => await transcriptSearch(input))

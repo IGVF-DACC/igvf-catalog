@@ -85,7 +85,7 @@ async function query (input: { query: string, password: string, verbose: string 
 }
 
 const llmQuery = publicProcedure
-  .meta({ openapi: { method: 'POST', path: '/llm-query', description: descriptions.llm_query, tags: ['Utility Endpoints'] } })
+  .meta({ openapi: { method: 'POST', path: '/llm-query', description: descriptions.llm_query } })
   .input(queryFormat)
   .output(outputFormat)
   .mutation(async ({ input }) => await query(input))
