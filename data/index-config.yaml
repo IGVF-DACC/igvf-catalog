@@ -439,7 +439,6 @@ variants_genes:
 variants_genomic_elements:
   persistent:
     fields:
-      fields:
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
       - source, method, files_filesets
