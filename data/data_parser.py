@@ -99,7 +99,7 @@ if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:
 # validate_doc, which raises rather than skips -- turning validation on by default for these
 # would abort the entire load on the first bad record). --validate/--no-validate always wins
 # when explicitly passed, for any adapter.
-VARIANT_LOADING_ADAPTERS = {'favor', 'mouse_variant'}
+VARIANT_LOADING_ADAPTERS = {'favor'}
 if args.validate is None:
     args.validate = args.adapter not in VARIANT_LOADING_ADAPTERS
 
