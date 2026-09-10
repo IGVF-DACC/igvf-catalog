@@ -5,63 +5,65 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the disease to gene edge",
-      "example": "SGC_100001"
+      "description": "GenCC submission identifier and Ensembl gene ID joined by an underscore.",
+      "example": "SGC-TEST001_ENSG00000157933"
     },
     "_from": {
       "type": "string",
-      "description": "Source ontology term for the disease to gene edge",
+      "description": "Handle of the disease ontology term from the submission's disease_curie.",
       "pattern": "^ontology_terms/",
       "collections": [
         "ontology_terms"
-      ]
+      ],
+      "example": "ontology_terms/MONDO_0008426"
     },
     "_to": {
       "type": "string",
-      "description": "Target gene for the disease to gene edge",
+      "description": "Handle of the Ensembl gene resolved from the submission's HGNC id.",
       "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
         "genes"
-      ]
+      ],
+      "example": "genes/ENSG00000157933"
     },
     "sgc_id": {
       "type": "string",
-      "description": "Submission identifier and version from GenCC",
-      "example": "SGC-100001.1"
+      "description": "GenCC submission identifier and version number, joined by a dot.",
+      "example": "SGC-TEST001.1"
     },
     "name": {
       "type": "string",
-      "description": "Name for the disease to gene edge",
+      "description": "Predicate for the disease-to-gene direction.",
       "enum": [
         "associated_with"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the disease to gene edge",
+      "description": "Predicate for the gene-to-disease direction. Identical to name; the relationship is symmetric.",
       "enum": [
         "associated_with"
       ]
     },
     "hgnc": {
       "type": "string",
-      "description": "HGNC ID used to resolve the gene",
+      "description": "HGNC identifier of the gene, used to resolve the Ensembl gene handle.",
       "pattern": "^HGNC:[0-9]+$",
       "example": "HGNC:10896"
     },
     "gene_symbol": {
       "type": "string",
-      "description": "Gene symbol from GenCC submission",
+      "description": "HGNC symbol from the GenCC submission.",
       "example": "SKI"
     },
     "term_name": {
       "type": "string",
-      "description": "Disease title from GenCC submission",
+      "description": "Disease title from the GenCC submission.",
       "example": "Shprintzen-Goldberg syndrome"
     },
     "classification": {
       "type": "string",
-      "description": "GenCC classification title",
+      "description": "GenCC evidence classification of the gene–disease assertion.",
       "enum": [
         "Definitive",
         "Disputed Evidence",
@@ -76,7 +78,7 @@
     },
     "moi_id": {
       "type": "string",
-      "description": "Mode of inheritance HPO CURIE from GenCC",
+      "description": "HPO identifier for the asserted mode of inheritance.",
       "enum": [
         "HP:0000005",
         "HP:0000006",
@@ -90,7 +92,7 @@
     },
     "moi_name": {
       "type": "string",
-      "description": "Mode of inheritance label from GenCC",
+      "description": "HPO label for the asserted mode of inheritance.",
       "enum": [
         "Autosomal dominant",
         "Autosomal recessive",
@@ -104,7 +106,7 @@
     },
     "submitter": {
       "type": "string",
-      "description": "Submitter display name from GenCC (submitter_title)",
+      "description": "Display name of the GenCC member group that submitted the assertion.",
       "enum": [
         "Ambry Genetics",
         "Baylor College of Medicine Research Center",
@@ -127,7 +129,7 @@
     },
     "pmids": {
       "type": "array",
-      "description": "PMIDs parsed from submitted_as_pmids",
+      "description": "PubMed identifiers from the submission's submitted_as_pmids field. Empty when none were given.",
       "items": {
         "type": "string"
       },
@@ -137,31 +139,31 @@
     },
     "source": {
       "type": "string",
-      "description": "Source for the disease to gene edge",
+      "description": "The Gene Curation Coalition.",
       "enum": [
         "GenCC"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the disease to gene edge",
+      "description": "GenCC page for this submission, using the sgc_id.",
       "pattern": "^https://thegencc\\.org/submissions/"
     },
     "class": {
       "type": "string",
-      "description": "The class of the disease to gene edge, from the associated files_filesets record"
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
     },
     "method": {
       "type": "string",
-      "description": "The method of the disease to gene edge, from the associated files_filesets record"
+      "description": "How the association was assigned, taken from the associated files_filesets record."
     },
     "label": {
       "type": "string",
-      "description": "The label of the disease to gene edge; same value as method"
+      "description": "Same value as method, taken from the associated files_filesets record."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the disease to gene edge",
+      "description": "Handle of the files_filesets record for the IGVF file the GenCC submissions table was read from.",
       "example": "files_filesets/IGVFFI8022JGUK",
       "pattern": "^files_filesets/",
       "collections": [

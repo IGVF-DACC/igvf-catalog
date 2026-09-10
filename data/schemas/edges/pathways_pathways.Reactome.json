@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "The unique key of the pathway pathway edge",
+      "description": "Parent and child Reactome pathway IDs joined by an underscore.",
       "example": "R-HSA-1971475_R-HSA-1971476"
     },
     "_from": {
       "type": "string",
-      "description": "The from node of the pathway pathway edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "pathways/R-HSA-1971475",
       "pattern": "^pathways/R-HSA-[0-9]+$",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the pathway pathway edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "example": "pathways/R-HSA-1971476",
       "pattern": "^pathways/R-HSA-[0-9]+$",
       "collections": [
@@ -28,57 +28,57 @@
     },
     "source": {
       "type": "string",
-      "description": "The source of the pathway pathway edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "Reactome"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "The source URL of the pathway pathway edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "enum": [
         "https://reactome.org/"
       ]
     },
     "name": {
       "type": "string",
-      "description": "The name of the pathway pathway edge",
+      "description": "Predicate describing the relationship in the _from to _to direction.",
       "enum": [
         "parent of"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the pathway pathway edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "enum": [
         "child of"
       ]
     },
     "organism": {
       "type": "string",
-      "description": "The organism of the pathway pathway edge",
+      "description": "Species these pathways belong to. Only Homo sapiens parent-child links are loaded.",
       "enum": [
         "Homo sapiens"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the pathway pathway edge, from the associated files_filesets record",
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record.",
       "enum": [
         "biological relationship"
       ]
     },
     "method": {
       "type": ["string", "null"],
-      "description": "The method of the pathway pathway edge, from the associated files_filesets record"
+      "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
     },
     "label": {
       "type": ["string", "null"],
-      "description": "The label of the pathway pathway edge, from the associated files_filesets record"
+      "description": "Same value as method."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the pathway pathway edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI8363VRKN",
       "pattern": "^files_filesets/",
       "collections": [

@@ -38,7 +38,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Handle of the files_filesets record for the ENCODE caQTL file this accessible peak was read from.",
           "example": "files_filesets/ENCFF103XRK",
           "pattern": "^files_filesets/"
         }

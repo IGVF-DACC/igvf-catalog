@@ -11,18 +11,18 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to protein edge",
+          "description": "Variant key, Ensembl protein ID, motif concordance with spaces rewritten to underscore, ADASTRA, and the GTRD cell identifier, joined by underscores.",
           "example": "NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520"
         },
         "_from": {
-          "example": "variants/NC_000004.12:11439934:A:G",
+          "example": "variants/NC_000015.10:75202391:C:G",
           "pattern": "^variants/",
           "collections": [
             "variants"
           ]
         },
         "_to": {
-          "example": "proteins/ENSP00000227163",
+          "example": "proteins/ENSP00000281043",
           "pattern": "^proteins/",
           "collections": [
             "proteins"
@@ -30,78 +30,78 @@
         },
         "chr": {
           "type": "string",
-          "description": "The chromosome of the variant to protein edge",
-          "example": "chr10"
+          "description": "Chromosome of the variant, prefixed with chr.",
+          "example": "chr15"
         },
         "rsid": {
           "type": "string",
-          "description": "The rsid of the variant to protein edge",
+          "description": "dbSNP identifier of the variant.",
           "example": "rs1234567890"
         },
         "motif_fc": {
           "type": "string",
-          "description": "The motif fc of the variant to protein edge",
+          "description": "Log2 ratio of HOCOMOCO motif p-values for the reference versus alternate allele. Positive values mean the motif prefers the alternate allele; negative values prefer the reference.",
           "example": "-0.2727347850176788"
         },
         "motif_pos": {
           "type": "string",
-          "description": "The motif pos of the variant to protein edge",
+          "description": "0-based position of the variant relative to the best HOCOMOCO PWM hit.",
           "example": "10"
         },
         "motif_orient": {
           "type": "string",
-          "description": "The motif orient of the variant to protein edge",
+          "description": "Strand of the best HOCOMOCO PWM hit relative to the reference assembly.",
           "example": "+"
         },
         "motif_conc": {
           "type": "string",
-          "description": "The motif conc of the variant to protein edge",
-          "example": "No Hit"
+          "description": "Whether the allelic read imbalance agrees with the motif fold-change, assessed at 25% FDR.",
+          "example": "Concordant"
         },
         "motif": {
           "type": "string",
-          "description": "The motif of the variant to protein edge",
+          "description": "HOCOMOCO v11 motif for the transcription factor, as a handle into motifs.",
           "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
           "pattern": "^motifs/"
         },
         "es_mean_ref": {
           "type": "string",
-          "description": "The effect size mean for the reference allele",
+          "description": "Allele-wise effect size for the reference allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger reference-allele ASB.",
           "example": "1.795276180193825"
         },
         "es_mean_alt": {
           "type": "string",
-          "description": "The effect size mean for the alternate allele",
+          "description": "Allele-wise effect size for the alternate allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger alternate-allele ASB.",
           "example": "-1.7019721868875686"
         },
         "p_value_adj_ref": {
           "type": "number",
-          "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793
         },
         "p_value_adj_alt": {
           "type": "number",
-          "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
         "neg_log10_pvalue_adj_ref": {
           "type": "number",
-          "description": "The negative log10 of the FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
-          "example": 0.0171981040581793
+          "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
+          "example": 1.7645194276538037
         },
         "neg_log10_pvalue_adj_alt": {
           "type": "number",
-          "description": "The negative log10 of the FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
-          "example": 1.0
+          "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
+          "example": 0
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context (cell type name) of the variant to protein edge",
+          "description": "GTRD name of the cell type the ASB was called in.",
           "example": "Kelly (neuroblastoma)"
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term (ontology term ID) of the variant to protein edge",
+          "description": "Ontology term for that cell type, as a handle into ontology_terms.",
           "example": "ontology_terms/EFO_0002069",
           "pattern": "^ontology_terms/"
         },
@@ -140,14 +140,14 @@
         },
         "biological_process": {
           "type": "string",
-          "description": "The biological process of the variant to protein edge",
+          "description": "Gene Ontology term for regulation of DNA binding, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0051101"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the variant to protein edge",
+          "description": "Handle of the files_filesets record for the IGVF file this ASB table was read from.",
           "example": "files_filesets/IGVFFI5943XCOS",
           "pattern": "^files_filesets/",
           "collections": [

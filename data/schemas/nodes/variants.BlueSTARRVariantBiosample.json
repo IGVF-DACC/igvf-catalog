@@ -22,7 +22,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets of the variant",
+          "description": "Handle of the files_filesets record for the BlueSTARR prediction file this variant was scored in.",
           "example": "files_filesets/IGVFFI1663LKVQ",
           "pattern": "^files_filesets/",
           "collections": [

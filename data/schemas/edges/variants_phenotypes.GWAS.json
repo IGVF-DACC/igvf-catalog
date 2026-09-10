@@ -10,92 +10,92 @@
       "properties": {
         "equivalent_ontology_term": {
           "type": ["string", "null"],
-          "description": "Equivalent ontology term for the variant to phenotype edge",
-          "example": "ontology_terms/GO_0008150"
+          "description": "The other of the MONDO or EFO identifiers for the same trait, when both are present. MONDO is preferred as the edge target when it can be resolved.",
+          "example": "EFO_0007010"
         },
         "lead_chrom": {
           "type": "string",
-          "description": "Lead chromosome for the variant to phenotype edge",
+          "description": "Chromosome of the lead variant, without a chr prefix.",
           "example": "1"
         },
         "lead_pos": {
           "type": "number",
-          "description": "Lead position for the variant to phenotype edge",
+          "description": "Position of the lead variant, converted from the Open Targets 1-based coordinate to 0-based.",
           "example": 10000
         },
         "lead_ref": {
           "type": "string",
-          "description": "Lead reference for the variant to phenotype edge",
+          "description": "Reference allele of the lead variant.",
           "example": "A"
         },
         "lead_alt": {
           "type": "string",
-          "description": "Lead alternative for the variant to phenotype edge",
+          "description": "Alternate allele of the lead variant.",
           "example": "G"
         },
         "phenotype_term": {
           "type": ["string", "null"],
-          "description": "Phenotype term for the variant to phenotype edge",
+          "description": "Display name of the ontology term used as the edge target. Rows with neither a MONDO nor an EFO identifier are not loaded.",
           "example": "chronic obstructive pulmonary disease"
         },
         "direction": {
           "type": "string",
-          "description": "Direction for the variant to phenotype edge",
+          "description": "Sign of the reported effect of the alternate allele on the trait.",
           "example": "+"
         },
         "beta": {
           "type": "number",
-          "description": "Beta for the variant to phenotype edge",
+          "description": "Effect size of the alternate allele on the trait.",
           "example": 0.01
         },
         "beta_ci_lower": {
           "type": "number",
-          "description": "Beta CI lower for the variant to phenotype edge",
+          "description": "Lower bound of the confidence interval on beta.",
           "example": 0.005
         },
         "beta_ci_upper": {
           "type": "number",
-          "description": "Beta CI upper for the variant to phenotype edge",
+          "description": "Upper bound of the confidence interval on beta.",
           "example": 0.015
         },
         "odds_ratio": {
           "type": "number",
-          "description": "Odds ratio for the variant to phenotype edge",
+          "description": "Odds ratio of the alternate allele for a binary trait. 0 when the study reports a beta instead.",
           "example": 1.5
         },
         "oddsr_ci_lower": {
           "type": "number",
-          "description": "Odds ratio CI lower for the variant to phenotype edge",
+          "description": "Lower bound of the confidence interval on the odds ratio.",
           "example": 1.2
         },
         "oddsr_ci_upper": {
           "type": "number",
-          "description": "Odds ratio CI upper for the variant to phenotype edge",
+          "description": "Upper bound of the confidence interval on the odds ratio.",
           "example": 1.8
         },
         "p_val_mantissa": {
           "type": "number",
-          "description": "P value mantissa for the variant to phenotype edge",
+          "description": "Mantissa of the association p-value.",
           "example": 0.01
         },
         "p_val_exponent": {
           "type": "number",
-          "description": "P value exponent for the variant to phenotype edge",
+          "description": "Base-10 exponent of the association p-value.",
           "example": 10
         },
         "p_value": {
           "type": "number",
-          "description": "P value for the variant to phenotype edge",
+          "description": "Association p-value, reconstructed from mantissa and exponent.",
           "example": 0.01
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to phenotype edge",
+          "description": "Negative log10 of the association p-value. Capped at 27000 when the reported p-value is 0.",
           "example": 1
         },
         "tagged_variants": {
           "type": "array",
-          "description": "Tagged variants for the variant to phenotype edge",
+          "description": "Variants in LD with the lead, each with its alleles, overall r2, whether it falls in the PICS 95 percent credible set, 1000 Genomes superpopulation proportions, log10 approximate Bayes factor, and posterior probability of causality.",
           "example": [
             {
               "tag_chrom": "1",
@@ -136,11 +136,11 @@
         },
         "source_url": {
           "type": "string",
-          "description": "Source URL for the variant to phenotype edge"
+          "description": "IGVF reference-file page for the Open Targets file this record was read from."
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to phenotype edge"
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from."
         },
         "name": {
           "enum": [
@@ -154,17 +154,17 @@
         },
         "version": {
           "type": "string",
-          "description": "Version of the data source",
+          "description": "Open Targets Genetics release this record was taken from.",
           "example": "October 2022 (22.10)"
         },
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edge, generated as a hash of the source and target node IDs",
+          "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
         "study": {
           "type": "string",
-          "description": "Studies ID for the variant to phenotype edge",
+          "description": "Handle of the studies record this association comes from.",
           "example": "studies/GCST006368"
         }
       },

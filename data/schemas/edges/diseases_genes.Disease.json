@@ -5,42 +5,44 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the disease to gene edge",
-      "example": "Orphanet_100000_ENSG00000171759"
+      "description": "Orphanet disease term key and Ensembl gene ID joined by an underscore.",
+      "example": "Orphanet_166024_ENSG00000166813"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the disease to gene edge",
+      "description": "Handle of the Orphanet disease term.",
       "pattern": "^ontology_terms/Orphanet_",
       "collections": [
         "ontology_terms"
-      ]
+      ],
+      "example": "ontology_terms/Orphanet_166024"
     },
     "_to": {
       "type": "string",
-      "description": "Target for the disease to gene edge",
+      "description": "Handle of the Ensembl gene Orphanet associates with the disease.",
       "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
         "genes"
-      ]
+      ],
+      "example": "genes/ENSG00000166813"
     },
     "name": {
       "type": "string",
-      "description": "Name for the disease to gene edge",
+      "description": "Predicate for the disease-to-gene direction.",
       "enum": [
         "associated_with"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the disease to gene edge",
+      "description": "Predicate for the gene-to-disease direction. Identical to name; the relationship is symmetric.",
       "enum": [
         "associated_with"
       ]
     },
     "pmids": {
       "type": "array",
-      "description": "PMIDs for the disease to gene edge",
+      "description": "PubMed identifiers Orphanet cites as the source of validation for this association.",
       "items": {
         "type": "string"
       },
@@ -50,53 +52,53 @@
     },
     "term_name": {
       "type": "string",
-      "description": "Term name for the disease to gene edge",
+      "description": "Orphanet preferred name of the disease.",
       "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
     },
     "gene_symbol": {
       "type": "string",
-      "description": "Gene symbol for the disease to gene edge",
-      "example": "BRCA1"
+      "description": "HGNC symbol of the associated gene.",
+      "example": "KIF7"
     },
     "association_type": {
       "type": "string",
-      "description": "Association type for the disease to gene edge",
+      "description": "Orphanet label for the role of the gene in the disease.",
       "example": "Disease-causing germline mutation(s) in"
     },
     "association_status": {
       "type": "string",
-      "description": "Association status for the disease to gene edge",
-      "example": "Pathogenic"
+      "description": "Orphanet status of the gene–disease relationship, as written in the XML.",
+      "example": "Assessed"
     },
     "source": {
       "type": "string",
-      "description": "Source for the disease to gene edge",
+      "description": "Orphanet, via the Orphadata gene–disease product.",
       "enum": [
         "Orphanet"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the disease to gene edge",
+      "description": "Orphadata page for the gene–disease download.",
       "enum": [
         "https://www.orphadata.com/genes/"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the disease to gene edge, from the associated files_filesets record"
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
     },
     "method": {
       "type": "string",
-      "description": "The method of the disease to gene edge, from the associated files_filesets record"
+      "description": "How the association was assigned, taken from the associated files_filesets record."
     },
     "label": {
       "type": "string",
-      "description": "The label of the disease to gene edge; same value as method"
+      "description": "Same value as method, taken from the associated files_filesets record."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the disease to gene edge",
+      "description": "Handle of the files_filesets record for the IGVF file the Orphadata XML was read from.",
       "example": "files_filesets/IGVFFI4540ZCXZ",
       "pattern": "^files_filesets/",
       "collections": [

@@ -6,146 +6,173 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the genomic element"
+      "description": "Human genomic element key and mouse genomic element key joined by an underscore."
     },
     "_from": {
       "type": "string",
-      "description": "Source for the genomic element"
+      "description": "Handle of the mouse genomic element."
     },
     "_to": {
       "type": "string",
-      "description": "Target for the genomic element"
+      "description": "Handle of the paired human genomic element."
     },
     "percent_identical_bp": {
       "type": "string",
-      "description": "Percent identical base pairs for the genomic element"
+      "description": "Fraction of aligned bases that are identical between the human and mouse elements.",
+      "example": "0.495"
     },
     "phastCons4way": {
       "type": "string",
-      "description": "PhastCons4way for the genomic element"
+      "description": "phastCons score of the aligned interval, computed on a 4-way alignment.",
+      "example": "0"
     },
     "phyloP4way": {
       "type": "string",
-      "description": "PhyloP4way for the genomic element"
+      "description": "phyloP score of the aligned interval, computed on a 4-way alignment.",
+      "example": "0"
     },
     "cov_chromatin_accessibility": {
       "type": "string",
-      "description": "Cov chromatin accessibility for the genomic element"
+      "description": "FUNCODE conservation of variable activity (CO-V) for chromatin accessibility: the weighted Spearman correlation of accessibility across in silico matched human and mouse samples.",
+      "example": "-0.08705883748059523"
     },
     "cov_chromatin_accessibility_pval": {
       "type": "string",
-      "description": "Cov chromatin accessibility p-value for the genomic element"
+      "description": "Empirical p-value of the chromatin-accessibility CO-V score against a null of randomly paired elements.",
+      "example": "0.74469"
     },
     "cov_chromatin_accessibility_fdr": {
       "type": "string",
-      "description": "Cov chromatin accessibility FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-V p-value.",
+      "example": "0.7880168243061526"
     },
     "cob_chromatin_accessibility": {
       "type": "string",
-      "description": "Cob chromatin accessibility for the genomic element"
+      "description": "FUNCODE conservation of baseline activity (CO-B) for chromatin accessibility: an h-index-like statistic for constitutive accessibility across tissues in both species.",
+      "example": "0.45999999999999996"
     },
     "cob_chromatin_accessibility_pval": {
       "type": "string",
-      "description": "Cob chromatin accessibility p-value for the genomic element"
+      "description": "Empirical p-value of the chromatin-accessibility CO-B score against a null of randomly paired elements.",
+      "example": "0.38023"
     },
     "cob_chromatin_accessibility_fdr": {
       "type": "string",
-      "description": "Cob chromatin accessibility FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-B p-value.",
+      "example": "0.706372507818166"
     },
     "cov_H3K27ac": {
       "type": "string",
-      "description": "Cov H3K27ac for the genomic element"
+      "description": "FUNCODE CO-V for H3K27ac: the weighted Spearman correlation of H3K27ac signal across in silico matched samples.",
+      "example": "-0.04897145589966213"
     },
     "cov_H3K27ac_pval": {
       "type": "string",
-      "description": "Cov H3K27ac p-value for the genomic element"
+      "description": "Empirical p-value of the H3K27ac CO-V score against a null of randomly paired elements.",
+      "example": "0.672636"
     },
     "cov_H3K27ac_fdr": {
       "type": "string",
-      "description": "Cov H3K27ac FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the H3K27ac CO-V p-value.",
+      "example": "0.8353311889993958"
     },
     "cob_H3K27ac": {
       "type": "string",
-      "description": "Cob H3K27ac for the genomic element"
+      "description": "FUNCODE CO-B for H3K27ac: an h-index-like statistic for constitutive H3K27ac signal across tissues in both species.",
+      "example": "0.33"
     },
     "cob_H3K27ac_pval": {
       "type": "string",
-      "description": "Cob H3K27ac p-value for the genomic element"
+      "description": "Empirical p-value of the H3K27ac CO-B score against a null of randomly paired elements.",
+      "example": "0.85179"
     },
     "cob_H3K27ac_fdr": {
       "type": "string",
-      "description": "Cob H3K27ac FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the H3K27ac CO-B p-value.",
+      "example": "0.9741088464334399"
     },
     "cov_H3K4me1": {
       "type": "string",
-      "description": "Cov H3K4me1 for the genomic element"
+      "description": "FUNCODE CO-V for H3K4me1: the weighted Spearman correlation of H3K4me1 signal across in silico matched samples.",
+      "example": "-0.16420816777029995"
     },
     "cov_H3K4me1_pval": {
       "type": "string",
-      "description": "Cov H3K4me1 p-value for the genomic element"
+      "description": "Empirical p-value of the H3K4me1 CO-V score against a null of randomly paired elements.",
+      "example": "0.833716"
     },
     "cov_H3K4me1_fdr": {
       "type": "string",
-      "description": "Cov H3K4me1 FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-V p-value.",
+      "example": "0.9170052784062483"
     },
     "cob_H3K4me1": {
       "type": "string",
-      "description": "Cob H3K4me1 for the genomic element"
+      "description": "FUNCODE CO-B for H3K4me1: an h-index-like statistic for constitutive H3K4me1 signal across tissues in both species.",
+      "example": "0.30000000000000004"
     },
     "cob_H3K4me1_pval": {
       "type": "string",
-      "description": "Cob H3K4me1 p-value for the genomic element"
+      "description": "Empirical p-value of the H3K4me1 CO-B score against a null of randomly paired elements.",
+      "example": "0.87628"
     },
     "cob_H3K4me1_fdr": {
       "type": "string",
-      "description": "Cob H3K4me1 FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-B p-value.",
+      "example": "0.9810987190296945"
     },
     "cov_H3K4me3": {
       "type": "string",
-      "description": "Cov H3K4me3 for the genomic element"
+      "description": "FUNCODE CO-V for H3K4me3: the weighted Spearman correlation of H3K4me3 signal across in silico matched samples.",
+      "example": "-0.13407817495685007"
     },
     "cov_H3K4me3_pval": {
       "type": "string",
-      "description": "Cov H3K4me3 p-value for the genomic element"
+      "description": "Empirical p-value of the H3K4me3 CO-V score against a null of randomly paired elements.",
+      "example": "0.892402"
     },
     "cov_H3K4me3_fdr": {
       "type": "string",
-      "description": "Cov H3K4me3 FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-V p-value.",
+      "example": "0.9650710516056851"
     },
     "cob_H3K4me3": {
       "type": "string",
-      "description": "Cob H3K4me3 for the genomic element"
+      "description": "FUNCODE CO-B for H3K4me3: an h-index-like statistic for constitutive H3K4me3 signal across tissues in both species.",
+      "example": "0.35"
     },
     "cob_H3K4me3_pval": {
       "type": "string",
-      "description": "Cob H3K4me3 p-value for the genomic element"
+      "description": "Empirical p-value of the H3K4me3 CO-B score against a null of randomly paired elements.",
+      "example": "0.87563"
     },
     "cob_H3K4me3_fdr": {
       "type": "string",
-      "description": "Cob H3K4me3 FDR for the genomic element"
+      "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-B p-value.",
+      "example": "0.9758546569869605"
     },
     "source": {
       "type": "string",
-      "description": "Source for the genomic element",
+      "description": "FUNCODE, the pipeline that scored functional conservation of the paired elements.",
       "enum": [
         "FUNCODE"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the genomic element",
+      "description": "IGVF reference-file page for the FUNCODE pairing table this edge was read from.",
       "pattern": "^https://data.igvf.org/reference-files/"
     },
     "name": {
       "type": "string",
-      "description": "Name for the genomic element",
+      "description": "Predicate for the mouse-to-human homology direction.",
       "enum": [
         "homologous to"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the genomic element",
+      "description": "Predicate for the human-to-mouse homology direction. Identical to name; the relationship is symmetric.",
       "enum": [
         "homologous to"
       ]

@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the complex to protein edge",
+      "description": "Complex accession and Ensembl protein ID joined by an underscore.",
       "example": "CPX-2428_ENSP00000372925"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the complex to protein edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "complexes/CPX-2428",
       "pattern": "^complexes/",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the complex to protein edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "example": "proteins/ENSP00000372925",
       "pattern": "^proteins/",
       "collections": [
@@ -28,17 +28,17 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the complex to protein edge",
+      "description": "Predicate describing the relationship in the _from to _to direction.",
       "example": "contains"
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the complex to protein edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "example": "belongs to"
     },
     "stoichiometry": {
       "type": "integer",
-      "description": "Stoichiometry for the complex to protein edge",
+      "description": "Number of copies of this protein in the complex. 0 means the stoichiometry is unknown.",
       "example": 1
     },
     "chain_id": {
@@ -46,28 +46,28 @@
         "string",
         "null"
       ],
-      "description": "Chain ID for the complex to protein edge"
+      "description": "UniProt chain identifier when the participant is a specific processed chain rather than the full protein. Null otherwise."
     },
     "isoform_id": {
       "type": [
         "string",
         "null"
       ],
-      "description": "Isoform ID for the complex to protein edge"
+      "description": "UniProt isoform number when the participant is a specific isoform. Null otherwise."
     },
     "number_of_paralogs": {
       "type": [
         "integer",
         "null"
       ],
-      "description": "Number of paralogs for the complex to protein edge"
+      "description": "Count of interchangeable paralogs when this participant is a molecule set. Null for a single protein."
     },
     "paralogs": {
       "type": [
         "array",
         "null"
       ],
-      "description": "Paralogs for the complex to protein edge",
+      "description": "UniProt accessions of the interchangeable paralogs when this participant is a molecule set. Null for a single protein.",
       "example": [
         "O15342",
         "Q8NHE4"
@@ -75,7 +75,7 @@
     },
     "linked_features": {
       "type": "array",
-      "description": "Linked features for the complex to protein edge",
+      "description": "Binding regions between this protein and other participants of the complex, taken from the Complex Portal API: each entry names a participant and the residue ranges involved.",
       "example": [
         {
           "participantId": "proteins/ENSP00000365025",
@@ -93,39 +93,39 @@
     },
     "source": {
       "type": "string",
-      "description": "Source for the complex to protein edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "EBI"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the complex to protein edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "enum": [
         "https://www.ebi.ac.uk/complexportal/"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the complex to protein edge, from the associated files_filesets record"
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
     },
     "method": {
       "type": [
         "string",
         "null"
       ],
-      "description": "The method of the complex to protein edge, from the associated files_filesets record"
+      "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
     },
     "label": {
       "type": [
         "string",
         "null"
       ],
-      "description": "The label of the complex to protein edge, same value as method"
+      "description": "Same value as method."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the complex to protein edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI1444TRQL",
       "pattern": "^files_filesets/",
       "collections": [

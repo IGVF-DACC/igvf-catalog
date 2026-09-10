@@ -1,48 +1,157 @@
-# Collection Key
+# Collection Keys
 
-The schema for each collecion we load into our database is defined in data/schemas. But the key definition for each collection is not defined in schema. We will document the key definition in this document.
+Every document in the catalog is identified by `_key`, unique within its collection. The key
+composition for each collection is documented in the `_key` description of that collection's
+schema under `data/schemas`; this page explains the conventions those keys follow.
 
-| Model                                             | Type | Collection name                     | Hashed | Key format | Example |
-| :------------------------------------------------ | ---: | ----------------------------------: | -----: | ---------: | ----: |
-| accessible dna element                             | node | regulatory_regions              | N | accessible_dna_element_{chr}\_{start}\_{end}\_{assembly} | chr1_778381_779150_GRCh38 |
-| ccre regulatory region                            | node | regulatory_regions   | N | {candidate_cis_regulatory_element_id} | EH38E2776516 |
-| gene                                              | node | genes                               | N | {Ensembl_id}{optinal suffix _PAR_Y} | ENSG00000197976 or ENSG00000197976_PAR_Y|
-| ontology term                                     | node | ontology_terms                      | N | {ontology}_{id} | EFO_0001086 |
-| protein                                           | node | proteins                            | N | {Uniprot_id} | P31946 |
-| pathway                                           | node | pathways                            | N | {reactome_id} | R-HSA-109581 |
-| regulatory region                                 | node | regulatory_regions                  | N | {class_name}\_{chr}\_{start}\_{end}\_{assembly} | enhancer_chr1_827140_827667_GRCh38 |
-| transcript                                        | node | transcripts                         | N |  {Ensembl_id}{optinal suffix _PAR_Y} | ENST00000313871 or ENST00000313871_PAR_Y |
-| sequence variant                                  | node | variants                            | Y | {chr}_{start}\_{ref_seq}\_{alt_seq}\_{assembly} | 20_9567040_T_G_GRCh38 |
-| allele specific binding   | edge | variants_proteins               | N | {variant_id}\_{uniprot_id}|
-| variant to protein association   |  edge  |  variants_proteins  |  N  |  {variant_id}\_{uniprot_id}\_{source}  |  45680fb8f0bb29a0f0d19fa5fa73eb603d15956b841bc3813ad6f5ecc5c3039d_P09110_UKB |
-| child pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
-| gaf                                               | edge | go_gene_product_links               | Y | {annotation_dict}  |
-| gene to pathway association                       | edge | genes_pathways                      | N | {gene_id}_{pathway_id} | ENSG00000000419_R-HSA-162699 |
-| studies       | node | studies                  | N | {study_id} |
-| studies to variants       | edge | studies_variants                  | Y | {study_id}\_{variant_id} |
-| study variant association to phenotype       | edge | studies_variants_phenotypes                  | Y | {study_id}\_{variant_id}\_{ontology_term_id} |
-| ontology relationship                             | edge | ontology_relationships              | N | {from_node}\_{predicate}\_{to_node} | obo:GO_0000001_01:rdf-schema.subClassOf_obo:GO_0048308 |
-| parent pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
-| regulatory element to gene expression association | edge | regulatory_regions_genes                      | N | {regulatory_region_id}_{gene id}_{file_accesion} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_ENCFF712SUP |
-| regulatory element to gene expression association to biosample | edge | regulatory_regions_genes_biosamples  | N | {regulatory_region_id}_{gene id}_{file_accesion}_{biosample_ontology_term_id} | promoter_chr1_778390_779142_GRCh38_ENSG00000225880_ENCFF617FJH_EFO_0001203 |
-| regulatory element to gene expression association to biosample to CHEBI treatment | edge | regulatory_regions_genes_biosamples_treatments_CHEBI | N | {regulatory_region_id}_{gene id}_{file_accesion}_{treatment_ontology_term_id} | promoter_chr1_778390_779142_GRCh38_ENSG00000225880_ENCFF617FJH_CHEBI_23965 |
-| regulatory element to gene expression association to biosample to protein treatment | edge | regulatory_regions_genes_biosamples_treatments_proteins | N | {regulatory_region_id}_{gene id}_{file_accesion}_{treatment_protein_id} | intergenic_chr1_633776_634276_GRCh38_ENSG00000225880_ENCFF728HSS_P60568 |
-| regulatory element to gene expression association to biosample to donor | edge | regulatory_regions_genes_biosamples_donors | N | {regulatory_region_id}_{gene id}_{file_accesion}_{donor_id} | promoter_chr1_827209_827840_GRCh38_ENSG00000225880_ENCFF617FJH_ENCDO000AAE |
-| donor |    node |  donors |  N | {donor_id} | ENCDO000AAE|
-| topld in linkage disequilibrium with              | edge | variant_correlations                | Y | {ancestry}{chr}{uniq_id_snp1}{uniq_id_snp2}{assembly}|
-| regulatory element to biosample  | edge |  regulatory_regions_biosamples  | N  | {regulatory_region_id}\_{file_accesion}\_{biosample_ontology_term_id}  |   MPRA_chr1_632980_633180_GRCh38_ENCFF802FUV_EFO_0002067
- |
-| transcribed from                                  | edge | gencode_transcripts                 | N | {transcript_id}_{gene_id} | ENST00000456328_ENSG00000290825 |
-| transcribed to                                    | edge | gencode_transcripts                 | N | {gene_id}_{transcript_id} | ENSG00000290825_ENST00000456328 |
-| translates to                                     | edge | protein_transcript_relationship     | N | {protein_id}_{transcript_id} | P31946_ENST00000353703 |
-| translation of                                    | edge | protein_transcript_relationship     | N | {transcript_id}_{protein_id} | ENST00000353703_P31946 |
-| variant to regulatory region      | edge | variant_accessible_dna_region_links | N | {variant_id}_{regulatory_region_id} |
-| drugs      | node | drugs | N | {drug_id} | PA166178620  |
-| variant to drug      | edge | variants_drugs | N | {variantAnnotation_id}_{drug_id} | 608178486_PA450657 |
-| variant drug association to gene    | edge   | variants_drugs_genes  | N | {variantAnnotation_id}\_{drug_id}\_{gene_id}   |  608178486_PA450657_ENSG00000085563  |
-| disease to gene                   | edge | diseases_genes     | N | {ontology_term_id}_{gene_id}   | Orphanet_93_ENSG00000038002  |
-| gene to term         | edge | genes_terms    | N | {gene_id}_{ontology_term_id} | ENSG00000117362_CVCL_A1VE   |
-| complex   | node  | complexes | N | {complex_id}  |   CPX-1  |
-| complex to protein |  edge  |  complexes_proteins  | N |  {complex_id}_{protein_id} | CPX-1_Q15796  |
-| complex to term |  edge  |   complexes_terms  | N  |  {complex_id}_{ontology_term_id}  |  CPX-1_GO_0006355  |
-| protein to protein  | edge | proteins_proteins   | N | {protein_id}_{protein_id}_{detection_method_code}_{pmids} | A5YKK6_Q9UPQ9_MI_0096_21981923
+Previously this page carried the per-collection key formats because they were not recorded in the
+schemas. They now are, so the formats live in the schemas and this page no longer duplicates them.
+
+## Conventions
+
+Keys are built one of three ways.
+
+**Source accession.** Where the upstream source already issues a stable identifier, that identifier
+is the key, with version suffixes stripped and characters that ArangoDB disallows rewritten. Ensembl
+IDs drop the version (`ENSG00000197976.12` becomes `ENSG00000197976`) and take a `_PAR_Y` suffix for
+the pseudoautosomal copy on chromosome Y. Ontology term IDs replace the colon with an underscore, so
+`EFO:0001086` becomes `EFO_0001086`.
+
+**Composite.** Where no single accession identifies the record, the key is the underscore-joined
+concatenation of the fields that make it unique. Genomic elements use
+`{class}_{chr}_{start}_{end}_{assembly}`, and edges typically append the endpoints plus the accession
+of the source file, which is what distinguishes two measurements of the same relationship reported by
+different experiments.
+
+**Hashed.** ArangoDB limits `_key` to 254 characters, so adapters fall back to a SHA-256 hex digest
+when a composite would exceed that. Some collections always hash. Two consequences are worth knowing:
+a hashed key is not parseable back into its parts, and variant keys switch representation at the
+length boundary — a variant is keyed by its SPDI expression, or by its GA4GH VRS allele digest when
+the SPDI is too long.
+
+## Variant keys
+
+Variants are keyed by the normalized SPDI expression, for example `NC_000001.11:10202:C:A`, which is
+also stored in `spdi` and used as the `name`. SPDI uses a RefSeq accession, a 0-based position, the
+deleted sequence and the inserted sequence. Coding variants are keyed as
+`{gene_name}_{transcript_id}_{protein_hgvs}_{coding_hgvs}`, for example
+`OR4F5_ENST00000641515_p.Met1!_c.1A-C`; note that `?` is rewritten to `!` and `>` to `-`.
+
+## Collections
+
+The catalog has 54 collections, loaded by the adapter and schema pairs below. Where several adapters
+write into one collection, each has its own schema and its own key composition.
+
+| Collection | Type | Adapter | Schema |
+| :--- | :--- | :--- | :--- |
+| `coding_variants_phenotypes` | edge | `DUALIPAAdapter` | `edges/coding_variants_phenotypes.DUALIPAAdapter.json` |
+| `coding_variants_phenotypes` | edge | `ESM1vCodingVariantsScores` | `edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json` |
+| `coding_variants_phenotypes` | edge | `Mutpred2CodingVariantsScores` | `edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json` |
+| `coding_variants_phenotypes` | edge | `SGE` | `edges/coding_variants_phenotypes.SGE.json` |
+| `coding_variants_phenotypes` | edge | `VAMPAdapter` | `edges/coding_variants_phenotypes.VAMPAdapter.json` |
+| `coding_variants_phenotypes` | edge | `VariantPaintingAdapter` | `edges/coding_variants_phenotypes.VariantPaintingAdapter.json` |
+| `coding_variants_proteins` | edge | `DbNSFP` | `edges/coding_variants_proteins.DbNSFP.json` |
+| `complexes_proteins` | edge | `EBIComplex` | `edges/complexes_proteins.EBIComplex.json` |
+| `complexes_proteins` | edge | `SEMMotif` | `edges/complexes_proteins.SEMMotif.json` |
+| `complexes_terms` | edge | `EBIComplex` | `edges/complexes_terms.EBIComplex.json` |
+| `diseases_genes` | edge | `Disease` | `edges/diseases_genes.Disease.json` |
+| `diseases_genes` | edge | `GenccDiseasesGenes` | `edges/diseases_genes.GenccDiseasesGenes.json` |
+| `gene_products_terms` | edge | `GAF` | `edges/gene_products_terms.GAF.json` |
+| `genes_biosamples` | edge | `DepMap` | `edges/genes_biosamples.DepMap.json` |
+| `genes_genes` | edge | `Coxpresdb` | `edges/genes_genes.Coxpresdb.json` |
+| `genes_genes` | edge | `GeneGeneBiogrid` | `edges/genes_genes.GeneGeneBiogrid.json` |
+| `genes_mm_genes` | edge | `MGIHumanMouseOrthologAdapter` | `edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json` |
+| `genes_pathways` | edge | `Reactome` | `edges/genes_pathways.Reactome.json` |
+| `genes_transcripts` | edge | `Gencode` | `edges/genes_transcripts.Gencode.json` |
+| `genomic_elements_biosamples` | edge | `MPRAAdapter` | `edges/genomic_elements_biosamples.MPRAAdapter.json` |
+| `genomic_elements_genes` | edge | `CRISPRElementGeneENCODE` | `edges/genomic_elements_genes.CRISPRElementGeneENCODE.json` |
+| `genomic_elements_genes` | edge | `CRISPRElementGeneIGVF` | `edges/genomic_elements_genes.CRISPRElementGeneIGVF.json` |
+| `genomic_elements_genes` | edge | `EncodeElementGeneLink` | `edges/genomic_elements_genes.EncodeElementGeneLink.json` |
+| `genomic_elements_genes` | edge | `scE2G` | `edges/genomic_elements_genes.scE2G.json` |
+| `genomic_elements_mm_genomic_elements` | edge | `HumanMouseElementAdapter` | `edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json` |
+| `genomic_elements_phenotypes` | edge | `CRISPRElementPhenotype` | `edges/genomic_elements_phenotypes.CRISPRElementPhenotype.json` |
+| `mm_genes_mm_genes` | edge | `GeneGeneBiogrid` | `edges/mm_genes_mm_genes.GeneGeneBiogrid.json` |
+| `mm_transcripts_mm_genes_structure` | edge | `GencodeStructure` | `edges/mm_transcripts_mm_genes_structure.GencodeStructure.json` |
+| `motifs_proteins` | edge | `Motif` | `edges/motifs_proteins.Motif.json` |
+| `motifs_proteins` | edge | `SEMMotif` | `edges/motifs_proteins.SEMMotif.json` |
+| `ontology_terms_ontology_terms` | edge | `Cellosaurus` | `edges/ontology_terms_ontology_terms.Cellosaurus.json` |
+| `ontology_terms_ontology_terms` | edge | `Oncotree` | `edges/ontology_terms_ontology_terms.Oncotree.json` |
+| `ontology_terms_ontology_terms` | edge | `Ontology` | `edges/ontology_terms_ontology_terms.Ontology.json` |
+| `pathways_pathways` | edge | `Reactome` | `edges/pathways_pathways.Reactome.json` |
+| `proteins_proteins` | edge | `ProteinsInteraction` | `edges/proteins_proteins.ProteinsInteraction.json` |
+| `transcripts_genes_structure` | edge | `GencodeStructure` | `edges/transcripts_genes_structure.GencodeStructure.json` |
+| `transcripts_proteins` | edge | `GencodeProtein` | `edges/transcripts_proteins.GencodeProtein.json` |
+| `variants_biosamples` | edge | `BlueSTARRVariantBiosample` | `edges/variants_biosamples.BlueSTARRVariantBiosample.json` |
+| `variants_biosamples` | edge | `MPRAAdapter` | `edges/variants_biosamples.MPRAAdapter.json` |
+| `variants_biosamples` | edge | `STARRseqVariantBiosample` | `edges/variants_biosamples.STARRseqVariantBiosample.json` |
+| `variants_coding_variants` | edge | `DbNSFP` | `edges/variants_coding_variants.DbNSFP.json` |
+| `variants_coding_variants` | edge | `ESM1vCodingVariantsScores` | `edges/variants_coding_variants.ESM1vCodingVariantsScores.json` |
+| `variants_coding_variants` | edge | `Mutpred2CodingVariantsScores` | `edges/variants_coding_variants.Mutpred2CodingVariantsScores.json` |
+| `variants_diseases` | edge | `ClinGen` | `edges/variants_diseases.ClinGen.json` |
+| `variants_diseases_genes` | edge | `ClinGen` | `edges/variants_diseases_genes.ClinGen.json` |
+| `variants_drugs` | edge | `PharmGKB` | `edges/variants_drugs.PharmGKB.json` |
+| `variants_drugs_genes` | edge | `PharmGKB` | `edges/variants_drugs_genes.PharmGKB.json` |
+| `variants_genes` | edge | `AFGREQtl` | `edges/variants_genes.AFGREQtl.json` |
+| `variants_genes` | edge | `AFGRSQtl` | `edges/variants_genes.AFGRSQtl.json` |
+| `variants_genes` | edge | `CRISPRVariantGene` | `edges/variants_genes.CRISPRVariantGene.json` |
+| `variants_genes` | edge | `EQTLCatalog` | `edges/variants_genes.EQTLCatalog.json` |
+| `variants_genomic_elements` | edge | `AFGRCAQtl` | `edges/variants_genomic_elements.AFGRCAQtl.json` |
+| `variants_genomic_elements` | edge | `CAQtl` | `edges/variants_genomic_elements.CAQtl.json` |
+| `variants_phenotypes` | edge | `CRISPRVariantPhenotype` | `edges/variants_phenotypes.CRISPRVariantPhenotype.json` |
+| `variants_phenotypes` | edge | `GWAS` | `edges/variants_phenotypes.GWAS.json` |
+| `variants_phenotypes` | edge | `SGE` | `edges/variants_phenotypes.SGE.json` |
+| `variants_phenotypes` | edge | `cV2F` | `edges/variants_phenotypes.cV2F.json` |
+| `variants_proteins` | edge | `ASB` | `edges/variants_proteins.ASB.json` |
+| `variants_proteins` | edge | `ASB_GVATDB` | `edges/variants_proteins.ASB_GVATDB.json` |
+| `variants_proteins` | edge | `SEMPred` | `edges/variants_proteins.SEMPred.json` |
+| `variants_proteins` | edge | `pQTL` | `edges/variants_proteins.pQTL.json` |
+| `variants_variants` | edge | `TopLD` | `edges/variants_variants.TopLD.json` |
+| `coding_variants` | node | `DbNSFP` | `nodes/coding_variants.DbNSFP.json` |
+| `coding_variants` | node | `ESM1vCodingVariantsScores` | `nodes/coding_variants.ESM1vCodingVariantsScores.json` |
+| `coding_variants` | node | `Mutpred2CodingVariantsScores` | `nodes/coding_variants.Mutpred2CodingVariantsScores.json` |
+| `complexes` | node | `EBIComplex` | `nodes/complexes.EBIComplex.json` |
+| `complexes` | node | `SEMMotif` | `nodes/complexes.SEMMotif.json` |
+| `donors` | node | `FileFileSet` | `nodes/donors.FileFileSet.json` |
+| `drugs` | node | `PharmGKB` | `nodes/drugs.PharmGKB.json` |
+| `files_filesets` | node | `FileFileSet` | `nodes/files_filesets.FileFileSet.json` |
+| `genes` | node | `GencodeGene` | `nodes/genes.GencodeGene.json` |
+| `genes_structure` | node | `GencodeStructure` | `nodes/genes_structure.GencodeStructure.json` |
+| `genomic_elements` | node | `AFGRCAQtl` | `nodes/genomic_elements.AFGRCAQtl.json` |
+| `genomic_elements` | node | `CAQtl` | `nodes/genomic_elements.CAQtl.json` |
+| `genomic_elements` | node | `CCRE` | `nodes/genomic_elements.CCRE.json` |
+| `genomic_elements` | node | `CRISPRElementGeneENCODE` | `nodes/genomic_elements.CRISPRElementGeneENCODE.json` |
+| `genomic_elements` | node | `CRISPRElementGeneIGVF` | `nodes/genomic_elements.CRISPRElementGeneIGVF.json` |
+| `genomic_elements` | node | `CRISPRElementPhenotype` | `nodes/genomic_elements.CRISPRElementPhenotype.json` |
+| `genomic_elements` | node | `EncodeElementGeneLink` | `nodes/genomic_elements.EncodeElementGeneLink.json` |
+| `genomic_elements` | node | `HumanMouseElementAdapter` | `nodes/genomic_elements.HumanMouseElementAdapter.json` |
+| `genomic_elements` | node | `MPRAAdapter` | `nodes/genomic_elements.MPRAAdapter.json` |
+| `genomic_elements` | node | `scE2G` | `nodes/genomic_elements.scE2G.json` |
+| `mm_genes` | node | `GencodeGene` | `nodes/mm_genes.GencodeGene.json` |
+| `mm_genes_structure` | node | `GencodeStructure` | `nodes/mm_genes_structure.GencodeStructure.json` |
+| `mm_genomic_elements` | node | `CCRE` | `nodes/mm_genomic_elements.CCRE.json` |
+| `mm_genomic_elements` | node | `HumanMouseElementAdapter` | `nodes/mm_genomic_elements.HumanMouseElementAdapter.json` |
+| `mm_transcripts` | node | `Gencode` | `nodes/mm_transcripts.Gencode.json` |
+| `mm_variants` | node | `MouseGenomesProjectAdapter` | `nodes/mm_variants.MouseGenomesProjectAdapter.json` |
+| `motifs` | node | `Motif` | `nodes/motifs.Motif.json` |
+| `motifs` | node | `SEMMotif` | `nodes/motifs.SEMMotif.json` |
+| `ontology_terms` | node | `CRISPRVariantPhenotype` | `nodes/ontology_terms.CRISPRVariantPhenotype.json` |
+| `ontology_terms` | node | `Cellosaurus` | `nodes/ontology_terms.Cellosaurus.json` |
+| `ontology_terms` | node | `FileFileSet` | `nodes/ontology_terms.FileFileSet.json` |
+| `ontology_terms` | node | `Oncotree` | `nodes/ontology_terms.Oncotree.json` |
+| `ontology_terms` | node | `Ontology` | `nodes/ontology_terms.Ontology.json` |
+| `pathways` | node | `ReactomePathway` | `nodes/pathways.ReactomePathway.json` |
+| `proteins` | node | `GencodeProtein` | `nodes/proteins.GencodeProtein.json` |
+| `studies` | node | `EQTLCatalog` | `nodes/studies.EQTLCatalog.json` |
+| `studies` | node | `GWAS` | `nodes/studies.GWAS.json` |
+| `transcripts` | node | `Gencode` | `nodes/transcripts.Gencode.json` |
+| `variants` | node | `BlueSTARRVariantBiosample` | `nodes/variants.BlueSTARRVariantBiosample.json` |
+| `variants` | node | `CRISPRVariantGene` | `nodes/variants.CRISPRVariantGene.json` |
+| `variants` | node | `CRISPRVariantPhenotype` | `nodes/variants.CRISPRVariantPhenotype.json` |
+| `variants` | node | `ESM1vCodingVariantsScores` | `nodes/variants.ESM1vCodingVariantsScores.json` |
+| `variants` | node | `Favor` | `nodes/variants.Favor.json` |
+| `variants` | node | `MPRAAdapter` | `nodes/variants.MPRAAdapter.json` |
+| `variants` | node | `Mutpred2CodingVariantsScores` | `nodes/variants.Mutpred2CodingVariantsScores.json` |
+| `variants` | node | `SGE` | `nodes/variants.SGE.json` |
+| `variants` | node | `STARRseqVariantBiosample` | `nodes/variants.STARRseqVariantBiosample.json` |
+| `variants` | node | `autogenerated_topld` | `nodes/variants.autogenerated_topld.json` |
+| `variants` | node | `cV2F` | `nodes/variants.cV2F.json` |

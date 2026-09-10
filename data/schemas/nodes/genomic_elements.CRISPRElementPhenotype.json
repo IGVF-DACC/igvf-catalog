@@ -24,7 +24,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "How the source file classifies the element. These screens target DNase hypersensitive sites, all annotated 'enhancer'.",
           "enum": [
             "enhancer"
           ]
@@ -45,7 +45,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Handle of the files_filesets record for the screen file this element was tested in.",
           "example": "files_filesets/IGVFFI5135QZCS",
           "pattern": "^files_filesets/"
         }

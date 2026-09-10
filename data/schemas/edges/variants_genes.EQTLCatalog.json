@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to gene edge"
+          "description": "SHA-256 hash of the variant key, Ensembl gene ID and eQTL Catalogue dataset identifier."
         },
         "_from": {
           "example": "variants/NC_000001.11:10000:T:A",
@@ -20,7 +20,7 @@
           ]
         },
         "_to": {
-          "example": "genes/ENSG00000187583.10",
+          "example": "genes/ENSG00000187583",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
@@ -28,24 +28,24 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the variant to gene edge",
+          "description": "Tissue or cell-type label of the QTL dataset.",
           "example": "macrophage"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the variant to gene edge",
-          "example": "ontology_terms/EFO_0002067",
+          "description": "Ontology term for the tissue or cell type the QTL was measured in, as a handle into ontology_terms.",
+          "example": "ontology_terms/CL_0000235",
           "pattern": "^ontology_terms/"
         },
         "biological_process": {
           "type": "string",
-          "description": "Biological process for the variant to gene edge",
+          "description": "Gene Ontology term for the process this edge represents, as a handle into ontology_terms: regulation of gene expression for eQTLs, regulation of RNA splicing for spliceQTLs.",
           "example": "ontology_terms/GO_0010468",
           "pattern": "^ontology_terms/"
         },
         "study": {
           "type": "string",
-          "description": "Study for the variant to gene edge",
+          "description": "Handle of the studies record this QTL comes from.",
           "example": "studies/QTS000001",
           "pattern": "^studies/"
         },
@@ -76,7 +76,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the variant to gene edge",
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
           "example": "files_filesets/IGVFFI2520EPCL",
           "pattern": "^files_filesets/",
           "collections": [
@@ -97,78 +97,78 @@
         },
         "molecular_trait_id": {
           "type": "string",
-          "description": "Molecular trait ID for the variant to gene edge",
+          "description": "Identifier of the molecular trait used for QTL mapping: an Ensembl gene ID for gene-expression QTLs, or a Leafcutter intron cluster ID for splice QTLs.",
           "example": "ENSG00000230489"
         },
         "gene_id": {
           "type": "string",
-          "description": "Gene ID for the variant to gene edge",
+          "description": "Ensembl gene ID of the molecular trait.",
           "example": "ENSG00000230489"
         },
         "credible_set_id": {
           "type": "string",
-          "description": "Credible set ID for the variant to gene edge",
+          "description": "SuSiE credible-set identifier for this signal within the dataset.",
           "example": "ENSG00000230489_L1"
         },
         "variant_chromosome_position_ref_alt": {
           "type": "string",
-          "description": "Variant chromosome position ref alt for the variant to gene edge",
+          "description": "Variant identifier as chromosome, position, reference and alternate alleles, underscore-separated, on GRCh38.",
           "example": "chr1_108004887_G_T"
         },
         "rsid": {
           "type": "string",
-          "description": "RSID for the variant to gene edge",
+          "description": "dbSNP identifier of the variant.",
           "example": "rs1936009"
         },
         "credible_set_size": {
           "type": "integer",
-          "description": "Credible set size for the variant to gene edge"
+          "description": "Number of variants in the SuSiE credible set."
         },
         "posterior_inclusion_probability": {
           "type": "number",
-          "description": "Posterior inclusion probability for the variant to gene edge"
+          "description": "Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping."
         },
         "p_value": {
           "type": "number",
-          "description": "Pvalue for the variant to gene edge"
+          "description": "Nominal p-value of association between the variant and the molecular trait."
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to gene edge"
+          "description": "Negative log10 of the association p-value. Capped at 400 when the reported p-value is 0."
         },
         "effect_size": {
           "type": "number",
-          "description": "Effect size for the variant to gene edge"
+          "description": "Regression coefficient of the alternate allele on the molecular trait."
         },
         "standard_error": {
           "type": "number",
-          "description": "Standard error for the variant to gene edge"
+          "description": "Standard error of the effect size."
         },
         "z_score": {
           "type": "number",
-          "description": "Zscore for the variant to gene edge"
+          "description": "Univariate z-score of the variant."
         },
         "credible_set_min_r2": {
           "type": "number",
-          "description": "Credible set min R2 for the variant to gene edge"
+          "description": "Smallest linkage-disequilibrium r2 between any two variants in the credible set."
         },
         "region": {
           "type": "string",
-          "description": "Region for the variant to gene edge",
+          "description": "Genomic interval that was fine-mapped.",
           "example": "chr1:106964443-108964443"
         },
         "intron_chr": {
           "type": "string",
-          "description": "Intron chromosome for the variant to gene edge",
+          "description": "Chromosome of the spliced intron, parsed from the Leafcutter molecular trait ID. Present only on spliceQTL edges.",
           "example": "1"
         },
         "intron_start": {
           "type": "string",
-          "description": "Intron start for the variant to gene edge"
+          "description": "Start of the spliced intron, parsed from the Leafcutter molecular trait ID. Present only on spliceQTL edges."
         },
         "intron_end": {
           "type": "string",
-          "description": "Intron end for the variant to gene edge"
+          "description": "End of the spliced intron, parsed from the Leafcutter molecular trait ID. Present only on spliceQTL edges."
         }
       },
       "required": [
