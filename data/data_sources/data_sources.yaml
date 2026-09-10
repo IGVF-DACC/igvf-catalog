@@ -1136,13 +1136,13 @@ variant to biosample starr-seq:
   label: variant effect on regulatory element activity
   threshold: 0.9
 
-# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI7195KIHI.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
+# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
   collection: genomic_elements
   pypy3: true
   command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_ccre.jsonl
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7195KIHI/@@download/IGVFFI7195KIHI.bed.gz
+    - https://www.encodeproject.org/files/ENCFF420VPZ/@@download/ENCFF420VPZ.bed.gz # IGVF:IGVFFI7195KIHI
   source: ENCODE
   type: candidate cis regulatory element
   source_annotation: str # ccre annotation

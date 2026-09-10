@@ -51,14 +51,14 @@ def test_ccre_adapter_mm_genomic_element_collection_name():
 
 
 @pytest.mark.external_dependency
-def test_ccre_adapter_mm_genomic_element_key_uses_mm10(mock_file_fileset):
+def test_ccre_adapter_mm_genomic_element_key_uses_grcm39(mock_file_fileset):
     writer = SpyWriter()
     adapter = CCRE(filepath='./samples/ENCFF167FJQ.example.bed.gz',
                    label='mm_genomic_element', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
-    assert '_mm10_' in first_item['_key']
+    assert '_GRCm39_' in first_item['_key']
     assert 'GRCh38' not in first_item['_key']
 
 
