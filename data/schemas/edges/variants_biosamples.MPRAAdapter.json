@@ -48,21 +48,21 @@
           "type": "number",
           "description": "Log2FC for the edge"
         },
-        "DNA_count_ref": {
+        "inputCountRef": {
           "type": "number",
-          "description": "DNA count ref for the edge"
+          "description": "Input count reference allele, normalized (CPM), mean across replicates."
         },
-        "RNA_count_ref": {
+        "outputCountRef": {
           "type": "number",
-          "description": "RNA count ref for the edge"
+          "description": "Output count reference allele, normalized (CPM), mean across replicates."
         },
-        "DNA_count_alt": {
+        "inputCountAlt": {
           "type": "number",
-          "description": "DNA count alt for the edge"
+          "description": "Input count alternative allele, normalized (CPM), mean across replicates."
         },
-        "RNA_count_alt": {
+        "outputCountAlt": {
           "type": "number",
-          "description": "RNA count alt for the edge"
+          "description": "Output count alternative allele, normalized (CPM), mean across replicates."
         },
         "neg_log10_pvalue": {
           "type": "number",
@@ -164,10 +164,10 @@
         "strand",
         "log2FC",
         "bed_score",
-        "DNA_count_ref",
-        "RNA_count_ref",
-        "DNA_count_alt",
-        "RNA_count_alt",
+        "inputCountRef",
+        "outputCountRef",
+        "inputCountAlt",
+        "outputCountAlt",
         "neg_log10_pvalue",
         "neg_log10_pvalue_adj",
         "postProbEffect",
@@ -178,7 +178,7 @@
     }
   ],
   "accessible_via": {
-    "return": "strand, log2FC, bed_score, DNA_count_ref, RNA_count_ref, DNA_count_alt, RNA_count_alt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
+    "return": "strand, log2FC, bed_score, inputCountRef, outputCountRef, inputCountAlt, outputCountAlt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
   },
   "db_collection_name": "variants_biosamples"
 }
