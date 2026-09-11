@@ -91,6 +91,10 @@ class Ontology:
     DESCRIPTION = URIRef(
         'http://purl.obolibrary.org/obo/IAO_0000115')
 
+    # PREDICATES + RESTRICTION_PREDICATES together are the closed set of URIs ever written to
+    # an edge's `type_uri` (see process_edges below). Keep this in sync with the `type_uri`
+    # enum in data/schemas/edges/ontology_terms_ontology_terms.Ontology.json -- adding a
+    # predicate here without updating that enum will fail schema validation.
     PREDICATES = [SUBCLASS, DB_XREF]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF, DERIVES_FROM]
 
