@@ -1147,13 +1147,13 @@ genomic element encode human ccre:
   type: candidate cis regulatory element
   source_annotation: str # ccre annotation
 
-# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF167FJQ.bed.gz --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl --label mm_genomic_element
+# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI8753TTYC.bed.gz --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl --label mm_genomic_element
 mouse genomic element ccre:
   collection: mm_genomic_elements
   pypy3: true
   command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl --label mm_genomic_element
   datafiles:
-    - https://www.encodeproject.org/files/ENCFF167FJQ/@@download/ENCFF167FJQ.bed.gz # IGVF:IGVFFI8753TTYC
+    - https://api.data.igvf.org/reference-files/IGVFFI8753TTYC/@@download/IGVFFI8753TTYC.bed.gz
   source: ENCODE
   type: candidate cis regulatory element
   source_annotation: str # ccre annotation

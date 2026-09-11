@@ -50,6 +50,18 @@ def test_ccre_adapter_mm_genomic_element_collection_name():
     assert adapter._get_collection_name() == 'mm_genomic_elements'
 
 
+@pytest.mark.external_dependency
+def test_ccre_adapter_mm_genomic_element_key_uses_grcm39(mock_file_fileset):
+    writer = SpyWriter()
+    adapter = CCRE(filepath='./samples/ENCFF167FJQ.example.bed.gz',
+                   label='mm_genomic_element', writer=writer, validate=True)
+    adapter.process_file()
+    assert len(writer.contents) > 0
+    first_item = json.loads(writer.contents[0])
+    assert '_GRCm39_' in first_item['_key']
+    assert 'GRCh38' not in first_item['_key']
+
+
 def test_ccre_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
