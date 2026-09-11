@@ -82,13 +82,26 @@ parser.add_argument(
 )
 parser.add_argument('--replace', action='store_true', default=None,
                     help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
-parser.add_argument('--validate', action='store_true', default=False,
-                    help='Enable schema validation for parsed records.')
+parser.add_argument('--validate', action=argparse.BooleanOptionalAction, default=None,
+                    help='Enable schema validation for parsed records. Defaults to enabled, '
+                         'except for the variant-loading adapters (favor, mouse_variant), which '
+                         'default to disabled due to known pre-existing schema mismatches in '
+                         'their source data. Pass --validate or --no-validate to override the '
+                         'default for any adapter.')
 
 args = parser.parse_args()
 if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:
     parser.error(
         '--filepath is required unless using the "file_fileset" adapter')
+
+# Validation defaults to on, except for the variant-loading adapters, whose source data is
+# known to contain records that currently fail schema validation (see base_adapter.py's
+# validate_doc, which raises rather than skips -- turning validation on by default for these
+# would abort the entire load on the first bad record). --validate/--no-validate always wins
+# when explicitly passed, for any adapter.
+VARIANT_LOADING_ADAPTERS = {'favor'}
+if args.validate is None:
+    args.validate = args.adapter not in VARIANT_LOADING_ADAPTERS
 
 non_adapter_signature_args = [
     'output_bucket',
