@@ -143,7 +143,7 @@ class BlueSTARRVariantBiosample(BaseAdapter):
                     row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + BlueSTARRVariantBiosample.ELEMENT_FILE_ACCESSION
 
             edge_key = _id + '_' + \
-                self.biosample_term.replaceAll(
+                self.biosample_term.replace(
                     '/', '_') + '_' + self.file_accession
 
             edge_props = {
