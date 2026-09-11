@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/transcripts_genes.MORFTranscriptGene.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the overexpressed transcript to readout gene edge",
+          "example": "ENST00000619387_ENSG00000198846_IGVFFI6734IWRB_AATF_1"
+        },
+        "_from": {
+          "example": "transcripts/ENST00000619387",
+          "pattern": "^transcripts/ENST[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "transcripts"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000198846",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "DESeq2 log2 fold-change of ORF abundance in high versus low readout-gene FACS bins. Positive values indicate enrichment with higher readout-gene expression."
+        },
+        "log2FC_se": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "DESeq2 standard error of log2FC."
+        },
+        "base_mean": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "DESeq2 mean normalized ORF counts across samples."
+        },
+        "p_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association."
+        },
+        "p_value_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "DESeq2 Benjamini-Hochberg adjusted p-value."
+        },
+        "neg_log10_pvalue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of p_value."
+        },
+        "neg_log10_pvalue_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of p_value_adj."
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Whether the adjusted p-value is below 0.05."
+        },
+        "morf_id": {
+          "type": "string",
+          "description": "ORF construct identifier from the MORF library (DESeq2 rowID / ORF table MORF_id).",
+          "example": "AATF_1"
+        },
+        "orf_gene": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Ensembl gene ID of the overexpressed ORF when provided in the ORF table.",
+          "example": "ENSG00000275700",
+          "pattern": "^ENSG[0-9]{11}(?:_PAR_Y)?$"
+        },
+        "ensembl_transcript_ids": {
+          "type": "array",
+          "description": "Ensembl transcript IDs mapped from the ORF table for this construct.",
+          "items": {
+            "type": "string",
+            "pattern": "^ENST[0-9]{11}(?:_PAR_Y)?$"
+          },
+          "minItems": 1
+        },
+        "refseq_transcript_ids": {
+          "type": "array",
+          "description": "RefSeq transcript IDs listed for this ORF construct.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "method": {
+          "enum": [
+            "MORF screen"
+          ]
+        },
+        "crispr_modality": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "CRISPR modality from the associated files_filesets record. Null for ORF overexpression screens."
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "transcript effect on gene expression"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI6734IWRB/",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the transcript to gene edge",
+          "example": "files_filesets/IGVFFI6734IWRB",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the transcript to gene edge",
+          "example": "CD8-positive, alpha-beta T cell"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the transcript to gene edge",
+          "example": "ontology_terms/CL_0000625",
+          "pattern": "^ontology_terms/"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The treatments term ids of the transcript to gene edge"
+        },
+        "name": {
+          "enum": [
+            "modulates expression of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "expression modulated by"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "log2FC",
+        "significant",
+        "morf_id",
+        "ensembl_transcript_ids",
+        "refseq_transcript_ids",
+        "files_filesets",
+        "biological_context",
+        "biosample_term",
+        "treatments_term_ids"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, base_mean",
+    "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_se, base_mean, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, morf_id, orf_gene, ensembl_transcript_ids, refseq_transcript_ids"
+  },
+  "db_collection_name": "transcripts_genes"
+}

@@ -42,6 +42,8 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/genomic-elements/variants', tag: 'IGVF Data' },
   { path: '/genomic-elements/genes', tag: 'IGVF Data' },
   { path: '/genomic-elements/phenotypes', tag: 'IGVF Data' },
+  { path: '/transcripts/genes/effects', tag: 'IGVF Data' },
+  { path: '/genes/transcripts/effects', tag: 'IGVF Data' },
   { path: '/genomic-elements/biosamples', tag: 'IGVF Data' },
   { path: '/genes/variants', tag: 'IGVF Data' },
   { path: '/genes/genomic-elements', tag: 'IGVF Data' },

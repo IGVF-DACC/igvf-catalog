@@ -67,3 +67,4 @@ registry in `data/schemas/registry.json`.
 | GenccDiseasesGenes           | gencc_diseases_genes_adapter        | diseases_genes                                                                              |
 | scE2G                        | scE2G_adapter                       | genomic_elements<br>genomic_elements_genes                                                  |
 | DUALIPAAdapter               | DUAL_IPA_coding_variant_scores_adapter | coding_variants_phenotypes                                                               |
+| MORFTranscriptGene           | MORF_transcript_gene_adapter        | transcripts_genes                                                                       |
