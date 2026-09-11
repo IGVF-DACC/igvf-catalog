@@ -57,7 +57,7 @@ def test_topld_adapter_process_file(mocker):
     assert first_item['_key'] == 'fake_variant_id_C:A_fake_variant_id_A:G_SAS'
     assert first_item['chr'] == 'chr22'
     assert first_item['ancestry'] == 'SAS'
-    assert first_item['label'] == 'linkage disequilibrum'
+    assert first_item['label'] == 'linkage disequilibrium'
     assert first_item['name'] == 'correlated with'
     assert first_item['inverse_name'] == 'correlated with'
     assert first_item['source'] == 'TopLD'

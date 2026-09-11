@@ -91,7 +91,7 @@ class TopLD(BaseAdapter):
                 'r2': float(row[4]),
                 'd_prime': float(row[5]),
                 'ancestry': self.ancestry,
-                'label': 'linkage disequilibrum',
+                'label': 'linkage disequilibrium',
                 'name': 'correlated with',
                 'inverse_name': 'correlated with',
                 'source': 'TopLD',

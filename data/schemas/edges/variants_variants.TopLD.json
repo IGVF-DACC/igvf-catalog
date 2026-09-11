@@ -80,7 +80,7 @@
       "type": "string",
       "description": "Label for the variant to variant edge",
       "enum": [
-        "linkage disequilibrum"
+        "linkage disequilibrium"
       ]
     },
     "name": {
