@@ -111,8 +111,8 @@ class DepMap(BaseAdapter):
                                 'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
                                 'model_id': gene_model_id,
                                 'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
-                                # oncotree code can be mapped to NCIT ids
-                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
+                                # Match Oncotree _key ( '/' is illegal in ArangoDB keys)
+                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'].replace('/', '_'),
                                 'gene_dependency': float(value),
                                 'source': DepMap.SOURCE,
                                 'source_url': DepMap.SOURCE_URL,
