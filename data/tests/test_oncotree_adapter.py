@@ -44,7 +44,7 @@ def test_oncotree_adapter(mock_file_fileset):
     assert tissue['files_filesets'] == f'files_filesets/{SAMPLE_ACCESSION}'
 
     mds_mpn = next(doc for doc in docs if doc['_key'] == 'Oncotree_MDS_MPN')
-    assert mds_mpn['term_id'] == 'Oncotree_MDS/MPN'
+    assert mds_mpn['term_id'] == 'Oncotree_MDS_MPN'
     assert mds_mpn['name'] == 'Myelodysplastic/Myeloproliferative Neoplasms'
     assert mds_mpn['files_filesets'] == f'files_filesets/{SAMPLE_ACCESSION}'
 
