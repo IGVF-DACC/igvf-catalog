@@ -479,7 +479,7 @@ variants_phenotypes_coding_variants:
 variants_proteins:
   zkd_sparse:
     fields:
-      - log10pvalue
+      - neg_log10_pvalue
   persistent:
     fields:
       - files_filesets, _key, source, label

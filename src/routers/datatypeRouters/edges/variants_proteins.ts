@@ -80,10 +80,6 @@ const outputFormat = z.object({
   effect_on_binding: z.string().nullish()
 })
 
-const apiKeyToDbFieldMap = {
-  log10pvalue: 'neg_log10_pvalue'
-}
-
 const MOTIF_LOG2FC_RETURN = "'motif_log2FC': (record.motif_fc != null && record.motif_fc != '') ? TO_NUMBER(record.motif_fc) : null"
 
 const ADASTRA_SCORE_EXPR = `(
@@ -220,19 +216,19 @@ const buildQuery = ({
         'biosample_term': bioTerm,
         'score': ${ADASTRA_SCORE_EXPR},
         'method': record.method,
-        ${getDBReturnStatements(asbSchema, false, MOTIF_LOG2FC_RETURN, ['motif_fc'], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(asbSchema, false, MOTIF_LOG2FC_RETURN, ['motif_fc'])}
       } :
       record.source == 'GVATdb' ? {
         'method': record.method,
-        ${getDBReturnStatements(gvatdbSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(gvatdbSchema)}
       } :
       record.source == 'UKB' ? {
         'method': record.method,
-        ${getDBReturnStatements(ukbSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(ukbSchema)}
       } :
       record.source == 'IGVF' ? {
         'biosample_term': bioTerm,
-        ${getDBReturnStatements(semplSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(semplSchema)}
       } : {}
     )
 `
