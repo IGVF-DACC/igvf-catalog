@@ -3,6 +3,7 @@ import gzip
 import json
 import math
 import re
+from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -18,7 +19,7 @@ from db.arango_db import ArangoDB
 # MORF overexpression screens measuring a constant readout gene.
 # DESeq2 differential ORF quantifications are joined to the ORF/transcript table
 # supplied by the caller via MORF_id. Catalog transcript nodes use Ensembl
-# (ENST) keys, so RefSeq-only ORFs are skipped until they can be reconciled.
+# (ENST) keys. RefSeq-only ORFs use GENCODE v43 cross-references.
 
 # Example DESeq2 row (IGVFFI6734IWRB / IGVFFI6032GREJ):
 # rowID  baseMean  log2FoldChange  lfcSE  stat  pvalue  padj
@@ -42,6 +43,10 @@ class MORFTranscriptGene(BaseAdapter):
     SIGNIFICANCE_THRESHOLD = 0.05
     MAX_LOG10_PVALUE = 240
     CONTROL_MORF_IDS = frozenset({'GFP_1', 'mCherry_1'})
+    REFSEQ_MAPPING_PATH = Path(__file__).resolve(
+    ).parents[1] / 'data_loading_support_files/MORF_screen/gencode.v43.metadata.RefSeq.gz'
+    EXCLUSION_PATH = Path(__file__).resolve(
+    ).parents[1] / 'data_loading_support_files/MORF_screen/excluded_constructs.tsv'
     # Both current files sort on TOX-GFP (same readout as CRISPR-SURF IGVFFI4396TZAN).
     TOX_ENSEMBL_ID = 'ENSG00000198846'
     FILE_CONFIG = {
@@ -205,6 +210,63 @@ class MORFTranscriptGene(BaseAdapter):
             )
         return orfs
 
+    def _load_exclusions(self):
+        exclusions = {}
+        with self._open_file(self.EXCLUSION_PATH) as handle:
+            reader = csv.DictReader(handle, delimiter='\t')
+            self._check_columns(reader, {'screen_accession', 'MORF_id', 'reason'},
+                                self.EXCLUSION_PATH)
+            for row in reader:
+                if row['screen_accession'].strip() != self.file_accession:
+                    continue
+                morf_id = self._normalize_morf_id(row['MORF_id'])
+                reason = row['reason'].strip()
+                if not morf_id or not reason:
+                    raise ValueError(
+                        f'{self.EXCLUSION_PATH}: empty MORF_id or reason')
+                if morf_id in exclusions:
+                    raise ValueError(
+                        f'{self.EXCLUSION_PATH}: duplicate exclusion {morf_id!r}')
+                exclusions[morf_id] = reason
+        return exclusions
+
+    def _resolve_missing_transcripts(self, orfs):
+        missing = [orf for orf in orfs.values()
+                   if not orf['ensembl_transcript_ids']
+                   and orf['refseq_transcript_ids']
+                   and orf['morf_id'] not in self.CONTROL_MORF_IDS]
+        if not missing:
+            return
+        requested = {ref.split('.')[0] for orf in missing
+                     for ref in orf['refseq_transcript_ids']}
+        mapping = {}
+        with self._open_file(self.REFSEQ_MAPPING_PATH) as metadata:
+            for line in metadata:
+                transcript, *refs = line.rstrip().split('\t')
+                transcript = re.sub(r'\.[0-9]+(?=_PAR_Y$|$)', '', transcript)
+                if not _ENST_RE.fullmatch(transcript):
+                    raise ValueError(
+                        f'Invalid transcript in {self.REFSEQ_MAPPING_PATH}: {transcript!r}')
+                for ref in refs:
+                    accession = ref.split('.')[0]
+                    if accession in requested:
+                        mapping.setdefault(accession, set()).add(transcript)
+        candidates = sorted({t for transcripts in mapping.values()
+                            for t in transcripts})
+        valid = set()
+        if candidates:
+            db = ArangoDB().get_igvf_connection()
+            valid = set(db.aql.execute(
+                'FOR t IN transcripts FILTER t._key IN @ids RETURN t._key',
+                bind_vars={'ids': candidates}))
+        for orf in missing:
+            # Accept all RefSeq versions, preserving the supplied versioned IDs.
+            transcripts = {t for ref in orf['refseq_transcript_ids']
+                           for t in mapping.get(ref.split('.')[0], set())}
+            orf['ensembl_transcript_ids'] = sorted(transcripts & valid)
+            if orf['ensembl_transcript_ids']:
+                orf['transcript_mapping_method'] = 'GENCODE v43 RefSeq accession without version'
+
     def _resolve_missing_orf_genes(self, orfs):
         """Resolve names, then synonyms; disambiguate using all listed transcripts.
 
@@ -296,6 +358,9 @@ class MORFTranscriptGene(BaseAdapter):
             )
 
         orfs = self._load_orf_reference()
+        exclusions = self._load_exclusions()
+        orfs = {key: orf for key, orf in orfs.items() if key not in exclusions}
+        self._resolve_missing_transcripts(orfs)
         self._resolve_missing_orf_genes(orfs)
         missing_ensembl = []
         missing_reference = []
@@ -310,9 +375,13 @@ class MORFTranscriptGene(BaseAdapter):
                 row_id = (row.get('rowID') or '').strip()
                 if not row_id:
                     continue
-                if self._normalize_morf_id(row_id) in self.CONTROL_MORF_IDS:
-                    continue
                 normalized = self._normalize_morf_id(row_id)
+                if normalized in exclusions:
+                    self.logger.info('Excluded %s from %s: %s',
+                                     row_id, self.file_accession, exclusions[normalized])
+                    continue
+                if normalized in self.CONTROL_MORF_IDS:
+                    continue
                 if normalized in seen_ids:
                     raise ValueError(
                         f'{self.filepath}: duplicate rowID {row_id!r}')
@@ -377,6 +446,7 @@ class MORFTranscriptGene(BaseAdapter):
                         'orf_gene': orf['orf_gene'],
                         'ensembl_transcript_ids': ensembl_ids,
                         'refseq_transcript_ids': orf['refseq_transcript_ids'],
+                        'transcript_mapping_method': orf.get('transcript_mapping_method', 'supplied ENST'),
                         'class': self.edge_class,
                         'label': self.COLLECTION_LABEL,
                         'name': 'modulates expression of',

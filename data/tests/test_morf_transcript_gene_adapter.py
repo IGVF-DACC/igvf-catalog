@@ -330,3 +330,70 @@ def test_null_pvalues_are_preserved(tmp_path, mock_file_fileset, mock_gene_valid
     assert doc['p_value'] is None
     assert doc['neg_log10_pvalue'] is None
     assert doc['significant'] is False
+
+
+@pytest.fixture(autouse=True)
+def mock_transcript_database():
+    with patch('adapters.MORF_transcript_gene_adapter.ArangoDB') as db:
+        db.return_value.get_igvf_connection.return_value.aql.execute.return_value = []
+        yield db
+
+
+def test_refseq_fallback_ignores_versions_and_filters_catalog(tmp_path, mock_transcript_database):
+    path = tmp_path / 'mapping.tsv'
+    path.write_text('ENST00000000001.2\tNM_123.2\tNP_123.1\n'
+                    'ENST00000000002.1\tNM_123.3\n'
+                    'ENST00000000003.1\tNM_123.3\n'
+                    'ENST00000000001.2_PAR_Y\tNM_123.4\n')
+    adapter = MORFTranscriptGene.__new__(MORFTranscriptGene)
+    adapter.REFSEQ_MAPPING_PATH = path
+
+    def orf(name, transcripts, refs):
+        return {'morf_id': name, 'ensembl_transcript_ids': transcripts,
+                'refseq_transcript_ids': refs}
+    orfs = {'missing': orf('TEST_1', [], ['NM_123.1']),
+            'supplied': orf('TEST_2', ['ENST00000000004'], ['NM_123.1']),
+            'unmatched': orf('TEST_3', [], ['NM_999.1']),
+            'control': orf('GFP_1', [], ['NM_123.1'])}
+    mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute.return_value = [
+        'ENST00000000001', 'ENST00000000001_PAR_Y', 'ENST00000000002']
+    adapter._resolve_missing_transcripts(orfs)
+    assert orfs['missing']['ensembl_transcript_ids'] == [
+        'ENST00000000001', 'ENST00000000001_PAR_Y', 'ENST00000000002']
+    assert orfs['missing']['refseq_transcript_ids'] == ['NM_123.1']
+    assert orfs['missing']['transcript_mapping_method'] == 'GENCODE v43 RefSeq accession without version'
+    assert orfs['supplied']['ensembl_transcript_ids'] == ['ENST00000000004']
+    assert orfs['unmatched']['ensembl_transcript_ids'] == []
+    assert orfs['control']['ensembl_transcript_ids'] == []
+
+
+@pytest.fixture(autouse=True)
+def empty_exclusion_file(tmp_path, monkeypatch):
+    path = tmp_path / 'exclusions.tsv'
+    path.write_text('screen_accession\tMORF_id\treason\n')
+    monkeypatch.setattr(MORFTranscriptGene, 'EXCLUSION_PATH', path)
+    return path
+
+
+def test_exclusions_are_screen_specific_and_normalized(empty_exclusion_file, mock_file_fileset, mock_gene_validator, caplog):
+    empty_exclusion_file.write_text(
+        'screen_accession\tMORF_id\treason\n'
+        'IGVFFI6734IWRB\tNKX2-1_1\tmanual_exclusion\n'
+        'IGVFFI6032GREJ\tAATF_1\tother_screen\n')
+    caplog.set_level('INFO')
+    writer = SpyWriter()
+    adapter = _build_adapter(writer)
+    adapter.process_file()
+    docs = _parsed_docs(writer)
+    assert not any(d['morf_id'] == 'NKX2_1_1' for d in docs)
+    assert any(d['morf_id'] == 'AATF_1' for d in docs)
+    assert 'manual_exclusion' in caplog.text
+
+
+def test_excluded_constructs_do_not_reach_mapping(empty_exclusion_file, mock_file_fileset, mock_gene_validator):
+    empty_exclusion_file.write_text(
+        'screen_accession\tMORF_id\treason\nIGVFFI6734IWRB\tACTL6A_2\tno_transcript\n')
+    adapter = _build_adapter(SpyWriter())
+    with patch.object(adapter, '_resolve_missing_transcripts') as resolve:
+        adapter.process_file()
+    assert 'ACTL6A_2' not in resolve.call_args.args[0]
