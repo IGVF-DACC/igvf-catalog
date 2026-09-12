@@ -1,0 +1,189 @@
+screen_accession	screen_row_id	MORF_id	reason	detail	source_transcript_ids	log2FoldChange
+IGVFFI6734IWRB	ARID1B_1	ARID1B_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_005267069,ENST00000636930
+IGVFFI6734IWRB	ARID2_1	ARID2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_152641,ENST00000334344
+IGVFFI6734IWRB	ASH1L_1	ASH1L_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_018489,XM_006711451,XM_006711450,XM_017001784,XM_017001785,ENST00000392403
+IGVFFI6734IWRB	ATF6_1	ATF6_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_007348,ENST00000367942
+IGVFFI6734IWRB	BAZ2B_1	BAZ2B_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001289975,ENST00000392782
+IGVFFI6734IWRB	BAZ2B_2	BAZ2B_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_013450,ENST00000392783
+IGVFFI6734IWRB	BPTF_1	BPTF_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_182641,ENST00000306378
+IGVFFI6734IWRB	BTAF1_1	BTAF1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_003972,ENST00000265990
+IGVFFI6734IWRB	CAMTA2_4	CAMTA2_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_015099,ENST00000348066
+IGVFFI6734IWRB	CHD5_1	CHD5_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_015557,ENST00000262450
+IGVFFI6734IWRB	CHD6_1	CHD6_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_032221,ENST00000373233
+IGVFFI6734IWRB	CHD7_2	CHD7_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_017780,ENST00000423902
+IGVFFI6734IWRB	CREBBP_1	CREBBP_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_004380,ENST00000262367
+IGVFFI6734IWRB	DENND4A_2	DENND4A_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001144823,ENST00000443035
+IGVFFI6734IWRB	EP300_1	EP300_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001429,ENST00000263253
+IGVFFI6734IWRB	EP400_1	EP400_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_015409,ENST00000389561,ENST00000389562
+IGVFFI6734IWRB	ESRRG_4	ESRRG_4	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011509277.1	0.121263996735838
+IGVFFI6734IWRB	FLI1_4	FLI1_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_002017,ENST00000527786
+IGVFFI6734IWRB	GFP_1	GFP_1	control_construct	GFP/mCherry control; intentionally not adapted.		0.512580913526579
+IGVFFI6734IWRB	GON4L_3	GON4L_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001282860,NM_001282856,ENST00000368331,ENST00000615926
+IGVFFI6734IWRB	HELZ2_2	HELZ2_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001037335,ENST00000467148
+IGVFFI6734IWRB	HIVEP1_1	HIVEP1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011514551,XM_011514552,NM_002114,XM_011514553,ENST00000379388
+IGVFFI6734IWRB	HIVEP2_1	HIVEP2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006734,XM_017010805,ENST00000367603,ENST00000012134,ENST00000367604
+IGVFFI6734IWRB	HSF2_3	HSF2_3	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001243094.1	-0.0784578531244055
+IGVFFI6734IWRB	HSFY2_3	HSFY2_3	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017030031.1	-0.168226881852734
+IGVFFI6734IWRB	KMT2B_1	KMT2B_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_014727,ENST00000420124
+IGVFFI6734IWRB	LCORL_1	LCORL_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011513822,ENST00000635767
+IGVFFI6734IWRB	mCherry_1	mCherry_1	control_construct	GFP/mCherry control; intentionally not adapted.		0.512580913526579
+IGVFFI6734IWRB	MGA_1	MGA_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001080541,ENST00000545763,ENST00000566586
+IGVFFI6734IWRB	MYBBP1A_1	MYBBP1A_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001105538,ENST00000381556
+IGVFFI6734IWRB	NCOA1_3	NCOA1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_005264626,NM_147233,ENST00000395856
+IGVFFI6734IWRB	NCOA3_3	NCOA3_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006534.3
+IGVFFI6734IWRB	NCOA6_2	NCOA6_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_014071,NM_001318240,ENST00000374796,ENST00000359003
+IGVFFI6734IWRB	NCOR1_1	NCOR1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006311,ENST00000268712
+IGVFFI6734IWRB	NCOR2_2	NCOR2_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001077261,ENST00000404621
+IGVFFI6734IWRB	NF1_2	NF1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001042492,ENST00000358273
+IGVFFI6734IWRB	NF1_3	NF1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_000267,ENST00000356175
+IGVFFI6734IWRB	NKRF_2	NKRF_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001173488.1	0.28158750705158
+IGVFFI6734IWRB	NOTCH1_1	NOTCH1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_017617,ENST00000277541
+IGVFFI6734IWRB	NOTCH2_1	NOTCH2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_024408.3
+IGVFFI6734IWRB	NR2C2_2	NR2C2_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011534061.2	-0.462270827605766
+IGVFFI6734IWRB	NR2C2_4	NR2C2_4	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011534061.2	-0.179496472606855
+IGVFFI6734IWRB	PBRM1_3	PBRM1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_018313,ENST00000394830
+IGVFFI6734IWRB	PBRM1_4	PBRM1_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017006758,XM_017006757,ENST00000409057
+IGVFFI6734IWRB	PBX3_5	PBX3_5	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_006717133.1	-0.0695985740936572
+IGVFFI6734IWRB	POU2F1_4	POU2F1_4	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011509654.2	-0.0702021665623169
+IGVFFI6734IWRB	POU6F1_2	POU6F1_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017019524.1	0.090114765926835
+IGVFFI6734IWRB	RB1CC1_1	RB1CC1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001083617,XM_017014107,ENST00000435644
+IGVFFI6734IWRB	RBAK_1	RBAK_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_021163.3
+IGVFFI6734IWRB	SMARCA1_2	SMARCA1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001282874,ENST00000371121
+IGVFFI6734IWRB	SMARCA2_4	SMARCA2_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001289397,ENST00000450198
+IGVFFI6734IWRB	SMARCA2_6	SMARCA2_6	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_003070,NM_001289396,ENST00000349721,ENST00000382203
+IGVFFI6734IWRB	SMARCA4_4	SMARCA4_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_006722845,XM_011528198,NM_001128849,XM_006722846,ENST00000450717
+IGVFFI6734IWRB	SMARCA4_6	SMARCA4_6	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017027166,NM_001128846,ENST00000589677
+IGVFFI6734IWRB	SP140_1	SP140_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001278452,ENST00000343805
+IGVFFI6734IWRB	SP140_2	SP140_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_007237,ENST00000392045
+IGVFFI6734IWRB	SP140_5	SP140_5	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001278451,ENST00000420434
+IGVFFI6734IWRB	SP140L_3	SP140L_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001308162,ENST00000243810
+IGVFFI6734IWRB	SRCAP_1	SRCAP_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006662,ENST00000262518
+IGVFFI6734IWRB	STOX1_1	STOX1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_152709,NM_001130161,ENST00000298596,ENST00000399169
+IGVFFI6734IWRB	TADA2B_2	TADA2B_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011513595.1	0.104889327868221
+IGVFFI6734IWRB	TAF1_1	TAF1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_138923,ENST00000373790
+IGVFFI6734IWRB	TAF1_2	TAF1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001286074,ENST00000423759
+IGVFFI6734IWRB	TAF1_3	TAF1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_004606,ENST00000276072
+IGVFFI6734IWRB	TCF3_2	TCF3_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017027180,ENST00000395423
+IGVFFI6734IWRB	TOPORS_1	TOPORS_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001195622,ENST00000379858
+IGVFFI6734IWRB	TOPORS_2	TOPORS_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_005802,ENST00000360538
+IGVFFI6734IWRB	TP53BP1_3	TP53BP1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_005657,ENST00000263801
+IGVFFI6734IWRB	TP53BP1_4	TP53BP1_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001141980,ENST00000382044
+IGVFFI6734IWRB	TRPS1_2	TRPS1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011517268,XM_005251049,ENST00000640765,ENST00000220888
+IGVFFI6734IWRB	TRPS1_3	TRPS1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001282902,ENST00000520276
+IGVFFI6734IWRB	USF3_1	USF3_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001009899,XM_017005871,ENST00000316407,ENST00000478658
+IGVFFI6734IWRB	WNK1_3	WNK1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_018979,ENST00000315939
+IGVFFI6734IWRB	ZBTB24_1	ZBTB24_1	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001164313.1	0.159707975166421
+IGVFFI6734IWRB	ZBTB38_1	ZBTB38_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001080412,XM_005247257,XM_011512611,XM_017006061,XM_017006055,XM_017006054,XM_017006053,XM_017006060,XM_017006056,XM_005247258,XM_017006052,XM_005247261,XM_017006059,XM_017006058,XM_017006057,ENST00000514251,ENST00000637056,ENST00000441582,ENST00000321464
+IGVFFI6734IWRB	ZFHX2_1	ZFHX2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_033400,XM_011537247,XM_011537246,XM_017021714,XM_011537245,ENST00000419474
+IGVFFI6734IWRB	ZFHX3_1	ZFHX3_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001164766,ENST00000397992
+IGVFFI6734IWRB	ZNF138_7	ZNF138_7	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001271649.1	0.0877188050851169
+IGVFFI6734IWRB	ZNF14_1	ZNF14_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_021030,ENST00000344099
+IGVFFI6734IWRB	ZNF169_2	ZNF169_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017014364.1	-0.227792988555244
+IGVFFI6734IWRB	ZNF208_1	ZNF208_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_007153,ENST00000397126
+IGVFFI6734IWRB	ZNF273_1	ZNF273_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017011688,NM_021148,ENST00000476120
+IGVFFI6734IWRB	ZNF292_1	ZNF292_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_015021,ENST00000369577
+IGVFFI6734IWRB	ZNF335_1	ZNF335_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_022095,ENST00000322927
+IGVFFI6734IWRB	ZNF407_2	ZNF407_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011526070,NM_001146190,ENST00000582337,ENST00000309902
+IGVFFI6734IWRB	ZNF407_3	ZNF407_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_005266726,XM_011526068,NM_017757,ENST00000299687
+IGVFFI6734IWRB	ZNF441_1	ZNF441_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_152355,ENST00000357901
+IGVFFI6734IWRB	ZNF462_1	ZNF462_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_021224,XM_006717216,ENST00000277225
+IGVFFI6734IWRB	ZNF483_3	ZNF483_3	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017014339.1	0.108923081541184
+IGVFFI6734IWRB	ZNF518A_1	ZNF518A_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017016994,XM_011540413,NM_001278524,NM_014803,XM_011540415,XM_011540412,XM_011540419,XM_017016993,XM_011540406,XM_011540410,XM_011540418,XM_011540420,XM_017016989,XM_011540408,NM_001278525,XM_017016992,XM_017016991,XM_017016986,XM_017016995,XM_017016990,XM_017016987,XM_017016996,XM_017016988,XM_017016997,XM_017016999,XM_017016998,ENST00000316045,ENST00000624776,ENST00000614149
+IGVFFI6734IWRB	ZNF570_2	ZNF570_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_144694,NM_001321991,XM_011526544,ENST00000330173
+IGVFFI6734IWRB	ZNF611_1	ZNF611_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_030972,NM_001161499,NM_001161500,ENST00000540744,ENST00000543227,ENST00000319783
+IGVFFI6734IWRB	ZNF615_3	ZNF615_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017026649,XM_017026648,NM_198480,NM_001321320,ENST00000602063,ENST00000376716
+IGVFFI6734IWRB	ZNF646_1	ZNF646_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011545990,XM_005255711,XM_005255710,NM_014699,ENST00000300850
+IGVFFI6734IWRB	ZNF654_1	ZNF654_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017006790,ENST00000636215
+IGVFFI6734IWRB	ZNF721_1	ZNF721_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_133474,ENST00000511833
+IGVFFI6734IWRB	ZNF761_1	ZNF761_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001289951,NM_001008401,NM_001289952,ENST00000432094,ENST00000454407
+IGVFFI6734IWRB	ZNF781_1	ZNF781_1	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_152605.3	-0.211067939871203
+IGVFFI6734IWRB	ZNF836_1	ZNF836_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011526558,XM_011526559,NM_001102657,ENST00000597252
+IGVFFI6734IWRB	ZNF845_1	ZNF845_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_138374,NM_001321523,NM_001321524,NM_001321522,ENST00000458035,ENST00000595091
+IGVFFI6734IWRB	ZNF846_2	ZNF846_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017026405.1	-0.0172334132453828
+IGVFFI6734IWRB	ZNF850_1	ZNF850_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001193552,ENST00000591344
+IGVFFI6734IWRB	ZSCAN12_2	ZSCAN12_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011515017	-0.333090687771911
+IGVFFI6032GREJ	ARID1B_1	ARID1B_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_005267069,ENST00000636930
+IGVFFI6032GREJ	ARID1B_3	ARID1B_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_020732,ENST00000346085
+IGVFFI6032GREJ	ARID2_1	ARID2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_152641,ENST00000334344
+IGVFFI6032GREJ	ASH1L_1	ASH1L_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_018489,XM_006711451,XM_006711450,XM_017001784,XM_017001785,ENST00000392403
+IGVFFI6032GREJ	ATF6_1	ATF6_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_007348,ENST00000367942
+IGVFFI6032GREJ	BAZ2A_2	BAZ2A_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001300905,ENST00000549884
+IGVFFI6032GREJ	BAZ2B_1	BAZ2B_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001289975,ENST00000392782
+IGVFFI6032GREJ	BAZ2B_2	BAZ2B_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_013450,ENST00000392783
+IGVFFI6032GREJ	BPTF_1	BPTF_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_182641,ENST00000306378
+IGVFFI6032GREJ	CHD3_3	CHD3_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001005271,ENST00000380358
+IGVFFI6032GREJ	CHD6_1	CHD6_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_032221,ENST00000373233
+IGVFFI6032GREJ	CHD7_2	CHD7_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_017780,ENST00000423902
+IGVFFI6032GREJ	CREBBP_1	CREBBP_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_004380,ENST00000262367
+IGVFFI6032GREJ	EP300_1	EP300_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001429,ENST00000263253
+IGVFFI6032GREJ	ESRRG_4	ESRRG_4	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011509277.1	-0.67945356831685
+IGVFFI6032GREJ	FANCD2_1	FANCD2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_033084,ENST00000287647
+IGVFFI6032GREJ	FLI1_4	FLI1_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_002017,ENST00000527786
+IGVFFI6032GREJ	GFP_1	GFP_1	control_construct	GFP/mCherry control; intentionally not adapted.
+IGVFFI6032GREJ	GON4L_2	GON4L_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001282858,XM_006711393,XM_006711394,ENST00000437809,ENST00000271883
+IGVFFI6032GREJ	GON4L_3	GON4L_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001282860,NM_001282856,ENST00000368331,ENST00000615926
+IGVFFI6032GREJ	HELZ2_1	HELZ2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_033405,ENST00000427522
+IGVFFI6032GREJ	HELZ2_2	HELZ2_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001037335,ENST00000467148
+IGVFFI6032GREJ	HIVEP1_1	HIVEP1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011514551,XM_011514552,NM_002114,XM_011514553,ENST00000379388
+IGVFFI6032GREJ	HIVEP2_1	HIVEP2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006734,XM_017010805,ENST00000367603,ENST00000012134,ENST00000367604
+IGVFFI6032GREJ	HSF2_3	HSF2_3	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001243094.1	0.11403157233881
+IGVFFI6032GREJ	HSFY2_3	HSFY2_3	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017030031.1	0.205677560207491
+IGVFFI6032GREJ	KDM5A_1	KDM5A_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001042603,ENST00000399788
+IGVFFI6032GREJ	mCherry_1	mCherry_1	control_construct	GFP/mCherry control; intentionally not adapted.
+IGVFFI6032GREJ	MYT1L_2	MYT1L_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001303052,XM_017003609,XM_017003610,ENST00000399161
+IGVFFI6032GREJ	NCL_1	NCL_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_005381,ENST00000322723
+IGVFFI6032GREJ	NCOA3_3	NCOA3_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006534.3
+IGVFFI6032GREJ	NCOA6_2	NCOA6_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_014071,NM_001318240,ENST00000374796,ENST00000359003
+IGVFFI6032GREJ	NCOR1_1	NCOR1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006311,ENST00000268712
+IGVFFI6032GREJ	NCOR2_2	NCOR2_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001077261,ENST00000404621
+IGVFFI6032GREJ	NF1_2	NF1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001042492,ENST00000358273
+IGVFFI6032GREJ	NF1_3	NF1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_000267,ENST00000356175
+IGVFFI6032GREJ	NKRF_2	NKRF_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001173488.1	2.02279917353882
+IGVFFI6032GREJ	NOTCH2_1	NOTCH2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_024408.3
+IGVFFI6032GREJ	NR2C2_2	NR2C2_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011534061.2	-0.190101722078566
+IGVFFI6032GREJ	NR2C2_4	NR2C2_4	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011534061.2	-1.22482662433468
+IGVFFI6032GREJ	PBRM1_4	PBRM1_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017006758,XM_017006757,ENST00000409057
+IGVFFI6032GREJ	PBX3_5	PBX3_5	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_006717133.1	0.0188398869181885
+IGVFFI6032GREJ	POU2F1_4	POU2F1_4	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011509654.2	-0.778354352434766
+IGVFFI6032GREJ	POU6F1_2	POU6F1_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017019524.1	0.291407485081141
+IGVFFI6032GREJ	RBAK_1	RBAK_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_021163.3
+IGVFFI6032GREJ	SP140_1	SP140_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001278452,ENST00000343805
+IGVFFI6032GREJ	SP140_2	SP140_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_007237,ENST00000392045
+IGVFFI6032GREJ	SP140_4	SP140_4	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001278453,ENST00000417495
+IGVFFI6032GREJ	SRCAP_1	SRCAP_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_006662,ENST00000262518
+IGVFFI6032GREJ	STOX1_1	STOX1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_152709,NM_001130161,ENST00000298596,ENST00000399169
+IGVFFI6032GREJ	TADA2B_2	TADA2B_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011513595.1	0.446130620455704
+IGVFFI6032GREJ	TAF1_1	TAF1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_138923,ENST00000373790
+IGVFFI6032GREJ	TAF1_2	TAF1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001286074,ENST00000423759
+IGVFFI6032GREJ	TAF1_3	TAF1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_004606,ENST00000276072
+IGVFFI6032GREJ	TCF20_1	TCF20_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_181492,XM_011530354,ENST00000335626
+IGVFFI6032GREJ	TCF3_2	TCF3_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017027180,ENST00000395423
+IGVFFI6032GREJ	TOPORS_1	TOPORS_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001195622,ENST00000379858
+IGVFFI6032GREJ	TOPORS_2	TOPORS_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_005802,ENST00000360538
+IGVFFI6032GREJ	TRPS1_1	TRPS1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_014112,XM_006716625,XM_011517264,XM_011517266,ENST00000395715
+IGVFFI6032GREJ	TRPS1_2	TRPS1_2	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011517268,XM_005251049,ENST00000640765,ENST00000220888
+IGVFFI6032GREJ	TRPS1_3	TRPS1_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001282902,ENST00000520276
+IGVFFI6032GREJ	WNK1_1	WNK1_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001184985,ENST00000537687
+IGVFFI6032GREJ	ZBTB24_1	ZBTB24_1	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001164313.1	0.321469131547851
+IGVFFI6032GREJ	ZBTB38_1	ZBTB38_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001080412,XM_005247257,XM_011512611,XM_017006061,XM_017006055,XM_017006054,XM_017006053,XM_017006060,XM_017006056,XM_005247258,XM_017006052,XM_005247261,XM_017006059,XM_017006058,XM_017006057,ENST00000514251,ENST00000637056,ENST00000441582,ENST00000321464
+IGVFFI6032GREJ	ZFHX2_1	ZFHX2_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_033400,XM_011537247,XM_011537246,XM_017021714,XM_011537245,ENST00000419474
+IGVFFI6032GREJ	ZFP69_1	ZFP69_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_006710606,NM_198494,NM_001320179,ENST00000372706,ENST00000372705
+IGVFFI6032GREJ	ZFX_3	ZFX_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_005274592,XM_011545581,XM_005274591,NM_001178084,NM_001178085,NM_003410,XM_017029794,XM_011545579,XM_017029795,ENST00000379177,ENST00000304543
+IGVFFI6032GREJ	ZNF138_7	ZNF138_7	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_001271649.1	-0.126769658663163
+IGVFFI6032GREJ	ZNF14_1	ZNF14_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_021030,ENST00000344099
+IGVFFI6032GREJ	ZNF169_2	ZNF169_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017014364.1	0.0361832412284444
+IGVFFI6032GREJ	ZNF273_1	ZNF273_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017011688,NM_021148,ENST00000476120
+IGVFFI6032GREJ	ZNF292_1	ZNF292_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_015021,ENST00000369577
+IGVFFI6032GREJ	ZNF407_1	ZNF407_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001146189,ENST00000577538
+IGVFFI6032GREJ	ZNF407_3	ZNF407_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_005266726,XM_011526068,NM_017757,ENST00000299687
+IGVFFI6032GREJ	ZNF441_1	ZNF441_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_152355,ENST00000357901
+IGVFFI6032GREJ	ZNF483_3	ZNF483_3	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017014339.1	0.387810439369144
+IGVFFI6032GREJ	ZNF532_1	ZNF532_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001318726,NM_018181,XM_017025815,XM_017025818,NM_001318727,XM_017025812,XM_017025816,NM_001318728,XM_017025814,XM_017025817,XM_017025813,ENST00000336078,ENST00000591083,ENST00000589288,ENST00000591230,ENST00000591808
+IGVFFI6032GREJ	ZNF615_3	ZNF615_3	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017026649,XM_017026648,NM_198480,NM_001321320,ENST00000602063,ENST00000376716
+IGVFFI6032GREJ	ZNF646_1	ZNF646_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011545990,XM_005255711,XM_005255710,NM_014699,ENST00000300850
+IGVFFI6032GREJ	ZNF654_1	ZNF654_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_017006790,ENST00000636215
+IGVFFI6032GREJ	ZNF761_1	ZNF761_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	NM_001289951,NM_001008401,NM_001289952,ENST00000432094,ENST00000454407
+IGVFFI6032GREJ	ZNF781_1	ZNF781_1	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	NM_152605.3	0.130443399092663
+IGVFFI6032GREJ	ZNF836_1	ZNF836_1	missing_log2FoldChange	DESeq2 log2FoldChange is missing; adapter requires a numeric effect size.	XM_011526558,XM_011526559,NM_001102657,ENST00000597252
+IGVFFI6032GREJ	ZNF846_2	ZNF846_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_017026405.1	-0.963345471450023
+IGVFFI6032GREJ	ZSCAN12_2	ZSCAN12_2	no_transcript	No supplied ENST and no GENCODE v43 RefSeq RNA cross-reference yielding a Catalog transcript.	XM_011515017	0.121537458390515
