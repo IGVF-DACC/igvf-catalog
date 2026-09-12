@@ -139,9 +139,9 @@ def test_morf_transcript_gene_flags_refseq_only_orfs(mock_file_fileset, mock_gen
 
     docs = _parsed_docs(writer)
     assert all(doc['morf_id'] not in {'ACTL6A_2', 'GFP_1'} for doc in docs)
-    assert 'Flagged 2 ORF(s)' in caplog.text
+    assert 'Flagged 1 ORF(s)' in caplog.text
     assert 'ACTL6A_2' in caplog.text
-    assert 'GFP_1' in caplog.text
+    assert 'GFP_1' not in caplog.text
     assert 'NM_004301.4' in caplog.text
 
 
@@ -152,7 +152,7 @@ def test_morf_transcript_gene_skips_na_deseq_stats(mock_file_fileset, mock_gene_
     adapter.process_file()
 
     assert all(doc['morf_id'] != 'ARID1B_1' for doc in _parsed_docs(writer))
-    assert 'NA DESeq2 log2FoldChange/p-value' in caplog.text
+    assert 'missing DESeq2 log2FoldChange' in caplog.text
 
 
 def test_morf_transcript_gene_chronic_accession(mock_file_fileset, mock_gene_validator):
@@ -183,6 +183,7 @@ def test_morf_transcript_gene_unsupported_accession(mock_file_fileset):
             source_url='https://data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
             reference_filepath=ORF_PATH,
+            reference_source_url=REFERENCE_SOURCE_URL,
         )
 
 
@@ -210,6 +211,122 @@ def test_morf_transcript_gene_invalid_readout_gene(mock_file_fileset):
             writer=writer,
             validate=False,
             reference_filepath=ORF_PATH,
+            reference_source_url=REFERENCE_SOURCE_URL,
         )
         with pytest.raises(ValueError, match='ENSG00000198846 is not a valid gene'):
             adapter.process_file()
+
+
+@pytest.fixture(autouse=True)
+def mock_gene_maps():
+    with patch('adapters.MORF_transcript_gene_adapter.get_gene_map_from_arangodb', return_value={}) as mapping:
+        yield mapping
+
+
+def test_missing_gene_name_then_synonym(mock_gene_maps):
+    mock_gene_maps.side_effect = [
+        {'CURRENT': ['ENSG00000000001']}, {'OLD': ['ENSG00000000002']}]
+    orfs = {name: {'morf_id': name, 'orf_gene': None, 'orf_gene_symbol': name,
+                   'ensembl_transcript_ids': []} for name in ['CURRENT', 'OLD', 'GFP_1', 'mCherry_1']}
+    adapter = MORFTranscriptGene.__new__(MORFTranscriptGene)
+    adapter._resolve_missing_orf_genes(orfs)
+    assert orfs['CURRENT']['orf_gene'] == 'ENSG00000000001'
+    assert orfs['OLD']['orf_gene'] == 'ENSG00000000002'
+    assert orfs['GFP_1']['orf_gene'] is None
+    assert orfs['mCherry_1']['orf_gene'] is None
+
+
+@pytest.mark.parametrize('parents, expected', [
+    (['ENSG00000000001', 'ENSG00000000001'], 'ENSG00000000001'),
+    (['ENSG00000000001', 'ENSG00000000002'], None),
+    (['ENSG00000000001'], None),
+    (['ENSG00000000003', 'ENSG00000000003'], None),
+])
+def test_ambiguous_gene_requires_consistent_transcripts(mock_gene_maps, parents, expected):
+    mock_gene_maps.side_effect = [
+        {}, {'OLD': ['ENSG00000000001', 'ENSG00000000002']}]
+    orf = {'morf_id': 'OLD_1', 'orf_gene': None, 'orf_gene_symbol': 'OLD',
+           'ensembl_transcript_ids': ['ENST00000000001', 'ENST00000000002']}
+    adapter = MORFTranscriptGene.__new__(MORFTranscriptGene)
+    with patch('adapters.MORF_transcript_gene_adapter.ArangoDB') as db, patch.object(
+        MORFTranscriptGene, 'logger', create=True
+    ):
+        db.return_value.get_igvf_connection.return_value.aql.execute.return_value = [
+            {'transcript': 'transcripts/' + t, 'gene': 'genes/' + g}
+            for t, g in zip(orf['ensembl_transcript_ids'], parents)]
+        adapter._resolve_missing_orf_genes({'OLD_1': orf})
+    assert orf['orf_gene'] == expected
+
+
+def test_reference_provenance_uses_input(mock_file_fileset, mock_gene_validator):
+    writer = SpyWriter()
+    writer.add_tag = MagicMock()
+    adapter = _build_adapter(
+        writer, reference_source_url='https://data.igvf.org/tabular-files/IGVFFI0000AAAA/?format=json')
+    adapter.process_file()
+    assert adapter.reference_accession == 'IGVFFI0000AAAA'
+    tags = [call.args[1] for call in writer.add_tag.call_args_list]
+    assert 'IGVFFI0000AAAA' in tags
+    assert 'IGVFFI2373SYJW' not in tags
+
+
+@pytest.mark.parametrize('url', [None, '', 'IGVFFI2373SYJW', 'https://data.igvf.org/tabular-files/bad/'])
+def test_reference_url_required(mock_file_fileset, mock_gene_validator, url):
+    with pytest.raises(ValueError, match='reference_source_url'):
+        _build_adapter(SpyWriter(), reference_source_url=url)
+
+
+def test_transcript_parser_rejects_partial_ids():
+    assert MORFTranscriptGene._parse_transcript_ids(
+        'ENST000000000010,xENST00000000001,ENST00000000001.bad,'
+        'ENST00000000002.3,ENST00000000002.4,NM_123.1,NM_123.1'
+    ) == (['ENST00000000002'], ['NM_123.1'])
+
+
+@pytest.mark.parametrize('field,value', [('pvalue', '-0.1'), ('padj', '1.1'),
+                                         ('baseMean', '-1'), ('lfcSE', '-1'),
+                                         ('log2FoldChange', 'inf')])
+def test_invalid_statistics_have_row_context(tmp_path, mock_file_fileset, mock_gene_validator, field, value):
+    import csv
+    with open(DESEQ_PATH) as f:
+        reader = csv.DictReader(f, delimiter='\t')
+        columns = reader.fieldnames
+        row = next(reader)
+    row[field] = value
+    path = tmp_path / 'bad.tsv'
+    with path.open('w') as f:
+        writer = csv.DictWriter(f, fieldnames=columns, delimiter='\t')
+        writer.writeheader()
+        writer.writerow(row)
+    adapter = _build_adapter(SpyWriter(), filepath=str(path))
+    with pytest.raises(ValueError, match='AATF_1'):
+        adapter.process_file()
+
+
+def test_missing_columns_fail(tmp_path, mock_file_fileset, mock_gene_validator):
+    path = tmp_path / 'bad.tsv'
+    path.write_text('rowID\nAATF_1\n')
+    adapter = _build_adapter(SpyWriter(), filepath=str(path))
+    with pytest.raises(ValueError, match='missing required columns'):
+        adapter.process_file()
+
+
+def test_duplicate_screen_rows_fail(tmp_path, mock_file_fileset, mock_gene_validator):
+    lines = open(DESEQ_PATH).readlines()
+    path = tmp_path / 'duplicate.tsv'
+    path.write_text(''.join([lines[0], lines[1], lines[1]]))
+    adapter = _build_adapter(SpyWriter(), filepath=str(path))
+    with pytest.raises(ValueError, match='duplicate rowID'):
+        adapter.process_file()
+
+
+def test_null_pvalues_are_preserved(tmp_path, mock_file_fileset, mock_gene_validator):
+    path = tmp_path / 'null.tsv'
+    path.write_text(
+        'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tpvalue\tpadj\nAATF_1\t1\t2\t0.1\tNA\tNA\n')
+    writer = SpyWriter()
+    _build_adapter(writer, filepath=str(path)).process_file()
+    doc = _parsed_docs(writer)[0]
+    assert doc['p_value'] is None
+    assert doc['neg_log10_pvalue'] is None
+    assert doc['significant'] is False
