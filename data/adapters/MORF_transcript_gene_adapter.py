@@ -4,16 +4,21 @@ import json
 import math
 import re
 from typing import Optional
+from urllib.parse import urlparse
 
 from adapters.base import BaseAdapter
 from adapters.gene_validator import GeneValidator
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    get_file_fileset_by_accession_in_arangodb,
+    get_gene_map_from_arangodb,
+)
 from adapters.writer import Writer
+from db.arango_db import ArangoDB
 
-# MORF (modular ORF) overexpression screens measuring a constant readout gene.
+# MORF overexpression screens measuring a constant readout gene.
 # DESeq2 differential ORF quantifications are joined to the ORF/transcript table
-# IGVFFI2373SYJW via MORF_id. Catalog transcript nodes are Ensembl (ENST) keyed,
-# so RefSeq-only ORFs are flagged and skipped until they can be reconciled.
+# supplied by the caller via MORF_id. Catalog transcript nodes use Ensembl
+# (ENST) keys, so RefSeq-only ORFs are skipped until they can be reconciled.
 
 # Example DESeq2 row (IGVFFI6734IWRB / IGVFFI6032GREJ):
 # rowID  baseMean  log2FoldChange  lfcSE  stat  pvalue  padj
@@ -23,7 +28,8 @@ from adapters.writer import Writer
 # Name      MORF_id  RefSeq_Gene_Name  RefSeq_and_Gencode_ID              ENSG_id
 # TFORF2521 AATF_1   AATF              NM_012138,ENST00000619387          ENSG00000275700
 
-_ENST_RE = re.compile(r'(ENST[0-9]{11}(?:_PAR_Y)?)(?:\.[0-9]+)?')
+_ENST_RE = re.compile(
+    r'(?<![\w.])(ENST[0-9]{11}(?:_PAR_Y)?)(?:\.[0-9]+)?(?![\w.])')
 _ENSG_RE = re.compile(r'^(ENSG[0-9]{11}(?:_PAR_Y)?)(?:\.[0-9]+)?$')
 _REFSEQ_RE = re.compile(r'(?:N[MR]|X[MR])_\d+(?:\.\d+)?')
 _NA_VALUES = frozenset({'', 'NA', 'NaN', 'nan', 'None', '.'})
@@ -35,7 +41,7 @@ class MORFTranscriptGene(BaseAdapter):
     COLLECTION_LABEL = 'transcript effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
     MAX_LOG10_PVALUE = 240
-    ORF_REFERENCE_ACCESSION = 'IGVFFI2373SYJW'
+    CONTROL_MORF_IDS = frozenset({'GFP_1', 'mCherry_1'})
     # Both current files sort on TOX-GFP (same readout as CRISPR-SURF IGVFFI4396TZAN).
     TOX_ENSEMBL_ID = 'ENSG00000198846'
     FILE_CONFIG = {
@@ -58,7 +64,7 @@ class MORFTranscriptGene(BaseAdapter):
         reference_source_url: Optional[str] = None,
         **kwargs
     ):
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
+        self.file_accession = self._file_accession(source_url, 'source_url')
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '
@@ -66,13 +72,14 @@ class MORFTranscriptGene(BaseAdapter):
             )
         if not reference_filepath:
             raise ValueError(
-                'reference_filepath is required (ORF transcript table '
-                f'{self.ORF_REFERENCE_ACCESSION}).'
+                'reference_filepath is required (ORF transcript table).'
             )
 
         self.source_url = (
             f'https://data.igvf.org/tabular-files/{self.file_accession}/'
         )
+        self.reference_accession = self._file_accession(
+            reference_source_url, 'reference_source_url')
         self.reference_filepath = reference_filepath
         self.reference_source_url = reference_source_url
         self.readout_gene = self.FILE_CONFIG[self.file_accession]['readout_gene']
@@ -101,10 +108,26 @@ class MORFTranscriptGene(BaseAdapter):
         return 'transcripts_genes'
 
     @staticmethod
+    def _file_accession(source_url: Optional[str], field: str) -> str:
+        parsed = urlparse(source_url or '')
+        parts = parsed.path.strip('/').split('/')
+        if (parsed.scheme not in {'http', 'https'} or not parsed.netloc
+                or len(parts) != 2 or parts[0] != 'tabular-files'
+                or not re.fullmatch(r'IGVFFI[0-9A-Z]{8}', parts[-1])):
+            raise ValueError(f'{field} must be an IGVF tabular-file URL.')
+        return parts[-1]
+
+    @staticmethod
     def _open_file(filepath):
-        if filepath.endswith('.gz'):
-            return gzip.open(filepath, 'rt')
-        return open(filepath, 'r')
+        opener = gzip.open if str(filepath).endswith('.gz') else open
+        return opener(filepath, 'rt', encoding='utf-8-sig', newline='')
+
+    @staticmethod
+    def _check_columns(reader, required, filepath):
+        missing = required - set(reader.fieldnames or [])
+        if missing:
+            raise ValueError(
+                f'{filepath}: missing required columns: {", ".join(sorted(missing))}')
 
     @staticmethod
     def _normalize_morf_id(morf_id: str) -> str:
@@ -118,12 +141,18 @@ class MORFTranscriptGene(BaseAdapter):
         normalized = value.strip()
         if normalized in _NA_VALUES:
             return None
-        return float(normalized)
+        number = float(normalized)
+        if not math.isfinite(number):
+            raise ValueError(f'Expected a finite number, got {value!r}')
+        return number
 
     @classmethod
     def _neg_log10_pvalue(cls, p_value: Optional[float]) -> Optional[float]:
         if p_value is None:
             return None
+        if not math.isfinite(p_value) or not 0 <= p_value <= 1:
+            raise ValueError(
+                f'P-value must be between 0 and 1, got {p_value!r}')
         if p_value == 0:
             return cls.MAX_LOG10_PVALUE
         return -1 * math.log10(p_value)
@@ -141,13 +170,15 @@ class MORFTranscriptGene(BaseAdapter):
     def _parse_transcript_ids(refseq_and_gencode_id: str) -> tuple[list[str], list[str]]:
         raw = (refseq_and_gencode_id or '').strip()
         ensembl_ids = list(dict.fromkeys(_ENST_RE.findall(raw)))
-        refseq_ids = _REFSEQ_RE.findall(raw)
+        refseq_ids = list(dict.fromkeys(_REFSEQ_RE.findall(raw)))
         return ensembl_ids, refseq_ids
 
     def _load_orf_reference(self) -> dict[str, dict]:
         orfs = {}
         with self._open_file(self.reference_filepath) as reference_file:
             reader = csv.DictReader(reference_file, delimiter='\t')
+            self._check_columns(reader, {'MORF_id', 'RefSeq_Gene_Name',
+                                         'RefSeq_and_Gencode_ID', 'ENSG_id'}, self.reference_filepath)
             for row in reader:
                 morf_id = (row.get('MORF_id') or '').strip()
                 if not morf_id:
@@ -156,7 +187,7 @@ class MORFTranscriptGene(BaseAdapter):
                 if normalized in orfs:
                     raise ValueError(
                         f'Duplicate MORF_id {morf_id!r} in ORF reference '
-                        f'{self.ORF_REFERENCE_ACCESSION}.'
+                        f'{self.reference_accession}.'
                     )
                 ensembl_ids, refseq_ids = self._parse_transcript_ids(
                     row.get('RefSeq_and_Gencode_ID') or '')
@@ -173,6 +204,55 @@ class MORFTranscriptGene(BaseAdapter):
                 f'No ORF rows loaded from {self.reference_filepath}.'
             )
         return orfs
+
+    def _resolve_missing_orf_genes(self, orfs):
+        """Resolve names, then synonyms; disambiguate using all listed transcripts.
+
+        Supplied gene IDs are preserved. Unresolved mappings remain null rather
+        than selecting one of several candidates arbitrarily.
+        """
+        missing = [orf for orf in orfs.values()
+                   if not orf['orf_gene'] and orf['morf_id'] not in self.CONTROL_MORF_IDS]
+        if not missing:
+            return
+        names = get_gene_map_from_arangodb('name')
+        synonyms = None
+        ambiguous = []
+        for orf in missing:
+            symbol = orf['orf_gene_symbol']
+            candidates = set(names.get(symbol, []))
+            if not candidates and symbol:
+                if synonyms is None:
+                    synonyms = get_gene_map_from_arangodb('synonyms')
+                candidates = set(synonyms.get(symbol, []))
+            if len(candidates) == 1:
+                orf['orf_gene'] = next(iter(candidates))
+            elif len(candidates) > 1:
+                ambiguous.append((orf, candidates))
+        transcript_ids = sorted({f'transcripts/{t}' for orf, _ in ambiguous
+                                 for t in orf['ensembl_transcript_ids']})
+        parents = {}
+        if transcript_ids:
+            db = ArangoDB().get_igvf_connection()
+            for edge in db.aql.execute(
+                'FOR e IN genes_transcripts FILTER e._to IN @ids '
+                'RETURN {transcript: e._to, gene: e._from}',
+                bind_vars={'ids': transcript_ids}
+            ):
+                parents.setdefault(edge['transcript'], set()).add(
+                    edge['gene'].removeprefix('genes/'))
+        for orf, candidates in ambiguous:
+            mappings = [parents.get(f'transcripts/{t}', set())
+                        for t in orf['ensembl_transcript_ids']]
+            # Require every listed transcript to agree on one candidate gene.
+            if mappings and all(len(m) == 1 for m in mappings):
+                genes = set.union(*mappings)
+                if len(genes) == 1 and genes <= candidates:
+                    orf['orf_gene'] = next(iter(genes))
+        for orf in missing:
+            if not orf['orf_gene']:
+                self.logger.warning('Unresolved ORF gene for %s (%s)',
+                                    orf['morf_id'], orf['orf_gene_symbol'])
 
     def _write_doc(self, props: dict) -> None:
         if self.validate:
@@ -198,7 +278,7 @@ class MORFTranscriptGene(BaseAdapter):
             )
         if na_stats:
             self.logger.info(
-                'Skipped %d ORF(s) in %s with NA DESeq2 log2FoldChange/p-value.',
+                'Skipped %d ORF(s) in %s with missing DESeq2 log2FoldChange.',
                 len(na_stats),
                 self.file_accession,
             )
@@ -208,12 +288,7 @@ class MORFTranscriptGene(BaseAdapter):
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
-        self.writer.add_tag('portal_accessions', self.ORF_REFERENCE_ACCESSION)
-        if self.reference_source_url:
-            reference_accession = self.reference_source_url.rstrip(
-                '/').split('/')[-1]
-            if reference_accession.startswith('IGVF'):
-                self.writer.add_tag('portal_accessions', reference_accession)
+        self.writer.add_tag('portal_accessions', self.reference_accession)
 
         if not self.gene_validator.validate(self.readout_gene):
             raise ValueError(
@@ -221,17 +296,28 @@ class MORFTranscriptGene(BaseAdapter):
             )
 
         orfs = self._load_orf_reference()
+        self._resolve_missing_orf_genes(orfs)
         missing_ensembl = []
         missing_reference = []
         na_stats = []
 
         with self._open_file(self.filepath) as deseq_file:
             reader = csv.DictReader(deseq_file, delimiter='\t')
+            self._check_columns(reader, {'rowID', 'log2FoldChange', 'lfcSE',
+                                         'baseMean', 'pvalue', 'padj'}, self.filepath)
+            seen_ids = set()
             for row in reader:
                 row_id = (row.get('rowID') or '').strip()
                 if not row_id:
                     continue
-                orf = orfs.get(self._normalize_morf_id(row_id))
+                if self._normalize_morf_id(row_id) in self.CONTROL_MORF_IDS:
+                    continue
+                normalized = self._normalize_morf_id(row_id)
+                if normalized in seen_ids:
+                    raise ValueError(
+                        f'{self.filepath}: duplicate rowID {row_id!r}')
+                seen_ids.add(normalized)
+                orf = orfs.get(normalized)
                 if orf is None:
                     missing_reference.append(row_id)
                     continue
@@ -246,9 +332,20 @@ class MORFTranscriptGene(BaseAdapter):
                     )
                     continue
 
-                log2fc = self._parse_optional_float(row.get('log2FoldChange'))
-                p_value = self._parse_optional_float(row.get('pvalue'))
-                p_value_adj = self._parse_optional_float(row.get('padj'))
+                try:
+                    stats = {field: self._parse_optional_float(row.get(field))
+                             for field in ('log2FoldChange', 'lfcSE', 'baseMean', 'pvalue', 'padj')}
+                    p_value = stats['pvalue']
+                    p_value_adj = stats['padj']
+                    neg_log10_pvalue = self._neg_log10_pvalue(p_value)
+                    neg_log10_pvalue_adj = self._neg_log10_pvalue(p_value_adj)
+                    for field in ('lfcSE', 'baseMean'):
+                        if stats[field] is not None and stats[field] < 0:
+                            raise ValueError(f'{field} must be nonnegative')
+                except ValueError as error:
+                    raise ValueError(
+                        f'{self.filepath}: row {row_id!r}: {error}') from error
+                log2fc = stats['log2FoldChange']
                 if log2fc is None:
                     na_stats.append(row_id)
                     continue
@@ -266,12 +363,12 @@ class MORFTranscriptGene(BaseAdapter):
                         '_from': f'transcripts/{transcript_id}',
                         '_to': f'genes/{self.readout_gene}',
                         'log2FC': log2fc,
-                        'log2FC_se': self._parse_optional_float(row.get('lfcSE')),
-                        'base_mean': self._parse_optional_float(row.get('baseMean')),
+                        'log2FC_se': stats['lfcSE'],
+                        'base_mean': stats['baseMean'],
                         'p_value': p_value,
                         'p_value_adj': p_value_adj,
-                        'neg_log10_pvalue': self._neg_log10_pvalue(p_value),
-                        'neg_log10_pvalue_adj': self._neg_log10_pvalue(p_value_adj),
+                        'neg_log10_pvalue': neg_log10_pvalue,
+                        'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'significant': significant,
                         'morf_id': orf['morf_id'],
                         'orf_gene': orf['orf_gene'],
