@@ -354,6 +354,9 @@ class MORFTranscriptGene(BaseAdapter):
                     p_value_adj is not None
                     and p_value_adj < self.SIGNIFICANCE_THRESHOLD
                 )
+                # Preserve every listed ENST for transcript-level discovery.
+                # These edges share one construct measurement, identified by
+                # (file_accession, morf_id), and the full source transcript list.
                 for transcript_id in ensembl_ids:
                     self._write_doc({
                         '_key': (
