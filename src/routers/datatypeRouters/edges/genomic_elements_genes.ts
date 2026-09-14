@@ -7,14 +7,17 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
-import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow, getMergedCollectionSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
-const genomicElementsGenesCrisprElementGeneEncodeSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json')
 const genomicElementsGenesCrisprElementGeneIgvfSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json')
+// genomic_elements_genes holds ENCODE E-G links, IGVF CRISPR, scE2G, and ENCODE CRISPR
+// element-gene edges. Filtering must see every source's fields/ranges (e.g. IGVF's
+// z_score/idr/neg_log10_pvalue), not just the ENCODE CRISPR schema's subset.
+const genomicElementsGenesFilterSchema = getMergedCollectionSchema('edges', 'genomic_elements_genes')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
@@ -139,7 +142,7 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
     input.cell_annotation_term = `ontology_terms/${input.cell_annotation_term as string}`
   }
   // edge filters are the same for all methods
-  const filters = getFilterStatements(genomicElementsGenesCrisprElementGeneEncodeSchema, input)
+  const filters = getFilterStatements(genomicElementsGenesFilterSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
