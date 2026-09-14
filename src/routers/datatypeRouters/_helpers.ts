@@ -23,6 +23,15 @@ export function distanceGeneVariant (geneStart: number, geneEnd: number, variant
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
 }
 
+// The gene schema's `hgnc` property stores IDs with an `HGNC:` prefix (e.g. `HGNC:4232`),
+// but the `hgnc_id` API param accepts the bare number. Any caller that filters on `hgnc`
+// directly (rather than delegating to geneSearch()) must apply this same prefixing or the
+// filter silently matches nothing.
+export function withHgncPrefix (hgncId: string | number): string {
+  const value = hgncId.toString()
+  return value.startsWith('HGNC') ? value : `HGNC:${value}`
+}
+
 export function validRegion (region: string): string[] | null {
   const regex: RegExp = /(chr\w+):(\d*)-(\d*)/
 
