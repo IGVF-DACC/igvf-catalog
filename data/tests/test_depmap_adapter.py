@@ -67,6 +67,54 @@ def test_depmap_adapter_process_file(mock_file_fileset):
     assert first_item['method'] == 'DepMap'
     assert first_item['label'] == first_item['method']
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI8863BMFF'
+    assert first_item['cancer_term'].startswith('ontology_terms/Oncotree_')
+    assert first_item['cancer_term'].count('/') == 1
+
+
+def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
+    """Oncotree codes with '/' must match sanitized ontology_terms _key (e.g. MDS/MPN → MDS_MPN)."""
+    mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        return_value={'FAKEGENE': ['ENSG00000000001']},
+    )
+
+    import tempfile
+    import os
+
+    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    model_id = header[1]
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
+        f.write(','.join(row) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = DepMap(filepath=temp_file_path,
+                         label='depmap', writer=writer)
+        adapter.file_accession = 'IGVFFI8863BMFF'
+
+        original_load = adapter.load_cell_ontology_id_mapping
+
+        def load_with_slash_code():
+            original_load()
+            adapter.cell_ontology_id_mapping[model_id]['oncotree_code'] = 'MDS/MPN'
+
+        adapter.load_cell_ontology_id_mapping = load_with_slash_code
+        adapter.process_file()
+
+        items = [json.loads(item)
+                 for item in writer.contents if item.startswith('{')]
+        assert items
+        assert all(
+            item['cancer_term'] == 'ontology_terms/Oncotree_MDS_MPN'
+            for item in items
+        )
+    finally:
+        os.unlink(temp_file_path)
 
 
 def test_depmap_adapter_initialization():
