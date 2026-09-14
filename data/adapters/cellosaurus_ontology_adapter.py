@@ -176,6 +176,8 @@ class Cellosaurus(BaseAdapter):
                             inverse_name = 'originate from same individual as'
                         props['inverse_name'] = inverse_name
 
+                        if self.validate:
+                            self.validate_doc(props)
                         self.save_props(props)
 
     def save_props(self, props):
