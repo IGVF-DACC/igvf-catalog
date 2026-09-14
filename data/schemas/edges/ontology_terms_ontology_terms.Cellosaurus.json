@@ -29,14 +29,18 @@
       "type": "string",
       "description": "Name for the ontology term to ontology term edge",
       "enum": [
-        "database cross-reference"
+        "database cross-reference",
+        "derived from",
+        "originate from same individual as"
       ]
     },
     "inverse_name": {
       "type": "string",
       "description": "Inverse name for the ontology term to ontology term edge",
       "enum": [
-        "database cross-reference"
+        "database cross-reference",
+        "derives",
+        "originate from same individual as"
       ]
     },
     "source": {
