@@ -19,7 +19,7 @@
         },
         "strand": {
           "type": "string",
-          "description": "Strand of the MPRA element tile",
+          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
           "enum": [
             "+",
             "-",
@@ -47,7 +47,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Handle of the files_filesets record for the file this element was tested in.",
           "pattern": "^files_filesets/"
         }
       },

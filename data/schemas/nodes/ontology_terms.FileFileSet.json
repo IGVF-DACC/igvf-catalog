@@ -10,27 +10,27 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CL_0000746"
+          "example": "NTR_0000856"
         },
         "name": {
-          "example": "cardiac muscle cell"
+          "example": "mesendoderm"
         },
         "uri": {
           "type": "string",
-          "description": "URI for the ontology term",
+          "description": "Link to the term's page on the source portal.",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         },
         "term_id": {
           "type": "string",
-          "description": "Term ID for the ontology term",
-          "example": "CL_0000746"
+          "description": "Ontology identifier describing the biological sample, with the prefix separated by an underscore rather than a colon. Only NTR terms are loaded here: biosample types the portals describe with a new-term request because no existing ontology term covers them.",
+          "example": "NTR_0000856"
         },
         "synonyms": {
           "type": [
             "array",
             "null"
           ],
-          "description": "Synonyms for the ontology term"
+          "description": "Synonyms for the term that have been recorded in an ontology."
         },
         "source": {
           "enum": [
@@ -39,7 +39,7 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/sample-terms/CL_0000746"
+          "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         }
       },
       "required": [

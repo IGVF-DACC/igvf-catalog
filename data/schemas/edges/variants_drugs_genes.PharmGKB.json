@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the variant to drug to gene edge",
+      "description": "PharmGKB variant annotation ID, drug accession and Ensembl gene ID joined by underscores.",
       "example": "1450377668_PA450373_ENSG00000165841"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the variant to drug to gene edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "pattern": "^variants_drugs/",
       "collections": [
         "variants_drugs"
@@ -18,7 +18,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Source for the variant to drug to gene edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
         "genes"
@@ -26,53 +26,53 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the variant to drug to gene edge",
+      "description": "Predicate describing the relationship in the _from to _to direction.",
       "enum": [
         "associated with"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the variant to drug to gene edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "enum": [
         "associated with"
       ]
     },
     "gene_symbol": {
       "type": "string",
-      "description": "Gene symbol for the variant to drug to gene edge",
+      "description": "HGNC symbol of the gene this edge attaches to the variant-drug annotation.",
       "example": "ABCB1"
     },
     "source": {
       "type": "string",
-      "description": "Source for the variant to drug to gene edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "pharmGKB"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the variant to drug to gene edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
       "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
     },
     "class": {
       "type": "string",
-      "description": "The class of the variant to drug to gene edge, from the associated files_filesets record",
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record.",
       "enum": [
         "observed data"
       ]
     },
     "method": {
       "type": "string",
-      "description": "The method of the variant to drug to gene edge, from the associated files_filesets record",
+      "description": "Model or pipeline that produced this record, taken from the associated files_filesets record.",
       "enum": [
         "PharmGKB"
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the variant to drug to gene edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI8835SMSP",
       "pattern": "^files_filesets/",
       "collections": [

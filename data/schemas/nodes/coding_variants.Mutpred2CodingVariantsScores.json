@@ -16,56 +16,56 @@
         },
         "ref": {
           "type": "string",
-          "description": "Reference amino acid for the coding variant",
+          "description": "Reference amino acid at the substituted position, as a one-letter code.",
           "example": "Q"
         },
         "alt": {
           "type": "string",
-          "description": "Alternative amino acid for the coding variant",
+          "description": "Substituting amino acid, as a one-letter code.",
           "example": "T"
         },
         "aapos": {
           "type": "integer",
-          "description": "Amino acid position for the coding variant"
+          "description": "1-based position of the substituted residue within the protein."
         },
         "refcodon": {
           "type": "string",
-          "description": "Reference codon for the coding variant",
+          "description": "Reference codon at the substituted position.",
           "example": "ATG"
         },
         "gene_name": {
           "type": "string",
-          "description": "Gene name for the coding variant",
+          "description": "HGNC symbol of the gene encoding the protein.",
           "example": "DSG2"
         },
         "protein_name": {
           "type": "string",
-          "description": "Protein name for the coding variant",
+          "description": "UniProtKB entry name of the protein.",
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
           "type": "string",
-          "description": "Protein ENSEMBL id for the coding variant",
+          "description": "Ensembl protein ID the substitution is described against, with its version suffix removed.",
           "example": "ENSP00000493376"
         },
         "codonpos": {
           "type": "integer",
-          "description": "Codon position for the coding variant"
+          "description": "Which of the three codon positions the underlying nucleotide change falls at."
         },
         "hgvsc": {
           "type": "string",
-          "description": "HGVS for the coding variant",
+          "description": "HGVS coding-level description of the nucleotide change that produces this substitution.",
           "example": "c.2617_2618delinsAC"
         },
         "hgvsp": {
           "type": "string",
-          "description": "HGVS for the coding variant",
+          "description": "HGVS protein-level description of the amino acid substitution. Substitutions at the start codon are written p.Met1? so that they match dbNSFP.",
           "example": "p.Gln873Thr",
           "pattern": "^p."
         },
         "transcript_id": {
           "type": "string",
-          "description": "Transcript ENSEMBL id for the coding variant",
+          "description": "Ensembl transcript ID the coding change is described against, with its version suffix removed.",
           "example": "ENST00000261590"
         },
         "source": {

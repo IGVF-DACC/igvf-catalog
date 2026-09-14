@@ -14,13 +14,13 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "The unique ENSEMBL gene ID with version number",
+          "description": "Ensembl gene ID including its version suffix. The _key of this record is the same ID with the version removed.",
           "example": "ENSG00000290825.1",
           "pattern": "^ENSG[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "gene_type": {
           "type": "string",
-          "description": "The type of gene",
+          "description": "Biotype GENCODE assigns to the gene.",
           "enum": [
             "artifact",
             "IG_C_gene",
@@ -62,27 +62,28 @@
             "unitary_pseudogene",
             "unprocessed_pseudogene",
             "vault_RNA"
-          ]
+          ],
+          "example": "protein_coding"
         },
         "chr": {
           "type": "string",
-          "description": "The chromosome name",
+          "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
         "start": {
           "type": "number",
-          "description": "The start position of the gene",
+          "description": "Start of the gene, 0-based and inclusive.",
           "example": 11869
         },
         "end": {
           "type": "number",
-          "description": "The end position of the gene",
+          "description": "End of the gene, 0-based and exclusive.",
           "example": 14409
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the gene",
+          "description": "Strand the gene is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
             "+",
             "-"
@@ -93,7 +94,7 @@
         },
         "symbol": {
           "type": "string",
-          "description": "The symbol of the gene",
+          "description": "GENCODE gene symbol. Carries the same value as name.",
           "example": "DDX11L2"
         },
         "source": {
@@ -103,7 +104,7 @@
         },
         "version": {
           "type": "string",
-          "description": "The version of the gene annotation",
+          "description": "GENCODE release the annotation was taken from.",
           "enum": [
             "v43"
           ]
@@ -115,7 +116,7 @@
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the gene",
+          "description": "Species this annotation describes.",
           "enum": [
             "Homo sapiens"
           ]
@@ -125,7 +126,7 @@
             "array",
             "null"
           ],
-          "description": "The study sets of the gene",
+          "description": "IGVF study sets that include this gene, read from the IGVF portal at load time. Null for genes the portal does not list.",
           "items": {
             "type": "string",
             "enum": [
@@ -163,7 +164,7 @@
             "array",
             "null"
           ],
-          "description": "The collections of the gene",
+          "description": "Curated gene collections that include this gene, read from the IGVF portal at load time. Null for genes in no collection.",
           "items": {
             "type": "string",
             "enum": [
@@ -172,29 +173,30 @@
               "Morphic",
               "StanfordFCC"
             ]
-          }
+          },
+          "example": ["ACMG73"]
         },
         "version_number": {
           "type": "string",
-          "description": "The version number of the ENSEMBL gene ID",
+          "description": "Version suffix of the Ensembl gene ID.",
           "example": "1"
         },
         "hgnc": {
           "type": "string",
-          "description": "The HGNC ID of the gene",
+          "description": "HGNC ID for the gene, taken from the GENCODE annotation where present, otherwise resolved through the NCBI gene info file.",
           "example": "HGNC:100000",
           "pattern": "^HGNC:[0-9]+$"
         },
         "synonyms": {
           "type": "array",
-          "description": "The synonyms of the gene",
+          "description": "Alternative symbols and names for the gene, gathered from the NCBI gene info file: its synonyms, other designations, and nomenclature-authority symbol and full name.",
           "items": {
             "type": "string"
           }
         },
         "entrez": {
           "type": "string",
-          "description": "The Entrez ID of the gene",
+          "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:'.",
           "example": "ENTREZ:100287102",
           "pattern": "^ENTREZ:[0-9]+$"
         }

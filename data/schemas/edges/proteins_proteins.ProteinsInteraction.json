@@ -10,25 +10,27 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the proteins interaction edge"
+          "description": "SHA-256 hash of the two Ensembl protein IDs, the PSI-MI detection method code and the supporting PubMed IDs."
         },
         "_from": {
           "example": "proteins/ENSP00000340898",
           "pattern": "^proteins/",
           "collections": [
             "proteins"
-          ]
+          ],
+          "description": "Handle of one protein in the physical interaction."
         },
         "_to": {
           "example": "proteins/ENSP00000340898",
           "pattern": "^proteins/",
           "collections": [
             "proteins"
-          ]
+          ],
+          "description": "Handle of the other protein in the physical interaction."
         },
         "detection_method": {
           "type": "string",
-          "description": "The detection method of the proteins interaction edge",
+          "description": "PSI-MI detection method used to observe the interaction, looked up from the PSI-MI ontology.",
           "enum": [
             "3D electron microscopy",
             "Split renilla luciferase complementation",
@@ -221,12 +223,12 @@
         },
         "detection_method_code": {
           "type": "string",
-          "description": "The detection method code of the proteins interaction edge",
+          "description": "PSI-MI identifier of that detection method.",
           "example": "MI:0004"
         },
         "interaction_type": {
           "type": "array",
-          "description": "The interaction type of the proteins interaction edge",
+          "description": "PSI-MI interaction types for the pair, looked up from the PSI-MI ontology.",
           "items": {
             "type": "string",
             "enum": [
@@ -276,7 +278,7 @@
         },
         "interaction_type_code": {
           "type": "array",
-          "description": "The interaction type code of the proteins interaction edge",
+          "description": "PSI-MI identifiers of those interaction types.",
           "example": [
             "MI:0915"
           ]
@@ -286,14 +288,14 @@
             "number",
             "null"
           ],
-          "description": "The confidence value of the proteins interaction edge"
+          "description": "BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence."
         },
         "confidence_value_intact": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The confidence value of the proteins interaction edge"
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
           "enum": [
@@ -304,14 +306,14 @@
         },
         "pmids": {
           "type": "array",
-          "description": "The pmids of the proteins interaction edge",
+          "description": "PubMed pages cited as evidence for this interaction.",
           "example": [
             "http://pubmed.ncbi.nlm.nih.gov/23836931"
           ]
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the proteins interaction edge",
+          "description": "Species of the two proteins.",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
@@ -329,7 +331,7 @@
         },
         "molecular_function": {
           "type": "string",
-          "description": "The molecular function of the proteins interaction edge",
+          "description": "Gene Ontology term for protein binding, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0005515"
           ]
@@ -617,7 +619,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the protein to protein edge",
+          "description": "Handle of the files_filesets record for the merged interaction table this edge was read from.",
           "example": "files_filesets/IGVFFI4317VDGK",
           "pattern": "^files_filesets/",
           "collections": [

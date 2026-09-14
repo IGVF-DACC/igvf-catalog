@@ -9,55 +9,56 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+          "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C",
+          "description": "Gene symbol, Ensembl transcript ID, protein HGVS and coding HGVS joined by underscores. \"?\" is rewritten to \"!\" and \">\" to \"-\". A \"_splicing\" suffix is added when aapos is -1."
         },
         "name": {
           "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "ref": {
           "type": "string",
-          "description": "The reference of the DbNSFP",
+          "description": "Reference amino acid. A stop is stored as \"*\"; dbNSFP writes that as X.",
           "example": "M"
         },
         "alt": {
           "type": "string",
-          "description": "The alternate of the DbNSFP",
+          "description": "Alternate amino acid. A stop is stored as \"*\"; dbNSFP writes that as X.",
           "example": "L"
         },
         "aapos": {
           "type": "number",
-          "description": "The amino acid position of the DbNSFP",
+          "description": "1-based amino acid position in the protein. -1 when the variant is a splice-site SNP (2 bp at either end of an intron).",
           "example": 1
         },
         "gene_name": {
           "type": "string",
-          "description": "The gene name of the DbNSFP",
+          "description": "HGNC gene symbol assigned by dbNSFP.",
           "example": "OR4F5"
         },
         "protein_name": {
           "type": "string",
-          "description": "The protein name of the DbNSFP",
+          "description": "UniProt entry name matching the Ensembl protein.",
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
           "type": "string",
-          "description": "The protein ENSEMBL id of the DbNSFP",
+          "description": "Ensembl protein ID matching the transcript.",
           "example": "ENSP00000493376",
           "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
           "type": "string",
-          "description": "The hgvsp of the DbNSFP",
+          "description": "Protein HGVS from snpEff (dbNSFP HGVSp_snpEff).",
           "example": "p.Met1?"
         },
         "hgvsc": {
           "type": "string",
-          "description": "The hgvsc of the DbNSFP",
+          "description": "Coding HGVS from VEP (dbNSFP HGVSc_VEP).",
           "example": "c.1A>C"
         },
         "refcodon": {
           "type": "string",
-          "description": "The refcodon of the DbNSFP",
+          "description": "Reference codon at the variant.",
           "example": "ATG"
         },
         "codonpos": {
@@ -65,12 +66,12 @@
             "number",
             "null"
           ],
-          "description": "The codon position of the DbNSFP",
+          "description": "Position of the variant within the codon: 1, 2 or 3. Null when not applicable.",
           "example": 1
         },
         "transcript_id": {
           "type": "string",
-          "description": "The transcript ENSEMBL id of the DbNSFP",
+          "description": "Ensembl transcript ID this coding consequence is annotated on.",
           "example": "ENST00000641515",
           "pattern": "^ENST[0-9]{11}$"
         },
@@ -79,112 +80,112 @@
             "number",
             "null"
           ],
-          "description": "The SIFT score of the DbNSFP"
+          "description": "SIFT score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this protein."
         },
         "SIFT4G_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The SIFT4G score of the DbNSFP"
+          "description": "SIFT 4G score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this transcript."
         },
         "Polyphen2_HDIV_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The Polyphen2 HDIV score of the DbNSFP"
+          "description": "PolyPhen-2 HumDiv probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "Polyphen2_HVAR_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The Polyphen2 HVAR score of the DbNSFP"
+          "description": "PolyPhen-2 HumVar probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "VEST4_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The VEST4 score of the DbNSFP"
+          "description": "VEST 4.0 score from 0 to 1. Larger values are more likely to cause a functional change. Null when dbNSFP has no score."
         },
         "REVEL_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The REVEL score of the DbNSFP"
+          "description": "REVEL ensemble pathogenicity score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "MutPred_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The MutPred score of the DbNSFP"
+          "description": "MutPred score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "BayesDel_addAF_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The BayesDel addAF score of the DbNSFP"
+          "description": "BayesDel meta-score with maximum allele frequency included. Higher values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "BayesDel_noAF_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The BayesDel noAF score of the DbNSFP"
+          "description": "BayesDel meta-score without maximum allele frequency. Higher values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_R_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The VARITY R score of the DbNSFP"
+          "description": "VARITY_R pathogenicity score for rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_ER_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The VARITY ER score of the DbNSFP"
+          "description": "VARITY_ER pathogenicity score for extremely rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_R_LOO_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The VARITY R LOO score of the DbNSFP"
+          "description": "VARITY_R score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score."
         },
         "VARITY_ER_LOO_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The VARITY ER LOO score of the DbNSFP"
+          "description": "VARITY_ER score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score."
         },
         "ESM1b_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The ESM1b score of the DbNSFP"
+          "description": "ESM1b log-likelihood ratio. Smaller (more negative) values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "AlphaMissense_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The AlphaMissense score of the DbNSFP"
+          "description": "AlphaMissense pathogenicity score from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "CADD_raw_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The CADD raw score of the DbNSFP"
+          "description": "CADD raw score. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "source": {
           "enum": [

@@ -22,7 +22,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets of the variant",
+          "description": "Handle of the files_filesets record for the CRISPR screen file this variant was tested in.",
           "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [

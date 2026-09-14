@@ -8,31 +8,31 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "The unique key of the gene gene edge",
+          "description": "The two NCBI Entrez gene IDs in canonical order and coxpresdb, joined by underscores. Ensembl IDs are used instead when either gene maps to more than one Ensembl identifier.",
           "example": "80185_2222_coxpresdb"
         },
         "_from": {
           "type": "string",
-          "description": "The from node of the gene gene edge",
+          "description": "Handle of the first gene in the pair (smaller Entrez ID).",
           "example": "genes/ENSG00000129696",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": ["genes"]
         },
         "_to": {
           "type": "string",
-          "description": "The to node of the gene gene edge",
-          "example": "genes/ENSG00000129696",
+          "description": "Handle of the second gene in the pair (larger Entrez ID).",
+          "example": "genes/ENSG00000079459",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": ["genes"]
         },
         "z_score": {
           "type": "number",
-          "description": "The z score of the gene gene edge",
-          "example": 1.23
+          "description": "COXPRESdb coexpression z-score. 0 is random-level coexpression; 3 is a false-positive rate of 0.1%. Larger absolute values mean stronger coexpression. Only pairs with absolute value of 3 or greater are loaded.",
+          "example": 3.2
         },
         "associated_process": {
           "type": "string",
-          "description": "The associated process of the gene gene edge",
+          "description": "Gene Ontology term for gene expression, as a handle into ontology_terms.",
           "enum": ["ontology_terms/GO_0010467"]
         },
         "method": {
@@ -58,7 +58,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the gene gene edge",
+          "description": "Handle of the files_filesets record for the COXPRESdb coexpression bundle this pair was read from.",
           "example": "files_filesets/IGVFFI3321YNBP",
           "pattern": "^files_filesets/",
           "collections": ["files_filesets"]

@@ -10,10 +10,10 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to genomic element edge"
+          "description": "Variant SPDI, genomic element key, source-file cell label and source file accession joined by underscores."
         },
         "_from": {
-          "example": "variants/chr1_766455_T_C",
+          "example": "variants/NC_000001.11:766454:T:C",
           "pattern": "^variants/",
           "collections": [
             "variants"
@@ -28,7 +28,8 @@
         },
         "rsid": {
           "type": "string",
-          "description": "RSID for the variant to genomic element edge"
+          "description": "dbSNP reference SNP identifier of the variant.",
+          "example": "rs189800799"
         },
         "label": {
           "enum": [
@@ -56,18 +57,20 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the variant to genomic element edge",
+          "description": "Handle of the files_filesets record for the ENCODE caQTL file this edge was read from.",
           "example": "files_filesets/ENCFF103XRK",
           "pattern": "^files_filesets/"
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the variant to genomic element edge"
+          "description": "Cell or tissue the caQTL was measured in, as the ontology term name mapped from the source file's cell label.",
+          "example": "neural progenitor cell"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the variant to genomic element edge",
-          "pattern": "^ontology_terms/"
+          "description": "Ontology term for the cell or tissue the caQTL was measured in.",
+          "pattern": "^ontology_terms/",
+          "example": "ontology_terms/CL_0011020"
         },
         "name": {
           "enum": [
@@ -81,7 +84,7 @@
         },
         "method_term": {
           "type": "string",
-          "description": "Method term for the variant to genomic element edge",
+          "description": "BioAssay Ontology term for a chromatin accessibility assay, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/BAO_0040027"
           ]

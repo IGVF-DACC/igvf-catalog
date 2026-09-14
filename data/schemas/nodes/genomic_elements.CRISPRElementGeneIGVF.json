@@ -19,7 +19,7 @@
         },
         "promoter_of": {
           "type": "string",
-          "description": "Promoter of the genomic element",
+          "description": "Gene whose promoter this element is, set only where the source file annotates the element as a promoter. Null for enhancers and distal elements.",
           "example": "genes/ENSG00000123685"
         },
         "method": {
@@ -30,7 +30,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "How the source file classifies the element: an enhancer, a promoter, or a distal element.",
           "example": "promoter",
           "enum": [
             "enhancer",
@@ -53,7 +53,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Handle of the files_filesets record for the screen file this element was tested in.",
           "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         }

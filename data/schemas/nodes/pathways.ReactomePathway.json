@@ -16,29 +16,29 @@
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the pathway",
+          "description": "Species this pathway describes. Only Homo sapiens pathways are loaded.",
           "enum": [
             "Homo sapiens"
           ]
         },
         "class": {
           "type": "string",
-          "description": "The class of the pathway, from the associated files_filesets record",
+          "description": "Evidence tier for the underlying data, taken from the associated files_filesets record.",
           "enum": [
             "biological relationship"
           ]
         },
         "method": {
           "type": ["string", "null"],
-          "description": "The method of the pathway, from the associated files_filesets record"
+          "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
         },
         "label": {
           "type": ["string", "null"],
-          "description": "The label of the pathway, from the associated files_filesets record"
+          "description": "Same value as method."
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the pathway",
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
           "example": "files_filesets/IGVFFI6981KOFP",
           "pattern": "^files_filesets/",
           "collections": [
@@ -57,29 +57,29 @@
         },
         "id_version": {
           "type": "string",
-          "description": "The ID version of the pathway",
+          "description": "Reactome stable identifier with its version suffix.",
           "example": "R-HSA-1971475.4"
         },
         "is_in_disease": {
           "type": "boolean",
-          "description": "Whether the pathway is in disease",
+          "description": "Whether Reactome annotates this pathway as a disease pathway.",
           "example": true
         },
         "name_aliases": {
           "type": "array",
-          "description": "The name aliases of the pathway",
+          "description": "Names Reactome lists for the pathway, including the display name.",
           "example": [
             "A tetrasaccharide linker sequence is required for GAG synthesis"
           ]
         },
         "is_top_level_pathway": {
           "type": "boolean",
-          "description": "Whether the pathway is a top level pathway",
+          "description": "Whether this is a Reactome top-level pathway.",
           "example": true
         },
         "disease_ontology_terms": {
           "type": "array",
-          "description": "The disease ontology terms of the pathway",
+          "description": "Disease ontology terms Reactome associates with this pathway, as handles into ontology_terms. Present only when is_in_disease is true.",
           "example": [
             "ontology_terms/GO_0006914"
           ],
@@ -90,7 +90,7 @@
         },
         "go_biological_process": {
           "type": "string",
-          "description": "The GO biological process of the pathway",
+          "description": "Gene Ontology biological process term for this pathway, as a handle into ontology_terms.",
           "example": "ontology_terms/GO_0006914",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         }

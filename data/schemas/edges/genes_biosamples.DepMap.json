@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the gene to biosample edge",
+      "description": "Ensembl gene ID and Cellosaurus cell line key joined by an underscore.",
       "example": "ENSG00000189007_CVCL_1628"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the gene to biosample edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "genes/ENSG00000290825",
       "pattern": "^genes/",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the gene to biosample edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "example": "ontology_terms/CVCL_1628",
       "pattern": "^ontology_terms/",
       "collections": [
@@ -28,60 +28,60 @@
     },
     "biology_context": {
       "type": "string",
-      "description": "Biology context for the gene to biosample edge",
+      "description": "Cell-line name from the DepMap model table.",
       "example": "OVCAR-5"
     },
     "model_id": {
       "type": "string",
-      "description": "Model ID for the gene to biosample edge",
+      "description": "DepMap model accession for the cell line.",
       "example": "ACH-000082"
     },
     "model_type": {
       "type": "string",
-      "description": "Model type for the gene to biosample edge",
+      "description": "DepMap model type of the cell line.",
       "example": "HGSOC"
     },
     "cancer_term": {
       "type": "string",
-      "description": "Cancer term for the gene to biosample edge",
+      "description": "Oncotree code of the cell line, as a handle into ontology_terms.",
       "example": "ontology_terms/Oncotree_HGSOC",
       "pattern": "^ontology_terms/Oncotree_"
     },
     "gene_dependency": {
       "type": "number",
-      "description": "Gene dependency for the gene to biosample edge"
+      "description": "Probability that knocking out this gene is a true dependency in this cell line, from DepMap CRISPRGeneDependency. Only scores of 0.5 or greater are loaded."
     },
     "source": {
       "type": "string",
-      "description": "Source for the gene to biosample edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "DepMap"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the gene to biosample edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "enum": [
         "https://depmap.org/portal/"
       ]
     },
     "source_file": {
       "type": "string",
-      "description": "Source file for the gene to biosample edge",
+      "description": "DepMap release file this score was read from.",
       "enum": [
         "CRISPRGeneDependency.csv"
       ]
     },
     "name": {
       "type": "string",
-      "description": "Name for the gene to biosample edge",
+      "description": "Predicate describing the relationship in the _from to _to direction.",
       "enum": [
         "essential in"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the gene to biosample edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "enum": [
         "dependent on"
       ]
@@ -89,21 +89,21 @@
     "class": {
       "type": "string",
       "enum": ["observed data"],
-      "description": "The class of the gene to biosample edge, from the associated files_filesets record"
+      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
     },
     "method": {
       "type": "string",
       "enum": ["DepMap"],
-      "description": "The method of the gene to biosample edge, from the associated files_filesets record"
+      "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
     },
     "label": {
       "type": "string",
       "enum": ["DepMap"],
-      "description": "The label of the gene to biosample edge; same value as method"
+      "description": "Same value as method."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the gene to biosample edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI8863BMFF",
       "pattern": "^files_filesets/",
       "collections": [

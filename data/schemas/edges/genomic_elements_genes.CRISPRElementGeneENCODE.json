@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
         },
         "_from": {
@@ -29,31 +29,34 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
+          "description": "Signed relative change in target-gene expression after CRISPRi of the element (ENCODE EffectSize). Negative values mean lower expression. Missing values are stored as 0.",
+          "example": -0.293431866
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2 fold change of readout gene expression for the perturbation."
+          "description": "Log2 of one plus EffectSize. Computed at load; the source file does not have this column. Negative values mean lower expression."
         },
         "p_value": {
           "type": ["number", "null"],
-          "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
+          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
         },
         "p_value_adj": {
           "type": ["number", "null"],
-          "description": "The adjusted p value of the genomic element to gene edge. Can be 'NA' or a number."
+          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "example": 0.004023984
         },
         "neg_log10_pvalue": {
           "type": ["number", "null"],
-          "description": "The neg_log10_pvalue of the genomic element to gene edge"
+          "description": "Negative log10 of the uncorrected p-value. Capped at 240 when the reported p-value is 0. Null when the source has none."
         },
         "neg_log10_pvalue_adj": {
           "type": ["number", "null"],
-          "description": "The adjusted neg_log10_pvalue of the genomic element to gene edge"
+          "description": "Negative log10 of the Benjamini–Hochberg FDR. Capped at 240 when the reported FDR is 0. Null when the source has none."
         },
         "significant": {
           "type": "boolean",
-          "description": "The significant of the genomic element to gene edge"
+          "description": "Whether the combined dataset calls the pair significant (adjusted p-value below 0.05).",
+          "example": true
         },
         "method": {
           "enum": [
@@ -64,7 +67,7 @@
           "type": [
             "string"
           ],
-          "description": "The CRISPR modality from the associated files_filesets record",
+          "description": "CRISPR interference, from the associated files_filesets record.",
           "enum": [
             "interference"
           ]
@@ -91,21 +94,21 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
+          "description": "Handle of the files_filesets record for the ENCODE combined CRISPR quantification file this pair was read from.",
           "enum": [
             "files_filesets/ENCFF968BZL"
           ]
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
+          "description": "Tissue the screen was run in. This file used K562.",
           "enum": [
             "K562"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
+          "description": "Ontology term for K562, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]

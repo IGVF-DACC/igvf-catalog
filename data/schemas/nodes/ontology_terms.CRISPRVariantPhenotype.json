@@ -17,12 +17,12 @@
         },
         "uri": {
           "type": "string",
-          "description": "URI for the phenotype ontology term",
+          "description": "Link to the phenotype term's page on the IGVF portal.",
           "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
         },
         "term_id": {
           "type": "string",
-          "description": "Term ID for the phenotype ontology term",
+          "description": "Ontology identifier for the screened phenotype, with the prefix separated by an underscore rather than a colon. These are NTR terms: phenotypes the portal describes with a new-term request because no existing ontology term covers them, which is why this adapter loads them rather than the standard ontology adapter.",
           "example": "NTR_0001118"
         },
         "synonyms": {
@@ -30,7 +30,7 @@
             "array",
             "null"
           ],
-          "description": "Synonyms for the ontology term"
+          "description": "Synonyms for the term that have been recorded in an ontology. Null for NTR terms, which have none."
         },
         "source": {
           "enum": [

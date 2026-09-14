@@ -7,39 +7,44 @@
     "properties": {
       "_from": {
         "type": "string",
-        "description": "Unique identifier for the source node"
+        "description": "Document handle of the source node, in collection/key form."
       },
       "_to": {
         "type": "string",
-        "description": "Unique identifier for the target node"
+        "description": "Document handle of the target node, in collection/key form."
       },
       "label": {
         "type": "string",
-        "description": "Label for the edge"
+        "description": "The specific assay or relationship this edge represents, phrased for display. Predicted edges carry a 'predicted' prefix.",
+        "example": "eQTL"
       },
       "class": {
         "type": "string",
-        "description": "Class for the edge"
+        "description": "Evidence tier for the edge: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship drawn from an ontology or pathway database."
       },
       "method": {
         "type": "string",
-        "description": "Method for the edge"
+        "description": "The assay, algorithm, or pipeline that generated the edge.",
+        "example": "MPRA"
       },
       "name": {
         "type": "string",
-        "description": "Name for the edge"
+        "description": "Predicate describing the relationship in the _from to _to direction.",
+        "example": "modulates expression of"
       },
       "inverse_name": {
         "type": "string",
-        "description": "Inverse name for the edge"
+        "description": "Predicate describing the same relationship in the _to to _from direction. Identical to name for symmetric relationships.",
+        "example": "expression modulated by"
       },
       "source": {
         "type": "string",
-        "description": "Data source of the edge"
+        "description": "The dataset or consortium this edge was loaded from.",
+        "example": "IGVF"
       },
       "source_url": {
         "type": "string",
-        "description": "Source URL of the edge"
+        "description": "Link to the specific upstream record or file this edge was derived from."
       }
     },
     "required": [

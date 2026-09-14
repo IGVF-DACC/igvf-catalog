@@ -13,7 +13,7 @@
         "properties": {
           "source_annotation": {
             "type": "string",
-            "description": "Source annotation of the CCRE",
+            "description": "Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.",
             "enum": [
               "CA-CTCF: chromatin accessible + CTCF binding",
               "CA-TF: chromatin accessible + TF binding",
@@ -47,7 +47,7 @@
           },
           "files_filesets": {
             "type": "string",
-            "description": "Filesets of the CCRE",
+            "description": "Handle of the files_filesets record for the ENCODE Registry V4 mouse cCRE BED this element was read from.",
             "enum": [
               "files_filesets/ENCFF167FJQ"
             ]
