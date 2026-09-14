@@ -28,6 +28,7 @@ class ASB(BaseAdapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
+    MAX_LOG10_PVALUE = 400  # cap when fdrp_bh is 0 (same as AFGR/eQTL Catalog)
 
     def __init__(
         self,
@@ -135,12 +136,12 @@ class ASB(BaseAdapter):
 
                         p_value_adj_ref = float(row[13])  # fdrp_bh_ref
                         p_value_adj_alt = float(row[15])  # fdrp_bh_alt
-                        neg_log10_pvalue_adj_ref = float('inf')
+                        neg_log10_pvalue_adj_ref = ASB.MAX_LOG10_PVALUE
                         if p_value_adj_ref > 0:
                             neg_log10_pvalue_adj_ref = - \
                                 1 * log10(p_value_adj_ref)
 
-                        neg_log10_pvalue_adj_alt = float('inf')
+                        neg_log10_pvalue_adj_alt = ASB.MAX_LOG10_PVALUE
                         if p_value_adj_alt > 0:
                             neg_log10_pvalue_adj_alt = - \
                                 1 * log10(p_value_adj_alt)

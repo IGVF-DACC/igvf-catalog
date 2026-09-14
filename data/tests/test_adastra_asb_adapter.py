@@ -112,6 +112,55 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
         adapter.validate_doc(invalid_doc)
 
 
+ASB_HEADER = (
+    '#chr\tpos\tID\tref\talt\trepeat_type\tmean_BAD\tmean_SNP_per_segment\t'
+    'total_cover\tn_aggregated\tes_mean_ref\tes_mean_alt\tlogitp_ref\t'
+    'fdrp_bh_ref\tlogitp_alt\tfdrp_bh_alt\tmotif_log_pref\tmotif_log_palt\t'
+    'motif_fc\tmotif_pos\tmotif_orient\tmotif_conc\tnovel'
+)
+
+
+@pytest.fixture
+def zero_fdrp_archive(tmp_path):
+    """Archive with a single row whose fdrp_bh_ref/alt are 0 (the -log10 edge case)."""
+    # fdrp_bh_ref (col 13) and fdrp_bh_alt (col 15) are both 0.
+    row = (
+        'chr19\t9435653.0\trs1433060\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.4349511461894011\t-1.104751195642913\t4.221586590047205e-05\t0\t'
+        '0.9967883068007664\t0\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse'
+    )
+    tsv_path = tmp_path / 'ATF1_HUMAN@HepG2__hepatoblastoma_.tsv'
+    tsv_path.write_text(f'{ASB_HEADER}\n{row}\n')
+
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(str(tsv_path),
+                    arcname='ATF1_HUMAN@HepG2__hepatoblastoma_.tsv')
+    return str(archive_filepath)
+
+
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_caps_zero_fdrp_instead_of_infinity(mock_build_variant_id, mock_file_fileset, mock_protein_map, zero_fdrp_archive):
+    """When fdrp_bh is 0, neg_log10_pvalue_adj must be capped, not float('inf')."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+
+    adapter = ASB(filepath=zero_fdrp_archive,
+                  label='asb', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) > 0
+
+    for content in non_empty_contents:
+        item = json.loads(content)
+        assert item['neg_log10_pvalue_adj_ref'] == ASB.MAX_LOG10_PVALUE
+        assert item['neg_log10_pvalue_adj_alt'] == ASB.MAX_LOG10_PVALUE
+        # allow_nan=False raises on Infinity/NaN, guaranteeing valid JSON output.
+        json.dumps(item, allow_nan=False)
+
+
 @patch('adapters.adastra_asb_adapter.build_variant_id')
 def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
     """Test process_file method with mocked protein mapping"""
