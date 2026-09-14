@@ -486,7 +486,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
-  const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
+  const edgeFilters = getFilterStatements(variantsGenesCRISPRVariantGene, input)
   if (!isGeneQuery) {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
     if (filesetFilter !== '') {
@@ -500,7 +500,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     ? `FILTER ${[...baseFilters, `record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`].join(' AND ')}`
     : filterStatement
 
-  const searchViewName = `${variantsGenesAFGSRQtl.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${variantsGenesCRISPRVariantGene.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
   const bindVars = isGeneQuery ? { geneIDs } : undefined
 
   const exactObjects = await executeExactMatchQuery({
@@ -587,7 +587,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
-  const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
+  const edgeFilters = getFilterStatements(variantsGenesCRISPRVariantGene, input)
   let useIndex = ''
   if (!isVariantQuery && filesetFilter !== '') {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
@@ -599,7 +599,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     ? `FILTER ${[...baseFilters, `record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`].join(' AND ')}`
     : filterStatement
 
-  const searchViewName = `${variantsGenesAFGSRQtl.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${variantsGenesCRISPRVariantGene.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
   const bindVars = isVariantQuery ? { variantIDs } : undefined
 
   const exactObjects = await executeExactMatchQuery({
