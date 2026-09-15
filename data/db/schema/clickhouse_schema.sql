@@ -571,7 +571,7 @@ CREATE TABLE IF NOT EXISTS variants_diseases_genes (
 );
 
 CREATE TABLE IF NOT EXISTS genes_biosamples (
-	biology_context String,
+	biological_context String,
 	model_id String,
 	model_type String,
 	cancer_term String,

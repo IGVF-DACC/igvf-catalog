@@ -26,9 +26,9 @@
         "ontology_terms"
       ]
     },
-    "biology_context": {
+    "biological_context": {
       "type": "string",
-      "description": "Biology context for the gene to biosample edge",
+      "description": "Biological context for the gene to biosample edge",
       "example": "OVCAR-5"
     },
     "model_id": {
@@ -115,7 +115,7 @@
     "_key",
     "_from",
     "_to",
-    "biology_context",
+    "biological_context",
     "model_id",
     "model_type",
     "cancer_term",
@@ -132,7 +132,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "biology_context, model_id, model_type, cancer_term, gene_dependency, class, method, label, files_filesets, source, source_url, source_file"
+    "return": "biological_context, model_id, model_type, cancer_term, gene_dependency, class, method, label, files_filesets, source, source_url, source_file"
   },
   "db_collection_name": "genes_biosamples"
 }
