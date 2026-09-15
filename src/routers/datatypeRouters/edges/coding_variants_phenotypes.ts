@@ -125,20 +125,20 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
   } else if (input.phenotype_name !== undefined) {
     phenotypeQuery = `
       FOR record IN ontology_terms
-      FILTER record.name == "${input.phenotype_name as string}"
+      FILTER record.name == @phenotypeName
       RETURN record._id
     `
-    const phenotypes = await (await db.query(phenotypeQuery)).all()
+    const phenotypes = await (await db.query(phenotypeQuery, { phenotypeName: input.phenotype_name as string })).all()
     if (phenotypes.length !== 0) {
       phenotypeIds = `${JSON.stringify(phenotypes)}`
     } else {
       phenotypeQuery = `
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.phenotype_name as string}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS(@phenotypeName, "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
       `
-      const phenotypes = await (await db.query(phenotypeQuery)).all()
+      const phenotypes = await (await db.query(phenotypeQuery, { phenotypeName: input.phenotype_name as string })).all()
       phenotypeIds = `${JSON.stringify(phenotypes)}`
     }
   }
