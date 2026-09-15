@@ -41,7 +41,10 @@ class CCRE(BaseAdapter):
 
     def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filename = filepath.split('/')[-1].split('.')[0]
-        self.source_url = 'https://www.encodeproject.org/files/' + self.filename
+        if label == 'mm_genomic_element':
+            self.source_url = f'https://data.igvf.org/reference-files/{self.filename}/'
+        else:
+            self.source_url = 'https://www.encodeproject.org/files/' + self.filename
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
