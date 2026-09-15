@@ -48,7 +48,7 @@ def test_depmap_adapter_process_file(mock_file_fileset):
 
     # Check for presence of essential keys
     expected_keys = [
-        '_key', '_from', '_to', 'biology_context',
+        '_key', '_from', '_to', 'biological_context',
         'model_id', 'model_type', 'cancer_term',
         'gene_dependency', 'source', 'source_url',
         'source_file', 'name', 'inverse_name',
