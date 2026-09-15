@@ -95,7 +95,93 @@
         },
         "tagged_variants": {
           "type": "array",
-          "description": "Tagged variants for the variant to phenotype edge",
+          "description": "Tagged variants for the variant to phenotype edge, from Open Targets' LD/PICS expansion",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag_chrom": {
+                "type": "string",
+                "description": "Chromosome of the tagged variant",
+                "example": "1"
+              },
+              "tag_pos": {
+                "type": "integer",
+                "description": "0-based position of the tagged variant",
+                "example": 16964110
+              },
+              "tag_ref": {
+                "type": "string",
+                "description": "Reference allele of the tagged variant",
+                "example": "TTTTTC"
+              },
+              "tag_alt": {
+                "type": "string",
+                "description": "Alternate allele of the tagged variant",
+                "example": "T"
+              },
+              "overall_r2": {
+                "type": ["string", "null"],
+                "description": "Overall LD r2 with the lead variant. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.68343289"
+              },
+              "pics_95perc_credset": {
+                "type": ["string", "null"],
+                "description": "Whether the tagged variant is in the PICS 95% credible set. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "False"
+              },
+              "AFR_1000G_prop": {
+                "type": ["string", "null"],
+                "description": "1000 Genomes AFR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "AMR_1000G_prop": {
+                "type": ["string", "null"],
+                "description": "1000 Genomes AMR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "EAS_1000G_prop": {
+                "type": ["string", "null"],
+                "description": "1000 Genomes EAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "EUR_1000G_prop": {
+                "type": ["string", "null"],
+                "description": "1000 Genomes EUR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "SAS_1000G_prop": {
+                "type": ["string", "null"],
+                "description": "1000 Genomes SAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.0"
+              },
+              "log10_ABF": {
+                "type": ["string", "null"],
+                "description": "Log10 approximate Bayes factor. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "NA"
+              },
+              "posterior_prob": {
+                "type": ["string", "null"],
+                "description": "PICS posterior probability. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "NA"
+              }
+            },
+            "required": [
+              "tag_chrom",
+              "tag_pos",
+              "tag_ref",
+              "tag_alt",
+              "overall_r2",
+              "pics_95perc_credset",
+              "AFR_1000G_prop",
+              "AMR_1000G_prop",
+              "EAS_1000G_prop",
+              "EUR_1000G_prop",
+              "SAS_1000G_prop",
+              "log10_ABF",
+              "posterior_prob"
+            ],
+            "additionalProperties": false
+          },
           "example": [
             {
               "tag_chrom": "1",
