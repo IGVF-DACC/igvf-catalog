@@ -39,14 +39,14 @@
           "example": "rs1234567890"
         },
         "motif_fc": {
-          "type": "string",
+          "type": ["number", "null"],
           "description": "The motif fc of the variant to protein edge",
-          "example": "-0.2727347850176788"
+          "example": -0.2727347850176788
         },
         "motif_pos": {
-          "type": "string",
+          "type": ["number", "null"],
           "description": "The motif pos of the variant to protein edge",
-          "example": "10"
+          "example": 10
         },
         "motif_orient": {
           "type": "string",
@@ -65,14 +65,14 @@
           "pattern": "^motifs/"
         },
         "es_mean_ref": {
-          "type": "string",
+          "type": "number",
           "description": "The effect size mean for the reference allele",
-          "example": "1.795276180193825"
+          "example": 1.795276180193825
         },
         "es_mean_alt": {
-          "type": "string",
+          "type": "number",
           "description": "The effect size mean for the alternate allele",
-          "example": "-1.7019721868875686"
+          "example": -1.7019721868875686
         },
         "p_value_adj_ref": {
           "type": "number",

@@ -80,15 +80,15 @@ const outputFormat = z.object({
   effect_on_binding: z.string().nullish()
 })
 
-const MOTIF_LOG2FC_RETURN = "'motif_log2FC': (record.motif_fc != null && record.motif_fc != '') ? TO_NUMBER(record.motif_fc) : null"
+const MOTIF_LOG2FC_RETURN = "'motif_log2FC': record.motif_fc"
 
 const ADASTRA_SCORE_EXPR = `(
-  TO_NUMBER(record.p_value_adj_ref) < 0.05 && TO_NUMBER(record.p_value_adj_alt) < 0.05
+  record.p_value_adj_ref < 0.05 && record.p_value_adj_alt < 0.05
     ? null
     : (
-      TO_NUMBER(record.p_value_adj_ref) < 0.05
-        ? -TO_NUMBER(record.p_value_adj_ref)
-        : (TO_NUMBER(record.p_value_adj_alt) < 0.05 ? TO_NUMBER(record.p_value_adj_alt) : null)
+      record.p_value_adj_ref < 0.05
+        ? -record.p_value_adj_ref
+        : (record.p_value_adj_alt < 0.05 ? record.p_value_adj_alt : null)
     )
 )`
 
