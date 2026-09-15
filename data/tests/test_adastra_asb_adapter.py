@@ -81,7 +81,11 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
     assert 'chr' in first_item
     assert 'rsid' in first_item
     assert 'motif_fc' in first_item
+    assert first_item['motif_fc'] is None or isinstance(
+        first_item['motif_fc'], (int, float))
     assert 'motif_pos' in first_item
+    assert first_item['motif_pos'] is None or isinstance(
+        first_item['motif_pos'], int)
     assert 'motif_orient' in first_item
     assert 'motif_conc' in first_item
     assert first_item['source'] == ASB.SOURCE
@@ -92,8 +96,8 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
     assert first_item['name'] == 'modulates binding of'
     assert first_item['inverse_name'] == 'binding modulated by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
-    assert 'es_mean_ref' in first_item
-    assert 'es_mean_alt' in first_item
+    assert isinstance(first_item['es_mean_ref'], float)
+    assert isinstance(first_item['es_mean_alt'], float)
     assert 'neg_log10_pvalue_adj_ref' in first_item
     assert 'neg_log10_pvalue_adj_alt' in first_item
     assert 'biological_context' in first_item
