@@ -714,7 +714,7 @@ export const descriptions = {
 
   phenotypes_variants:
     'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by phenotypes.<br> \
-    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=). neg_log10_pvalue is only populated for GWAS records; it does not filter out SGE, cV2F, or CRISPR screen edges, which have no p-value field.<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -808,7 +808,7 @@ export const descriptions = {
   variants_phenotypes:
     'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by variants.<br> \
     Filters on phenotype ontology id can be used together.<br> \
-    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=). neg_log10_pvalue is only populated for GWAS records; it does not filter out SGE, cV2F, or CRISPR screen edges, which have no p-value field.<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
