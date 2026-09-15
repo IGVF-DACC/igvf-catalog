@@ -28,7 +28,7 @@ from adapters.writer import Writer
 class Motif(BaseAdapter):
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'HOCOMOCOv11'
-    SOURCE_URL = 'hocomoco11.autosome.org/motif/'
+    SOURCE_URL = 'https://hocomoco11.autosome.org/motif/'
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
     # UniProt ACs missing from proteins.uniprot_ids at load time.
     # P49639 is Swiss-Prot HOXA1; catalog proteins still use Trembl IDs.
