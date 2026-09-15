@@ -81,7 +81,7 @@
           "type": "array",
           "description": "The disease ontology terms of the pathway",
           "example": [
-            "ontology_terms/GO_0006914"
+            "ontology_terms/DOID_12345"
           ],
           "items": {
             "type": "string",
