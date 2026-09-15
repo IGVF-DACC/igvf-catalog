@@ -45,6 +45,7 @@ from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
 from adapters.CRISPR_variant_gene_adapter import CRISPRVariantGene
+from adapters.MORF_transcript_gene_adapter import MORFTranscriptGene
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
@@ -90,6 +91,7 @@ KEY_TO_ADAPTER = {
     'crispr_element_phenotype': CRISPRElementPhenotype,
     'crispr_variant_gene': CRISPRVariantGene,
     'crispr_variant_phenotype': CRISPRVariantPhenotype,
+    'morf_transcript_gene': MORFTranscriptGene,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,

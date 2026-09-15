@@ -102,6 +102,9 @@ igvf_file_accessions:
     - IGVFFI2440ESUS
     - IGVFFI4769NVJT
     - IGVFFI8101RHSC
+  MORF screen:
+    - IGVFFI6734IWRB
+    - IGVFFI6032GREJ
   SEM prediction:
     - IGVFFI2943RVII
     - IGVFFI3116SMJK
