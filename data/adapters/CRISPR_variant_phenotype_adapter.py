@@ -17,9 +17,13 @@ from adapters.writer import Writer
 # Variant-level CRISPR screens linking variants to cellular phenotypes.
 #
 # IGVFFI2014OOZP (Sherwood / IGVFDS2873IRMJ) – LDL-C uptake (NTR:0001118); prime editing
-#   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
+#   variant_id is SPDI (0-based)
 # IGVFFI6803HZJG (Sherwood / IGVFDS9278NUAZ) – LDL-C uptake (NTR:0001118); prime editing
-#   variant_id is SPDI (0-based); preferred_assay_titles: CRISPR FACS screen.
+#   variant_id is SPDI (0-based)
+# IGVFFI9726GFTC (Sherwood / IGVFDS6504OLWV) – LDL-C uptake (NTR:0001118); CRISPRi
+#   target_id is 1-based chr_pos_hg38_ref_alt.
+# IGVFFI1678CDBR (Sherwood / IGVFDS0021NCLH) – LDL-C uptake (NTR:0001118); base editing
+#   target_id is 1-based chr_pos_hg38_ref_alt.
 #
 # NTR phenotype terms are not loaded by the standard ontology adapter, so this
 # adapter also writes ontology_terms for NTR phenotypes (e.g. NTR_0001118).
@@ -33,6 +37,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'variant effect on phenotype'
     CHUNK_SIZE = 6500
+    WALD_Z_95 = 1.96
 
     # Accession -> phenotype + column layout.
     FILE_CONFIG = {
@@ -60,6 +65,31 @@ class CRISPRVariantPhenotype(BaseAdapter):
             'edit_rate_mean_col': 'edit_rate_mean',
             'ci_lower_col': 'CI[0.025',
             'ci_upper_col': '0.975]',
+        },
+        'IGVFFI9726GFTC': {
+            'phenotype_term': 'NTR_0001118',
+            'phenotype_name': 'LDL-C uptake',
+            'variant_id_col': 'target_id',
+            'variant_type_col': 'target_type',
+            'variant_type_value': 'variant',
+            'effect_size_col': 'mu',
+            'z_score_col': 'mu_z',
+            'num_guides_col': 'n_guides',
+            'ci_lower_col': 'CI[0.025',
+            'ci_upper_col': '0.975]',
+        },
+        'IGVFFI1678CDBR': {
+            'phenotype_term': 'NTR_0001118',
+            'phenotype_name': 'LDL-C uptake',
+            'variant_id_col': 'target_id',
+            'variant_type_col': 'target_type',
+            'variant_type_value': 'variant',
+            'effect_size_col': 'mu_adj',
+            'z_score_col': 'mu_z_adj',
+            'effect_size_sd_col': 'mu_sd_adj',
+            'edit_rate_mean_col': 'edit_rate_mean',
+            'p_value_adj_col': 'fdr_adj',
+            'neg_log10_pvalue_adj_col': 'log_fdr_adj',
         },
     }
 
@@ -138,13 +168,42 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
         return variant_id.startswith('NC_')
 
-    def _is_significant(self, row) -> bool:
+    @staticmethod
+    def _to_loadable_variant_id(raw_id: str) -> str:
+        """Convert 1-based chr_pos_hg38_ref_alt IDs to VCF (1-based) for load_variant.
+
+        Example: 19_11091518_hg38_GC_G -> 19-11091518-GC-G
+        SPDI IDs (NC_...) are returned unchanged.
+        """
+        if raw_id.startswith('NC_'):
+            return raw_id
+        marker = '_hg38_'
+        if marker not in raw_id:
+            return raw_id
+        left, right = raw_id.split(marker, 1)
+        if '_' not in left or '_' not in right:
+            return raw_id
+        chrom, pos = left.rsplit('_', 1)
+        ref, alt = right.rsplit('_', 1)
+        if not pos.isdigit() or not ref or not alt:
+            return raw_id
+        return f'{chrom}-{pos}-{ref}-{alt}'
+
+    def _effect_size_ci95(self, row):
         config = self.file_config
         ci_lower = self._optional_float(row, config.get('ci_lower_col'))
         ci_upper = self._optional_float(row, config.get('ci_upper_col'))
         if ci_lower is not None and ci_upper is not None:
-            return ci_lower > 0 or ci_upper < 0
-        return False
+            return ci_lower, ci_upper
+
+        # BEAN files that omit CI columns still report mu_sd; the 95% CI on
+        # IGVFFI6803HZJG matches this Wald interval around mu_adj.
+        sd = self._optional_float(row, config.get('effect_size_sd_col'))
+        if sd is None:
+            return None, None
+        effect_size = float(row[config['effect_size_col']])
+        margin = self.WALD_Z_95 * sd
+        return effect_size - margin, effect_size + margin
 
     def parse(self):
         if self.label == 'ontology_term':
@@ -175,7 +234,8 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
         for row in chunk:
             raw_variant_id = row[self.file_config['variant_id_col']].strip()
-            variant, skipped_message = load_variant(raw_variant_id)
+            variant_id = self._to_loadable_variant_id(raw_variant_id)
+            variant, skipped_message = load_variant(variant_id)
             if variant:
                 spdi = variant['spdi']
                 spdi_to_variant[spdi] = variant
@@ -231,6 +291,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
             for row in rows:
                 num_guides = self._optional_int(
                     row, config.get('num_guides_col'))
+                ci_lower, ci_upper = self._effect_size_ci95(row)
 
                 props = {
                     '_key': f'{spdi}_{self.phenotype_term}_{self.file_accession}',
@@ -238,14 +299,20 @@ class CRISPRVariantPhenotype(BaseAdapter):
                     '_to': f'ontology_terms/{self.phenotype_term}',
                     'effect_size': float(row[config['effect_size_col']]),
                     'z_score': float(row[config['z_score_col']]),
-                    'significant': self._is_significant(row),
+                    'significant': (
+                        ci_lower is not None
+                        and ci_upper is not None
+                        and (ci_lower > 0 or ci_upper < 0)
+                    ),
                     'num_guides': num_guides,
                     'edit_rate_mean': self._optional_float(
                         row, config.get('edit_rate_mean_col')),
-                    'effect_size_ci95_lower': self._optional_float(
-                        row, config.get('ci_lower_col')),
-                    'effect_size_ci95_upper': self._optional_float(
-                        row, config.get('ci_upper_col')),
+                    'effect_size_ci95_lower': ci_lower,
+                    'effect_size_ci95_upper': ci_upper,
+                    'p_value_adj': self._optional_float(
+                        row, config.get('p_value_adj_col')),
+                    'neg_log10_pvalue_adj': self._optional_float(
+                        row, config.get('neg_log10_pvalue_adj_col')),
                     'method': self.method,
                     'crispr_modality': self.crispr_modality,
                     'class': self.collection_class,
