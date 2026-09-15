@@ -75,14 +75,15 @@ class Oncotree(BaseAdapter):
             oncotree_json = [Oncotree.ROOT_NODE] + oncotree_json
 
         for node in oncotree_json:
-            # reformating for one illegal term: MDS/MPN
+            # Sanitize '/' (illegal in ArangoDB _key); keep term_id == _key
+            # so API lookups that treat term ids as keys stay consistent.
             key = node['code'].replace('/', '_')
 
             if self.label == 'node':
                 _id = 'Oncotree_' + key
                 _props = {
                     '_key': _id,
-                    'term_id': 'Oncotree_' + node['code'],
+                    'term_id': _id,
                     'name': node['name'],
                     # could add those two new props for ontology terms in future
                     # 'main_type': node['mainType'],

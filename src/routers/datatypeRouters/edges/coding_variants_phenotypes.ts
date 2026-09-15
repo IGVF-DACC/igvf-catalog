@@ -183,7 +183,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'variant': {
           ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
         },
-        'score': phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
+        'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
         'method': phenoEdges.method,
         'class': phenoEdges.class,
         'label': phenoEdges.label,

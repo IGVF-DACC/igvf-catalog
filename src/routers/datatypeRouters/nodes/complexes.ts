@@ -29,8 +29,8 @@ export const complexFormat = z.object({
   complex_source: z.string().nullish(),
   reactome_xref: z.array(z.string()).nullish(),
   class: z.string().nullish(),
-  method: z.string().nullable(),
-  label: z.string().nullable(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
   files_filesets: z.string().nullish(),
   source: z.string(),
   source_url: z.string()
