@@ -42,14 +42,14 @@
           },
           "source_url": {
             "enum": [
-              "https://www.encodeproject.org/files/ENCFF167FJQ"
+              "https://data.igvf.org/reference-files/IGVFFI8753TTYC/"
             ]
           },
           "files_filesets": {
             "type": "string",
             "description": "Filesets of the CCRE",
             "enum": [
-              "files_filesets/ENCFF167FJQ"
+              "files_filesets/IGVFFI8753TTYC"
             ]
           }
         },
