@@ -193,8 +193,8 @@ class EQTLCatalog(BaseAdapter):
                 if label == 'spliceQTL':
                     molecular_trait_id_list = row[0].split(':')
                     _props['intron_chr'] = molecular_trait_id_list[0]
-                    _props['intron_start'] = molecular_trait_id_list[1]
-                    _props['intron_end'] = molecular_trait_id_list[2]
+                    _props['intron_start'] = int(molecular_trait_id_list[1])
+                    _props['intron_end'] = int(molecular_trait_id_list[2])
                 if self.validate:
                     self.validate_doc(_props)
                 self.writer.write(json.dumps(_props) + '\n')

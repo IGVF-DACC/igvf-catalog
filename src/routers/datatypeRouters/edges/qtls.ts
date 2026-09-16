@@ -45,8 +45,8 @@ const outputFormat = z.object({
   effect_size: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(), // EBI eQTL and spliceQTL only
   intron_chr: z.string().nullish(), // spliceQTL only
-  intron_start: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
-  intron_end: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
+  intron_start: z.number().nullish(), // spliceQTL only
+  intron_end: z.number().nullish(), // spliceQTL only
   study: z.object({
     id: z.string(),
     pmid: z.string().nullish()
