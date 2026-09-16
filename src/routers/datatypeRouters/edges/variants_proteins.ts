@@ -2,7 +2,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { ontologyFormat } from '../nodes/ontologies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
@@ -95,31 +95,31 @@ const ADASTRA_SCORE_EXPR = `(
 const buildEdgeFilter = (input: paramsFormatType, nameField: 'name' | 'inverse_name'): string => {
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
-    filesetFilter = `record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    filesetFilter = `record.files_filesets == 'files_filesets/${escapeAqlString(input.files_fileset as string)}'`
     delete input.files_fileset
   }
 
   let methodFilter = ''
   let sourceFilter = ''
   if (input.method !== undefined) {
-    methodFilter = `record.method == '${input.method as string}'`
+    methodFilter = `record.method == '${escapeAqlString(input.method as string)}'`
     delete input.method
   }
 
   if (input.source !== undefined) {
-    sourceFilter = `record.source == '${input.source as string}'`
+    sourceFilter = `record.source == '${escapeAqlString(input.source as string)}'`
     delete input.source
   }
 
   let labelFilter = ''
   if (input.label !== undefined) {
-    labelFilter = `record.label == '${input.label as string}'`
+    labelFilter = `record.label == '${escapeAqlString(input.label as string)}'`
     delete input.label
   }
 
   let nameFilter = ''
   if (input.name !== undefined) {
-    nameFilter = `record.${nameField} == '${input.name as string}'`
+    nameFilter = `record.${nameField} == '${escapeAqlString(input.name as string)}'`
     delete input.name
   }
 
