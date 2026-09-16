@@ -289,7 +289,7 @@ topld in linkage disequilibrium with:
         - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
   source: TopLD
-  label: linkage disequilibrum
+  label: linkage disequilibrium
 # Note:
 # The tar.gz archive containing the rdict can be downloaded from s3://igvf-catalog-source-data/hgvs_to_caid_rdict.tar.gz
 # In the following examples, assume that we have decompressed the archive to the current directory.
