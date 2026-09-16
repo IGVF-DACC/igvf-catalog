@@ -61,8 +61,10 @@ class AFGREQtl(BaseAdapter):
                 if not is_gene_id_valid:
                     continue
 
+                # Include file_accession so distinct population/dataset files
+                # (e.g. AFR vs EUR meta) do not collide on the same edge key.
                 variants_genes_id = hashlib.sha256(
-                    (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
+                    (variant_id + '_' + gene_id + '_' + self.file_accession).encode()).hexdigest()
 
                 _id = variants_genes_id
                 _source = 'variants/' + variant_id

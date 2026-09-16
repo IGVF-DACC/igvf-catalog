@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to gene edge"
+          "description": "SHA256 of variant_id, gene_id, and file accession (dataset identifier)"
         },
         "_from": {
           "example": "variants/NC_000001.11:10000:T:A",
