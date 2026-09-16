@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat } from '../params'
@@ -191,10 +191,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.hgnc_id !== undefined) {
-    input.hgnc = input.hgnc_id
-    if (!(input.hgnc.toString().startsWith('HGNC'))) {
-      input.hgnc = `HGNC:${input.hgnc as string}`
-    }
+    input.hgnc = withHgncPrefix(input.hgnc_id as string)
     delete input.hgnc_id
   }
 
