@@ -28,28 +28,28 @@
     },
     "name": {
       "type": "string",
-      "description": "Predicate for the motif-to-protein direction.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "is used by"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate for the protein-to-motif direction.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "uses"
       ]
     },
     "biological_process": {
       "type": "string",
-      "description": "Gene Ontology term GO:0003677 (DNA binding), as a handle into ontology_terms. The identifier is a molecular function, not a biological process.",
+      "description": "Gene Ontology term GO:0003677 (DNA binding).",
       "enum": [
         "ontology_terms/GO_0003677"
       ]
     },
     "source": {
       "type": "string",
-      "description": "HOCOMOCO version the motif was taken from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "HOCOMOCOv11"
       ]
@@ -63,14 +63,14 @@
     },
     "method": {
       "type": "string",
-      "description": "Model collection that produced this motif, taken from the associated files_filesets record.",
+      "description": "Name of the experimental class or prediction model that produced this result.",
       "enum": [
         "HOCOMOCO"
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "Handle of the files_filesets record for the IGVF file the HOCOMOCO PWM bundle was read from.",
+      "description": "Reference to the File and Metadata.",
       "example": "files_filesets/IGVFFI1444TRQL",
       "pattern": "^files_filesets/",
       "collections": [

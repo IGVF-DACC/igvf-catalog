@@ -37,15 +37,15 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "-log10 of p_value, capped at 240 where the source file reports a p-value of exactly 0."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the genomic element met the significance threshold for the phenotype"
+          "description": "Boolean indicator of the significance of the element's effect on the phenotype."
         },
         "num_guides": {
           "type": "number",
-          "description": "Number of guides targeting the element in the screen."
+          "description": "Number of guides targeting the pertubed element in the screen."
         },
         "num_guides_hit": {
           "type": "number",
@@ -60,6 +60,7 @@
           "description": "Fraction of guides that met hit thresholds"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
@@ -72,27 +73,31 @@
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "regulatory element effect on phenotype"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the file this measurement was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI5135QZCS",
           "pattern": "^files_filesets/",
           "collections": [
@@ -101,12 +106,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the assay was run in, taken from the associated files_filesets record.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "human HFF-1 cell line from donor(s) IGVFDO0058YJWC"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the assay was run in, taken from the associated files_filesets record.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/CLO_0003730",
           "pattern": "^ontology_terms/"
         },
@@ -115,14 +120,16 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the associated files_filesets record. Null when none were applied."
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]

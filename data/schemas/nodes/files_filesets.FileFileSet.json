@@ -12,6 +12,7 @@
           "example": "ENCFF004PFU"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "ENCFF004PFU"
         },
         "file_set_id": {
@@ -21,7 +22,7 @@
         },
         "lab": {
           "type": "string",
-          "description": "Lab associated with the submission, as the portal's short lab name: lower-cased and hyphen-delimited from the PI's first and last name.",
+          "description": "Lab associated with the submission.",
           "enum": [
             "alan-boyle",
             "bill-majoros",
@@ -55,7 +56,7 @@
             "array",
             "null"
           ],
-          "description": "The lab's preferred label for the assay that produced the data. For an analysis set, the preferred assay titles of the assays whose data it analyzes. Null when the portal records none.",
+          "description": "Preferred assay title from the IGVF Portal.",
           "items": {
             "type": "string",
             "enum": [
@@ -104,7 +105,7 @@
             "string",
             "null"
           ],
-          "description": "The method the data is curated under in the catalog. Taken from the software title for prediction sets, from the preferred assay title for analysis and pseudobulk sets, and from the curated catalog method for externally sourced community data.",
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ADASTRA",
             "BlueSTARR",
@@ -149,7 +150,7 @@
         },
         "class": {
           "type": "string",
-          "description": "The class curated in the IGVF catalog that the data in this file belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship",
             "observed data",
@@ -161,7 +162,7 @@
             "array",
             "null"
           ],
-          "description": "Software packages used to produce the file, under their preferred viewable names.",
+          "description": "Name of the software packages used to produce the file.",
           "items": {
             "type": "string",
             "enum": [
@@ -219,7 +220,7 @@
             "array",
             "null"
           ],
-          "description": "Ontology terms identifying the biosamples the data was produced from, as handles into ontology_terms. Where a sample is an in vitro system with a differentiation endpoint, the targeted endpoint term is used in place of its starting term.",
+          "description": "Ontology terms identifying the biosamples the data was produced from.",
           "example": [
             "ontology_terms/UBERON_0002048"
           ],
@@ -233,7 +234,7 @@
             "array",
             "null"
           ],
-          "description": "Accessions of the samples the data was produced from, as used to reference those samples on the source portal.",
+          "description": "ENCODE or IGVF Accessions of the samples the data was produced from.",
           "example": [
             "ENCBS160ZPI",
             "ENCBS659PKW",
@@ -248,7 +249,7 @@
             "array",
             "null"
           ],
-          "description": "Short readable summary of each sample, assembled by the catalog from the sample's ontology term names, followed by 'induced to' and the targeted endpoint term for differentiated systems, 'from' and the donor accessions for organoid and specimen classifications, and 'treated with' and the treatment term names where treatments were applied.",
+          "description": "Short readable summary of each sample.",
           "example": [
             "GM12878"
           ]
@@ -258,7 +259,7 @@
             "array",
             "null"
           ],
-          "description": "Donors the samples were derived from, as handles into the donors collection.",
+          "description": "ENCODE or IGVF Donors the samples were derived from.",
           "example": [
             "donors/ENCDO000AAK"
           ],
@@ -282,7 +283,7 @@
             "string",
             "null"
           ],
-          "description": "Publication identifier associated with the file set. Only one publication per file is supported.",
+          "description": "Publication identifier associated with the file set.",
           "example": "PMID:34017130"
         },
         "collections": {
@@ -297,6 +298,7 @@
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE",
             "IGVF",
@@ -304,6 +306,7 @@
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/",
           "type": [
             "string",
@@ -320,7 +323,7 @@
             "string",
             "null"
           ],
-          "description": "The cell annotation of the file set, recorded for most scE2G file sets and all pseudobulk sets.",
+          "description": "The cell annotation of the file set, with optional qualifier, for single-cell derived results.",
           "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
@@ -328,7 +331,7 @@
             "string",
             "null"
           ],
-          "description": "Ontology term describing the cell type of the cells in this pseudobulk or pseudobulk-derived prediction, as a handle into ontology_terms.",
+          "description": "Base ontology term describing the cell type of a single-cell derived result.",
           "example": "ontology_terms/CL_0000352",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
@@ -345,7 +348,7 @@
             "string",
             "null"
           ],
-          "description": "Download link for the genome browser index file (.tbi). Null for ENCODE files; for IGVF files, the tabix index file when present in the file set.",
+          "description": "Download link for the genome browser index file (.tbi).",
           "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
         },
         "crispr_modality": {
@@ -353,7 +356,7 @@
             "string",
             "null"
           ],
-          "description": "The purpose or intended effect of the CRISPR modification applied to the samples. Null when no sample carries a CRISPR modification.",
+          "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
           "enum": [
             null,
             "interference",
@@ -369,7 +372,7 @@
             "string",
             "null"
           ],
-          "description": "Version of the external data source, recorded only for community-curated files loaded into the catalog from outside IGVF and ENCODE.",
+          "description": "Version of the external data source",
           "example": "File generated on 2023-10-10"
         }
       },

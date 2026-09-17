@@ -26,6 +26,7 @@
             ]
           },
           "method": {
+            "description": "Name of the experimental class or prediction model that produced this result.",
             "enum": [
               "candidate Cis-Regulatory Elements"
             ]
@@ -36,18 +37,20 @@
             ]
           },
           "source": {
+            "description": "The database, dataset or organization that is a source for these data.",
             "enum": [
               "ENCODE"
             ]
           },
           "source_url": {
+            "description": "The URL for the source.",
             "enum": [
               "https://data.igvf.org/reference-files/IGVFFI8753TTYC/"
             ]
           },
           "files_filesets": {
             "type": "string",
-            "description": "Handle of the files_filesets record for the ENCODE Registry V4 mouse cCRE BED this element was read from.",
+            "description": "Reference to the File and Metadata",
             "enum": [
               "files_filesets/IGVFFI8753TTYC"
             ]

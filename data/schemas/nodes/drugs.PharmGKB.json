@@ -13,11 +13,12 @@
           "description": "PharmGKB chemical accession."
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "17-alpha-dihydroequilenin sulfate"
         },
         "drug_ontology_terms": {
           "type": "array",
-          "description": "ChEBI ontology terms for this chemical, as handles into ontology_terms. Only ChEBI cross-references from PharmGKB are loaded.",
+          "description": "ChEBI ontology terms for this drug.",
           "example": [
             "ontology_terms/CHEBI_15956"
           ],
@@ -27,31 +28,33 @@
           }
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "pharmGKB"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "pattern": "^https://www\\.pharmgkb\\.org/chemical/[A-Z0-9]+$",
           "example": "https://www.pharmgkb.org/chemical/PA166238901"
         },
         "class": {
           "type": "string",
-          "description": "Evidence tier for the underlying data, taken from the associated files_filesets record.",
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
           "type": "string",
-          "description": "Model or pipeline that produced this record, taken from the associated files_filesets record.",
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "PharmGKB"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI2997DUKO",
           "pattern": "^files_filesets/",
           "collections": [

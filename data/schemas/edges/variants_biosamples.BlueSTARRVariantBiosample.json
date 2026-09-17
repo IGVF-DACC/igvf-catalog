@@ -40,47 +40,54 @@
         },
         "log2FC": {
           "type": "number",
-          "description": "Predicted log2 fold change in STARR-seq reporter activity when the alternate allele is inserted."
+          "description": "log2 fold change in STARR-seq reporter activity."
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted variant effect on gene expression"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "BlueSTARR"
           ]
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the prediction applies to, taken from the associated files_filesets record."
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record."
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the prediction applies to, taken from the associated files_filesets record."
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for"
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates regulatory activity of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulatory activity modulated by"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI3351LASN/",
             "https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/",
@@ -90,7 +97,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the prediction file this score was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI1663LKVQ",
           "pattern": "^files_filesets/",
           "collections": [

@@ -13,11 +13,12 @@
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID including its version suffix. The _key of this record is the same ID with the version removed.",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENSMUST00000161581.2",
           "pattern": "^ENSMUST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "Gm1992-201"
         },
         "transcript_type": {
@@ -52,10 +53,11 @@
         },
         "gene_name": {
           "type": "string",
-          "description": "GENCODE symbol of the gene this transcript belongs to.",
+          "description": "HGNC gene symbol",
           "example": "Gm1992"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
@@ -68,6 +70,7 @@
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]

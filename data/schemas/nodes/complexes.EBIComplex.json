@@ -14,7 +14,7 @@
         },
         "name": {
           "example": "SMAD2-SMAD3-SMAD4 complex",
-          "description": "Recommended name of the complex."
+          "description": "Human readable display name for the entity"
         },
         "alias": {
           "type": "array",
@@ -29,7 +29,7 @@
         },
         "molecules": {
           "type": "array",
-          "description": "Participants of the complex as recorded by Complex Portal: a UniProt accession, isoform, processed chain, molecule set, or nested complex accession, each followed by stoichiometry in parentheses. 0 means the stoichiometry is unknown. Complexes that include a ChEBI chemical or RNAcentral RNA are not loaded.",
+          "description": "Participants of the complex as recorded by Complex Portal: a UniProt accession, isoform, processed chain, molecule set, or nested complex accession, each followed by stoichiometry in parentheses. 0 means the stoichiometry is unknown.",
           "example": [
             "P84022(1)",
             "Q13485(1)",
@@ -84,36 +84,38 @@
           }
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://www.ebi.ac.uk/complexportal/"
           ]
         },
         "class": {
           "type": "string",
-          "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
         },
         "method": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
+          "description": "Name of the experimental class or prediction model that produced this result."
         },
         "label": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Same value as method."
+          "description": "Non-method specific human readable label for the node or edge"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI1444TRQL",
           "pattern": "^files_filesets/",
           "collections": [

@@ -26,34 +26,36 @@
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression in"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulatory activity modulated by"
           ]
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2 fold change for the variants to biosamples edge"
+          "description": "Log2 fold change for variant effect on gene expression."
         },
         "inputCountRef": {
           "type": "number",
-          "description": "Input count ref for the variants to biosamples edge"
+          "description": "Input count for the reference allele." 
         },
         "inputCountAlt": {
           "type": "number",
-          "description": "Input count alt for the variants to biosamples edge"
+          "description": "Input count for the alternative allele."
         },
         "outputCountRef": {
           "type": "number",
-          "description": "Output count ref for the variants to biosamples edge"
+          "description": "Output count for the reference allele."
         },
         "outputCountAlt": {
           "type": "number",
-          "description": "Output count alt for the variants to biosamples edge"
+          "description": "Output count for the alternative allele."
         },
         "postProbEffect": {
           "type": "number",
@@ -61,7 +63,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "True when postProbEffect is greater than the STARR-seq significance threshold"
+          "description": "Boolean indicating the significance of the variant effect, based on the posterior probability."
         },
         "CI_lower_95": {
           "type": "number",
@@ -72,32 +74,37 @@
           "description": "Upper bound of a 95% interval for the variant effect."
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on regulatory element activity"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "STARR-seq"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI7664HHXI",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the file this measurement was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI7664HHXI",
           "pattern": "^files_filesets/",
           "collections": [
@@ -106,12 +113,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the assay was run in, taken from the associated files_filesets record.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the assay was run in, taken from the associated files_filesets record.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/EFO_0002067",
           "pattern": "^ontology_terms/"
         },
@@ -123,7 +130,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the associated files_filesets record. Null when none were applied."
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
         }
       },
       "required": [

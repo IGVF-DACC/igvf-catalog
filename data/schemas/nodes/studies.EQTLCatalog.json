@@ -12,32 +12,34 @@
           "example": "QTS000038"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "OneK1K"
         },
         "pmid": {
           "type": "string",
-          "description": "PubMed identifier of the publication reporting the study.",
+          "description": "PubMed identifier.",
           "example": "35389779"
         },
         "study_type": {
           "type": "string",
-          "description": "Whether the study measured expression in bulk tissue or in single cells. Only gene-expression and Leafcutter datasets from the naive condition are loaded.",
+          "description": "Whether the study measured expression in bulk tissue or in single cells.",
           "enum": [
             "single-cell",
             "bulk"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
         },
         "source_url": {
-          "description": "eQTL Catalogue dataset metadata file this record was read from."
+          "description": "The URL for the source."
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this record was read from."
+          "description": "Reference to the File and Metadata"
         }
       },
       "required": [

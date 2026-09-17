@@ -14,17 +14,17 @@
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome of the variant, prefixed with chr.",
+          "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "pos": {
           "type": "number",
-          "description": "0-based start of the variant on GRCm39.",
+          "description": "0-based genomic coordinate of the variant.",
           "example": 3050706
         },
         "rsid": {
           "type": "array",
-          "description": "dbSNP identifiers from the VCF ID column. Empty when the site has none.",
+          "description": "dbSNP id for the variant position",
           "example": []
         },
         "ref": {
@@ -39,7 +39,7 @@
         },
         "organism": {
           "type": "string",
-          "description": "Species the variant was called in.",
+          "description": "Species this annotation describes.",
           "enum": [
             "Mus musculus"
           ]
@@ -65,7 +65,7 @@
         },
         "qual": {
           "type": "string",
-          "description": "VCF QUAL score for the site, stored as a string.",
+          "description": "VCF QUAL score for the variant position.",
           "example": "50110.4"
         },
         "filter": {
@@ -77,16 +77,16 @@
         },
         "fi": {
           "type": "number",
-          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release. Kept from the first loaded strain when the same variant is merged across strains.",
+          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release.",
           "example": 0
         },
         "name": {
           "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG",
-          "description": "SPDI of the variant, identical to _key when the SPDI fits in a document key."
+          "description": "Human readable display name for the entity"
         },
         "spdi": {
           "type": "string",
-          "description": "SPDI of the variant on GRCm39 (0-based).",
+          "description": "Normalized SPDI expression identifying the allele.",
           "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
         },
         "hgvs": {
@@ -95,11 +95,13 @@
           "example": "NC_000067.7:g.3050715_3050716insG"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "MOUSE GENOMES PROJECT"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/mousegenomes/"
           ]

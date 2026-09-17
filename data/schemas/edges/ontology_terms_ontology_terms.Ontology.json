@@ -28,7 +28,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Relationship between the two terms.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "has part",
         "part of",
@@ -41,7 +41,7 @@
     },
     "inverse_name": {
       "type": "string",
-      "description": "The same relationship in the opposite direction.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "part of",
         "has part",
@@ -64,7 +64,7 @@
     },
     "source": {
       "type": "string",
-      "description": "Ontology this edge was extracted from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "GO",
         "CLO",
@@ -88,7 +88,7 @@
     },
     "source_url": {
       "type": "string",
-      "description": "Homepage of the ontology this edge was extracted from.",
+      "description": "The URL for the source.",
       "enum": [
         "https://geneontology.org/",
         "https://obofoundry.org/ontology/clo.html",
@@ -112,7 +112,7 @@
     },
     "class": {
       "type": "string",
-      "description": "The class of the ontology term to ontology term edge, from the associated files_filesets record",
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
       "enum": [
         "biological relationship"
       ]
@@ -122,14 +122,14 @@
         "string",
         "null"
       ],
-      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record",
+      "description": "Name of the experimental class or prediction model that produced this result.",
       "enum": [
         null
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "Handle of the files_filesets record for the OWL file this edge was read from.",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI7433WATG",
       "pattern": "^files_filesets/",
       "collections": [

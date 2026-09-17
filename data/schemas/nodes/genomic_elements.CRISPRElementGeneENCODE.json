@@ -15,11 +15,12 @@
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "source_annotation": {
           "type": "string",
-          "description": "enhancer if the element is significant for any tested gene in the file; negative control otherwise.",
+          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "enum": [
             "enhancer",
             "negative control"
@@ -27,10 +28,11 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the ENCODE combined CRISPR quantification file this element was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/ENCFF968BZL"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]

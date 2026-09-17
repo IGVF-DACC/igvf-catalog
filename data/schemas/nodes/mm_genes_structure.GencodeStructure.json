@@ -11,6 +11,7 @@
           "example": "ENSMUST00000193812_ENSMUSE00001343744_exon"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "4933401J01Rik-201_exon_1_exon"
         },
         "chr": {
@@ -51,17 +52,17 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "Ensembl gene ID of the gene this feature belongs to, with the version suffix removed. Genes in the pseudoautosomal region keep a _PAR_Y suffix.",
+          "description": "Ensembl gene ID.",
           "example": "ENSMUSG00000102693"
         },
         "gene_name": {
           "type": "string",
-          "description": "GENCODE gene symbol.",
+          "description": "HGNC gene symbol",
           "example": "4933401J01Rik"
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID of the transcript this feature belongs to, with the version suffix removed.",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENSMUST00000193812"
         },
         "transcript_name": {
@@ -76,10 +77,11 @@
         },
         "exon_id": {
           "type": "string",
-          "description": "Ensembl exon ID, including its version suffix. The same exon ID recurs in every transcript that contains that exon, so it is not unique within the collection.",
+          "description": "Ensembl exon ID, including its version suffix.",
           "example": "ENSMUSE00001343744.2"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
@@ -92,6 +94,7 @@
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]

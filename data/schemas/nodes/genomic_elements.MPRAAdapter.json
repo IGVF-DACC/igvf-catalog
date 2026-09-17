@@ -15,6 +15,7 @@
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "strand": {
@@ -27,6 +28,7 @@
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "MPRA"
           ]
@@ -37,17 +39,19 @@
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF769REH/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the file this element was tested in.",
+          "description": "Reference to the File and Metadata",
           "pattern": "^files_filesets/"
         }
       },

@@ -25,11 +25,13 @@
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "mutational effect"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "altered due to mutation"
           ]
@@ -40,7 +42,7 @@
         },
         "property_scores": {
           "type": "array",
-          "description": "Molecular mechanisms MutPred2 predicts the substitution to disrupt, drawn from its 58 structural, functional, and post-translational-modification properties. Only mechanisms reaching a posterior probability of 0.25 or higher with a p-value below 0.05 are retained. Each entry carries the property, its posterior probability, p-value, affected position, and whether the property is Lost, Gained, or Altered; the affected position is \"-\" for properties that describe a whole region rather than a residue.",
+          "description": "Molecular mechanisms MutPred2 predicts the substitution to disrupt, drawn from its 58 structural, functional, and post-translational-modification properties.",
           "items": {
             "type": "object",
             "properties": {
@@ -86,40 +88,45 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this measurement was read from.",
+          "description": "Reference to the File and Metadata",
           "pattern": "^files_filesets/"
         },
         "biosample_term": {
           "type": ["string", "null"],
-          "description": "Ontology term for the sample the assay was run in, taken from the associated files_filesets record. Null when the fileset lists no sample.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "pattern": "^ontology_terms/"
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record. Null when the fileset carries no summary.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "MutPred2"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted protein variant effect"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI6893ZOAA"
           ]

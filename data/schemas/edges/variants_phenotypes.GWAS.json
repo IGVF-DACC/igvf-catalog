@@ -10,7 +10,7 @@
       "properties": {
         "equivalent_ontology_term": {
           "type": ["string", "null"],
-          "description": "The other of the MONDO or EFO identifiers for the same trait, when both are present. MONDO is preferred as the edge target when it can be resolved.",
+          "description": "The other of the MONDO or EFO identifiers for the same trait, when both are present.",
           "example": "EFO_0007010"
         },
         "lead_chrom": {
@@ -35,7 +35,7 @@
         },
         "phenotype_term": {
           "type": ["string", "null"],
-          "description": "Display name of the ontology term used as the edge target. Rows with neither a MONDO nor an EFO identifier are not loaded.",
+          "description": "Ontology term for the phenotype, trait or disease.",
           "example": "chronic obstructive pulmonary disease"
         },
         "direction": {
@@ -90,13 +90,12 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the association p-value. Capped at 27000 when the reported p-value is 0.",
+          "description": "Negative log 10 p-value of the measurement or prediction",
           "example": 1
         },
         "tagged_variants": {
           "type": "array",
-          "description": "Variants in LD with the lead, each with its alleles, overall r2, whether it falls in the PICS 95 percent credible set, 1000 Genomes superpopulation proportions, log10 approximate Bayes factor, and posterior probability of causality.",
-          "items": {
+          "description": "Variants in LD with the lead SNP.",
             "type": "object",
             "properties": {
               "tag_chrom": {
@@ -201,39 +200,45 @@
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "GWAS"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "GWAS"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "OpenTargets"
           ]
         },
         "source_url": {
           "type": "string",
-          "description": "IGVF reference-file page for the Open Targets file this record was read from."
+          "description": "The URL for the source."
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this record was read from."
+          "description": "Reference to the File and Metadata"
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]
@@ -250,7 +255,7 @@
         },
         "study": {
           "type": "string",
-          "description": "Handle of the studies record this association comes from.",
+          "description": "ID of the GWAS study.",
           "example": "studies/GCST006368"
         }
       },

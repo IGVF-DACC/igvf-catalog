@@ -153,26 +153,26 @@
     },
     "source": {
       "type": "string",
-      "description": "FUNCODE, the pipeline that scored functional conservation of the paired elements.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "FUNCODE"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "IGVF reference-file page for the FUNCODE pairing table this edge was read from.",
+      "description": "The URL for the source.",
       "pattern": "^https://data.igvf.org/reference-files/"
     },
     "name": {
       "type": "string",
-      "description": "Predicate for the mouse-to-human homology direction.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "homologous to"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate for the human-to-mouse homology direction. Identical to name; the relationship is symmetric.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "homologous to"
       ]

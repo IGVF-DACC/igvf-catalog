@@ -28,27 +28,27 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Tissue the QTL was measured in. AFGR used lymphoblastoid cell lines.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "enum": [
             "lymphoblastoid cell line"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for lymphoblastoid cell line, as a handle into ontology_terms.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "enum": [
             "ontology_terms/EFO_0005292"
           ]
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome of the variant, prefixed with chr.",
+          "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1",
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the nominal association p-value. Capped at 400 when the reported p-value is 0."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
           "type": "number",
@@ -68,64 +68,71 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the variant–intron association passed the study's significance threshold."
+          "description": "Boolean indicating the signficance of the variant association with splicing."
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "spliceQTL"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "spliceQTL"
           ]
         },
         "intron_chr": {
           "type": "string",
-          "description": "Chromosome of the LeafCutter intron, prefixed with chr.",
+          "description": "Chromosome of the spliced intron",
           "example": "chr1",
           "pattern": "^chr"
         },
         "intron_start": {
           "type": "number",
-          "description": "Start of the LeafCutter intron, stored as a string."
+          "description": "Start position of the spliced intron."
         },
         "intron_end": {
           "type": "number",
-          "description": "End of the LeafCutter intron, stored as a string."
+          "description": "End position of the splicedintron."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "AFGR"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://github.com/smontgomlab/AFGR"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this QTL was read from."
+          "description": "Reference to the File and Metadata"
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates splicing of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "splicing modulated by"
           ]
         },
         "biological_process": {
           "type": "string",
-          "description": "Gene Ontology term for regulation of RNA splicing, as a handle into ontology_terms.",
+          "description": "Gene Ontology term for regulation of RNA splicing.",
           "enum": [
             "ontology_terms/GO_0043484"
           ]

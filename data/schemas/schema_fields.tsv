@@ -1,0 +1,1412 @@
+kind	file	field	description
+node	coding_variants.DbNSFP	name	Human readable display name for the entity
+node	coding_variants.DbNSFP	ref	Reference amino acid, in single-letter code.
+node	coding_variants.DbNSFP	alt	Alternate amino acid, in single-letter code.
+node	coding_variants.DbNSFP	aapos	1-based amino acid position in the protein. -1 when the variant is a splice-site SNP (2 bp at either end of an intron).
+node	coding_variants.DbNSFP	gene_name	HGNC gene symbol.
+node	coding_variants.DbNSFP	protein_name	UniProtKB protein name.
+node	coding_variants.DbNSFP	protein_id	Ensembl ID of the protein (without version number).
+node	coding_variants.DbNSFP	hgvsp	HGVS protein-level description of the variant.
+node	coding_variants.DbNSFP	hgvsc	HGVS description of the variant in the cDNA reference frame.
+node	coding_variants.DbNSFP	refcodon	Reference codon at the substituted position.
+node	coding_variants.DbNSFP	codonpos	Position of the variant within the codon: 1, 2 or 3. Null when not applicable.
+node	coding_variants.DbNSFP	transcript_id	ENSEMBL transcript ID, without version number.
+node	coding_variants.DbNSFP	SIFT_score	SIFT score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this protein.
+node	coding_variants.DbNSFP	SIFT4G_score	SIFT 4G score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this transcript.
+node	coding_variants.DbNSFP	Polyphen2_HDIV_score	PolyPhen-2 HumDiv probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	Polyphen2_HVAR_score	PolyPhen-2 HumVar probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	VEST4_score	VEST 4.0 score from 0 to 1. Larger values are more likely to cause a functional change. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	REVEL_score	REVEL ensemble pathogenicity score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	MutPred_score	MutPred score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	BayesDel_addAF_score	BayesDel meta-score with maximum allele frequency included. Higher values are more likely pathogenic. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	BayesDel_noAF_score	BayesDel meta-score without maximum allele frequency. Higher values are more likely pathogenic. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	VARITY_R_score	VARITY_R pathogenicity score for rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	VARITY_ER_score	VARITY_ER pathogenicity score for extremely rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	VARITY_R_LOO_score	VARITY_R score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	VARITY_ER_LOO_score	VARITY_ER score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	ESM1b_score	ESM1b log-likelihood ratio. Smaller (more negative) values are more likely pathogenic. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	AlphaMissense_score	AlphaMissense pathogenicity score from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	CADD_raw_score	CADD raw score. Larger values are more likely damaging. Null when dbNSFP has no score.
+node	coding_variants.DbNSFP	source	The database, dataset or organization that is a source for these data.
+node	coding_variants.DbNSFP	source_url	The URL for the source.
+node	coding_variants.ESM1vCodingVariantsScores	name	Human readable display name for the entity
+node	coding_variants.ESM1vCodingVariantsScores	ref	Reference amino acid, in single letter code.
+node	coding_variants.ESM1vCodingVariantsScores	alt	Alternate amino acid, in single letter code.
+node	coding_variants.ESM1vCodingVariantsScores	aapos	1-based position of the substituted residue within the protein.
+node	coding_variants.ESM1vCodingVariantsScores	refcodon	Reference codon at the substituted position.
+node	coding_variants.ESM1vCodingVariantsScores	gene_name	HGNC gene symbol
+node	coding_variants.ESM1vCodingVariantsScores	protein_name	UniProtKB protein name.
+node	coding_variants.ESM1vCodingVariantsScores	protein_id	Ensembl ID of the protein (without version number).
+node	coding_variants.ESM1vCodingVariantsScores	codonpos	Position of the variant within the codon: 1, 2 or 3. 
+node	coding_variants.ESM1vCodingVariantsScores	hgvsc	HGVS description of the variant in the cDNA reference frame.
+node	coding_variants.ESM1vCodingVariantsScores	hgvsp	HGVS protein-level description of the variant.
+node	coding_variants.ESM1vCodingVariantsScores	transcript_id	ENSEMBL transcript ID, without version number.
+node	coding_variants.ESM1vCodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+node	coding_variants.ESM1vCodingVariantsScores	source_url	The URL for the source.
+node	coding_variants.Mutpred2CodingVariantsScores	name	Human readable display name for the entity
+node	coding_variants.Mutpred2CodingVariantsScores	ref	Reference amino acid, in single-letter code.
+node	coding_variants.Mutpred2CodingVariantsScores	alt	Alternate amino acid, in single-letter code.
+node	coding_variants.Mutpred2CodingVariantsScores	aapos	1-based position of the substituted residue within the protein.
+node	coding_variants.Mutpred2CodingVariantsScores	refcodon	Reference codon at the substituted position.
+node	coding_variants.Mutpred2CodingVariantsScores	gene_name	HGNC gene symbol
+node	coding_variants.Mutpred2CodingVariantsScores	protein_name	UniProtKB protein name.
+node	coding_variants.Mutpred2CodingVariantsScores	protein_id	Ensembl ID of the protein (without version number).
+node	coding_variants.Mutpred2CodingVariantsScores	codonpos	Position of the variant within the codon: 1, 2 or 3. 
+node	coding_variants.Mutpred2CodingVariantsScores	hgvsc	HGVS description of the variant in the cDNA reference frame.
+node	coding_variants.Mutpred2CodingVariantsScores	hgvsp	HGVS protein-level description of the variant.
+node	coding_variants.Mutpred2CodingVariantsScores	transcript_id	ENSEMBL transcript ID, without version number.
+node	coding_variants.Mutpred2CodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+node	coding_variants.Mutpred2CodingVariantsScores	source_url	The URL for the source.
+node	complexes.EBIComplex	name	Human readable display name for the entity
+node	complexes.EBIComplex	alias	Regularly used synonyms for the complex.
+node	complexes.EBIComplex	molecules	Participants of the complex as recorded by Complex Portal: a UniProt accession, isoform, processed chain, molecule set, or nested complex accession, each followed by stoichiometry in parentheses. 0 means the stoichiometry is unknown.
+node	complexes.EBIComplex	evidence_code	Evidence and Conclusion Ontology term supporting the complex, with the ECO identifier and its label in parentheses.
+node	complexes.EBIComplex	experimental_evidence	Identifier of the experimental evidence for this complex in an IMEx member database, PDB, or EMDB. Null when none is recorded.
+node	complexes.EBIComplex	description	Free-text description of the function and role of the complex.
+node	complexes.EBIComplex	complex_assembly	Assembly type of the complex.
+node	complexes.EBIComplex	complex_source	IMEx database the original curator of the complex is associated with.
+node	complexes.EBIComplex	reactome_xref	Reactome pathway identifiers this complex is cross-referenced to, each with a qualifier in parentheses.
+node	complexes.EBIComplex	source	The database, dataset or organization that is a source for these data.
+node	complexes.EBIComplex	source_url	The URL for the source.
+node	complexes.EBIComplex	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	complexes.EBIComplex	method	Name of the experimental class or prediction model that produced this result.
+node	complexes.EBIComplex	label	Non-method specific human readable label for the node or edge
+node	complexes.EBIComplex	files_filesets	Reference to the File and Metadata
+node	complexes.SEMMotif	name	Human readable display name for the entity
+node	complexes.SEMMotif	source	The database, dataset or organization that is a source for these data.
+node	complexes.SEMMotif	source_url	The URL for the source.
+node	donors.FileFileSet	name	Human readable display name for the entity
+node	donors.FileFileSet	sex	Sex of the donor: female, male, mixed, unknown, or unspecified.
+node	donors.FileFileSet	age	Age of the donor, in the units given by age_units. Stored as a string, since the portal records open-ended values as well as exact ages.
+node	donors.FileFileSet	age_units	Unit the age value is expressed in: day, week, month, or year.
+node	donors.FileFileSet	ethnicities	Ethnicity of the donor.
+node	donors.FileFileSet	phenotypic_features	Phenotypic features observed for the donor, with DOID identifiers mapped onto MONDO or HP.
+node	donors.FileFileSet	source	The database, dataset or organization that is a source for these data.
+node	donors.FileFileSet	source_url	The URL for the source.
+node	drugs.PharmGKB	name	Human readable display name for the entity
+node	drugs.PharmGKB	drug_ontology_terms	ChEBI ontology terms for this drug.
+node	drugs.PharmGKB	source	The database, dataset or organization that is a source for these data.
+node	drugs.PharmGKB	source_url	The URL for the source.
+node	drugs.PharmGKB	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	drugs.PharmGKB	method	Name of the experimental class or prediction model that produced this result.
+node	drugs.PharmGKB	files_filesets	Reference to the File and Metadata
+node	files_filesets.FileFileSet	name	Human readable display name for the entity
+node	files_filesets.FileFileSet	file_set_id	Accession of the file set that contains this file: the unique identifier used to reference that file set on the source portal.
+node	files_filesets.FileFileSet	lab	Lab associated with the submission.
+node	files_filesets.FileFileSet	preferred_assay_titles	Preferred assay title from the IGVF Portal.
+node	files_filesets.FileFileSet	assay_term_ids	Ontology term identifiers for the assays used to produce the data.
+node	files_filesets.FileFileSet	method	Name of the experimental class or prediction model that produced this result.
+node	files_filesets.FileFileSet	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	files_filesets.FileFileSet	software	Name of the software packages used to produce the file.
+node	files_filesets.FileFileSet	samples	Ontology terms identifying the biosamples the data was produced from.
+node	files_filesets.FileFileSet	sample_ids	ENCODE or IGVF Accessions of the samples the data was produced from.
+node	files_filesets.FileFileSet	simple_sample_summaries	Short readable summary of each sample.
+node	files_filesets.FileFileSet	donors	ENCODE or IGVF Donors the samples were derived from.
+node	files_filesets.FileFileSet	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+node	files_filesets.FileFileSet	publication	Publication identifier associated with the file set.
+node	files_filesets.FileFileSet	collections	The collections in the IGVF catalog that contain the data in this file.
+node	files_filesets.FileFileSet	source	The database, dataset or organization that is a source for these data.
+node	files_filesets.FileFileSet	source_url	The URL for the source.
+node	files_filesets.FileFileSet	download_link	The download path to obtain the file from the source portal.
+node	files_filesets.FileFileSet	cell_annotation	The cell annotation of the file set, with optional qualifier, for single-cell derived results.
+node	files_filesets.FileFileSet	cell_annotation_term	Base ontology term describing the cell type of a single-cell derived result.
+node	files_filesets.FileFileSet	genome_browser_link	Link to a file that can be rendered in a genome browser: the file set's bigInteract, bigBed, bigWig, or bedpe file where one exists, or the file itself for a pseudobulk set.
+node	files_filesets.FileFileSet	browser_index_file	Download link for the genome browser index file (.tbi).
+node	files_filesets.FileFileSet	crispr_modality	The purpose or intended effect of the CRISPR modification applied to the samples.
+node	files_filesets.FileFileSet	version	Version of the external data source, recorded only for community-curated files loaded into the catalog from outside IGVF and ENCODE.
+node	genes.GencodeGene	gene_id	Ensembl gene ID including its version suffix.
+node	genes.GencodeGene	gene_type	Biotype GENCODE assigns to the gene.
+node	genes.GencodeGene	chr	Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	genes.GencodeGene	start	Start of the gene, 0-based and inclusive.
+node	genes.GencodeGene	end	End of the gene, 0-based and exclusive.
+node	genes.GencodeGene	strand	Strand the gene is transcribed from: '+' for the forward strand, '-' for the reverse strand.
+node	genes.GencodeGene	name	Human readable display name for the entity
+node	genes.GencodeGene	symbol	GENCODE gene symbol.
+node	genes.GencodeGene	source	The database, dataset or organization that is a source for these data.
+node	genes.GencodeGene	version	GENCODE release the annotation was taken from.
+node	genes.GencodeGene	source_url	The URL for the source.
+node	genes.GencodeGene	organism	Species this annotation describes.
+node	genes.GencodeGene	study_sets	IGVF study sets that include this gene.
+node	genes.GencodeGene	collections	The collections in the IGVF catalog that contain the data in this file.
+node	genes.GencodeGene	version_number	Version suffix of the Ensembl gene ID.
+node	genes.GencodeGene	hgnc	HGNC gene symbol
+node	genes.GencodeGene	synonyms	Alternative symbols and names for the gene, gathered from the NCBI gene info file: its synonyms, other designations, and nomenclature-authority symbol and full name.
+node	genes.GencodeGene	entrez	Entrez gene ID for the gene, prefixed with 'ENTREZ:'.
+node	genes_structure.GencodeStructure	name	Human readable display name for the entity
+node	genes_structure.GencodeStructure	chr	Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	genes_structure.GencodeStructure	start	Start of the feature, 0-based and inclusive.
+node	genes_structure.GencodeStructure	end	End of the feature, 0-based and exclusive.
+node	genes_structure.GencodeStructure	strand	Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.
+node	genes_structure.GencodeStructure	type	Kind of sub-transcript feature. Exons and their CDS, UTR, start_codon, and stop_codon sub-features are taken from the GENCODE annotation, and the sub-features share the exon_id of the exon they fall in. Introns are not annotated by GENCODE and are derived from the gaps between consecutive exons of a transcript.
+node	genes_structure.GencodeStructure	gene_id	Ensembl gene ID
+node	genes_structure.GencodeStructure	gene_name	HGNC gene symbol.
+node	genes_structure.GencodeStructure	transcript_id	ENSEMBL transcript ID, without version number.
+node	genes_structure.GencodeStructure	transcript_name	GENCODE transcript name, which is the gene symbol followed by a transcript index.
+node	genes_structure.GencodeStructure	exon_number	1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, joined by an underscore.
+node	genes_structure.GencodeStructure	exon_id	Ensembl exon ID, including its version suffix.
+node	genes_structure.GencodeStructure	source	The database, dataset or organization that is a source for these data.
+node	genes_structure.GencodeStructure	version	GENCODE release the annotation was taken from.
+node	genes_structure.GencodeStructure	source_url	The URL for the source.
+node	genes_structure.GencodeStructure	organism	Species this annotation describes.
+node	genomic_elements.AFGRCAQtl	name	Human readable display name for the entity
+node	genomic_elements.AFGRCAQtl	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.AFGRCAQtl	source_url	The URL for the source.
+node	genomic_elements.AFGRCAQtl	type	
+node	genomic_elements.AFGRCAQtl	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.AFGRCAQtl	files_filesets	Reference to the File and Metadata
+node	genomic_elements.CAQtl	name	Human readable display name for the entity
+node	genomic_elements.CAQtl	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.CAQtl	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.CAQtl	source_url	The URL for the source.
+node	genomic_elements.CAQtl	type	
+node	genomic_elements.CAQtl	files_filesets	Reference to the File and Metadata
+node	genomic_elements.CCRE	name	Human readable display name for the entity
+node	genomic_elements.CCRE	source_annotation	Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.
+node	genomic_elements.CCRE	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.CCRE	type	
+node	genomic_elements.CCRE	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.CCRE	source_url	The URL for the source.
+node	genomic_elements.CCRE	files_filesets	Reference to the File and Metadata
+node	genomic_elements.CRISPRElementGeneENCODE	name	Human readable display name for the entity
+node	genomic_elements.CRISPRElementGeneENCODE	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
+node	genomic_elements.CRISPRElementGeneENCODE	files_filesets	Reference to the File and Metadata
+node	genomic_elements.CRISPRElementGeneENCODE	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.CRISPRElementGeneIGVF	name	Human readable display name for the entity
+node	genomic_elements.CRISPRElementGeneIGVF	promoter_of	The gene this element is the presumed promoter of.
+node	genomic_elements.CRISPRElementGeneIGVF	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.CRISPRElementGeneIGVF	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
+node	genomic_elements.CRISPRElementGeneIGVF	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.CRISPRElementGeneIGVF	source_url	The URL for the source.
+node	genomic_elements.CRISPRElementGeneIGVF	type	
+node	genomic_elements.CRISPRElementGeneIGVF	files_filesets	Reference to the File and Metadata
+node	genomic_elements.CRISPRElementPhenotype	name	Human readable display name for the entity
+node	genomic_elements.CRISPRElementPhenotype	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.CRISPRElementPhenotype	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
+node	genomic_elements.CRISPRElementPhenotype	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.CRISPRElementPhenotype	source_url	The URL for the source.
+node	genomic_elements.CRISPRElementPhenotype	type	
+node	genomic_elements.CRISPRElementPhenotype	files_filesets	Reference to the File and Metadata
+node	genomic_elements.EncodeElementGeneLink	name	Human readable display name for the entity
+node	genomic_elements.EncodeElementGeneLink	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.EncodeElementGeneLink	type	
+node	genomic_elements.EncodeElementGeneLink	source_annotation	Class of the element as reported by ENCODE-rE2G: a promoter, genic where it falls inside a gene body, or intergenic.
+node	genomic_elements.EncodeElementGeneLink	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.EncodeElementGeneLink	source_url	The URL for the source.
+node	genomic_elements.EncodeElementGeneLink	files_filesets	Reference to the File and Metadata
+node	genomic_elements.EncodeElementGeneLink	simple_sample_summaries	Short readable summary of each sample.
+node	genomic_elements.EncodeElementGeneLink	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+node	genomic_elements.HumanMouseElementAdapter	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.HumanMouseElementAdapter	type	
+node	genomic_elements.HumanMouseElementAdapter	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.HumanMouseElementAdapter	source_url	The URL for the source.
+node	genomic_elements.MPRAAdapter	name	Human readable display name for the entity
+node	genomic_elements.MPRAAdapter	strand	Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.
+node	genomic_elements.MPRAAdapter	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.MPRAAdapter	type	
+node	genomic_elements.MPRAAdapter	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.MPRAAdapter	source_url	The URL for the source.
+node	genomic_elements.MPRAAdapter	files_filesets	Reference to the File and Metadata
+node	genomic_elements.base	chr	Chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	genomic_elements.base	start	Start of the element, 0-based and inclusive.
+node	genomic_elements.base	end	End of the element, 0-based and exclusive.
+node	genomic_elements.base	strand	Strand the element is annotated on: + for forward, - for reverse, or . where strand does not apply.
+node	genomic_elements.base	type	Category of element.
+node	genomic_elements.base	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.scE2G	name	Human readable display name for the entity
+node	genomic_elements.scE2G	method	Name of the experimental class or prediction model that produced this result.
+node	genomic_elements.scE2G	type	
+node	genomic_elements.scE2G	source_annotation	Class of the element: promoter, genic, or intergenic.
+node	genomic_elements.scE2G	source	The database, dataset or organization that is a source for these data.
+node	genomic_elements.scE2G	source_url	The URL for the source.
+node	genomic_elements.scE2G	files_filesets	Reference to the File and Metadata
+node	mm_genes.GencodeGene	gene_id	Ensembl gene ID including its version suffix.
+node	mm_genes.GencodeGene	gene_type	Biotype GENCODE assigns to the gene.
+node	mm_genes.GencodeGene	chr	Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	mm_genes.GencodeGene	start	Start of the gene, 0-based and inclusive.
+node	mm_genes.GencodeGene	end	End of the gene, 0-based and exclusive.
+node	mm_genes.GencodeGene	strand	Strand the gene is transcribed from: '+' for the forward strand, '-' for the reverse strand.
+node	mm_genes.GencodeGene	name	Human readable display name for the entity
+node	mm_genes.GencodeGene	symbol	GENCODE gene symbol.
+node	mm_genes.GencodeGene	source	The database, dataset or organization that is a source for these data.
+node	mm_genes.GencodeGene	version	GENCODE release the annotation was taken from.
+node	mm_genes.GencodeGene	source_url	The URL for the source.
+node	mm_genes.GencodeGene	organism	Species this annotation describes.
+node	mm_genes.GencodeGene	study_sets	IGVF study sets that include this gene. 
+node	mm_genes.GencodeGene	collections	The collections in the IGVF catalog that contain the data in this file.
+node	mm_genes.GencodeGene	version_number	Version suffix of the Ensembl gene ID.
+node	mm_genes.GencodeGene	mgi	MGI ID for the gene.
+node	mm_genes.GencodeGene	synonyms	Alternative symbols and names for the gene, gathered from the NCBI gene info file: its synonyms, other designations, and nomenclature-authority symbol and full name.
+node	mm_genes.GencodeGene	entrez	Entrez gene ID for the gene, prefixed with 'ENTREZ:'.
+node	mm_genes_structure.GencodeStructure	name	Human readable display name for the entity
+node	mm_genes_structure.GencodeStructure	chr	Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	mm_genes_structure.GencodeStructure	start	Start of the feature, 0-based and inclusive.
+node	mm_genes_structure.GencodeStructure	end	End of the feature, 0-based and exclusive.
+node	mm_genes_structure.GencodeStructure	strand	Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.
+node	mm_genes_structure.GencodeStructure	type	Kind of sub-transcript feature. Exons and their CDS, UTR, start_codon, and stop_codon sub-features are taken from the GENCODE annotation, and the sub-features share the exon_id of the exon they fall in. Introns are not annotated by GENCODE and are derived from the gaps between consecutive exons of a transcript.
+node	mm_genes_structure.GencodeStructure	gene_id	Ensembl gene ID.
+node	mm_genes_structure.GencodeStructure	gene_name	HGNC gene symbol
+node	mm_genes_structure.GencodeStructure	transcript_id	ENSEMBL transcript ID, without version number.
+node	mm_genes_structure.GencodeStructure	transcript_name	GENCODE transcript name, which is the gene symbol followed by a transcript index.
+node	mm_genes_structure.GencodeStructure	exon_number	1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, joined by an underscore.
+node	mm_genes_structure.GencodeStructure	exon_id	Ensembl exon ID, including its version suffix.
+node	mm_genes_structure.GencodeStructure	source	The database, dataset or organization that is a source for these data.
+node	mm_genes_structure.GencodeStructure	version	GENCODE release the annotation was taken from.
+node	mm_genes_structure.GencodeStructure	source_url	The URL for the source.
+node	mm_genes_structure.GencodeStructure	organism	Species this annotation describes.
+node	mm_genomic_elements.CCRE	source_annotation	Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.
+node	mm_genomic_elements.CCRE	method	Name of the experimental class or prediction model that produced this result.
+node	mm_genomic_elements.CCRE	type	
+node	mm_genomic_elements.CCRE	source	The database, dataset or organization that is a source for these data.
+node	mm_genomic_elements.CCRE	source_url	The URL for the source.
+node	mm_genomic_elements.CCRE	files_filesets	Reference to the File and Metadata
+node	mm_genomic_elements.HumanMouseElementAdapter	chr	Mouse chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	mm_genomic_elements.HumanMouseElementAdapter	start	Start of the element, 0-based and inclusive.
+node	mm_genomic_elements.HumanMouseElementAdapter	end	End of the mouse element on mm10, 0-based and exclusive.
+node	mm_genomic_elements.HumanMouseElementAdapter	method	Name of the experimental class or prediction model that produced this result.
+node	mm_genomic_elements.HumanMouseElementAdapter	type	Category of element: a mouse DNase hypersensitive site paired to a human site by FUNCODE.
+node	mm_genomic_elements.HumanMouseElementAdapter	source	The database, dataset or organization that is a source for these data.
+node	mm_genomic_elements.HumanMouseElementAdapter	source_url	The URL for the source.
+node	mm_transcripts.Gencode	transcript_id	ENSEMBL transcript ID, without version number.
+node	mm_transcripts.Gencode	name	Human readable display name for the entity
+node	mm_transcripts.Gencode	transcript_type	Biotype GENCODE assigns to the transcript.
+node	mm_transcripts.Gencode	chr	Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	mm_transcripts.Gencode	start	Start of the transcript, 0-based and inclusive.
+node	mm_transcripts.Gencode	end	End of the transcript, 0-based and exclusive.
+node	mm_transcripts.Gencode	strand	Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.
+node	mm_transcripts.Gencode	gene_name	HGNC gene symbol
+node	mm_transcripts.Gencode	source	The database, dataset or organization that is a source for these data.
+node	mm_transcripts.Gencode	version	GENCODE release the annotation was taken from.
+node	mm_transcripts.Gencode	source_url	The URL for the source.
+node	mm_transcripts.Gencode	organism	Species this annotation describes.
+node	mm_variants.MouseGenomesProjectAdapter	chr	Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.
+node	mm_variants.MouseGenomesProjectAdapter	pos	0-based genomic coordinate of the variant.
+node	mm_variants.MouseGenomesProjectAdapter	rsid	dbSNP id for the variant position
+node	mm_variants.MouseGenomesProjectAdapter	ref	Reference allele, relative to C57BL/6J (GRCm39).
+node	mm_variants.MouseGenomesProjectAdapter	alt	Alternate allele.
+node	mm_variants.MouseGenomesProjectAdapter	organism	Species this annotation describes.
+node	mm_variants.MouseGenomesProjectAdapter	strain	Collaborative Cross founder strains that carry the alternate allele.
+node	mm_variants.MouseGenomesProjectAdapter	qual	VCF QUAL score for the variant position.
+node	mm_variants.MouseGenomesProjectAdapter	filter	VCF FILTER for the site. PASS if at least one strain call passed the release filters; LowQual otherwise. Null when the source has none.
+node	mm_variants.MouseGenomesProjectAdapter	fi	Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release.
+node	mm_variants.MouseGenomesProjectAdapter	name	Human readable display name for the entity
+node	mm_variants.MouseGenomesProjectAdapter	spdi	Normalized SPDI expression identifying the allele.
+node	mm_variants.MouseGenomesProjectAdapter	hgvs	Genomic HGVS notation derived from the SPDI.
+node	mm_variants.MouseGenomesProjectAdapter	source	The database, dataset or organization that is a source for these data.
+node	mm_variants.MouseGenomesProjectAdapter	source_url	The URL for the source.
+node	motifs.Motif	source	The database, dataset or organization that is a source for these data.
+node	motifs.Motif	source_url	The URL for the source.
+node	motifs.Motif	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	motifs.Motif	method	Name of the experimental class or prediction model that produced this result.
+node	motifs.Motif	files_filesets	Reference to the File and Metadata
+node	motifs.SEMMotif	source	The database, dataset or organization that is a source for these data.
+node	motifs.SEMMotif	source_url	The URL for the source.
+node	motifs.SEMMotif	baseline	log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers.
+node	motifs.SEMMotif	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	motifs.SEMMotif	method	Name of the experimental class or prediction model that produced this result.
+node	motifs.SEMMotif	files_filesets	Reference to the File and Metadata
+node	motifs.base	tf_name	Name of the transcription factor whose binding preference the motif describes.
+node	motifs.base	pwm	Position weight matrix for the motif: an N-by-4 matrix with one row per motif position and one score per nucleotide.
+node	motifs.base	length	Number of positions in the motif, equal to the number of rows in pwm.
+node	node.base	name	Human readable display name for the entity
+node	node.base	source	The database, dataset or organization that is a source for these data.
+node	node.base	source_url	The URL for the source.
+node	ontology_terms.CRISPRVariantPhenotype	name	Human readable display name for the entity
+node	ontology_terms.CRISPRVariantPhenotype	uri	URI for the ontology term.
+node	ontology_terms.CRISPRVariantPhenotype	term_id	Ontology term identifier.
+node	ontology_terms.CRISPRVariantPhenotype	synonyms	Alternative names for the ontology term.
+node	ontology_terms.CRISPRVariantPhenotype	source	The database, dataset or organization that is a source for these data.
+node	ontology_terms.CRISPRVariantPhenotype	source_url	The URL for the source.
+node	ontology_terms.CRISPRVariantPhenotype	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	ontology_terms.CRISPRVariantPhenotype	method	Name of the experimental class or prediction model that produced this result.
+node	ontology_terms.CRISPRVariantPhenotype	files_filesets	Reference to the File and Metadata
+node	ontology_terms.Cellosaurus	uri	URI for the ontology term.
+node	ontology_terms.Cellosaurus	term_id	Ontology term identifier.
+node	ontology_terms.Cellosaurus	name	Human readable display name for the entity
+node	ontology_terms.Cellosaurus	synonyms	Alternative names for the ontology term.
+node	ontology_terms.Cellosaurus	source	The database, dataset or organization that is a source for these data.
+node	ontology_terms.Cellosaurus	source_url	The URL for the source.
+node	ontology_terms.Cellosaurus	subset	Cellosaurus category tags for the cell line, including cell-line class and sex of the donor. Null when the OBO entry has none.
+node	ontology_terms.Cellosaurus	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	ontology_terms.Cellosaurus	method	Name of the experimental class or prediction model that produced this result.
+node	ontology_terms.Cellosaurus	files_filesets	Reference to the File and Metadata
+node	ontology_terms.FileFileSet	name	Human readable display name for the entity
+node	ontology_terms.FileFileSet	uri	URI for the ontology term.
+node	ontology_terms.FileFileSet	term_id	Ontology term identifier.
+node	ontology_terms.FileFileSet	synonyms	Alternative names for the ontology term.
+node	ontology_terms.FileFileSet	source	The database, dataset or organization that is a source for these data.
+node	ontology_terms.FileFileSet	source_url	The URL for the source.
+node	ontology_terms.Oncotree	name	Human readable display name for the entity
+node	ontology_terms.Oncotree	uri	URI for the ontology term.
+node	ontology_terms.Oncotree	term_id	Ontology term identifier.
+node	ontology_terms.Oncotree	source	The database, dataset or organization that is a source for these data.
+node	ontology_terms.Oncotree	source_url	The URL for the source.
+node	ontology_terms.Oncotree	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	ontology_terms.Oncotree	method	Name of the experimental class or prediction model that produced this result.
+node	ontology_terms.Oncotree	files_filesets	Reference to the File and Metadata
+node	ontology_terms.Ontology	uri	URI for the ontology term.
+node	ontology_terms.Ontology	term_id	Ontology term identifier.
+node	ontology_terms.Ontology	name	Human readable display name for the entity
+node	ontology_terms.Ontology	description	Textual definition of the term (IAO_0000115).
+node	ontology_terms.Ontology	synonyms	Alternative names for the ontology term.
+node	ontology_terms.Ontology	source	The database, dataset or organization that is a source for these data.
+node	ontology_terms.Ontology	source_url	The URL for the source.
+node	ontology_terms.Ontology	subontology	GO namespace of the term. Null for terms that are not from GO.
+node	ontology_terms.Ontology	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	ontology_terms.Ontology	method	Name of the experimental class or prediction model that produced this result.
+node	ontology_terms.Ontology	files_filesets	Reference to the File and Metadata
+node	pathways.ReactomePathway	name	Human readable display name for the entity
+node	pathways.ReactomePathway	organism	Species this annotation describes.
+node	pathways.ReactomePathway	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+node	pathways.ReactomePathway	method	Name of the experimental class or prediction model that produced this result.
+node	pathways.ReactomePathway	label	Non-method specific human readable label for the node or edge
+node	pathways.ReactomePathway	files_filesets	Reference to the File and Metadata
+node	pathways.ReactomePathway	source	The database, dataset or organization that is a source for these data.
+node	pathways.ReactomePathway	source_url	The URL for the source.
+node	pathways.ReactomePathway	id_version	Reactome stable identifier with its version suffix.
+node	pathways.ReactomePathway	is_in_disease	Whether Reactome annotates this pathway as a disease pathway.
+node	pathways.ReactomePathway	name_aliases	Names Reactome lists for the pathway, including the display name.
+node	pathways.ReactomePathway	is_top_level_pathway	Whether this is a Reactome top-level pathway.
+node	pathways.ReactomePathway	disease_ontology_terms	Disease ontology terms Reactome associates with this pathway.
+node	pathways.ReactomePathway	go_biological_process	Gene Ontology biological process term for this pathway, as a handle into ontology_terms.
+node	proteins.GencodeProtein	MANE_Select	Whether GENCODE tags the transcript this protein is translated from as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.
+node	proteins.GencodeProtein	protein_id	Ensembl ID of the protein (without version number).
+node	proteins.GencodeProtein	source	The database, dataset or organization that is a source for these data.
+node	proteins.GencodeProtein	version	GENCODE release the annotation was taken from.
+node	proteins.GencodeProtein	source_url	The URL for the source.
+node	proteins.GencodeProtein	organism	Species this annotation describes.
+node	proteins.GencodeProtein	uniprot_collection	Which section of UniProtKB the mapped entries come from: Swiss-Prot for manually reviewed entries, TrEMBL for automatically annotated ones.
+node	proteins.GencodeProtein	uniprot_ids	UniProtKB accessions mapped to this Ensembl protein (isoforms specific).
+node	proteins.GencodeProtein	uniprot_names	UniProtKB entry names of the mapped accessions.
+node	proteins.GencodeProtein	dbxrefs	Cross-references to other databases, taken from the mapped UniProtKB entries.
+node	proteins.GencodeProtein	uniprot_full_names	Recommended full protein names from the mapped UniProtKB entries
+node	studies.EQTLCatalog	name	Human readable display name for the entity
+node	studies.EQTLCatalog	pmid	PubMed identifier.
+node	studies.EQTLCatalog	study_type	Whether the study measured expression in bulk tissue or in single cells.
+node	studies.EQTLCatalog	source	The database, dataset or organization that is a source for these data.
+node	studies.EQTLCatalog	source_url	The URL for the source.
+node	studies.EQTLCatalog	files_filesets	Reference to the File and Metadata
+node	studies.GWAS	name	Human readable display name for the entity
+node	studies.GWAS	ancestry_initial	Ancestry composition of the discovery GWAS sample, as recorded by Open Targets.
+node	studies.GWAS	ancestry_replication	Ancestry composition of the replication GWAS sample, as recorded by Open Targets.
+node	studies.GWAS	n_cases	Number of cases in the study.
+node	studies.GWAS	n_initial	Discovery sample size of the study.
+node	studies.GWAS	n_replication	Replication sample size of the study.
+node	studies.GWAS	pmid	PubMed identifier.
+node	studies.GWAS	pub_author	First author of the publication.
+node	studies.GWAS	pub_date	Publication date.
+node	studies.GWAS	pub_journal	Journal the study was published in.
+node	studies.GWAS	pub_title	Title of the publication.
+node	studies.GWAS	has_sumstats	Whether Open Targets has full summary statistics for this study.
+node	studies.GWAS	num_assoc_loci	Number of independently associated loci in the study.
+node	studies.GWAS	study_source	Consortium or pipeline the study was ingested from.
+node	studies.GWAS	trait_reported	Trait as reported by the study authors.
+node	studies.GWAS	trait_efos	EFO identifiers Open Targets mapped the reported trait to.
+node	studies.GWAS	trait_category	Open Targets category of the mapped trait.
+node	studies.GWAS	source	The database, dataset or organization that is a source for these data.
+node	studies.GWAS	version	Open Targets Genetics release this record was taken from.
+node	studies.GWAS	source_url	The URL for the source.
+node	studies.GWAS	files_filesets	Reference to the File and Metadata
+node	transcripts.Gencode	transcript_id	ENSEMBL transcript ID, without version number.
+node	transcripts.Gencode	name	Human readable display name for the entity
+node	transcripts.Gencode	transcript_type	Biotype GENCODE assigns to the transcript.
+node	transcripts.Gencode	chr	Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	transcripts.Gencode	start	Start of the transcript, 0-based and inclusive.
+node	transcripts.Gencode	end	End of the transcript, 0-based and exclusive.
+node	transcripts.Gencode	strand	Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.
+node	transcripts.Gencode	gene_name	HGNC gene symbol
+node	transcripts.Gencode	MANE_Select	Whether GENCODE tags this transcript as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.
+node	transcripts.Gencode	source	The database, dataset or organization that is a source for these data.
+node	transcripts.Gencode	version	GENCODE release the annotation was taken from.
+node	transcripts.Gencode	source_url	The URL for the source.
+node	transcripts.Gencode	organism	Species this annotation describes.
+node	variants.BlueSTARRVariantBiosample	source	The database, dataset or organization that is a source for these data.
+node	variants.BlueSTARRVariantBiosample	source_url	The URL for the source.
+node	variants.BlueSTARRVariantBiosample	files_filesets	Reference to the File and Metadata
+node	variants.CRISPRVariantGene	source	The database, dataset or organization that is a source for these data.
+node	variants.CRISPRVariantGene	source_url	The URL for the source.
+node	variants.CRISPRVariantGene	files_filesets	Reference to the File and Metadata
+node	variants.CRISPRVariantPhenotype	source	The database, dataset or organization that is a source for these data.
+node	variants.CRISPRVariantPhenotype	source_url	The URL for the source.
+node	variants.CRISPRVariantPhenotype	files_filesets	Reference to the File and Metadata
+node	variants.ESM1vCodingVariantsScores	variation_type	
+node	variants.ESM1vCodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+node	variants.ESM1vCodingVariantsScores	source_url	The URL for the source.
+node	variants.Favor	source	The database, dataset or organization that is a source for these data.
+node	variants.Favor	source_url	The URL for the source.
+node	variants.MPRAAdapter	source	The database, dataset or organization that is a source for these data.
+node	variants.MPRAAdapter	source_url	The URL for the source.
+node	variants.MPRAAdapter	files_filesets	Reference to the File and Metadata
+node	variants.Mutpred2CodingVariantsScores	variation_type	
+node	variants.Mutpred2CodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+node	variants.Mutpred2CodingVariantsScores	source_url	The URL for the source.
+node	variants.SGE	source	The database, dataset or organization that is a source for these data.
+node	variants.SGE	source_url	The URL for the source.
+node	variants.SGE	files_filesets	Reference to the File and Metadata
+node	variants.STARRseqVariantBiosample	source	The database, dataset or organization that is a source for these data.
+node	variants.STARRseqVariantBiosample	source_url	The URL for the source.
+node	variants.STARRseqVariantBiosample	files_filesets	Reference to the File and Metadata
+node	variants.autogenerated_dbnsfp	source	The database, dataset or organization that is a source for these data.
+node	variants.autogenerated_dbnsfp	source_url	The URL for the source.
+node	variants.autogenerated_topld	source	The database, dataset or organization that is a source for these data.
+node	variants.autogenerated_topld	source_url	The URL for the source.
+node	variants.base	chr	Chromosome the variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+node	variants.base	pos	0-based genomic coordinate of the variant.
+node	variants.base	rsid	dbSNP id for the variant position
+node	variants.base	ref	Reference allele sequence at this position, empty for a pure insertion.
+node	variants.base	alt	Alternate allele sequence, empty for a pure deletion.
+node	variants.base	qual	VCF QUAL score for the variant position.
+node	variants.base	variation_type	Class of sequence change, derived by comparing the reference and alternate allele lengths: SNP, insertion, deletion, or deletion-insertion.
+node	variants.base	annotations	Source-specific annotations parsed from from FAVOR.
+node	variants.base	spdi	Normalized SPDI expression identifying the allele.
+node	variants.base	hgvs	HGVS genomic expression for the allele.
+node	variants.base	vrs_digest	GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele.
+node	variants.base	ca_id	Canonical allele identifier assigned by the ClinGen Allele Registry.
+node	variants.base	organism	Species this annotation describes.
+node	variants.cV2F	source	The database, dataset or organization that is a source for these data.
+node	variants.cV2F	source_url	The URL for the source.
+node	variants.cV2F	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.DUALIPAAdapter	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_phenotypes.DUALIPAAdapter	source_url	The URL for the source.
+edge	coding_variants_phenotypes.DUALIPAAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_phenotypes.DUALIPAAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_phenotypes.DUALIPAAdapter	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.DUALIPAAdapter	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	coding_variants_phenotypes.DUALIPAAdapter	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	coding_variants_phenotypes.DUALIPAAdapter	method	Name of the experimental class or prediction model that produced this result.
+edge	coding_variants_phenotypes.DUALIPAAdapter	label	Non-method specific human readable label for the node or edge
+edge	coding_variants_phenotypes.DUALIPAAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	coding_variants_phenotypes.DUALIPAAdapter	avg_gfp	Single cell mean GFP fluorescence value per well
+edge	coding_variants_phenotypes.DUALIPAAdapter	avg_mcherry	Single cell mean mCherry fluorescence value per well
+edge	coding_variants_phenotypes.DUALIPAAdapter	avg_GFP_mCherry_ratio	Ratio of avg_gfp to avg_mcherry for the well, the abundance readout for the variant allele.
+edge	coding_variants_phenotypes.DUALIPAAdapter	wt_GFP_mCherry_ratio	Ratio of avg_gfp/avg_mcherry of related wild-type measurement
+edge	coding_variants_phenotypes.DUALIPAAdapter	allele_wt_ratio	Ratio of avg_GFP_mCherry_ratio/wt_GFP_mCherry_ratio
+edge	coding_variants_phenotypes.DUALIPAAdapter	dualipa_abun_score	Abundance score for the variant: the log2 Z-score of allele_wt_ratio against the wild-type distribution, computed as (log2(allele_wt_ratio) - log2(wt_mean)) / log2(wt_std).
+edge	coding_variants_phenotypes.DUALIPAAdapter	dualipa_abun_change	Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm_1v_score	Combined ESM-1v score for the substitution: the mean of the five model scores. 
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	method	Name of the experimental class or prediction model that produced this result.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	label	Non-method specific human readable label for the node or edge
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	source_url	The URL for the source.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_1	Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_1 model, one of the five ESM-1v models.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_2	Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_2 model, one of the five ESM-1v models.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_3	Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_3 model, one of the five ESM-1v models.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_4	Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_4 model, one of the five ESM-1v models.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_5	Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_5 model, one of the five ESM-1v models.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_1_next	Masked-marginals score from the esm1v_t33_650M_UR90S_1 model for the later segment of an overlap.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_2_next	Masked-marginals score from the esm1v_t33_650M_UR90S_2 model for the later segment of an overlap.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_3_next	Masked-marginals score from the esm1v_t33_650M_UR90S_3 model for the later segment of an overlap.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_4_next	Masked-marginals score from the esm1v_t33_650M_UR90S_4 model for the later segment of an overlap.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm1v_t33_650M_UR90S_5_next	Masked-marginals score from the esm1v_t33_650M_UR90S_5 model for the later segment of an overlap.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	pathogenicity_score	MutPred2 pathogenicity score for the substitution, between 0 and 1. Higher values indicate greater predicted pathogenicity.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	property_scores	Molecular mechanisms MutPred2 predicts the substitution to disrupt, drawn from its 58 structural, functional, and post-translational-modification properties.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	method	Name of the experimental class or prediction model that produced this result.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	label	Non-method specific human readable label for the node or edge
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	source_url	The URL for the source.
+edge	coding_variants_phenotypes.SGE	variants	Handle of the variants record for the genomic variant this coding variant was called from.
+edge	coding_variants_phenotypes.SGE	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_phenotypes.SGE	source_url	The URL for the source.
+edge	coding_variants_phenotypes.SGE	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.SGE	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	coding_variants_phenotypes.SGE	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	coding_variants_phenotypes.SGE	method	Name of the experimental class or prediction model that produced this result.
+edge	coding_variants_phenotypes.SGE	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	coding_variants_phenotypes.SGE	label	Non-method specific human readable label for the node or edge
+edge	coding_variants_phenotypes.SGE	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_phenotypes.SGE	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_phenotypes.SGE	exon	Exon of the target gene the variant lies in, written as GENE_X followed by the exon number. A non-exonic variant carries the exon of the SGE target whose genomic context includes it.
+edge	coding_variants_phenotypes.SGE	target	SGE library the variant was assayed in. Equal to exon where a single library covers the whole exon; otherwise a part of the exon.
+edge	coding_variants_phenotypes.SGE	consequence	Most severe consequence VEP annotates for the variant against the MANE Select transcript.
+edge	coding_variants_phenotypes.SGE	score	SGE score: the change in variant frequency over time, as log2 fold change per day. Normalized so that the median synonymous variant scores 0, so lower scores mean reduced cell fitness.
+edge	coding_variants_phenotypes.SGE	standard_error	Standard error of the score estimate.
+edge	coding_variants_phenotypes.SGE	95_ci_upper	Upper bound of the 95% confidence interval on score.
+edge	coding_variants_phenotypes.SGE	95_ci_lower	Lower bound of the 95% confidence interval on score.
+edge	coding_variants_phenotypes.SGE	amino_acid_change	Amino acid change the variant introduces into the reference sequence, in single-letter code.
+edge	coding_variants_phenotypes.SGE	hgvs_p	HGVS protein-level description of the variant.
+edge	coding_variants_phenotypes.SGE	functional_consequence	Functional consequence assigned to the variant from its z-score: functionally_normal, indeterminate, or functionally_abnormal.
+edge	coding_variants_phenotypes.SGE	functional_consequence_zscore	Z-score of the variant's score against the distribution of expected neutral variant scores. Thresholds on this value assign functional_consequence.
+edge	coding_variants_phenotypes.SGE	variant_qc_flag	Whether the variant passes the assay QC metrics: PASS, FAIL, or LOWCOV for low coverage.
+edge	coding_variants_phenotypes.SGE	snvlib_lib1	Count of the variant in the plasmid library before transfection and selection, from amplicon sequencing of the targeted region.
+edge	coding_variants_phenotypes.SGE	snvlib_lib2	Count of the variant in the second plasmid library before transfection and selection. Null unless two targets overlap and the variant was assayed in both.
+edge	coding_variants_phenotypes.SGE	D05_R1_lib1	Count of the variant at day 5 in replicate 1.
+edge	coding_variants_phenotypes.SGE	D05_R1_lib2	Count of the variant at day 5 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	coding_variants_phenotypes.SGE	D05_R2_lib1	Count of the variant at day 5 in replicate 2.
+edge	coding_variants_phenotypes.SGE	D05_R2_lib2	Count of the variant at day 5 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	coding_variants_phenotypes.SGE	D05_R3_lib1	Count of the variant at day 5 in replicate 3. Null when only two replicates passed QC.
+edge	coding_variants_phenotypes.SGE	D05_R3_lib2	Count of the variant at day 5 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC.
+edge	coding_variants_phenotypes.SGE	D13_R1_lib1	Count of the variant at day 13 in replicate 1.
+edge	coding_variants_phenotypes.SGE	D13_R1_lib2	Count of the variant at day 13 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	coding_variants_phenotypes.SGE	D13_R2_lib1	Count of the variant at day 13 in replicate 2.
+edge	coding_variants_phenotypes.SGE	D13_R2_lib2	Count of the variant at day 13 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	coding_variants_phenotypes.SGE	D13_R3_lib1	Count of the variant at day 13 in replicate 3. Null when only two replicates passed QC.
+edge	coding_variants_phenotypes.SGE	D13_R3_lib2	Count of the variant at day 13 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC.
+edge	coding_variants_phenotypes.VAMPAdapter	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_phenotypes.VAMPAdapter	source_url	The URL for the source.
+edge	coding_variants_phenotypes.VAMPAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_phenotypes.VAMPAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_phenotypes.VAMPAdapter	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.VAMPAdapter	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	coding_variants_phenotypes.VAMPAdapter	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	coding_variants_phenotypes.VAMPAdapter	method	Name of the experimental class or prediction model that produced this result.
+edge	coding_variants_phenotypes.VAMPAdapter	label	Non-method specific human readable label for the node or edge
+edge	coding_variants_phenotypes.VAMPAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	coding_variants_phenotypes.VAMPAdapter	score	VAMP-seq abundance score: For the variant, the mean of its replicate measurements. Normalized so that the median synonymous variant scores 1 and the median nonsense variant scores 0, so lower scores mean reduced abundance of the variant protein.
+edge	coding_variants_phenotypes.VAMPAdapter	standard_error	Standard error of the overall score.
+edge	coding_variants_phenotypes.VAMPAdapter	rep1_score	Abundance score calculated for replicate 1.
+edge	coding_variants_phenotypes.VAMPAdapter	rep2_score	Abundance score calculated for replicate 2.
+edge	coding_variants_phenotypes.VAMPAdapter	rep3_score	Abundance score calculated for replicate 3.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	source_url	The URL for the source.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	files_filesets	Reference to the File and Metadata
+edge	coding_variants_phenotypes.VariantPaintingAdapter	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	coding_variants_phenotypes.VariantPaintingAdapter	method	Name of the experimental class or prediction model that produced this result.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	label	Non-method specific human readable label for the node or edge
+edge	coding_variants_phenotypes.VariantPaintingAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	coding_variants_phenotypes.VariantPaintingAdapter	localization_score	XGBoost classifier score measuring the probability of protein mislocalization caused by the variant
+edge	coding_variants_phenotypes.VariantPaintingAdapter	mislocalization_hit	Whether the variant is classified as causing protein mislocalization based on the localization score threshold
+edge	coding_variants_proteins.DbNSFP	type	Whether the consequence is a protein-coding amino-acid change or a splice-site SNP (aapos = -1).
+edge	coding_variants_proteins.DbNSFP	name	Directional human readable label for the relationship, _from to _to.
+edge	coding_variants_proteins.DbNSFP	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	coding_variants_proteins.DbNSFP	source	The database, dataset or organization that is a source for these data.
+edge	coding_variants_proteins.DbNSFP	source_url	The URL for the source.
+edge	complexes_proteins.EBIComplex	name	Directional human readable label for the relationship, _from to _to.
+edge	complexes_proteins.EBIComplex	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	complexes_proteins.EBIComplex	stoichiometry	Number of copies of this protein in the complex. 0 means the stoichiometry is unknown.
+edge	complexes_proteins.EBIComplex	chain_id	UniProt chain identifier when the participant is a specific processed chain rather than the full protein. Null otherwise.
+edge	complexes_proteins.EBIComplex	isoform_id	UniProt isoform number when the participant is a specific isoform. Null otherwise.
+edge	complexes_proteins.EBIComplex	number_of_paralogs	Count of interchangeable paralogs when this participant is a molecule set. Null for a single protein.
+edge	complexes_proteins.EBIComplex	paralogs	UniProt accessions of the interchangeable paralogs when this participant is a molecule set. Null for a single protein.
+edge	complexes_proteins.EBIComplex	linked_features	Binding regions between this protein and other participants of the complex, taken from the Complex Portal API: each entry names a participant and the residue ranges involved.
+edge	complexes_proteins.EBIComplex	source	The database, dataset or organization that is a source for these data.
+edge	complexes_proteins.EBIComplex	source_url	The URL for the source.
+edge	complexes_proteins.EBIComplex	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	complexes_proteins.EBIComplex	method	Name of the experimental class or prediction model that produced this result.
+edge	complexes_proteins.EBIComplex	label	Non-method specific human readable label for the node or edge
+edge	complexes_proteins.EBIComplex	files_filesets	Reference to the File and Metadata
+edge	complexes_proteins.SEMMotif	name	Directional human readable label for the relationship, _from to _to.
+edge	complexes_proteins.SEMMotif	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	complexes_proteins.SEMMotif	source	The database, dataset or organization that is a source for these data.
+edge	complexes_proteins.SEMMotif	source_url	The URL for the source.
+edge	complexes_terms.EBIComplex	term_name	Ontology term name.
+edge	complexes_terms.EBIComplex	source	The database, dataset or organization that is a source for these data.
+edge	complexes_terms.EBIComplex	source_url	The URL for the source.
+edge	complexes_terms.EBIComplex	name	Directional human readable label for the relationship, _from to _to.
+edge	complexes_terms.EBIComplex	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	complexes_terms.EBIComplex	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	complexes_terms.EBIComplex	method	Name of the experimental class or prediction model that produced this result.
+edge	complexes_terms.EBIComplex	label	Non-method specific human readable label for the node or edge
+edge	complexes_terms.EBIComplex	files_filesets	Reference to the File and Metadata
+edge	diseases_genes.Disease	name	Directional human readable label for the relationship, _from to _to.
+edge	diseases_genes.Disease	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	diseases_genes.Disease	pmids	Pubmed identifiers.
+edge	diseases_genes.Disease	term_name	Ontology term name.
+edge	diseases_genes.Disease	gene_symbol	HGNC symbol of the associated gene.
+edge	diseases_genes.Disease	association_type	Orphanet label for the role of the gene in the disease.
+edge	diseases_genes.Disease	association_status	Orphanet status of the gene–disease relationship (Assessed or Confirmed)
+edge	diseases_genes.Disease	source	The database, dataset or organization that is a source for these data.
+edge	diseases_genes.Disease	source_url	The URL for the source.
+edge	diseases_genes.Disease	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	diseases_genes.Disease	method	Name of the experimental class or prediction model that produced this result.
+edge	diseases_genes.Disease	label	Non-method specific human readable label for the node or edge
+edge	diseases_genes.Disease	files_filesets	Reference to the File and Metadata
+edge	diseases_genes.GenccDiseasesGenes	sgc_id	GenCC submission identifier and version number.
+edge	diseases_genes.GenccDiseasesGenes	name	Directional human readable label for the relationship, _from to _to.
+edge	diseases_genes.GenccDiseasesGenes	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	diseases_genes.GenccDiseasesGenes	hgnc	HGNC gene symbol
+edge	diseases_genes.GenccDiseasesGenes	gene_symbol	HGNC symbol from the GenCC submission.
+edge	diseases_genes.GenccDiseasesGenes	term_name	Ontology term name.
+edge	diseases_genes.GenccDiseasesGenes	classification	GenCC evidence classification of the gene–disease assertion.
+edge	diseases_genes.GenccDiseasesGenes	moi_id	HPO identifier for the asserted mode of inheritance.
+edge	diseases_genes.GenccDiseasesGenes	moi_name	HPO label for the asserted mode of inheritance.
+edge	diseases_genes.GenccDiseasesGenes	submitter	Name of the GenCC member group that submitted the assertion.
+edge	diseases_genes.GenccDiseasesGenes	pmids	Pubmed identifiers.
+edge	diseases_genes.GenccDiseasesGenes	source	The database, dataset or organization that is a source for these data.
+edge	diseases_genes.GenccDiseasesGenes	source_url	The URL for the source.
+edge	diseases_genes.GenccDiseasesGenes	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	diseases_genes.GenccDiseasesGenes	method	Name of the experimental class or prediction model that produced this result.
+edge	diseases_genes.GenccDiseasesGenes	label	Non-method specific human readable label for the node or edge
+edge	diseases_genes.GenccDiseasesGenes	files_filesets	Reference to the File and Metadata
+edge	edges.base	label	Non-method specific human readable label for the node or edge
+edge	edges.base	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	edges.base	method	Name of the experimental class or prediction model that produced this result.
+edge	edges.base	name	Directional human readable label for the relationship, _from to _to.
+edge	edges.base	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	edges.base	source	The database, dataset or organization that is a source for these data.
+edge	edges.base	source_url	The URL for the source.
+edge	gene_products_terms.GAF	db	Database the annotated gene product identifier is drawn from.
+edge	gene_products_terms.GAF	gene_product_id	Identifier of the annotated gene product in that database.
+edge	gene_products_terms.GAF	gene_product_symbol	Symbol of the annotated gene or gene product.
+edge	gene_products_terms.GAF	gene_product_name	Full name of the annotated gene or gene product.
+edge	gene_products_terms.GAF	gene_product_type	Class of biological entity of the annotated identifier.
+edge	gene_products_terms.GAF	qualifier	Relation Ontology predicate describing how the gene product relates to the GO term. Negation is written as NOT followed by the relation, pipe-separated.
+edge	gene_products_terms.GAF	go_id	Gene Ontology identifier of the associated term.
+edge	gene_products_terms.GAF	db_reference	Identifiers of the reference cited as the source of the annotation.
+edge	gene_products_terms.GAF	evidence	GO evidence code supporting the annotation.
+edge	gene_products_terms.GAF	with	Additional identifiers supporting the evidence, used with certain evidence codes.
+edge	gene_products_terms.GAF	aspect	Branch of the Gene Ontology the term belongs to: P for biological process, F for molecular function, or C for cellular component.
+edge	gene_products_terms.GAF	synonyms	Alternate names the annotated gene or gene product.
+edge	gene_products_terms.GAF	taxon_id	NCBI taxonomic identifiers of the species the gene product is found in.
+edge	gene_products_terms.GAF	date	Date the annotation was made, as YYYYMMDD.
+edge	gene_products_terms.GAF	assigned_by	Database that made the annotation.
+edge	gene_products_terms.GAF	annotation_extension	Further specification of the GO term using a Relation Ontology predicate and an additional entity.
+edge	gene_products_terms.GAF	gene_product_form_id	Identifier of a specific isoform or processed form when the annotation is more specific than the canonical gene product.
+edge	gene_products_terms.GAF	organism	Species this annotation describes.
+edge	gene_products_terms.GAF	source	The database, dataset or organization that is a source for these data.
+edge	gene_products_terms.GAF	source_url	The URL for the source.
+edge	gene_products_terms.GAF	name	Directional human readable label for the relationship, _from to _to.
+edge	gene_products_terms.GAF	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	gene_products_terms.GAF	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	gene_products_terms.GAF	method	Name of the experimental class or prediction model that produced this result.
+edge	gene_products_terms.GAF	label	Non-method specific human readable label for the node or edge
+edge	gene_products_terms.GAF	files_filesets	Reference to the File and Metadata
+edge	genes_biosamples.DepMap	biology_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genes_biosamples.DepMap	model_id	DepMap model accession for the cell line.
+edge	genes_biosamples.DepMap	model_type	DepMap model type of the cell line.
+edge	genes_biosamples.DepMap	cancer_term	Oncotree ontology term of the cell line.
+edge	genes_biosamples.DepMap	gene_dependency	Probability that knocking out this gene is a true genetic dependency in this cell line.
+edge	genes_biosamples.DepMap	source	The database, dataset or organization that is a source for these data.
+edge	genes_biosamples.DepMap	source_url	The URL for the source.
+edge	genes_biosamples.DepMap	source_file	DepMap release file this score was read from.
+edge	genes_biosamples.DepMap	name	Directional human readable label for the relationship, _from to _to.
+edge	genes_biosamples.DepMap	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genes_biosamples.DepMap	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genes_biosamples.DepMap	method	Name of the experimental class or prediction model that produced this result.
+edge	genes_biosamples.DepMap	label	Non-method specific human readable label for the node or edge
+edge	genes_biosamples.DepMap	files_filesets	Reference to the File and Metadata
+edge	genes_genes.Coxpresdb	z_score	COXPRESdb coexpression z-score. 0 is random-level coexpression; 3 is a false-positive rate of 0.1%. Larger absolute values mean stronger coexpression. Only pairs with absolute value of 3 or greater are loaded.
+edge	genes_genes.Coxpresdb	associated_process	Gene Ontology term for gene expression, as a handle into ontology_terms.
+edge	genes_genes.Coxpresdb	method	Name of the experimental class or prediction model that produced this result.
+edge	genes_genes.Coxpresdb	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genes_genes.Coxpresdb	label	Non-method specific human readable label for the node or edge
+edge	genes_genes.Coxpresdb	source	The database, dataset or organization that is a source for these data.
+edge	genes_genes.Coxpresdb	source_url	The URL for the source.
+edge	genes_genes.Coxpresdb	name	Directional human readable label for the relationship, _from to _to.
+edge	genes_genes.Coxpresdb	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genes_genes.Coxpresdb	files_filesets	Reference to the File and Metadata
+edge	genes_genes.GeneGeneBiogrid	detection_method	PSI-MI detection method used to observe the interaction
+edge	genes_genes.GeneGeneBiogrid	detection_method_code	PSI-MI identifier of the detection method.
+edge	genes_genes.GeneGeneBiogrid	interaction_type	BioGRID genetic-interaction class.
+edge	genes_genes.GeneGeneBiogrid	interaction_type_code	PSI-MI identifiers of the genetic-interaction class.
+edge	genes_genes.GeneGeneBiogrid	confidence_value_biogrid	BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence.
+edge	genes_genes.GeneGeneBiogrid	confidence_value_intact	IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence.
+edge	genes_genes.GeneGeneBiogrid	source	The database, dataset or organization that is a source for these data.
+edge	genes_genes.GeneGeneBiogrid	pmids	Pubmed identifiers.
+edge	genes_genes.GeneGeneBiogrid	z_score	Placeholder value of 0 so this collection can share a z_score index with COXPRESdb. Not a coexpression score.
+edge	genes_genes.GeneGeneBiogrid	name	Directional human readable label for the relationship, _from to _to.
+edge	genes_genes.GeneGeneBiogrid	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genes_genes.GeneGeneBiogrid	molecular_function	Gene Ontology term for protein binding.
+edge	genes_genes.GeneGeneBiogrid	method	Name of the experimental class or prediction model that produced this result.
+edge	genes_genes.GeneGeneBiogrid	label	Non-method specific human readable label for the node or edge
+edge	genes_genes.GeneGeneBiogrid	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genes_genes.GeneGeneBiogrid	files_filesets	Reference to the File and Metadata
+edge	genes_genes.GeneGeneBiogrid	source_url	The URL for the source.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	relationship	NCI Thesaurus term for a homologous gene.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	source	The database, dataset or organization that is a source for these data.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	source_url	The URL for the source.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	method	Name of the experimental class or prediction model that produced this result.
+edge	genes_mm_genes.MGIHumanMouseOrthologAdapter	files_filesets	Reference to the File and Metadata
+edge	genes_pathways.Reactome	source	The database, dataset or organization that is a source for these data.
+edge	genes_pathways.Reactome	source_url	The URL for the source.
+edge	genes_pathways.Reactome	name	Directional human readable label for the relationship, _from to _to.
+edge	genes_pathways.Reactome	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genes_pathways.Reactome	organism	Species this annotation describes.
+edge	genes_pathways.Reactome	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genes_pathways.Reactome	method	Name of the experimental class or prediction model that produced this result.
+edge	genes_pathways.Reactome	label	Non-method specific human readable label for the node or edge
+edge	genes_pathways.Reactome	files_filesets	Reference to the File and Metadata
+edge	genes_transcripts.Gencode	source	The database, dataset or organization that is a source for these data.
+edge	genes_transcripts.Gencode	version	GENCODE release the annotation was taken from.
+edge	genes_transcripts.Gencode	source_url	The URL for the source.
+edge	genes_transcripts.Gencode	name	Directional human readable label for the relationship, _from to _to.
+edge	genes_transcripts.Gencode	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genes_transcripts.Gencode	organism	Species this annotation describes.
+edge	genes_transcripts.Gencode	biological_process	Gene Ontology term for the process this edge represents. GO_0010467 is 'gene expression'.
+edge	genomic_elements_biosamples.MPRAAdapter	bed_score	Score column of the source BED file.
+edge	genomic_elements_biosamples.MPRAAdapter	strand	Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.
+edge	genomic_elements_biosamples.MPRAAdapter	log2FC	Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio.
+edge	genomic_elements_biosamples.MPRAAdapter	DNA_count	Input count (DNA), normalized to counts per million and averaged across replicates.
+edge	genomic_elements_biosamples.MPRAAdapter	RNA_count	Output count (RNA), normalized to counts per million and averaged across replicates.
+edge	genomic_elements_biosamples.MPRAAdapter	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_biosamples.MPRAAdapter	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_biosamples.MPRAAdapter	significant	Boolean indicator of the significance of the element's activity. The threshold is: a neg_log10_pvalue_adj of 1 or more.
+edge	genomic_elements_biosamples.MPRAAdapter	label	Non-method specific human readable label for the node or edge
+edge	genomic_elements_biosamples.MPRAAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_biosamples.MPRAAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genomic_elements_biosamples.MPRAAdapter	method	Name of the experimental class or prediction model that produced this result.
+edge	genomic_elements_biosamples.MPRAAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genomic_elements_biosamples.MPRAAdapter	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_biosamples.MPRAAdapter	source_url	The URL for the source.
+edge	genomic_elements_biosamples.MPRAAdapter	files_filesets	Reference to the File and Metadata
+edge	genomic_elements_biosamples.MPRAAdapter	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genomic_elements_biosamples.MPRAAdapter	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	genomic_elements_biosamples.MPRAAdapter	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	effect_size	Signed relative change in target-gene expression after CRISPRi of the element (ENCODE EffectSize). Negative values mean lower expression. Missing values are stored as 0.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	log2FC	Effect size converted to log2 scale.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	p_value	Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	p_value_adj	Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	significant	Boolean indicator of the significance of the element-gene interactions. The threshold is: adjusted p-value below 0.05.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	method	Name of the experimental class or prediction model that produced this result.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	label	Non-method specific human readable label for the node or edge
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	source_url	The URL for the source.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	files_filesets	Reference to the File and Metadata
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	source_url	The URL for the source.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	files_filesets	Reference to the File and Metadata
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	label	Non-method specific human readable label for the node or edge
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	method	Name of the experimental class or prediction model that produced this result.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	p_value	Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	p_value_adj	Multiple-testing-adjusted p-value when reported by the source.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	log2FC	Log2 fold change of readout gene expression for the perturbation.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	log2FC_ci95_lower	Lower bound of a 95% confidence interval for log2FC.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	log2FC_ci95_upper	Upper bound of a 95% confidence interval for log2FC.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	pct_1	Fraction of cells in the first comparison group expressing the readout gene.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	pct_2	Fraction of cells in the second comparison group expressing the readout gene.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	significant	Boolean indicator of the significance of the perturbation effect.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	effect_size	Perturbation effect size on readout gene expression. Semantics depend on the source assay.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	effect_size_ci_95	Half-width of the 95% confidence interval on effect_size.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	num_guides	Number of guides targeting the perturbed element.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	fold_change	Fold change of readout expression in perturbed versus background cells.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	background_corrected_fold_change	Fold change of readout expression in perturbed versus a matched or selected background.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	gamma_approximation_ln_p_value	Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	hypergeometric_ln_p_value	Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	empirical_p_value	Empirical p-value from random background comparison.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	cpm_perturb	Counts per million reads for the readout gene in perturbed cells.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	cpm_bg	Counts per million reads for the readout gene in background cells.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	num_cells	Number of cells with perturbation guides at the element.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	z_score	Phenotype or effect z-score for the element-gene association when reported by the source.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	t_score	T-statistic for the element-gene association.
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	idr	Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility.
+edge	genomic_elements_genes.EncodeElementGeneLink	method	Name of the experimental class or prediction model that produced this result.
+edge	genomic_elements_genes.EncodeElementGeneLink	label	Non-method specific human readable label for the node or edge
+edge	genomic_elements_genes.EncodeElementGeneLink	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genomic_elements_genes.EncodeElementGeneLink	score	ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene.
+edge	genomic_elements_genes.EncodeElementGeneLink	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_genes.EncodeElementGeneLink	source_url	The URL for the source.
+edge	genomic_elements_genes.EncodeElementGeneLink	files_filesets	Reference to the File and Metadata
+edge	genomic_elements_genes.EncodeElementGeneLink	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genomic_elements_genes.EncodeElementGeneLink	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	genomic_elements_genes.EncodeElementGeneLink	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	genomic_elements_genes.EncodeElementGeneLink	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_genes.EncodeElementGeneLink	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genomic_elements_genes.scE2G	method	Name of the experimental class or prediction model that produced this result.
+edge	genomic_elements_genes.scE2G	label	Non-method specific human readable label for the node or edge
+edge	genomic_elements_genes.scE2G	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genomic_elements_genes.scE2G	score	scE2G score: Probability that the element has a regulatory effect on the target gene
+edge	genomic_elements_genes.scE2G	transcription_start_site	Transcription start site of the target gene used by the model, as a 0-based coordinate.
+edge	genomic_elements_genes.scE2G	rna_pseudobulk_tpm	RNA pseudobulk TPM of the target gene in the cell type
+edge	genomic_elements_genes.scE2G	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genomic_elements_genes.scE2G	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	genomic_elements_genes.scE2G	cell_annotation	The cell annotation of the file set, with optional qualifier, for single-cell derived results.
+edge	genomic_elements_genes.scE2G	cell_annotation_term	Base ontology term describing the cell type of a single-cell derived result.
+edge	genomic_elements_genes.scE2G	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_genes.scE2G	source_url	The URL for the source.
+edge	genomic_elements_genes.scE2G	files_filesets	Reference to the File and Metadata
+edge	genomic_elements_genes.scE2G	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_genes.scE2G	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	percent_identical_bp	Fraction of aligned bases that are identical between the human and mouse elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	phastCons4way	phastCons score of the aligned interval, computed on a 4-way alignment.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	phyloP4way	phyloP score of the aligned interval, computed on a 4-way alignment.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_chromatin_accessibility	FUNCODE conservation of variable activity (CO-V) for chromatin accessibility: the weighted Spearman correlation of accessibility across in silico matched human and mouse samples.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_chromatin_accessibility_pval	Empirical p-value of the chromatin-accessibility CO-V score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_chromatin_accessibility_fdr	Benjamini–Hochberg FDR for the chromatin-accessibility CO-V p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_chromatin_accessibility	FUNCODE conservation of baseline activity (CO-B) for chromatin accessibility: an h-index-like statistic for constitutive accessibility across tissues in both species.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_chromatin_accessibility_pval	Empirical p-value of the chromatin-accessibility CO-B score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_chromatin_accessibility_fdr	Benjamini–Hochberg FDR for the chromatin-accessibility CO-B p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K27ac	FUNCODE CO-V for H3K27ac: the weighted Spearman correlation of H3K27ac signal across in silico matched samples.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K27ac_pval	Empirical p-value of the H3K27ac CO-V score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K27ac_fdr	Benjamini–Hochberg FDR for the H3K27ac CO-V p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K27ac	FUNCODE CO-B for H3K27ac: an h-index-like statistic for constitutive H3K27ac signal across tissues in both species.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K27ac_pval	Empirical p-value of the H3K27ac CO-B score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K27ac_fdr	Benjamini–Hochberg FDR for the H3K27ac CO-B p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K4me1	FUNCODE CO-V for H3K4me1: the weighted Spearman correlation of H3K4me1 signal across in silico matched samples.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K4me1_pval	Empirical p-value of the H3K4me1 CO-V score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K4me1_fdr	Benjamini–Hochberg FDR for the H3K4me1 CO-V p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K4me1	FUNCODE CO-B for H3K4me1: an h-index-like statistic for constitutive H3K4me1 signal across tissues in both species.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K4me1_pval	Empirical p-value of the H3K4me1 CO-B score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K4me1_fdr	Benjamini–Hochberg FDR for the H3K4me1 CO-B p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K4me3	FUNCODE CO-V for H3K4me3: the weighted Spearman correlation of H3K4me3 signal across in silico matched samples.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K4me3_pval	Empirical p-value of the H3K4me3 CO-V score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cov_H3K4me3_fdr	Benjamini–Hochberg FDR for the H3K4me3 CO-V p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K4me3	FUNCODE CO-B for H3K4me3: an h-index-like statistic for constitutive H3K4me3 signal across tissues in both species.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K4me3_pval	Empirical p-value of the H3K4me3 CO-B score against a null of randomly paired elements.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	cob_H3K4me3_fdr	Benjamini–Hochberg FDR for the H3K4me3 CO-B p-value.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	source_url	The URL for the source.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	z_score	Average phenotype z-score across guides targeting the genomic element
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	p_value	P-value for the element's association with the screened phenotype.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	significant	Boolean indicator of the significance of the element's effect on the phenotype.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	num_guides	Number of guides targeting the pertubed element in the screen.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	num_guides_hit	Number of guides that met hit thresholds
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	num_guides_nonhit	Number of guides that did not meet hit thresholds
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	fraction_guides_hit	Fraction of guides that met hit thresholds
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	method	Name of the experimental class or prediction model that produced this result.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	label	Non-method specific human readable label for the node or edge
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	source	The database, dataset or organization that is a source for these data.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	source_url	The URL for the source.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	files_filesets	Reference to the File and Metadata
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	name	Directional human readable label for the relationship, _from to _to.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	detection_method	PSI-MI detection method used to observe the interaction
+edge	mm_genes_mm_genes.GeneGeneBiogrid	detection_method_code	PSI-MI identifier of the detection method.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	interaction_type	BioGRID genetic-interaction class.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	interaction_type_code	PSI-MI identifiers of the genetic-interaction class.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	confidence_value_biogrid	BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	confidence_value_intact	IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	source	The database, dataset or organization that is a source for these data.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	pmids	Pubmed identifiers.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	z_score	Placeholder value of 0 so this collection can share a z_score index with COXPRESdb. Not a coexpression score.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	name	Directional human readable label for the relationship, _from to _to.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	molecular_function	Gene Ontology term for protein binding, as a handle into ontology_terms.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	method	Name of the experimental class or prediction model that produced this result.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	label	Non-method specific human readable label for the node or edge
+edge	mm_genes_mm_genes.GeneGeneBiogrid	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	files_filesets	Reference to the File and Metadata
+edge	mm_genes_mm_genes.GeneGeneBiogrid	source_url	The URL for the source.
+edge	mm_transcripts_mm_genes_structure.GencodeStructure	source	The database, dataset or organization that is a source for these data.
+edge	mm_transcripts_mm_genes_structure.GencodeStructure	version	GENCODE release the annotation was taken from.
+edge	mm_transcripts_mm_genes_structure.GencodeStructure	source_url	The URL for the source.
+edge	mm_transcripts_mm_genes_structure.GencodeStructure	organism	Species this annotation describes.
+edge	mm_transcripts_mm_genes_structure.GencodeStructure	name	Directional human readable label for the relationship, _from to _to.
+edge	mm_transcripts_mm_genes_structure.GencodeStructure	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	motifs_proteins.Motif	name	Directional human readable label for the relationship, _from to _to.
+edge	motifs_proteins.Motif	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	motifs_proteins.Motif	biological_process	Gene Ontology term GO:0003677 (DNA binding).
+edge	motifs_proteins.Motif	source	The database, dataset or organization that is a source for these data.
+edge	motifs_proteins.Motif	class	Evidence tier for the underlying data, taken from the associated files_filesets record: 'observed data' for a motif derived from ChIP-seq.
+edge	motifs_proteins.Motif	method	Name of the experimental class or prediction model that produced this result.
+edge	motifs_proteins.Motif	files_filesets	Reference to the File and Metadata.
+edge	motifs_proteins.SEMMotif	name	Directional human readable label for the relationship, _from to _to.
+edge	motifs_proteins.SEMMotif	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	motifs_proteins.SEMMotif	biological_process	Gene Ontology term for the process this edge represents. GO_0003677 is 'DNA binding'.
+edge	motifs_proteins.SEMMotif	source	The database, dataset or organization that is a source for these data.
+edge	motifs_proteins.SEMMotif	source_url	The URL for the source.
+edge	motifs_proteins.SEMMotif	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	motifs_proteins.SEMMotif	method	Name of the experimental class or prediction model that produced this result.
+edge	motifs_proteins.SEMMotif	files_filesets	Reference to the File and Metadata
+edge	ontology_terms_ontology_terms.Cellosaurus	name	Directional human readable label for the relationship, _from to _to.
+edge	ontology_terms_ontology_terms.Cellosaurus	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	ontology_terms_ontology_terms.Cellosaurus	source	The database, dataset or organization that is a source for these data.
+edge	ontology_terms_ontology_terms.Cellosaurus	source_url	The URL for the source.
+edge	ontology_terms_ontology_terms.Cellosaurus	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	ontology_terms_ontology_terms.Cellosaurus	method	Name of the experimental class or prediction model that produced this result.
+edge	ontology_terms_ontology_terms.Cellosaurus	files_filesets	Reference to the File and Metadata
+edge	ontology_terms_ontology_terms.Oncotree	name	Directional human readable label for the relationship, _from to _to.
+edge	ontology_terms_ontology_terms.Oncotree	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	ontology_terms_ontology_terms.Oncotree	type	Subclass of the parent tumor type, or database cross-reference to NCIT.
+edge	ontology_terms_ontology_terms.Oncotree	source	The database, dataset or organization that is a source for these data.
+edge	ontology_terms_ontology_terms.Oncotree	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	ontology_terms_ontology_terms.Oncotree	method	Name of the experimental class or prediction model that produced this result.
+edge	ontology_terms_ontology_terms.Oncotree	files_filesets	Reference to the File and Metadata
+edge	ontology_terms_ontology_terms.Ontology	name	Directional human readable label for the relationship, _from to _to.
+edge	ontology_terms_ontology_terms.Ontology	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	ontology_terms_ontology_terms.Ontology	type_uri	IRI of the RDF predicate for this relationship.
+edge	ontology_terms_ontology_terms.Ontology	source	The database, dataset or organization that is a source for these data.
+edge	ontology_terms_ontology_terms.Ontology	source_url	The URL for the source.
+edge	ontology_terms_ontology_terms.Ontology	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	ontology_terms_ontology_terms.Ontology	method	Name of the experimental class or prediction model that produced this result.
+edge	ontology_terms_ontology_terms.Ontology	files_filesets	Reference to the File and Metadata
+edge	pathways_pathways.Reactome	source	The database, dataset or organization that is a source for these data.
+edge	pathways_pathways.Reactome	source_url	The URL for the source.
+edge	pathways_pathways.Reactome	name	Directional human readable label for the relationship, _from to _to.
+edge	pathways_pathways.Reactome	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	pathways_pathways.Reactome	organism	Species this annotation describes.
+edge	pathways_pathways.Reactome	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	pathways_pathways.Reactome	method	Name of the experimental class or prediction model that produced this result.
+edge	pathways_pathways.Reactome	label	Non-method specific human readable label for the node or edge
+edge	pathways_pathways.Reactome	files_filesets	Reference to the File and Metadata
+edge	proteins_proteins.ProteinsInteraction	detection_method	PSI-MI detection method used to observe the interaction
+edge	proteins_proteins.ProteinsInteraction	detection_method_code	PSI-MI identifier of the detection method.
+edge	proteins_proteins.ProteinsInteraction	interaction_type	BioGRID physical-interaction class.
+edge	proteins_proteins.ProteinsInteraction	interaction_type_code	PSI-MI identifiers of the interaction types.
+edge	proteins_proteins.ProteinsInteraction	confidence_value_biogrid	BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence.
+edge	proteins_proteins.ProteinsInteraction	confidence_value_intact	IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence.
+edge	proteins_proteins.ProteinsInteraction	source	The database, dataset or organization that is a source for these data.
+edge	proteins_proteins.ProteinsInteraction	pmids	Pubmed identifiers.
+edge	proteins_proteins.ProteinsInteraction	organism	Species this annotation describes.
+edge	proteins_proteins.ProteinsInteraction	name	Directional human readable label for the relationship, _from to _to.
+edge	proteins_proteins.ProteinsInteraction	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	proteins_proteins.ProteinsInteraction	molecular_function	Gene Ontology term for protein binding.
+edge	proteins_proteins.ProteinsInteraction	method	Name of the experimental class or prediction model that produced this result.
+edge	proteins_proteins.ProteinsInteraction	label	Non-method specific human readable label for the node or edge
+edge	proteins_proteins.ProteinsInteraction	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	proteins_proteins.ProteinsInteraction	files_filesets	Reference to the File and Metadata
+edge	proteins_proteins.ProteinsInteraction	source_url	The URL for the source.
+edge	transcripts_genes_structure.GencodeStructure	source	The database, dataset or organization that is a source for these data.
+edge	transcripts_genes_structure.GencodeStructure	version	GENCODE release the annotation was taken from.
+edge	transcripts_genes_structure.GencodeStructure	source_url	The URL for the source.
+edge	transcripts_genes_structure.GencodeStructure	organism	Species this annotation describes.
+edge	transcripts_genes_structure.GencodeStructure	name	Directional human readable label for the relationship, _from to _to.
+edge	transcripts_genes_structure.GencodeStructure	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	transcripts_proteins.GencodeProtein	source	The database, dataset or organization that is a source for these data.
+edge	transcripts_proteins.GencodeProtein	version	GENCODE release the annotation was taken from.
+edge	transcripts_proteins.GencodeProtein	source_url	The URL for the source.
+edge	transcripts_proteins.GencodeProtein	organism	Species this annotation describes.
+edge	transcripts_proteins.GencodeProtein	name	Directional human readable label for the relationship, _from to _to.
+edge	transcripts_proteins.GencodeProtein	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	transcripts_proteins.GencodeProtein	biological_process	Gene Ontology term for the process this edge represents. GO_0006412 is 'translation'.
+edge	variants_biosamples.BlueSTARRVariantBiosample	genomic_element	Reference to the candidate cis-regulatory element the variant falls in; null when the source file has no linked cCREs.
+edge	variants_biosamples.BlueSTARRVariantBiosample	log2FC	log2 fold change in STARR-seq reporter activity.
+edge	variants_biosamples.BlueSTARRVariantBiosample	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_biosamples.BlueSTARRVariantBiosample	label	Non-method specific human readable label for the node or edge
+edge	variants_biosamples.BlueSTARRVariantBiosample	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_biosamples.BlueSTARRVariantBiosample	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_biosamples.BlueSTARRVariantBiosample	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_biosamples.BlueSTARRVariantBiosample	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_biosamples.BlueSTARRVariantBiosample	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_biosamples.BlueSTARRVariantBiosample	source	The database, dataset or organization that is a source for these data.
+edge	variants_biosamples.BlueSTARRVariantBiosample	source_url	The URL for the source.
+edge	variants_biosamples.BlueSTARRVariantBiosample	files_filesets	Reference to the File and Metadata
+edge	variants_biosamples.MPRAAdapter	genomic_element	Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample.
+edge	variants_biosamples.MPRAAdapter	strand	Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.
+edge	variants_biosamples.MPRAAdapter	bed_score	Score column of the source BED file.
+edge	variants_biosamples.MPRAAdapter	log2FC	Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space.
+edge	variants_biosamples.MPRAAdapter	DNA_count_ref	Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	RNA_count_ref	Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	DNA_count_alt	Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	RNA_count_alt	Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_biosamples.MPRAAdapter	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
+edge	variants_biosamples.MPRAAdapter	significant	Boolean indicator of the significace of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more.
+edge	variants_biosamples.MPRAAdapter	postProbEffect	Posterior probability that the variant has a regulatory effect.
+edge	variants_biosamples.MPRAAdapter	CI_lower_95	Lower bound of a 95% interval for the variant effect.
+edge	variants_biosamples.MPRAAdapter	CI_upper_95	Upper bound of a 95% interval for the variant effect.
+edge	variants_biosamples.MPRAAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_biosamples.MPRAAdapter	label	Non-method specific human readable label for the node or edge
+edge	variants_biosamples.MPRAAdapter	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_biosamples.MPRAAdapter	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_biosamples.MPRAAdapter	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_biosamples.MPRAAdapter	source	The database, dataset or organization that is a source for these data.
+edge	variants_biosamples.MPRAAdapter	source_url	The URL for the source.
+edge	variants_biosamples.MPRAAdapter	files_filesets	Reference to the File and Metadata
+edge	variants_biosamples.MPRAAdapter	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_biosamples.MPRAAdapter	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_biosamples.MPRAAdapter	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	variants_biosamples.STARRseqVariantBiosample	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_biosamples.STARRseqVariantBiosample	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_biosamples.STARRseqVariantBiosample	log2FC	Log2 fold change for variant effect on gene expression.
+edge	variants_biosamples.STARRseqVariantBiosample	inputCountRef	Input count for the reference allele.
+edge	variants_biosamples.STARRseqVariantBiosample	inputCountAlt	Input count for the alternative allele.
+edge	variants_biosamples.STARRseqVariantBiosample	outputCountRef	Output count for the reference allele.
+edge	variants_biosamples.STARRseqVariantBiosample	outputCountAlt	Output count for the alternative allele.
+edge	variants_biosamples.STARRseqVariantBiosample	postProbEffect	Posterior probability that the variant has a regulatory effect.
+edge	variants_biosamples.STARRseqVariantBiosample	significant	Boolean indicating the significance of the variant effect, based on the posterior probability.
+edge	variants_biosamples.STARRseqVariantBiosample	CI_lower_95	Lower bound of a 95% interval for the variant effect.
+edge	variants_biosamples.STARRseqVariantBiosample	CI_upper_95	Upper bound of a 95% interval for the variant effect.
+edge	variants_biosamples.STARRseqVariantBiosample	label	Non-method specific human readable label for the node or edge
+edge	variants_biosamples.STARRseqVariantBiosample	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_biosamples.STARRseqVariantBiosample	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_biosamples.STARRseqVariantBiosample	source	The database, dataset or organization that is a source for these data.
+edge	variants_biosamples.STARRseqVariantBiosample	source_url	The URL for the source.
+edge	variants_biosamples.STARRseqVariantBiosample	files_filesets	Reference to the File and Metadata
+edge	variants_biosamples.STARRseqVariantBiosample	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_biosamples.STARRseqVariantBiosample	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_biosamples.STARRseqVariantBiosample	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	variants_coding_variants.DbNSFP	source	The database, dataset or organization that is a source for these data.
+edge	variants_coding_variants.DbNSFP	source_url	The URL for the source.
+edge	variants_coding_variants.DbNSFP	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_coding_variants.DbNSFP	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_coding_variants.DbNSFP	chr	Chromosome of the variant as dbNSFP records it, without a chr prefix. Scaffolds and patch regions use UCSC-style names.
+edge	variants_coding_variants.DbNSFP	pos	0-based genomic coordinate of the variant.
+edge	variants_coding_variants.DbNSFP	ref	Reference allele of the genomic variant.
+edge	variants_coding_variants.DbNSFP	alt	Alternate allele of the genomic variant.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	chr	Chromosome the genomic variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	pos	0-based genomic coordinate of the variant.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	ref	Reference allele of the genomic variant.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	alt	Alternate allele of the genomic variant.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	label	Non-method specific human readable label for the node or edge
+edge	variants_coding_variants.ESM1vCodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+edge	variants_coding_variants.ESM1vCodingVariantsScores	source_url	The URL for the source.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	chr	Chromosome the genomic variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	pos	0-based genomic coordinate of the variant.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	ref	Reference allele of the genomic variant.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	alt	Alternate allele of the genomic variant.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	label	Non-method specific human readable label for the node or edge
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	source	The database, dataset or organization that is a source for these data.
+edge	variants_coding_variants.Mutpred2CodingVariantsScores	source_url	The URL for the source.
+edge	variants_diseases.ClinGen	gene_id	Ensembl gene ID
+edge	variants_diseases.ClinGen	assertion	ACMG/AMP pathogenicity classification assigned by a ClinGen Variant Curation Expert Panel.
+edge	variants_diseases.ClinGen	pmids	Pubmed identifiers.
+edge	variants_diseases.ClinGen	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_diseases.ClinGen	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_diseases.ClinGen	source	The database, dataset or organization that is a source for these data.
+edge	variants_diseases.ClinGen	source_url	The URL for the source.
+edge	variants_diseases.ClinGen	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_diseases.ClinGen	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_diseases.ClinGen	label	Non-method specific human readable label for the node or edge
+edge	variants_diseases.ClinGen	files_filesets	Reference to the File and Metadata
+edge	variants_diseases_genes.ClinGen	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_diseases_genes.ClinGen	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_diseases_genes.ClinGen	inheritance_mode	Mode of inheritance for the disease the assertion applies to.
+edge	variants_diseases_genes.ClinGen	source	The database, dataset or organization that is a source for these data.
+edge	variants_diseases_genes.ClinGen	source_url	The URL for the source.
+edge	variants_diseases_genes.ClinGen	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_diseases_genes.ClinGen	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_diseases_genes.ClinGen	label	Non-method specific human readable label for the node or edge
+edge	variants_diseases_genes.ClinGen	files_filesets	Reference to the File and Metadata
+edge	variants_drugs.PharmGKB	gene_symbol	HGNC symbols of the genes PharmGKB associates with this annotation.
+edge	variants_drugs.PharmGKB	pmid	PubMed identifier.
+edge	variants_drugs.PharmGKB	study_parameters	Study-level details attached to the annotation. Each entry has a study parameter ID, study type, case and control counts, p-value as reported, and biogeographical group. One annotation can have several entries when the paper reports more than one analysis.
+edge	variants_drugs.PharmGKB	phenotype_categories	PharmGKB phenotype category of the association.
+edge	variants_drugs.PharmGKB	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_drugs.PharmGKB	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_drugs.PharmGKB	source	The database, dataset or organization that is a source for these data.
+edge	variants_drugs.PharmGKB	source_url	The URL for the source.
+edge	variants_drugs.PharmGKB	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_drugs.PharmGKB	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_drugs.PharmGKB	files_filesets	Reference to the File and Metadata
+edge	variants_drugs_genes.PharmGKB	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_drugs_genes.PharmGKB	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_drugs_genes.PharmGKB	gene_symbol	HGNC symbol of the gene this edge attaches to the variant-drug annotation.
+edge	variants_drugs_genes.PharmGKB	source	The database, dataset or organization that is a source for these data.
+edge	variants_drugs_genes.PharmGKB	source_url	The URL for the source.
+edge	variants_drugs_genes.PharmGKB	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_drugs_genes.PharmGKB	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_drugs_genes.PharmGKB	files_filesets	Reference to the File and Metadata
+edge	variants_genes.AFGREQtl	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_genes.AFGREQtl	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_genes.AFGREQtl	chr	Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.
+edge	variants_genes.AFGREQtl	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_genes.AFGREQtl	p_value	Nominal p-value of association between the variant and gene expression, from the African-population meta-analysis.
+edge	variants_genes.AFGREQtl	effect_size	Regression coefficient (beta) of the alternate allele on gene expression.
+edge	variants_genes.AFGREQtl	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_genes.AFGREQtl	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_genes.AFGREQtl	label	Non-method specific human readable label for the node or edge
+edge	variants_genes.AFGREQtl	source	The database, dataset or organization that is a source for these data.
+edge	variants_genes.AFGREQtl	source_url	The URL for the source.
+edge	variants_genes.AFGREQtl	files_filesets	Reference to the File and Metadata
+edge	variants_genes.AFGREQtl	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_genes.AFGREQtl	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_genes.AFGREQtl	biological_process	Gene Ontology term for regulation of gene expression.
+edge	variants_genes.AFGRSQtl	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_genes.AFGRSQtl	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_genes.AFGRSQtl	chr	Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.
+edge	variants_genes.AFGRSQtl	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_genes.AFGRSQtl	p_value	Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis.
+edge	variants_genes.AFGRSQtl	effect_size	Regression coefficient (beta) of the alternate allele on intron excision.
+edge	variants_genes.AFGRSQtl	posterior_inclusion_probability	Posterior inclusion probability that this variant is causal for the splice QTL.
+edge	variants_genes.AFGRSQtl	log2FC	log2 fold change of intron excision associated with the alternate allele.
+edge	variants_genes.AFGRSQtl	significant	Boolean indicating the signficance of the variant association with splicing.
+edge	variants_genes.AFGRSQtl	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_genes.AFGRSQtl	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_genes.AFGRSQtl	label	Non-method specific human readable label for the node or edge
+edge	variants_genes.AFGRSQtl	intron_chr	Chromosome of the spliced intron
+edge	variants_genes.AFGRSQtl	intron_start	Start position of the spliced intron.
+edge	variants_genes.AFGRSQtl	intron_end	End position of the splicedintron.
+edge	variants_genes.AFGRSQtl	source	The database, dataset or organization that is a source for these data.
+edge	variants_genes.AFGRSQtl	source_url	The URL for the source.
+edge	variants_genes.AFGRSQtl	files_filesets	Reference to the File and Metadata
+edge	variants_genes.AFGRSQtl	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_genes.AFGRSQtl	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_genes.AFGRSQtl	biological_process	Gene Ontology term for regulation of RNA splicing.
+edge	variants_genes.CRISPRVariantGene	effect_size	Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change.
+edge	variants_genes.CRISPRVariantGene	log2FC	log2 fold-change in gene expression for the effect allele relative to the other allele.
+edge	variants_genes.CRISPRVariantGene	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_genes.CRISPRVariantGene	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
+edge	variants_genes.CRISPRVariantGene	power	Power to detect an effect of the size observed, from 0 to 1.
+edge	variants_genes.CRISPRVariantGene	posterior_inclusion_probability	Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1.
+edge	variants_genes.CRISPRVariantGene	coefficient_stddev	Standard deviation of the effect size estimate.
+edge	variants_genes.CRISPRVariantGene	significant	Boolean indicator of the significance of the variant effect on gene expression.
+edge	variants_genes.CRISPRVariantGene	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_genes.CRISPRVariantGene	label	Non-method specific human readable label for the node or edge
+edge	variants_genes.CRISPRVariantGene	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_genes.CRISPRVariantGene	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_genes.CRISPRVariantGene	source	The database, dataset or organization that is a source for these data.
+edge	variants_genes.CRISPRVariantGene	source_url	The URL for the source.
+edge	variants_genes.CRISPRVariantGene	files_filesets	Reference to the File and Metadata
+edge	variants_genes.CRISPRVariantGene	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_genes.CRISPRVariantGene	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	variants_genes.CRISPRVariantGene	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_genes.CRISPRVariantGene	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_genes.CRISPRVariantGene	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	variants_genes.EQTLCatalog	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_genes.EQTLCatalog	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_genes.EQTLCatalog	biological_process	Gene Ontology term for the process this edge represents: regulation of gene expression for eQTLs, regulation of RNA splicing for spliceQTLs.
+edge	variants_genes.EQTLCatalog	study	ID of the QTL study.
+edge	variants_genes.EQTLCatalog	label	Non-method specific human readable label for the node or edge
+edge	variants_genes.EQTLCatalog	source	The database, dataset or organization that is a source for these data.
+edge	variants_genes.EQTLCatalog	source_url	The URL for the source.
+edge	variants_genes.EQTLCatalog	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_genes.EQTLCatalog	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_genes.EQTLCatalog	files_filesets	Reference to the File and Metadata
+edge	variants_genes.EQTLCatalog	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_genes.EQTLCatalog	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_genes.EQTLCatalog	molecular_trait_id	Identifier of the molecular trait used for QTL mapping: an Ensembl gene ID for gene-expression QTLs, or a Leafcutter intron cluster ID for splice QTLs.
+edge	variants_genes.EQTLCatalog	gene_id	Ensembl gene ID.
+edge	variants_genes.EQTLCatalog	credible_set_id	SuSiE credible-set identifier for this signal within the dataset.
+edge	variants_genes.EQTLCatalog	variant_chromosome_position_ref_alt	Variant identifier as chromosome, position, reference and alternate alleles, underscore-separated, on GRCh38.
+edge	variants_genes.EQTLCatalog	rsid	dbSNP id for the variant position
+edge	variants_genes.EQTLCatalog	credible_set_size	Number of variants in the SuSiE credible set.
+edge	variants_genes.EQTLCatalog	posterior_inclusion_probability	Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping.
+edge	variants_genes.EQTLCatalog	p_value	Nominal p-value of association between the variant and the molecular trait.
+edge	variants_genes.EQTLCatalog	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_genes.EQTLCatalog	effect_size	Regression coefficient of the alternate allele on the molecular trait.
+edge	variants_genes.EQTLCatalog	standard_error	Standard error of the effect size.
+edge	variants_genes.EQTLCatalog	z_score	Univariate z-score of the variant.
+edge	variants_genes.EQTLCatalog	credible_set_min_r2	Smallest linkage-disequilibrium r2 between any two variants in the credible set.
+edge	variants_genes.EQTLCatalog	region	Genomic interval that was fine-mapped.
+edge	variants_genes.EQTLCatalog	intron_chr	Chromosome of the spliced intron
+edge	variants_genes.EQTLCatalog	intron_start	Start position of the spliced intron.
+edge	variants_genes.EQTLCatalog	intron_end	End position of the splicedintron.
+edge	variants_genomic_elements.AFGRCAQtl	label	Non-method specific human readable label for the node or edge
+edge	variants_genomic_elements.AFGRCAQtl	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_genomic_elements.AFGRCAQtl	p_value	Nominal p-value of association between the variant and chromatin accessibility of the peak.
+edge	variants_genomic_elements.AFGRCAQtl	beta	Regression coefficient of the alternate allele on chromatin accessibility.
+edge	variants_genomic_elements.AFGRCAQtl	source	The database, dataset or organization that is a source for these data.
+edge	variants_genomic_elements.AFGRCAQtl	source_url	The URL for the source.
+edge	variants_genomic_elements.AFGRCAQtl	files_filesets	Reference to the File and Metadata
+edge	variants_genomic_elements.AFGRCAQtl	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_genomic_elements.AFGRCAQtl	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_genomic_elements.AFGRCAQtl	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_genomic_elements.AFGRCAQtl	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_genomic_elements.AFGRCAQtl	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_genomic_elements.AFGRCAQtl	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_genomic_elements.CAQtl	rsid	dbSNP id for the variant position
+edge	variants_genomic_elements.CAQtl	label	Non-method specific human readable label for the node or edge
+edge	variants_genomic_elements.CAQtl	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_genomic_elements.CAQtl	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_genomic_elements.CAQtl	source	The database, dataset or organization that is a source for these data.
+edge	variants_genomic_elements.CAQtl	source_url	The URL for the source.
+edge	variants_genomic_elements.CAQtl	files_filesets	Reference to the File and Metadata
+edge	variants_genomic_elements.CAQtl	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_genomic_elements.CAQtl	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_genomic_elements.CAQtl	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_genomic_elements.CAQtl	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_genomic_elements.CAQtl	method_term	Ontology term for the chromatin accessibility assay.
+edge	variants_phenotypes.CRISPRVariantPhenotype	effect_size	Estimated phenotype effect size (mu or mu_adj)
+edge	variants_phenotypes.CRISPRVariantPhenotype	z_score	Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one.
+edge	variants_phenotypes.CRISPRVariantPhenotype	significant	Boolean indicator of the significance of the variant effect on the phenotype.
+edge	variants_phenotypes.CRISPRVariantPhenotype	num_guides	Number of guides aggregated across the variant in the screen.
+edge	variants_phenotypes.CRISPRVariantPhenotype	edit_rate_mean	Mean effective prime-editing rate across the variant's guides: the fraction of cells edited, from 0 to 1.
+edge	variants_phenotypes.CRISPRVariantPhenotype	effect_size_ci95_lower	Lower bound of the 95% confidence interval for effect size.
+edge	variants_phenotypes.CRISPRVariantPhenotype	effect_size_ci95_upper	Upper bound of the 95% confidence interval for effect size.
+edge	variants_phenotypes.CRISPRVariantPhenotype	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_phenotypes.CRISPRVariantPhenotype	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	variants_phenotypes.CRISPRVariantPhenotype	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_phenotypes.CRISPRVariantPhenotype	label	Non-method specific human readable label for the node or edge
+edge	variants_phenotypes.CRISPRVariantPhenotype	source	The database, dataset or organization that is a source for these data.
+edge	variants_phenotypes.CRISPRVariantPhenotype	source_url	The URL for the source.
+edge	variants_phenotypes.CRISPRVariantPhenotype	files_filesets	Reference to the File and Metadata
+edge	variants_phenotypes.CRISPRVariantPhenotype	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_phenotypes.CRISPRVariantPhenotype	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_phenotypes.CRISPRVariantPhenotype	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
+edge	variants_phenotypes.CRISPRVariantPhenotype	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_phenotypes.CRISPRVariantPhenotype	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_phenotypes.GWAS	equivalent_ontology_term	The other of the MONDO or EFO identifiers for the same trait, when both are present.
+edge	variants_phenotypes.GWAS	lead_chrom	Chromosome of the lead variant, without a chr prefix.
+edge	variants_phenotypes.GWAS	lead_pos	Position of the lead variant, converted from the Open Targets 1-based coordinate to 0-based.
+edge	variants_phenotypes.GWAS	lead_ref	Reference allele of the lead variant.
+edge	variants_phenotypes.GWAS	lead_alt	Alternate allele of the lead variant.
+edge	variants_phenotypes.GWAS	phenotype_term	Ontology term for the phenotype, trait or disease.
+edge	variants_phenotypes.GWAS	direction	Sign of the reported effect of the alternate allele on the trait.
+edge	variants_phenotypes.GWAS	beta	Effect size of the alternate allele on the trait.
+edge	variants_phenotypes.GWAS	beta_ci_lower	Lower bound of the confidence interval on beta.
+edge	variants_phenotypes.GWAS	beta_ci_upper	Upper bound of the confidence interval on beta.
+edge	variants_phenotypes.GWAS	odds_ratio	Odds ratio of the alternate allele for a binary trait. 0 when the study reports a beta instead.
+edge	variants_phenotypes.GWAS	oddsr_ci_lower	Lower bound of the confidence interval on the odds ratio.
+edge	variants_phenotypes.GWAS	oddsr_ci_upper	Upper bound of the confidence interval on the odds ratio.
+edge	variants_phenotypes.GWAS	p_val_mantissa	Mantissa of the association p-value.
+edge	variants_phenotypes.GWAS	p_val_exponent	Base-10 exponent of the association p-value.
+edge	variants_phenotypes.GWAS	p_value	Association p-value, reconstructed from mantissa and exponent.
+edge	variants_phenotypes.GWAS	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_phenotypes.GWAS	tagged_variants	Variants in LD with the lead SNP.
+edge	variants_phenotypes.GWAS	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_phenotypes.GWAS	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_phenotypes.GWAS	label	Non-method specific human readable label for the node or edge
+edge	variants_phenotypes.GWAS	source	The database, dataset or organization that is a source for these data.
+edge	variants_phenotypes.GWAS	source_url	The URL for the source.
+edge	variants_phenotypes.GWAS	files_filesets	Reference to the File and Metadata
+edge	variants_phenotypes.GWAS	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_phenotypes.GWAS	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_phenotypes.GWAS	version	Open Targets Genetics release this record was taken from.
+edge	variants_phenotypes.GWAS	study	ID of the GWAS study.
+edge	variants_phenotypes.SGE	protein_id	Ensembl ID of the protein (without version number).
+edge	variants_phenotypes.SGE	source	The database, dataset or organization that is a source for these data.
+edge	variants_phenotypes.SGE	source_url	The URL for the source.
+edge	variants_phenotypes.SGE	files_filesets	Reference to the File and Metadata
+edge	variants_phenotypes.SGE	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_phenotypes.SGE	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_phenotypes.SGE	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_phenotypes.SGE	label	Non-method specific human readable label for the node or edge
+edge	variants_phenotypes.SGE	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_phenotypes.SGE	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_phenotypes.SGE	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_phenotypes.SGE	exon	Exon of the target gene the variant lies in, written as GENE_X followed by the exon number. A non-exonic variant carries the exon of the SGE target whose genomic context includes it.
+edge	variants_phenotypes.SGE	target	SGE library the variant was assayed in. Equal to exon where a single library covers the whole exon; otherwise a part of the exon.
+edge	variants_phenotypes.SGE	consequence	Most severe consequence VEP annotates for the variant against the MANE Select transcript.
+edge	variants_phenotypes.SGE	score	SGE score: the change in variant frequency over time, as log2 fold change per day. Normalized so that the median synonymous variant scores 0, so lower scores mean reduced cell fitness.
+edge	variants_phenotypes.SGE	standard_error	Standard error of the score estimate.
+edge	variants_phenotypes.SGE	95_ci_upper	Upper bound of the 95% confidence interval on score.
+edge	variants_phenotypes.SGE	95_ci_lower	Lower bound of the 95% confidence interval on score.
+edge	variants_phenotypes.SGE	amino_acid_change	Amino acid change the variant introduces into the reference sequence, using single-letter code.
+edge	variants_phenotypes.SGE	hgvs_p	HGVS protein-level description of the variant.
+edge	variants_phenotypes.SGE	functional_consequence	Functional consequence assigned to the variant from its z-score: functionally_normal, indeterminate, or functionally_abnormal.
+edge	variants_phenotypes.SGE	functional_consequence_zscore	Z-score of the variant's score against the distribution of expected neutral variant scores. Thresholds on this value assign functional_consequence.
+edge	variants_phenotypes.SGE	variant_qc_flag	Whether the variant passes the assay QC metrics: PASS, FAIL, or LOWCOV for low coverage.
+edge	variants_phenotypes.SGE	snvlib_lib1	Count of the variant in the plasmid library before transfection and selection, from amplicon sequencing of the targeted region.
+edge	variants_phenotypes.SGE	snvlib_lib2	Count of the variant in the second plasmid library before transfection and selection. Null unless two targets overlap and the variant was assayed in both.
+edge	variants_phenotypes.SGE	D05_R1_lib1	Count of the variant at day 5 in replicate 1.
+edge	variants_phenotypes.SGE	D05_R1_lib2	Count of the variant at day 5 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	variants_phenotypes.SGE	D05_R2_lib1	Count of the variant at day 5 in replicate 2.
+edge	variants_phenotypes.SGE	D05_R2_lib2	Count of the variant at day 5 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	variants_phenotypes.SGE	D05_R3_lib1	Count of the variant at day 5 in replicate 3. Null when only two replicates passed QC.
+edge	variants_phenotypes.SGE	D05_R3_lib2	Count of the variant at day 5 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC.
+edge	variants_phenotypes.SGE	D13_R1_lib1	Count of the variant at day 13 in replicate 1.
+edge	variants_phenotypes.SGE	D13_R1_lib2	Count of the variant at day 13 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	variants_phenotypes.SGE	D13_R2_lib1	Count of the variant at day 13 in replicate 2.
+edge	variants_phenotypes.SGE	D13_R2_lib2	Count of the variant at day 13 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both.
+edge	variants_phenotypes.SGE	D13_R3_lib1	Count of the variant at day 13 in replicate 3. Null when only two replicates passed QC.
+edge	variants_phenotypes.SGE	D13_R3_lib2	Count of the variant at day 13 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC.
+edge	variants_phenotypes.cV2F	score	cV2F scoree: prediction value for the variant, a continuous score between 0 and 1for how likely the variant is to be functional.
+edge	variants_phenotypes.cV2F	source	The database, dataset or organization that is a source for these data.
+edge	variants_phenotypes.cV2F	source_url	The URL for the source.
+edge	variants_phenotypes.cV2F	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_phenotypes.cV2F	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_phenotypes.cV2F	files_filesets	Reference to the File and Metadata
+edge	variants_phenotypes.cV2F	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_phenotypes.cV2F	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_phenotypes.cV2F	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_phenotypes.cV2F	label	Non-method specific human readable label for the node or edge
+edge	variants_phenotypes.cV2F	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_proteins.ASB	chr	Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.
+edge	variants_proteins.ASB	rsid	dbSNP id for the variant position
+edge	variants_proteins.ASB	motif_fc	Log2 ratio of HOCOMOCO motif p-values for the reference versus alternate allele. Positive values mean the motif prefers the alternate allele; negative values prefer the reference.
+edge	variants_proteins.ASB	motif_pos	0-based position of the variant relative to the best HOCOMOCO PWM hit.
+edge	variants_proteins.ASB	motif_orient	Strand of the best HOCOMOCO PWM hit relative to the reference assembly.
+edge	variants_proteins.ASB	motif_conc	Whether the allelic read imbalance agrees with the motif fold-change, assessed at 25% FDR.
+edge	variants_proteins.ASB	motif	HOCOMOCO v11 motif for the transcription factor.
+edge	variants_proteins.ASB	es_mean_ref	Allele-wise effect size for the reference allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger reference-allele ASB.
+edge	variants_proteins.ASB	es_mean_alt	Allele-wise effect size for the alternate allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger alternate-allele ASB.
+edge	variants_proteins.ASB	p_value_adj_ref	Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.
+edge	variants_proteins.ASB	p_value_adj_alt	Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.
+edge	variants_proteins.ASB	neg_log10_pvalue_adj_ref	Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.
+edge	variants_proteins.ASB	neg_log10_pvalue_adj_alt	Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.
+edge	variants_proteins.ASB	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_proteins.ASB	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_proteins.ASB	source	The database, dataset or organization that is a source for these data.
+edge	variants_proteins.ASB	source_url	The URL for the source.
+edge	variants_proteins.ASB	label	Non-method specific human readable label for the node or edge
+edge	variants_proteins.ASB	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_proteins.ASB	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_proteins.ASB	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_proteins.ASB	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_proteins.ASB	biological_process	Gene Ontology term for regulation of DNA binding.
+edge	variants_proteins.ASB	files_filesets	Reference to the File and Metadata
+edge	variants_proteins.ASB_GVATDB	p_value	Monte-Carlo p-value of the preferential binding score.
+edge	variants_proteins.ASB_GVATDB	p_value_adj	FDR of the preferential binding score.
+edge	variants_proteins.ASB_GVATDB	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_proteins.ASB_GVATDB	experiment	GVATdb experiment identifier.
+edge	variants_proteins.ASB_GVATDB	hg19_coordinate	hg19 coordinates of the 40-bp oligo used in SNP-SELEX.
+edge	variants_proteins.ASB_GVATDB	oligo_auc	Oligo binding score: area under the SELEX enrichment curve for the 40-bp oligo, regardless of allele. Larger values mean stronger TF binding to the oligo.
+edge	variants_proteins.ASB_GVATDB	oligo_pval	P-value of the oligo binding score.
+edge	variants_proteins.ASB_GVATDB	ref_auc	Area under the SELEX enrichment curve for the reference allele.
+edge	variants_proteins.ASB_GVATDB	alt_auc	Area under the SELEX enrichment curve for the alternate allele.
+edge	variants_proteins.ASB_GVATDB	pbs	Preferential binding score: area between the reference and alternate enrichment curves. Negative values mean the TF prefers the alternate allele.
+edge	variants_proteins.ASB_GVATDB	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
+edge	variants_proteins.ASB_GVATDB	source	The database, dataset or organization that is a source for these data.
+edge	variants_proteins.ASB_GVATDB	source_url	The URL for the source.
+edge	variants_proteins.ASB_GVATDB	label	Non-method specific human readable label for the node or edge
+edge	variants_proteins.ASB_GVATDB	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_proteins.ASB_GVATDB	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_proteins.ASB_GVATDB	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_proteins.ASB_GVATDB	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_proteins.ASB_GVATDB	biological_process	Gene Ontology term for regulation of DNA binding.
+edge	variants_proteins.ASB_GVATDB	files_filesets	Reference to the File and Metadata
+edge	variants_proteins.SEMPred	label	Non-method specific human readable label for the node or edge
+edge	variants_proteins.SEMPred	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_proteins.SEMPred	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_proteins.SEMPred	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_proteins.SEMPred	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_proteins.SEMPred	motif	SEMpl motif for the transcription factor.
+edge	variants_proteins.SEMPred	ref_seq_context	Coordinate range on the reference genome holding the highest SEM score with the reference allele.
+edge	variants_proteins.SEMPred	alt_seq_context	Coordinate range on the reference genome holding the highest SEM score with the alternate allele. For an indel, apply the change described by the variant identifier to this reference range to recreate the alternate sequence.
+edge	variants_proteins.SEMPred	ref_score	Predicted binding score at the reference allele: the transcription factor's affinity for the reference sequence, relative to its average binding affinity.
+edge	variants_proteins.SEMPred	alt_score	Predicted binding score at the alternate allele, on the same scale as ref_score.
+edge	variants_proteins.SEMPred	variant_effect_score	log2 ratio of alt_score to ref_score. Positive values mean increased preference for the alternate allele, negative values increased preference for the reference allele.
+edge	variants_proteins.SEMPred	SEMpl_annotation	Predicted effect of the variant on binding, assigned by comparing ref_score and alt_score against 2 raised to SEMpl_baseline: no_binding when neither allele binds, binding_unchanged, binding_increased, binding_decreased, binding_created when only the alternate allele binds, or binding_ablated when only the reference allele binds.
+edge	variants_proteins.SEMPred	SEMpl_baseline	log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers: a baseline where binding is not expected to occur. Binding is called only for scores above 2 raised to this value. Constant across every variant scored with the same SNP Effect Matrix.
+edge	variants_proteins.SEMPred	files_filesets	Reference to the File and Metadata
+edge	variants_proteins.SEMPred	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_proteins.SEMPred	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_proteins.SEMPred	biological_process	Gene Ontology term for the process this edge represents. GO_0051101 is 'regulation of DNA binding'.
+edge	variants_proteins.SEMPred	source	The database, dataset or organization that is a source for these data.
+edge	variants_proteins.SEMPred	source_url	The URL for the source.
+edge	variants_proteins.pQTL	rsid	dbSNP id for the variant position
+edge	variants_proteins.pQTL	label	Non-method specific human readable label for the node or edge
+edge	variants_proteins.pQTL	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
+edge	variants_proteins.pQTL	beta	Discovery-cohort effect size of allele A1 on plasma protein level.
+edge	variants_proteins.pQTL	se	Standard error of the discovery-cohort beta.
+edge	variants_proteins.pQTL	regulatory_type	Whether the association is cis (within 1 Mb of the gene encoding the protein) or trans.
+edge	variants_proteins.pQTL	gene	Ensembl gene the source annotates at this locus, as a handle into genes. Null when the annotation is missing or the identifier is not in the catalog.
+edge	variants_proteins.pQTL	gene_consequence	Sequence Ontology consequence of the variant on the annotated gene. Null when none is recorded.
+edge	variants_proteins.pQTL	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	variants_proteins.pQTL	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
+edge	variants_proteins.pQTL	source	The database, dataset or organization that is a source for these data.
+edge	variants_proteins.pQTL	source_url	The URL for the source.
+edge	variants_proteins.pQTL	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_proteins.pQTL	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_proteins.pQTL	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
+edge	variants_proteins.pQTL	method	Name of the experimental class or prediction model that produced this result.
+edge	variants_proteins.pQTL	files_filesets	Reference to the File and Metadata
+edge	variants_variants.TopLD	chr	Chromosome the pair of variants lies on. Scaffolds and patch regions use UCSC-style names.
+edge	variants_variants.TopLD	negated	Sign of the Pearson correlation between the two reference alleles, as written by the adapter: true when TopLD reports +, false when it reports -.
+edge	variants_variants.TopLD	variant_1_base_pair	Reference and alternate alleles of the first variant.
+edge	variants_variants.TopLD	variant_2_base_pair	Reference and alternate alleles of the second variant.
+edge	variants_variants.TopLD	variant_1_rsid	dbSNP identifier of the first variant.
+edge	variants_variants.TopLD	variant_2_rsid	dbSNP identifier of the second variant.
+edge	variants_variants.TopLD	r2	Squared Pearson correlation of the two variants on phased haplotypes, from TOPMed ancestry-specific LD.
+edge	variants_variants.TopLD	d_prime	Lewontin's D' between the two variants, from TOPMed ancestry-specific LD.
+edge	variants_variants.TopLD	ancestry	Ancestry group the LD estimate was computed in.
+edge	variants_variants.TopLD	label	Non-method specific human readable label for the node or edge
+edge	variants_variants.TopLD	name	Directional human readable label for the relationship, _from to _to.
+edge	variants_variants.TopLD	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
+edge	variants_variants.TopLD	source	The database, dataset or organization that is a source for these data.
+edge	variants_variants.TopLD	source_url	The URL for the source.

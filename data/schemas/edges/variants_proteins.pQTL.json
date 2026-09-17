@@ -25,15 +25,16 @@
             },
             "rsid": {
                 "type": ["string", "null"],
-                "description": "dbSNP identifier of the variant. Null when the source has none.",
+                "description": "dbSNP id for the variant position",
                 "example": "rs1260326"
             },
             "label": {
+                "description": "Non-method specific human readable label for the node or edge",
                 "enum": ["pQTL"]
             },
             "neg_log10_pvalue": {
                 "type": "number",
-                "description": "Negative log10 of the discovery-cohort association p-value (UKB-PPP column log10(p)). Larger values mean stronger association."
+                "description": "Negative log 10 p-value of the measurement or prediction"
             },
             "beta": {
                 "type": "number",
@@ -63,35 +64,41 @@
             },
             "biological_context": {
                 "type": "string",
-                "description": "Tissue the pQTL was measured in. UKB-PPP used blood plasma.",
+                "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
                 "enum": ["blood plasma"]
             },
             "biosample_term": {
                 "type": "string",
-                "description": "Ontology term for blood plasma, as a handle into ontology_terms.",
+                "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
                 "enum": ["ontology_terms/UBERON_0001969"]
             },
             "source": {
+                "description": "The database, dataset or organization that is a source for these data.",
                 "enum": ["UKB"]
             },
             "source_url": {
+                "description": "The URL for the source.",
                 "enum": ["https://metabolomips.org/ukbbpgwas/"]
             },
             "name": {
+                "description": "Directional human readable label for the relationship, _from to _to.",
                 "enum": ["associated with levels of"]
             },
             "inverse_name": {
+                "description": "Reversed directional human readable label for the relationship, _to to _from.",
                 "enum": ["level associated with"]
             },
             "class": {
+                "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
                 "enum": ["observed data"]
             },
             "method": {
+                "description": "Name of the experimental class or prediction model that produced this result.",
                 "enum": ["pQTL"]
             },
             "files_filesets": {
                 "type": "string",
-                "description": "Handle of the files_filesets record for the IGVF file this pQTL table was read from.",
+                "description": "Reference to the File and Metadata",
                 "example": "files_filesets/IGVFFI2053GDNI",
                 "pattern": "^files_filesets/",
                 "collections": [

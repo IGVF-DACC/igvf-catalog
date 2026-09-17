@@ -28,47 +28,52 @@
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ENCODE-rE2G"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted regulatory element effect on gene expression"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "score": {
           "type": "number",
-          "description": "ENCODE-rE2G probability that the element has a regulatory effect on the target gene, from the DNase-only logistic regression classifier. Only links that pass the thresholded file's cutoff are loaded; that cutoff is set for 70% recall of CRISPR-validated links."
+          "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the ENCODE thresholded element-gene file this link was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/ENCFF003BKC",
           "pattern": "^files_filesets/"
         },
         "biological_context": {
           "type": "string",
-          "description": "Plain-language summary of the biosample the prediction was made in, taken from the first entry of simple_sample_summaries on the associated files_filesets record.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "head of caudate nucleus from ENCDO948PMW"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the prediction was made in, taken from the associated files_filesets record.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/UBERON_0002626",
           "pattern": "^ontology_terms/"
         },
@@ -77,17 +82,19 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the associated files_filesets record. Null when none were applied.",
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
           "example": [
             "UniProtKB:P05112"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "regulates"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulated by"
           ]

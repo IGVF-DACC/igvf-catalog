@@ -30,12 +30,12 @@
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome of the variant, prefixed with chr.",
+          "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr15"
         },
         "rsid": {
           "type": "string",
-          "description": "dbSNP identifier of the variant.",
+          "description": "dbSNP id for the variant position",
           "example": "rs1234567890"
         },
         "motif_fc": {
@@ -60,7 +60,7 @@
         },
         "motif": {
           "type": "string",
-          "description": "HOCOMOCO v11 motif for the transcription factor, as a handle into motifs.",
+          "description": "HOCOMOCO v11 motif for the transcription factor.",
           "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
           "pattern": "^motifs/"
         },
@@ -96,58 +96,65 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "GTRD name of the cell type the ASB was called in.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "Kelly (neuroblastoma)"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for that cell type, as a handle into ontology_terms.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/EFO_0002069",
           "pattern": "^ontology_terms/"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ADASTRA"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=520"
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "allele-specific binding"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ADASTRA"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates binding of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "binding modulated by"
           ]
         },
         "biological_process": {
           "type": "string",
-          "description": "Gene Ontology term for regulation of DNA binding, as a handle into ontology_terms.",
+          "description": "Gene Ontology term for regulation of DNA binding.",
           "enum": [
             "ontology_terms/GO_0051101"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this ASB table was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI5943XCOS",
           "pattern": "^files_filesets/",
           "collections": [

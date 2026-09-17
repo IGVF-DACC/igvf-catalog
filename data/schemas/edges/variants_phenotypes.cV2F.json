@@ -29,30 +29,34 @@
         },
         "score": {
           "type": "number",
-          "description": "cV2F prediction value for the variant, a continuous score for how likely the variant is to be functional. Only variants passing the 0.75 threshold are loaded."
+          "description": "cV2F scoree: prediction value for the variant, a continuous score between 0 and 1for how likely the variant is to be functional."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/",
           "collections": [
@@ -64,21 +68,24 @@
             "string",
             "null"
           ],
-          "description": "Ontology term for the sample this applies to, taken from the associated files_filesets record. Null when the fileset lists no sample. Null for the sample-agnostic prediction file.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/UBERON_0002048",
           "pattern": "^ontology_terms/"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "cV2F"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted variant effect on phenotype"
           ]
@@ -88,7 +95,7 @@
             "string",
             "null"
           ],
-          "description": "Plain-language summary of the sample this applies to, taken from the associated files_filesets record. Null when the fileset carries no summary. Null for the sample-agnostic prediction file.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "lung"
         }
       },

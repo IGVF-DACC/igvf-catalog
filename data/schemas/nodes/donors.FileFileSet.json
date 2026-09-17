@@ -12,6 +12,7 @@
           "example": "ENCDO374BBL"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "ENCDO374BBL"
         },
         "sex": {
@@ -19,7 +20,7 @@
             "string",
             "null"
           ],
-          "description": "Sex of the donor as recorded on the source portal: female, male, mixed, unknown, or unspecified.",
+          "description": "Sex of the donor: female, male, mixed, unknown, or unspecified.",
           "enum": [
             "female",
             "male",
@@ -55,7 +56,7 @@
             "array",
             "null"
           ],
-          "description": "Ethnicity of the donor, read from ethnicities for IGVF donors and from ethnicity for ENCODE donors.",
+          "description": "Ethnicity of the donor.",
           "example": [
             "African American"
           ]
@@ -65,18 +66,20 @@
             "array",
             "null"
           ],
-          "description": "Phenotypic features observed for the donor, as handles into ontology_terms. For IGVF donors these come from the donor's own phenotypic features; for ENCODE donors they come from the diseases recorded on the biosample, with DOID identifiers mapped onto MONDO or HP.",
+          "description": "Phenotypic features observed for the donor, with DOID identifiers mapped onto MONDO or HP.",
           "example": [
             "ontology_terms/DOID_3308"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE",
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/human-donors/ENCDO374BBL/"
         }
       },

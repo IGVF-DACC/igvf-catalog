@@ -27,7 +27,7 @@
         },
         "z_score": {
           "type": "number",
-          "description": "COXPRESdb coexpression z-score. 0 is random-level coexpression; 3 is a false-positive rate of 0.1%. Larger absolute values mean stronger coexpression. Only pairs with absolute value of 3 or greater are loaded.",
+          "description": "COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.",
           "example": 3.2
         },
         "associated_process": {
@@ -36,29 +36,36 @@
           "enum": ["ontology_terms/GO_0010467"]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": ["COXPRESdb"]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": ["observed data"]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": ["co-expression"]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": ["COXPRESdb"]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": ["https://coxpresdb.jp/"]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": ["coexpressed with"]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": ["coexpressed with"]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the COXPRESdb coexpression bundle this pair was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI3321YNBP",
           "pattern": "^files_filesets/",
           "collections": ["files_filesets"]

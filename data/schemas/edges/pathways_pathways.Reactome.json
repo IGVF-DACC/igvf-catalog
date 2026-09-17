@@ -28,57 +28,57 @@
     },
     "source": {
       "type": "string",
-      "description": "The dataset or consortium this record was loaded from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "Reactome"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Link to the specific upstream record or file this data was loaded from.",
+      "description": "The URL for the source.",
       "enum": [
         "https://reactome.org/"
       ]
     },
     "name": {
       "type": "string",
-      "description": "Predicate describing the relationship in the _from to _to direction.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "parent of"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate describing the same relationship in the _to to _from direction.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "child of"
       ]
     },
     "organism": {
       "type": "string",
-      "description": "Species these pathways belong to. Only Homo sapiens parent-child links are loaded.",
+      "description": "Species this annotation describes.",
       "enum": [
         "Homo sapiens"
       ]
     },
     "class": {
       "type": "string",
-      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record.",
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
       "enum": [
         "biological relationship"
       ]
     },
     "method": {
       "type": ["string", "null"],
-      "description": "Model or pipeline that produced this record, taken from the associated files_filesets record."
+      "description": "Name of the experimental class or prediction model that produced this result."
     },
     "label": {
       "type": ["string", "null"],
-      "description": "Same value as method."
+      "description": "Non-method specific human readable label for the node or edge"
     },
     "files_filesets": {
       "type": "string",
-      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI8363VRKN",
       "pattern": "^files_filesets/",
       "collections": [

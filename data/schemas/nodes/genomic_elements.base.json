@@ -5,7 +5,7 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome the element lies on, prefixed with 'chr'.",
+      "description": "Chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
       "example": "chr1"
     },
     "start": {
@@ -27,7 +27,7 @@
     },
     "method": {
       "type": "string",
-      "description": "The assay or pipeline that defined the element.",
+      "description": "Name of the experimental class or prediction model that produced this result.",
       "example": "MPRA"
     }
   },

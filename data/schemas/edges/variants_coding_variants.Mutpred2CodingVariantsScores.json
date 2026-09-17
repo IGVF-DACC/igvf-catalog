@@ -27,54 +27,54 @@
     },
     "name": {
       "type": "string",
-      "description": "Predicate describing the relationship in the _from to _to direction: the genomic variant codes for this coding variant.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "codes for"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate describing the same relationship in the _to to _from direction: the coding variant is encoded by this genomic variant.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "encoded by"
       ]
     },
     "chr": {
       "type": "string",
-      "description": "Chromosome the genomic variant lies on, prefixed with 'chr'.",
+      "description": "Chromosome the genomic variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
       "example": "chr18"
     },
     "pos": {
       "type": "integer",
-      "description": "Position of the genomic variant on the chromosome, 0-based, taken from its SPDI expression."
+      "description": "0-based genomic coordinate of the variant."
     },
     "ref": {
       "type": "string",
-      "description": "Reference allele of the genomic variant, on the forward strand.",
+      "description": "Reference allele of the genomic variant.",
       "example": "CA"
     },
     "alt": {
       "type": "string",
-      "description": "Alternate allele of the genomic variant, on the forward strand.",
+      "description": "Alternate allele of the genomic variant.",
       "example": "AC"
     },
     "label": {
       "type": "string",
-      "description": "The relationship this edge represents, phrased for display.",
+      "description": "Non-method specific human readable label for the node or edge",
       "enum": [
         "codes for"
       ]
     },
     "source": {
       "type": "string",
-      "description": "The dataset this edge was loaded from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "IGVF"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Link to the IGVF file this edge was derived from.",
+      "description": "The URL for the source.",
       "enum": [
         "https://data.igvf.org/tabular-files/IGVFFI6893ZOAA"
       ]

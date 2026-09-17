@@ -13,16 +13,17 @@
           "description": "Gene symbol, Ensembl transcript ID, protein HGVS and coding HGVS joined by underscores. \"?\" is rewritten to \"!\" and \">\" to \"-\". A \"_splicing\" suffix is added when aapos is -1."
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "ref": {
           "type": "string",
-          "description": "Reference amino acid. A stop is stored as \"*\"; dbNSFP writes that as X.",
+          "description": "Reference amino acid, in single-letter code.",
           "example": "M"
         },
         "alt": {
           "type": "string",
-          "description": "Alternate amino acid. A stop is stored as \"*\"; dbNSFP writes that as X.",
+          "description": "Alternate amino acid, in single-letter code.",
           "example": "L"
         },
         "aapos": {
@@ -32,33 +33,33 @@
         },
         "gene_name": {
           "type": "string",
-          "description": "HGNC gene symbol assigned by dbNSFP.",
+          "description": "HGNC gene symbol.",
           "example": "OR4F5"
         },
         "protein_name": {
           "type": "string",
-          "description": "UniProt entry name matching the Ensembl protein.",
+          "description": "UniProtKB protein name.",
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
           "type": "string",
-          "description": "Ensembl protein ID matching the transcript.",
+          "description": "Ensembl ID of the protein (without version number).",
           "example": "ENSP00000493376",
           "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
           "type": "string",
-          "description": "Protein HGVS from snpEff (dbNSFP HGVSp_snpEff).",
+          "description": "HGVS protein-level description of the variant.",
           "example": "p.Met1?"
         },
         "hgvsc": {
           "type": "string",
-          "description": "Coding HGVS from VEP (dbNSFP HGVSc_VEP).",
+          "description": "HGVS description of the variant in the cDNA reference frame.",
           "example": "c.1A>C"
         },
         "refcodon": {
           "type": "string",
-          "description": "Reference codon at the variant.",
+          "description": "Reference codon at the substituted position.",
           "example": "ATG"
         },
         "codonpos": {
@@ -71,7 +72,7 @@
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID this coding consequence is annotated on.",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000641515",
           "pattern": "^ENST[0-9]{11}$"
         },
@@ -188,11 +189,13 @@
           "description": "CADD raw score. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "dbNSFP 5.1a"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "http://database.liulab.science/dbNSFP"
           ]

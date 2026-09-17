@@ -11,12 +11,12 @@
       "properties": {
         "chr": {
           "type": "string",
-          "description": "Mouse chromosome the element lies on, prefixed with 'chr'.",
+          "description": "Mouse chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr6"
         },
         "start": {
           "type": "number",
-          "description": "Start of the mouse element on mm10, 0-based and inclusive.",
+          "description": "Start of the element, 0-based and inclusive.",
           "example": 121522229
         },
         "end": {
@@ -26,7 +26,7 @@
         },
         "method": {
           "type": "string",
-          "description": "How the element was defined: integrative pairing of human and mouse DNase hypersensitive sites.",
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "integrative"
           ]
@@ -39,11 +39,13 @@
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "FUNCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "pattern": "^https://data.igvf.org/reference-files/"
         }
       },

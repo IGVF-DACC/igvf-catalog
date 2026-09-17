@@ -13,34 +13,36 @@
         },
         "uri": {
           "type": "string",
-          "description": "Cellosaurus page for this cell line.",
+          "description": "URI for the ontology term.",
           "example": "https://www.cellosaurus.org/CVCL_JJ44"
         },
         "term_id": {
           "type": "string",
-          "description": "Cellosaurus accession of the cell line.",
+          "description": "Ontology term identifier.",
           "example": "CVCL_JJ44"
         },
         "name": {
           "example": "CW70177",
-          "description": "Recommended name of the cell line."
+          "description": "Human readable display name for the entity"
         },
         "synonyms": {
           "type": [
             "array",
             "null"
           ],
-          "description": "Alternative names for the cell line. Null when the OBO entry has none.",
+          "description": "Alternative names for the ontology term.",
           "items": {
             "type": "string"
           }
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "Cellosaurus"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://www.cellosaurus.org/"
           ]
@@ -61,18 +63,18 @@
         },
         "class": {
           "type": "string",
-          "description": "The class of the ontology term, from the associated files_filesets record"
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
         },
         "method": {
           "type": [
             "string",
             "null"
           ],
-          "description": "The method of the ontology term, from the associated files_filesets record"
+          "description": "Name of the experimental class or prediction model that produced this result."
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the Cellosaurus OBO file this term was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI9279GNOP",
           "pattern": "^files_filesets/",
           "collections": [

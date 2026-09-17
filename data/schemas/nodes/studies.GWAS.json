@@ -12,6 +12,7 @@
           "example": "GCST011427_344"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "GCST011427_344"
         },
         "ancestry_initial": {
@@ -41,7 +42,7 @@
         },
         "pmid": {
           "type": "string",
-          "description": "PubMed identifier of the publication reporting the study.",
+          "description": "PubMed identifier.",
           "example": "PMID:32778093"
         },
         "pub_author": {
@@ -95,6 +96,7 @@
           "example": "measurement"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "OpenTargets"
           ]
@@ -108,11 +110,11 @@
         },
         "source_url": {
           "type": "string",
-          "description": "IGVF reference-file page for the Open Targets file this record was read from."
+          "description": "The URL for the source."
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this record was read from."
+          "description": "Reference to the File and Metadata"
         }
       },
       "required": [

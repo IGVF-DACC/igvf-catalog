@@ -38,7 +38,7 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the PBS p-value. Capped at 5 when the reported p-value is 0."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "experiment": {
           "type": "string",
@@ -72,53 +72,60 @@
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Negative log10 of the FDR. Set to 2 when the reported FDR is 0."
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GVATdb"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://renlab.sdsc.edu/GVATdb/"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "allele-specific binding"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "GVATdb"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates binding of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "binding modulated by"
           ]
         },
         "biological_process": {
           "type": "string",
-          "description": "Gene Ontology term for regulation of DNA binding, as a handle into ontology_terms.",
+          "description": "Gene Ontology term for regulation of DNA binding.",
           "enum": [
             "ontology_terms/GO_0051101"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the IGVF file this SNP-SELEX table was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI8897VGII",
           "pattern": "^files_filesets/",
           "collections": [

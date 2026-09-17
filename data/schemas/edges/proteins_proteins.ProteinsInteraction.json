@@ -30,7 +30,7 @@
         },
         "detection_method": {
           "type": "string",
-          "description": "PSI-MI detection method used to observe the interaction, looked up from the PSI-MI ontology.",
+          "description": "PSI-MI detection method used to observe the interaction",
           "enum": [
             "3D electron microscopy",
             "Split renilla luciferase complementation",
@@ -223,12 +223,12 @@
         },
         "detection_method_code": {
           "type": "string",
-          "description": "PSI-MI identifier of that detection method.",
+          "description": "PSI-MI identifier of the detection method.",
           "example": "MI:0004"
         },
         "interaction_type": {
           "type": "array",
-          "description": "PSI-MI interaction types for the pair, looked up from the PSI-MI ontology.",
+          "description": "BioGRID physical-interaction class.",
           "items": {
             "type": "string",
             "enum": [
@@ -278,7 +278,7 @@
         },
         "interaction_type_code": {
           "type": "array",
-          "description": "PSI-MI identifiers of those interaction types.",
+          "description": "PSI-MI identifiers of the interaction types.",
           "example": [
             "MI:0915"
           ]
@@ -298,6 +298,7 @@
           "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "BioGRID",
             "BioGRID; IntAct",
@@ -306,37 +307,40 @@
         },
         "pmids": {
           "type": "array",
-          "description": "PubMed pages cited as evidence for this interaction.",
+          "description": "Pubmed identifiers.",
           "example": [
             "http://pubmed.ncbi.nlm.nih.gov/23836931"
           ]
         },
         "organism": {
           "type": "string",
-          "description": "Species of the two proteins.",
+          "description": "Species this annotation describes.",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "physically interacts with"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "physically interacts with"
           ]
         },
         "molecular_function": {
           "type": "string",
-          "description": "Gene Ontology term for protein binding, as a handle into ontology_terms.",
+          "description": "Gene Ontology term for protein binding.",
           "enum": [
             "ontology_terms/GO_0005515"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "acetylation reaction",
             "acetylation reaction, direct interaction",
@@ -422,6 +426,7 @@
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "3D electron microscopy",
             "Split renilla luciferase complementation",
@@ -613,13 +618,14 @@
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the merged interaction table this edge was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI4317VDGK",
           "pattern": "^files_filesets/",
           "collections": [
@@ -627,6 +633,7 @@
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK",
             "https://data.igvf.org/reference-files/IGVFFI1165YVBA"

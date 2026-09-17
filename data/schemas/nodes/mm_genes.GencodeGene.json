@@ -13,8 +13,7 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "Ensembl gene ID including its version suffix. The _key of this record is the same ID with the version removed.",
-          "example": "ENSMUSG00000094271.1",
+          "description": "Ensembl gene ID including its version suffix.",
           "pattern": "^ENSMUSG[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "gene_type": {
@@ -47,14 +46,16 @@
           ]
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "Gm13290"
         },
         "symbol": {
           "type": "string",
-          "description": "GENCODE gene symbol. Carries the same value as name.",
+          "description": "GENCODE gene symbol.",
           "example": "Gm13290"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
@@ -67,6 +68,7 @@
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
@@ -83,7 +85,7 @@
             "array",
             "null"
           ],
-          "description": "IGVF study sets that include this gene. Always null for mouse genes, because the portal only reports study sets for human genes.",
+          "description": "IGVF study sets that include this gene. ",
           "items": {
             "type": "string"
           }
@@ -93,7 +95,7 @@
             "array",
             "null"
           ],
-          "description": "Curated gene collections that include this gene. Always null for mouse genes, because the portal only reports collections for human genes.",
+          "description": "The collections in the IGVF catalog that contain the data in this file.",
           "items": {
             "type": "string"
           }
@@ -105,7 +107,7 @@
         },
         "mgi": {
           "type": "string",
-          "description": "MGI ID for the gene, taken from the GENCODE annotation where present, otherwise resolved through the NCBI gene info file.",
+          "description": "MGI ID for the gene.",
           "example": "MGI:3701990",
           "pattern": "^MGI:[0-9]+$"
         },

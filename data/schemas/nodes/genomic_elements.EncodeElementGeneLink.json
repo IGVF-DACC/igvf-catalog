@@ -15,9 +15,11 @@
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ENCODE-rE2G"
           ]
@@ -37,17 +39,19 @@
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the ENCODE thresholded element-gene file this element was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/ENCFF003BKC",
           "pattern": "^files_filesets/"
         },
@@ -56,7 +60,7 @@
             "array",
             "null"
           ],
-          "description": "Short readable summaries of the samples the prediction was made in, copied from the associated files_filesets record.",
+          "description": "Short readable summary of each sample.",
           "example": [
             "head of caudate nucleus from ENCDO948PMW"
           ]
@@ -66,7 +70,7 @@
             "array",
             "null"
           ],
-          "description": "Ontology term identifiers for the treatments applied to the samples, taken from the associated files_filesets record. Null when none were applied.",
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
           "example": [
             "UniProtKB:P05112"
           ]

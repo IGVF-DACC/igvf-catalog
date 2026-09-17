@@ -28,23 +28,27 @@
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "scE2G"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted regulatory element effect on gene expression"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "score": {
           "type": "number",
-          "description": "scE2G prediction score for the element-gene link"
+          "description": "scE2G score: Probability that the element has a regulatory effect on the target gene",
+          "example": 0.95
         },
         "transcription_start_site": {
           "type": "integer",
@@ -62,7 +66,7 @@
             "string",
             "null"
           ],
-          "description": "Biosample / sample summary for the genomic element to gene edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "adrenal medulla chromaffin cell"
         },
         "biosample_term": {
@@ -70,42 +74,52 @@
             "string",
             "null"
           ],
-          "description": "Ontology term for the biosample the prediction applies to, taken from the associated files_filesets record.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/CL_0000336",
           "pattern": "^ontology_terms/"
         },
         "cell_annotation": {
-          "type": "string",
-          "description": "Cell annotation label for the genomic element to gene edge (optionally including Qualifier)",
-          "example": "adrenal medulla chromaffin cell"
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The cell annotation of the file set, with optional qualifier, for single-cell derived results.",
+          "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
-          "type": "string",
-          "description": "Ontology term for the cell type the prediction applies to, taken from the associated files_filesets record.",
-          "example": "ontology_terms/CL_0000336",
-          "pattern": "^ontology_terms/"
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Base ontology term describing the cell type of a single-cell derived result.",
+          "example": "ontology_terms/CL_0000352",
+          "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the prediction file this link was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI5648GWQX",
           "pattern": "^files_filesets/"
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "regulates"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulated by"
           ]

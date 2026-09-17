@@ -5,16 +5,16 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome the variant lies on, prefixed with 'chr'.",
+      "description": "Chromosome the variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
       "example": "chr1"
     },
     "pos": {
       "type": "number",
-      "description": "Position of the variant on the chromosome, 0-based."
+      "description": "0-based genomic coordinate of the variant."
     },
     "rsid": {
       "type": "array",
-      "description": "dbSNP reference SNP identifiers for this allele. An array because several rsIDs can normalize to the same allele.",
+      "description": "dbSNP id for the variant position",
       "example": [
         "rs6054257"
       ]
@@ -29,20 +29,20 @@
     },
     "qual": {
       "type": "string",
-      "description": "Variant call quality score carried over from the QUAL column of the source VCF.",
+      "description": "VCF QUAL score for the variant position.",
       "example": "50110.4"
     },
     "variation_type": {
       "type": "string",
-      "description": "Class of sequence change, derived by comparing the reference and alternate allele lengths: SNP, insertion, deletion, or deletion-insertion."
+      "description": "Class of sequence change: SNP, insertion, deletion, or deletion-insertion."
     },
     "annotations": {
       "type": "object",
-      "description": "Source-specific annotations parsed from the INFO column of the source VCF, including population allele frequencies keyed by cohort."
+      "description": "Source-specific annotations parsed from from FAVOR."
     },
     "spdi": {
       "type": "string",
-      "description": "Normalized SPDI expression identifying the allele, written as RefSeq accession, 0-based position, deleted sequence and inserted sequence.",
+      "description": "Normalized SPDI expression identifying the allele.",
       "example": "NC_000001.11:10887495:C:T"
     },
     "hgvs": {
@@ -60,7 +60,7 @@
     },
     "organism": {
       "type": "string",
-      "description": "Species the variant was called in, either Homo sapiens against GRCh38 or Mus musculus against GRCm39."
+      "description": "Species this annotation describes."
     }
   },
   "required": [

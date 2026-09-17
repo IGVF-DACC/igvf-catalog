@@ -13,11 +13,12 @@
         },
         "transcript_id": {
           "type": "string",
-          "description": "Ensembl transcript ID including its version suffix. The _key of this record is the same ID with the version removed.",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000456328.2",
           "pattern": "^ENST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "DDX11L2-202"
         },
         "transcript_type": {
@@ -99,7 +100,7 @@
         },
         "gene_name": {
           "type": "string",
-          "description": "GENCODE symbol of the gene this transcript belongs to.",
+          "description": "HGNC gene symbol",
           "example": "DDX11L2"
         },
         "MANE_Select": {
@@ -108,6 +109,7 @@
           "example": true
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
@@ -120,6 +122,7 @@
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]

@@ -28,21 +28,21 @@
     },
     "name": {
       "type": "string",
-      "description": "Predicate for the disease-to-gene direction.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "associated_with"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate for the gene-to-disease direction. Identical to name; the relationship is symmetric.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "associated_with"
       ]
     },
     "pmids": {
       "type": "array",
-      "description": "PubMed identifiers Orphanet cites as the source of validation for this association.",
+      "description": "Pubmed identifiers.",
       "items": {
         "type": "string"
       },
@@ -52,7 +52,7 @@
     },
     "term_name": {
       "type": "string",
-      "description": "Orphanet preferred name of the disease.",
+      "description": "Ontology term name.",
       "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
     },
     "gene_symbol": {
@@ -67,38 +67,38 @@
     },
     "association_status": {
       "type": "string",
-      "description": "Orphanet status of the gene–disease relationship, as written in the XML.",
+      "description": "Orphanet status of the gene–disease relationship (Assessed or Confirmed)",
       "example": "Assessed"
     },
     "source": {
       "type": "string",
-      "description": "Orphanet, via the Orphadata gene–disease product.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "Orphanet"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Orphadata page for the gene–disease download.",
+      "description": "The URL for the source.",
       "enum": [
         "https://www.orphadata.com/genes/"
       ]
     },
     "class": {
       "type": "string",
-      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record."
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
     },
     "method": {
       "type": "string",
-      "description": "How the association was assigned, taken from the associated files_filesets record."
+      "description": "Name of the experimental class or prediction model that produced this result."
     },
     "label": {
       "type": "string",
-      "description": "Same value as method, taken from the associated files_filesets record."
+      "description": "Non-method specific human readable label for the node or edge"
     },
     "files_filesets": {
       "type": "string",
-      "description": "Handle of the files_filesets record for the IGVF file the Orphadata XML was read from.",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI4540ZCXZ",
       "pattern": "^files_filesets/",
       "collections": [

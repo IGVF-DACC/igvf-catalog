@@ -28,40 +28,40 @@
     },
     "source": {
       "type": "string",
-      "description": "dbNSFP release this record was read from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "dbNSFP 5.1a"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "dbNSFP project page.",
+      "description": "The URL for the source.",
       "enum": [
         "http://database.liulab.science/dbNSFP"
       ]
     },
     "name": {
       "type": "string",
-      "description": "Predicate for the genomic-variant to coding-consequence direction.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "codes for"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate for the coding-consequence to genomic-variant direction.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "encoded by"
       ]
     },
     "chr": {
       "type": "string",
-      "description": "Chromosome of the variant as dbNSFP records it, without a chr prefix.",
+      "description": "Chromosome of the variant as dbNSFP records it, without a chr prefix. Scaffolds and patch regions use UCSC-style names.",
       "example": "1"
     },
     "pos": {
       "type": "number",
-      "description": "Start of the variant on GRCh38, converted from dbNSFP's 1-based coordinate to 0-based.",
+      "description": "0-based genomic coordinate of the variant.",
       "example": 10202
     },
     "ref": {

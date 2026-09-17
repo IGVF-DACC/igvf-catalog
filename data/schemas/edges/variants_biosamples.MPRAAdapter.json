@@ -37,13 +37,13 @@
         },
         "strand": {
           "type": "string",
-          "description": "Strand of the MPRA tile in the reference sequence design. Distinguishes same coordinates on opposite strands.",
+          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
           "enum": ["+", "-", "."],
           "example": "+"
         },
         "bed_score": {
           "type": "number",
-          "description": "Score column of the source BED file, which sets how dark the feature is drawn in a genome browser, on a scale of 0 to 1000."
+          "description": "Score column of the source BED file."
         },
         "log2FC": {
           "type": "number",
@@ -67,15 +67,15 @@
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "-log10 of the P-value for the variant effect. Null when the source file does not report one."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "-log10 of the FDR-adjusted P-value (Q-value) for the variant effect. Null when the source file does not report one."
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the variant effect passes the significance threshold applied at load time: a neg_log10_pvalue_adj of 1 or more, equivalent to an FDR of 0.1 or lower. False when no adjusted P-value is available."
+          "description": "Boolean indicator of the significace of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },
         "postProbEffect": {
           "type": "number",
@@ -90,42 +90,49 @@
           "description": "Upper bound of a 95% interval for the variant effect."
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on regulatory element activity"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates regulatory activity of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulatory activity modulated by"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "MPRA"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
         },
         "files_filesets": {
           "type": "string",
-          "description": "Handle of the files_filesets record for the file this measurement was read from.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI1323RCIE",
           "pattern": "^files_filesets/",
           "collections": [
@@ -134,12 +141,12 @@
         },
         "biological_context": {
           "type": ["string", "null"],
-          "description": "Plain-language summary of the biosample the assay was run in, taken from the associated files_filesets record. Null when the fileset carries no summary.",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Ontology term for the biosample the assay was run in, taken from the associated files_filesets record. Null when the fileset lists no sample.",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/UBERON_0002048"
         },
         "treatments_term_ids": {
@@ -150,7 +157,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation, taken from the associated files_filesets record. Null when none were applied."
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
         }
       },
       "required": [

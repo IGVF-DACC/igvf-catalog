@@ -27,7 +27,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Relationship between the two terms.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "database cross-reference",
         "derived from",
@@ -36,7 +36,7 @@
     },
     "inverse_name": {
       "type": "string",
-      "description": "The same relationship in the opposite direction.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "database cross-reference",
         "derives",
@@ -45,32 +45,32 @@
     },
     "source": {
       "type": "string",
-      "description": "Dataset this edge was loaded from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "Cellosaurus"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Cellosaurus homepage.",
+      "description": "The URL for the source.",
       "enum": [
         "https://www.cellosaurus.org/"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the ontology term to ontology term edge, from the associated files_filesets record"
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
     },
     "method": {
       "type": [
         "string",
         "null"
       ],
-      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record"
+      "description": "Name of the experimental class or prediction model that produced this result."
     },
     "files_filesets": {
       "type": "string",
-      "description": "Handle of the files_filesets record for the Cellosaurus OBO file this edge was read from.",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI9279GNOP",
       "pattern": "^files_filesets/",
       "collections": [

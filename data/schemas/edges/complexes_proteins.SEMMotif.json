@@ -26,28 +26,28 @@
     },
     "name": {
       "type": "string",
-      "description": "Predicate describing the relationship in the _from to _to direction: the complex contains this protein.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "contains"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate describing the same relationship in the _to to _from direction: the protein belongs to this complex.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "belongs to"
       ]
     },
     "source": {
       "type": "string",
-      "description": "The dataset this edge was loaded from.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "IGVF"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Link to the IGVF model file this edge was derived from.",
+      "description": "The URL for the source.",
       "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
       "pattern": "^https://data.igvf.org/model-files/"
     }

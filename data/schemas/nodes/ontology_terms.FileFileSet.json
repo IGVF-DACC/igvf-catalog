@@ -13,16 +13,17 @@
           "example": "NTR_0000856"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "mesendoderm"
         },
         "uri": {
           "type": "string",
-          "description": "Link to the term's page on the source portal.",
+          "description": "URI for the ontology term.",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         },
         "term_id": {
           "type": "string",
-          "description": "Ontology identifier describing the biological sample, with the prefix separated by an underscore rather than a colon. Only NTR terms are loaded here: biosample types the portals describe with a new-term request because no existing ontology term covers them.",
+          "description": "Ontology term identifier.",
           "example": "NTR_0000856"
         },
         "synonyms": {
@@ -30,15 +31,17 @@
             "array",
             "null"
           ],
-          "description": "Synonyms for the term that have been recorded in an ontology."
+          "description": "Alternative names for the ontology term."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         }
       },

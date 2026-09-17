@@ -28,54 +28,54 @@
     },
     "name": {
       "type": "string",
-      "description": "Predicate for the human-to-mouse homology direction.",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "homologous to"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Predicate for the mouse-to-human homology direction. Identical to name; the relationship is symmetric.",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "homologous to"
       ]
     },
     "relationship": {
       "type": "string",
-      "description": "NCI Thesaurus term for a homologous gene, as a handle into ontology_terms.",
+      "description": "NCI Thesaurus term for a homologous gene.",
       "enum": [
         "ontology_terms/NCIT_C79968"
       ]
     },
     "source": {
       "type": "string",
-      "description": "Mouse Genome Informatics, which distributes the Alliance of Genome Resources homology classes.",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "MGI"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "MGI report of human and mouse homology classes with sequence identifiers.",
+      "description": "The URL for the source.",
       "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
     },
     "class": {
       "type": "string",
-      "description": "Evidence tier for the underlying data, taken from the associated files_filesets record: 'observed data' for a curated homology assertion.",
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
       "enum": [
         "observed data"
       ]
     },
     "method": {
       "type": "string",
-      "description": "How the relationship was assigned, taken from the associated files_filesets record.",
+      "description": "Name of the experimental class or prediction model that produced this result.",
       "enum": [
         "Homology"
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "Handle of the files_filesets record for the IGVF file the MGI homology report was read from.",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI9177QQPS",
       "pattern": "^files_filesets/",
       "collections": [
