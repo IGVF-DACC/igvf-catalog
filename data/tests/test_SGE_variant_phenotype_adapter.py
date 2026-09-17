@@ -113,7 +113,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_check
     assert first_item['95_ci_upper'] == -0.0485354
     assert first_item['95_ci_lower'] == -0.232587
     assert first_item['amino_acid_change'] == 'P1153L'
-    assert first_item['hgvs_p'] == 'ENSP00000261584.4:p.Pro1153Leu'
+    assert first_item['hgvsp'] == 'ENSP00000261584.4:p.Pro1153Leu'
     assert first_item['functional_consequence'] == 'functionally_abnormal'
     assert first_item['functional_consequence_zscore'] == -4.24559
     assert first_item['variant_qc_flag'] == 'PASS'
