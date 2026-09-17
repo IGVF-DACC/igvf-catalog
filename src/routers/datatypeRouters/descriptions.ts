@@ -2056,6 +2056,34 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
+  transcripts_genes_effects:
+    'Retrieve genes whose expression is modulated by overexpressed transcripts (MORF screens).<br> \
+    At least one of these properties must be defined: transcript_id, gene_id, morf_id, files_fileset, or method. <br> \
+    Set significant = true to return only associations with adjusted p-value &lt; 0.05.<br> \
+    Set verbose = true to retrieve full info on the transcript and gene.<br> \
+    Example: transcript_id = ENST00000619387, <br> \
+    gene_id = ENSG00000198846 (TOX), <br> \
+    morf_id = AATF_1, <br> \
+    method = MORF screen, <br> \
+    files_fileset = IGVFFI6734IWRB, <br> \
+    significant = true. <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based.',
+
+  genes_transcripts_effects:
+    'Retrieve overexpressed transcripts associated with a readout gene (MORF screens).<br> \
+    At least one of these properties must be defined: gene_id, transcript_id, morf_id, files_fileset, or method. <br> \
+    Set significant = true to return only associations with adjusted p-value &lt; 0.05.<br> \
+    Set verbose = true to retrieve full info on the transcript and gene.<br> \
+    Example: gene_id = ENSG00000198846 (TOX), <br> \
+    transcript_id = ENST00000619387, <br> \
+    morf_id = AATF_1, <br> \
+    method = MORF screen, <br> \
+    files_fileset = IGVFFI6734IWRB, <br> \
+    significant = true. <br> \
+    The limit parameter controls the page size and can not exceed 500. <br> \
+    Pagination is 0-based.',
+
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \

@@ -46,3 +46,4 @@ The schema for each collecion we load into our database is defined in data/schem
 | complex to protein |  edge  |  complexes_proteins  | N |  {complex_id}_{protein_id} | CPX-1_Q15796  |
 | complex to term |  edge  |   complexes_terms  | N  |  {complex_id}_{ontology_term_id}  |  CPX-1_GO_0006355  |
 | protein to protein  | edge | proteins_proteins   | N | {protein_id}_{protein_id}_{detection_method_code}_{pmids} | A5YKK6_Q9UPQ9_MI_0096_21981923
+| transcript effect on gene expression | edge | transcripts_genes | N | {transcript_id}_{gene_id}_{file_accession}_{morf_id} | ENST00000619387_ENSG00000198846_IGVFFI6734IWRB_AATF_1 |

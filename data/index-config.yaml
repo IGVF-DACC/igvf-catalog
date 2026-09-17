@@ -330,6 +330,22 @@ genomic_elements_phenotypes:
       - _to, significant
       - significant, files_filesets
 
+transcripts_genes:
+  persistent:
+    fields:
+      - files_filesets
+      - files_filesets, _key
+      - _from, files_filesets
+      - _from, significant
+      - _to, _key
+      - _to, significant
+      - significant, files_filesets
+      - method, files_filesets
+      - morf_id
+  zkd_sparse:
+    fields:
+      - log2FC, neg_log10_pvalue_adj
+
 studies:
   persistent:
     fields:
