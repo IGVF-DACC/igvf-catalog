@@ -79,7 +79,7 @@ class Disease(BaseAdapter):
                              for pmid in source.split('_')]
 
                 gene = assoc.find('Gene')
-                gene_symbol = gene.find('Symbol').text
+                gene_name = gene.find('Symbol').text
                 gene_id = None
                 for exter_ref in gene.findall('./ExternalReferenceList/ExternalReference'):
                     exter_source = exter_ref.find('Source').text
@@ -108,7 +108,7 @@ class Disease(BaseAdapter):
                     'inverse_name': 'associated_with',
                     'pmids': pmids,
                     'term_name': term_name,
-                    'gene_symbol': gene_symbol,
+                    'gene_name': gene_name,
                     'association_type': assoc_type_name,
                     'association_status': assoc_status_name,
                     'source': Disease.SOURCE,

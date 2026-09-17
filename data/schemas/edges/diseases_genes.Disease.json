@@ -53,9 +53,9 @@
       "description": "Term name for the disease to gene edge",
       "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
     },
-    "gene_symbol": {
+    "gene_name": {
       "type": "string",
-      "description": "Gene symbol for the disease to gene edge",
+      "description": "HGNC gene symbol",
       "example": "BRCA1"
     },
     "association_type": {
@@ -112,7 +112,7 @@
     "inverse_name",
     "pmids",
     "term_name",
-    "gene_symbol",
+    "gene_name",
     "association_type",
     "association_status",
     "source",
@@ -124,7 +124,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "pmids, term_name, gene_symbol, association_type, association_status, class, method, label, files_filesets, source, source_url"
+    "return": "pmids, term_name, gene_name, association_type, association_status, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "diseases_genes"
 }

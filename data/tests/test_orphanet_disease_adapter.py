@@ -44,7 +44,7 @@ def test_process_file(sample_filepath, spy_writer, mock_file_fileset):
         assert 'pmids' in data
         assert data['pmids'] == ['22587682']
         assert 'term_name' in data
-        assert 'gene_symbol' in data
+        assert 'gene_name' in data
         assert 'association_type' in data
         assert 'association_status' in data
         assert 'source' in data

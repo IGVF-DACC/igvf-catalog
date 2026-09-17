@@ -38,9 +38,9 @@
         "associated with"
       ]
     },
-    "gene_symbol": {
+    "gene_name": {
       "type": "string",
-      "description": "Gene symbol for the variant to drug to gene edge",
+      "description": "HGNC gene symbol",
       "example": "ABCB1"
     },
     "source": {
@@ -86,7 +86,7 @@
     "_to",
     "name",
     "inverse_name",
-    "gene_symbol",
+    "gene_name",
     "source",
     "source_url",
     "class",
@@ -95,7 +95,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, inverse_name, gene_symbol, source, source_url, class, method, files_filesets"
+    "return": "_id, name, inverse_name, gene_name, source, source_url, class, method, files_filesets"
   },
   "db_collection_name": "variants_drugs_genes"
 }
