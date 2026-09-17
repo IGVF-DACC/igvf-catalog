@@ -249,7 +249,7 @@ variants_diseases_genes: |
 
 genes_biosamples: |
   INSERT INTO genes_biosamples
-  SELECT biology_context, model_id, model_type, cancer_term, gene_dependency, source, source_url, source_file, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as genes_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
+  SELECT biological_context, model_id, model_type, cancer_term, gene_dependency, source, source_url, source_file, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as genes_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
   FROM s3('s3://igvf-catalog-parsed-collections/genes_biosamples/*.jsonl', 'JSONEachRow')
 
 complexes: |
