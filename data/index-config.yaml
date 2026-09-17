@@ -230,7 +230,7 @@ pathways:
   persistent:
     fields:
       - name
-      - go_biological_process
+      - biological_process
       - is_top_level_pathway, is_in_disease, species
       - is_in_disease, species
       - species

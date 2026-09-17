@@ -132,7 +132,7 @@ genes_pathways: |
 
 pathways: |
   INSERT INTO pathways
-  SELECT id_version, name, is_in_disease, name_aliases, organism, disease_ontology_terms, go_biological_process, is_top_lvel_pathway, source, source_url, _key as id
+  SELECT id_version, name, is_in_disease, name_aliases, organism, disease_ontology_terms, biological_process, is_top_lvel_pathway, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/pathways/*.jsonl');
 
 pathways_pathways: |
