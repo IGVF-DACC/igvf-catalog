@@ -59,7 +59,7 @@
           "study_controls": {
             "type": "string",
             "description": "Number of study controls. Stored as a string as provided by the source, may be empty",
-            "example": ""
+            "example": "149"
           },
           "p-value": {
             "type": ["string", "null"],
