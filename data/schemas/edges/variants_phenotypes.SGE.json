@@ -130,12 +130,12 @@
           ],
           "description": "Amino acid change for the variants to phenotypes edge"
         },
-        "hgvs_p": {
+        "hgvsp": {
           "type": [
             "string",
             "null"
           ],
-          "description": "HGVS p for the variants to phenotypes edge"
+          "description": "HGVS protein notation for the variants to phenotypes edge"
         },
         "functional_consequence": {
           "type": [
@@ -271,7 +271,7 @@
         "95_ci_upper",
         "95_ci_lower",
         "amino_acid_change",
-        "hgvs_p",
+        "hgvsp",
         "functional_consequence",
         "functional_consequence_zscore",
         "variant_qc_flag",

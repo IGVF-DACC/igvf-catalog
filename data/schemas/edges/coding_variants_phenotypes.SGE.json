@@ -136,7 +136,7 @@
           ],
           "description": "Amino acid change notation"
         },
-        "hgvs_p": {
+        "hgvsp": {
           "type": [
             "string",
             "null"
@@ -277,7 +277,7 @@
         "95_ci_upper",
         "95_ci_lower",
         "amino_acid_change",
-        "hgvs_p",
+        "hgvsp",
         "functional_consequence",
         "functional_consequence_zscore",
         "variant_qc_flag",
