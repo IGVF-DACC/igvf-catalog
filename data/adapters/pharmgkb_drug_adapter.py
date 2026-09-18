@@ -229,7 +229,7 @@ class PharmGKB(BaseAdapter):
 
                             # gene info
                             # can be multiple genes split by ', ', or empty str for NA cases
-                            gene_symbols = variant_drug_row[2].split(', ')
+                            gene_names = variant_drug_row[2].split(', ')
                             if self.label == 'variant_drug_gene':
                                 if not variant_drug_row[2]:
                                     continue
@@ -297,7 +297,7 @@ class PharmGKB(BaseAdapter):
                                             '_key': edge_key,
                                             '_from': _from,
                                             '_to': _to,
-                                            'gene_symbol': gene_symbols,
+                                            'gene_name': gene_names,
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
                                             'phenotype_categories': _normalize_phenotype_categories(variant_drug_row[5]),
@@ -315,11 +315,11 @@ class PharmGKB(BaseAdapter):
 
                                     elif self.label == 'variant_drug_gene':
 
-                                        for gene_symbol in gene_symbols:
+                                        for gene_name in gene_names:
                                             gene_id_str = self.gene_id_mapping.get(
-                                                gene_symbol)
+                                                gene_name)
                                             if gene_id_str is None:
-                                                self.logger.warning(gene_symbol +
+                                                self.logger.warning(gene_name +
                                                                     ' has no matched gene id.')
                                             # take care of a few genes mapped to multiple Ensembl IDs
                                             # maybe should clear out those cases
@@ -336,7 +336,7 @@ class PharmGKB(BaseAdapter):
                                                         '_to': _to,
                                                         'name': 'associated with',
                                                         'inverse_name': 'associated with',
-                                                        'gene_symbol': gene_symbol,
+                                                        'gene_name': gene_name,
                                                         'source': PharmGKB.SOURCE,
                                                         'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id,
                                                         'class': self.collection_class,

@@ -44,7 +44,7 @@ class GenccDiseasesGenes(BaseAdapter):
                 if gene_ids is None:
                     print(f'No gene id found for {hgnc_id}')
                     continue
-                gene_symbol = row[3]
+                gene_name = row[3]
                 # need to replace ":" with "_" in the ontology_term_id
                 ontology_term_id = row[4].replace(':', '_')
                 _from = f'ontology_terms/{ontology_term_id}'
@@ -68,7 +68,7 @@ class GenccDiseasesGenes(BaseAdapter):
                         'name': 'associated_with',
                         'inverse_name': 'associated_with',
                         'hgnc': hgnc_id,
-                        'gene_symbol': gene_symbol,
+                        'gene_name': gene_name,
                         'term_name': term_name,
                         'classification': classification,
                         'moi_id': moi_id,
