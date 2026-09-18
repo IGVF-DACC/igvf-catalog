@@ -159,7 +159,10 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   const nonGWASFilter = getFilterStatements(variantsPhenotypeNonGwasSchema, nonGwasFilterInput)
   let GWASFilter = ''
   if (input.neg_log10_pvalue !== undefined) {
-    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })}`
+    const pvalueFilter = getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })
+    // neg_log10_pvalue only exists on GWAS (OpenTargets) edges. ANDing it in directly would
+    // exclude every CRISPR/SGE/cV2F edge, which has no comparable p-value field.
+    GWASFilter = `(record.source != 'OpenTargets' OR (${pvalueFilter}))`
   }
 
   const studyVerboseQuery = `
@@ -269,7 +272,10 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   const nonGWASFilter = getFilterStatements(variantsPhenotypeNonGwasSchema, nonGwasFilterInput)
   let GWASFilter = ''
   if (input.neg_log10_pvalue !== undefined) {
-    GWASFilter = `${getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })}`
+    const pvalueFilter = getFilterStatements(variantPhenotypeGwasSchema, { neg_log10_pvalue: input.neg_log10_pvalue })
+    // neg_log10_pvalue only exists on GWAS (OpenTargets) edges. ANDing it in directly would
+    // exclude every CRISPR/SGE/cV2F edge, which has no comparable p-value field.
+    GWASFilter = `(record.source != 'OpenTargets' OR (${pvalueFilter}))`
   }
 
   const studyVerboseQuery = `
