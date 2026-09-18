@@ -163,11 +163,11 @@
           "example": "1"
         },
         "intron_start": {
-          "type": "string",
+          "type": "number",
           "description": "Intron start for the variant to gene edge"
         },
         "intron_end": {
-          "type": "string",
+          "type": "number",
           "description": "Intron end for the variant to gene edge"
         }
       },
