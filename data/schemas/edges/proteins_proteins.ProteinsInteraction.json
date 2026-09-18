@@ -279,7 +279,53 @@
           "description": "The interaction type code of the proteins interaction edge",
           "example": [
             "MI:0915"
-          ]
+          ],
+          "items": {
+            "type": "string",
+            "enum": [
+              "MI:0192",
+              "MI:0194",
+              "MI:0195",
+              "MI:0197",
+              "MI:0203",
+              "MI:0204",
+              "MI:0210",
+              "MI:0211",
+              "MI:0212",
+              "MI:0213",
+              "MI:0214",
+              "MI:0216",
+              "MI:0217",
+              "MI:0220",
+              "MI:0403",
+              "MI:0407",
+              "MI:0408",
+              "MI:0414",
+              "MI:0556",
+              "MI:0557",
+              "MI:0559",
+              "MI:0566",
+              "MI:0567",
+              "MI:0569",
+              "MI:0570",
+              "MI:0572",
+              "MI:0844",
+              "MI:0871",
+              "MI:0882",
+              "MI:0883",
+              "MI:0902",
+              "MI:0914",
+              "MI:0915",
+              "MI:0945",
+              "MI:1126",
+              "MI:1127",
+              "MI:1148",
+              "MI:1237",
+              "MI:1310",
+              "MI:2252",
+              "MI:2364"
+            ]
+          }
         },
         "confidence_value_biogrid": {
           "type": [
@@ -307,7 +353,11 @@
           "description": "The pmids of the proteins interaction edge",
           "example": [
             "http://pubmed.ncbi.nlm.nih.gov/23836931"
-          ]
+          ],
+          "items": {
+            "type": "string",
+            "pattern": "^http://pubmed\\.ncbi\\.nlm\\.nih\\.gov/(?:unassigned)?[0-9]+$"
+          }
         },
         "organism": {
           "type": "string",
