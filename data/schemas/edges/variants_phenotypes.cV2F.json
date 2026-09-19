@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to phenotype edge",
+          "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD"
         },
         "_from": {
@@ -29,30 +29,34 @@
         },
         "score": {
           "type": "number",
-          "description": "Score for the variant to phenotype edge"
+          "description": "cV2F score: prediction value for the variant, a continuous score between 0 and 1 for how likely the variant is to be functional."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the variant to phenotype edge",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/",
           "collections": [
@@ -64,21 +68,24 @@
             "string",
             "null"
           ],
-          "description": "Biosample term for the variant to phenotype edge",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/UBERON_0002048",
           "pattern": "^ontology_terms/"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "cV2F"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted variant effect on phenotype"
           ]
@@ -88,7 +95,7 @@
             "string",
             "null"
           ],
-          "description": "Biological context for the variant to phenotype edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "lung"
         }
       },

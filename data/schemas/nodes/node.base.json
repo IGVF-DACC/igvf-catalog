@@ -7,19 +7,21 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the node"
+      "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists, otherwise a composite of the fields that make the record unique."
     },
     "name": {
       "type": "string",
-      "description": "Name for the node"
+      "description": "Human readable display name for the entity",
+      "example": "TP53"
     },
     "source": {
       "type": "string",
-      "description": "Data source of the collection"
+      "description": "The database, dataset or organization that is a source for these data.",
+      "example": "IGVF"
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL of the collection"
+      "description": "The URL for the source."
     }
   },
   "required": [

@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
         "_from": {
@@ -28,35 +28,41 @@
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "regulatory element effect on gene expression"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "expression modulated by"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "Perturb-seq",
             "CRISPR screen"
@@ -74,18 +80,19 @@
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/EFO_0002067"
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "K562"
         },
         "treatments_term_ids": {
@@ -93,7 +100,7 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the genomic element to gene edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
         },
         "p_value": {
           "type": [
@@ -114,11 +121,11 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of p-value."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Negative log10 of adjusted p-value."
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "log2FC": {
           "type": [
@@ -145,7 +152,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the source analysis calls the element-gene pair significant."
+          "description": "Boolean indicator of the significance of the perturbation effect."
         },
         "effect_size": {
           "type": "number",
@@ -177,7 +184,7 @@
         },
         "empirical_p_value": {
           "type": "number",
-          "description": "pySpade pval-empirical: empirical p-value from random background comparison. Stored but not returned by the API."
+          "description": "Empirical p-value from random background comparison."
         },
         "cpm_perturb": {
           "type": "number",
@@ -197,7 +204,7 @@
         },
         "t_score": {
           "type": "number",
-          "description": "T-statistic for the element-gene association when reported by the source."
+          "description": "T-statistic for the element-gene association."
         },
         "idr": {
           "type": "number",

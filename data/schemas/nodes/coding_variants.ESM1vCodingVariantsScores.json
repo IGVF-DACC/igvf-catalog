@@ -12,68 +12,71 @@
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "ref": {
           "type": "string",
-          "description": "Reference amino acid for the coding variant",
+          "description": "Reference amino acid, in single letter code.",
           "example": "Q"
         },
         "alt": {
           "type": "string",
-          "description": "Alternative amino acid for the coding variant",
+          "description": "Alternate amino acid, in single letter code.",
           "example": "T"
         },
         "aapos": {
           "type": "integer",
-          "description": "Amino acid position for the coding variant"
+          "description": "1-based position of the substituted residue within the protein."
         },
         "refcodon": {
           "type": "string",
-          "description": "Reference codon for the coding variant",
+          "description": "Reference codon at the substituted position.",
           "example": "ATG"
         },
         "gene_name": {
           "type": "string",
-          "description": "Gene name for the coding variant",
+          "description": "HGNC gene symbol",
           "example": "DSG2"
         },
         "protein_name": {
           "type": "string",
-          "description": "Protein name for the coding variant",
+          "description": "UniProtKB protein name.",
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
           "type": "string",
-          "description": "Protein ENSEMBL id for the coding variant",
+          "description": "Ensembl ID of the protein (without version number).",
           "example": "ENSP00000493376"
         },
         "codonpos": {
           "type": "integer",
-          "description": "Codon position for the coding variant"
+          "description": "Position of the variant within the codon: 1, 2 or 3. "
         },
         "hgvsc": {
           "type": "string",
-          "description": "HGVS for the coding variant",
+          "description": "HGVS description of the variant in the cDNA reference frame.",
           "example": "c.2617_2618delinsAC"
         },
         "hgvsp": {
           "type": "string",
-          "description": "HGVS for the coding variant",
+          "description": "HGVS protein-level description of the variant.",
           "example": "p.Gln873Thr",
           "pattern": "^p."
         },
         "transcript_id": {
           "type": "string",
-          "description": "Transcript ENSEMBL id for the coding variant",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000261590"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
           "pattern": "^https://data.igvf.org/tabular-files/"
         }

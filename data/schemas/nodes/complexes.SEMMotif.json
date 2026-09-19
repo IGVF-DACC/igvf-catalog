@@ -12,14 +12,17 @@
           "example": "SEMpl_TAL1:TCF4"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "TAL1:TCF4 complex"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "pattern": "^https://data.igvf.org/tabular-files/IGVFFI[A-Z0-9]{8}$",
           "example": "https://data.igvf.org/tabular-files/IGVFFI4892QCRR"
         }

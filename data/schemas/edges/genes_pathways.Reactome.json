@@ -5,12 +5,12 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "The unique key of the gene pathway edge",
+      "description": "Ensembl gene ID and Reactome pathway ID joined by an underscore.",
       "example": "ENSG00000290825_R-HSA-1971475"
     },
     "_from": {
       "type": "string",
-      "description": "The from node of the gene pathway edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "genes/ENSG00000290825",
       "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the gene pathway edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "example": "pathways/R-HSA-1971475",
       "pattern": "^pathways/R-HSA-[0-9]+$",
       "collections": [
@@ -28,57 +28,57 @@
     },
     "source": {
       "type": "string",
-      "description": "The source of the gene pathway edge",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "Reactome"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "The source URL of the gene pathway edge",
+      "description": "The URL for the source.",
       "enum": [
         "https://reactome.org/"
       ]
     },
     "name": {
       "type": "string",
-      "description": "The name of the gene pathway edge",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "belongs to"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the gene pathway edge",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "has part"
       ]
     },
     "organism": {
       "type": "string",
-      "description": "The organism of the gene pathway edge",
+      "description": "Species this annotation describes.",
       "enum": [
         "Homo sapiens"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the gene pathway edge, from the associated files_filesets record",
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
       "enum": [
         "biological relationship"
       ]
     },
     "method": {
       "type": ["string", "null"],
-      "description": "The method of the gene pathway edge, from the associated files_filesets record"
+      "description": "Name of the experimental class or prediction model that produced this result."
     },
     "label": {
       "type": ["string", "null"],
-      "description": "The label of the gene pathway edge, from the associated files_filesets record"
+      "description": "Non-method specific human readable label for the node or edge"
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the gene pathway edge",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI7082TATW",
       "pattern": "^files_filesets/",
       "collections": [

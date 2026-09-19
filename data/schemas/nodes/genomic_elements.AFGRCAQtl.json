@@ -15,14 +15,17 @@
           "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "AFGR"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://github.com/smontgomlab/AFGR"
           ]
@@ -33,13 +36,14 @@
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "caQTL"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element"
+          "description": "Reference to the File and Metadata"
         }
       },
       "required": [

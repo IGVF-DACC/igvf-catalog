@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to genomic element edge",
+          "description": "Variant key, genomic element key and the source name AFGR joined by underscores.",
           "example": "NC_000001.11:903006:T:C_accessible_dna_element_1_906596_907043_GRCh38_AFGR"
         },
         "_from": {
@@ -28,66 +28,73 @@
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "caQTL"
           ]
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to genomic element edge"
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
           "type": "number",
-          "description": "Pvalue of the variant to genomic element edge"
+          "description": "Nominal p-value of association between the variant and chromatin accessibility of the peak."
         },
         "beta": {
           "type": "number",
-          "description": "Beta of the variant to genomic element edge"
+          "description": "Regression coefficient of the alternate allele on chromatin accessibility."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "AFGR"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://github.com/smontgomlab/AFGR"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to genomic element edge"
+          "description": "Reference to the File and Metadata"
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context of the variant to genomic element edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "enum": [
             "lymphoblastoid cell line"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term of the variant to genomic element edge",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "enum": [
             "ontology_terms/EFO_0005292"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates accessibility of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "accessibility modulated by"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "caQTL"
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]

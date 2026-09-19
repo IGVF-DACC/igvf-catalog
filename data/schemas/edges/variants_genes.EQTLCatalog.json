@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to gene edge"
+          "description": "SHA-256 hash of the variant key, Ensembl gene ID and eQTL Catalogue dataset identifier."
         },
         "_from": {
           "example": "variants/NC_000001.11:10000:T:A",
@@ -20,7 +20,7 @@
           ]
         },
         "_to": {
-          "example": "genes/ENSG00000187583.10",
+          "example": "genes/ENSG00000187583",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
@@ -28,47 +28,52 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the variant to gene edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "macrophage"
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the variant to gene edge",
-          "example": "ontology_terms/EFO_0002067",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
+          "example": "ontology_terms/CL_0000235",
           "pattern": "^ontology_terms/"
         },
         "biological_process": {
           "type": "string",
-          "description": "Biological process for the variant to gene edge",
+          "description": "Gene Ontology term for the process this edge represents: regulation of gene expression for eQTLs, regulation of RNA splicing for spliceQTLs.",
           "example": "ontology_terms/GO_0010468",
           "pattern": "^ontology_terms/"
         },
         "study": {
           "type": "string",
-          "description": "Study for the variant to gene edge",
+          "description": "ID of the QTL study.",
           "example": "studies/QTS000001",
           "pattern": "^studies/"
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "eQTL",
             "spliceQTL"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz"
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "eQTL",
             "spliceQTL"
@@ -76,7 +81,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the variant to gene edge",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI2520EPCL",
           "pattern": "^files_filesets/",
           "collections": [
@@ -84,12 +89,14 @@
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression of",
             "modulates splicing of"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "expression modulated by",
             "splicing modulated by"
@@ -97,78 +104,78 @@
         },
         "molecular_trait_id": {
           "type": "string",
-          "description": "Molecular trait ID for the variant to gene edge",
+          "description": "Identifier of the molecular trait used for QTL mapping: an Ensembl gene ID for gene-expression QTLs, or a Leafcutter intron cluster ID for splice QTLs.",
           "example": "ENSG00000230489"
         },
         "gene_id": {
           "type": "string",
-          "description": "Gene ID for the variant to gene edge",
+          "description": "Ensembl gene ID.",
           "example": "ENSG00000230489"
         },
         "credible_set_id": {
           "type": "string",
-          "description": "Credible set ID for the variant to gene edge",
+          "description": "SuSiE credible-set identifier for this signal within the dataset.",
           "example": "ENSG00000230489_L1"
         },
         "variant_chromosome_position_ref_alt": {
           "type": "string",
-          "description": "Variant chromosome position ref alt for the variant to gene edge",
+          "description": "Variant identifier as chromosome, position, reference and alternate alleles, underscore-separated, on GRCh38.",
           "example": "chr1_108004887_G_T"
         },
         "rsid": {
           "type": "string",
-          "description": "RSID for the variant to gene edge",
+          "description": "dbSNP id for the variant position",
           "example": "rs1936009"
         },
         "credible_set_size": {
           "type": "integer",
-          "description": "Credible set size for the variant to gene edge"
+          "description": "Number of variants in the SuSiE credible set."
         },
         "posterior_inclusion_probability": {
           "type": "number",
-          "description": "Posterior inclusion probability for the variant to gene edge"
+          "description": "Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping."
         },
         "p_value": {
           "type": "number",
-          "description": "Pvalue for the variant to gene edge"
+          "description": "Nominal p-value of association between the variant and the molecular trait."
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to gene edge"
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "effect_size": {
           "type": "number",
-          "description": "Effect size for the variant to gene edge"
+          "description": "Regression coefficient of the alternate allele on the molecular trait."
         },
         "standard_error": {
           "type": "number",
-          "description": "Standard error for the variant to gene edge"
+          "description": "Standard error of the effect size."
         },
         "z_score": {
           "type": "number",
-          "description": "Zscore for the variant to gene edge"
+          "description": "Univariate z-score of the variant."
         },
         "credible_set_min_r2": {
           "type": "number",
-          "description": "Credible set min R2 for the variant to gene edge"
+          "description": "Smallest linkage-disequilibrium r2 between any two variants in the credible set."
         },
         "region": {
           "type": "string",
-          "description": "Region for the variant to gene edge",
+          "description": "Genomic interval that was fine-mapped.",
           "example": "chr1:106964443-108964443"
         },
         "intron_chr": {
           "type": "string",
-          "description": "Intron chromosome for the variant to gene edge",
+          "description": "Chromosome of the spliced intron, as recorded in the molecular trait identifier, without a chr prefix.",
           "example": "1"
         },
         "intron_start": {
           "type": "number",
-          "description": "Intron start for the variant to gene edge"
+          "description": "Start position of the spliced intron."
         },
         "intron_end": {
           "type": "number",
-          "description": "Intron end for the variant to gene edge"
+          "description": "End position of the spliced intron."
         }
       },
       "required": [

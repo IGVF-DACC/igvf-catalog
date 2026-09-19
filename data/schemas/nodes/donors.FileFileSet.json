@@ -12,6 +12,7 @@
           "example": "ENCDO374BBL"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "ENCDO374BBL"
         },
         "sex": {
@@ -19,7 +20,7 @@
             "string",
             "null"
           ],
-          "description": "The sex of the donor",
+          "description": "Sex of the donor: female, male, mixed, unknown, or unspecified.",
           "enum": [
             "female",
             "male",
@@ -33,7 +34,7 @@
             "string",
             "null"
           ],
-          "description": "The age of the donor",
+          "description": "Age of the donor, in the units given by age_units. Stored as a string, since the portal records open-ended values as well as exact ages.",
           "example": "35"
         },
         "age_units": {
@@ -41,7 +42,7 @@
             "string",
             "null"
           ],
-          "description": "The age units of the donor",
+          "description": "Unit the age value is expressed in: day, week, month, or year.",
           "enum": [
             "day",
             "month",
@@ -55,7 +56,7 @@
             "array",
             "null"
           ],
-          "description": "The ethnicities of the donor",
+          "description": "Ethnicity of the donor.",
           "example": [
             "African American"
           ]
@@ -65,18 +66,20 @@
             "array",
             "null"
           ],
-          "description": "The phenotypic features of the donor",
+          "description": "Phenotypic features observed for the donor, with DOID identifiers mapped onto MONDO or HP.",
           "example": [
             "ontology_terms/DOID_3308"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE",
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/human-donors/ENCDO374BBL/"
         }
       },

@@ -13,7 +13,7 @@
         "properties": {
           "source_annotation": {
             "type": "string",
-            "description": "Source annotation of the CCRE",
+            "description": "Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.",
             "enum": [
               "CA-CTCF: chromatin accessible + CTCF binding",
               "CA-TF: chromatin accessible + TF binding",
@@ -26,6 +26,7 @@
             ]
           },
           "method": {
+            "description": "Name of the experimental class or prediction model that produced this result.",
             "enum": [
               "candidate Cis-Regulatory Elements"
             ]
@@ -36,18 +37,20 @@
             ]
           },
           "source": {
+            "description": "The database, dataset or organization that is a source for these data.",
             "enum": [
               "ENCODE"
             ]
           },
           "source_url": {
+            "description": "The URL for the source.",
             "enum": [
               "https://data.igvf.org/reference-files/IGVFFI8753TTYC/"
             ]
           },
           "files_filesets": {
             "type": "string",
-            "description": "Filesets of the CCRE",
+            "description": "Reference to the File and Metadata",
             "enum": [
               "files_filesets/IGVFFI8753TTYC"
             ]

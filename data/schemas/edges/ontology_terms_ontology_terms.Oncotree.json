@@ -5,13 +5,13 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the ontology term to ontology term edge",
-      "example": "Oncotree_ASM_rdf-schema.subClassOf_Oncotree_SM"
+      "description": "Source term key, the relationship predicate and the target term key, joined by underscores.",
+      "example": "Oncotree_MMB_rdf-schema.subClassOf_Oncotree_EMBT"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
-      "example": "ontology_terms/Oncotree_ASM",
+      "description": "Handle of the source OncoTree term.",
+      "example": "ontology_terms/Oncotree_MMB",
       "pattern": "^ontology_terms/Oncotree_",
       "collections": [
         "ontology_terms"
@@ -19,8 +19,8 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the ontology term to ontology term edge",
-      "example": "ontology_terms/Oncotree_SM or ontology_terms/NCIT_C40511",
+      "description": "Handle of the parent OncoTree term, or of the NCIT cross-reference.",
+      "example": "ontology_terms/Oncotree_EMBT",
       "pattern": "^ontology_terms/Oncotree_|^ontology_terms/NCIT_",
       "collections": [
         "ontology_terms"
@@ -28,7 +28,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the ontology term to ontology term edge",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "subclass",
         "database cross-reference"
@@ -36,7 +36,7 @@
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the ontology term to ontology term edge",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "type of",
         "database cross-reference"
@@ -44,7 +44,7 @@
     },
     "type": {
       "type": "string",
-      "description": "Type for the ontology term to ontology term edge",
+      "description": "Subclass of the parent tumor type, or database cross-reference to NCIT.",
       "enum": [
         "subclass",
         "database cross-reference"
@@ -52,14 +52,14 @@
     },
     "source": {
       "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "Oncotree"
       ]
     },
     "class": {
       "type": "string",
-      "description": "The class of the ontology term to ontology term edge",
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
       "enum": [
         "biological relationship"
       ]
@@ -69,11 +69,11 @@
         "string",
         "null"
       ],
-      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record"
+      "description": "Name of the experimental class or prediction model that produced this result."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the ontology term to ontology term edge",
+      "description": "Reference to the File and Metadata",
       "example": "files_filesets/IGVFFI4975UFZM",
       "pattern": "^files_filesets/",
       "collections": [

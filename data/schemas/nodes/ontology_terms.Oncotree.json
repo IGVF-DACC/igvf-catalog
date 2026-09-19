@@ -10,34 +10,38 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "Oncotree_0_0"
+          "example": "Oncotree_MMB",
+          "description": "Oncotree_ plus the OncoTree code, with slash rewritten to underscore."
         },
         "name": {
-          "example": "0_0"
+          "example": "Medullomyoblastoma",
+          "description": "Human readable display name for the entity"
         },
         "uri": {
           "type": "string",
-          "description": "The URI of the ontology term",
-          "example": "https://oncotree.mskcc.org/api/tumorTypes/0_0"
+          "description": "URI for the ontology term.",
+          "example": "https://oncotree.mskcc.org/"
         },
         "term_id": {
           "type": "string",
-          "description": "The ID of the ontology term",
-          "example": "0_0"
+          "description": "Ontology term identifier.",
+          "example": "Oncotree_MMB"
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "Oncotree"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://oncotree.mskcc.org/api/tumorTypes"
           ]
         },
         "class": {
           "type": "string",
-          "description": "The class of the ontology term",
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship"
           ]
@@ -47,11 +51,11 @@
             "string",
             "null"
           ],
-          "description": "The method of the ontology term, from the associated files_filesets record"
+          "description": "Name of the experimental class or prediction model that produced this result."
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the ontology term",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI4975UFZM",
           "pattern": "^files_filesets/",
           "collections": [

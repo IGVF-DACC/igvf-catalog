@@ -7,39 +7,44 @@
     "properties": {
       "_from": {
         "type": "string",
-        "description": "Unique identifier for the source node"
+        "description": "Document handle of the source node, in collection/key form."
       },
       "_to": {
         "type": "string",
-        "description": "Unique identifier for the target node"
+        "description": "Document handle of the target node, in collection/key form."
       },
       "label": {
         "type": "string",
-        "description": "Label for the edge"
+        "description": "Non-method specific human readable label for the node or edge",
+        "example": "eQTL"
       },
       "class": {
         "type": "string",
-        "description": "Class for the edge"
+        "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
       },
       "method": {
         "type": "string",
-        "description": "Method for the edge"
+        "description": "Name of the experimental class or prediction model that produced this result.",
+        "example": "MPRA"
       },
       "name": {
         "type": "string",
-        "description": "Name for the edge"
+        "description": "Directional human readable label for the relationship, _from to _to.",
+        "example": "modulates expression of"
       },
       "inverse_name": {
         "type": "string",
-        "description": "Inverse name for the edge"
+        "description": "Reversed directional human readable label for the relationship, _to to _from.",
+        "example": "expression modulated by"
       },
       "source": {
         "type": "string",
-        "description": "Data source of the edge"
+        "description": "The database, dataset or organization that is a source for these data.",
+        "example": "IGVF"
       },
       "source_url": {
         "type": "string",
-        "description": "Source URL of the edge"
+        "description": "The URL for the source."
       }
     },
     "required": [

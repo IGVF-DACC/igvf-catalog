@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
         },
         "_from": {
@@ -29,33 +29,37 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
+          "description": "Signed relative change in target-gene expression after CRISPRi of the element (ENCODE EffectSize). Negative values mean lower expression. Missing values are stored as 0.",
+          "example": -0.293431866
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2 fold change of readout gene expression for the perturbation."
+          "description": "Effect size converted to log2 scale."
         },
         "p_value": {
           "type": ["number", "null"],
-          "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
+          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
         },
         "p_value_adj": {
           "type": ["number", "null"],
-          "description": "The adjusted p value of the genomic element to gene edge. Can be 'NA' or a number."
+          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "example": 0.004023984
         },
         "neg_log10_pvalue": {
           "type": ["number", "null"],
-          "description": "The neg_log10_pvalue of the genomic element to gene edge"
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
           "type": ["number", "null"],
-          "description": "The adjusted neg_log10_pvalue of the genomic element to gene edge"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "type": "boolean",
-          "description": "The significant of the genomic element to gene edge"
+          "description": "Boolean indicator of the significance of the element-gene interactions.",
+          "example": true
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
@@ -70,52 +74,58 @@
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "regulatory element effect on gene expression"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://www.encodeproject.org/files/ENCFF968BZL/"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
+          "description": "Reference to the File and Metadata",
           "enum": [
             "files_filesets/ENCFF968BZL"
           ]
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "enum": [
             "K562"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "regulates"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulated by"
           ]

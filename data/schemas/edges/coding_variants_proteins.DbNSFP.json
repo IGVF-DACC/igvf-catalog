@@ -5,7 +5,7 @@
   "properties": {
     "_from": {
       "type": "string",
-      "description": "Source for the coding variant to protein edge",
+      "description": "Handle of the coding consequence.",
       "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
       "pattern": "^coding_variants/",
       "collections": [
@@ -14,7 +14,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the coding variant to protein edge",
+      "description": "Handle of the protein. The adapter writes the Ensembl protein ID from dbNSFP; isoform suffixes are stripped if present.",
       "example": "proteins/ENSP00000493376",
       "pattern": "^proteins/",
       "collections": [
@@ -23,7 +23,7 @@
     },
     "type": {
       "type": "string",
-      "description": "Type for the coding variant to protein edge",
+      "description": "Whether the consequence is a protein-coding amino-acid change or a splice-site SNP (aapos = -1).",
       "enum": [
         "protein coding",
         "splicing"
@@ -31,28 +31,28 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the coding variant to protein edge",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "variant of"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the coding variant to protein edge",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "has variant"
       ]
     },
     "source": {
       "type": "string",
-      "description": "Source for the coding variant to protein edge",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "dbNSFP 5.1a"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the coding variant to protein edge",
+      "description": "The URL for the source.",
       "enum": [
         "http://database.liulab.science/dbNSFP"
       ]

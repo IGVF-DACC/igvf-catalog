@@ -12,30 +12,34 @@
           "example": "QTS000038"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "OneK1K"
         },
         "pmid": {
           "type": "string",
-          "description": "The PMID of the study",
+          "description": "PubMed identifier.",
           "example": "35389779"
         },
         "study_type": {
           "type": "string",
-          "description": "The type of the study",
+          "description": "Whether the study measured expression in bulk tissue or in single cells.",
           "enum": [
             "single-cell",
             "bulk"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
         },
-        "source_url": {},
+        "source_url": {
+          "description": "The URL for the source."
+        },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the study"
+          "description": "Reference to the File and Metadata"
         }
       },
       "required": [

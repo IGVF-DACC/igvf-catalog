@@ -15,26 +15,30 @@
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "enum": [
             "enhancer"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
@@ -45,7 +49,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI5135QZCS",
           "pattern": "^files_filesets/"
         }

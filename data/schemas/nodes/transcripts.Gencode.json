@@ -13,16 +13,17 @@
         },
         "transcript_id": {
           "type": "string",
-          "description": "The unique ENSEMBL transcript ID with version number",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000456328.2",
           "pattern": "^ENST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "DDX11L2-202"
         },
         "transcript_type": {
           "type": "string",
-          "description": "The type of transcript",
+          "description": "Biotype GENCODE assigns to the transcript.",
           "enum": [
             "artifact",
             "IG_C_gene",
@@ -70,27 +71,28 @@
             "unitary_pseudogene",
             "unprocessed_pseudogene",
             "vault_RNA"
-          ]
+          ],
+          "example": "lncRNA"
         },
         "chr": {
           "type": "string",
-          "description": "The chromosome name",
+          "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
         "start": {
           "type": "number",
-          "description": "The start position of the transcript",
+          "description": "Start of the transcript, 0-based and inclusive.",
           "example": 11869
         },
         "end": {
           "type": "number",
-          "description": "The end position of the transcript",
+          "description": "End of the transcript, 0-based and exclusive.",
           "example": 14409
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the transcript",
+          "description": "Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
             "+",
             "-"
@@ -98,34 +100,36 @@
         },
         "gene_name": {
           "type": "string",
-          "description": "The name of the gene",
+          "description": "HGNC gene symbol",
           "example": "DDX11L2"
         },
         "MANE_Select": {
           "type": "boolean",
-          "description": "Whether the transcript is a MANE Select transcript",
+          "description": "Whether GENCODE tags this transcript as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.",
           "example": true
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
         },
         "version": {
           "type": "string",
-          "description": "The version of the transcript annotation",
+          "description": "GENCODE release the annotation was taken from.",
           "enum": [
             "v43"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
         },
         "organism": {
           "type": "string",
-          "description": "The organism of the transcript",
+          "description": "Species this annotation describes.",
           "enum": [
             "Homo sapiens"
           ]

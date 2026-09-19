@@ -5,27 +5,30 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the ontology term to ontology term edge"
+      "description": "Source term key, the RDF predicate key and the target term key, joined by underscores.",
+      "example": "GO_0000001_rdf-schema.subClassOf_GO_0048308"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
+      "description": "Handle of the source ontology term.",
       "pattern": "^ontology_terms/",
       "collections": [
         "ontology_terms"
-      ]
+      ],
+      "example": "ontology_terms/GO_0000001"
     },
     "_to": {
       "type": "string",
-      "description": "Target for the ontology term to ontology term edge",
+      "description": "Handle of the target ontology term.",
       "pattern": "^ontology_terms/",
       "collections": [
         "ontology_terms"
-      ]
+      ],
+      "example": "ontology_terms/GO_0048308"
     },
     "name": {
       "type": "string",
-      "description": "Name for the ontology term to ontology term edge",
+      "description": "Directional human readable label for the relationship, _from to _to.",
       "enum": [
         "has part",
         "part of",
@@ -38,7 +41,7 @@
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the ontology term to ontology term edge",
+      "description": "Reversed directional human readable label for the relationship, _to to _from.",
       "enum": [
         "part of",
         "has part",
@@ -50,7 +53,7 @@
     },
     "type_uri": {
       "type": "string",
-      "description": "Type URI for the ontology term to ontology term edge",
+      "description": "IRI of the RDF predicate for this relationship.",
       "enum": [
         "http://www.w3.org/2000/01/rdf-schema#subClassOf",
         "http://www.geneontology.org/formats/oboInOwl#hasDbXref",
@@ -61,7 +64,7 @@
     },
     "source": {
       "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
+      "description": "The database, dataset or organization that is a source for these data.",
       "enum": [
         "GO",
         "CLO",
@@ -85,7 +88,7 @@
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the ontology term to ontology term edge",
+      "description": "The URL for the source.",
       "enum": [
         "https://geneontology.org/",
         "https://obofoundry.org/ontology/clo.html",
@@ -109,7 +112,7 @@
     },
     "class": {
       "type": "string",
-      "description": "The class of the ontology term to ontology term edge, from the associated files_filesets record",
+      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
       "enum": [
         "biological relationship"
       ]
@@ -119,15 +122,15 @@
         "string",
         "null"
       ],
-      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record",
+      "description": "Name of the experimental class or prediction model that produced this result.",
       "enum": [
         null
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the ontology term to ontology term edge",
-      "example": "files_filesets/IGVFFI7407XTPX",
+      "description": "Reference to the File and Metadata",
+      "example": "files_filesets/IGVFFI7433WATG",
       "pattern": "^files_filesets/",
       "collections": [
         "files_filesets"

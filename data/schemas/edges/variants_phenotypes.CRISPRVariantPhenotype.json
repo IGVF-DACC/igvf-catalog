@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to phenotype edge",
+          "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP"
         },
         "_from": {
@@ -33,25 +33,25 @@
         },
         "z_score": {
           "type": "number",
-          "description": "Phenotype association z-score"
+          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the 95% confidence interval for effect size excludes 0."
+          "description": "Boolean indicator of the significance of the variant effect on the phenotype."
         },
         "num_guides": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Number of guides targeting the variant."
+          "description": "Number of guides aggregated across the variant in the screen."
         },
         "edit_rate_mean": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Mean editing rate."
+          "description": "Mean effective prime-editing rate across the variant's guides: the fraction of cells edited, from 0 to 1."
         },
         "effect_size_ci95_lower": {
           "type": [
@@ -68,6 +68,7 @@
           "description": "Upper bound of the 95% confidence interval for effect size."
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
@@ -80,27 +81,31 @@
           ]
         },
         "class": {
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
+          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on phenotype"
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI2014OOZP/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to phenotype edge",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [
@@ -109,12 +114,12 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "The biological context of the variant to phenotype edge",
+          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "human HCT116 cell line from donor(s) IGVFDO0384OZRW"
         },
         "biosample_term": {
           "type": "string",
-          "description": "The biosample term of the variant to phenotype edge",
+          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/EFO_0002824",
           "pattern": "^ontology_terms/"
         },
@@ -123,14 +128,16 @@
             "array",
             "null"
           ],
-          "description": "The treatments term ids of the variant to phenotype edge"
+          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
         },
         "name": {
+          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]

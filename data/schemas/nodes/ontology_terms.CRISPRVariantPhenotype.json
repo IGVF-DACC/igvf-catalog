@@ -13,16 +13,17 @@
           "example": "NTR_0001118"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "LDL-C uptake"
         },
         "uri": {
           "type": "string",
-          "description": "URI for the phenotype ontology term",
+          "description": "URI for the ontology term.",
           "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
         },
         "term_id": {
           "type": "string",
-          "description": "Term ID for the phenotype ontology term",
+          "description": "Ontology term identifier.",
           "example": "NTR_0001118"
         },
         "synonyms": {
@@ -30,19 +31,21 @@
             "array",
             "null"
           ],
-          "description": "Synonyms for the ontology term"
+          "description": "Alternative names for the ontology term."
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
         },
         "class": {
           "type": "string",
-          "description": "The class of the ontology term, from the associated files_filesets record",
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
@@ -52,7 +55,7 @@
             "string",
             "null"
           ],
-          "description": "The method of the ontology term, from the associated files_filesets record",
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
@@ -62,7 +65,7 @@
             "string",
             "null"
           ],
-          "description": "The files filesets of the ontology term. Null because the NTR phenotype term is shared vocabulary, not tied to a single dataset. See DSERV-1466.",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI2014OOZP",
           "pattern": "^files_filesets/",
           "collections": [

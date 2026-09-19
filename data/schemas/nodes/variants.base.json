@@ -5,55 +5,62 @@
   "properties": {
     "chr": {
       "type": "string",
-      "description": "Chromosome of the variant"
+      "description": "Chromosome the variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
+      "example": "chr1"
     },
     "pos": {
       "type": "number",
-      "description": "Position of the variant"
+      "description": "0-based genomic coordinate of the variant."
     },
     "rsid": {
       "type": "array",
-      "description": "RSID of the variant"
+      "description": "dbSNP id for the variant position",
+      "example": [
+        "rs6054257"
+      ]
     },
     "ref": {
       "type": "string",
-      "description": "Reference allele of the variant"
+      "description": "Reference allele sequence at this position, empty for a pure insertion."
     },
     "alt": {
       "type": "string",
-      "description": "Alternate allele of the variant"
+      "description": "Alternate allele sequence, empty for a pure deletion."
     },
     "qual": {
       "type": "string",
-      "description": "Quality of the variant"
+      "description": "Variant call quality score from VCF QUAL field.",
+      "example": "50110.4"
     },
     "variation_type": {
       "type": "string",
-      "description": "Variation type of the variant"
+      "description": "Class of sequence change: SNP, insertion, deletion, or deletion-insertion."
     },
     "annotations": {
       "type": "object",
-      "description": "Annotations of the variant"
+      "description": "Source-specific annotations parsed from FAVOR."
     },
     "spdi": {
       "type": "string",
-      "description": "SPDI of the variant"
+      "description": "Normalized SPDI expression identifying the allele.",
+      "example": "NC_000001.11:10887495:C:T"
     },
     "hgvs": {
       "type": "string",
-      "description": "HGVS of the variant"
+      "description": "HGVS genomic expression for the allele.",
+      "example": "NC_000067.7:g.3050715_3050716insG"
     },
     "vrs_digest": {
       "type": "string",
-      "description": "VRS digest of the variant"
+      "description": "GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele."
     },
     "ca_id": {
       "type": "string",
-      "description": "CA ID of the variant"
+      "description": "Canonical allele identifier assigned by the ClinGen Allele Registry."
     },
     "organism": {
       "type": "string",
-      "description": "Organism of the variant"
+      "description": "Species this annotation describes."
     }
   },
   "required": [

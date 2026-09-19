@@ -8,36 +8,39 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "GO:0000001"
+          "example": "GO_0000001",
+          "description": "Last path segment of the term IRI, with characters ArangoDB disallows in keys rewritten to underscore."
         },
         "uri": {
           "type": "string",
-          "description": "The URI of the ontology term",
+          "description": "URI for the ontology term.",
           "example": "http://purl.obolibrary.org/obo/GO_0000001"
         },
         "term_id": {
           "type": "string",
-          "description": "The ID of the ontology term",
-          "example": "GO:0000001"
+          "description": "Ontology term identifier.",
+          "example": "GO_0000001"
         },
         "name": {
-          "example": "positive regulation of positive chemotaxis to camp by chlorinated alkylphenone"
+          "example": "mitochondrion inheritance",
+          "description": "Human readable display name for the entity"
         },
         "description": {
           "type": "string",
-          "description": "The description of the ontology term"
+          "description": "Textual definition of the term (IAO_0000115)."
         },
         "synonyms": {
           "type": "array",
-          "description": "The synonyms of the ontology term",
+          "description": "Alternative names for the ontology term.",
           "example": [
-            "GO:0000001"
+            "mitochondrial inheritance"
           ],
           "items": {
             "type": "string"
           }
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "BAO",
             "CHEBI",
@@ -60,14 +63,15 @@
           ]
         },
         "source_url": {
-          "example": "https://geneontology.org/ontology/go"
+          "example": "https://geneontology.org/",
+          "description": "The URL for the source."
         },
         "subontology": {
           "type": [
             "string",
             "null"
           ],
-          "description": "The subontology of the GO ontology term",
+          "description": "GO namespace of the term. Null for terms that are not from GO.",
           "enum": [
             "biological_process",
             "cellular_component",
@@ -77,7 +81,7 @@
         },
         "class": {
           "type": "string",
-          "description": "The class of the ontology term, from the associated files_filesets record",
+          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship"
           ]
@@ -87,15 +91,15 @@
             "string",
             "null"
           ],
-          "description": "The method of the ontology term, from the associated files_filesets record",
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             null
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the ontology term",
-          "example": "files_filesets/IGVFFI7407XTPX",
+          "description": "Reference to the File and Metadata",
+          "example": "files_filesets/IGVFFI7433WATG",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"

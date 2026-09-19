@@ -15,14 +15,16 @@
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "name": {
+          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "promoter_of": {
           "type": "string",
-          "description": "Promoter of the genomic element",
+          "description": "The gene this element is the presumed promoter of.",
           "example": "genes/ENSG00000123685"
         },
         "method": {
+          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "Perturb-seq",
             "CRISPR screen"
@@ -30,7 +32,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "example": "promoter",
           "enum": [
             "enhancer",
@@ -39,11 +41,13 @@
           ]
         },
         "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "description": "The URL for the source.",
           "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "type": {
@@ -53,7 +57,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element",
+          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI3069QCRA",
           "pattern": "^files_filesets/"
         }
