@@ -56,7 +56,7 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "Regression coefficient (beta) of the alternate allele on intron excision."
+          "description": "Regression coefficient (beta) of the alternate allele on the quantile-normalized intron excision ratio."
         },
         "posterior_inclusion_probability": {
           "type": ["number", "null"],
@@ -68,7 +68,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Boolean indicating the signficance of the variant association with splicing."
+          "description": "Boolean indicating the significance of the variant association with splicing."
         },
         "class": {
           "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
@@ -100,7 +100,7 @@
         },
         "intron_end": {
           "type": "number",
-          "description": "End position of the splicedintron."
+          "description": "End position of the spliced intron."
         },
         "source": {
           "description": "The database, dataset or organization that is a source for these data.",

@@ -176,7 +176,7 @@
         },
         "intron_end": {
           "type": "number",
-          "description": "End position of the splicedintron."
+          "description": "End position of the spliced intron."
         }
       },
       "required": [

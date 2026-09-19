@@ -40,7 +40,7 @@
         },
         "esm_1v_score": {
           "type": "number",
-          "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. "
+          "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
         "files_filesets": {
           "type": "string",

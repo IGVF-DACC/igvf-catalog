@@ -116,7 +116,7 @@
         },
         "z_score": {
           "type": "number",
-          "description": "COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.",
+          "description": "Placeholder set to 0 because BioGRID interactions do not have a COXPRESdb coexpression z-score.",
           "enum": [
             0
           ]

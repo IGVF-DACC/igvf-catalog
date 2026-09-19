@@ -55,7 +55,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the element-gene interactions. The threshold is: adjusted p-value below 0.05.",
+          "description": "Boolean indicator of the significance of the element-gene interactions.",
           "example": true
         },
         "method": {

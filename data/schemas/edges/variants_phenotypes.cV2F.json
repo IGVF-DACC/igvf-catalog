@@ -29,7 +29,7 @@
         },
         "score": {
           "type": "number",
-          "description": "cV2F scoree: prediction value for the variant, a continuous score between 0 and 1for how likely the variant is to be functional."
+          "description": "cV2F score: prediction value for the variant, a continuous score between 0 and 1 for how likely the variant is to be functional."
         },
         "source": {
           "description": "The database, dataset or organization that is a source for these data.",

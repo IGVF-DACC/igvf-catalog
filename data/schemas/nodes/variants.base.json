@@ -29,7 +29,7 @@
     },
     "qual": {
       "type": "string",
-      "description": "VCF QUAL score for the variant position.",
+      "description": "Variant call quality score from VCF QUAL field.",
       "example": "50110.4"
     },
     "variation_type": {
@@ -38,7 +38,7 @@
     },
     "annotations": {
       "type": "object",
-      "description": "Source-specific annotations parsed from from FAVOR."
+      "description": "Source-specific annotations parsed from FAVOR."
     },
     "spdi": {
       "type": "string",

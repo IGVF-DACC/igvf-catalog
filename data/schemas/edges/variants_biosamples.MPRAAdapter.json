@@ -75,7 +75,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Boolean indicator of the significace of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more."
+          "description": "Boolean indicator of the significance of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },
         "postProbEffect": {
           "type": "number",
