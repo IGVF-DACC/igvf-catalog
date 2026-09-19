@@ -166,9 +166,8 @@
         },
         "intron_chr": {
           "type": "string",
-          "description": "Chromosome of the spliced intron",
-          "example": "chr1",
-          "pattern": "^chr"
+          "description": "Chromosome of the spliced intron, as recorded in the molecular trait identifier, without a chr prefix.",
+          "example": "1"
         },
         "intron_start": {
           "type": "number",

@@ -113,7 +113,7 @@ node	files_filesets.FileFileSet	cell_annotation_term	Base ontology term describi
 node	files_filesets.FileFileSet	genome_browser_link	Link to a file that can be rendered in a genome browser: the file set's bigInteract, bigBed, bigWig, or bedpe file where one exists, or the file itself for a pseudobulk set.
 node	files_filesets.FileFileSet	browser_index_file	Download link for the genome browser index file (.tbi).
 node	files_filesets.FileFileSet	crispr_modality	The purpose or intended effect of the CRISPR modification applied to the samples.
-node	files_filesets.FileFileSet	version	Version of the external data source, recorded only for community-curated files loaded into the catalog from outside IGVF and ENCODE.
+node	files_filesets.FileFileSet	version	Version of the external data source
 node	genes.GencodeGene	gene_id	Ensembl gene ID including its version suffix.
 node	genes.GencodeGene	gene_type	Biotype GENCODE assigns to the gene.
 node	genes.GencodeGene	chr	Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.
@@ -454,9 +454,9 @@ node	variants.base	pos	0-based genomic coordinate of the variant.
 node	variants.base	rsid	dbSNP id for the variant position
 node	variants.base	ref	Reference allele sequence at this position, empty for a pure insertion.
 node	variants.base	alt	Alternate allele sequence, empty for a pure deletion.
-node	variants.base	qual	VCF QUAL score for the variant position.
-node	variants.base	variation_type	Class of sequence change, derived by comparing the reference and alternate allele lengths: SNP, insertion, deletion, or deletion-insertion.
-node	variants.base	annotations	Source-specific annotations parsed from from FAVOR.
+node	variants.base	qual	Variant call quality score from VCF QUAL field.
+node	variants.base	variation_type	Class of sequence change: SNP, insertion, deletion, or deletion-insertion.
+node	variants.base	annotations	Source-specific annotations parsed from FAVOR.
 node	variants.base	spdi	Normalized SPDI expression identifying the allele.
 node	variants.base	hgvs	HGVS genomic expression for the allele.
 node	variants.base	vrs_digest	GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele.
@@ -484,7 +484,7 @@ edge	coding_variants_phenotypes.DUALIPAAdapter	dualipa_abun_score	Abundance scor
 edge	coding_variants_phenotypes.DUALIPAAdapter	dualipa_abun_change	Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	name	Directional human readable label for the relationship, _from to _to.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
-edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm_1v_score	Combined ESM-1v score for the substitution: the mean of the five model scores.
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm_1v_score	Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	files_filesets	Reference to the File and Metadata
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	method	Name of the experimental class or prediction model that produced this result.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
@@ -515,7 +515,7 @@ edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	class	The class of 
 edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	label	Non-method specific human readable label for the node or edge
 edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	source	The database, dataset or organization that is a source for these data.
 edge	coding_variants_phenotypes.Mutpred2CodingVariantsScores	source_url	The URL for the source.
-edge	coding_variants_phenotypes.SGE	variants	Handle of the variants record for the genomic variant this coding variant was called from.
+edge	coding_variants_phenotypes.SGE	variants	Genomic variant corresponding to this coding variant.
 edge	coding_variants_phenotypes.SGE	source	The database, dataset or organization that is a source for these data.
 edge	coding_variants_phenotypes.SGE	source_url	The URL for the source.
 edge	coding_variants_phenotypes.SGE	files_filesets	Reference to the File and Metadata
@@ -674,7 +674,7 @@ edge	gene_products_terms.GAF	class	The class of the data this record belongs to:
 edge	gene_products_terms.GAF	method	Name of the experimental class or prediction model that produced this result.
 edge	gene_products_terms.GAF	label	Non-method specific human readable label for the node or edge
 edge	gene_products_terms.GAF	files_filesets	Reference to the File and Metadata
-edge	genes_biosamples.DepMap	biology_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
+edge	genes_biosamples.DepMap	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
 edge	genes_biosamples.DepMap	model_id	DepMap model accession for the cell line.
 edge	genes_biosamples.DepMap	model_type	DepMap model type of the cell line.
 edge	genes_biosamples.DepMap	cancer_term	Oncotree ontology term of the cell line.
@@ -688,7 +688,7 @@ edge	genes_biosamples.DepMap	class	The class of the data this record belongs to:
 edge	genes_biosamples.DepMap	method	Name of the experimental class or prediction model that produced this result.
 edge	genes_biosamples.DepMap	label	Non-method specific human readable label for the node or edge
 edge	genes_biosamples.DepMap	files_filesets	Reference to the File and Metadata
-edge	genes_genes.Coxpresdb	z_score	COXPRESdb coexpression z-score. 0 is random-level coexpression; 3 is a false-positive rate of 0.1%. Larger absolute values mean stronger coexpression. Only pairs with absolute value of 3 or greater are loaded.
+edge	genes_genes.Coxpresdb	z_score	COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.
 edge	genes_genes.Coxpresdb	associated_process	Gene Ontology term for gene expression, as a handle into ontology_terms.
 edge	genes_genes.Coxpresdb	method	Name of the experimental class or prediction model that produced this result.
 edge	genes_genes.Coxpresdb	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
@@ -706,7 +706,7 @@ edge	genes_genes.GeneGeneBiogrid	confidence_value_biogrid	BioGRID confidence sco
 edge	genes_genes.GeneGeneBiogrid	confidence_value_intact	IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence.
 edge	genes_genes.GeneGeneBiogrid	source	The database, dataset or organization that is a source for these data.
 edge	genes_genes.GeneGeneBiogrid	pmids	Pubmed identifiers.
-edge	genes_genes.GeneGeneBiogrid	z_score	Placeholder value of 0 so this collection can share a z_score index with COXPRESdb. Not a coexpression score.
+edge	genes_genes.GeneGeneBiogrid	z_score	Placeholder set to 0 because BioGRID interactions do not have a COXPRESdb coexpression z-score.
 edge	genes_genes.GeneGeneBiogrid	name	Directional human readable label for the relationship, _from to _to.
 edge	genes_genes.GeneGeneBiogrid	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
 edge	genes_genes.GeneGeneBiogrid	molecular_function	Gene Ontology term for protein binding.
@@ -764,7 +764,7 @@ edge	genomic_elements_genes.CRISPRElementGeneENCODE	p_value	Uncorrected differen
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	p_value_adj	Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
-edge	genomic_elements_genes.CRISPRElementGeneENCODE	significant	Boolean indicator of the significance of the element-gene interactions. The threshold is: adjusted p-value below 0.05.
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	significant	Boolean indicator of the significance of the element-gene interactions.
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	method	Name of the experimental class or prediction model that produced this result.
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	crispr_modality	The CRISPR modality from the associated files_filesets record
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
@@ -898,7 +898,7 @@ edge	mm_genes_mm_genes.GeneGeneBiogrid	confidence_value_biogrid	BioGRID confiden
 edge	mm_genes_mm_genes.GeneGeneBiogrid	confidence_value_intact	IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence.
 edge	mm_genes_mm_genes.GeneGeneBiogrid	source	The database, dataset or organization that is a source for these data.
 edge	mm_genes_mm_genes.GeneGeneBiogrid	pmids	Pubmed identifiers.
-edge	mm_genes_mm_genes.GeneGeneBiogrid	z_score	Placeholder value of 0 so this collection can share a z_score index with COXPRESdb. Not a coexpression score.
+edge	mm_genes_mm_genes.GeneGeneBiogrid	z_score	Placeholder set to 0 because BioGRID interactions do not have a COXPRESdb coexpression z-score.
 edge	mm_genes_mm_genes.GeneGeneBiogrid	name	Directional human readable label for the relationship, _from to _to.
 edge	mm_genes_mm_genes.GeneGeneBiogrid	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
 edge	mm_genes_mm_genes.GeneGeneBiogrid	molecular_function	Gene Ontology term for protein binding, as a handle into ontology_terms.
@@ -1011,7 +1011,7 @@ edge	variants_biosamples.MPRAAdapter	DNA_count_alt	Input count (DNA) for the alt
 edge	variants_biosamples.MPRAAdapter	RNA_count_alt	Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates.
 edge	variants_biosamples.MPRAAdapter	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
 edge	variants_biosamples.MPRAAdapter	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
-edge	variants_biosamples.MPRAAdapter	significant	Boolean indicator of the significace of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more.
+edge	variants_biosamples.MPRAAdapter	significant	Boolean indicator of the significance of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more.
 edge	variants_biosamples.MPRAAdapter	postProbEffect	Posterior probability that the variant has a regulatory effect.
 edge	variants_biosamples.MPRAAdapter	CI_lower_95	Lower bound of a 95% interval for the variant effect.
 edge	variants_biosamples.MPRAAdapter	CI_upper_95	Upper bound of a 95% interval for the variant effect.
@@ -1131,16 +1131,16 @@ edge	variants_genes.AFGRSQtl	biosample_term	Ontology term for the experimental s
 edge	variants_genes.AFGRSQtl	chr	Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.
 edge	variants_genes.AFGRSQtl	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
 edge	variants_genes.AFGRSQtl	p_value	Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis.
-edge	variants_genes.AFGRSQtl	effect_size	Regression coefficient (beta) of the alternate allele on intron excision.
+edge	variants_genes.AFGRSQtl	effect_size	Regression coefficient (beta) of the alternate allele on the quantile-normalized intron excision ratio.
 edge	variants_genes.AFGRSQtl	posterior_inclusion_probability	Posterior inclusion probability that this variant is causal for the splice QTL.
 edge	variants_genes.AFGRSQtl	log2FC	log2 fold change of intron excision associated with the alternate allele.
-edge	variants_genes.AFGRSQtl	significant	Boolean indicating the signficance of the variant association with splicing.
+edge	variants_genes.AFGRSQtl	significant	Boolean indicating the significance of the variant association with splicing.
 edge	variants_genes.AFGRSQtl	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
 edge	variants_genes.AFGRSQtl	method	Name of the experimental class or prediction model that produced this result.
 edge	variants_genes.AFGRSQtl	label	Non-method specific human readable label for the node or edge
 edge	variants_genes.AFGRSQtl	intron_chr	Chromosome of the spliced intron
 edge	variants_genes.AFGRSQtl	intron_start	Start position of the spliced intron.
-edge	variants_genes.AFGRSQtl	intron_end	End position of the splicedintron.
+edge	variants_genes.AFGRSQtl	intron_end	End position of the spliced intron.
 edge	variants_genes.AFGRSQtl	source	The database, dataset or organization that is a source for these data.
 edge	variants_genes.AFGRSQtl	source_url	The URL for the source.
 edge	variants_genes.AFGRSQtl	files_filesets	Reference to the File and Metadata
@@ -1193,9 +1193,9 @@ edge	variants_genes.EQTLCatalog	standard_error	Standard error of the effect size
 edge	variants_genes.EQTLCatalog	z_score	Univariate z-score of the variant.
 edge	variants_genes.EQTLCatalog	credible_set_min_r2	Smallest linkage-disequilibrium r2 between any two variants in the credible set.
 edge	variants_genes.EQTLCatalog	region	Genomic interval that was fine-mapped.
-edge	variants_genes.EQTLCatalog	intron_chr	Chromosome of the spliced intron
+edge	variants_genes.EQTLCatalog	intron_chr	Chromosome of the spliced intron, as recorded in the molecular trait identifier, without a chr prefix.
 edge	variants_genes.EQTLCatalog	intron_start	Start position of the spliced intron.
-edge	variants_genes.EQTLCatalog	intron_end	End position of the splicedintron.
+edge	variants_genes.EQTLCatalog	intron_end	End position of the spliced intron.
 edge	variants_genomic_elements.AFGRCAQtl	label	Non-method specific human readable label for the node or edge
 edge	variants_genomic_elements.AFGRCAQtl	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
 edge	variants_genomic_elements.AFGRCAQtl	p_value	Nominal p-value of association between the variant and chromatin accessibility of the peak.
@@ -1305,7 +1305,7 @@ edge	variants_phenotypes.SGE	D13_R2_lib1	Count of the variant at day 13 in repli
 edge	variants_phenotypes.SGE	D13_R2_lib2	Count of the variant at day 13 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both.
 edge	variants_phenotypes.SGE	D13_R3_lib1	Count of the variant at day 13 in replicate 3. Null when only two replicates passed QC.
 edge	variants_phenotypes.SGE	D13_R3_lib2	Count of the variant at day 13 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC.
-edge	variants_phenotypes.cV2F	score	cV2F scoree: prediction value for the variant, a continuous score between 0 and 1for how likely the variant is to be functional.
+edge	variants_phenotypes.cV2F	score	cV2F score: prediction value for the variant, a continuous score between 0 and 1 for how likely the variant is to be functional.
 edge	variants_phenotypes.cV2F	source	The database, dataset or organization that is a source for these data.
 edge	variants_phenotypes.cV2F	source_url	The URL for the source.
 edge	variants_phenotypes.cV2F	name	Directional human readable label for the relationship, _from to _to.
