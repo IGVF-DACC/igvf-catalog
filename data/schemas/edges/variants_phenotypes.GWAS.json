@@ -95,7 +95,7 @@
         },
         "tagged_variants": {
           "type": "array",
-          "description": "Variants in LD with the lead, each with its alleles, overall r2, whether it falls in the PICS 95 percent credible set, 1000 Genomes superpopulation proportions, log10 approximate Bayes factor, and posterior probability of causality.",
+          "description": "Variants in LD with the lead SNP.",
           "items": {
             "type": "object",
             "properties": {
