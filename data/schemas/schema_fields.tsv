@@ -37,7 +37,7 @@ node	coding_variants.ESM1vCodingVariantsScores	refcodon	Reference codon at the s
 node	coding_variants.ESM1vCodingVariantsScores	gene_name	HGNC gene symbol
 node	coding_variants.ESM1vCodingVariantsScores	protein_name	UniProtKB protein name.
 node	coding_variants.ESM1vCodingVariantsScores	protein_id	Ensembl ID of the protein (without version number).
-node	coding_variants.ESM1vCodingVariantsScores	codonpos	Position of the variant within the codon: 1, 2 or 3. 
+node	coding_variants.ESM1vCodingVariantsScores	codonpos	Position of the variant within the codon: 1, 2 or 3.
 node	coding_variants.ESM1vCodingVariantsScores	hgvsc	HGVS description of the variant in the cDNA reference frame.
 node	coding_variants.ESM1vCodingVariantsScores	hgvsp	HGVS protein-level description of the variant.
 node	coding_variants.ESM1vCodingVariantsScores	transcript_id	ENSEMBL transcript ID, without version number.
@@ -51,7 +51,7 @@ node	coding_variants.Mutpred2CodingVariantsScores	refcodon	Reference codon at th
 node	coding_variants.Mutpred2CodingVariantsScores	gene_name	HGNC gene symbol
 node	coding_variants.Mutpred2CodingVariantsScores	protein_name	UniProtKB protein name.
 node	coding_variants.Mutpred2CodingVariantsScores	protein_id	Ensembl ID of the protein (without version number).
-node	coding_variants.Mutpred2CodingVariantsScores	codonpos	Position of the variant within the codon: 1, 2 or 3. 
+node	coding_variants.Mutpred2CodingVariantsScores	codonpos	Position of the variant within the codon: 1, 2 or 3.
 node	coding_variants.Mutpred2CodingVariantsScores	hgvsc	HGVS description of the variant in the cDNA reference frame.
 node	coding_variants.Mutpred2CodingVariantsScores	hgvsp	HGVS protein-level description of the variant.
 node	coding_variants.Mutpred2CodingVariantsScores	transcript_id	ENSEMBL transcript ID, without version number.
@@ -151,19 +151,19 @@ node	genes_structure.GencodeStructure	organism	Species this annotation describes
 node	genomic_elements.AFGRCAQtl	name	Human readable display name for the entity
 node	genomic_elements.AFGRCAQtl	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.AFGRCAQtl	source_url	The URL for the source.
-node	genomic_elements.AFGRCAQtl	type	
+node	genomic_elements.AFGRCAQtl	type
 node	genomic_elements.AFGRCAQtl	method	Name of the experimental class or prediction model that produced this result.
 node	genomic_elements.AFGRCAQtl	files_filesets	Reference to the File and Metadata
 node	genomic_elements.CAQtl	name	Human readable display name for the entity
 node	genomic_elements.CAQtl	method	Name of the experimental class or prediction model that produced this result.
 node	genomic_elements.CAQtl	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.CAQtl	source_url	The URL for the source.
-node	genomic_elements.CAQtl	type	
+node	genomic_elements.CAQtl	type
 node	genomic_elements.CAQtl	files_filesets	Reference to the File and Metadata
 node	genomic_elements.CCRE	name	Human readable display name for the entity
 node	genomic_elements.CCRE	source_annotation	Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.
 node	genomic_elements.CCRE	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.CCRE	type	
+node	genomic_elements.CCRE	type
 node	genomic_elements.CCRE	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.CCRE	source_url	The URL for the source.
 node	genomic_elements.CCRE	files_filesets	Reference to the File and Metadata
@@ -177,18 +177,18 @@ node	genomic_elements.CRISPRElementGeneIGVF	method	Name of the experimental clas
 node	genomic_elements.CRISPRElementGeneIGVF	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
 node	genomic_elements.CRISPRElementGeneIGVF	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.CRISPRElementGeneIGVF	source_url	The URL for the source.
-node	genomic_elements.CRISPRElementGeneIGVF	type	
+node	genomic_elements.CRISPRElementGeneIGVF	type
 node	genomic_elements.CRISPRElementGeneIGVF	files_filesets	Reference to the File and Metadata
 node	genomic_elements.CRISPRElementPhenotype	name	Human readable display name for the entity
 node	genomic_elements.CRISPRElementPhenotype	method	Name of the experimental class or prediction model that produced this result.
 node	genomic_elements.CRISPRElementPhenotype	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
 node	genomic_elements.CRISPRElementPhenotype	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.CRISPRElementPhenotype	source_url	The URL for the source.
-node	genomic_elements.CRISPRElementPhenotype	type	
+node	genomic_elements.CRISPRElementPhenotype	type
 node	genomic_elements.CRISPRElementPhenotype	files_filesets	Reference to the File and Metadata
 node	genomic_elements.EncodeElementGeneLink	name	Human readable display name for the entity
 node	genomic_elements.EncodeElementGeneLink	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.EncodeElementGeneLink	type	
+node	genomic_elements.EncodeElementGeneLink	type
 node	genomic_elements.EncodeElementGeneLink	source_annotation	Class of the element as reported by ENCODE-rE2G: a promoter, genic where it falls inside a gene body, or intergenic.
 node	genomic_elements.EncodeElementGeneLink	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.EncodeElementGeneLink	source_url	The URL for the source.
@@ -196,13 +196,13 @@ node	genomic_elements.EncodeElementGeneLink	files_filesets	Reference to the File
 node	genomic_elements.EncodeElementGeneLink	simple_sample_summaries	Short readable summary of each sample.
 node	genomic_elements.EncodeElementGeneLink	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
 node	genomic_elements.HumanMouseElementAdapter	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.HumanMouseElementAdapter	type	
+node	genomic_elements.HumanMouseElementAdapter	type
 node	genomic_elements.HumanMouseElementAdapter	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.HumanMouseElementAdapter	source_url	The URL for the source.
 node	genomic_elements.MPRAAdapter	name	Human readable display name for the entity
 node	genomic_elements.MPRAAdapter	strand	Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.
 node	genomic_elements.MPRAAdapter	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.MPRAAdapter	type	
+node	genomic_elements.MPRAAdapter	type
 node	genomic_elements.MPRAAdapter	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.MPRAAdapter	source_url	The URL for the source.
 node	genomic_elements.MPRAAdapter	files_filesets	Reference to the File and Metadata
@@ -214,7 +214,7 @@ node	genomic_elements.base	type	Category of element.
 node	genomic_elements.base	method	Name of the experimental class or prediction model that produced this result.
 node	genomic_elements.scE2G	name	Human readable display name for the entity
 node	genomic_elements.scE2G	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.scE2G	type	
+node	genomic_elements.scE2G	type
 node	genomic_elements.scE2G	source_annotation	Class of the element: promoter, genic, or intergenic.
 node	genomic_elements.scE2G	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.scE2G	source_url	The URL for the source.
@@ -231,7 +231,7 @@ node	mm_genes.GencodeGene	source	The database, dataset or organization that is a
 node	mm_genes.GencodeGene	version	GENCODE release the annotation was taken from.
 node	mm_genes.GencodeGene	source_url	The URL for the source.
 node	mm_genes.GencodeGene	organism	Species this annotation describes.
-node	mm_genes.GencodeGene	study_sets	IGVF study sets that include this gene. 
+node	mm_genes.GencodeGene	study_sets	IGVF study sets that include this gene.
 node	mm_genes.GencodeGene	collections	The collections in the IGVF catalog that contain the data in this file.
 node	mm_genes.GencodeGene	version_number	Version suffix of the Ensembl gene ID.
 node	mm_genes.GencodeGene	mgi	MGI ID for the gene.
@@ -255,7 +255,7 @@ node	mm_genes_structure.GencodeStructure	source_url	The URL for the source.
 node	mm_genes_structure.GencodeStructure	organism	Species this annotation describes.
 node	mm_genomic_elements.CCRE	source_annotation	Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.
 node	mm_genomic_elements.CCRE	method	Name of the experimental class or prediction model that produced this result.
-node	mm_genomic_elements.CCRE	type	
+node	mm_genomic_elements.CCRE	type
 node	mm_genomic_elements.CCRE	source	The database, dataset or organization that is a source for these data.
 node	mm_genomic_elements.CCRE	source_url	The URL for the source.
 node	mm_genomic_elements.CCRE	files_filesets	Reference to the File and Metadata
@@ -428,7 +428,7 @@ node	variants.CRISPRVariantGene	files_filesets	Reference to the File and Metadat
 node	variants.CRISPRVariantPhenotype	source	The database, dataset or organization that is a source for these data.
 node	variants.CRISPRVariantPhenotype	source_url	The URL for the source.
 node	variants.CRISPRVariantPhenotype	files_filesets	Reference to the File and Metadata
-node	variants.ESM1vCodingVariantsScores	variation_type	
+node	variants.ESM1vCodingVariantsScores	variation_type
 node	variants.ESM1vCodingVariantsScores	source	The database, dataset or organization that is a source for these data.
 node	variants.ESM1vCodingVariantsScores	source_url	The URL for the source.
 node	variants.Favor	source	The database, dataset or organization that is a source for these data.
@@ -436,7 +436,7 @@ node	variants.Favor	source_url	The URL for the source.
 node	variants.MPRAAdapter	source	The database, dataset or organization that is a source for these data.
 node	variants.MPRAAdapter	source_url	The URL for the source.
 node	variants.MPRAAdapter	files_filesets	Reference to the File and Metadata
-node	variants.Mutpred2CodingVariantsScores	variation_type	
+node	variants.Mutpred2CodingVariantsScores	variation_type
 node	variants.Mutpred2CodingVariantsScores	source	The database, dataset or organization that is a source for these data.
 node	variants.Mutpred2CodingVariantsScores	source_url	The URL for the source.
 node	variants.SGE	source	The database, dataset or organization that is a source for these data.
@@ -484,7 +484,7 @@ edge	coding_variants_phenotypes.DUALIPAAdapter	dualipa_abun_score	Abundance scor
 edge	coding_variants_phenotypes.DUALIPAAdapter	dualipa_abun_change	Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	name	Directional human readable label for the relationship, _from to _to.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
-edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm_1v_score	Combined ESM-1v score for the substitution: the mean of the five model scores. 
+edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	esm_1v_score	Combined ESM-1v score for the substitution: the mean of the five model scores.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	files_filesets	Reference to the File and Metadata
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	method	Name of the experimental class or prediction model that produced this result.
 edge	coding_variants_phenotypes.ESM1vCodingVariantsScores	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.

@@ -43,7 +43,7 @@
         },
         "inputCountRef": {
           "type": "number",
-          "description": "Input count for the reference allele." 
+          "description": "Input count for the reference allele."
         },
         "inputCountAlt": {
           "type": "number",
