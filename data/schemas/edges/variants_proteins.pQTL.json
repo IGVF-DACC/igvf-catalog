@@ -14,18 +14,18 @@
                 "example": "NC_000017.11:7166092:G:A_ENSP00000491556_UKB"
             },
             "_from": {
-                "example": "variants/NC_000001.11:10000:T:A",
+                "example": "variants/NC_000017.11:7166092:G:A",
                 "pattern": "^variants/",
                 "collections": ["variants"]
             },
             "_to": {
-                "example": "proteins/ENSP00000456328",
+                "example": "proteins/ENSP00000491556",
                 "pattern": "^proteins/",
                 "collections": ["proteins"]
             },
             "rsid": {
                 "type": ["string", "null"],
-                "description": "The rsid of the variant to protein edge",
+                "description": "dbSNP identifier of the variant. Null when the source has none.",
                 "example": "rs1260326"
             },
             "label": {
@@ -33,19 +33,19 @@
             },
             "neg_log10_pvalue": {
                 "type": "number",
-                "description": "The neg log10pvalue of the variant to protein edge"
+                "description": "Negative log10 of the discovery-cohort association p-value (UKB-PPP column log10(p)). Larger values mean stronger association."
             },
             "beta": {
                 "type": "number",
-                "description": "The beta of the variant to protein edge"
+                "description": "Discovery-cohort effect size of allele A1 on plasma protein level."
             },
             "se": {
                 "type": "number",
-                "description": "The se of the variant to protein edge"
+                "description": "Standard error of the discovery-cohort beta."
             },
             "regulatory_type": {
                 "type": "string",
-                "description": "The regulatory type of the variant to protein edge",
+                "description": "Whether the association is cis (within 1 Mb of the gene encoding the protein) or trans.",
                 "enum": [
                     "cis",
                     "trans"
@@ -53,22 +53,22 @@
             },
             "gene": {
                 "type": ["string", "null"],
-                "description": "The gene of the variant to protein edge",
+                "description": "Ensembl gene the source annotates at this locus, as a handle into genes. Null when the annotation is missing or the identifier is not in the catalog.",
                 "example": "genes/ENSG00000165841"
             },
             "gene_consequence": {
                 "type": ["string", "null"],
-                "description": "The gene consequence of the variant to protein edge",
+                "description": "Sequence Ontology consequence of the variant on the annotated gene. Null when none is recorded.",
                 "example": "intergenic_variant"
             },
             "biological_context": {
                 "type": "string",
-                "description": "The biological context of the variant to protein edge",
+                "description": "Tissue the pQTL was measured in. UKB-PPP used blood plasma.",
                 "enum": ["blood plasma"]
             },
             "biosample_term": {
                 "type": "string",
-                "description": "The biosample term of the variant to protein edge",
+                "description": "Ontology term for blood plasma, as a handle into ontology_terms.",
                 "enum": ["ontology_terms/UBERON_0001969"]
             },
             "source": {
@@ -91,7 +91,7 @@
             },
             "files_filesets": {
                 "type": "string",
-                "description": "The files filesets of the variant to protein edge",
+                "description": "Handle of the files_filesets record for the IGVF file this pQTL table was read from.",
                 "example": "files_filesets/IGVFFI2053GDNI",
                 "pattern": "^files_filesets/",
                 "collections": [

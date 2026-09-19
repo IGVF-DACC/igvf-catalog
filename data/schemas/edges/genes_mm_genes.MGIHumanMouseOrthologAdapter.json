@@ -10,7 +10,7 @@
     },
     "_from": {
       "type": "string",
-      "description": "The from node of the genes to mm genes edge",
+      "description": "Handle of the human gene.",
       "example": "genes/ENSG00000175334",
       "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "The to node of the genes to mm genes edge",
+      "description": "Handle of the mouse gene in the same MGI homology class.",
       "example": "mm_genes/ENSMUSG00000024844",
       "pattern": "^mm_genes/ENSMUSG[0-9]{11}(?:_PAR_Y)?$",
       "collections": [
@@ -28,54 +28,54 @@
     },
     "name": {
       "type": "string",
-      "description": "The name of the genes to mm genes edge",
+      "description": "Predicate for the human-to-mouse homology direction.",
       "enum": [
         "homologous to"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "The inverse name of the genes to mm genes edge",
+      "description": "Predicate for the mouse-to-human homology direction. Identical to name; the relationship is symmetric.",
       "enum": [
         "homologous to"
       ]
     },
     "relationship": {
       "type": "string",
-      "description": "The relationship of the genes to mm genes edge",
+      "description": "NCI Thesaurus term for a homologous gene, as a handle into ontology_terms.",
       "enum": [
         "ontology_terms/NCIT_C79968"
       ]
     },
     "source": {
       "type": "string",
-      "description": "The source of the genes to mm genes edge",
+      "description": "Mouse Genome Informatics, which distributes the Alliance of Genome Resources homology classes.",
       "enum": [
         "MGI"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "The source URL of the genes to mm genes edge",
+      "description": "MGI report of human and mouse homology classes with sequence identifiers.",
       "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
     },
     "class": {
       "type": "string",
-      "description": "The class of the genes to mm genes edge, from the associated files_filesets record",
+      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata: 'observed data' for a curated homology assertion.",
       "enum": [
         "observed data"
       ]
     },
     "method": {
       "type": "string",
-      "description": "The method of the genes to mm genes edge, from the associated files_filesets record",
+      "description": "How the relationship was assigned, taken from the file's fileset metadata.",
       "enum": [
         "Homology"
       ]
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the genes to mm genes edge",
+      "description": "Handle of the files_filesets record for the IGVF file the MGI homology report was read from.",
       "example": "files_filesets/IGVFFI9177QQPS",
       "pattern": "^files_filesets/",
       "collections": [

@@ -10,7 +10,7 @@
     },
     "_from": {
       "type": "string",
-      "description": "Source for the complex to term edge",
+      "description": "Document handle of the source node, in collection/key form.",
       "example": "complexes/CPX-1",
       "pattern": "^complexes/",
       "collections": [
@@ -19,7 +19,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the complex to term edge",
+      "description": "Document handle of the target node, in collection/key form.",
       "example": "ontology_terms/GO_0071144",
       "pattern": "^ontology_terms/",
       "collections": [
@@ -28,26 +28,26 @@
     },
     "term_name": {
       "type": "string",
-      "description": "Term name for the complex to term edge",
+      "description": "Name of the Gene Ontology term, taken from the GO annotation column. Absent on edges built from non-GO cross-references.",
       "example": "heteromeric SMAD protein complex"
     },
     "source": {
       "type": "string",
-      "description": "Source for the complex to term edge",
+      "description": "The dataset or consortium this record was loaded from.",
       "enum": [
         "EBI"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the complex to term edge",
+      "description": "Link to the specific upstream record or file this data was loaded from.",
       "enum": [
         "https://www.ebi.ac.uk/complexportal/"
       ]
     },
     "name": {
       "type": "string",
-      "description": "Name for the complex to term edge",
+      "description": "Predicate for the relationship, chosen from the ontology aspect: 'is located in' for cellular component, 'involved in' for biological process, 'has the function' for molecular function, and 'associated with' for disease or other cross-references.",
       "enum": [
         "associated with",
         "is located in",
@@ -57,7 +57,7 @@
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the complex to term edge",
+      "description": "Predicate describing the same relationship in the _to to _from direction.",
       "enum": [
         "associated with",
         "contains",
@@ -67,25 +67,25 @@
     },
     "class": {
       "type": "string",
-      "description": "The class of the complex to term edge, from the associated files_filesets record"
+      "description": "Evidence tier for the underlying data, taken from the file's fileset metadata."
     },
     "method": {
       "type": [
         "string",
         "null"
       ],
-      "description": "The method of the complex to term edge, from the associated files_filesets record"
+      "description": "Model or pipeline that produced this record, taken from the file's fileset metadata."
     },
     "label": {
       "type": [
         "string",
         "null"
       ],
-      "description": "The label of the complex to term edge, same value as method"
+      "description": "Same value as method."
     },
     "files_filesets": {
       "type": "string",
-      "description": "The files filesets of the complex to term edge",
+      "description": "Handle of the files_filesets record for the IGVF file this record was read from.",
       "example": "files_filesets/IGVFFI1444TRQL",
       "pattern": "^files_filesets/",
       "collections": [

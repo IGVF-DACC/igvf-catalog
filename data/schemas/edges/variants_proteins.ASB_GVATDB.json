@@ -15,14 +15,14 @@
           "example": "NC_000003.12:12567078:C:G_ENSP00000368332_DBD_1_1_H2"
         },
         "_from": {
-          "example": "variants/NC_000001.11:10000:T:A",
+          "example": "variants/NC_000003.12:12567078:C:G",
           "pattern": "^variants/",
           "collections": [
             "variants"
           ]
         },
         "_to": {
-          "example": "proteins/ENSP00000456328",
+          "example": "proteins/ENSP00000368332",
           "pattern": "^proteins/",
           "collections": [
             "proteins"
@@ -30,49 +30,49 @@
         },
         "p_value": {
           "type": "number",
-          "description": "The p-value of the variant to protein edge"
+          "description": "Monte-Carlo p-value of the preferential binding score."
         },
         "p_value_adj": {
           "type": "number",
-          "description": "The adjusted p-value of the variant to protein edge"
+          "description": "FDR of the preferential binding score."
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "The neg log10pvalue of the variant to protein edge"
+          "description": "Negative log10 of the PBS p-value. Capped at 5 when the reported p-value is 0."
         },
         "experiment": {
           "type": "string",
-          "description": "The experiment of the variant to protein edge",
+          "description": "GVATdb experiment identifier.",
           "example": "DBD.1.1.H2"
         },
         "hg19_coordinate": {
           "type": "string",
-          "description": "The hg19 coordinate of the variant to protein edge",
+          "description": "hg19 coordinates of the 40-bp oligo used in SNP-SELEX.",
           "example": "chr10:114386719-114386759"
         },
         "oligo_auc": {
           "type": "number",
-          "description": "The oligo auc of the variant to protein edge"
+          "description": "Oligo binding score: area under the SELEX enrichment curve for the 40-bp oligo, regardless of allele. Larger values mean stronger TF binding to the oligo."
         },
         "oligo_pval": {
           "type": "number",
-          "description": "The oligo pval of the variant to protein edge"
+          "description": "P-value of the oligo binding score."
         },
         "ref_auc": {
           "type": "number",
-          "description": "The ref auc of the variant to protein edge"
+          "description": "Area under the SELEX enrichment curve for the reference allele."
         },
         "alt_auc": {
           "type": "number",
-          "description": "The alt auc of the variant to protein edge"
+          "description": "Area under the SELEX enrichment curve for the alternate allele."
         },
         "pbs": {
           "type": "number",
-          "description": "The pbs of the variant to protein edge"
+          "description": "Preferential binding score: area between the reference and alternate enrichment curves. Negative values mean the TF prefers the alternate allele."
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "The fdr (-log10(pvalue)) of the variant to protein edge"
+          "description": "Negative log10 of the FDR. Set to 2 when the reported FDR is 0."
         },
         "source": {
           "enum": [
@@ -111,14 +111,14 @@
         },
         "biological_process": {
           "type": "string",
-          "description": "The biological process of the variant to protein edge",
+          "description": "Gene Ontology term for regulation of DNA binding, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0051101"
           ]
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the variant to protein edge",
+          "description": "Handle of the files_filesets record for the IGVF file this SNP-SELEX table was read from.",
           "example": "files_filesets/IGVFFI8897VGII",
           "pattern": "^files_filesets/",
           "collections": [

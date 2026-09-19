@@ -8,27 +8,29 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CVCL_JJ44"
+          "example": "CVCL_JJ44",
+          "description": "Cellosaurus accession of the cell line."
         },
         "uri": {
           "type": "string",
-          "description": "The URI of the ontology term",
+          "description": "Cellosaurus page for this cell line.",
           "example": "https://www.cellosaurus.org/CVCL_JJ44"
         },
         "term_id": {
           "type": "string",
-          "description": "The ID of the ontology term",
+          "description": "Cellosaurus accession of the cell line.",
           "example": "CVCL_JJ44"
         },
         "name": {
-          "example": "CW70177"
+          "example": "CW70177",
+          "description": "Recommended name of the cell line."
         },
         "synonyms": {
           "type": [
             "array",
             "null"
           ],
-          "description": "The synonyms of the ontology term",
+          "description": "Alternative names for the cell line. Null when the OBO entry has none.",
           "items": {
             "type": "string"
           }
@@ -48,7 +50,7 @@
             "array",
             "null"
           ],
-          "description": "The subset of the ontology term",
+          "description": "Cellosaurus category tags for the cell line, including cell-line class and sex of the donor. Null when the OBO entry has none.",
           "example": [
             "Induced_pluripotent_stem_cell",
             "Female"
@@ -70,7 +72,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the ontology term",
+          "description": "Handle of the files_filesets record for the Cellosaurus OBO file this term was read from.",
           "example": "files_filesets/IGVFFI9279GNOP",
           "pattern": "^files_filesets/",
           "collections": [

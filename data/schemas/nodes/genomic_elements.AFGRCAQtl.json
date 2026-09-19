@@ -39,7 +39,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets for the genomic element"
+          "description": "Handle of the files_filesets record for the IGVF file this accessible peak was read from."
         }
       },
       "required": [

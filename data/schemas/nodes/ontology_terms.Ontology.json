@@ -8,30 +8,32 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "GO:0000001"
+          "example": "GO_0000001",
+          "description": "Last path segment of the term IRI, with characters ArangoDB disallows in keys rewritten to underscore."
         },
         "uri": {
           "type": "string",
-          "description": "The URI of the ontology term",
+          "description": "IRI of the term in the OWL file.",
           "example": "http://purl.obolibrary.org/obo/GO_0000001"
         },
         "term_id": {
           "type": "string",
-          "description": "The ID of the ontology term",
-          "example": "GO:0000001"
+          "description": "Last path segment of the term IRI, as written in the OWL file.",
+          "example": "GO_0000001"
         },
         "name": {
-          "example": "positive regulation of positive chemotaxis to camp by chlorinated alkylphenone"
+          "example": "mitochondrion inheritance",
+          "description": "rdfs:label of the term, lowercased."
         },
         "description": {
           "type": "string",
-          "description": "The description of the ontology term"
+          "description": "Textual definition of the term (IAO_0000115)."
         },
         "synonyms": {
           "type": "array",
-          "description": "The synonyms of the ontology term",
+          "description": "Exact and related OBO synonyms of the term.",
           "example": [
-            "GO:0000001"
+            "mitochondrial inheritance"
           ],
           "items": {
             "type": "string"
@@ -60,14 +62,15 @@
           ]
         },
         "source_url": {
-          "example": "https://geneontology.org/ontology/go"
+          "example": "https://geneontology.org/",
+          "description": "Homepage of the ontology this term was loaded from."
         },
         "subontology": {
           "type": [
             "string",
             "null"
           ],
-          "description": "The subontology of the GO ontology term",
+          "description": "GO namespace of the term. Null for terms that are not from GO.",
           "enum": [
             "biological_process",
             "cellular_component",
@@ -94,8 +97,8 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the ontology term",
-          "example": "files_filesets/IGVFFI7407XTPX",
+          "description": "Handle of the files_filesets record for the OWL file this term was read from.",
+          "example": "files_filesets/IGVFFI7433WATG",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"

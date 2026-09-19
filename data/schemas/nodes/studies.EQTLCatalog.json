@@ -16,12 +16,12 @@
         },
         "pmid": {
           "type": "string",
-          "description": "The PMID of the study",
+          "description": "PubMed identifier of the publication reporting the study.",
           "example": "35389779"
         },
         "study_type": {
           "type": "string",
-          "description": "The type of the study",
+          "description": "Whether the study measured expression in bulk tissue or in single cells. Only gene-expression and Leafcutter datasets from the naive condition are loaded.",
           "enum": [
             "single-cell",
             "bulk"
@@ -32,10 +32,12 @@
             "EBI"
           ]
         },
-        "source_url": {},
+        "source_url": {
+          "description": "eQTL Catalogue dataset metadata file this record was read from."
+        },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the study"
+          "description": "Handle of the files_filesets record for the IGVF file this record was read from."
         }
       },
       "required": [

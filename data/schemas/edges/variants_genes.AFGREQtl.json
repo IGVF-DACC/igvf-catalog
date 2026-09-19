@@ -28,35 +28,35 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the variant to gene edge",
+          "description": "Tissue the QTL was measured in. AFGR used lymphoblastoid cell lines.",
           "enum": [
             "lymphoblastoid cell line"
           ]
         },
         "biosample_term": {
           "type": "string",
-          "description": "Biosample term for the variant to gene edge",
+          "description": "Ontology term for lymphoblastoid cell line, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/EFO_0005292"
           ]
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome for the variant to gene edge",
+          "description": "Chromosome of the variant, prefixed with chr.",
           "example": "chr1",
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to gene edge"
+          "description": "Negative log10 of the nominal association p-value, taken from the AFGR meta-analysis file."
         },
         "p_value": {
           "type": "number",
-          "description": "Pvalue for the variant to gene edge"
+          "description": "Nominal p-value of association between the variant and gene expression, from the African-population meta-analysis."
         },
         "effect_size": {
           "type": "number",
-          "description": "Effect size for the variant to gene edge"
+          "description": "Regression coefficient (beta) of the alternate allele on gene expression."
         },
         "class": {
           "enum": [
@@ -85,7 +85,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The filesets of the variant to gene edge"
+          "description": "Handle of the files_filesets record for the IGVF file this QTL was read from."
         },
         "name": {
           "enum": [
@@ -99,7 +99,7 @@
         },
         "biological_process": {
           "type": "string",
-          "description": "Biological process for the variant to gene edge",
+          "description": "Gene Ontology term for regulation of gene expression, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0010468"
           ]

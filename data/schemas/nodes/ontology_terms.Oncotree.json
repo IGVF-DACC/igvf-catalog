@@ -10,20 +10,22 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "Oncotree_0_0"
+          "example": "Oncotree_MMB",
+          "description": "Oncotree_ plus the OncoTree code, with slash rewritten to underscore."
         },
         "name": {
-          "example": "0_0"
+          "example": "Medullomyoblastoma",
+          "description": "Tumor-type name from the OncoTree API."
         },
         "uri": {
           "type": "string",
-          "description": "The URI of the ontology term",
-          "example": "https://oncotree.mskcc.org/api/tumorTypes/0_0"
+          "description": "OncoTree site homepage. The API does not publish a per-node IRI, so every term carries this value.",
+          "example": "https://oncotree.mskcc.org/"
         },
         "term_id": {
           "type": "string",
-          "description": "The ID of the ontology term",
-          "example": "0_0"
+          "description": "Oncotree_ plus the OncoTree code as published (slash left in place).",
+          "example": "Oncotree_MMB"
         },
         "source": {
           "enum": [
@@ -51,7 +53,7 @@
         },
         "files_filesets": {
           "type": "string",
-          "description": "The files filesets of the ontology term",
+          "description": "Handle of the files_filesets record for the OncoTree tumor-type dump this term was read from.",
           "example": "files_filesets/IGVFFI4975UFZM",
           "pattern": "^files_filesets/",
           "collections": [

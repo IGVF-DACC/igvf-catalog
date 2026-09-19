@@ -11,26 +11,29 @@
       "properties": {
         "chr": {
           "type": "string",
-          "description": "Chromosome for the genomic element"
+          "description": "Mouse chromosome the element lies on, prefixed with 'chr'.",
+          "example": "chr6"
         },
         "start": {
           "type": "number",
-          "description": "Start position for the genomic element"
+          "description": "Start of the mouse element on mm10, 0-based and inclusive.",
+          "example": 121522229
         },
         "end": {
           "type": "number",
-          "description": "End position for the genomic element"
+          "description": "End of the mouse element on mm10, 0-based and exclusive.",
+          "example": 121522428
         },
         "method": {
           "type": "string",
-          "description": "Method for the genomic element",
+          "description": "How the element was defined: integrative pairing of human and mouse DNase hypersensitive sites.",
           "enum": [
             "integrative"
           ]
         },
         "type": {
           "type": "string",
-          "description": "Type for the genomic element",
+          "description": "Category of element: a mouse DNase hypersensitive site paired to a human site by FUNCODE.",
           "enum": [
             "accessible dna elements (mouse)"
           ]
