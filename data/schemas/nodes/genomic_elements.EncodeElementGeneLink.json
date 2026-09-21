@@ -18,11 +18,7 @@
         },
         "method": {
           "$ref": "../mixins.json#/classification/method"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "files_filesets": {
           "$ref": "../mixins.json#/file_metadata/files_filesets"
         },

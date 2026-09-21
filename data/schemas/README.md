@@ -12,7 +12,9 @@ after base references and before local property definitions:
 { "properties": { "$ref": "../mixins.json#/file_metadata" } }
 ```
 
-Schemas using a subset should import only those fields to avoid adding properties:
+When importing multiple mixins, combine their individual property references in
+one `properties` block. Schemas using a subset should import only those fields
+to avoid adding properties:
 
 ```json
 {

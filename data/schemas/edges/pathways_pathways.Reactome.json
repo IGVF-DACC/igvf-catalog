@@ -10,11 +10,7 @@
       "properties": {
         "organism": {
           "$ref": "../mixins.json#/organism/organism"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "source": {
           "$ref": "../mixins.json#/provenance/source"
         },
@@ -29,11 +25,7 @@
         },
         "class": {
           "$ref": "../mixins.json#/classification/class"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "files_filesets": {
           "$ref": "../mixins.json#/file_metadata/files_filesets"
         }

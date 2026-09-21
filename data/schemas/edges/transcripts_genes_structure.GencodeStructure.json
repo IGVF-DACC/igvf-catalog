@@ -7,11 +7,7 @@
       "properties": {
         "organism": {
           "$ref": "../mixins.json#/organism/organism"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "source": {
           "$ref": "../mixins.json#/provenance/source"
         },

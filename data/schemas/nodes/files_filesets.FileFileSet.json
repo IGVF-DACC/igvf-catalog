@@ -21,11 +21,7 @@
         },
         "crispr_modality": {
           "$ref": "../mixins.json#/assay_metadata/crispr_modality"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "treatments_term_ids": {
           "$ref": "../mixins.json#/file_metadata/treatments_term_ids"
         }

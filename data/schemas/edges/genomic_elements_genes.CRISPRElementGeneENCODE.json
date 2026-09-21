@@ -24,11 +24,7 @@
         },
         "crispr_modality": {
           "$ref": "../mixins.json#/assay_metadata/crispr_modality"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "files_filesets": {
           "$ref": "../mixins.json#/file_metadata/files_filesets"
         },

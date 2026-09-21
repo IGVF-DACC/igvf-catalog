@@ -12,11 +12,7 @@
         },
         "source_url": {
           "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
-    },
-    {
-      "properties": {
+        },
         "files_filesets": {
           "$ref": "../mixins.json#/file_metadata/files_filesets"
         }

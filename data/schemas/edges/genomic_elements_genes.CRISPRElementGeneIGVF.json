@@ -24,12 +24,19 @@
         },
         "crispr_modality": {
           "$ref": "../mixins.json#/assay_metadata/crispr_modality"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/file_metadata/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/file_metadata/biosample_term"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/file_metadata/treatments_term_ids"
         }
-      }
-    },
-    {
-      "properties": {
-        "$ref": "../mixins.json#/file_metadata"
       }
     },
     {
