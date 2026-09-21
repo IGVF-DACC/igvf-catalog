@@ -19,6 +19,9 @@ const LABELS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'label'
 const NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'name')
 const INVERSE_NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'inverse_name')
 // Values calculated from database to optimize range queries
+// MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
+// Upper bounds make open-ended client filters (e.g. gte:5) usable with the ZKD sparse index
+const MAX_LOG10_PVALUE = 400
 const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const qtlsSummaryFormat = z.object({
@@ -201,6 +204,8 @@ const getQueryLimit = (input: paramsFormatType): number => {
 const getRestrictiveFiltersArray = (input: paramsFormatType): string[] => {
   const restrictiveFiltersArray: string[] = []
   if ('neg_log10_pvalue' in input) {
+    // Upper bound for ZKD index on (neg_log10_pvalue, effect_size); does not change response values
+    restrictiveFiltersArray.push(`record.neg_log10_pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.neg_log10_pvalue as string).includes(':')) {
       raiseInvalidParameters('neg_log10_pvalue')
     }
