@@ -7,21 +7,18 @@
   "db_collection_name": "variants_drugs_genes",
   "allOf": [
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -69,33 +66,22 @@
           "example": "ABCB1"
         },
         "source": {
-          "type": "string",
           "enum": [
             "pharmGKB"
           ]
         },
         "source_url": {
-          "type": "string",
           "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
           "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
         },
         "class": {
-          "type": "string",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
           "enum": [
             "PharmGKB"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI8835SMSP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

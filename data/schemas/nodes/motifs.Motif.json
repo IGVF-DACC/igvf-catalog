@@ -9,21 +9,18 @@
       "$ref": "motifs.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -40,22 +37,13 @@
           "example": "hocomoco11.autosome.org/motif/ATF1_HUMAN.H11MO.0.B"
         },
         "class": {
-          "type": "string",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
           "enum": [
             "HOCOMOCO"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI1444TRQL",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

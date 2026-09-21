@@ -5,17 +5,10 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
     },
     {
       "type": "object",
@@ -31,7 +24,6 @@
           "pattern": "^ENSMUST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "Gm1992-201"
         },
         "transcript_type": {

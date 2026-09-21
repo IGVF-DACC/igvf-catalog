@@ -7,21 +7,18 @@
   "db_collection_name": "genes_mm_genes",
   "allOf": [
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -73,32 +70,21 @@
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "MGI"
           ]
         },
         "source_url": {
-          "type": "string",
           "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
         },
         "class": {
-          "type": "string",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
           "enum": [
             "Homology"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI9177QQPS",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

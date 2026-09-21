@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -31,7 +28,6 @@
           "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
         },
         "source": {

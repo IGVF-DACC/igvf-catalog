@@ -4,11 +4,7 @@
   "db_collection_name": "variants",
   "allOf": [
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        }
-      }
+      "$ref": "../mixins.json#/organism"
     },
     {
       "type": "object",

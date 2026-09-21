@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -31,11 +28,9 @@
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "strand": {
-          "type": "string",
           "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
           "enum": [
             "+",
@@ -61,9 +56,6 @@
         },
         "source_url": {
           "example": "https://www.encodeproject.org/files/ENCFF769REH/"
-        },
-        "files_filesets": {
-          "pattern": "^files_filesets/"
         }
       },
       "required": [

@@ -6,14 +6,7 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",
@@ -23,7 +16,6 @@
           "description": "Gene symbol, Ensembl transcript ID, protein HGVS and coding HGVS joined by underscores. \"?\" is rewritten to \"!\" and \">\" to \"-\". A \"_splicing\" suffix is added when aapos is -1."
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "ref": {

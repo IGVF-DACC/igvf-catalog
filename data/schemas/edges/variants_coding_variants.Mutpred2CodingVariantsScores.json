@@ -4,15 +4,12 @@
   "db_collection_name": "variants_coding_variants",
   "allOf": [
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "label": {
-          "$ref": "../mixins.json#/classification/label"
+          "$ref": "../mixins.json#/classification/properties/label"
         }
       }
     },
@@ -75,19 +72,16 @@
           "example": "AC"
         },
         "label": {
-          "type": "string",
           "enum": [
             "codes for"
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI6893ZOAA"
           ]

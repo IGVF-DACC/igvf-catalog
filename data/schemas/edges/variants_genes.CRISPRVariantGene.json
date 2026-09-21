@@ -6,38 +6,16 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/assay_metadata/crispr_modality"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/file_metadata/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/file_metadata/biosample_term"
-        },
-        "treatments_term_ids": {
-          "$ref": "../mixins.json#/file_metadata/treatments_term_ids"
-        }
-      }
+      "$ref": "../mixins.json#/file_metadata"
+    },
+    {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
+      "$ref": "../mixins.json#/assay_metadata"
     },
     {
       "type": "object",
@@ -121,13 +99,11 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "expression modulated by"
           ]
@@ -140,10 +116,6 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI0524YUIL/"
         },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI0332UGDD",
-          "pattern": "^files_filesets/"
-        },
         "method": {
           "enum": [
             "Variant-EFFECTS",
@@ -151,9 +123,6 @@
           ]
         },
         "crispr_modality": {
-          "type": [
-            "string"
-          ],
           "enum": [
             "prime editing",
             "base editing"
@@ -166,13 +135,7 @@
           "example": "THP-1"
         },
         "biosample_term": {
-          "example": "ontology_terms/EFO_0002067",
-          "pattern": "^ontology_terms/"
-        },
-        "treatments_term_ids": {
-          "items": {
-            "type": "string"
-          }
+          "example": "ontology_terms/EFO_0002067"
         }
       },
       "required": [

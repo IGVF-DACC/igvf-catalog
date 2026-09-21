@@ -7,24 +7,15 @@
       "$ref": "edges.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -122,13 +113,11 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates binding of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "binding modulated by"
           ]
@@ -138,13 +127,6 @@
           "description": "Gene Ontology term for regulation of DNA binding.",
           "enum": [
             "ontology_terms/GO_0051101"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI8897VGII",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

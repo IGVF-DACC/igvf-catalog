@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -64,7 +61,8 @@
         "files_filesets": {
           "enum": [
             "files_filesets/IGVFFI8753TTYC"
-          ]
+          ],
+          "example": "files_filesets/IGVFFI8753TTYC"
         }
       },
       "required": [

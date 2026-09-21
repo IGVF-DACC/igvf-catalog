@@ -9,7 +9,7 @@
     {
       "properties": {
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         }
       }
     },
@@ -39,7 +39,6 @@
           "example": "tested elements"
         },
         "method": {
-          "type": "string",
           "example": "MPRA"
         }
       },

@@ -4,24 +4,12 @@
   "db_collection_name": "complexes_terms",
   "allOf": [
     {
+      "$ref": "edges.base.json"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -34,8 +22,6 @@
           "example": "CPX-1_GO_0071144"
         },
         "_from": {
-          "type": "string",
-          "description": "Document handle of the source node, in collection/key form.",
           "example": "complexes/CPX-1",
           "pattern": "^complexes/",
           "collections": [
@@ -43,8 +29,6 @@
           ]
         },
         "_to": {
-          "type": "string",
-          "description": "Document handle of the target node, in collection/key form.",
           "example": "ontology_terms/GO_0071144",
           "pattern": "^ontology_terms/",
           "collections": [
@@ -57,39 +41,32 @@
           "example": "heteromeric SMAD protein complex"
         },
         "source": {
-          "type": "string",
           "enum": [
             "EBI"
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "https://www.ebi.ac.uk/complexportal/"
           ]
         },
         "name": {
-          "type": "string",
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with",
             "is located in",
             "involved in",
             "has the function"
-          ]
+          ],
+          "example": "associated with"
         },
         "inverse_name": {
-          "type": "string",
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with",
             "contains",
             "has component",
             "is a function of"
-          ]
-        },
-        "class": {
-          "type": "string"
+          ],
+          "example": "associated with"
         },
         "method": {
           "type": [
@@ -102,26 +79,10 @@
             "string",
             "null"
           ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI1444TRQL",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
         }
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
-        "source",
-        "source_url",
-        "name",
-        "inverse_name",
-        "class",
-        "method",
-        "label",
         "files_filesets"
       ],
       "additionalProperties": false

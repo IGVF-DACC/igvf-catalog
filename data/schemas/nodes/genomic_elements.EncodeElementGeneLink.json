@@ -9,21 +9,18 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         },
         "treatments_term_ids": {
-          "$ref": "../mixins.json#/file_metadata/treatments_term_ids"
+          "$ref": "../mixins.json#/file_metadata/properties/treatments_term_ids"
         }
       }
     },
@@ -34,7 +31,6 @@
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "method": {
@@ -64,10 +60,6 @@
         "source_url": {
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
-        },
-        "files_filesets": {
-          "example": "files_filesets/ENCFF003BKC",
-          "pattern": "^files_filesets/"
         },
         "simple_sample_summaries": {
           "type": [

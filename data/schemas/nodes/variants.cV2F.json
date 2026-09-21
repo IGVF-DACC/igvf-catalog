@@ -9,15 +9,12 @@
       "$ref": "variants.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -32,13 +29,6 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI0332UGDD",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
         }
       },
       "required": [

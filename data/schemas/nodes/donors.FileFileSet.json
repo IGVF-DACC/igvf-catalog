@@ -6,14 +6,7 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",
@@ -22,7 +15,6 @@
           "example": "ENCDO374BBL"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "ENCDO374BBL"
         },
         "sex": {

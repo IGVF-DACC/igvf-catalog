@@ -4,14 +4,7 @@
   "db_collection_name": "genomic_elements_mm_genomic_elements",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",
@@ -164,13 +157,11 @@
           "example": "0.9758546569869605"
         },
         "source": {
-          "type": "string",
           "enum": [
             "FUNCODE"
           ]
         },
         "source_url": {
-          "type": "string",
           "pattern": "^https://data.igvf.org/reference-files/"
         },
         "name": {

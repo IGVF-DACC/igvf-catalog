@@ -6,17 +6,10 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
     },
     {
       "type": "object",
@@ -92,8 +85,7 @@
           "example": 0
         },
         "name": {
-          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG",
-          "description": "Human readable display name for the entity"
+          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
         },
         "spdi": {
           "type": "string",

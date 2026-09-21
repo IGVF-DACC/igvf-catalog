@@ -6,30 +6,21 @@
       "$ref": "edges.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         },
         "biological_context": {
-          "$ref": "../mixins.json#/file_metadata/biological_context"
+          "$ref": "../mixins.json#/file_metadata/properties/biological_context"
         },
         "biosample_term": {
-          "$ref": "../mixins.json#/file_metadata/biosample_term"
+          "$ref": "../mixins.json#/file_metadata/properties/biosample_term"
         }
       }
     },
@@ -86,13 +77,11 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates regulatory activity of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulatory activity modulated by"
           ]
@@ -108,13 +97,6 @@
             "https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/",
             "https://data.igvf.org/tabular-files/IGVFFI5288RAAV/",
             "https://data.igvf.org/tabular-files/IGVFFI0818FMCC/"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI1663LKVQ",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

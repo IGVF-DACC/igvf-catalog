@@ -4,17 +4,10 @@
   "db_collection_name": "mm_transcripts_mm_genes_structure",
   "allOf": [
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
     },
     {
       "type": "object",
@@ -38,7 +31,6 @@
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "GENCODE"
           ]
@@ -51,7 +43,6 @@
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]

@@ -5,21 +5,18 @@
       "$ref": "ontology_terms.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -37,8 +34,7 @@
           "example": "CVCL_JJ44"
         },
         "name": {
-          "example": "CW70177",
-          "description": "Human readable display name for the entity"
+          "example": "CW70177"
         },
         "synonyms": {
           "type": [
@@ -74,20 +70,10 @@
             "type": "string"
           }
         },
-        "class": {
-          "type": "string"
-        },
         "method": {
           "type": [
             "string",
             "null"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI9279GNOP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

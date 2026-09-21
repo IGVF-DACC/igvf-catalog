@@ -6,24 +6,15 @@
       "$ref": "node.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -35,8 +26,7 @@
           "description": "Complex Portal accession."
         },
         "name": {
-          "example": "SMAD2-SMAD3-SMAD4 complex",
-          "description": "Human readable display name for the entity"
+          "example": "SMAD2-SMAD3-SMAD4 complex"
         },
         "alias": {
           "type": "array",
@@ -115,9 +105,6 @@
             "https://www.ebi.ac.uk/complexportal/"
           ]
         },
-        "class": {
-          "type": "string"
-        },
         "method": {
           "type": [
             "string",
@@ -128,13 +115,6 @@
           "type": [
             "string",
             "null"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI1444TRQL",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

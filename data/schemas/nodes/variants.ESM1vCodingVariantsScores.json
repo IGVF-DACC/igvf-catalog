@@ -9,14 +9,7 @@
       "$ref": "variants.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",

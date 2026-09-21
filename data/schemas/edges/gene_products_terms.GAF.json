@@ -7,27 +7,15 @@
   "db_collection_name": "gene_products_terms",
   "allOf": [
     {
+      "$ref": "edges.base.json"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
+    },
+    {
       "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -39,8 +27,6 @@
           "description": "SHA-256 hash of the source GAF annotation record together with the gene product handle."
         },
         "_to": {
-          "type": "string",
-          "description": "Document handle of the target node, in collection/key form.",
           "example": "ontology_terms/GO_0005515",
           "pattern": "^ontology_terms/.*",
           "collections": [
@@ -48,8 +34,6 @@
           ]
         },
         "_from": {
-          "type": "string",
-          "description": "Document handle of the source node, in collection/key form.",
           "example": "proteins/ENSP00000493376",
           "pattern": "^proteins/.*|^transcripts/.*",
           "collections": [
@@ -159,13 +143,11 @@
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "Gene Ontology"
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "http://geneontology.org/gene-associations/goa_human.gaf.gz",
             "http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz",
@@ -174,25 +156,22 @@
           ]
         },
         "name": {
-          "type": "string",
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "involved in",
             "is located in",
             "has the function"
-          ]
+          ],
+          "example": "involved in"
         },
         "inverse_name": {
-          "type": "string",
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "has component",
             "contains",
             "is a function of"
-          ]
+          ],
+          "example": "has component"
         },
         "class": {
-          "type": "string",
           "enum": [
             "biological relationship"
           ]
@@ -208,19 +187,10 @@
             "string",
             "null"
           ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI1490WZCV",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
         }
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
         "db",
         "gene_product_id",
         "gene_product_symbol",
@@ -239,13 +209,6 @@
         "annotation_extension",
         "gene_product_form_id",
         "organism",
-        "source",
-        "source_url",
-        "name",
-        "inverse_name",
-        "class",
-        "method",
-        "label",
         "files_filesets"
       ],
       "additionalProperties": false

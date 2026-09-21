@@ -6,21 +6,18 @@
       "$ref": "node.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -32,7 +29,6 @@
           "description": "PharmGKB chemical accession."
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "17-alpha-dihydroequilenin sulfate"
         },
         "drug_ontology_terms": {
@@ -56,22 +52,13 @@
           "example": "https://www.pharmgkb.org/chemical/PA166238901"
         },
         "class": {
-          "type": "string",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
           "enum": [
             "PharmGKB"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI2997DUKO",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

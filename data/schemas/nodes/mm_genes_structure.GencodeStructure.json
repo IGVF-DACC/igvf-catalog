@@ -5,17 +5,10 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
     },
     {
       "type": "object",
@@ -24,7 +17,6 @@
           "example": "ENSMUST00000193812_ENSMUSE00001343744_exon"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "4933401J01Rik-201_exon_1_exon"
         },
         "chr": {

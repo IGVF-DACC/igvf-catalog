@@ -6,27 +6,18 @@
       "$ref": "edges.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
+    },
+    {
       "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -393,13 +384,11 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "physically interacts with"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "physically interacts with"
           ]
@@ -690,13 +679,6 @@
         "class": {
           "enum": [
             "observed data"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI4317VDGK",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         },
         "source_url": {

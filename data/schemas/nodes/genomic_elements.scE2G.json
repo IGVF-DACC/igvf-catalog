@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -31,7 +28,6 @@
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "method": {
@@ -62,10 +58,6 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI5648GWQX",
-          "pattern": "^files_filesets/"
         }
       },
       "required": [

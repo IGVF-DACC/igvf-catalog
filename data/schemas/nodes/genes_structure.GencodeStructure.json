@@ -5,17 +5,10 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
     },
     {
       "type": "object",
@@ -24,7 +17,6 @@
           "example": "ENST00000456328_ENSE00002234944_exon"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "DDX11L2-202_exon_1_exon"
         },
         "chr": {

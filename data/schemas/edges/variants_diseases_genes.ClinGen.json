@@ -7,24 +7,12 @@
   "db_collection_name": "variants_diseases_genes",
   "allOf": [
     {
+      "$ref": "edges.base.json"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -36,16 +24,12 @@
           "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
         },
         "_from": {
-          "type": "string",
-          "description": "Document handle of the source node, in collection/key form.",
           "pattern": "^variants_diseases/",
           "collections": [
             "variants_diseases"
           ]
         },
         "_to": {
-          "type": "string",
-          "description": "Document handle of the target node, in collection/key form.",
           "example": "genes/ENSG00000171759",
           "pattern": "^genes/",
           "collections": [
@@ -53,18 +37,16 @@
           ]
         },
         "name": {
-          "type": "string",
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
-          ]
+          ],
+          "example": "associated with"
         },
         "inverse_name": {
-          "type": "string",
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
-          ]
+          ],
+          "example": "associated with"
         },
         "inheritance_mode": {
           "type": "string",
@@ -72,46 +54,19 @@
           "example": "Autosomal recessive inheritance"
         },
         "source": {
-          "type": "string",
           "enum": [
             "ClinGen"
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "https://search.clinicalgenome.org/kb/downloads"
-          ]
-        },
-        "class": {
-          "type": "string"
-        },
-        "method": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI5852GYTT",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
-        "name",
-        "inverse_name",
-        "source",
-        "source_url",
         "inheritance_mode",
-        "class",
-        "method",
-        "label",
         "files_filesets"
       ],
       "additionalProperties": false

@@ -4,14 +4,7 @@
   "db_collection_name": "coding_variants_proteins",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",
@@ -57,13 +50,11 @@
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "dbNSFP 5.1a"
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "http://database.liulab.science/dbNSFP"
           ]

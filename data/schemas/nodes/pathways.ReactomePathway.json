@@ -5,27 +5,18 @@
       "$ref": "node.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
+      "$ref": "../mixins.json#/organism"
+    },
+    {
       "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism/organism"
-        },
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -37,7 +28,6 @@
           "example": "R-HSA-1971475"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "A tetrasaccharide linker sequence is required for GAG synthesis"
         },
         "organism": {
@@ -46,7 +36,6 @@
           ]
         },
         "class": {
-          "type": "string",
           "enum": [
             "biological relationship"
           ]
@@ -61,13 +50,6 @@
           "type": [
             "string",
             "null"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI6981KOFP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         },
         "source": {

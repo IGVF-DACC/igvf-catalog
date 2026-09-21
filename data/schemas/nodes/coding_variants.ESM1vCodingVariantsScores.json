@@ -6,14 +6,7 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",
@@ -22,7 +15,6 @@
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "ref": {

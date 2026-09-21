@@ -6,24 +6,15 @@
       "$ref": "edges.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/classification"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -36,7 +27,6 @@
           "example": "80185_2222_coxpresdb"
         },
         "_from": {
-          "type": "string",
           "description": "Handle of the first gene in the pair (smaller Entrez ID).",
           "example": "genes/ENSG00000129696",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
@@ -45,7 +35,6 @@
           ]
         },
         "_to": {
-          "type": "string",
           "description": "Handle of the second gene in the pair (larger Entrez ID).",
           "example": "genes/ENSG00000079459",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
@@ -91,22 +80,13 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "coexpressed with"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "coexpressed with"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI3321YNBP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

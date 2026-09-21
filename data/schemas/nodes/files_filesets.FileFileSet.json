@@ -6,24 +6,21 @@
       "$ref": "node.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
+      "$ref": "../mixins.json#/assay_metadata"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/assay_metadata/crispr_modality"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "treatments_term_ids": {
-          "$ref": "../mixins.json#/file_metadata/treatments_term_ids"
+          "$ref": "../mixins.json#/file_metadata/properties/treatments_term_ids"
         }
       }
     },
@@ -34,7 +31,6 @@
           "example": "ENCFF004PFU"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "ENCFF004PFU"
         },
         "file_set_id": {
@@ -170,7 +166,6 @@
           ]
         },
         "class": {
-          "type": "string",
           "enum": [
             "biological relationship",
             "observed data",

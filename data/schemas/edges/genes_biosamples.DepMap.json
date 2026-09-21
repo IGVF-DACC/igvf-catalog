@@ -7,27 +7,15 @@
   "db_collection_name": "genes_biosamples",
   "allOf": [
     {
+      "$ref": "edges.base.json"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         },
         "biological_context": {
-          "$ref": "../mixins.json#/file_metadata/biological_context"
+          "$ref": "../mixins.json#/file_metadata/properties/biological_context"
         }
       }
     },
@@ -40,8 +28,6 @@
           "example": "ENSG00000189007_CVCL_1628"
         },
         "_from": {
-          "type": "string",
-          "description": "Document handle of the source node, in collection/key form.",
           "example": "genes/ENSG00000290825",
           "pattern": "^genes/",
           "collections": [
@@ -49,8 +35,6 @@
           ]
         },
         "_to": {
-          "type": "string",
-          "description": "Document handle of the target node, in collection/key form.",
           "example": "ontology_terms/CVCL_1628",
           "pattern": "^ontology_terms/",
           "collections": [
@@ -81,13 +65,11 @@
           "description": "Probability that knocking out this gene is a true genetic dependency in this cell line."
         },
         "source": {
-          "type": "string",
           "enum": [
             "DepMap"
           ]
         },
         "source_url": {
-          "type": "string",
           "enum": [
             "https://depmap.org/portal/"
           ]
@@ -100,62 +82,41 @@
           ]
         },
         "name": {
-          "type": "string",
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "essential in"
-          ]
+          ],
+          "example": "essential in"
         },
         "inverse_name": {
-          "type": "string",
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "dependent on"
-          ]
+          ],
+          "example": "dependent on"
         },
         "class": {
-          "type": "string",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
           "enum": [
             "DepMap"
           ]
         },
         "label": {
-          "type": "string",
           "enum": [
             "DepMap"
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI8863BMFF",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
         "biological_context",
         "model_id",
         "model_type",
         "cancer_term",
         "gene_dependency",
-        "source",
-        "source_url",
         "source_file",
-        "name",
-        "inverse_name",
-        "class",
-        "method",
-        "label",
         "files_filesets"
       ],
       "additionalProperties": false

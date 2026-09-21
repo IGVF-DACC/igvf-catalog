@@ -7,24 +7,12 @@
   "db_collection_name": "diseases_genes",
   "allOf": [
     {
+      "$ref": "edges.base.json"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/classification/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/classification/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/classification/class"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -37,7 +25,6 @@
           "example": "SGC-TEST001_ENSG00000157933"
         },
         "_from": {
-          "type": "string",
           "description": "Handle of the disease ontology term from the submission's disease_curie.",
           "pattern": "^ontology_terms/",
           "collections": [
@@ -46,7 +33,6 @@
           "example": "ontology_terms/MONDO_0008426"
         },
         "_to": {
-          "type": "string",
           "description": "Handle of the Ensembl gene resolved from the submission's HGNC id.",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
@@ -60,18 +46,16 @@
           "example": "SGC-TEST001.1"
         },
         "name": {
-          "type": "string",
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated_with"
-          ]
+          ],
+          "example": "associated_with"
         },
         "inverse_name": {
-          "type": "string",
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated_with"
-          ]
+          ],
+          "example": "associated_with"
         },
         "hgnc": {
           "type": "string",
@@ -166,39 +150,17 @@
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "GenCC"
           ]
         },
         "source_url": {
-          "type": "string",
           "pattern": "^https://thegencc\\.org/submissions/"
-        },
-        "class": {
-          "type": "string"
-        },
-        "method": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI8022JGUK",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
         }
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
         "sgc_id",
-        "name",
-        "inverse_name",
         "hgnc",
         "gene_symbol",
         "term_name",
@@ -207,11 +169,6 @@
         "moi_name",
         "submitter",
         "pmids",
-        "source",
-        "source_url",
-        "class",
-        "method",
-        "label",
         "files_filesets"
       ],
       "additionalProperties": false

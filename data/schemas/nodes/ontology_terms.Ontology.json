@@ -5,21 +5,18 @@
       "$ref": "ontology_terms.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/class"
+          "$ref": "../mixins.json#/classification/properties/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -37,8 +34,7 @@
           "example": "GO_0000001"
         },
         "name": {
-          "example": "mitochondrion inheritance",
-          "description": "Human readable display name for the entity"
+          "example": "mitochondrion inheritance"
         },
         "description": {
           "type": "string",
@@ -93,7 +89,6 @@
           ]
         },
         "class": {
-          "type": "string",
           "enum": [
             "biological relationship"
           ]
@@ -105,13 +100,6 @@
           ],
           "enum": [
             null
-          ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI7433WATG",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

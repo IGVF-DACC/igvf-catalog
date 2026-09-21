@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -31,8 +28,7 @@
           "example": "candidate_cis_regulatory_element_chr1_16097_16381_GRCh38_ENCFF420VPZ"
         },
         "name": {
-          "example": "EH38E3951272",
-          "description": "Human readable display name for the entity"
+          "example": "EH38E3951272"
         },
         "source_annotation": {
           "type": "string",
@@ -71,7 +67,8 @@
         "files_filesets": {
           "enum": [
             "files_filesets/ENCFF420VPZ"
-          ]
+          ],
+          "example": "files_filesets/ENCFF420VPZ"
         }
       },
       "required": [

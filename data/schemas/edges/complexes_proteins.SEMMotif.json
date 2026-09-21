@@ -4,14 +4,7 @@
   "db_collection_name": "complexes_proteins",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        }
-      }
+      "$ref": "../mixins.json#/provenance"
     },
     {
       "type": "object",
@@ -52,13 +45,11 @@
           ]
         },
         "source": {
-          "type": "string",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "type": "string",
           "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
           "pattern": "^https://data.igvf.org/model-files/"
         }

@@ -10,7 +10,7 @@ beforeAll(() => {
   directory = fs.mkdtempSync(path.join(os.tmpdir(), 'catalog-schema-'))
   fs.writeFileSync(path.join(directory, 'mixins.json'), JSON.stringify({
     metadata: {
-      sample: { $ref: '#/definitions/a~1b~0c%20d' }
+      properties: { sample: { $ref: '#/definitions/a~1b~0c%20d' } }
     },
     definitions: {
       'a/b~c d': { description: 'Shared sample description' }
@@ -31,7 +31,7 @@ function load (schema: any): any {
 test('resolves grouped fragments, nested local references and escaped pointer tokens', () => {
   const schema = load({
     allOf: [
-      { properties: { $ref: 'mixins.json#/metadata' } },
+      { $ref: 'mixins.json#/metadata' },
       { properties: { sample: { type: ['string', 'null'] } }, required: ['sample'] }
     ]
   })
@@ -42,7 +42,7 @@ test('resolves grouped fragments, nested local references and escaped pointer to
 })
 
 test('imports an individual property without adding other fields', () => {
-  expect(load({ properties: { sample: { $ref: 'mixins.json#/metadata/sample' } } }).properties)
+  expect(load({ properties: { sample: { $ref: 'mixins.json#/metadata/properties/sample' } } }).properties)
     .toEqual({ sample: { description: 'Shared sample description' } })
 })
 
@@ -61,7 +61,7 @@ test('merges mixins composed by a base schema before child overrides', () => {
     allOf: [
       {
         allOf: [
-          { properties: { $ref: 'mixins.json#/metadata' } },
+          { $ref: 'mixins.json#/metadata' },
           { properties: { sample: { type: 'string' } }, required: ['sample'] }
         ]
       },

@@ -6,15 +6,12 @@
       "$ref": "node.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -25,7 +22,6 @@
           "example": "QTS000038"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "OneK1K"
         },
         "pmid": {

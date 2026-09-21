@@ -7,15 +7,12 @@
       "$ref": "node.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         }
       }
     },
@@ -38,7 +35,6 @@
           "example": 121522428
         },
         "method": {
-          "type": "string",
           "enum": [
             "integrative"
           ]

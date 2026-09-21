@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -31,7 +28,6 @@
           "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
         },
         "method": {
@@ -52,10 +48,6 @@
           "enum": [
             "accessible dna elements"
           ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/ENCFF103XRK",
-          "pattern": "^files_filesets/"
         }
       },
       "required": [

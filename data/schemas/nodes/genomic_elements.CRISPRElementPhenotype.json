@@ -9,18 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "$ref": "../mixins.json#/provenance"
+    },
+    {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/provenance/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/provenance/source_url"
-        },
         "method": {
-          "$ref": "../mixins.json#/classification/method"
+          "$ref": "../mixins.json#/classification/properties/method"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/files_filesets"
+          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
         }
       }
     },
@@ -31,7 +28,6 @@
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
         },
         "method": {
@@ -59,10 +55,6 @@
           "enum": [
             "tested elements"
           ]
-        },
-        "files_filesets": {
-          "example": "files_filesets/IGVFFI5135QZCS",
-          "pattern": "^files_filesets/"
         }
       },
       "required": [
