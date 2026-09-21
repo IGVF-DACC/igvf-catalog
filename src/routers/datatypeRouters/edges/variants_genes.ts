@@ -19,8 +19,6 @@ const LABELS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'label'
 const NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'name')
 const INVERSE_NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'inverse_name')
 // Values calculated from database to optimize range queries
-// MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
-const MAX_LOG10_PVALUE = 400
 const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const qtlsSummaryFormat = z.object({
@@ -63,7 +61,7 @@ const completeQtlsFormat = z.object({
   intron_start: z.string().nullish(),
   intron_end: z.string().nullish(),
   effect_size: z.number().nullish(),
-  neg_log10_pvalue: z.number().or(z.string()).nullish(),
+  neg_log10_pvalue: z.number().nullish(),
   neg_log10_pvalue_adj: z.number().nullish(),
   log2FC: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(),
@@ -203,7 +201,6 @@ const getQueryLimit = (input: paramsFormatType): number => {
 const getRestrictiveFiltersArray = (input: paramsFormatType): string[] => {
   const restrictiveFiltersArray: string[] = []
   if ('neg_log10_pvalue' in input) {
-    restrictiveFiltersArray.push(`record.neg_log10_pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.neg_log10_pvalue as string).includes(':')) {
       raiseInvalidParameters('neg_log10_pvalue')
     }
@@ -440,16 +437,6 @@ const executeLevenshteinMatchQuery = async ({
   return await executeVariantsGenesQuery(query, bindVars)
 }
 
-const normalizeLog10Pvalue = (objects: any[]): any[] => {
-  for (let index = 0; index < objects.length; index++) {
-    const element = objects[index]
-    if (element.neg_log10_pvalue === MAX_LOG10_PVALUE) {
-      objects[index].neg_log10_pvalue = 'inf'
-    }
-  }
-  return objects
-}
-
 async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
   delete input.organism
@@ -514,7 +501,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   if (exactObjects.length > 0 || biologicalContext === undefined) {
-    return normalizeLog10Pvalue(exactObjects)
+    return exactObjects
   }
 
   const prefixMatchObjects = await executePrefixMatchQuery({
@@ -528,7 +515,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   if (prefixMatchObjects.length > 0) {
-    return normalizeLog10Pvalue(prefixMatchObjects)
+    return prefixMatchObjects
   }
 
   const tokenMatchObjects = await executeTokenMatchQuery({
@@ -542,7 +529,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   if (tokenMatchObjects.length > 0) {
-    return normalizeLog10Pvalue(tokenMatchObjects)
+    return tokenMatchObjects
   }
 
   const levenshteinMatchObjects = await executeLevenshteinMatchQuery({
@@ -555,7 +542,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     nameField: 'inverse_name',
     bindVars
   })
-  return normalizeLog10Pvalue(levenshteinMatchObjects)
+  return levenshteinMatchObjects
 }
 
 async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
@@ -613,7 +600,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   if (exactObjects.length > 0 || biologicalContext === undefined) {
-    return normalizeLog10Pvalue(exactObjects)
+    return exactObjects
   }
 
   const prefixMatchObjects = await executePrefixMatchQuery({
@@ -627,7 +614,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   if (prefixMatchObjects.length > 0) {
-    return normalizeLog10Pvalue(prefixMatchObjects)
+    return prefixMatchObjects
   }
 
   const tokenMatchObjects = await executeTokenMatchQuery({
@@ -641,7 +628,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   if (tokenMatchObjects.length > 0) {
-    return normalizeLog10Pvalue(tokenMatchObjects)
+    return tokenMatchObjects
   }
 
   const levenshteinMatchObjects = await executeLevenshteinMatchQuery({
@@ -654,7 +641,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     nameField: 'name',
     bindVars
   })
-  return normalizeLog10Pvalue(levenshteinMatchObjects)
+  return levenshteinMatchObjects
 }
 
 async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
