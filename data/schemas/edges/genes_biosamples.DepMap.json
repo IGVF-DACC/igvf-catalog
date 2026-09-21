@@ -1,138 +1,168 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/genes_biosamples.DepMap.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Ensembl gene ID and Cellosaurus cell line key joined by an underscore.",
-      "example": "ENSG00000189007_CVCL_1628"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Document handle of the source node, in collection/key form.",
-      "example": "genes/ENSG00000290825",
-      "pattern": "^genes/",
-      "collections": [
-        "genes"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Document handle of the target node, in collection/key form.",
-      "example": "ontology_terms/CVCL_1628",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "biological_context": {
-      "type": "string",
-      "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
-      "example": "OVCAR-5"
-    },
-    "model_id": {
-      "type": "string",
-      "description": "DepMap model accession for the cell line.",
-      "example": "ACH-000082"
-    },
-    "model_type": {
-      "type": "string",
-      "description": "DepMap model type of the cell line.",
-      "example": "HGSOC"
-    },
-    "cancer_term": {
-      "type": "string",
-      "description": "Oncotree ontology term of the cell line.",
-      "example": "ontology_terms/Oncotree_HGSOC",
-      "pattern": "^ontology_terms/Oncotree_"
-    },
-    "gene_dependency": {
-      "type": "number",
-      "description": "Probability that knocking out this gene is a true genetic dependency in this cell line."
-    },
-    "source": {
-      "type": "string",
-      "description": "The database, dataset or organization that is a source for these data.",
-      "enum": [
-        "DepMap"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The URL for the source.",
-      "enum": [
-        "https://depmap.org/portal/"
-      ]
-    },
-    "source_file": {
-      "type": "string",
-      "description": "DepMap release file this score was read from.",
-      "enum": [
-        "CRISPRGeneDependency.csv"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Directional human readable label for the relationship, _from to _to.",
-      "enum": [
-        "essential in"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Reversed directional human readable label for the relationship, _to to _from.",
-      "enum": [
-        "dependent on"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "enum": ["observed data"],
-      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
-    },
-    "method": {
-      "type": "string",
-      "enum": ["DepMap"],
-      "description": "Name of the experimental class or prediction model that produced this result."
-    },
-    "label": {
-      "type": "string",
-      "enum": ["DepMap"],
-      "description": "Non-method specific human readable label for the node or edge"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Reference to the File and Metadata",
-      "example": "files_filesets/IGVFFI8863BMFF",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "biological_context",
-    "model_id",
-    "model_type",
-    "cancer_term",
-    "gene_dependency",
-    "source",
-    "source_url",
-    "source_file",
-    "name",
-    "inverse_name",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "biological_context, model_id, model_type, cancer_term, gene_dependency, class, method, label, files_filesets, source, source_url, source_file"
   },
-  "db_collection_name": "genes_biosamples"
+  "db_collection_name": "genes_biosamples",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/file_metadata/biological_context"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Ensembl gene ID and Cellosaurus cell line key joined by an underscore.",
+          "example": "ENSG00000189007_CVCL_1628"
+        },
+        "_from": {
+          "type": "string",
+          "description": "Document handle of the source node, in collection/key form.",
+          "example": "genes/ENSG00000290825",
+          "pattern": "^genes/",
+          "collections": [
+            "genes"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Document handle of the target node, in collection/key form.",
+          "example": "ontology_terms/CVCL_1628",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "biological_context": {
+          "example": "OVCAR-5"
+        },
+        "model_id": {
+          "type": "string",
+          "description": "DepMap model accession for the cell line.",
+          "example": "ACH-000082"
+        },
+        "model_type": {
+          "type": "string",
+          "description": "DepMap model type of the cell line.",
+          "example": "HGSOC"
+        },
+        "cancer_term": {
+          "type": "string",
+          "description": "Oncotree ontology term of the cell line.",
+          "example": "ontology_terms/Oncotree_HGSOC",
+          "pattern": "^ontology_terms/Oncotree_"
+        },
+        "gene_dependency": {
+          "type": "number",
+          "description": "Probability that knocking out this gene is a true genetic dependency in this cell line."
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "DepMap"
+          ]
+        },
+        "source_url": {
+          "type": "string",
+          "enum": [
+            "https://depmap.org/portal/"
+          ]
+        },
+        "source_file": {
+          "type": "string",
+          "description": "DepMap release file this score was read from.",
+          "enum": [
+            "CRISPRGeneDependency.csv"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "essential in"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "dependent on"
+          ]
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "DepMap"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "enum": [
+            "DepMap"
+          ]
+        },
+        "files_filesets": {
+          "example": "files_filesets/IGVFFI8863BMFF",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "biological_context",
+        "model_id",
+        "model_type",
+        "cancer_term",
+        "gene_dependency",
+        "source",
+        "source_url",
+        "source_file",
+        "name",
+        "inverse_name",
+        "class",
+        "method",
+        "label",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

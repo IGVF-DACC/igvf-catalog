@@ -6,6 +6,41 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        },
+        "crispr_modality": {
+          "$ref": "../mixins.json#/assay_metadata/crispr_modality"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/file_metadata/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/file_metadata/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -37,20 +72,32 @@
           "description": "Effect size converted to log2 scale."
         },
         "p_value": {
-          "type": ["number", "null"],
-          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
         },
         "p_value_adj": {
-          "type": ["number", "null"],
-          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Benjamini\u2013Hochberg FDR of the differential-expression test. Null when the source has none.",
           "example": 0.004023984
         },
         "neg_log10_pvalue": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
@@ -59,7 +106,6 @@
           "example": true
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
@@ -68,52 +114,41 @@
           "type": [
             "string"
           ],
-          "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
             "interference"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "regulatory element effect on gene expression"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://www.encodeproject.org/files/ENCFF968BZL/"
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "enum": [
             "files_filesets/ENCFF968BZL"
           ]
         },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "enum": [
             "K562"
           ]
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]
@@ -146,7 +181,6 @@
         "biosample_term"
       ],
       "additionalProperties": false
-
     }
   ],
   "accessible_via": {

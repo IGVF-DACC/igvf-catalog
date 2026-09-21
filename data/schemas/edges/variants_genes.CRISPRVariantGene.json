@@ -6,6 +6,33 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        },
+        "crispr_modality": {
+          "$ref": "../mixins.json#/assay_metadata/crispr_modality"
+        }
+      }
+    },
+    {
+      "properties": {
+        "$ref": "../mixins.json#/file_metadata"
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -77,13 +104,11 @@
           "description": "Boolean indicator of the significance of the variant effect on gene expression."
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on gene expression"
           ]
@@ -101,23 +126,18 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0524YUIL/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI0332UGDD",
           "pattern": "^files_filesets/"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "Variant-EFFECTS",
             "CRISPR screen"
@@ -127,32 +147,22 @@
           "type": [
             "string"
           ],
-          "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
             "prime editing",
             "base editing"
           ]
         },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "items": {
             "type": "string"
           },
           "example": "THP-1"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/EFO_0002067",
           "pattern": "^ontology_terms/"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
           "items": {
             "type": "string"
           }

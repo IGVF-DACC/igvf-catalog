@@ -9,6 +9,26 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -19,7 +39,6 @@
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "scE2G"
           ]
@@ -40,19 +59,15 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI5648GWQX",
           "pattern": "^files_filesets/"
         }

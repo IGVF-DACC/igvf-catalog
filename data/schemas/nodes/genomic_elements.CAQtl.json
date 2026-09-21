@@ -9,6 +9,26 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -19,19 +39,16 @@
           "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "caQTL"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF103XRK/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
@@ -41,8 +58,6 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/ENCFF103XRK",
           "pattern": "^files_filesets/"
         }

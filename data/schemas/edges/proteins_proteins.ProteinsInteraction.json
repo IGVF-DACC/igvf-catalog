@@ -6,6 +6,39 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism/organism"
+        }
+      }
+    },
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -341,10 +374,9 @@
             "number",
             "null"
           ],
-          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
+          "description": "IntAct MIscore from the merged table, on a 0\u20131 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "BioGRID",
             "BioGRID; IntAct",
@@ -363,8 +395,6 @@
           }
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
@@ -390,7 +420,6 @@
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "acetylation reaction",
             "acetylation reaction, direct interaction",
@@ -476,7 +505,6 @@
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "3D electron microscopy",
             "Split renilla luciferase complementation",
@@ -668,14 +696,11 @@
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI4317VDGK",
           "pattern": "^files_filesets/",
           "collections": [
@@ -683,7 +708,6 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK",
             "https://data.igvf.org/reference-files/IGVFFI1165YVBA"

@@ -7,6 +7,38 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/file_metadata/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/file_metadata/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -76,12 +108,12 @@
         },
         "p_value_adj_ref": {
           "type": "number",
-          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
+          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793
         },
         "p_value_adj_alt": {
           "type": "number",
-          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
+          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
         "neg_log10_pvalue_adj_ref": {
@@ -95,40 +127,31 @@
           "example": 0
         },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "Kelly (neuroblastoma)"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/EFO_0002069",
           "pattern": "^ontology_terms/"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ADASTRA"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=520"
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "allele-specific binding"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ADASTRA"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
@@ -153,8 +176,6 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI5943XCOS",
           "pattern": "^files_filesets/",
           "collections": [

@@ -9,6 +9,20 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -27,12 +41,9 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/ENCFF968BZL"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]

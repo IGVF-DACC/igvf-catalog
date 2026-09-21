@@ -6,6 +6,16 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -189,13 +199,11 @@
           "description": "CADD raw score. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "dbNSFP 5.1a"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "http://database.liulab.science/dbNSFP"
           ]

@@ -4,12 +4,43 @@
   "db_collection_name": "variants_phenotypes",
   "type": "object",
   "allOf": [
-    { "$ref": "edges.base.json" },
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        }
+      }
+    },
     {
       "type": "object",
       "properties": {
         "equivalent_ontology_term": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The other of the MONDO or EFO identifiers for the same trait, when both are present.",
           "example": "EFO_0007010"
         },
@@ -34,7 +65,10 @@
           "example": "G"
         },
         "phenotype_term": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Ontology term for the phenotype, trait or disease.",
           "example": "chronic obstructive pulmonary disease"
         },
@@ -120,47 +154,74 @@
                 "example": "T"
               },
               "overall_r2": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "Overall LD r2 with the lead variant. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.68343289"
               },
               "pics_95perc_credset": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "Whether the tagged variant is in the PICS 95% credible set. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "False"
               },
               "AFR_1000G_prop": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes AFR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "AMR_1000G_prop": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes AMR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "EAS_1000G_prop": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes EAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "EUR_1000G_prop": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes EUR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "SAS_1000G_prop": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes SAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.0"
               },
               "log10_ABF": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "Log10 approximate Bayes factor. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "NA"
               },
               "posterior_prob": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "PICS posterior probability. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "NA"
               }
@@ -201,36 +262,27 @@
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "GWAS"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "GWAS"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "OpenTargets"
           ]
         },
         "source_url": {
-          "type": "string",
-          "description": "The URL for the source."
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata"
+          "type": "string"
         },
         "name": {
           "description": "Directional human readable label for the relationship, _from to _to.",

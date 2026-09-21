@@ -4,7 +4,17 @@
   "db_collection_name": "ontology_terms",
   "allOf": [
     {
-      "$ref": "node.base.json"
+      "$ref": "ontology_terms.base.json"
+    },
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        }
+      }
     },
     {
       "type": "object",
@@ -17,13 +27,9 @@
           "example": "mesendoderm"
         },
         "uri": {
-          "type": "string",
-          "description": "URI for the ontology term.",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         },
         "term_id": {
-          "type": "string",
-          "description": "Ontology term identifier.",
           "example": "NTR_0000856"
         },
         "synonyms": {
@@ -34,20 +40,16 @@
           "description": "Alternative names for the ontology term."
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         }
       },
       "required": [
-        "uri",
-        "term_id",
         "synonyms"
       ],
       "additionalProperties": false

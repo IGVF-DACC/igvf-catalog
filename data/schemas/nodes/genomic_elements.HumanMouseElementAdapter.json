@@ -9,10 +9,22 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "integrative"
           ]
@@ -23,13 +35,11 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "FUNCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "pattern": "^https://data.igvf.org/reference-files/"
         }
       },

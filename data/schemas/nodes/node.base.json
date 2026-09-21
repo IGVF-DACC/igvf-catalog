@@ -3,31 +3,43 @@
   "$id": "node.base.json",
   "title": "Base Node Schema",
   "description": "Base schema for all node types in the IGVF Catalog. Defines common required properties.",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists, otherwise a composite of the fields that make the record unique."
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        }
+      }
     },
-    "name": {
-      "type": "string",
-      "description": "Human readable display name for the entity",
-      "example": "TP53"
-    },
-    "source": {
-      "type": "string",
-      "description": "The database, dataset or organization that is a source for these data.",
-      "example": "IGVF"
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The URL for the source."
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists, otherwise a composite of the fields that make the record unique."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human readable display name for the entity",
+          "example": "TP53"
+        },
+        "source": {
+          "type": "string",
+          "example": "IGVF"
+        },
+        "source_url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "_key",
+        "name",
+        "source",
+        "source_url"
+      ]
     }
-  },
-  "required": [
-    "_key",
-    "name",
-    "source",
-    "source_url"
   ]
 }

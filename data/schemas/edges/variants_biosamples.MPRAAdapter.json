@@ -6,6 +6,30 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/classification/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/classification/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/classification/class"
+        }
+      }
+    },
+    {
+      "properties": {
+        "$ref": "../mixins.json#/file_metadata"
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -38,7 +62,11 @@
         "strand": {
           "type": "string",
           "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
-          "enum": ["+", "-", "."],
+          "enum": [
+            "+",
+            "-",
+            "."
+          ],
           "example": "+"
         },
         "bed_score": {
@@ -90,13 +118,11 @@
           "description": "Upper bound of a 95% interval for the variant effect."
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on regulatory element activity"
           ]
@@ -114,25 +140,20 @@
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "MPRA"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "example": "files_filesets/IGVFFI1323RCIE",
           "pattern": "^files_filesets/",
           "collections": [
@@ -140,24 +161,19 @@
           ]
         },
         "biological_context": {
-          "type": ["string", "null"],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "type": [
+            "string",
+            "null"
+          ],
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
           "example": "ontology_terms/UBERON_0002048"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
           "items": {
             "type": "string"
-          },
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
+          }
         }
       },
       "required": [

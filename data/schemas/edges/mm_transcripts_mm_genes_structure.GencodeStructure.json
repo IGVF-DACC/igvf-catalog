@@ -2,78 +2,95 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "edges/mm_transcripts_mm_genes_structure.GencodeStructure.json",
   "db_collection_name": "mm_transcripts_mm_genes_structure",
-  "type": "object",
-  "properties": {
-    "_from": {
-      "type": "string",
-      "description": "Document handle of the transcript that contains the feature.",
-      "example": "mm_transcripts/ENSMUST00000193812",
-      "pattern": "^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
-      "collections": [
-        "mm_transcripts"
-      ]
+  "allOf": [
+    {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism/organism"
+        }
+      }
     },
-    "_to": {
-      "type": "string",
-      "description": "Document handle of the sub-transcript feature.",
-      "example": "mm_genes_structure/ENSMUST00000193812_ENSMUSE00001343744_exon",
-      "pattern": "^mm_genes_structure/",
-      "collections": [
-        "mm_genes_structure"
-      ]
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        }
+      }
     },
-    "source": {
-      "type": "string",
-      "description": "The database, dataset or organization that is a source for these data.",
-      "enum": [
-        "GENCODE"
-      ]
-    },
-    "version": {
-      "type": "string",
-      "description": "GENCODE release the annotation was taken from.",
-      "enum": [
-        "vM36"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The URL for the source.",
-      "enum": [
-        "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
-      ]
-    },
-    "organism": {
-      "type": "string",
-      "description": "Species this annotation describes.",
-      "enum": [
-        "Mus musculus"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Directional human readable label for the relationship, _from to _to.",
-      "enum": [
-        "contains"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Reversed directional human readable label for the relationship, _to to _from.",
-      "enum": [
-        "contained in"
-      ]
+    {
+      "type": "object",
+      "properties": {
+        "_from": {
+          "type": "string",
+          "description": "Document handle of the transcript that contains the feature.",
+          "example": "mm_transcripts/ENSMUST00000193812",
+          "pattern": "^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "mm_transcripts"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Document handle of the sub-transcript feature.",
+          "example": "mm_genes_structure/ENSMUST00000193812_ENSMUSE00001343744_exon",
+          "pattern": "^mm_genes_structure/",
+          "collections": [
+            "mm_genes_structure"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "GENCODE"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "GENCODE release the annotation was taken from.",
+          "enum": [
+            "vM36"
+          ]
+        },
+        "source_url": {
+          "type": "string",
+          "enum": [
+            "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
+          ]
+        },
+        "organism": {
+          "enum": [
+            "Mus musculus"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "contains"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "contained in"
+          ]
+        }
+      },
+      "required": [
+        "_from",
+        "_to",
+        "source",
+        "version",
+        "source_url",
+        "organism",
+        "name",
+        "inverse_name"
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_from",
-    "_to",
-    "source",
-    "version",
-    "source_url",
-    "organism",
-    "name",
-    "inverse_name"
-  ],
-  "additionalProperties": false
+  ]
 }

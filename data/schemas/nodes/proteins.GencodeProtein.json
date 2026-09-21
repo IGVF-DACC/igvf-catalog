@@ -6,6 +6,23 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism/organism"
+        }
+      }
+    },
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -24,7 +41,6 @@
           "pattern": "^ENSP[0-9]{11}\\.[0-9]+|ENSMUSP[0-9]{11}\\.[0-9]+$"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
@@ -38,15 +54,12 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz",
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
@@ -66,7 +79,9 @@
           "items": {
             "type": "string"
           },
-          "example": ["Q6UWL6-5"]
+          "example": [
+            "Q6UWL6-5"
+          ]
         },
         "uniprot_names": {
           "type": "array",

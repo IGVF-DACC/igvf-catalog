@@ -6,6 +6,23 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/provenance/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/provenance/source_url"
+        }
+      }
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/file_metadata/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -29,17 +46,9 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
-        },
-        "source_url": {
-          "description": "The URL for the source."
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata"
         }
       },
       "required": [
