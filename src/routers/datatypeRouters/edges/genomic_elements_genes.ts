@@ -31,7 +31,17 @@ const edgeQueryFormat = z.object({
   biological_context: z.string().optional(),
   cell_annotation: z.string().optional(),
   cell_annotation_term: z.string().optional(),
-  source: z.enum(SOURCES).optional()
+  source: z.enum(SOURCES).optional(),
+  // range-filterable across the sources sharing this collection (see
+  // genomicElementsGenesFilterSchema) - score (ENCODE/scE2G), effect_size/log2FC (ENCODE
+  // CRISPR), neg_log10_pvalue/neg_log10_pvalue_adj/z_score/idr (IGVF CRISPR)
+  score: z.string().trim().optional(),
+  effect_size: z.string().trim().optional(),
+  log2FC: z.string().trim().optional(),
+  neg_log10_pvalue: z.string().trim().optional(),
+  neg_log10_pvalue_adj: z.string().trim().optional(),
+  z_score: z.string().trim().optional(),
+  idr: z.string().trim().optional()
 })
 
 const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)

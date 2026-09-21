@@ -29,6 +29,12 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mocker):
         assert len(writer.contents) == 214
         assert len(first_item) == 21
         assert first_item['intron_chr'].startswith('chr')
+        # regression test: intron_start/intron_end are range-filterable (ZKD index) and
+        # the API's completeQtlsFormat expects numbers; they used to be written as raw
+        # strings from intron_id.split(':'), which both broke numeric range filtering and
+        # caused "Output validation failed" once the real output schema was enforced.
+        assert isinstance(first_item['intron_start'], int)
+        assert isinstance(first_item['intron_end'], int)
 
 
 def test_AFGR_sqtl_adapter_AFGR_sqtl_term_invalid_label(mocker):
