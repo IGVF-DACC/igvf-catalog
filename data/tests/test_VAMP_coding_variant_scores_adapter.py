@@ -25,7 +25,7 @@ MOCKED_GET_FILES_FILESET_ARANGO_RETURN = {
     'class': 'observed data',
     'label': 'protein variant effect',
     'simple_sample_summaries': ['test_summaries'],
-    'samples': ['test_sample']
+    'samples': ['ontology_terms/test_sample']
 }
 
 
