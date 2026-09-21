@@ -24,7 +24,10 @@
         },
         "rsid": {
           "type": "array",
-          "description": "dbSNP id for the variant position",
+          "items": {
+            "type": "string"
+          },
+          "description": "dbSNP ids from the VCF ID column. Empty when that column is '.'.",
           "example": []
         },
         "ref": {
@@ -76,8 +79,11 @@
           "description": "VCF FILTER for the site. PASS if at least one strain call passed the release filters; LowQual otherwise. Null when the source has none."
         },
         "fi": {
-          "type": "number",
-          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release. Null when the FORMAT FI value is missing ('.').",
           "example": 0
         },
         "name": {
