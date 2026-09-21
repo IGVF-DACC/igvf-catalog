@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "example": "ENSP00000493376 or ENSMUSP00000077785",
-          "pattern": "^ENSP[0-9]{11}|ENSMUSP[0-9]{11}$"
+          "pattern": "^(ENSP|ENSMUSP)[0-9]{11}$"
         },
         "MANE_Select": {
           "type": "boolean",
@@ -21,7 +21,7 @@
           "type": "string",
           "description": "Ensembl ID of the protein (without version number).",
           "example": "ENSP00000493376.2 or ENSMUSP00000077785.1",
-          "pattern": "^ENSP[0-9]{11}\\.[0-9]+|ENSMUSP[0-9]{11}\\.[0-9]+$"
+          "pattern": "^(ENSP|ENSMUSP)[0-9]{11}\\.[0-9]+$"
         },
         "source": {
           "description": "The database, dataset or organization that is a source for these data.",
