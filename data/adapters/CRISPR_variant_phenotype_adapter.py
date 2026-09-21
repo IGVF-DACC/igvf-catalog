@@ -173,6 +173,8 @@ class CRISPRVariantPhenotype(BaseAdapter):
         """Convert 1-based chr_pos_hg38_ref_alt IDs to VCF (1-based) for load_variant.
 
         Example: 19_11091518_hg38_GC_G -> 19-11091518-GC-G
+        For embedded chr:pos:ref:alt IDs, retain the explicit hg38 coordinates
+        and extract the trailing alternate allele.
         SPDI IDs (NC_...) are returned unchanged.
         """
         if raw_id.startswith('NC_'):
@@ -185,6 +187,21 @@ class CRISPRVariantPhenotype(BaseAdapter):
             return raw_id
         chrom, pos = left.rsplit('_', 1)
         ref, alt = right.rsplit('_', 1)
+        if ':' in alt:
+            parts = alt.split(':')
+            if len(parts) != 4:
+                raise ValueError(
+                    'Invalid trailing chr:pos:ref:alt coordinates')
+            embedded_chrom, embedded_pos, embedded_ref, alt = parts
+            if (not embedded_pos.isdigit() or int(embedded_pos) < 1
+                    or not embedded_ref or not alt):
+                raise ValueError(
+                    'Invalid trailing chr:pos:ref:alt coordinates')
+            if embedded_chrom != chrom or embedded_ref != ref:
+                raise ValueError(
+                    'Trailing chromosome/reference conflicts with hg38 ID')
+        if ':' in ref:
+            raise ValueError('Invalid reference allele in hg38 variant ID')
         if not pos.isdigit() or not ref or not alt:
             return raw_id
         return f'{chrom}-{pos}-{ref}-{alt}'
@@ -234,7 +251,14 @@ class CRISPRVariantPhenotype(BaseAdapter):
 
         for row in chunk:
             raw_variant_id = row[self.file_config['variant_id_col']].strip()
-            variant_id = self._to_loadable_variant_id(raw_variant_id)
+            try:
+                variant_id = self._to_loadable_variant_id(raw_variant_id)
+            except ValueError as exc:
+                skipped_variants.append({
+                    'variant_id': raw_variant_id,
+                    'reason': str(exc),
+                })
+                continue
             variant, skipped_message = load_variant(variant_id)
             if variant:
                 spdi = variant['spdi']

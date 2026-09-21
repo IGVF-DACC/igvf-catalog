@@ -342,3 +342,43 @@ def test_variant_phenotype_sherwood_abe(mock_load, mock_bulk, mock_file_fileset)
     assert sig['neg_log10_pvalue_adj'] == pytest.approx(1.418722818)
     assert nonsig['significant'] is False
     assert nonsig['p_value_adj'] == pytest.approx(0.866342209)
+
+
+@patch('adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=set())
+@patch('adapters.CRISPR_variant_phenotype_adapter.load_variant', side_effect=_mock_load_variant)
+def test_embedded_id_preserves_hg38_coordinates(
+    mock_load, mock_bulk, mock_file_fileset, tmp_path, monkeypatch
+):
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath='unused.csv',
+        label='variant',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/',
+        writer=writer,
+    )
+    monkeypatch.chdir(tmp_path)
+    embedded = '19_11116804_hg38_A_19:11227480:A:C'
+    adapter._process_chunk([
+        {'target_id': embedded},
+        {'target_id': '19_11091518_hg38_GC_G'},
+    ])
+
+    assert [call.args[0] for call in mock_load.call_args_list] == [
+        '19-11116804-A-C', '19-11091518-GC-G',
+    ]
+    assert len(writer.contents) == 2
+    assert not (tmp_path / 'skipped_variants.jsonl').exists()
+
+
+def test_trailing_indel_coordinates():
+    assert CRISPRVariantPhenotype._to_loadable_variant_id(
+        '12_124877799_hg38_CAG_12:125362345:CAG:C'
+    ) == '12-124877799-CAG-C'
+
+
+@pytest.mark.parametrize('suffix', ['19:11227480:A', '19:bad:A:C', '19:0:A:C'])
+def test_invalid_trailing_coordinates(suffix):
+    with pytest.raises(ValueError, match='Invalid trailing'):
+        CRISPRVariantPhenotype._to_loadable_variant_id(
+            f'19_11116804_hg38_A_{suffix}'
+        )
