@@ -83,7 +83,12 @@ class TopLD(BaseAdapter):
                 '_to': _to,
                 '_key': key,
                 'chr': self.chr,
-                'negated': row[6] == '+',
+                # TopLD's +/-corr column is the sign of the Pearson correlation between the
+                # two reference alleles (Huang et al. 2022): + for positive, - for negative.
+                # row[6] is the last column and still carries the line's trailing newline
+                # (this file is split(',') on the raw line, not read via csv.reader), so it
+                # must be stripped or the comparison never matches.
+                'positive_corr': row[6].strip() == '+',
                 'variant_1_base_pair': variant_1_base_pair,
                 'variant_2_base_pair': variant_2_base_pair,
                 'variant_1_rsid': self.ids[row[0]]['rsid'],
