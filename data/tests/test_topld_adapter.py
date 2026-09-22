@@ -40,7 +40,12 @@ def test_topld_adapter_process_file(mocker):
     assert '_from' in first_item
     assert '_to' in first_item
     assert 'chr' in first_item
-    assert 'negated' in first_item
+    # regression test: TopLD's +/-corr column is + for positive correlation, - for
+    # negative; positive_corr used to be named "negated" while keeping the same `== '+'`
+    # comparison, so it was true for positive correlation despite the name implying the
+    # opposite.
+    assert 'positive_corr' in first_item
+    assert first_item['positive_corr'] is True
     assert 'variant_1_base_pair' in first_item
     assert 'variant_2_base_pair' in first_item
     assert 'variant_1_rsid' in first_item
