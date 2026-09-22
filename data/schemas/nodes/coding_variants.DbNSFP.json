@@ -6,16 +6,6 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {

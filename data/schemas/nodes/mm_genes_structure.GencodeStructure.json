@@ -6,12 +6,6 @@
     },
     {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
         "organism": {
           "$ref": "../mixins.json#/organism"
         }

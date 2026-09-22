@@ -35,7 +35,7 @@
   "source_url": {
     "description": "The URL for the source.",
     "type": "string",
-    "exampl": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
+    "example": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
   },
   "method": {
     "description": "Name of the experimental class or prediction model that produced this result.",

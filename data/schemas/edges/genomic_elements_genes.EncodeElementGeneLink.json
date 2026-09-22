@@ -18,21 +18,6 @@
         },
         "treatments_term_ids": {
           "$ref": "../mixins.json#/treatments_term_ids"
-        },
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
         }
       }
     },

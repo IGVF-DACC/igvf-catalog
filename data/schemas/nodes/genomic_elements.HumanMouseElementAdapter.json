@@ -9,19 +9,6 @@
       "$ref": "genomic_elements.base.json"
     },
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "method": {
