@@ -82,7 +82,7 @@ export const commonPathwayQueryFormat = z.object({
   pathway_name: z.string().trim().optional(),
   name_aliases: z.string().trim().optional(),
   disease_ontology_terms: z.string().trim().optional(),
-  go_biological_process: z.string().trim().optional()
+  biological_process: z.string().trim().optional()
 })
 
 export const commonHumanEdgeParamsFormat = z.object({

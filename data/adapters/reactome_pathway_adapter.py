@@ -160,7 +160,7 @@ class ReactomePathway(BaseAdapter):
                 if go_biological_process:
                     to_json.update(
                         {
-                            'go_biological_process': 'ontology_terms/' + go_biological_process['databaseName'] + '_' + go_biological_process['accession']
+                            'biological_process': 'ontology_terms/' + go_biological_process['databaseName'] + '_' + go_biological_process['accession']
                         }
                     )
                 if self.validate:

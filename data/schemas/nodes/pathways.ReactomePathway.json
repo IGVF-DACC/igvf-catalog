@@ -91,7 +91,7 @@
             "pattern": "^ontology_terms/[A-Z0-9_]+$"
           }
         },
-        "go_biological_process": {
+        "biological_process": {
           "type": "string",
           "description": "Gene Ontology biological process term for this pathway, as a handle into ontology_terms.",
           "example": "ontology_terms/GO_0006914",
@@ -113,7 +113,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, class, method, label, files_filesets, source, source_url"
+    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, biological_process, id_version, organism, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "pathways"
 }
