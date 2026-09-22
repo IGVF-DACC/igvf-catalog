@@ -77,7 +77,7 @@
         },
         "exon_id": {
           "type": "string",
-          "description": "Ensembl exon ID, including its version suffix.",
+          "description": "Ensembl exon ID, including its version suffix. Present for exons and their CDS, UTR, start_codon, and stop_codon sub-features. Absent for synthesized introns, which have no Ensembl exon ID.",
           "example": "ENSMUSE00001343744.2"
         },
         "source": {
@@ -118,7 +118,6 @@
         "transcript_id",
         "transcript_name",
         "exon_number",
-        "exon_id",
         "version",
         "organism"
       ]
