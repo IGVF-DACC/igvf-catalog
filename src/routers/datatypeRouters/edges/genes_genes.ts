@@ -144,6 +144,17 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   delete input.associated_gene_name
   delete input.associated_synonym
 
+  // z_score only exists on COXPRESdb edges (BioGRID doesn't write this field at all), so
+  // it must be filtered using CoXPresdbSchema, not the BioGRID-derived genesGenesSchema
+  // (which no longer declares z_score as a property). BioGRID edges simply lack the
+  // attribute, so a plain range comparison already excludes them without needing an
+  // explicit source guard.
+  let zScoreFilter = ''
+  if (input.z_score !== undefined) {
+    zScoreFilter = getFilterStatements(CoXPresdbSchema, { z_score: input.z_score })
+    delete input.z_score
+  }
+
   const filters = []
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
   const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
@@ -159,6 +170,10 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   if (edgeFilters) {
     filters.push(edgeFilters)
+  }
+
+  if (zScoreFilter) {
+    filters.push(zScoreFilter)
   }
 
   const combinedFilter = filters.filter((filter) => filter !== '').join(' AND ')
