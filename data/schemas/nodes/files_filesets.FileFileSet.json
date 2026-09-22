@@ -6,21 +6,24 @@
       "$ref": "node.base.json"
     },
     {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
-      "$ref": "../mixins.json#/assay_metadata"
-    },
-    {
       "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality"
+        },
         "method": {
-          "$ref": "../mixins.json#/classification/properties/method"
+          "$ref": "../mixins.json#/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/properties/class"
+          "$ref": "../mixins.json#/class"
         },
         "treatments_term_ids": {
-          "$ref": "../mixins.json#/file_metadata/properties/treatments_term_ids"
+          "$ref": "../mixins.json#/treatments_term_ids"
         }
       }
     },

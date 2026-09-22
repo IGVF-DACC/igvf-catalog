@@ -4,10 +4,17 @@
   "db_collection_name": "mm_transcripts_mm_genes_structure",
   "allOf": [
     {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
-      "$ref": "../mixins.json#/organism"
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        }
+      }
     },
     {
       "type": "object",

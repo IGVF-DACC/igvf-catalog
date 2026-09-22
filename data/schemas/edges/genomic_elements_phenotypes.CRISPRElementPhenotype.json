@@ -6,16 +6,38 @@
       "$ref": "edges.base.json"
     },
     {
-      "$ref": "../mixins.json#/file_metadata"
-    },
-    {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
-      "$ref": "../mixins.json#/classification"
-    },
-    {
-      "$ref": "../mixins.json#/assay_metadata"
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality"
+        }
+      }
     },
     {
       "type": "object",

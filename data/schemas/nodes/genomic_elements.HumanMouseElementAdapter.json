@@ -9,12 +9,15 @@
       "$ref": "genomic_elements.base.json"
     },
     {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
       "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
         "method": {
-          "$ref": "../mixins.json#/classification/properties/method"
+          "$ref": "../mixins.json#/method"
         }
       }
     },

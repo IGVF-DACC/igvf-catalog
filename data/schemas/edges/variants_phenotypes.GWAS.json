@@ -8,15 +8,24 @@
       "$ref": "edges.base.json"
     },
     {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
-      "$ref": "../mixins.json#/classification"
-    },
-    {
       "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
+          "$ref": "../mixins.json#/files_filesets"
         }
       }
     },

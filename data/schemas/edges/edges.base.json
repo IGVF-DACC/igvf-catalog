@@ -5,10 +5,23 @@
   "description": "Base schema for all edge types in the IGVF Catalog. Defines common required properties.",
   "allOf": [
     {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
-      "$ref": "../mixins.json#/classification"
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        }
+      }
     },
     {
       "type": "object",

@@ -5,7 +5,14 @@
   "description": "Base schema for all node types in the IGVF Catalog. Defines common required properties.",
   "allOf": [
     {
-      "$ref": "../mixins.json#/provenance"
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        }
+      }
     },
     {
       "type": "object",

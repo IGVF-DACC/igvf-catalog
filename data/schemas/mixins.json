@@ -1,84 +1,63 @@
 {
-  "title": "Mixin Properties",
-  "file_metadata": {
-    "properties": {
-      "files_filesets": {
-        "description": "Reference to the File and Metadata",
-        "type": "string",
-        "pattern": "^files_filesets/",
-        "collections": [
-          "files_filesets"
-        ],
-        "example": "files_filesets/IGVFFI0332UGDD"
-      },
-      "biological_context": {
-        "description": "Plain-language summary of the experimental sample or the sample context for a prediction.",
-        "type": "string"
-      },
-      "biosample_term": {
-        "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-        "type": "string",
-        "pattern": "^ontology_terms/"
-      },
-      "treatments_term_ids": {
-        "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
-        "type": [
-          "array",
-          "null"
-        ],
-        "items": {
-          "type": "string"
-        }
-      }
+  "files_filesets": {
+    "description": "Reference to the File and Metadata",
+    "type": "string",
+    "pattern": "^files_filesets/",
+    "collections": [
+      "files_filesets"
+    ],
+    "example": "files_filesets/IGVFFI0332UGDD"
+  },
+  "biological_context": {
+    "description": "Plain-language summary of the experimental sample or the sample context for a prediction.",
+    "type": "string"
+  },
+  "biosample_term": {
+    "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
+    "type": "string",
+    "pattern": "^ontology_terms/"
+  },
+  "treatments_term_ids": {
+    "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
+    "type": [
+      "array",
+      "null"
+    ],
+    "items": {
+      "type": "string"
     }
   },
-  "provenance": {
-    "properties": {
-      "source": {
-        "description": "The database, dataset or organization that is a source for these data.",
-        "type": "string",
-        "example": "IGVF"
-      },
-      "source_url": {
-        "description": "The URL for the source.",
-        "type": "string",
-        "exampl": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
-      }
-    }
+  "source": {
+    "description": "The database, dataset or organization that is a source for these data.",
+    "type": "string",
+    "example": "IGVF"
   },
-  "classification": {
-    "properties": {
-      "method": {
-        "description": "Name of the experimental class or prediction model that produced this result.",
-        "type": "string",
-        "example": "MPRA"
-      },
-      "label": {
-        "description": "Non-method specific human readable label for the node or edge",
-        "type": "string",
-        "example": "eQTL"
-      },
-      "class": {
-        "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
-        "type": "string",
-        "example": "observed data"
-      }
-    }
+  "source_url": {
+    "description": "The URL for the source.",
+    "type": "string",
+    "exampl": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
   },
-  "assay_metadata": {
-    "properties": {
-      "crispr_modality": {
-        "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
-        "type": "string"
-      }
-    }
+  "method": {
+    "description": "Name of the experimental class or prediction model that produced this result.",
+    "type": "string",
+    "example": "MPRA"
+  },
+  "label": {
+    "description": "Non-method specific human readable label for the node or edge",
+    "type": "string",
+    "example": "eQTL"
+  },
+  "class": {
+    "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+    "type": "string",
+    "example": "observed data"
+  },
+  "crispr_modality": {
+    "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
+    "type": "string"
   },
   "organism": {
-    "properties": {
-      "organism": {
-        "type": "string",
-        "description": "Species this annotation describes."
-      }
-    }
+    "type": "string",
+    "description": "Species this annotation describes."
   }
 }

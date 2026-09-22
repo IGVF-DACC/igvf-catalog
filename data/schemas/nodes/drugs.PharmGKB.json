@@ -6,18 +6,21 @@
       "$ref": "node.base.json"
     },
     {
-      "$ref": "../mixins.json#/provenance"
-    },
-    {
       "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
         "method": {
-          "$ref": "../mixins.json#/classification/properties/method"
+          "$ref": "../mixins.json#/method"
         },
         "class": {
-          "$ref": "../mixins.json#/classification/properties/class"
+          "$ref": "../mixins.json#/class"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/file_metadata/properties/files_filesets"
+          "$ref": "../mixins.json#/files_filesets"
         }
       }
     },

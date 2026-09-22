@@ -9,7 +9,7 @@
     {
       "properties": {
         "method": {
-          "$ref": "../mixins.json#/classification/properties/method"
+          "$ref": "../mixins.json#/method"
         }
       }
     },

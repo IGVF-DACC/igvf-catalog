@@ -6,7 +6,14 @@
       "$ref": "node.base.json"
     },
     {
-      "$ref": "../mixins.json#/provenance"
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        }
+      }
     },
     {
       "type": "object",
