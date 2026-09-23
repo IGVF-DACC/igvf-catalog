@@ -52,14 +52,14 @@
           "example": "rs1234567890"
         },
         "motif_fc": {
-          "type": "string",
+          "type": ["number", "null"],
           "description": "Log2 ratio of HOCOMOCO motif p-values for the reference versus alternate allele. Positive values mean the motif prefers the alternate allele; negative values prefer the reference.",
-          "example": "-0.2727347850176788"
+          "example": -0.2727347850176788
         },
         "motif_pos": {
-          "type": "string",
+          "type": ["number", "null"],
           "description": "0-based position of the variant relative to the best HOCOMOCO PWM hit.",
-          "example": "10"
+          "example": 10
         },
         "motif_orient": {
           "type": "string",
@@ -78,14 +78,14 @@
           "pattern": "^motifs/"
         },
         "es_mean_ref": {
-          "type": "string",
-          "description": "Allele-wise effect size for the reference allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger reference-allele ASB.",
-          "example": "1.795276180193825"
+          "type": "number",
+          "description": "The effect size mean for the reference allele",
+          "example": 1.795276180193825
         },
         "es_mean_alt": {
-          "type": "string",
-          "description": "Allele-wise effect size for the alternate allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger alternate-allele ASB.",
-          "example": "-1.7019721868875686"
+          "type": "number",
+          "description": "The effect size mean for the alternate allele",
+          "example": -1.7019721868875686
         },
         "p_value_adj_ref": {
           "type": "number",
