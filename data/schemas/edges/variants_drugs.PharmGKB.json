@@ -144,7 +144,15 @@
               "Other",
               "PD",
               "Toxicity"
-            ]
+            ],
+            "enum_descriptions": {
+              "Dosage": "Association with the amount of drug administered.",
+              "Efficacy": "Association with the therapeutic response to a drug.",
+              "Metabolism/PK": "Association with drug metabolism or pharmacokinetics, including drug exposure and clearance.",
+              "Other": "A phenotype outside the other listed pharmacogenomic categories.",
+              "PD": "Pharmacodynamics: association with the biological effects of a drug.",
+              "Toxicity": "Association with adverse or toxic effects of a drug."
+            }
           }
         },
         "name": {

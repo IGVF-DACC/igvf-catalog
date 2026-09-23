@@ -129,10 +129,13 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for regulation of DNA binding.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0051101"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0051101": "Regulation of DNA binding."
+          }
         }
       },
       "required": [

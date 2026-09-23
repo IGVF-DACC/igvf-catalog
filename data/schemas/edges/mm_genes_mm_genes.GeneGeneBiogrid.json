@@ -40,7 +40,10 @@
           "description": "PSI-MI detection method used to observe the interaction",
           "enum": [
             "genetic interference"
-          ]
+          ],
+          "enum_descriptions": {
+            "genetic interference": "This term refers to methods that aim at interfering with the activity of a specific gene by altering the gene regulatory or coding sequences. This goal can be achieved either by a classical genetic approach (random mutagenesis followed by phenotype characterization and genetic mapping) or by a reverse genetics approach where a gene of interest is modified by directed mutagenesis."
+          }
         },
         "detection_method_code": {
           "title": "Detection Method Code",
@@ -48,7 +51,10 @@
           "description": "PSI-MI identifier of the detection method.",
           "enum": [
             "MI:0254"
-          ]
+          ],
+          "enum_descriptions": {
+            "MI:0254": "genetic interference: This term refers to methods that aim at interfering with the activity of a specific gene by altering the gene regulatory or coding sequences. This goal can be achieved either by a classical genetic approach (random mutagenesis followed by phenotype characterization and genetic mapping) or by a reverse genetics approach where a gene of interest is modified by directed mutagenesis."
+          }
         },
         "interaction_type": {
           "title": "Interaction Type",
@@ -66,7 +72,18 @@
               "synthetic haploinsufficiency (sensu BioGRID)",
               "synthetic lethality (sensu BioGRID)",
               "synthetic rescue (sensu BioGRID)"
-            ]
+            ],
+            "enum_descriptions": {
+              "dosage rescue (sensu BioGRID)": "Increased dosage of one gene rescues lethality or a growth defect associated with perturbation of another gene.",
+              "negative genetic interaction (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotypic defect (or lethality) than from individual viable perturbations. This term is reserved for high throughput studies with scores.",
+              "phenotypic enhancement (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations.",
+              "phenotypic suppression (sensu BioGRID)": "Genetic perturbation of one gene suppresses a phenotype (other than lethality or growth defect) associated with perturbation of another gene.",
+              "positive genetic interaction (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a less severe phenotype than from individual perturbations. This term is reserved for high throughput studies with scores.",
+              "synthetic growth defect (sensu BioGRID)": "Mutation of multiple genes in combination that results in a more severe growth defect than from individual mutation.",
+              "synthetic haploinsufficiency (sensu BioGRID)": "Genetic perturbations of multiple genes in combination that results in a more severe growth defect than each individual perturbation, when one mutation is hemizygous.",
+              "synthetic lethality (sensu BioGRID)": "Mutation of multiple genes in combination that results in lethality when individual single mutations are viable.",
+              "synthetic rescue (sensu BioGRID)": "Mutation of one gene rescues lethality or a growth defect associated with perturbation of another gene."
+            }
           }
         },
         "interaction_type_code": {
@@ -85,7 +102,18 @@
               "MI:2374",
               "MI:2375",
               "MI:2376"
-            ]
+            ],
+            "enum_descriptions": {
+              "MI:2368": "phenotypic enhancement (sensu BioGRID): Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations.",
+              "MI:2369": "synthetic growth defect (sensu BioGRID): Mutation of multiple genes in combination that results in a more severe growth defect than from individual mutation.",
+              "MI:2370": "synthetic lethality (sensu BioGRID): Mutation of multiple genes in combination that results in lethality when individual single mutations are viable.",
+              "MI:2371": "positive genetic interaction (sensu BioGRID): Genetic perturbation of multiple genes in combination that results in a less severe phenotype than from individual perturbations. This term is reserved for high throughput studies with scores.",
+              "MI:2372": "synthetic haploinsufficiency (sensu BioGRID): Genetic perturbations of multiple genes in combination that results in a more severe growth defect than each individual perturbation, when one mutation is hemizygous.",
+              "MI:2373": "negative genetic interaction (sensu BioGRID): Genetic perturbation of multiple genes in combination that results in a more severe phenotypic defect (or lethality) than from individual viable perturbations. This term is reserved for high throughput studies with scores.",
+              "MI:2374": "phenotypic suppression (sensu BioGRID): Genetic perturbation of one gene suppresses a phenotype (other than lethality or growth defect) associated with perturbation of another gene.",
+              "MI:2375": "synthetic rescue (sensu BioGRID): Mutation of one gene rescues lethality or a growth defect associated with perturbation of another gene.",
+              "MI:2376": "dosage rescue (sensu BioGRID): Increased dosage of one gene rescues lethality or a growth defect associated with perturbation of another gene."
+            }
           }
         },
         "confidence_value_biogrid": {
@@ -123,10 +151,13 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Placeholder set to 0 because BioGRID interactions do not have a COXPRESdb coexpression z-score.",
+          "description": "Coexpression z-score placeholder for BioGRID interactions.",
           "enum": [
             0
-          ]
+          ],
+          "enum_descriptions": {
+            "0": "No COXPRESdb coexpression z-score is available; this value is a placeholder."
+          }
         },
         "name": {
           "enum": [
@@ -144,7 +175,10 @@
           "description": "Gene Ontology term for protein binding, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0005515"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0005515": "Protein binding."
+          }
         },
         "method": {
           "enum": [
@@ -164,7 +198,25 @@
             "synthetic haploinsufficiency (sensu BioGRID)",
             "synthetic lethality (sensu BioGRID)",
             "synthetic rescue (sensu BioGRID)"
-          ]
+          ],
+          "enum_descriptions": {
+            "dosage rescue (sensu BioGRID)": "Increased dosage of one gene rescues lethality or a growth defect associated with perturbation of another gene.",
+            "dosage rescue (sensu BioGRID), synthetic haploinsufficiency (sensu BioGRID)": "Increased dosage of one gene rescues lethality or a growth defect associated with perturbation of another gene. Genetic perturbations of multiple genes in combination that results in a more severe growth defect than each individual perturbation, when one mutation is hemizygous.",
+            "negative genetic interaction (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotypic defect (or lethality) than from individual viable perturbations. This term is reserved for high throughput studies with scores.",
+            "negative genetic interaction (sensu BioGRID), synthetic lethality (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotypic defect (or lethality) than from individual viable perturbations. This term is reserved for high throughput studies with scores. Mutation of multiple genes in combination that results in lethality when individual single mutations are viable.",
+            "phenotypic enhancement (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations.",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations. Genetic perturbation of one gene suppresses a phenotype (other than lethality or growth defect) associated with perturbation of another gene.",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID), synthetic haploinsufficiency (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations. Genetic perturbation of one gene suppresses a phenotype (other than lethality or growth defect) associated with perturbation of another gene. Genetic perturbations of multiple genes in combination that results in a more severe growth defect than each individual perturbation, when one mutation is hemizygous.",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID), synthetic lethality (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations. Genetic perturbation of one gene suppresses a phenotype (other than lethality or growth defect) associated with perturbation of another gene. Mutation of multiple genes in combination that results in lethality when individual single mutations are viable.",
+            "phenotypic enhancement (sensu BioGRID), synthetic growth defect (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations. Mutation of multiple genes in combination that results in a more severe growth defect than from individual mutation.",
+            "phenotypic enhancement (sensu BioGRID), synthetic lethality (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a more severe phenotype (except lethality or growth defect) than individual genetic perturbations. Mutation of multiple genes in combination that results in lethality when individual single mutations are viable.",
+            "phenotypic suppression (sensu BioGRID)": "Genetic perturbation of one gene suppresses a phenotype (other than lethality or growth defect) associated with perturbation of another gene.",
+            "positive genetic interaction (sensu BioGRID)": "Genetic perturbation of multiple genes in combination that results in a less severe phenotype than from individual perturbations. This term is reserved for high throughput studies with scores.",
+            "synthetic growth defect (sensu BioGRID)": "Mutation of multiple genes in combination that results in a more severe growth defect than from individual mutation.",
+            "synthetic haploinsufficiency (sensu BioGRID)": "Genetic perturbations of multiple genes in combination that results in a more severe growth defect than each individual perturbation, when one mutation is hemizygous.",
+            "synthetic lethality (sensu BioGRID)": "Mutation of multiple genes in combination that results in lethality when individual single mutations are viable.",
+            "synthetic rescue (sensu BioGRID)": "Mutation of one gene rescues lethality or a growth defect associated with perturbation of another gene."
+          }
         },
         "label": {
           "enum": [

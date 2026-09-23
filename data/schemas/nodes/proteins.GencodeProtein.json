@@ -61,11 +61,15 @@
         "uniprot_collection": {
           "title": "UniProt Collection",
           "type": "string",
-          "description": "Which section of UniProtKB the mapped entries come from: Swiss-Prot for manually reviewed entries, TrEMBL for automatically annotated ones.",
+          "description": "Section of UniProtKB the mapped entries come from.",
           "enum": [
             "Swiss-Prot",
             "TrEMBL"
-          ]
+          ],
+          "enum_descriptions": {
+            "Swiss-Prot": "Manually reviewed UniProtKB entries.",
+            "TrEMBL": "Automatically annotated UniProtKB entries that have not been manually reviewed."
+          }
         },
         "uniprot_ids": {
           "title": "UniProt IDs",

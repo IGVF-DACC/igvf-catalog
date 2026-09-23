@@ -90,7 +90,17 @@
             "Strong",
             "Supportive"
           ],
-          "example": "Definitive"
+          "example": "Definitive",
+          "enum_descriptions": {
+            "Definitive": "A well-established causal gene–disease relationship with convincing evidence replicated over time.",
+            "Strong": "Strong human evidence supports a causal gene–disease relationship.",
+            "Moderate": "Moderate human evidence supports a causal gene–disease relationship without contradictory evidence.",
+            "Supportive": "Evidence supports a causal gene–disease relationship, without a more specific strength classification.",
+            "Limited": "Human evidence is limited, but the proposed relationship has not been fully refuted.",
+            "Disputed Evidence": "Conflicting evidence casts doubt on the proposed gene–disease relationship.",
+            "Refuted Evidence": "Valid contradictory evidence refutes the original support for the relationship.",
+            "No Known Disease Relationship": "No established evidence supports the proposed gene–disease relationship."
+          }
         },
         "moi_id": {
           "title": "Mode of Inheritance ID",

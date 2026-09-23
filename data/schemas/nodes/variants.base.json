@@ -51,7 +51,13 @@
         "variation_type": {
           "title": "Variation Type",
           "type": "string",
-          "description": "Class of sequence change: SNP, insertion, deletion, or deletion-insertion."
+          "description": "Class of sequence change.",
+          "enum_descriptions": {
+            "SNP": "A single-nucleotide substitution.",
+            "deletion-insertion": "Replacement of a reference sequence with an alternate sequence.",
+            "insertion": "Addition of sequence relative to the reference.",
+            "deletion": "Removal of sequence relative to the reference."
+          }
         },
         "annotations": {
           "title": "Annotations",

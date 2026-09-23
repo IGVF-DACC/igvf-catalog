@@ -80,13 +80,19 @@
             "string",
             "null"
           ],
-          "description": "GO namespace of the term. Null for terms that are not from GO.",
+          "description": "Gene Ontology namespace of the term.",
           "enum": [
             "biological_process",
             "cellular_component",
             "molecular_function",
             null
-          ]
+          ],
+          "enum_descriptions": {
+            "biological_process": "A biological objective accomplished by molecular activities.",
+            "cellular_component": "A cellular location or complex in which a gene product acts.",
+            "molecular_function": "A molecular activity performed by a gene product.",
+            "null": "The term is not assigned to a Gene Ontology namespace."
+          }
         },
         "class": {
           "enum": [

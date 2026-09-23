@@ -49,7 +49,12 @@
         "strand": {
           "title": "Strand",
           "type": "string",
-          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one."
+          "description": "Strand the tile was tested in..",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence.",
+            ".": "Strand is not recorded or is not applicable."
+          }
         },
         "log2FC": {
           "title": "Log2 Fold Change",

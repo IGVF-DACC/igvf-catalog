@@ -96,7 +96,35 @@
           "title": "Evidence",
           "type": "string",
           "description": "GO evidence code supporting the annotation.",
-          "example": "IEA"
+          "example": "IEA",
+          "enum_descriptions": {
+            "EXP": "Supported by experimental results.",
+            "IDA": "Supported by a direct functional assay.",
+            "IPI": "Supported by measured physical interactions.",
+            "IMP": "Supported by a phenotype following mutation.",
+            "IGI": "Supported by observed genetic interactions.",
+            "IEP": "Supported by an observed expression pattern.",
+            "HTP": "Supported by large-scale experimental results.",
+            "HDA": "Supported by large-scale direct assays.",
+            "HMP": "Supported by large-scale mutant phenotype measurements.",
+            "HGI": "Supported by large-scale genetic interaction measurements.",
+            "HEP": "Supported by large-scale expression measurements.",
+            "IBA": "Transferred through an inferred ancestral function.",
+            "IBD": "Inferred using functions of evolutionary descendants.",
+            "IKR": "Inferred using functionally important residues.",
+            "IRD": "Inferred using rapid evolutionary divergence.",
+            "ISS": "Inferred using sequence or structural resemblance.",
+            "ISO": "Transferred using an orthologous sequence.",
+            "ISA": "Inferred using aligned sequences.",
+            "ISM": "Inferred using a sequence-based model.",
+            "IGC": "Inferred using the surrounding genomic context.",
+            "RCA": "Supported by a computational analysis reviewed by a curator.",
+            "TAS": "Based on an author claim with a traceable supporting reference.",
+            "NAS": "Based on an author claim without a traceable supporting reference.",
+            "IC": "Assigned through curator reasoning.",
+            "ND": "No supporting biological evidence is available.",
+            "IEA": "Assigned automatically without manual review of the annotation."
+          }
         },
         "with": {
           "title": "Supporting Identifiers",
@@ -109,8 +137,13 @@
         "aspect": {
           "title": "Aspect",
           "type": "string",
-          "description": "Branch of the Gene Ontology the term belongs to: P for biological process, F for molecular function, or C for cellular component.",
-          "example": "P"
+          "description": "Branch of the Gene Ontology the term belongs to.",
+          "example": "P",
+          "enum_descriptions": {
+            "P": "Biological process.",
+            "F": "Molecular function.",
+            "C": "Cellular component."
+          }
         },
         "synonyms": {
           "title": "Synonyms",

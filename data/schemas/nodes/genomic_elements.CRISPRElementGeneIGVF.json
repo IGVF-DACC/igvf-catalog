@@ -39,13 +39,18 @@
         "source_annotation": {
           "title": "Source Annotation",
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element supplied by the source.",
           "example": "promoter",
           "enum": [
             "enhancer",
             "promoter",
             "distal element"
-          ]
+          ],
+          "enum_descriptions": {
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter.",
+            "promoter": "An element associated with transcription initiation at a gene.",
+            "distal element": "An element located away from a promoter."
+          }
         },
         "source": {
           "enum": [

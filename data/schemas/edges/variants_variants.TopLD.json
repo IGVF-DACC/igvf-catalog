@@ -103,7 +103,13 @@
             "EAS",
             "EUR",
             "SAS"
-          ]
+          ],
+          "enum_descriptions": {
+            "AFR": "African ancestry.",
+            "EAS": "East Asian ancestry.",
+            "EUR": "European ancestry.",
+            "SAS": "South Asian ancestry."
+          }
         },
         "label": {
           "enum": [

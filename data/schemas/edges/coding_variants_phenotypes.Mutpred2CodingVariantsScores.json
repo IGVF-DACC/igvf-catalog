@@ -91,7 +91,12 @@
                   "Gain",
                   "Altered"
                 ],
-                "example": "Gain"
+                "example": "Gain",
+                "enum_descriptions": {
+                  "Loss": "Predicted loss of the specified molecular property.",
+                  "Gain": "Predicted gain of the specified molecular property.",
+                  "Altered": "Predicted change in the specified molecular property without a gain or loss designation."
+                }
               }
             },
             "required": [

@@ -161,7 +161,12 @@
             "string",
             "null"
           ],
-          "description": "Functional consequence assigned to the variant from its z-score: functionally_normal, indeterminate, or functionally_abnormal."
+          "description": "Functional consequence assigned to the variant from its z-score.",
+          "enum_descriptions": {
+            "functionally_normal": "The variant is classified as having normal function under the assay thresholds.",
+            "indeterminate": "The assay does not confidently classify the variant as functionally normal or abnormal.",
+            "functionally_abnormal": "The variant is classified as having abnormal function under the assay thresholds."
+          }
         },
         "functional_consequence_zscore": {
           "title": "Functional Consequence Z-Score",
@@ -177,7 +182,12 @@
             "string",
             "null"
           ],
-          "description": "Whether the variant passes the assay QC metrics: PASS, FAIL, or LOWCOV for low coverage."
+          "description": "Quality-control classification assigned to the variant by the assay.",
+          "enum_descriptions": {
+            "PASS": "The variant passes the assay quality-control criteria.",
+            "FAIL": "The variant fails the assay quality-control criteria.",
+            "LOWCOV": "The variant has insufficient coverage for reliable assessment."
+          }
         },
         "snvlib_lib1": {
           "title": "Plasmid Library 1 Variant Count",

@@ -37,13 +37,19 @@
         "source_annotation": {
           "title": "Source Annotation",
           "type": "string",
-          "description": "Class of the element: promoter, genic, or intergenic.",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
             "genic",
             "intergenic",
             "promoter",
             "enhancer"
-          ]
+          ],
+          "enum_descriptions": {
+            "genic": "An element within a gene body.",
+            "intergenic": "An element between annotated genes.",
+            "promoter": "An element associated with transcription initiation at a gene.",
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter."
+          }
         },
         "source": {
           "enum": [

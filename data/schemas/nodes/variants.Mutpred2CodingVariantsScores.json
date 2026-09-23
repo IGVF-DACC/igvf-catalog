@@ -15,7 +15,11 @@
           "enum": [
             "SNP",
             "deletion-insertion"
-          ]
+          ],
+          "enum_descriptions": {
+            "SNP": "A single-nucleotide substitution.",
+            "deletion-insertion": "Replacement of a reference sequence with an alternate sequence."
+          }
         },
         "source": {
           "enum": [

@@ -41,12 +41,16 @@
         "strand": {
           "title": "Strand",
           "type": "string",
-          "description": "Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand of the transcript the feature belongs to..",
           "enum": [
             "+",
             "-"
           ],
-          "example": "+"
+          "example": "+",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "type": {
           "title": "Type",
@@ -59,7 +63,15 @@
             "intron",
             "start_codon",
             "stop_codon"
-          ]
+          ],
+          "enum_descriptions": {
+            "CDS": "Coding sequence translated into protein.",
+            "UTR": "Untranslated region of a transcript.",
+            "exon": "A segment retained in the mature transcript.",
+            "intron": "An intervening segment removed during RNA splicing.",
+            "start_codon": "The codon at which translation begins.",
+            "stop_codon": "The codon at which translation terminates."
+          }
         },
         "gene_id": {
           "title": "Gene ID",

@@ -37,11 +37,15 @@
         "type": {
           "title": "Type",
           "type": "string",
-          "description": "Whether the consequence is a protein-coding amino-acid change or a splice-site SNP (aapos = -1).",
+          "description": "Category of the variant consequence.",
           "enum": [
             "protein coding",
             "splicing"
-          ]
+          ],
+          "enum_descriptions": {
+            "protein coding": "An amino acid change in a protein-coding sequence.",
+            "splicing": "A splice-site single-nucleotide variant, represented with amino acid position -1."
+          }
         },
         "name": {
           "title": "Name",

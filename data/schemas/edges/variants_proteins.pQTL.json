@@ -71,11 +71,15 @@
         "regulatory_type": {
           "title": "Regulatory Type",
           "type": "string",
-          "description": "Whether the association is cis (within 1 Mb of the gene encoding the protein) or trans.",
+          "description": "Location of the association relative to the gene encoding the measured protein.",
           "enum": [
             "cis",
             "trans"
-          ]
+          ],
+          "enum_descriptions": {
+            "cis": "The variant is within 1 Mb of the gene encoding the measured protein.",
+            "trans": "The variant is outside the cis window of the gene encoding the measured protein."
+          }
         },
         "gene": {
           "title": "Gene",
@@ -103,7 +107,10 @@
         "biosample_term": {
           "enum": [
             "ontology_terms/UBERON_0001969"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/UBERON_0001969": "Blood plasma."
+          }
         },
         "source": {
           "enum": [

@@ -52,11 +52,15 @@
         "strand": {
           "title": "Strand",
           "type": "string",
-          "description": "Strand the gene is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand the gene is transcribed from..",
           "enum": [
             "+",
             "-"
-          ]
+          ],
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "name": {
           "example": "Gm13290"

@@ -86,10 +86,13 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for the process this edge represents. GO_0006412 is 'translation'.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0006412"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0006412": "Translation."
+          }
         }
       },
       "required": [

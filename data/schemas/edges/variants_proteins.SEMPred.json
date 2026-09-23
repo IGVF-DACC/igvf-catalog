@@ -104,8 +104,16 @@
         "SEMpl_annotation": {
           "title": "SEMpl Annotation",
           "type": "string",
-          "description": "Predicted effect of the variant on binding, assigned by comparing ref_score and alt_score against 2 raised to SEMpl_baseline: no_binding when neither allele binds, binding_unchanged, binding_increased, binding_decreased, binding_created when only the alternate allele binds, or binding_ablated when only the reference allele binds.",
-          "example": "binding_created"
+          "description": "Predicted effect of the variant on binding, assigned by comparing reference and alternate scores against 2 raised to SEMpl_baseline.",
+          "example": "binding_created",
+          "enum_descriptions": {
+            "no_binding": "Neither allele has a binding score above the binding threshold.",
+            "binding_unchanged": "Binding is retained without a change in the predicted binding classification.",
+            "binding_increased": "The alternate allele has stronger predicted binding.",
+            "binding_decreased": "The alternate allele has weaker predicted binding.",
+            "binding_created": "Only the alternate allele has a binding score above the binding threshold.",
+            "binding_ablated": "Only the reference allele has a binding score above the binding threshold."
+          }
         },
         "SEMpl_baseline": {
           "title": "SEMpl Baseline",
@@ -125,10 +133,13 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for the process this edge represents. GO_0051101 is 'regulation of DNA binding'.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0051101"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0051101": "Regulation of DNA binding."
+          }
         },
         "source": {
           "enum": [

@@ -47,7 +47,10 @@
           "description": "Gene Ontology term for gene expression, as a handle into ontology_terms.",
           "enum": [
             "ontology_terms/GO_0010467"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0010467": "Gene expression."
+          }
         },
         "method": {
           "enum": [

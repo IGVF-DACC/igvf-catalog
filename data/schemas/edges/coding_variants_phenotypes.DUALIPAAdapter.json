@@ -116,7 +116,12 @@
             "N",
             "Uncertain"
           ],
-          "description": "Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method."
+          "description": "Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method.",
+          "enum_descriptions": {
+            "Y": "The variant meets the assay threshold for a significant change in protein abundance.",
+            "N": "The variant does not meet the assay threshold for a significant change in protein abundance.",
+            "Uncertain": "The assay does not confidently classify the abundance change as significant or not significant."
+          }
         }
       },
       "required": [

@@ -67,10 +67,13 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for the process this edge represents. GO_0003677 is 'DNA binding'.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0003677"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0003677": "DNA binding."
+          }
         },
         "source": {
           "enum": [

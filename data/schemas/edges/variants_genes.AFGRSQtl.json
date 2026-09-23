@@ -46,7 +46,10 @@
         "biosample_term": {
           "enum": [
             "ontology_terms/EFO_0005292"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/EFO_0005292": "Lymphoblastoid cell line."
+          }
         },
         "chr": {
           "title": "Chromosome",
@@ -146,10 +149,13 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for regulation of RNA splicing.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0043484"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0043484": "Regulation of RNA splicing."
+          }
         }
       },
       "required": [

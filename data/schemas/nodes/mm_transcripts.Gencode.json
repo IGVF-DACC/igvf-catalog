@@ -56,12 +56,16 @@
         "strand": {
           "title": "Strand",
           "type": "string",
-          "description": "Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand the transcript is transcribed from..",
           "enum": [
             "+",
             "-"
           ],
-          "example": "+"
+          "example": "+",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "gene_name": {
           "title": "Gene Name",

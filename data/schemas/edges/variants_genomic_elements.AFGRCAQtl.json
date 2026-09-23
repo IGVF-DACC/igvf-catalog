@@ -77,7 +77,10 @@
         "biosample_term": {
           "enum": [
             "ontology_terms/EFO_0005292"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/EFO_0005292": "Lymphoblastoid cell line."
+          }
         },
         "name": {
           "enum": [

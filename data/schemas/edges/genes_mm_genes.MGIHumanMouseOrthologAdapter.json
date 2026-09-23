@@ -73,7 +73,10 @@
           "description": "NCI Thesaurus term for a homologous gene.",
           "enum": [
             "ontology_terms/NCIT_C79968"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/NCIT_C79968": "Homologous gene."
+          }
         },
         "source": {
           "enum": [
