@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_biosamples.BlueSTARRVariantBiosample.json",
   "allOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to biosample edge"
+          "description": "Variant key, biosample ontology term and source file accession joined by underscores."
         },
         "_from": {
           "example": "variants/NC_000005.10:1779518:G:A",
@@ -40,7 +40,7 @@
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2FC of the variant to biosample edge"
+          "description": "log2 fold change in STARR-seq reporter activity."
         },
         "class": {
           "enum": [
@@ -56,14 +56,6 @@
           "enum": [
             "BlueSTARR"
           ]
-        },
-        "biological_context": {
-          "type": "string",
-          "description": "Biological context of the variant to biosample edge"
-        },
-        "biosample_term": {
-          "type": "string",
-          "description": "Biosample term of the variant to biosample edge"
         },
         "name": {
           "enum": [
@@ -89,13 +81,13 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filesets of the variant to biosample edge",
-          "example": "files_filesets/IGVFFI1663LKVQ",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
         }
       },
       "required": [

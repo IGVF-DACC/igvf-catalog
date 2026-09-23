@@ -37,6 +37,49 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl(mock_request, mocker):
         assert first_item['inverse_name'] == 'expression modulated by'
 
 
+@patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
+def test_AFGR_eqtl_adapter_key_includes_file_accession(mock_request, mocker):
+    """Different file accessions must produce different edge keys for the same pair."""
+    import hashlib
+    mock_igvf_metadata(mock_request)
+    mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+
+    with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+
+        writer_a = SpyWriter()
+        adapter_a = AFGREQtl(
+            filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+            label='AFGR_eqtl',
+            writer=writer_a,
+            validate=False
+        )
+        adapter_a.file_accession = 'IGVFFIAAAA0001'
+        adapter_a.process_file()
+
+        writer_b = SpyWriter()
+        adapter_b = AFGREQtl(
+            filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+            label='AFGR_eqtl',
+            writer=writer_b,
+            validate=False
+        )
+        adapter_b.file_accession = 'IGVFFIBBBB0002'
+        adapter_b.process_file()
+
+        key_a = json.loads(writer_a.contents[0])['_key']
+        key_b = json.loads(writer_b.contents[0])['_key']
+        assert key_a != key_b
+
+        gene_id = json.loads(writer_a.contents[0])['_to'].split('/')[-1]
+        expected_a = hashlib.sha256(
+            ('fake_variant_id_' + gene_id + '_IGVFFIAAAA0001').encode()
+        ).hexdigest()
+        assert key_a == expected_a
+
+
 def test_AFGR_eqtl_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError):

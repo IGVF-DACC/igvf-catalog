@@ -22,31 +22,23 @@
         },
         "baseline": {
           "type": "number",
-          "description": "The baseline of the motif",
+          "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers.",
           "example": -0.671761
         },
         "class": {
-          "type": "string",
-          "description": "The class of the motif, from the associated files_filesets record",
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
-          "description": "The method of the motif, from the associated files_filesets record",
+          "$ref": "../mixins.json#/method",
           "enum": [
             "SEMpl"
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "The files filesets of the motif",
-          "example": "files_filesets/IGVFFI5279OTVZ",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

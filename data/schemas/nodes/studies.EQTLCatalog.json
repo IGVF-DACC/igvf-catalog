@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/studies.EQTLCatalog.json",
+  "$id": "schemas/nodes/studies.EQTLCatalog.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -16,12 +16,12 @@
         },
         "pmid": {
           "type": "string",
-          "description": "The PMID of the study",
+          "description": "PubMed identifier.",
           "example": "35389779"
         },
         "study_type": {
           "type": "string",
-          "description": "The type of the study",
+          "description": "Whether the study measured expression in bulk tissue or in single cells.",
           "enum": [
             "single-cell",
             "bulk"
@@ -32,10 +32,8 @@
             "EBI"
           ]
         },
-        "source_url": {},
         "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the study"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
   "allOf": [
     {
@@ -10,11 +10,11 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Genomic element key, Ensembl gene ID and source file accession joined by underscores.",
           "example": "intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC"
         },
         "_from": {
-          "example": "genomic_elements/intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC",
+          "example": "genomic_elements/intergenic_chr1_778465_778965_GRCh38_ENCFF003BKC",
           "pattern": "^genomic_elements/",
           "collections": [
             "genomic_elements"
@@ -44,7 +44,7 @@
         },
         "score": {
           "type": "number",
-          "description": "The score of the genomic element to gene edge"
+          "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene."
         },
         "source": {
           "enum": [
@@ -55,29 +55,16 @@
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
-          "example": "files_filesets/ENCFF003BKC",
-          "pattern": "^files_filesets/"
-        },
         "biological_context": {
-          "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
-          "example": "K562"
+          "$ref": "../mixins.json#/biological_context",
+          "example": "head of caudate nucleus from ENCDO948PMW"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
-          "example": "ontology_terms/EFO_0002067",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/UBERON_0002626"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "The treatments term ids of the genomic element to gene edge",
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "UniProtKB:P05112"
           ]
@@ -91,6 +78,9 @@
           "enum": [
             "regulated by"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
@@ -106,7 +96,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "score",
-    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, score"
+    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, score"
   },
   "db_collection_name": "genomic_elements_genes"
 }

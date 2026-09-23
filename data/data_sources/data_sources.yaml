@@ -289,7 +289,7 @@ topld in linkage disequilibrium with:
         - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
   source: TopLD
-  label: linkage disequilibrum
+  label: linkage disequilibrium
 # Note:
 # The tar.gz archive containing the rdict can be downloaded from s3://igvf-catalog-source-data/hgvs_to_caid_rdict.tar.gz
 # In the following examples, assume that we have decompressed the archive to the current directory.
@@ -1147,13 +1147,13 @@ genomic element encode human ccre:
   type: candidate cis regulatory element
   source_annotation: str # ccre annotation
 
-# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF167FJQ.bed.gz --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl --label mm_genomic_element
+# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI8753TTYC.bed.gz --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl --label mm_genomic_element
 mouse genomic element ccre:
   collection: mm_genomic_elements
   pypy3: true
   command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl --label mm_genomic_element
   datafiles:
-    - https://www.encodeproject.org/files/ENCFF167FJQ/@@download/ENCFF167FJQ.bed.gz # IGVF:IGVFFI8753TTYC
+    - https://api.data.igvf.org/reference-files/IGVFFI8753TTYC/@@download/IGVFFI8753TTYC.bed.gz
   source: ENCODE
   type: candidate cis regulatory element
   source_annotation: str # ccre annotation
@@ -1333,6 +1333,8 @@ variant CRISPR variant phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/@@download/IGVFFI9726GFTC.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/@@download/IGVFFI1678CDBR.csv.gz
   source: IGVF
 
 # Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant_phenotype --output-bucket-key variants_phenotypes/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1344,6 +1346,8 @@ variant to phenotype CRISPR variant phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/@@download/IGVFFI9726GFTC.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/@@download/IGVFFI1678CDBR.csv.gz
   source: IGVF
   label: variant effect on phenotype
 

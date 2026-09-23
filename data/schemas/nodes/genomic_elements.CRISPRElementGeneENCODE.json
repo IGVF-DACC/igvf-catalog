@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.CRISPRElementGeneENCODE.json",
   "allOf": [
     {
@@ -11,22 +11,27 @@
     {
       "type": "object",
       "properties": {
+        "_key": {
+          "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
+        },
+        "name": {
+          "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
+        },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "enum": [
             "enhancer",
             "negative control"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element"
-        },
         "method": {
           "enum": [
             "CRISPR screen"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

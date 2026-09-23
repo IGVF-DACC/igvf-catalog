@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genomic_elements_biosamples.MPRAAdapter.json",
   "allOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to biosample edge"
+          "description": "Genomic element key, strand token, source file accession and biosample term joined by underscores."
         },
         "_from": {
           "example": "genomic_elements/MPRA_chr1_10410_10610_GRCh38_ENCFF769REH",
@@ -28,38 +28,43 @@
         },
         "bed_score": {
           "type": "integer",
-          "description": "The bed score of the genomic element to biosample edge"
+          "description": "Score column of the source BED file."
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the genomic element to biosample edge"
+          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one."
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2FC of the genomic element to biosample edge"
+          "description": "Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio."
         },
         "DNA_count": {
           "type": "number",
-          "description": "The DNA count of the genomic element to biosample edge"
+          "description": "Input count (DNA), normalized to counts per million and averaged across replicates."
         },
         "RNA_count": {
           "type": "number",
-          "description": "The RNA count of the genomic element to biosample edge"
+          "description": "Output count (RNA), normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
-          "type": ["number", "null"],
-          "description": "The minus log10 P value (null when not available)."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
-          "type": ["number", "null"],
-          "description": "The minus log10 adjusted P value (null when not available)."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "type": "boolean",
-          "description": "True if this edge met the significance threshold (e.g. neg_log10_pvalue_adj >= 1)."
+          "description": "Boolean indicator of the significance of the element's activity. The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },
         "label": {
-          "description": "Reference-tile (REF) MPRA activity; not alternate-allele–specific element effects.",
           "enum": [
             "regulatory reference element activity"
           ]
@@ -93,35 +98,19 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the genomic element to biosample edge",
-          "example": "files_filesets/IGVFFI1323RCIE",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "The biological context of the genomic element to biosample edge",
+          "$ref": "../mixins.json#/biological_context",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "The biosample term of the genomic element to biosample edge",
-          "example": "ontology_terms/UBERON_0002048",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/UBERON_0002048"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "description": "The treatments term ids of the genomic element to biosample edge"
+          "$ref": "../mixins.json#/treatments_term_ids"
         }
       },
       "required": [
