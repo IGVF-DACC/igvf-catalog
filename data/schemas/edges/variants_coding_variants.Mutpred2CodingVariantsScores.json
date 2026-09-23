@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_coding_variants.Mutpred2CodingVariantsScores.json",
   "db_collection_name": "variants_coding_variants",
   "allOf": [

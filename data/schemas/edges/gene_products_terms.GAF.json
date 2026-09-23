@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/gene_products_terms.GAF.json",
   "accessible_via": {
     "return": "db, gene_product_id, gene_product_symbol, gene_product_name, gene_product_type, qualifier, go_id, db_reference, evidence, with, aspect, synonyms, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, organism, source, source_url, name, inverse_name, class, method, label, files_filesets"

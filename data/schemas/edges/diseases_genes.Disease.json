@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/diseases_genes.Disease.json",
   "accessible_via": {
     "return": "pmids, term_name, gene_symbol, association_type, association_status, class, method, label, files_filesets, source, source_url"

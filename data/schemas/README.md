@@ -87,9 +87,9 @@ combined and deduplicated. This is application-specific composition, not standar
 JSON Schema `allOf` intersection semantics.
 
 Keep references and local overrides in separate entries. The current resolvers
-do not preserve sibling keywords beside `$ref`. Schema declarations currently
-include both draft-07 and 2020-12; standardizing the draft and supporting `$ref`
-siblings are separate work.
+do not preserve sibling keywords beside `$ref`. All schema files declare
+JSON Schema draft 2020-12 (`https://json-schema.org/draft/2020-12/schema`).
+Supporting `$ref` siblings is separate work.
 
 When changing composition, compare resolved schemas through both loaders and
 run the focused loader tests. Shared constraint changes also need affected

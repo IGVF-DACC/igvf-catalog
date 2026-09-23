@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json",
+  "$id": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json",
   "allOf": [
     {
       "$ref": "node.base.json"

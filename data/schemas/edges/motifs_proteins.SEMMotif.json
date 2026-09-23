@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/motifs_proteins.SEMMotif.json",
   "accessible_via": {
     "return": "_id, name, inverse_name, biological_process, source, source_url, class, method, files_filesets"
