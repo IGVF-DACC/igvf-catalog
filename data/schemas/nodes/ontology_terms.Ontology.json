@@ -22,10 +22,12 @@
           "example": "mitochondrion inheritance"
         },
         "description": {
+          "title": "Description",
           "type": "string",
           "description": "Textual definition of the term (IAO_0000115)."
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": "array",
           "description": "Alternative names for the ontology term.",
           "example": [
@@ -61,6 +63,7 @@
           "example": "https://geneontology.org/"
         },
         "subontology": {
+          "title": "Subontology",
           "type": [
             "string",
             "null"

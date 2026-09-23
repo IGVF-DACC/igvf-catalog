@@ -10,11 +10,13 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "PharmGKB variant annotation ID, drug accession and Ensembl gene ID joined by underscores.",
           "example": "1450377668_PA450373_ENSG00000165841"
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the source node, in collection/key form.",
           "pattern": "^variants_drugs/",
@@ -23,6 +25,7 @@
           ]
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the target node, in collection/key form.",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
@@ -31,6 +34,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -38,6 +42,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -45,6 +50,7 @@
           ]
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "ABCB1"

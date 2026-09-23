@@ -38,6 +38,13 @@ empty import blocks after removing duplicates.
 
 ## Shared definitions and local overrides
 
+Give every property a human-readable `title` in Title Case, including nested
+properties. Use the same title for the same field name across all schemas.
+Expand terse abbreviations (for example, `chr` becomes `Chromosome`) while
+preserving scientific acronyms and names such as HGVS and AlphaMissense.
+Define shared titles in bases or mixins and inherit them rather than repeating
+them in local overrides.
+
 The eleven mixins cover `files_filesets`, `biological_context`, `biosample_term`,
 `treatments_term_ids`, `source`, `source_url`, `method`, `label`, `class`,
 `crispr_modality`, and `organism`.
