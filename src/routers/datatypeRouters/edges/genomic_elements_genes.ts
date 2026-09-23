@@ -516,11 +516,17 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FOR record in genomic_elements_genes
           FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
           ${pvalueFilter}
+          LET ge = DOCUMENT(record._from)
+          // Not every genomic element has a presumed promoter gene (promoter_of is
+          // optional). Without one there's no regulator gene to report, so exclude these
+          // rather than returning a GRN row with a null regulator_gene - matching
+          // regulatorQuery/regulatorResponseQuery, which already only join elements that
+          // have a promoter_of set.
+          FILTER ge.promoter_of != null
           SORT record._key
 
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-          LET ge = DOCUMENT(record._from)
           LET perturbationEfficiencyEdge = FIRST(
             FOR se IN genomic_elements_genes
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
