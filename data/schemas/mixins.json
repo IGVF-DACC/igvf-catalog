@@ -1,5 +1,6 @@
 {
   "files_filesets": {
+    "title": "Files and File Sets",
     "description": "Reference to the File and Metadata",
     "type": "string",
     "pattern": "^files_filesets/",
@@ -9,15 +10,18 @@
     "example": "files_filesets/IGVFFI0332UGDD"
   },
   "biological_context": {
+    "title": "Biological Context",
     "description": "Plain-language summary of the experimental sample or the sample context for a prediction.",
     "type": "string"
   },
   "biosample_term": {
+    "title": "Biosample Term",
     "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
     "type": "string",
     "pattern": "^ontology_terms/"
   },
   "treatments_term_ids": {
+    "title": "Treatment Term IDs",
     "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
     "type": [
       "array",
@@ -28,35 +32,42 @@
     }
   },
   "source": {
+    "title": "Source",
     "description": "The database, dataset or organization that is a source for these data.",
     "type": "string",
     "example": "IGVF"
   },
   "source_url": {
+    "title": "Source URL",
     "description": "The URL for the source.",
     "type": "string",
     "example": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
   },
   "method": {
+    "title": "Method",
     "description": "Name of the experimental class or prediction model that produced this result.",
     "type": "string",
     "example": "MPRA"
   },
   "label": {
+    "title": "Label",
     "description": "Non-method specific human readable label for the node or edge",
     "type": "string",
     "example": "eQTL"
   },
   "class": {
+    "title": "Class",
     "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
     "type": "string",
     "example": "observed data"
   },
   "crispr_modality": {
+    "title": "CRISPR Modality",
     "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
     "type": "string"
   },
   "organism": {
+    "title": "Organism",
     "type": "string",
     "description": "Species this annotation describes."
   }

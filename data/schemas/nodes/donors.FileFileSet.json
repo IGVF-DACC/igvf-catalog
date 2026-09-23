@@ -15,6 +15,7 @@
           "example": "ENCDO374BBL"
         },
         "sex": {
+          "title": "Sex",
           "type": [
             "string",
             "null"
@@ -29,6 +30,7 @@
           ]
         },
         "age": {
+          "title": "Age",
           "type": [
             "string",
             "null"
@@ -37,6 +39,7 @@
           "example": "35"
         },
         "age_units": {
+          "title": "Age Units",
           "type": [
             "string",
             "null"
@@ -51,6 +54,7 @@
           ]
         },
         "ethnicities": {
+          "title": "Ethnicities",
           "type": [
             "array",
             "null"
@@ -61,6 +65,7 @@
           ]
         },
         "phenotypic_features": {
+          "title": "Phenotypic Features",
           "type": [
             "array",
             "null"

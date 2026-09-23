@@ -15,11 +15,13 @@
           "example": "ENCFF004PFU"
         },
         "file_set_id": {
+          "title": "File Set ID",
           "type": "string",
           "description": "Accession of the file set that contains this file: the unique identifier used to reference that file set on the source portal.",
           "example": "ENCSR359DFW"
         },
         "lab": {
+          "title": "Laboratory",
           "type": "string",
           "description": "Lab associated with the submission.",
           "enum": [
@@ -51,6 +53,7 @@
           "example": "jesse-engreitz"
         },
         "preferred_assay_titles": {
+          "title": "Preferred Assay Titles",
           "type": [
             "array",
             "null"
@@ -88,6 +91,7 @@
           ]
         },
         "assay_term_ids": {
+          "title": "Assay Term IDs",
           "type": [
             "array",
             "null"
@@ -159,6 +163,7 @@
           ]
         },
         "software": {
+          "title": "Software",
           "type": [
             "array",
             "null"
@@ -217,6 +222,7 @@
           }
         },
         "samples": {
+          "title": "Samples",
           "type": [
             "array",
             "null"
@@ -231,6 +237,7 @@
           }
         },
         "sample_ids": {
+          "title": "Sample IDs",
           "type": [
             "array",
             "null"
@@ -246,6 +253,7 @@
           }
         },
         "simple_sample_summaries": {
+          "title": "Simple Sample Summaries",
           "type": [
             "array",
             "null"
@@ -256,6 +264,7 @@
           ]
         },
         "donors": {
+          "title": "Donors",
           "type": [
             "array",
             "null"
@@ -276,6 +285,7 @@
           ]
         },
         "publication": {
+          "title": "Publication",
           "type": [
             "string",
             "null"
@@ -284,6 +294,7 @@
           "example": "PMID:34017130"
         },
         "collections": {
+          "title": "Collections",
           "type": "array",
           "items": {
             "type": "string",
@@ -309,11 +320,13 @@
           ]
         },
         "download_link": {
+          "title": "Download Link",
           "type": "string",
           "description": "The download path to obtain the file from the source portal.",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "cell_annotation": {
+          "title": "Cell Annotation",
           "type": [
             "string",
             "null"
@@ -322,6 +335,7 @@
           "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
+          "title": "Cell Annotation Term",
           "type": [
             "string",
             "null"
@@ -331,6 +345,7 @@
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
         "genome_browser_link": {
+          "title": "Genome Browser Link",
           "type": [
             "string",
             "null"
@@ -339,6 +354,7 @@
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "browser_index_file": {
+          "title": "Browser Index File",
           "type": [
             "string",
             "null"
@@ -363,6 +379,7 @@
           "example": "interference"
         },
         "version": {
+          "title": "Version",
           "type": [
             "string",
             "null"

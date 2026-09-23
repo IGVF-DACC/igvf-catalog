@@ -9,6 +9,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
@@ -28,15 +29,18 @@
           ]
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Signed relative change in target-gene expression after CRISPRi of the element (ENCODE EffectSize). Negative values mean lower expression. Missing values are stored as 0.",
           "example": -0.293431866
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": "number",
           "description": "Effect size converted to log2 scale."
         },
         "p_value": {
+          "title": "P-Value",
           "type": [
             "number",
             "null"
@@ -44,6 +48,7 @@
           "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
         },
         "p_value_adj": {
+          "title": "Adjusted P-Value",
           "type": [
             "number",
             "null"
@@ -52,6 +57,7 @@
           "example": 0.004023984
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -59,6 +65,7 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -66,6 +73,7 @@
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element-gene interactions.",
           "example": true

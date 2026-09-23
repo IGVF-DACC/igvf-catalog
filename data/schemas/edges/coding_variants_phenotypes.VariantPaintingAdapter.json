@@ -9,6 +9,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
@@ -69,10 +70,12 @@
           ]
         },
         "localization_score": {
+          "title": "Localization Score",
           "type": "number",
           "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant"
         },
         "mislocalization_hit": {
+          "title": "Mislocalization Hit",
           "type": "boolean",
           "description": "Whether the variant is classified as causing protein mislocalization based on the localization score threshold"
         },
