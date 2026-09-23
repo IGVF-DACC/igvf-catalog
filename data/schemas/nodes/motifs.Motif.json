@@ -9,40 +9,38 @@
       "$ref": "motifs.base.json"
     },
     {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "HOCOMOCOv11"
           ]
         },
         "source_url": {
           "pattern": "^hocomoco11\\.autosome\\.org/motif/.*$",
-          "example": "hocomoco11.autosome.org/motif/ATF1_HUMAN.H11MO.0.B",
-          "description": "The URL for the source."
+          "example": "hocomoco11.autosome.org/motif/ATF1_HUMAN.H11MO.0.B"
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "HOCOMOCO"
-          ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI1444TRQL",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

@@ -7,28 +7,44 @@ const SCHEMA_ROOT = path.join(__dirname, '../../..', 'data/schemas')
 /**
  * Resolve $ref references in a schema
  */
-function resolveRefs (schema: any, basePath: string): any {
+function resolveRefs (schema: any, documentPath: string): any {
   if (!schema || typeof schema !== 'object') {
     return schema
   }
 
   if (Array.isArray(schema)) {
-    return schema.map(item => resolveRefs(item, basePath))
+    return schema.map(item => resolveRefs(item, documentPath))
   }
 
   // Handle $ref
   if (schema.$ref) {
-    const refPath = path.join(basePath, schema.$ref)
+    const reference = schema.$ref as string
+    const [file, fragment] = reference.split('#')
+    const refPath = file ? path.resolve(path.dirname(documentPath), file) : documentPath
     const refContent = fs.readFileSync(refPath, 'utf8')
-    const refSchema = JSON.parse(refContent)
+    let refSchema = JSON.parse(refContent)
+    if (fragment) {
+      const pointer = decodeURIComponent(fragment)
+      if (!pointer.startsWith('/')) {
+        throw new Error(`Unsupported schema reference: ${reference}`)
+      }
+      for (const token of pointer.slice(1).split('/')) {
+        const key = token.replace(/~1/g, '/').replace(/~0/g, '~')
+        if (refSchema === null || typeof refSchema !== 'object' ||
+            !Object.prototype.hasOwnProperty.call(refSchema, key)) {
+          throw new Error(`Unresolved schema reference: ${reference}`)
+        }
+        refSchema = refSchema[key]
+      }
+    }
     // Recursively resolve refs in the referenced schema
-    return resolveRefs(refSchema, path.dirname(refPath))
+    return resolveRefs(refSchema, refPath)
   }
 
   // Recursively resolve refs in nested objects
   const resolved: any = {}
   for (const [key, value] of Object.entries(schema)) {
-    resolved[key] = resolveRefs(value, basePath)
+    resolved[key] = resolveRefs(value, documentPath)
   }
   return resolved
 }
@@ -50,7 +66,8 @@ function mergeAllOfSchema (schema: any): any {
   const merged: any = {}
 
   // Merge each schema in allOf sequentially
-  for (const schemaItem of schema.allOf) {
+  for (const item of schema.allOf) {
+    const schemaItem = mergeAllOfSchema(item)
     // Merge properties (deep merge for each property)
     if (schemaItem.properties) {
       if (!merged.properties) {
@@ -119,8 +136,7 @@ export function getSchema (schemaFilePath: string): configType {
   const schema = JSON.parse(schemaContent)
 
   // Resolve $ref references
-  const basePath = path.dirname(fullPath)
-  const resolvedSchema = resolveRefs(schema, basePath)
+  const resolvedSchema = resolveRefs(schema, fullPath)
 
   // Merge allOf if present
   const finalSchema = mergeAllOfSchema(resolvedSchema)

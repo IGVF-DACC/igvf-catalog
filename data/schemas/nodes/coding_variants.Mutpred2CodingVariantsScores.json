@@ -12,7 +12,6 @@
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "ref": {
@@ -70,13 +69,11 @@
           "example": "ENST00000261590"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
         }

@@ -12,13 +12,11 @@
       "type": "object",
       "properties": {
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "FAVOR"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "http://favor.genohub.org/"
         }
       },

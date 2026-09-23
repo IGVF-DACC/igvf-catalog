@@ -2,7 +2,20 @@
   "$id": "schemas/nodes/ontology_terms.Ontology.json",
   "allOf": [
     {
-      "$ref": "node.base.json"
+      "$ref": "ontology_terms.base.json"
+    },
+    {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
     },
     {
       "type": "object",
@@ -12,18 +25,13 @@
           "description": "Last path segment of the term IRI, with characters ArangoDB disallows in keys rewritten to underscore."
         },
         "uri": {
-          "type": "string",
-          "description": "URI for the ontology term.",
           "example": "http://purl.obolibrary.org/obo/GO_0000001"
         },
         "term_id": {
-          "type": "string",
-          "description": "Ontology term identifier.",
           "example": "GO_0000001"
         },
         "name": {
-          "example": "mitochondrion inheritance",
-          "description": "Human readable display name for the entity"
+          "example": "mitochondrion inheritance"
         },
         "description": {
           "type": "string",
@@ -40,7 +48,6 @@
           }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "BAO",
             "CHEBI",
@@ -63,8 +70,7 @@
           ]
         },
         "source_url": {
-          "example": "https://geneontology.org/",
-          "description": "The URL for the source."
+          "example": "https://geneontology.org/"
         },
         "subontology": {
           "type": [
@@ -80,8 +86,6 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship"
           ]
@@ -91,24 +95,12 @@
             "string",
             "null"
           ],
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             null
-          ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI7433WATG",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },
       "required": [
-        "uri",
-        "term_id",
         "description",
         "synonyms",
         "subontology",

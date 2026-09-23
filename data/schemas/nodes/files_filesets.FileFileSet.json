@@ -6,13 +6,28 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "example": "ENCFF004PFU"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "ENCFF004PFU"
         },
         "file_set_id": {
@@ -105,7 +120,6 @@
             "string",
             "null"
           ],
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ADASTRA",
             "BlueSTARR",
@@ -149,8 +163,6 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship",
             "observed data",
@@ -269,11 +281,6 @@
           }
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
           "example": [
             "CHEBI:15367"
           ]
@@ -298,7 +305,6 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE",
             "IGVF",
@@ -306,7 +312,6 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/",
           "type": [
             "string",
@@ -356,7 +361,6 @@
             "string",
             "null"
           ],
-          "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
           "enum": [
             null,
             "interference",

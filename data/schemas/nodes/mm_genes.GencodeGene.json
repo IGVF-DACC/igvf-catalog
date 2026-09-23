@@ -5,6 +5,13 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -46,7 +53,6 @@
           ]
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "Gm13290"
         },
         "symbol": {
@@ -55,7 +61,6 @@
           "example": "Gm13290"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
@@ -68,14 +73,11 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
           "enum": [
             "Mus musculus"
           ]

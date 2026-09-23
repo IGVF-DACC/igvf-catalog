@@ -6,6 +6,13 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -96,10 +103,9 @@
             "number",
             "null"
           ],
-          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
+          "description": "IntAct MIscore from the merged table, on a 0\u20131 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "BioGRID"
           ]
@@ -122,13 +128,11 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "interacts with"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "interacts with"
           ]
@@ -141,7 +145,6 @@
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "dosage growth defect (sensu BioGRID)",
             "dosage lethality (sensu BioGRID)",
@@ -172,28 +175,16 @@
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "genetic interference"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI4317VDGK",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK"
           ]

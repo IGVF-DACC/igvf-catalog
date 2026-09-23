@@ -6,6 +6,19 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -35,67 +48,49 @@
           "example": "variants/NC_000016.10:23603561:G:A"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI9974PZRX",
           "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
         },
         "biosample_term": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/EFO_0007598",
-          "pattern": "^ontology_terms/"
+          "example": "ontology_terms/EFO_0007598"
         },
         "biological_context": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "lung"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "SGE"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "protein variant effect"
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "mutational effect"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "altered due to mutation"
           ]

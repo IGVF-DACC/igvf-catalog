@@ -6,6 +6,19 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -27,13 +40,11 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "mutational effect"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "altered due to mutation"
           ]
@@ -43,39 +54,32 @@
           "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
           "enum": [
             "files_filesets/IGVFFI8105TNNO"
-          ]
-
+          ],
+          "example": "files_filesets/IGVFFI8105TNNO"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ESM-1v"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted protein variant effect"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
           ]
@@ -151,15 +155,13 @@
           "type": [
             "string",
             "null"
-          ],
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for"
+          ]
         },
         "biological_context": {
           "type": [
             "string",
             "null"
-          ],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record."
+          ]
         }
       },
       "required": [

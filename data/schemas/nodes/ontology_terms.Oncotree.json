@@ -4,7 +4,20 @@
   "db_collection_name": "ontology_terms",
   "allOf": [
     {
-      "$ref": "node.base.json"
+      "$ref": "ontology_terms.base.json"
+    },
+    {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
     },
     {
       "type": "object",
@@ -14,34 +27,25 @@
           "description": "Oncotree_ plus the OncoTree code, with slash rewritten to underscore."
         },
         "name": {
-          "example": "Medullomyoblastoma",
-          "description": "Human readable display name for the entity"
+          "example": "Medullomyoblastoma"
         },
         "uri": {
-          "type": "string",
-          "description": "URI for the ontology term.",
           "example": "https://oncotree.mskcc.org/"
         },
         "term_id": {
-          "type": "string",
-          "description": "Ontology term identifier.",
           "example": "Oncotree_MMB"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "Oncotree"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://oncotree.mskcc.org/api/tumorTypes"
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "biological relationship"
           ]
@@ -50,22 +54,10 @@
           "type": [
             "string",
             "null"
-          ],
-          "description": "Name of the experimental class or prediction model that produced this result."
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI4975UFZM",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },
       "required": [
-        "uri",
-        "term_id",
         "class",
         "method",
         "files_filesets"

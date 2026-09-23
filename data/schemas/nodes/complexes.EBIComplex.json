@@ -6,6 +6,22 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -13,8 +29,7 @@
           "description": "Complex Portal accession."
         },
         "name": {
-          "example": "SMAD2-SMAD3-SMAD4 complex",
-          "description": "Human readable display name for the entity"
+          "example": "SMAD2-SMAD3-SMAD4 complex"
         },
         "alias": {
           "type": "array",
@@ -84,42 +99,25 @@
           }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://www.ebi.ac.uk/complexportal/"
           ]
-        },
-        "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
         },
         "method": {
           "type": [
             "string",
             "null"
-          ],
-          "description": "Name of the experimental class or prediction model that produced this result."
+          ]
         },
         "label": {
           "type": [
             "string",
             "null"
-          ],
-          "description": "Non-method specific human readable label for the node or edge"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI1444TRQL",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },

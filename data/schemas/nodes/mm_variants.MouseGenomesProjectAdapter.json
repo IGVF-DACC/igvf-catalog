@@ -6,6 +6,13 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -41,8 +48,6 @@
           "example": "GGGGGGGGGG"
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
           "enum": [
             "Mus musculus"
           ]
@@ -87,8 +92,7 @@
           "example": 0
         },
         "name": {
-          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG",
-          "description": "Human readable display name for the entity"
+          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
         },
         "spdi": {
           "type": "string",
@@ -101,13 +105,11 @@
           "example": "NC_000067.7:g.3050715_3050716insG"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "MOUSE GENOMES PROJECT"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/mousegenomes/"
           ]

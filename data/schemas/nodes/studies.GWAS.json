@@ -6,13 +6,19 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "example": "GCST011427_344"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "GCST011427_344"
         },
         "ancestry_initial": {
@@ -96,7 +102,6 @@
           "example": "measurement"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "OpenTargets"
           ]
@@ -107,14 +112,6 @@
           "enum": [
             "October 2022 (22.10)"
           ]
-        },
-        "source_url": {
-          "type": "string",
-          "description": "The URL for the source."
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata"
         }
       },
       "required": [

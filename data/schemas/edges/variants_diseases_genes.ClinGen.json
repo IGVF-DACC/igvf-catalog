@@ -1,101 +1,75 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_diseases_genes.Clingen.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
-    },
-    "_from": {
-      "type": "string",
-      "description": "Document handle of the source node, in collection/key form.",
-      "pattern": "^variants_diseases/",
-      "collections": [
-        "variants_diseases"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Document handle of the target node, in collection/key form.",
-      "example": "genes/ENSG00000171759",
-      "pattern": "^genes/",
-      "collections": [
-        "genes"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Directional human readable label for the relationship, _from to _to.",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Reversed directional human readable label for the relationship, _to to _from.",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inheritance_mode": {
-      "type": "string",
-      "description": "Mode of inheritance for the disease the assertion applies to.",
-      "example": "Autosomal recessive inheritance"
-    },
-    "source": {
-      "type": "string",
-      "description": "The database, dataset or organization that is a source for these data.",
-      "enum": [
-        "ClinGen"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The URL for the source.",
-      "enum": [
-        "https://search.clinicalgenome.org/kb/downloads"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
-    },
-    "method": {
-      "type": "string",
-      "description": "Name of the experimental class or prediction model that produced this result."
-    },
-    "label": {
-      "type": "string",
-      "description": "Non-method specific human readable label for the node or edge"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Reference to the File and Metadata",
-      "example": "files_filesets/IGVFFI5852GYTT",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "source",
-    "source_url",
-    "inheritance_mode",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "inheritance_mode, class, method, label, files_filesets, source, source_url"
   },
-  "db_collection_name": "variants_diseases_genes"
+  "db_collection_name": "variants_diseases_genes",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
+        },
+        "_from": {
+          "pattern": "^variants_diseases/",
+          "collections": [
+            "variants_diseases"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000171759",
+          "pattern": "^genes/",
+          "collections": [
+            "genes"
+          ]
+        },
+        "name": {
+          "enum": [
+            "associated with"
+          ],
+          "example": "associated with"
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with"
+          ],
+          "example": "associated with"
+        },
+        "inheritance_mode": {
+          "type": "string",
+          "description": "Mode of inheritance for the disease the assertion applies to.",
+          "example": "Autosomal recessive inheritance"
+        },
+        "source": {
+          "enum": [
+            "ClinGen"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://search.clinicalgenome.org/kb/downloads"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "inheritance_mode",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

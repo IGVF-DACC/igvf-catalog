@@ -9,17 +9,25 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ENCODE-rE2G"
           ]
@@ -39,21 +47,13 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/ENCFF003BKC",
-          "pattern": "^files_filesets/"
         },
         "simple_sample_summaries": {
           "type": [
@@ -66,11 +66,6 @@
           ]
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
           "example": [
             "UniProtKB:P05112"
           ]

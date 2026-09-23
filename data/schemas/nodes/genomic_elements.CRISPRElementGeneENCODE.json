@@ -9,13 +9,19 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "source_annotation": {
@@ -26,13 +32,7 @@
             "negative control"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/ENCFF968BZL"
-        },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]

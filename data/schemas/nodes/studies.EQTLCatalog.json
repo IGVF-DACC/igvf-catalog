@@ -6,13 +6,19 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "example": "QTS000038"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "OneK1K"
         },
         "pmid": {
@@ -29,17 +35,9 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
-        },
-        "source_url": {
-          "description": "The URL for the source."
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata"
         }
       },
       "required": [

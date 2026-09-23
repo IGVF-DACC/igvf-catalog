@@ -6,6 +6,19 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -28,19 +41,16 @@
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "scE2G"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted regulatory element effect on gene expression"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
@@ -66,7 +76,6 @@
             "string",
             "null"
           ],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
           "example": "adrenal medulla chromaffin cell"
         },
         "biosample_term": {
@@ -74,9 +83,7 @@
             "string",
             "null"
           ],
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/CL_0000336",
-          "pattern": "^ontology_terms/"
+          "example": "ontology_terms/CL_0000336"
         },
         "cell_annotation": {
           "type": [
@@ -96,30 +103,20 @@
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI5648GWQX",
-          "pattern": "^files_filesets/"
-        },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "regulates"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulated by"
           ]

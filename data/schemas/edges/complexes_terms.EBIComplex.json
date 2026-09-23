@@ -1,111 +1,91 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/complexes_terms.EBIComplex.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Complex accession and ontology term key joined by an underscore.",
-      "example": "CPX-1_GO_0071144"
+  "db_collection_name": "complexes_terms",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Document handle of the source node, in collection/key form.",
-      "example": "complexes/CPX-1",
-      "pattern": "^complexes/",
-      "collections": [
-        "complexes"
-      ]
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
     },
-    "_to": {
-      "type": "string",
-      "description": "Document handle of the target node, in collection/key form.",
-      "example": "ontology_terms/GO_0071144",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "term_name": {
-      "type": "string",
-      "description": "Ontology term name.",
-      "example": "heteromeric SMAD protein complex"
-    },
-    "source": {
-      "type": "string",
-      "description": "The database, dataset or organization that is a source for these data.",
-      "enum": [
-        "EBI"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The URL for the source.",
-      "enum": [
-        "https://www.ebi.ac.uk/complexportal/"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Directional human readable label for the relationship, _from to _to.",
-      "enum": [
-        "associated with",
-        "is located in",
-        "involved in",
-        "has the function"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Reversed directional human readable label for the relationship, _to to _from.",
-      "enum": [
-        "associated with",
-        "contains",
-        "has component",
-        "is a function of"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
-    },
-    "method": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "Name of the experimental class or prediction model that produced this result."
-    },
-    "label": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "Non-method specific human readable label for the node or edge"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Reference to the File and Metadata",
-      "example": "files_filesets/IGVFFI1444TRQL",
-      "pattern": "^files_filesets/",
-      "collections": [
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Complex accession and ontology term key joined by an underscore.",
+          "example": "CPX-1_GO_0071144"
+        },
+        "_from": {
+          "example": "complexes/CPX-1",
+          "pattern": "^complexes/",
+          "collections": [
+            "complexes"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/GO_0071144",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "term_name": {
+          "type": "string",
+          "description": "Ontology term name.",
+          "example": "heteromeric SMAD protein complex"
+        },
+        "source": {
+          "enum": [
+            "EBI"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://www.ebi.ac.uk/complexportal/"
+          ]
+        },
+        "name": {
+          "enum": [
+            "associated with",
+            "is located in",
+            "involved in",
+            "has the function"
+          ],
+          "example": "associated with"
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with",
+            "contains",
+            "has component",
+            "is a function of"
+          ],
+          "example": "associated with"
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "_key",
         "files_filesets"
-      ]
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "source",
-    "source_url",
-    "name",
-    "inverse_name",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
-  "db_collection_name": "complexes_terms"
+  ]
 }

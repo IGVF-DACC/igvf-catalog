@@ -1,226 +1,217 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/gene_products_terms.GAF.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "SHA-256 hash of the source GAF annotation record together with the gene product handle."
-    },
-    "_to": {
-      "type": "string",
-      "description": "Document handle of the target node, in collection/key form.",
-      "example": "ontology_terms/GO_0005515",
-      "pattern": "^ontology_terms/.*",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "_from": {
-      "type": "string",
-      "description": "Document handle of the source node, in collection/key form.",
-      "example": "proteins/ENSP00000493376",
-      "pattern": "^proteins/.*|^transcripts/.*",
-      "collections": [
-        "proteins",
-        "transcripts"
-      ]
-    },
-    "db": {
-      "type": "string",
-      "description": "Database the annotated gene product identifier is drawn from.",
-      "example": "UniProtKB"
-    },
-    "gene_product_id": {
-      "type": "string",
-      "description": "Identifier of the annotated gene product in that database.",
-      "example": "A0A0J9YWV8"
-    },
-    "gene_product_symbol": {
-      "type": "string",
-      "description": "Symbol of the annotated gene or gene product.",
-      "example": "PHACTR4"
-    },
-    "gene_product_name": {
-      "type": "string",
-      "description": "Full name of the annotated gene or gene product.",
-      "example": "phosphorylated actin regulatory protein 4"
-    },
-    "gene_product_type": {
-      "type": "string",
-      "description": "Class of biological entity of the annotated identifier.",
-      "example": "protein"
-    },
-    "qualifier": {
-      "type": "array",
-      "description": "Relation Ontology predicate describing how the gene product relates to the GO term. Negation is written as NOT followed by the relation, pipe-separated.",
-      "example": [
-        "involved_in"
-      ]
-    },
-    "go_id": {
-      "type": "string",
-      "description": "Gene Ontology identifier of the associated term.",
-      "example": "GO:0005515"
-    },
-    "db_reference": {
-      "type": "array",
-      "description": "Identifiers of the reference cited as the source of the annotation.",
-      "example": [
-        "GO_REF:0000104"
-      ]
-    },
-    "evidence": {
-      "type": "string",
-      "description": "GO evidence code supporting the annotation.",
-      "example": "IEA"
-    },
-    "with": {
-      "type": "array",
-      "description": "Additional identifiers supporting the evidence, used with certain evidence codes.",
-      "example": [
-        "UniRule:UR001453775"
-      ]
-    },
-    "aspect": {
-      "type": "string",
-      "description": "Branch of the Gene Ontology the term belongs to: P for biological process, F for molecular function, or C for cellular component.",
-      "example": "P"
-    },
-    "synonyms": {
-      "type": "array",
-      "description": "Alternate names the annotated gene or gene product.",
-      "example": [
-        "PHACTR4"
-      ]
-    },
-    "taxon_id": {
-      "type": "array",
-      "description": "NCBI taxonomic identifiers of the species the gene product is found in.",
-      "example": [
-        "taxon:9606"
-      ]
-    },
-    "date": {
-      "type": "string",
-      "description": "Date the annotation was made, as YYYYMMDD.",
-      "example": "20230911"
-    },
-    "assigned_by": {
-      "type": "string",
-      "description": "Database that made the annotation.",
-      "example": "UniProt"
-    },
-    "annotation_extension": {
-      "type": "string",
-      "description": "Further specification of the GO term using a Relation Ontology predicate and an additional entity.",
-      "example": "occurs_in(GO:0005634)"
-    },
-    "gene_product_form_id": {
-      "type": "string",
-      "description": "Identifier of a specific isoform or processed form when the annotation is more specific than the canonical gene product.",
-      "example": "UniProtKB:C6GKH1"
-    },
-    "organism": {
-      "type": "string",
-      "description": "Species this annotation describes.",
-      "enum": [
-        "Homo sapiens",
-        "Mus musculus"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The database, dataset or organization that is a source for these data.",
-      "enum": [
-        "Gene Ontology"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The URL for the source.",
-      "enum": [
-        "http://geneontology.org/gene-associations/goa_human.gaf.gz",
-        "http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz",
-        "https://current.geneontology.org/annotations/mgi.gaf.gz",
-        "http://geneontology.org/gene-associations/goa_human_rna.gaf.gz"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Directional human readable label for the relationship, _from to _to.",
-      "enum": [
-        "involved in",
-        "is located in",
-        "has the function"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Reversed directional human readable label for the relationship, _to to _from.",
-      "enum": [
-        "has component",
-        "contains",
-        "is a function of"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "enum": ["biological relationship"],
-      "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship."
-    },
-    "method": {
-      "type": ["string", "null"],
-      "description": "Name of the experimental class or prediction model that produced this result."
-    },
-    "label": {
-      "type": ["string", "null"],
-      "description": "Non-method specific human readable label for the node or edge"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Reference to the File and Metadata",
-      "example": "files_filesets/IGVFFI1490WZCV",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "db",
-    "gene_product_id",
-    "gene_product_symbol",
-    "gene_product_name",
-    "gene_product_type",
-    "qualifier",
-    "go_id",
-    "db_reference",
-    "evidence",
-    "with",
-    "aspect",
-    "synonyms",
-    "taxon_id",
-    "date",
-    "assigned_by",
-    "annotation_extension",
-    "gene_product_form_id",
-    "organism",
-    "source",
-    "source_url",
-    "name",
-    "inverse_name",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "db, gene_product_id, gene_product_symbol, gene_product_name, gene_product_type, qualifier, go_id, db_reference, evidence, with, aspect, synonyms, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, organism, source, source_url, name, inverse_name, class, method, label, files_filesets"
   },
-  "db_collection_name": "gene_products_terms"
+  "db_collection_name": "gene_products_terms",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "SHA-256 hash of the source GAF annotation record together with the gene product handle."
+        },
+        "_to": {
+          "example": "ontology_terms/GO_0005515",
+          "pattern": "^ontology_terms/.*",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "_from": {
+          "example": "proteins/ENSP00000493376",
+          "pattern": "^proteins/.*|^transcripts/.*",
+          "collections": [
+            "proteins",
+            "transcripts"
+          ]
+        },
+        "db": {
+          "type": "string",
+          "description": "Database the annotated gene product identifier is drawn from.",
+          "example": "UniProtKB"
+        },
+        "gene_product_id": {
+          "type": "string",
+          "description": "Identifier of the annotated gene product in that database.",
+          "example": "A0A0J9YWV8"
+        },
+        "gene_product_symbol": {
+          "type": "string",
+          "description": "Symbol of the annotated gene or gene product.",
+          "example": "PHACTR4"
+        },
+        "gene_product_name": {
+          "type": "string",
+          "description": "Full name of the annotated gene or gene product.",
+          "example": "phosphorylated actin regulatory protein 4"
+        },
+        "gene_product_type": {
+          "type": "string",
+          "description": "Class of biological entity of the annotated identifier.",
+          "example": "protein"
+        },
+        "qualifier": {
+          "type": "array",
+          "description": "Relation Ontology predicate describing how the gene product relates to the GO term. Negation is written as NOT followed by the relation, pipe-separated.",
+          "example": [
+            "involved_in"
+          ]
+        },
+        "go_id": {
+          "type": "string",
+          "description": "Gene Ontology identifier of the associated term.",
+          "example": "GO:0005515"
+        },
+        "db_reference": {
+          "type": "array",
+          "description": "Identifiers of the reference cited as the source of the annotation.",
+          "example": [
+            "GO_REF:0000104"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "description": "GO evidence code supporting the annotation.",
+          "example": "IEA"
+        },
+        "with": {
+          "type": "array",
+          "description": "Additional identifiers supporting the evidence, used with certain evidence codes.",
+          "example": [
+            "UniRule:UR001453775"
+          ]
+        },
+        "aspect": {
+          "type": "string",
+          "description": "Branch of the Gene Ontology the term belongs to: P for biological process, F for molecular function, or C for cellular component.",
+          "example": "P"
+        },
+        "synonyms": {
+          "type": "array",
+          "description": "Alternate names the annotated gene or gene product.",
+          "example": [
+            "PHACTR4"
+          ]
+        },
+        "taxon_id": {
+          "type": "array",
+          "description": "NCBI taxonomic identifiers of the species the gene product is found in.",
+          "example": [
+            "taxon:9606"
+          ]
+        },
+        "date": {
+          "type": "string",
+          "description": "Date the annotation was made, as YYYYMMDD.",
+          "example": "20230911"
+        },
+        "assigned_by": {
+          "type": "string",
+          "description": "Database that made the annotation.",
+          "example": "UniProt"
+        },
+        "annotation_extension": {
+          "type": "string",
+          "description": "Further specification of the GO term using a Relation Ontology predicate and an additional entity.",
+          "example": "occurs_in(GO:0005634)"
+        },
+        "gene_product_form_id": {
+          "type": "string",
+          "description": "Identifier of a specific isoform or processed form when the annotation is more specific than the canonical gene product.",
+          "example": "UniProtKB:C6GKH1"
+        },
+        "organism": {
+          "enum": [
+            "Homo sapiens",
+            "Mus musculus"
+          ]
+        },
+        "source": {
+          "enum": [
+            "Gene Ontology"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "http://geneontology.org/gene-associations/goa_human.gaf.gz",
+            "http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz",
+            "https://current.geneontology.org/annotations/mgi.gaf.gz",
+            "http://geneontology.org/gene-associations/goa_human_rna.gaf.gz"
+          ]
+        },
+        "name": {
+          "enum": [
+            "involved in",
+            "is located in",
+            "has the function"
+          ],
+          "example": "involved in"
+        },
+        "inverse_name": {
+          "enum": [
+            "has component",
+            "contains",
+            "is a function of"
+          ],
+          "example": "has component"
+        },
+        "class": {
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "db",
+        "gene_product_id",
+        "gene_product_symbol",
+        "gene_product_name",
+        "gene_product_type",
+        "qualifier",
+        "go_id",
+        "db_reference",
+        "evidence",
+        "with",
+        "aspect",
+        "synonyms",
+        "taxon_id",
+        "date",
+        "assigned_by",
+        "annotation_extension",
+        "gene_product_form_id",
+        "organism",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

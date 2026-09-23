@@ -6,6 +6,19 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -13,7 +26,6 @@
           "description": "PharmGKB chemical accession."
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "17-alpha-dihydroequilenin sulfate"
         },
         "drug_ontology_terms": {
@@ -28,37 +40,22 @@
           }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "pharmGKB"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "pattern": "^https://www\\.pharmgkb\\.org/chemical/[A-Z0-9]+$",
           "example": "https://www.pharmgkb.org/chemical/PA166238901"
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "PharmGKB"
-          ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI2997DUKO",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },
