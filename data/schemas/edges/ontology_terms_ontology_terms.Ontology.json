@@ -1,30 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/ontology_terms_ontology_terms.Ontology.json",
   "accessible_via": {
     "return": "_id, name, inverse_name, type_uri, source, source_url, class, method, files_filesets"
   },
   "db_collection_name": "ontology_terms_ontology_terms",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -88,6 +69,7 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "GO",
             "CLO",
@@ -110,6 +92,7 @@
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "https://geneontology.org/",
             "https://obofoundry.org/ontology/clo.html",
@@ -132,11 +115,13 @@
           ]
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
@@ -144,6 +129,9 @@
           "enum": [
             null
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

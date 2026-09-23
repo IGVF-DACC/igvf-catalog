@@ -1,27 +1,8 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json",
   "db_collection_name": "ontology_terms_ontology_terms",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -66,20 +47,29 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "Cellosaurus"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "https://www.cellosaurus.org/"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ]
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

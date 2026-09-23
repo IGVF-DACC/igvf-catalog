@@ -5,16 +5,6 @@
   "description": "Base schema for all node types in the IGVF Catalog. Defines common required properties.",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -27,7 +17,11 @@
           "example": "TP53"
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "example": "IGVF"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
         }
       },
       "required": [

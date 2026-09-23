@@ -10,16 +10,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -64,6 +54,7 @@
           "example": "child of"
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]
@@ -84,6 +75,9 @@
             "string",
             "null"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

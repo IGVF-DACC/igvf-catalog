@@ -1,27 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/pathways.ReactomePathway.json",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -34,22 +16,26 @@
           "example": "A tetrasaccharide linker sequence is required for GAG synthesis"
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ]
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "type": [
             "string",
             "null"
@@ -103,6 +89,9 @@
           "description": "Gene Ontology biological process term for this pathway, as a handle into ontology_terms.",
           "example": "ontology_terms/GO_0006914",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

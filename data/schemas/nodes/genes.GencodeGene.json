@@ -1,16 +1,10 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genes.GencodeGene.json",
   "db_collection_name": "genes",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        }
-      }
     },
     {
       "type": "object",
@@ -122,6 +116,7 @@
           ]
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]

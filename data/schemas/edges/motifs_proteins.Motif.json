@@ -1,27 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/motifs_proteins.Motif.json",
   "accessible_via": {
     "return": "_id, name, inverse_name, biological_process, source, class, method, files_filesets"
   },
   "db_collection_name": "motifs_proteins",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -70,19 +54,25 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "HOCOMOCOv11"
           ]
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "HOCOMOCO"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

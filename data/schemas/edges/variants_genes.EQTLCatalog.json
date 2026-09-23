@@ -1,22 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_genes.EQTLCatalog.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -40,9 +27,11 @@
           ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "macrophage"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/CL_0000235"
         },
         "biological_process": {
@@ -168,6 +157,9 @@
         "intron_end": {
           "type": "number",
           "description": "End position of the spliced intron."
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

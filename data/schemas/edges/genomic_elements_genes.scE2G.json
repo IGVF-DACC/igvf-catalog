@@ -1,22 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genomic_elements_genes.scE2G.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -72,6 +59,7 @@
           "description": "RNA pseudobulk TPM of the target gene in the cell type"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "type": [
             "string",
             "null"
@@ -79,6 +67,7 @@
           "example": "adrenal medulla chromaffin cell"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "type": [
             "string",
             "null"
@@ -120,6 +109,9 @@
           "enum": [
             "regulated by"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

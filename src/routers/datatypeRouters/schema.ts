@@ -16,7 +16,8 @@ function resolveRefs (schema: any, documentPath: string): any {
     return schema.map(item => resolveRefs(item, documentPath))
   }
 
-  // Handle $ref
+  // Handle $ref; sibling keywords are kept and override the resolved target
+  // (JSON Schema 2020-12 allows keywords alongside $ref).
   if (schema.$ref) {
     const reference = schema.$ref as string
     const [file, fragment] = reference.split('#')
@@ -37,8 +38,21 @@ function resolveRefs (schema: any, documentPath: string): any {
         refSchema = refSchema[key]
       }
     }
-    // Recursively resolve refs in the referenced schema
-    return resolveRefs(refSchema, refPath)
+    const resolvedRef = resolveRefs(refSchema, refPath)
+    const siblings: any = {}
+    for (const [key, value] of Object.entries(schema)) {
+      if (key === '$ref') {
+        continue
+      }
+      siblings[key] = resolveRefs(value, documentPath)
+    }
+    if (Object.keys(siblings).length === 0) {
+      return resolvedRef
+    }
+    if (resolvedRef !== null && typeof resolvedRef === 'object' && !Array.isArray(resolvedRef)) {
+      return { ...resolvedRef, ...siblings }
+    }
+    return resolvedRef
   }
 
   // Recursively resolve refs in nested objects

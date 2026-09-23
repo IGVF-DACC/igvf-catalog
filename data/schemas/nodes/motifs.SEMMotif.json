@@ -9,19 +9,6 @@
       "$ref": "motifs.base.json"
     },
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "source": {
@@ -39,14 +26,19 @@
           "example": -0.671761
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "SEMpl"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

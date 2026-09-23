@@ -1,17 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/complexes_terms.EBIComplex.json",
   "db_collection_name": "complexes_terms",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -79,6 +72,9 @@
             "string",
             "null"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

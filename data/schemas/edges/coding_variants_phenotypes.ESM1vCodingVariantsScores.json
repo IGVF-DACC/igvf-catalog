@@ -1,22 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -54,6 +41,7 @@
           "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
         "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/IGVFFI8105TNNO"
           ],
@@ -152,12 +140,14 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_5 model for the later segment of an overlap."
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "type": [
             "string",
             "null"
           ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "type": [
             "string",
             "null"

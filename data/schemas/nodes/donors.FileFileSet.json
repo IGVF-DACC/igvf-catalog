@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/donors.FileFileSet.json",
+  "$id": "schemas/nodes/donors.FileFileSet.json",
   "allOf": [
     {
       "$ref": "node.base.json"

@@ -1,25 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/files_filesets.FileFileSet.json",
+  "$id": "schemas/nodes/files_filesets.FileFileSet.json",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "treatments_term_ids": {
-          "$ref": "../mixins.json#/treatments_term_ids"
-        }
-      }
     },
     {
       "type": "object",
@@ -116,6 +100,7 @@
           }
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
@@ -163,6 +148,7 @@
           ]
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship",
             "observed data",
@@ -281,6 +267,7 @@
           }
         },
         "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "CHEBI:15367"
           ]
@@ -357,6 +344,7 @@
           "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
         },
         "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality",
           "type": [
             "string",
             "null"

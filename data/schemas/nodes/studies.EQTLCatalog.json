@@ -1,16 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/studies.EQTLCatalog.json",
+  "$id": "schemas/nodes/studies.EQTLCatalog.json",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -38,6 +31,9 @@
           "enum": [
             "EBI"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

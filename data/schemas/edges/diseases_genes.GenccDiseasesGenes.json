@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/diseases_genes.GenccDiseasesGenes.json",
   "accessible_via": {
     "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmids, class, method, label, files_filesets, source, source_url"
@@ -8,13 +8,6 @@
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -75,7 +68,7 @@
         },
         "classification": {
           "type": "string",
-          "description": "GenCC evidence classification of the gene\u2013disease assertion.",
+          "description": "GenCC evidence classification of the gene–disease assertion.",
           "enum": [
             "Definitive",
             "Disputed Evidence",
@@ -156,6 +149,9 @@
         },
         "source_url": {
           "pattern": "^https://thegencc\\.org/submissions/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

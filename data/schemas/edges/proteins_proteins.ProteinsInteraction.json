@@ -1,19 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/proteins_proteins.ProteinsInteraction.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -351,7 +341,7 @@
             "number",
             "null"
           ],
-          "description": "IntAct MIscore from the merged table, on a 0\u20131 scale. Null when the source has none. Larger values mean more supporting evidence."
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
           "enum": [
@@ -372,6 +362,7 @@
           }
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
@@ -680,6 +671,9 @@
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK",
             "https://data.igvf.org/reference-files/IGVFFI1165YVBA"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

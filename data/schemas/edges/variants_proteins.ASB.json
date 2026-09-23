@@ -1,23 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "edges/variants_proteins.ASB.json",
   "db_collection_name": "variants_proteins",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -52,12 +39,18 @@
           "example": "rs1234567890"
         },
         "motif_fc": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Log2 ratio of HOCOMOCO motif p-values for the reference versus alternate allele. Positive values mean the motif prefers the alternate allele; negative values prefer the reference.",
           "example": -0.2727347850176788
         },
         "motif_pos": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "0-based position of the variant relative to the best HOCOMOCO PWM hit.",
           "example": 10
         },
@@ -89,12 +82,12 @@
         },
         "p_value_adj_ref": {
           "type": "number",
-          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793
         },
         "p_value_adj_alt": {
           "type": "number",
-          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
         "neg_log10_pvalue_adj_ref": {
@@ -108,9 +101,11 @@
           "example": 0
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "Kelly (neuroblastoma)"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/EFO_0002069"
         },
         "source": {
@@ -152,6 +147,9 @@
           "enum": [
             "ontology_terms/GO_0051101"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

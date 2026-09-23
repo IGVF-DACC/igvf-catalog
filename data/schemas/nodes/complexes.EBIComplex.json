@@ -6,22 +6,6 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -109,16 +93,24 @@
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ]
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "type": [
             "string",
             "null"
           ]
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

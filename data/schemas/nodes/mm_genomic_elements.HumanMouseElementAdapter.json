@@ -1,17 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "nodes/mm_genomic_elements.HumanMouseElementAdapter.json",
   "db_collection_name": "mm_genomic_elements",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        }
-      }
     },
     {
       "type": "object",
@@ -32,6 +25,7 @@
           "example": 121522428
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "integrative"
           ]

@@ -1,25 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -57,14 +41,14 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
+          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
         },
         "p_value_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Benjamini\u2013Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
           "example": 0.004023984
         },
         "neg_log10_pvalue": {
@@ -92,6 +76,7 @@
           ]
         },
         "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality",
           "enum": [
             "interference"
           ]
@@ -117,17 +102,20 @@
           ]
         },
         "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/ENCFF968BZL"
           ],
           "example": "files_filesets/ENCFF968BZL"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "enum": [
             "K562"
           ]
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]

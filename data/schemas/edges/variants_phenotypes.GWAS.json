@@ -1,18 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "edges/variants_phenotypes.GWAS.json",
   "db_collection_name": "variants_phenotypes",
   "type": "object",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -286,6 +279,9 @@
           "type": "string",
           "description": "ID of the GWAS study.",
           "example": "studies/GCST006368"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

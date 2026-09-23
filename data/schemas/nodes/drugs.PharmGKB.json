@@ -6,19 +6,6 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -49,14 +36,19 @@
           "example": "https://www.pharmgkb.org/chemical/PA166238901"
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "PharmGKB"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

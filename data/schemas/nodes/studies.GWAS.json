@@ -1,16 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/studies.GWAS.json",
+  "$id": "schemas/nodes/studies.GWAS.json",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -112,6 +105,9 @@
           "enum": [
             "October 2022 (22.10)"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

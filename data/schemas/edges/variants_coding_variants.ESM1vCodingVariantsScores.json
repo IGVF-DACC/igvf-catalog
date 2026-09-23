@@ -1,21 +1,8 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json",
   "db_collection_name": "variants_coding_variants",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -75,16 +62,19 @@
           "example": "AC"
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "enum": [
             "codes for"
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
           ]

@@ -1,30 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_drugs_genes.PharmGKB.json",
   "accessible_via": {
     "return": "_id, name, inverse_name, gene_symbol, source, source_url, class, method, files_filesets"
   },
   "db_collection_name": "variants_drugs_genes",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -69,23 +50,30 @@
           "example": "ABCB1"
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "pharmGKB"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
           "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "PharmGKB"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

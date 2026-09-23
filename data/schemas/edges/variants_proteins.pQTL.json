@@ -1,22 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "id": "schemas/edges/variants_proteins.pQTL.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/variants_proteins.pQTL.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -90,11 +77,13 @@
           "example": "intergenic_variant"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "enum": [
             "blood plasma"
           ]
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "enum": [
             "ontology_terms/UBERON_0001969"
           ]
@@ -128,6 +117,9 @@
           "enum": [
             "pQTL"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

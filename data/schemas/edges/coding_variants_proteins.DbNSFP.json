@@ -1,18 +1,8 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_proteins.DbNSFP.json",
   "db_collection_name": "coding_variants_proteins",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -57,11 +47,13 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "dbNSFP 5.1a"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "http://database.liulab.science/dbNSFP"
           ]

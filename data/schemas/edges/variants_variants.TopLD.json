@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_variants.TopLD.json",
   "accessible_via": {
     "filter_by_range": "r2, d_prime",
@@ -7,19 +7,6 @@
   },
   "db_collection_name": "variants_variants",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -97,6 +84,7 @@
           ]
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "enum": [
             "linkage disequilibrium"
           ]
@@ -116,11 +104,13 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "TopLD"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "http://topld.genetics.unc.edu/"
           ]

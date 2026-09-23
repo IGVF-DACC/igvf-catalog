@@ -9,19 +9,6 @@
       "$ref": "motifs.base.json"
     },
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "source": {
@@ -34,14 +21,19 @@
           "example": "hocomoco11.autosome.org/motif/ATF1_HUMAN.H11MO.0.B"
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "HOCOMOCO"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

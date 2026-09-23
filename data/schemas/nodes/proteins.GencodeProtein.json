@@ -1,16 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/proteins.GencodeProtein.json",
+  "$id": "schemas/nodes/proteins.GencodeProtein.json",
   "allOf": [
     {
       "$ref": "node.base.json"
-    },
-    {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        }
-      }
     },
     {
       "type": "object",
@@ -50,6 +43,7 @@
           ]
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens",
             "Mus musculus"

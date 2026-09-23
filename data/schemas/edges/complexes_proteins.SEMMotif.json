@@ -1,18 +1,8 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/complexes_proteins.SEMMotif.json",
   "db_collection_name": "complexes_proteins",
   "allOf": [
-    {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        }
-      }
-    },
     {
       "type": "object",
       "properties": {
@@ -52,11 +42,13 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
           "pattern": "^https://data.igvf.org/model-files/"
         }

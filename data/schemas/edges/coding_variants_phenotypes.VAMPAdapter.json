@@ -1,22 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
-    },
-    {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
     },
     {
       "type": "object",
@@ -59,12 +46,14 @@
           ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "items": {
             "type": "string"
           },
           "example": "HAP-1"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "items": {
             "type": "string"
           },
@@ -119,6 +108,9 @@
             "null"
           ],
           "description": "Abundance score calculated for replicate 3."
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

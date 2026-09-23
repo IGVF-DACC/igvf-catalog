@@ -1,21 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/ontology_terms.Cellosaurus.json",
   "allOf": [
     {
       "$ref": "ontology_terms.base.json"
-    },
-    {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
     },
     {
       "type": "object",
@@ -68,10 +56,17 @@
           }
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ]
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
