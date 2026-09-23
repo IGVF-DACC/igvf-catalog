@@ -143,7 +143,7 @@
           "description": "Amino acid change the variant introduces into the reference sequence, in single-letter code.",
           "example": "P1153L"
         },
-        "hgvs_p": {
+        "hgvsp": {
           "type": [
             "string",
             "null"
@@ -285,7 +285,7 @@
         "95_ci_upper",
         "95_ci_lower",
         "amino_acid_change",
-        "hgvs_p",
+        "hgvsp",
         "functional_consequence",
         "functional_consequence_zscore",
         "variant_qc_flag",
