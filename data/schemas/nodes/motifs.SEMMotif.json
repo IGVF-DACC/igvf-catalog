@@ -22,7 +22,7 @@
           "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
           "pattern": "^https://data.igvf.org/model-files/"
         },
-        "baseline": {
+        "SEMpl_baseline": {
           "type": "number",
           "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers.",
           "example": -0.671761
@@ -52,13 +52,13 @@
         }
       },
       "required": [
-        "baseline",
+        "SEMpl_baseline",
         "class",
         "method",
         "files_filesets"
       ],
       "accessible_via": {
-        "return": "_id, name, tf_name, source, source_url, pwm, length, baseline, class, method, files_filesets"
+        "return": "_id, name, tf_name, source, source_url, pwm, length, SEMpl_baseline, class, method, files_filesets"
       }
     }
   ],
