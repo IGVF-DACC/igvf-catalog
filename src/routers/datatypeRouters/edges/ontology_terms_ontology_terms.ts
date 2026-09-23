@@ -60,7 +60,7 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
         RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'otherRecord')}}
       )[0]
 
-      FILTER record.${opt === 'children' ? '_to' : '_from'} == '${id}' && details != null && record.name == 'subclass'
+      FILTER record.${opt === 'children' ? '_to' : '_from'} == @id && details != null && record.name == 'subclass'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
 
@@ -70,16 +70,16 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
       }
   `
 
-  return await (await db.query(query)).all()
+  return await (await db.query(query, { id })).all()
 }
 
 async function getPaths (from: string, to: string, fields: string[]): Promise<any> {
   const query = `
     FOR fromObj IN ${ontologyTermCollectionName}
-      FILTER fromObj._key == '${decodeURIComponent(from)}'
+      FILTER fromObj._key == @fromKey
 
     FOR toObj IN ${ontologyTermCollectionName}
-      FILTER toObj._key == '${decodeURIComponent(to)}'
+      FILTER toObj._key == @toKey
 
     FOR path IN ANY ALL_SHORTEST_PATHS
       fromObj TO toObj
@@ -87,7 +87,7 @@ async function getPaths (from: string, to: string, fields: string[]): Promise<an
       RETURN path
   `
 
-  const paths = await (await db.query(query)).all() as PathArangoDB[]
+  const paths = await (await db.query(query, { fromKey: decodeURIComponent(from), toKey: decodeURIComponent(to) })).all() as PathArangoDB[]
 
   const totalVertices: Record<string, any> = {}
   const edgesPaths: Edge[][] = []

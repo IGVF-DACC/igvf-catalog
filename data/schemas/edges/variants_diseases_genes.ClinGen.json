@@ -1,101 +1,71 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_diseases_genes.Clingen.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for variants_diseases_genes edge"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Source for variants_diseases_genes edge",
-      "pattern": "^variants_diseases/",
-      "collections": [
-        "variants_diseases"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for variants_diseases_genes edge",
-      "example": "genes/ENSG00000171759",
-      "pattern": "^genes/",
-      "collections": [
-        "genes"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for variants_diseases_genes edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for variants_diseases_genes edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inheritance_mode": {
-      "type": "string",
-      "description": "Inheritance mode for variants_diseases_genes edge",
-      "example": "Autosomal recessive inheritance"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for variants_diseases_genes edge",
-      "enum": [
-        "ClinGen"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for variants_diseases_genes edge",
-      "enum": [
-        "https://search.clinicalgenome.org/kb/downloads"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the variants_diseases_genes edge, from the associated files_filesets record"
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the variants_diseases_genes edge, from the associated files_filesets record"
-    },
-    "label": {
-      "type": "string",
-      "description": "The label of the variants_diseases_genes edge; same value as method"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the variants_diseases_genes edge",
-      "example": "files_filesets/IGVFFI5852GYTT",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "source",
-    "source_url",
-    "inheritance_mode",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "inheritance_mode, class, method, label, files_filesets, source, source_url"
   },
-  "db_collection_name": "variants_diseases_genes"
+  "db_collection_name": "variants_diseases_genes",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
+        },
+        "_from": {
+          "pattern": "^variants_diseases/",
+          "collections": [
+            "variants_diseases"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000171759",
+          "pattern": "^genes/",
+          "collections": [
+            "genes"
+          ]
+        },
+        "name": {
+          "enum": [
+            "associated with"
+          ],
+          "example": "associated with"
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with"
+          ],
+          "example": "associated with"
+        },
+        "inheritance_mode": {
+          "type": "string",
+          "description": "Mode of inheritance for the disease the assertion applies to.",
+          "example": "Autosomal recessive inheritance"
+        },
+        "source": {
+          "enum": [
+            "ClinGen"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://search.clinicalgenome.org/kb/downloads"
+          ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "_key",
+        "inheritance_mode",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

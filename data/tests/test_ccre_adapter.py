@@ -33,10 +33,10 @@ def test_ccre_adapter(mock_file_fileset):
 
 
 def test_ccre_adapter_initialization():
-    adapter = CCRE(filepath='./samples/ENCFF167FJQ.example.bed.gz',
+    adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
                    label='genomic_element')
     assert adapter.label == 'genomic_element'
-    assert adapter.filename == 'ENCFF167FJQ'
+    assert adapter.filename == 'ENCFF420VPZ'
     assert adapter.source_url.startswith(
         'https://www.encodeproject.org/files/')
     assert adapter._get_collection_name() == 'genomic_elements'
@@ -44,10 +44,27 @@ def test_ccre_adapter_initialization():
 
 def test_ccre_adapter_mm_genomic_element_collection_name():
     """Test that mm_genomic_element label returns correct collection name."""
-    adapter = CCRE(filepath='./samples/ENCFF167FJQ.example.bed.gz',
+    adapter = CCRE(filepath='./samples/IGVFFI8753TTYC.example.bed.gz',
                    label='mm_genomic_element')
     assert adapter.label == 'mm_genomic_element'
+    assert adapter.filename == 'IGVFFI8753TTYC'
+    assert adapter.source_url == 'https://data.igvf.org/reference-files/IGVFFI8753TTYC/'
     assert adapter._get_collection_name() == 'mm_genomic_elements'
+
+
+@pytest.mark.external_dependency
+def test_ccre_adapter_mm_genomic_element_key_uses_grcm39(mock_file_fileset):
+    writer = SpyWriter()
+    adapter = CCRE(filepath='./samples/IGVFFI8753TTYC.example.bed.gz',
+                   label='mm_genomic_element', writer=writer, validate=True)
+    adapter.process_file()
+    assert len(writer.contents) > 0
+    first_item = json.loads(writer.contents[0])
+    assert '_GRCm39_' in first_item['_key']
+    assert 'GRCh38' not in first_item['_key']
+    assert first_item['_key'].endswith('_IGVFFI8753TTYC')
+    assert first_item['source_url'] == 'https://data.igvf.org/reference-files/IGVFFI8753TTYC/'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI8753TTYC'
 
 
 def test_ccre_adapter_validate_doc_invalid():

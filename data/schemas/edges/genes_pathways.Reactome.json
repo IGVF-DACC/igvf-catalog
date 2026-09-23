@@ -1,108 +1,91 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genes_pathways.Reactome.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "The unique key of the gene pathway edge",
-      "example": "ENSG00000290825_R-HSA-1971475"
-    },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the gene pathway edge",
-      "example": "genes/ENSG00000290825",
-      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-      "collections": [
-        "genes"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the gene pathway edge",
-      "example": "pathways/R-HSA-1971475",
-      "pattern": "^pathways/R-HSA-[0-9]+$",
-      "collections": [
-        "pathways"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the gene pathway edge",
-      "enum": [
-        "Reactome"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The source URL of the gene pathway edge",
-      "enum": [
-        "https://reactome.org/"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the gene pathway edge",
-      "enum": [
-        "belongs to"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the gene pathway edge",
-      "enum": [
-        "has part"
-      ]
-    },
-    "organism": {
-      "type": "string",
-      "description": "The organism of the gene pathway edge",
-      "enum": [
-        "Homo sapiens"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the gene pathway edge, from the associated files_filesets record",
-      "enum": [
-        "biological relationship"
-      ]
-    },
-    "method": {
-      "type": ["string", "null"],
-      "description": "The method of the gene pathway edge, from the associated files_filesets record"
-    },
-    "label": {
-      "type": ["string", "null"],
-      "description": "The label of the gene pathway edge, from the associated files_filesets record"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the gene pathway edge",
-      "example": "files_filesets/IGVFFI7082TATW",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "source",
-    "source_url",
-    "name",
-    "inverse_name",
-    "organism",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "source, source_url, organism, class, method, label, files_filesets"
   },
-  "db_collection_name": "genes_pathways"
+  "db_collection_name": "genes_pathways",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Ensembl gene ID and Reactome pathway ID joined by an underscore.",
+          "example": "ENSG00000290825_R-HSA-1971475"
+        },
+        "_from": {
+          "example": "genes/ENSG00000290825",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "_to": {
+          "example": "pathways/R-HSA-1971475",
+          "pattern": "^pathways/R-HSA-[0-9]+$",
+          "collections": [
+            "pathways"
+          ]
+        },
+        "source": {
+          "enum": [
+            "Reactome"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://reactome.org/"
+          ]
+        },
+        "name": {
+          "enum": [
+            "belongs to"
+          ],
+          "example": "belongs to"
+        },
+        "inverse_name": {
+          "enum": [
+            "has part"
+          ],
+          "example": "has part"
+        },
+        "organism": {
+          "$ref": "../mixins.json#/organism",
+          "enum": [
+            "Homo sapiens"
+          ]
+        },
+        "class": {
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "_key",
+        "organism",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

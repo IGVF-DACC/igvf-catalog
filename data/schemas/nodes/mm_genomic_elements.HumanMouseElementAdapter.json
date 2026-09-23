@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "nodes/mm_genomic_elements.HumanMouseElementAdapter.json",
   "db_collection_name": "mm_genomic_elements",
   "allOf": [
@@ -11,26 +11,28 @@
       "properties": {
         "chr": {
           "type": "string",
-          "description": "Chromosome for the genomic element"
+          "description": "Mouse chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
+          "example": "chr6"
         },
         "start": {
           "type": "number",
-          "description": "Start position for the genomic element"
+          "description": "Start of the element, 0-based and inclusive.",
+          "example": 121522229
         },
         "end": {
           "type": "number",
-          "description": "End position for the genomic element"
+          "description": "End of the mouse element on mm10, 0-based and exclusive.",
+          "example": 121522428
         },
         "method": {
-          "type": "string",
-          "description": "Method for the genomic element",
+          "$ref": "../mixins.json#/method",
           "enum": [
             "integrative"
           ]
         },
         "type": {
           "type": "string",
-          "description": "Type for the genomic element",
+          "description": "Category of element: a mouse DNase hypersensitive site paired to a human site by FUNCODE.",
           "enum": [
             "accessible dna elements (mouse)"
           ]

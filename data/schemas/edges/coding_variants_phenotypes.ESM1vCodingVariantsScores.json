@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
   "allOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edges between coding variants and phenotypes"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
@@ -38,15 +38,14 @@
         },
         "esm_1v_score": {
           "type": "number",
-          "description": "Score for the edges between coding variants and phenotypes"
+          "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filefileset for the edges between coding variants and phenotypes",
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/IGVFFI8105TNNO"
-          ]
-
+          ],
+          "example": "files_filesets/IGVFFI8105TNNO"
         },
         "method": {
           "enum": [
@@ -75,84 +74,84 @@
         },
         "esm1v_t33_650M_UR90S_1": {
           "type": "number",
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_1 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_2": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_2 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_3": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_3 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_4": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_4 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_5": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_5 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_1_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_1 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_2_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_2 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_3_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_3 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_4_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the coding variant-phenotype edge"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_4 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_5_next": {
           "type": [
             "number",
             "null"
           ],
-          "description": "ESM1v score for the edges between coding variants and phenotypes"
+          "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_5 model for the later segment of an overlap."
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "type": [
             "string",
             "null"
-          ],
-          "description": "Biosample term for the edges between coding variants and phenotypes"
+          ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "type": [
             "string",
             "null"
-          ],
-          "description": "Biological context for the edges between coding variants and phenotypes"
+          ]
         }
       },
       "required": [

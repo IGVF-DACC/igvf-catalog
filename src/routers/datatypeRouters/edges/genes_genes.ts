@@ -7,7 +7,7 @@ import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, withHgncPrefix } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
-import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -16,6 +16,11 @@ const MousegenesGenesSchema = getSchema('data/schemas/edges/mm_genes_mm_genes.Ge
 const CoXPresdbSchema = getSchema('data/schemas/edges/genes_genes.Coxpresdb.json') // human coexpredb
 const HumangenesSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const MousegenesSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
+// genes_genes holds both BioGRID (fake z_score = 0) and COXPRESdb (real z_score) edges.
+// Filtering must see the union so a real z_score range filter isn't built from a schema
+// that doesn't know about it.
+const HumangenesGenesFilterSchema = getMergedCollectionSchema('edges', 'genes_genes')
+const MousegenesGenesFilterSchema = getMergedCollectionSchema('edges', 'mm_genes_mm_genes')
 
 const interactionTypes = z.enum([
   'dosage growth defect (sensu BioGRID)',
@@ -110,9 +115,11 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let genesSchema = HumangenesSchema
   let genesGenesSchema = HumangenesGenesSchema
+  let genesGenesFilterSchema = HumangenesGenesFilterSchema
   if (input.organism === 'Mus musculus') {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
+    genesGenesFilterSchema = MousegenesGenesFilterSchema
   }
   delete input.organism
 
@@ -147,7 +154,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   const filters = []
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
   const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
-  const edgeFilters = getFilterStatements(genesGenesSchema, input)
+  const edgeFilters = getFilterStatements(genesGenesFilterSchema, input)
 
   if (gene) {
     filters.push('(record._from == gene._id OR record._to == gene._id)')

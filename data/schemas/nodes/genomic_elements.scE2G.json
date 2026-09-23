@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.scE2G.json",
   "allOf": [
     {
@@ -29,7 +29,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Class of the element: promoter, genic, or intergenic.",
           "enum": [
             "genic",
             "intergenic",
@@ -47,10 +47,7 @@
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "example": "files_filesets/IGVFFI5648GWQX",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

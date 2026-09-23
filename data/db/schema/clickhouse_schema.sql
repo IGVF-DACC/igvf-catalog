@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS pathways (
 	name_aliases Array(String),
 	organism String,
 	disease_ontology_terms Array(String),
-	go_biological_process String,
+	biological_process String,
 	is_top_level_pathway boolean,
 	source String,
 	source_url String,
@@ -571,7 +571,7 @@ CREATE TABLE IF NOT EXISTS variants_diseases_genes (
 );
 
 CREATE TABLE IF NOT EXISTS genes_biosamples (
-	biology_context String,
+	biological_context String,
 	model_id String,
 	model_type String,
 	cancer_term String,

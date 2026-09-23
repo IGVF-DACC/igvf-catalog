@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/proteins_proteins.ProteinsInteraction.json",
   "allOf": [
     {
@@ -10,25 +10,27 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the proteins interaction edge"
+          "description": "SHA-256 hash of the two Ensembl protein IDs, the PSI-MI detection method code and the supporting PubMed IDs."
         },
         "_from": {
           "example": "proteins/ENSP00000340898",
           "pattern": "^proteins/",
           "collections": [
             "proteins"
-          ]
+          ],
+          "description": "Handle of one protein in the physical interaction."
         },
         "_to": {
           "example": "proteins/ENSP00000340898",
           "pattern": "^proteins/",
           "collections": [
             "proteins"
-          ]
+          ],
+          "description": "Handle of the other protein in the physical interaction."
         },
         "detection_method": {
           "type": "string",
-          "description": "The detection method of the proteins interaction edge",
+          "description": "PSI-MI detection method used to observe the interaction",
           "enum": [
             "3D electron microscopy",
             "Split renilla luciferase complementation",
@@ -221,12 +223,12 @@
         },
         "detection_method_code": {
           "type": "string",
-          "description": "The detection method code of the proteins interaction edge",
+          "description": "PSI-MI identifier of the detection method.",
           "example": "MI:0004"
         },
         "interaction_type": {
           "type": "array",
-          "description": "The interaction type of the proteins interaction edge",
+          "description": "BioGRID physical-interaction class.",
           "items": {
             "type": "string",
             "enum": [
@@ -276,24 +278,70 @@
         },
         "interaction_type_code": {
           "type": "array",
-          "description": "The interaction type code of the proteins interaction edge",
+          "description": "PSI-MI identifiers of the interaction types.",
           "example": [
             "MI:0915"
-          ]
+          ],
+          "items": {
+            "type": "string",
+            "enum": [
+              "MI:0192",
+              "MI:0194",
+              "MI:0195",
+              "MI:0197",
+              "MI:0203",
+              "MI:0204",
+              "MI:0210",
+              "MI:0211",
+              "MI:0212",
+              "MI:0213",
+              "MI:0214",
+              "MI:0216",
+              "MI:0217",
+              "MI:0220",
+              "MI:0403",
+              "MI:0407",
+              "MI:0408",
+              "MI:0414",
+              "MI:0556",
+              "MI:0557",
+              "MI:0559",
+              "MI:0566",
+              "MI:0567",
+              "MI:0569",
+              "MI:0570",
+              "MI:0572",
+              "MI:0844",
+              "MI:0871",
+              "MI:0882",
+              "MI:0883",
+              "MI:0902",
+              "MI:0914",
+              "MI:0915",
+              "MI:0945",
+              "MI:1126",
+              "MI:1127",
+              "MI:1148",
+              "MI:1237",
+              "MI:1310",
+              "MI:2252",
+              "MI:2364"
+            ]
+          }
         },
         "confidence_value_biogrid": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The confidence value of the proteins interaction edge"
+          "description": "BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence."
         },
         "confidence_value_intact": {
           "type": [
             "number",
             "null"
           ],
-          "description": "The confidence value of the proteins interaction edge"
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
           "enum": [
@@ -304,14 +352,17 @@
         },
         "pmids": {
           "type": "array",
-          "description": "The pmids of the proteins interaction edge",
+          "description": "Pubmed identifiers.",
           "example": [
             "http://pubmed.ncbi.nlm.nih.gov/23836931"
-          ]
+          ],
+          "items": {
+            "type": "string",
+            "pattern": "^http://pubmed\\.ncbi\\.nlm\\.nih\\.gov/(?:unassigned)?[0-9]+$"
+          }
         },
         "organism": {
-          "type": "string",
-          "description": "The organism of the proteins interaction edge",
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens",
             "Mus musculus"
@@ -329,7 +380,7 @@
         },
         "molecular_function": {
           "type": "string",
-          "description": "The molecular function of the proteins interaction edge",
+          "description": "Gene Ontology term for protein binding.",
           "enum": [
             "ontology_terms/GO_0005515"
           ]
@@ -615,20 +666,14 @@
             "observed data"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "The files filesets of the protein to protein edge",
-          "example": "files_filesets/IGVFFI4317VDGK",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "source_url": {
           "enum": [
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK",
             "https://data.igvf.org/reference-files/IGVFFI1165YVBA"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
