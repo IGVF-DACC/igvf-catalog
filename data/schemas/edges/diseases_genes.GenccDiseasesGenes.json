@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/diseases_genes.GenccDiseasesGenes.json",
   "accessible_via": {
-    "return": "sgc_id, hgnc, gene_symbol, term_name, classification, moi_id, moi_name, submitter, pmids, class, method, label, files_filesets, source, source_url"
+    "return": "sgc_id, hgnc, gene_name, term_name, classification, moi_id, moi_name, submitter, pmids, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "diseases_genes",
   "allOf": [
@@ -56,9 +56,9 @@
           "pattern": "^HGNC:[0-9]+$",
           "example": "HGNC:10896"
         },
-        "gene_symbol": {
+        "gene_name": {
           "type": "string",
-          "description": "HGNC symbol from the GenCC submission.",
+          "description": "HGNC gene symbol",
           "example": "SKI"
         },
         "term_name": {
@@ -158,7 +158,7 @@
         "_key",
         "sgc_id",
         "hgnc",
-        "gene_symbol",
+        "gene_name",
         "term_name",
         "classification",
         "moi_id",

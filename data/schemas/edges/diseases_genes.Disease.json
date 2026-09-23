@@ -60,9 +60,9 @@
           "description": "Ontology term name.",
           "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
         },
-        "gene_symbol": {
+        "gene_name": {
           "type": "string",
-          "description": "HGNC symbol of the associated gene.",
+          "description": "HGNC gene symbol",
           "example": "KIF7"
         },
         "association_type": {
@@ -93,7 +93,7 @@
         "_key",
         "pmids",
         "term_name",
-        "gene_symbol",
+        "gene_name",
         "association_type",
         "association_status",
         "files_filesets"

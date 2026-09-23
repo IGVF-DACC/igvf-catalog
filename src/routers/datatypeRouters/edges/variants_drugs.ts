@@ -38,7 +38,7 @@ const studyParametersDict = z.object({
 const variantsToDrugsFormat = z.object({
   drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
-  gene_symbol: z.array(z.string()).optional(),
+  gene_name: z.array(z.string()).optional(),
   pmid: z.string().optional(),
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),
@@ -53,7 +53,7 @@ const variantsToDrugsFormat = z.object({
 const drugsToVariantsFormat = z.object({
   sequence_variant: z.string().or(variantFormat).optional(),
   _to: z.string(),
-  gene_symbol: z.array(z.string()).optional(),
+  gene_name: z.array(z.string()).optional(),
   pmid: z.string().optional(),
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),

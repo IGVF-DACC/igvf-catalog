@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_drugs_genes.PharmGKB.json",
   "accessible_via": {
-    "return": "_id, name, inverse_name, gene_symbol, source, source_url, class, method, files_filesets"
+    "return": "_id, name, inverse_name, gene_name, source, source_url, class, method, files_filesets"
   },
   "db_collection_name": "variants_drugs_genes",
   "allOf": [
@@ -44,9 +44,9 @@
             "associated with"
           ]
         },
-        "gene_symbol": {
+        "gene_name": {
           "type": "string",
-          "description": "HGNC symbol of the gene this edge attaches to the variant-drug annotation.",
+          "description": "HGNC gene symbol",
           "example": "ABCB1"
         },
         "source": {
@@ -82,7 +82,7 @@
         "_to",
         "name",
         "inverse_name",
-        "gene_symbol",
+        "gene_name",
         "source",
         "source_url",
         "class",
