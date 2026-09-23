@@ -7,7 +7,6 @@
       "type": "object",
       "properties": {
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the transcript that contains the feature.",
           "example": "transcripts/ENST00000456328",
@@ -17,7 +16,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the sub-transcript feature.",
           "example": "genes_structure/ENST00000456328_ENSE00002234944_exon",

@@ -9,8 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the variant key, Ensembl gene ID and eQTL Catalogue dataset identifier."
         },
         "_from": {
@@ -183,7 +181,6 @@
         }
       },
       "required": [
-        "_key",
         "biological_context",
         "biological_process",
         "study",

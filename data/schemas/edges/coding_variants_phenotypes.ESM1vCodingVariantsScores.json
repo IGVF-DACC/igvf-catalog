@@ -9,8 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
@@ -167,7 +165,6 @@
         }
       },
       "required": [
-        "_key",
         "esm_1v_score",
         "files_filesets",
         "biosample_term",

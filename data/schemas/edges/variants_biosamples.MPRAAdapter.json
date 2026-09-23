@@ -9,8 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, genomic element key, strand token, biosample term and source file accession joined by underscores, hashed with SHA-256 when the composite would exceed the key length limit."
         },
         "_from": {
@@ -162,7 +160,6 @@
         }
       },
       "required": [
-        "_key",
         "label",
         "significant",
         "files_filesets",
