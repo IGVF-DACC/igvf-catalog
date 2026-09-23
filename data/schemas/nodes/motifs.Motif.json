@@ -17,8 +17,8 @@
           ]
         },
         "source_url": {
-          "pattern": "^https://hocomoco11\\.autosome\\.org/motif/.*$",
-          "example": "https://hocomoco11.autosome.org/motif/ATF1_HUMAN.H11MO.0.B"
+          "pattern": "^https://hocomoco11\\.autosome\\.org/downloads_v11$",
+          "example": "https://hocomoco11.autosome.org/downloads_v11"
         },
         "class": {
           "type": "string",

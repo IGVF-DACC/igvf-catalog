@@ -115,7 +115,7 @@ class Motif(BaseAdapter):
                         'name': _key,
                         'tf_name': tf_name,
                         'source': self.source,
-                        'source_url': self.source_url + model_name,
+                        'source_url': self.source_url,
                         'pwm': pwm,
                         'length': length,
                         'class': self.collection_class,
