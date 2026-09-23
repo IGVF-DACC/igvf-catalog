@@ -124,7 +124,10 @@
           "$ref": "../mixins.json#/biosample_term",
           "enum": [
             "ontology_terms/EFO_0002067"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/EFO_0002067": "K562 cell line."
+          }
         },
         "name": {
           "enum": [

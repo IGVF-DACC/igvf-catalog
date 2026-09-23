@@ -77,27 +77,16 @@
           "pattern": "^motifs/"
         },
         "es_mean_ref": {
-<<<<<<< HEAD
+          "title": "Mean Effect Size for Reference Allele",
           "type": "number",
           "description": "The effect size mean for the reference allele",
           "example": 1.795276180193825
         },
         "es_mean_alt": {
+          "title": "Mean Effect Size for Alternative Allele",
           "type": "number",
           "description": "The effect size mean for the alternate allele",
           "example": -1.7019721868875686
-=======
-          "title": "Mean Effect Size for Reference Allele",
-          "type": "string",
-          "description": "Allele-wise effect size for the reference allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger reference-allele ASB.",
-          "example": "1.795276180193825"
-        },
-        "es_mean_alt": {
-          "title": "Mean Effect Size for Alternate Allele",
-          "type": "string",
-          "description": "Allele-wise effect size for the alternate allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger alternate-allele ASB.",
-          "example": "-1.7019721868875686"
->>>>>>> 7dd6a444 (titles)
         },
         "p_value_adj_ref": {
           "title": "Adjusted P-Value for Reference Allele",
@@ -167,10 +156,14 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for regulation of DNA binding.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0051101"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0051101": "Regulation of DNA binding."
+          }
+
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
