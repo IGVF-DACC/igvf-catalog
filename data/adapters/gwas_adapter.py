@@ -6,7 +6,7 @@ from math import log10
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb, load_variant, bulk_check_variants_in_arangodb
 from adapters.writer import Writer
 
 
@@ -29,6 +29,7 @@ class GWAS(BaseAdapter):
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
     ALLOWED_LABELS = ['studies',
+                      'variants',
                       'variants_phenotypes']
     SOURCE = 'OpenTargets'
 
@@ -36,12 +37,16 @@ class GWAS(BaseAdapter):
         self.processed_keys = set()
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
+        # populated by validate_variants(); variant ids build_variant_id() produces that
+        # load_variant() rejects (e.g. ref allele mismatch), so process_variants_phenotypes
+        # can skip them instead of emitting an edge with a dangling _from reference.
+        self.invalid_variant_ids = set()
 
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
-        if self.label == 'studies':
+        if self.label in ('studies', 'variants'):
             return 'nodes'
         else:
             return 'edges'
@@ -95,6 +100,9 @@ class GWAS(BaseAdapter):
 
     def process_variants_phenotypes(self, row, tagged_variants):
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+
+        if variant_id in self.invalid_variant_ids:
+            return None
 
         equivalent_term_id = None
         phenotype_term = None
@@ -192,6 +200,70 @@ class GWAS(BaseAdapter):
             'files_filesets': 'files_filesets/' + self.file_accession
         }
 
+    def validate_variants(self):
+        """Scan the whole file once for the variant ids GWAS edges will reference (same
+        build_variant_id(row[4], row[5], row[6], row[7]) used everywhere else here), bulk-check
+        which already exist in the variants collection, and load_variant() the rest.
+
+        When self.label == 'variants', newly-valid variants get written as nodes here. Either
+        way, variant ids load_variant() rejects are recorded in self.invalid_variant_ids so
+        process_variants_phenotypes can skip them - otherwise that edge's _from would point at
+        a variant that will never exist, and any verbose lookup on it fails.
+
+        Note this only prevents dangling edges for variants that are missing *and* invalid.
+        A variant that's simply missing (but valid) only gets created if this adapter is run
+        with label='variants' before label='variants_phenotypes' - the same two-pass contract
+        SGE_variant_phenotype_adapter.py and AFGR_sqtl_adapter.py already rely on.
+        """
+        self.logger.info(f'Collecting variant ids in {self.file_accession}...')
+        header = None
+        trying_to_complete_line = None
+        variant_ids = set()
+
+        for record in open(self.filepath, 'r'):
+            if header is None:
+                header = record.strip().split('\t')
+                continue
+
+            if trying_to_complete_line:
+                record = trying_to_complete_line + record
+                trying_to_complete_line = None
+
+            row = record.strip().split('\t')
+
+            if self.line_appears_broken(row):
+                trying_to_complete_line = record
+                continue
+
+            row = row + [None] * (len(header) - len(row))
+            variant_ids.add(build_variant_id(row[4], row[5], row[6], row[7]))
+
+        loaded_ids = bulk_check_variants_in_arangodb(
+            list(variant_ids), check_by='_key')
+        missing_ids = variant_ids - loaded_ids
+        self.logger.info(
+            f'{len(loaded_ids)} out of {len(variant_ids)} variants are already loaded; '
+            f'validating {len(missing_ids)} missing variant(s).'
+        )
+
+        for variant_id in missing_ids:
+            variant_props, skipped = load_variant(variant_id)
+            if variant_props:
+                if self.label == 'variants':
+                    variant_props.update({
+                        'source': self.SOURCE,
+                        'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.file_accession
+                    })
+                    if self.validate:
+                        self.validate_doc(variant_props)
+                    self.writer.write(json.dumps(variant_props))
+                    self.writer.write('\n')
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
+                self.invalid_variant_ids.add(variant_id)
+
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -199,6 +271,13 @@ class GWAS(BaseAdapter):
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
+
+        if self.label in ('variants', 'variants_phenotypes'):
+            self.validate_variants()
+
+        if self.label == 'variants':
+            return
+
         if self.label == 'variants_phenotypes':
             self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
