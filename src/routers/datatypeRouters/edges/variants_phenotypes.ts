@@ -180,10 +180,10 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     } else {
       const phenotypeQuery = `
         FOR record IN ontology_terms
-        FILTER record.name == '${input.phenotype_name as string}'
+        FILTER record.name == @phenotypeName
         RETURN record._id
       `
-      phenotypeIds = await (await db.query(phenotypeQuery)).all()
+      phenotypeIds = await (await db.query(phenotypeQuery, { phenotypeName: input.phenotype_name as string })).all()
     }
   }
   const phenotypeFilter = phenotypeIds.length > 0 ? 'record._to IN @phenotypeIds' : ''
