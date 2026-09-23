@@ -1,130 +1,104 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/diseases_genes.Disease.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the disease to gene edge",
-      "example": "Orphanet_100000_ENSG00000171759"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Source for the disease to gene edge",
-      "pattern": "^ontology_terms/Orphanet_",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the disease to gene edge",
-      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-      "collections": [
-        "genes"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the disease to gene edge",
-      "enum": [
-        "associated_with"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the disease to gene edge",
-      "enum": [
-        "associated_with"
-      ]
-    },
-    "pmids": {
-      "type": "array",
-      "description": "PMIDs for the disease to gene edge",
-      "items": {
-        "type": "string"
-      },
-      "example": [
-        "22587682"
-      ]
-    },
-    "term_name": {
-      "type": "string",
-      "description": "Term name for the disease to gene edge",
-      "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
-    },
-    "gene_name": {
-      "type": "string",
-      "description": "HGNC gene symbol",
-      "example": "BRCA1"
-    },
-    "association_type": {
-      "type": "string",
-      "description": "Association type for the disease to gene edge",
-      "example": "Disease-causing germline mutation(s) in"
-    },
-    "association_status": {
-      "type": "string",
-      "description": "Association status for the disease to gene edge",
-      "example": "Pathogenic"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the disease to gene edge",
-      "enum": [
-        "Orphanet"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the disease to gene edge",
-      "enum": [
-        "https://www.orphadata.com/genes/"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the disease to gene edge, from the associated files_filesets record"
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the disease to gene edge, from the associated files_filesets record"
-    },
-    "label": {
-      "type": "string",
-      "description": "The label of the disease to gene edge; same value as method"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the disease to gene edge",
-      "example": "files_filesets/IGVFFI4540ZCXZ",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "pmids",
-    "term_name",
-    "gene_name",
-    "association_type",
-    "association_status",
-    "source",
-    "source_url",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
-    "return": "pmids, term_name, gene_name, association_type, association_status, class, method, label, files_filesets, source, source_url"
+    "return": "pmids, term_name, gene_symbol, association_type, association_status, class, method, label, files_filesets, source, source_url"
   },
-  "db_collection_name": "diseases_genes"
+  "db_collection_name": "diseases_genes",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Orphanet disease term key and Ensembl gene ID joined by an underscore.",
+          "example": "Orphanet_166024_ENSG00000166813"
+        },
+        "_from": {
+          "description": "Handle of the Orphanet disease term.",
+          "pattern": "^ontology_terms/Orphanet_",
+          "collections": [
+            "ontology_terms"
+          ],
+          "example": "ontology_terms/Orphanet_166024"
+        },
+        "_to": {
+          "description": "Handle of the Ensembl gene Orphanet associates with the disease.",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ],
+          "example": "genes/ENSG00000166813"
+        },
+        "name": {
+          "enum": [
+            "associated_with"
+          ],
+          "example": "associated_with"
+        },
+        "inverse_name": {
+          "enum": [
+            "associated_with"
+          ],
+          "example": "associated_with"
+        },
+        "pmids": {
+          "type": "array",
+          "description": "Pubmed identifiers.",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "22587682"
+          ]
+        },
+        "term_name": {
+          "type": "string",
+          "description": "Ontology term name.",
+          "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
+        },
+        "gene_name": {
+          "type": "string",
+          "description": "HGNC gene symbol",
+          "example": "KIF7"
+        },
+        "association_type": {
+          "type": "string",
+          "description": "Orphanet label for the role of the gene in the disease.",
+          "example": "Disease-causing germline mutation(s) in"
+        },
+        "association_status": {
+          "type": "string",
+          "description": "Orphanet status of the gene–disease relationship (Assessed or Confirmed)",
+          "example": "Assessed"
+        },
+        "source": {
+          "enum": [
+            "Orphanet"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://www.orphadata.com/genes/"
+          ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "_key",
+        "pmids",
+        "term_name",
+        "gene_name",
+        "association_type",
+        "association_status",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

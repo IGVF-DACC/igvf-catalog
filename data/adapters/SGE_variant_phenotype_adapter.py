@@ -26,6 +26,9 @@ class SGE(BaseAdapter):
     CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
     CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL = 'protein variant effect'
+    # the source file's header spells this column "hgvs_p", but every other coding-variant
+    # collection (DbNSFP, ESM-1v, MutPred2) uses "hgvsp" - rename on load so the KG is consistent.
+    FIELD_NAME_OVERRIDES = {'hgvs_p': 'hgvsp'}
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
@@ -186,16 +189,18 @@ class SGE(BaseAdapter):
                                 # don't need first 4 columns
                                 if column_index > 3:
                                     prop = {}
+                                    key = self.FIELD_NAME_OVERRIDES.get(
+                                        field, field)
                                     value = row[column_index]
                                     if field in self.FLOAT_FIELDS:
-                                        prop[field] = float(
+                                        prop[key] = float(
                                             value) if value != '' else None
                                     # starting from column 17 are integers
                                     elif column_index > 15:
-                                        prop[field] = int(
+                                        prop[key] = int(
                                             value) if value != '' else None
                                     else:
-                                        prop[field] = value if value != '' and value != '---' else None
+                                        prop[key] = value if value != '' and value != '---' else None
 
                                     _props.update(prop)
 
@@ -243,16 +248,18 @@ class SGE(BaseAdapter):
                                     # don't need first 4 columns
                                     if column_index > 3:
                                         prop = {}
+                                        key = self.FIELD_NAME_OVERRIDES.get(
+                                            field, field)
                                         value = row[column_index]
                                         if field in self.FLOAT_FIELDS:
-                                            prop[field] = float(
+                                            prop[key] = float(
                                                 value) if value != '' else None
                                         # starting from column 17 are integers
                                         elif column_index > 15:
-                                            prop[field] = int(
+                                            prop[key] = int(
                                                 value) if value != '' else None
                                         else:
-                                            prop[field] = value if value != '' and value != '---' else None
+                                            prop[key] = value if value != '' and value != '---' else None
 
                                         _props.update(prop)
 

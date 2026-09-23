@@ -1,139 +1,181 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_drugs.PharmGKB.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant to drug edge"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant to drug edge",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant to drug edge",
-      "pattern": "^drugs/",
-      "collections": [
-        "drugs"
-      ]
-    },
-    "gene_name": {
-      "type": "array",
-      "description": "HGNC gene symbol",
-      "example": [
-        "ABCB1"
-      ]
-    },
-    "pmid": {
-      "type": "string",
-      "description": "PMID for the variant to drug edge",
-      "example": "22587682"
-    },
-    "study_parameters": {
-      "type": "array",
-      "description": "Study parameters for the variant to drug edge",
-      "example": [
-        {
-          "study_parameter_id": "1451643610",
-          "study_type": "cohort",
-          "study_cases": "100",
-          "study_controls": "",
-          "p-value": "= 0.49",
-          "biogeographical_groups": "East Asian"
-        }
-      ]
-    },
-    "phenotype_categories": {
-      "type": "array",
-      "description": "Phenotype categories for the variant to drug edge",
-      "items": {
-        "type": "string",
-        "enum": [
-          "Dosage",
-          "Efficacy",
-          "Metabolism/PK",
-          "Other",
-          "PD",
-          "Toxicity"
-        ]
-      }
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variant to drug edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variant to drug edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variant to drug edge",
-      "enum": [
-        "pharmGKB"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the variant to drug edge",
-      "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
-      "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the variant to drug edge, from the associated files_filesets record",
-      "enum": [
-        "observed data"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the variant to drug edge, from the associated files_filesets record",
-      "enum": [
-        "PharmGKB"
-      ]
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the variant to drug edge",
-      "example": "files_filesets/IGVFFI8835SMSP",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "gene_name",
-    "pmid",
-    "study_parameters",
-    "phenotype_categories",
-    "source",
-    "source_url",
-    "class",
-    "method",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "_from, _to, gene_name, pmid, study_parameters, phenotype_categories, source, source_url, class, method, files_filesets"
   },
-  "db_collection_name": "variants_drugs"
+  "db_collection_name": "variants_drugs",
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "PharmGKB variant annotation ID and drug accession joined by an underscore.",
+          "example": "1450377668_PA450373"
+        },
+        "_from": {
+          "type": "string",
+          "description": "Document handle of the source node, in collection/key form.",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Document handle of the target node, in collection/key form.",
+          "pattern": "^drugs/",
+          "collections": [
+            "drugs"
+          ]
+        },
+        "gene_name": {
+          "type": "array",
+          "description": "HGNC gene symbol",
+          "example": [
+            "ABCB1"
+          ]
+        },
+        "pmid": {
+          "type": "string",
+          "description": "PubMed identifier.",
+          "example": "22587682"
+        },
+        "study_parameters": {
+          "type": "array",
+          "description": "Study-level details attached to the annotation. Each entry has a study parameter ID, study type, case and control counts, p-value as reported, and biogeographical group. One annotation can have several entries when the paper reports more than one analysis.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "study_parameter_id": {
+                "type": "string",
+                "description": "PharmGKB study parameter set identifier",
+                "example": "1451643610"
+              },
+              "study_type": {
+                "type": "string",
+                "description": "Type of study (e.g. cohort, case/control, trio)",
+                "example": "cohort"
+              },
+              "study_cases": {
+                "type": "string",
+                "description": "Number of study cases. Stored as a string as provided by the source, may be empty",
+                "example": "100"
+              },
+              "study_controls": {
+                "type": "string",
+                "description": "Number of study controls. Stored as a string as provided by the source, may be empty",
+                "example": "149"
+              },
+              "p-value": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Reported p-value operator and number as a single string (e.g. \"= 0.49\"), not a float. Null when the source row is malformed",
+                "example": "= 0.49"
+              },
+              "biogeographical_groups": {
+                "type": "string",
+                "description": "Biogeographical group studied",
+                "example": "East Asian"
+              }
+            },
+            "required": [
+              "study_parameter_id",
+              "study_type",
+              "study_cases",
+              "study_controls",
+              "p-value",
+              "biogeographical_groups"
+            ],
+            "additionalProperties": false
+          },
+          "example": [
+            {
+              "study_parameter_id": "1451643610",
+              "study_type": "cohort",
+              "study_cases": "100",
+              "study_controls": "",
+              "p-value": "= 0.49",
+              "biogeographical_groups": "East Asian"
+            }
+          ]
+        },
+        "phenotype_categories": {
+          "type": "array",
+          "description": "PharmGKB phenotype category of the association.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Dosage",
+              "Efficacy",
+              "Metabolism/PK",
+              "Other",
+              "PD",
+              "Toxicity"
+            ]
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "associated with"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "associated with"
+          ]
+        },
+        "source": {
+          "$ref": "../mixins.json#/source",
+          "enum": [
+            "pharmGKB"
+          ]
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url",
+          "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
+          "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class",
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "$ref": "../mixins.json#/method",
+          "enum": [
+            "PharmGKB"
+          ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "name",
+        "inverse_name",
+        "gene_name",
+        "pmid",
+        "study_parameters",
+        "phenotype_categories",
+        "source",
+        "source_url",
+        "class",
+        "method",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

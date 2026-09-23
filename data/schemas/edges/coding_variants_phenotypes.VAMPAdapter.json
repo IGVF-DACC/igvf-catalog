@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
   "allOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/coding_var_1",
@@ -45,26 +45,15 @@
             "altered due to mutation"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the coding variant to phenotype edge",
-          "example": "files_filesets/IGVFFI0332UGDD",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "The biological context of the coding variant to phenotype edge",
+          "$ref": "../mixins.json#/biological_context",
           "items": {
             "type": "string"
           },
           "example": "HAP-1"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "The biosample term of the coding variant to phenotype edge",
+          "$ref": "../mixins.json#/biosample_term",
           "items": {
             "type": "string"
           },
@@ -90,35 +79,38 @@
             "number",
             "null"
           ],
-          "description": "Score for the coding variant to phenotype edge"
+          "description": "VAMP-seq abundance score: For the variant, the mean of its replicate measurements. Normalized so that the median synonymous variant scores 1 and the median nonsense variant scores 0, so lower scores mean reduced abundance of the variant protein."
         },
         "standard_error": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Standard error for the coding variant to phenotype edge"
+          "description": "Standard error of the overall score."
         },
         "rep1_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Rep1 score for the coding variant to phenotype edge"
+          "description": "Abundance score calculated for replicate 1."
         },
         "rep2_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Rep2 score for the coding variant to phenotype edge"
+          "description": "Abundance score calculated for replicate 2."
         },
         "rep3_score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Rep3 score for the coding variant to phenotype edge"
+          "description": "Abundance score calculated for replicate 3."
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.CCRE.json",
   "allOf": [
     {
@@ -19,7 +19,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation of the CCRE",
+          "description": "Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.",
           "enum": [
             "CA-CTCF: chromatin accessible + CTCF binding",
             "CA-TF: chromatin accessible + TF binding",
@@ -52,11 +52,11 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filesets of the CCRE",
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/ENCFF420VPZ"
-          ]
+          ],
+          "example": "files_filesets/ENCFF420VPZ"
         }
       },
       "required": [

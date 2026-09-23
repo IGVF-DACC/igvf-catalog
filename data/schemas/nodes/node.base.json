@@ -3,29 +3,33 @@
   "$id": "node.base.json",
   "title": "Base Node Schema",
   "description": "Base schema for all node types in the IGVF Catalog. Defines common required properties.",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the node"
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the node"
-    },
-    "source": {
-      "type": "string",
-      "description": "Data source of the collection"
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL of the collection"
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists, otherwise a composite of the fields that make the record unique."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human readable display name for the entity",
+          "example": "TP53"
+        },
+        "source": {
+          "$ref": "../mixins.json#/source",
+          "example": "IGVF"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        }
+      },
+      "required": [
+        "_key",
+        "name",
+        "source",
+        "source_url"
+      ]
     }
-  },
-  "required": [
-    "_key",
-    "name",
-    "source",
-    "source_url"
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_genes.AFGRSQtl.json",
   "allOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to gene edge"
+          "description": "SHA-256 hash of the variant key, LeafCutter intron identifier and Ensembl gene ID."
         },
         "_from": {
           "example": "variants/NC_000001.11:10000:T:A",
@@ -20,43 +20,59 @@
           ]
         },
         "_to": {
-          "example": "genes/ENSG00000187583.10",
+          "example": "genes/ENSG00000187583",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
           ]
         },
         "biological_context": {
-          "type": "string",
-          "description": "Biological context for the variant to gene edge",
+          "$ref": "../mixins.json#/biological_context",
           "enum": [
             "lymphoblastoid cell line"
           ]
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Biosample term for the variant to gene edge",
+          "$ref": "../mixins.json#/biosample_term",
           "enum": [
             "ontology_terms/EFO_0005292"
           ]
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome for the variant to gene edge",
+          "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1",
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to gene edge"
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
           "type": "number",
-          "description": "Pvalue for the variant to gene edge"
+          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis."
         },
         "effect_size": {
           "type": "number",
-          "description": "Effect size for the variant to gene edge"
+          "description": "Regression coefficient (beta) of the alternate allele on the quantile-normalized intron excision ratio."
+        },
+        "posterior_inclusion_probability": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Posterior inclusion probability that this variant is causal for the splice QTL."
+        },
+        "log2FC": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "log2 fold change of intron excision associated with the alternate allele."
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Boolean indicating the significance of the variant association with splicing."
         },
         "class": {
           "enum": [
@@ -75,17 +91,17 @@
         },
         "intron_chr": {
           "type": "string",
-          "description": "Intron chromosome for the variant to gene edge",
+          "description": "Chromosome of the spliced intron",
           "example": "chr1",
           "pattern": "^chr"
         },
         "intron_start": {
-          "type": "string",
-          "description": "Intron start for the variant to gene edge"
+          "type": "number",
+          "description": "Start position of the spliced intron."
         },
         "intron_end": {
-          "type": "string",
-          "description": "Intron end for the variant to gene edge"
+          "type": "number",
+          "description": "End position of the spliced intron."
         },
         "source": {
           "enum": [
@@ -96,10 +112,6 @@
           "enum": [
             "https://github.com/smontgomlab/AFGR"
           ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the variant to gene edge"
         },
         "name": {
           "enum": [
@@ -113,10 +125,13 @@
         },
         "biological_process": {
           "type": "string",
-          "description": "Biological process for the variant to gene edge",
+          "description": "Gene Ontology term for regulation of RNA splicing.",
           "enum": [
             "ontology_terms/GO_0043484"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
