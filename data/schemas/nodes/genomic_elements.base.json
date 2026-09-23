@@ -1,42 +1,54 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/nodes/genomic_elements.base.json",
-  "type": "object",
-  "properties": {
-    "chr": {
-      "type": "string",
-      "description": "Chromosome of the genomic element"
-    },
-    "start": {
-      "type": "number",
-      "description": "Start position of the genomic element"
-    },
-    "end": {
-      "type": "number",
-      "description": "End position of the genomic element"
-    },
-    "strand": {
-      "type": "string",
-      "description": "Strand of the genomic element when applicable"
-    },
-    "type": {
-      "type": "string",
-      "description": "Type of the genomic element"
-    },
-    "method": {
-      "type": "string",
-      "description": "Method of the genomic element"
-    }
-  },
-  "required": [
-    "chr",
-    "start",
-    "end",
-    "type",
-    "method"
-  ],
   "accessible_via": {
     "return": "_id, name, chr, start, end, strand, type, source_annotation, source, source_url"
   },
-  "db_collection_name": "genomic_elements"
+  "db_collection_name": "genomic_elements",
+  "allOf": [
+    {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "chr": {
+          "type": "string",
+          "description": "Chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
+          "example": "chr1"
+        },
+        "start": {
+          "type": "number",
+          "description": "Start of the element, 0-based and inclusive."
+        },
+        "end": {
+          "type": "number",
+          "description": "End of the element, 0-based and exclusive."
+        },
+        "strand": {
+          "type": "string",
+          "description": "Strand the element is annotated on: + for forward, - for reverse, or . where strand does not apply."
+        },
+        "type": {
+          "type": "string",
+          "description": "Category of element.",
+          "example": "tested elements"
+        },
+        "method": {
+          "example": "MPRA"
+        }
+      },
+      "required": [
+        "chr",
+        "start",
+        "end",
+        "type",
+        "method"
+      ]
+    }
+  ]
 }

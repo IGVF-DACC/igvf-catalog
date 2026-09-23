@@ -42,7 +42,7 @@ class BaseAdapter(ABC):
         >>> class MyAdapter(BaseAdapter):
         ...     ALLOWED_LABELS = ['my_data']
         ...
-        ...     def __init__(self, filepath, label, writer, validate=False):
+        ...     def __init__(self, filepath, label, writer, validate=True):
         ...         super().__init__(filepath, label, writer, validate)
         ...         self.source = 'MyDataSource'
         ...         self.version = 'v1.0'
@@ -65,7 +65,7 @@ class BaseAdapter(ABC):
         filepath: str,
         label: str,
         writer: Optional[Writer] = None,
-        validate: bool = False,
+        validate: bool = True,
         **kwargs
     ):
         """
@@ -75,7 +75,9 @@ class BaseAdapter(ABC):
             filepath: Path to the input data file
             label: Label identifying the data type
             writer: Writer instance for output (optional)
-            validate: Whether to validate documents against schema
+            validate: Whether to validate documents against schema. Defaults to True;
+                subclasses that load known-nonconforming source data (e.g. the variant
+                loaders) should override this default in their own constructor.
             **kwargs: Additional adapter-specific arguments
 
         Raises:

@@ -158,6 +158,42 @@ def test_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
+def test_property_scores_rejects_malformed_entry():
+    # regression test: property_scores.items used to be a bare {"type": "object"} with no
+    # constraints, so a malformed mechanism entry (e.g. an unknown Type value) passed
+    # validation silently instead of being caught by the loader.
+    writer = SpyWriter()
+    adapter = Mutpred2CodingVariantsScores(
+        SAMPLE_FILEPATH, label='coding_variants_phenotypes', writer=writer, validate=True)
+
+    doc = {
+        '_key': 'test_key',
+        '_from': 'coding_variants/test',
+        '_to': 'ontology_terms/GO_0003674',
+        'name': 'mutational effect',
+        'inverse_name': 'altered due to mutation',
+        'pathogenicity_score': 0.279,
+        'property_scores': [{
+            'Property': 'VSL2B_disorder',
+            'Posterior Probability': 0.3,
+            'P-value': 0.04,
+            'Effected Position': 'S869',
+            'Type': 'not_a_real_type'
+        }],
+        'files_filesets': 'files_filesets/IGVFFI6893ZOAA',
+        'biosample_term': None,
+        'biological_context': None,
+        'method': 'MutPred2',
+        'class': 'prediction',
+        'label': 'predicted protein variant effect',
+        'source': 'IGVF',
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'
+    }
+
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(doc)
+
+
 def test_met1_aa_change_handling():
     """Test handling of Met1 amino acid changes"""
     writer = SpyWriter()

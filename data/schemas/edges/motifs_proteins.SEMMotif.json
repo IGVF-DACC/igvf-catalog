@@ -1,102 +1,108 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/motifs_proteins.SEMMotif.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the motif protein edge"
-    },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the motif protein edge",
-      "pattern": "^motifs/",
-      "collections": [
-        "motifs"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the motif protein edge",
-      "pattern": "^proteins/",
-      "collections": [
-        "proteins"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the motif protein edge",
-      "enum": [
-        "is used by"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the motif protein edge",
-      "enum": [
-        "uses"
-      ]
-    },
-    "biological_process": {
-      "type": "string",
-      "description": "The biological process of the motif protein edge",
-      "enum": [
-        "ontology_terms/GO_0003677"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the motif protein edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The source url of the motif protein edge",
-      "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
-      "pattern": "^https://data.igvf.org/model-files/"
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the motif protein edge, from the associated files_filesets record",
-      "enum": [
-        "observed data"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the motif protein edge, from the associated files_filesets record",
-      "enum": [
-        "SEMpl"
-      ]
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the motif protein edge",
-      "example": "files_filesets/IGVFFI5279OTVZ",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "biological_process",
-    "source",
-    "source_url",
-    "class",
-    "method",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "_id, name, inverse_name, biological_process, source, source_url, class, method, files_filesets"
   },
-  "db_collection_name": "motifs_proteins"
+  "db_collection_name": "motifs_proteins",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Motif key and Ensembl protein ID joined by an underscore."
+        },
+        "_from": {
+          "type": "string",
+          "description": "Document handle of the motif, whose key is the transcription factor name followed by _SEMpl.",
+          "pattern": "^motifs/",
+          "collections": [
+            "motifs"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Document handle of the transcription factor protein the motif models binding for.",
+          "pattern": "^proteins/",
+          "collections": [
+            "proteins"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "is used by"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "uses"
+          ]
+        },
+        "biological_process": {
+          "type": "string",
+          "description": "Gene Ontology term for the process this edge represents. GO_0003677 is 'DNA binding'.",
+          "enum": [
+            "ontology_terms/GO_0003677"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
+          "pattern": "^https://data.igvf.org/model-files/"
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "enum": [
+            "SEMpl"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "name",
+        "inverse_name",
+        "biological_process",
+        "source",
+        "source_url",
+        "class",
+        "method",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

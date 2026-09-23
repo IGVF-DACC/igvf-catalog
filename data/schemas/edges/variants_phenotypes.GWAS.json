@@ -4,98 +4,226 @@
   "db_collection_name": "variants_phenotypes",
   "type": "object",
   "allOf": [
-    { "$ref": "edges.base.json" },
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
     {
       "type": "object",
       "properties": {
         "equivalent_ontology_term": {
-          "type": ["string", "null"],
-          "description": "Equivalent ontology term for the variant to phenotype edge",
-          "example": "ontology_terms/GO_0008150"
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The other of the MONDO or EFO identifiers for the same trait, when both are present.",
+          "example": "EFO_0007010"
         },
         "lead_chrom": {
           "type": "string",
-          "description": "Lead chromosome for the variant to phenotype edge",
+          "description": "Chromosome of the lead variant, without a chr prefix.",
           "example": "1"
         },
         "lead_pos": {
           "type": "number",
-          "description": "Lead position for the variant to phenotype edge",
+          "description": "Position of the lead variant, converted from the Open Targets 1-based coordinate to 0-based.",
           "example": 10000
         },
         "lead_ref": {
           "type": "string",
-          "description": "Lead reference for the variant to phenotype edge",
+          "description": "Reference allele of the lead variant.",
           "example": "A"
         },
         "lead_alt": {
           "type": "string",
-          "description": "Lead alternative for the variant to phenotype edge",
+          "description": "Alternate allele of the lead variant.",
           "example": "G"
         },
         "phenotype_term": {
-          "type": ["string", "null"],
-          "description": "Phenotype term for the variant to phenotype edge",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Ontology term for the phenotype, trait or disease.",
           "example": "chronic obstructive pulmonary disease"
         },
         "direction": {
           "type": "string",
-          "description": "Direction for the variant to phenotype edge",
+          "description": "Sign of the reported effect of the alternate allele on the trait.",
           "example": "+"
         },
         "beta": {
           "type": "number",
-          "description": "Beta for the variant to phenotype edge",
+          "description": "Effect size of the alternate allele on the trait.",
           "example": 0.01
         },
         "beta_ci_lower": {
           "type": "number",
-          "description": "Beta CI lower for the variant to phenotype edge",
+          "description": "Lower bound of the confidence interval on beta.",
           "example": 0.005
         },
         "beta_ci_upper": {
           "type": "number",
-          "description": "Beta CI upper for the variant to phenotype edge",
+          "description": "Upper bound of the confidence interval on beta.",
           "example": 0.015
         },
         "odds_ratio": {
           "type": "number",
-          "description": "Odds ratio for the variant to phenotype edge",
+          "description": "Odds ratio of the alternate allele for a binary trait. 0 when the study reports a beta instead.",
           "example": 1.5
         },
         "oddsr_ci_lower": {
           "type": "number",
-          "description": "Odds ratio CI lower for the variant to phenotype edge",
+          "description": "Lower bound of the confidence interval on the odds ratio.",
           "example": 1.2
         },
         "oddsr_ci_upper": {
           "type": "number",
-          "description": "Odds ratio CI upper for the variant to phenotype edge",
+          "description": "Upper bound of the confidence interval on the odds ratio.",
           "example": 1.8
         },
         "p_val_mantissa": {
           "type": "number",
-          "description": "P value mantissa for the variant to phenotype edge",
+          "description": "Mantissa of the association p-value.",
           "example": 0.01
         },
         "p_val_exponent": {
           "type": "number",
-          "description": "P value exponent for the variant to phenotype edge",
+          "description": "Base-10 exponent of the association p-value.",
           "example": 10
         },
         "p_value": {
           "type": "number",
-          "description": "P value for the variant to phenotype edge",
+          "description": "Association p-value, reconstructed from mantissa and exponent.",
           "example": 0.01
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the p-value for the variant to phenotype edge",
+          "description": "Negative log 10 p-value of the measurement or prediction",
           "example": 1
         },
         "tagged_variants": {
           "type": "array",
-          "description": "Tagged variants for the variant to phenotype edge",
+          "description": "Variants in LD with the lead SNP.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag_chrom": {
+                "type": "string",
+                "description": "Chromosome of the tagged variant",
+                "example": "1"
+              },
+              "tag_pos": {
+                "type": "integer",
+                "description": "0-based position of the tagged variant",
+                "example": 16964110
+              },
+              "tag_ref": {
+                "type": "string",
+                "description": "Reference allele of the tagged variant",
+                "example": "TTTTTC"
+              },
+              "tag_alt": {
+                "type": "string",
+                "description": "Alternate allele of the tagged variant",
+                "example": "T"
+              },
+              "overall_r2": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Overall LD r2 with the lead variant. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.68343289"
+              },
+              "pics_95perc_credset": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Whether the tagged variant is in the PICS 95% credible set. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "False"
+              },
+              "AFR_1000G_prop": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "1000 Genomes AFR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "AMR_1000G_prop": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "1000 Genomes AMR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "EAS_1000G_prop": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "1000 Genomes EAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "EUR_1000G_prop": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "1000 Genomes EUR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.25"
+              },
+              "SAS_1000G_prop": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "1000 Genomes SAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "0.0"
+              },
+              "log10_ABF": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Log10 approximate Bayes factor. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "NA"
+              },
+              "posterior_prob": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "PICS posterior probability. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
+                "example": "NA"
+              }
+            },
+            "required": [
+              "tag_chrom",
+              "tag_pos",
+              "tag_ref",
+              "tag_alt",
+              "overall_r2",
+              "pics_95perc_credset",
+              "AFR_1000G_prop",
+              "AMR_1000G_prop",
+              "EAS_1000G_prop",
+              "EUR_1000G_prop",
+              "SAS_1000G_prop",
+              "log10_ABF",
+              "posterior_prob"
+            ],
+            "additionalProperties": false
+          },
           "example": [
             {
               "tag_chrom": "1",
@@ -134,14 +262,6 @@
             "OpenTargets"
           ]
         },
-        "source_url": {
-          "type": "string",
-          "description": "Source URL for the variant to phenotype edge"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the variant to phenotype edge"
-        },
         "name": {
           "enum": [
             "associated with"
@@ -154,17 +274,17 @@
         },
         "version": {
           "type": "string",
-          "description": "Version of the data source",
+          "description": "Open Targets Genetics release this record was taken from.",
           "example": "October 2022 (22.10)"
         },
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the edge, generated as a hash of the source and target node IDs",
+          "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
         "study": {
           "type": "string",
-          "description": "Studies ID for the variant to phenotype edge",
+          "description": "ID of the GWAS study.",
           "example": "studies/GCST006368"
         }
       },

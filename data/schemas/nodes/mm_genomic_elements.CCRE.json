@@ -1,68 +1,74 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "schemas/nodes/mm_genomic_elements.CCRE.json",
-    "allOf": [
-      {
-        "$ref": "node.base.json"
-      },
-      {
-        "$ref": "genomic_elements.base.json"
-      },
-      {
-        "type": "object",
-        "properties": {
-          "source_annotation": {
-            "type": "string",
-            "description": "Source annotation of the CCRE",
-            "enum": [
-              "CA-CTCF: chromatin accessible + CTCF binding",
-              "CA-TF: chromatin accessible + TF binding",
-              "CA-H3K4me3: chromatin accessible + H3K4me3 high signal",
-              "PLS: Promoter-like signal",
-              "pELS: proximal Enhancer-like signal",
-              "dELS: distal Enhancer-like signal",
-              "TF: TF binding",
-              "CA: chromatin accessible"
-            ]
-          },
-          "method": {
-            "enum": [
-              "candidate Cis-Regulatory Elements"
-            ]
-          },
-          "type": {
-            "enum": [
-              "candidate cis regulatory element"
-            ]
-          },
-          "source": {
-            "enum": [
-              "ENCODE"
-            ]
-          },
-          "source_url": {
-            "enum": [
-              "https://www.encodeproject.org/files/ENCFF167FJQ"
-            ]
-          },
-          "files_filesets": {
-            "type": "string",
-            "description": "Filesets of the CCRE",
-            "enum": [
-              "files_filesets/ENCFF167FJQ"
-            ]
-          }
-        },
-        "required": [
-          "source_annotation",
-          "files_filesets"
-        ],
-        "additionalProperties": false
-      }
-    ],
-    "accessible_via": {
-      "filter_by_range": "start, end",
-      "return": "_id, name, chr, start, end, type, source_annotation, type, source, source_url"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/mm_genomic_elements.CCRE.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
     },
-    "db_collection_name": "mm_genomic_elements"
-  }
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source_annotation": {
+          "type": "string",
+          "description": "Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.",
+          "enum": [
+            "CA-CTCF: chromatin accessible + CTCF binding",
+            "CA-TF: chromatin accessible + TF binding",
+            "CA-H3K4me3: chromatin accessible + H3K4me3 high signal",
+            "PLS: Promoter-like signal",
+            "pELS: proximal Enhancer-like signal",
+            "dELS: distal Enhancer-like signal",
+            "TF: TF binding",
+            "CA: chromatin accessible"
+          ]
+        },
+        "method": {
+          "enum": [
+            "candidate Cis-Regulatory Elements"
+          ]
+        },
+        "type": {
+          "enum": [
+            "candidate cis regulatory element"
+          ]
+        },
+        "source": {
+          "enum": [
+            "ENCODE"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/reference-files/IGVFFI8753TTYC/"
+          ]
+        },
+        "files_filesets": {
+          "enum": [
+            "files_filesets/IGVFFI8753TTYC"
+          ],
+          "example": "files_filesets/IGVFFI8753TTYC"
+        }
+      },
+      "required": [
+        "source_annotation",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "start, end",
+    "return": "_id, name, chr, start, end, type, source_annotation, type, source, source_url"
+  },
+  "db_collection_name": "mm_genomic_elements"
+}

@@ -1,57 +1,62 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "edge.base.json",
-    "title": "Edge Node Schema",
-    "description": "Base schema for all edge types in the IGVF Catalog. Defines common required properties.",
-    "type": "object",
-    "properties": {
-      "_from": {
-        "type": "string",
-        "description": "Unique identifier for the source node"
-      },
-      "_to": {
-        "type": "string",
-        "description": "Unique identifier for the target node"
-      },
-      "label": {
-        "type": "string",
-        "description": "Label for the edge"
-      },
-      "class": {
-        "type": "string",
-        "description": "Class for the edge"
-      },
-      "method": {
-        "type": "string",
-        "description": "Method for the edge"
-      },
-      "name": {
-        "type": "string",
-        "description": "Name for the edge"
-      },
-      "inverse_name": {
-        "type": "string",
-        "description": "Inverse name for the edge"
-      },
-      "source": {
-        "type": "string",
-        "description": "Data source of the edge"
-      },
-      "source_url": {
-        "type": "string",
-        "description": "Source URL of the edge"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "edge.base.json",
+  "title": "Edge Node Schema",
+  "description": "Base schema for all edge types in the IGVF Catalog. Defines common required properties.",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        }
       }
     },
-    "required": [
-      "_from",
-      "_to",
-      "label",
-      "class",
-      "method",
-      "name",
-      "inverse_name",
-      "source",
-      "source_url"
-    ],
-    "additionalProperties": false
-  }
+    {
+      "type": "object",
+      "properties": {
+        "_from": {
+          "type": "string",
+          "description": "Document handle of the source node, in collection/key form."
+        },
+        "_to": {
+          "type": "string",
+          "description": "Document handle of the target node, in collection/key form."
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "example": "modulates expression of"
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "example": "expression modulated by"
+        }
+      },
+      "required": [
+        "_from",
+        "_to",
+        "label",
+        "class",
+        "method",
+        "name",
+        "inverse_name",
+        "source",
+        "source_url"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

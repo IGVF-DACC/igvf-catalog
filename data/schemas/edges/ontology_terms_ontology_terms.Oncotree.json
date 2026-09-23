@@ -1,98 +1,104 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/ontology_terms_ontology_terms.Oncotree.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the ontology term to ontology term edge",
-      "example": "Oncotree_ASM_rdf-schema.subClassOf_Oncotree_SM"
+  "db_collection_name": "ontology_terms_ontology_terms",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
-      "example": "ontology_terms/Oncotree_ASM",
-      "pattern": "^ontology_terms/Oncotree_",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the ontology term to ontology term edge",
-      "example": "ontology_terms/Oncotree_SM or ontology_terms/NCIT_C40511",
-      "pattern": "^ontology_terms/Oncotree_|^ontology_terms/NCIT_",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the ontology term to ontology term edge",
-      "enum": [
-        "subclass",
-        "database cross-reference"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the ontology term to ontology term edge",
-      "enum": [
-        "type of",
-        "database cross-reference"
-      ]
-    },
-    "type": {
-      "type": "string",
-      "description": "Type for the ontology term to ontology term edge",
-      "enum": [
-        "subclass",
-        "database cross-reference"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
-      "enum": [
-        "Oncotree"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the ontology term to ontology term edge",
-      "enum": [
-        "biological relationship"
-      ]
-    },
-    "method": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the ontology term to ontology term edge",
-      "example": "files_filesets/IGVFFI4975UFZM",
-      "pattern": "^files_filesets/",
-      "collections": [
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Source term key, the relationship predicate and the target term key, joined by underscores.",
+          "example": "Oncotree_MMB_rdf-schema.subClassOf_Oncotree_EMBT"
+        },
+        "_from": {
+          "type": "string",
+          "description": "Handle of the source OncoTree term.",
+          "example": "ontology_terms/Oncotree_MMB",
+          "pattern": "^ontology_terms/Oncotree_",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Handle of the parent OncoTree term, or of the NCIT cross-reference.",
+          "example": "ontology_terms/Oncotree_EMBT",
+          "pattern": "^ontology_terms/Oncotree_|^ontology_terms/NCIT_",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "subclass",
+            "database cross-reference"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "type of",
+            "database cross-reference"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "description": "Subclass of the parent tumor type, or database cross-reference to NCIT.",
+          "enum": [
+            "subclass",
+            "database cross-reference"
+          ]
+        },
+        "source": {
+          "enum": [
+            "Oncotree"
+          ]
+        },
+        "class": {
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "name",
+        "inverse_name",
+        "type",
+        "source",
+        "class",
+        "method",
         "files_filesets"
-      ]
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "type",
-    "source",
-    "class",
-    "method",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
-  "db_collection_name": "ontology_terms_ontology_terms"
+  ]
 }

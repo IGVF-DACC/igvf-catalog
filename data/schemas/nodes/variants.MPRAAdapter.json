@@ -9,6 +9,13 @@
       "$ref": "variants.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "source": {
@@ -19,15 +26,6 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE",
           "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets of the variant",
-          "example": "files_filesets/IGVFFI1323RCIE",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
         }
       },
       "required": [

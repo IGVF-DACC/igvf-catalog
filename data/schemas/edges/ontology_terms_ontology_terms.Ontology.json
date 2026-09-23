@@ -1,152 +1,165 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/ontology_terms_ontology_terms.Ontology.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the ontology term to ontology term edge"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the ontology term to ontology term edge",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the ontology term to ontology term edge",
-      "enum": [
-        "has part",
-        "part of",
-        "subclass",
-        "database cross-reference",
-        "derives from",
-        "originate from same individual as",
-        ""
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the ontology term to ontology term edge",
-      "enum": [
-        "part of",
-        "has part",
-        "type of",
-        "database cross-reference",
-        "derives",
-        "originate from same individual as"
-      ]
-    },
-    "type_uri": {
-      "type": "string",
-      "description": "Type URI for the ontology term to ontology term edge",
-      "enum": [
-        "http://www.w3.org/2000/01/rdf-schema#subClassOf",
-        "http://www.geneontology.org/formats/oboInOwl#hasDbXref"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the ontology term to ontology term edge",
-      "enum": [
-        "GO",
-        "CLO",
-        "CHEBI",
-        "CL",
-        "PCL",
-        "EFO",
-        "MONDO",
-        "NCIT",
-        "ONCOTREE",
-        "UBERON",
-        "VARIO",
-        "HPO",
-        "ENCODE",
-        "BAO",
-        "OBA",
-        "OBI",
-        "DOID",
-        "ORPHANET"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the ontology term to ontology term edge",
-      "enum": [
-        "https://geneontology.org/",
-        "https://obofoundry.org/ontology/clo.html",
-        "https://www.ebi.ac.uk/chebi/",
-        "https://obophenotype.github.io/cell-ontology/",
-        "https://obophenotype.github.io/provisional_cell_ontology/",
-        "https://www.ebi.ac.uk/efo/",
-        "https://mondo.monarchinitiative.org/",
-        "https://github.com/NCI-Thesaurus/thesaurus-obo-edition",
-        "https://github.com/cBioPortal/oncotree",
-        "https://obophenotype.github.io/uberon/",
-        "http://variationontology.org/",
-        "https://hpo.jax.org/",
-        "https://encodeproject.org",
-        "http://bioassayontology.org/",
-        "https://github.com/obophenotype/bio-attribute-ontology",
-        "https://obi-ontology.org/",
-        "https://disease-ontology.org/",
-        "https://www.orpha.net/"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the ontology term to ontology term edge, from the associated files_filesets record",
-      "enum": [
-        "biological relationship"
-      ]
-    },
-    "method": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "The method of the ontology term to ontology term edge, from the associated files_filesets record",
-      "enum": [
-        null
-      ]
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the ontology term to ontology term edge",
-      "example": "files_filesets/IGVFFI7407XTPX",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "type_uri",
-    "source",
-    "source_url",
-    "class",
-    "method",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "_id, name, inverse_name, type_uri, source, source_url, class, method, files_filesets"
   },
-  "db_collection_name": "ontology_terms_ontology_terms"
+  "db_collection_name": "ontology_terms_ontology_terms",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Source term key, the RDF predicate key and the target term key, joined by underscores.",
+          "example": "GO_0000001_rdf-schema.subClassOf_GO_0048308"
+        },
+        "_from": {
+          "type": "string",
+          "description": "Handle of the source ontology term.",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ],
+          "example": "ontology_terms/GO_0000001"
+        },
+        "_to": {
+          "type": "string",
+          "description": "Handle of the target ontology term.",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ],
+          "example": "ontology_terms/GO_0048308"
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "has part",
+            "part of",
+            "subclass",
+            "database cross-reference",
+            "derives from",
+            "originate from same individual as",
+            ""
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "part of",
+            "has part",
+            "type of",
+            "database cross-reference",
+            "derives",
+            "originate from same individual as"
+          ]
+        },
+        "type_uri": {
+          "type": "string",
+          "description": "IRI of the RDF predicate for this relationship.",
+          "enum": [
+            "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+            "http://www.geneontology.org/formats/oboInOwl#hasDbXref",
+            "http://purl.obolibrary.org/obo/BFO_0000051",
+            "http://purl.obolibrary.org/obo/BFO_0000050",
+            "http://purl.obolibrary.org/obo/RO_0001000"
+          ]
+        },
+        "source": {
+          "enum": [
+            "GO",
+            "CLO",
+            "CHEBI",
+            "CL",
+            "PCL",
+            "EFO",
+            "MONDO",
+            "NCIT",
+            "ONCOTREE",
+            "UBERON",
+            "VARIO",
+            "HPO",
+            "ENCODE",
+            "BAO",
+            "OBA",
+            "OBI",
+            "DOID",
+            "ORPHANET"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://geneontology.org/",
+            "https://obofoundry.org/ontology/clo.html",
+            "https://www.ebi.ac.uk/chebi/",
+            "https://obophenotype.github.io/cell-ontology/",
+            "https://obophenotype.github.io/provisional_cell_ontology/",
+            "https://www.ebi.ac.uk/efo/",
+            "https://mondo.monarchinitiative.org/",
+            "https://github.com/NCI-Thesaurus/thesaurus-obo-edition",
+            "https://github.com/cBioPortal/oncotree",
+            "https://obophenotype.github.io/uberon/",
+            "http://variationontology.org/",
+            "https://hpo.jax.org/",
+            "https://encodeproject.org",
+            "http://bioassayontology.org/",
+            "https://github.com/obophenotype/bio-attribute-ontology",
+            "https://obi-ontology.org/",
+            "https://disease-ontology.org/",
+            "https://www.orpha.net/"
+          ]
+        },
+        "class": {
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "name",
+        "inverse_name",
+        "type_uri",
+        "source",
+        "source_url",
+        "class",
+        "method",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

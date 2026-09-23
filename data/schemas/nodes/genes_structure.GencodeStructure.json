@@ -5,6 +5,13 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -15,20 +22,20 @@
         },
         "chr": {
           "type": "string",
-          "description": "The chromosome of the gene structure",
+          "description": "Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "start": {
           "type": "number",
-          "description": "The start position of the gene structure"
+          "description": "Start of the feature, 0-based and inclusive."
         },
         "end": {
           "type": "number",
-          "description": "The end position of the gene structure"
+          "description": "End of the feature, 0-based and exclusive."
         },
         "strand": {
           "type": "string",
-          "description": "The strand of the gene structure",
+          "description": "Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
             "+",
             "-"
@@ -36,7 +43,7 @@
         },
         "type": {
           "type": "string",
-          "description": "The type of the gene structure",
+          "description": "Kind of sub-transcript feature. Exons and their CDS, UTR, start_codon, and stop_codon sub-features are taken from the GENCODE annotation, and the sub-features share the exon_id of the exon they fall in. Introns are not annotated by GENCODE and are derived from the gaps between consecutive exons of a transcript.",
           "enum": [
             "CDS",
             "UTR",
@@ -48,32 +55,32 @@
         },
         "gene_id": {
           "type": "string",
-          "description": "The ensembl gene ID of the gene structure",
+          "description": "Ensembl gene ID",
           "example": "ENSG00000290825"
         },
         "gene_name": {
           "type": "string",
-          "description": "The gene name of the gene structure",
+          "description": "HGNC gene symbol.",
           "example": "DDX11L2"
         },
         "transcript_id": {
           "type": "string",
-          "description": "The ensembl transcript ID of the gene structure",
+          "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000456328"
         },
         "transcript_name": {
           "type": "string",
-          "description": "The transcript name of the gene structure",
+          "description": "GENCODE transcript name, which is the gene symbol followed by a transcript index.",
           "example": "DDX11L2-202"
         },
         "exon_number": {
           "type": "string",
-          "description": "The exon number of the gene structure",
+          "description": "1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, joined by an underscore.",
           "example": "1"
         },
         "exon_id": {
           "type": "string",
-          "description": "The ensembl exon ID of the gene structure",
+          "description": "Ensembl exon ID, including its version suffix.",
           "example": "ENSE00002234944.1"
         },
         "source": {
@@ -83,7 +90,7 @@
         },
         "version": {
           "type": "string",
-          "description": "The version of the gene structure annotation",
+          "description": "GENCODE release the annotation was taken from.",
           "enum": [
             "v43"
           ]
@@ -94,8 +101,6 @@
           ]
         },
         "organism": {
-          "type": "string",
-          "description": "The organism of the gene structure",
           "enum": [
             "Homo sapiens"
           ]

@@ -6,11 +6,27 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to gene edge",
+          "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
         },
         "_from": {
@@ -29,31 +45,46 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
+          "description": "Signed relative change in target-gene expression after CRISPRi of the element (ENCODE EffectSize). Negative values mean lower expression. Missing values are stored as 0.",
+          "example": -0.293431866
         },
         "log2FC": {
           "type": "number",
-          "description": "Log2 fold change of readout gene expression for the perturbation."
+          "description": "Effect size converted to log2 scale."
         },
         "p_value": {
-          "type": ["number", "null"],
-          "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
         },
         "p_value_adj": {
-          "type": ["number", "null"],
-          "description": "The adjusted p value of the genomic element to gene edge. Can be 'NA' or a number."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Benjamini\u2013Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "example": 0.004023984
         },
         "neg_log10_pvalue": {
-          "type": ["number", "null"],
-          "description": "The neg_log10_pvalue of the genomic element to gene edge"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
-          "type": ["number", "null"],
-          "description": "The adjusted neg_log10_pvalue of the genomic element to gene edge"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "type": "boolean",
-          "description": "The significant of the genomic element to gene edge"
+          "description": "Boolean indicator of the significance of the element-gene interactions.",
+          "example": true
         },
         "method": {
           "enum": [
@@ -61,10 +92,6 @@
           ]
         },
         "crispr_modality": {
-          "type": [
-            "string"
-          ],
-          "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
             "interference"
           ]
@@ -90,22 +117,17 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the genomic element to gene edge",
           "enum": [
             "files_filesets/ENCFF968BZL"
-          ]
+          ],
+          "example": "files_filesets/ENCFF968BZL"
         },
         "biological_context": {
-          "type": "string",
-          "description": "The biological context of the genomic element to gene edge",
           "enum": [
             "K562"
           ]
         },
         "biosample_term": {
-          "type": "string",
-          "description": "The biosample term of the genomic element to gene edge",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]
@@ -136,7 +158,6 @@
         "biosample_term"
       ],
       "additionalProperties": false
-
     }
   ],
   "accessible_via": {

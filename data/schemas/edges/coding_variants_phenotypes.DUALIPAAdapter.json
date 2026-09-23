@@ -6,11 +6,24 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C",
@@ -45,23 +58,10 @@
             "altered due to mutation"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "File and fileset reference for this edge",
-          "example": "files_filesets/IGVFFI6224HZMG",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "Biological context of the measurement",
           "example": "HEK293 cell line, female, Homo sapiens"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Biosample ontology term reference",
           "example": "ontology_terms/EFO_0001182"
         },
         "method": {
@@ -81,15 +81,15 @@
         },
         "avg_gfp": {
           "type": "number",
-          "description": "Single cells mean GFP fluorescence value per well"
+          "description": "Single cell mean GFP fluorescence value per well"
         },
         "avg_mcherry": {
           "type": "number",
-          "description": "Single cells mean mCherry fluorescence value per well"
+          "description": "Single cell mean mCherry fluorescence value per well"
         },
         "avg_GFP_mCherry_ratio": {
           "type": "number",
-          "description": "Ratio of avg_gfp/avg_mcherry"
+          "description": "Ratio of avg_gfp to avg_mcherry for the well, the abundance readout for the variant allele."
         },
         "wt_GFP_mCherry_ratio": {
           "type": "number",
@@ -101,12 +101,16 @@
         },
         "dualipa_abun_score": {
           "type": "number",
-          "description": "Log2 Z-score of allele_wt_ratio"
+          "description": "Abundance score for the variant: the log2 Z-score of allele_wt_ratio against the wild-type distribution, computed as (log2(allele_wt_ratio) - log2(wt_mean)) / log2(wt_std)."
         },
         "dualipa_abun_change": {
           "type": "string",
-          "enum": ["Y", "N", "Uncertain"],
-          "description": "Significant change of abundance determined by thresholds derived from the log likelihood ratio method"
+          "enum": [
+            "Y",
+            "N",
+            "Uncertain"
+          ],
+          "description": "Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method."
         }
       },
       "required": [

@@ -22,8 +22,8 @@ def merge_allof_schema(schema):
     """
     Merge allOf schemas into a single schema.
 
-    Since we use a flattened allOf structure (no nested allOf),
-    this merges all schemas in the allOf array sequentially.
+    Resolve nested allOf entries before merging sequentially, so base schemas
+    can compose shared mixins too.
 
     For properties: Child definitions are MERGED with base definitions,
     not replaced. This means:
@@ -39,6 +39,7 @@ def merge_allof_schema(schema):
 
     # Merge each schema in allOf sequentially
     for schema_item in schema['allOf']:
+        schema_item = merge_allof_schema(schema_item)
         # Merge properties (deep merge for each property)
         if 'properties' in schema_item:
             if 'properties' not in merged:

@@ -33,7 +33,7 @@ const QueryFormat = z.object({
     return arg
   }, z.boolean()).optional(),
   disease_ontology_terms: z.string().trim().optional(),
-  go_biological_process: z.string().trim().optional()
+  biological_process: z.string().trim().optional()
 }).merge(commonHumanNodesParamsFormat)
 
 export const pathwayFormat = z.object({
@@ -47,7 +47,7 @@ export const pathwayFormat = z.object({
   name_aliases: z.array(z.string()),
   is_top_level_pathway: z.boolean(),
   disease_ontology_terms: z.array(z.string()).nullable(),
-  go_biological_process: z.string().nullable(),
+  biological_process: z.string().nullable(),
   class: z.string(),
   method: z.string().nullable(),
   label: z.string().nullable(),
@@ -113,8 +113,8 @@ export async function pathwaySearchPersistent (input: paramsFormatType): Promise
   if (input.disease_ontology_terms !== undefined) {
     input.disease_ontology_terms = `ontology_terms/${input.disease_ontology_terms as string}`
   }
-  if (input.go_biological_process !== undefined) {
-    input.go_biological_process = `ontology_terms/${input.go_biological_process as string}`
+  if (input.biological_process !== undefined) {
+    input.biological_process = `ontology_terms/${input.biological_process as string}`
   }
   let filterBy = ''
   const filterSts = getFilterStatements(pathwaySchema, input)

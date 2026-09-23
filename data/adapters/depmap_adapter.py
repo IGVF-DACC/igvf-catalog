@@ -108,7 +108,7 @@ class DepMap(BaseAdapter):
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
-                                'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
+                                'biological_context': self.cell_ontology_id_mapping[gene_model_id]['biological_context'],
                                 'model_id': gene_model_id,
                                 'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
                                 # Match Oncotree _key ( '/' is illegal in ArangoDB keys)
@@ -134,7 +134,7 @@ class DepMap(BaseAdapter):
         # need to take care of comma inside double quotes, e.g. ACH-000082,PT-noCCE4,"G-292, clone A141B1",...
         self.cell_ontology_id_mapping = defaultdict(dict)
         column_index_mapping = {
-            'biology_context': 2,
+            'biological_context': 2,
             'cell_ontology_id': 7,
             'model_type': 8,
             'oncotree_code': 26

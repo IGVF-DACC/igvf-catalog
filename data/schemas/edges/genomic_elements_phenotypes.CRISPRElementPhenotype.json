@@ -6,11 +6,30 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the genomic element to phenotype edge",
+          "description": "Genomic element key and phenotype ontology term joined by an underscore.",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477"
         },
         "_from": {
@@ -33,19 +52,19 @@
         },
         "p_value": {
           "type": "number",
-          "description": "Phenotype association p-value for the genomic element"
+          "description": "P-value for the element's association with the screened phenotype."
         },
         "neg_log10_pvalue": {
           "type": "number",
-          "description": "Negative log10 of the phenotype p-value"
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "type": "boolean",
-          "description": "Whether the genomic element met the significance threshold for the phenotype"
+          "description": "Boolean indicator of the significance of the element's effect on the phenotype."
         },
         "num_guides": {
           "type": "number",
-          "description": "Number of guides targeting the genomic element"
+          "description": "Number of guides targeting the pertubed element in the screen."
         },
         "num_guides_hit": {
           "type": "number",
@@ -65,8 +84,6 @@
           ]
         },
         "crispr_modality": {
-          "type": "string",
-          "description": "The CRISPR modality from the associated files_filesets record",
           "enum": [
             "interference"
           ]
@@ -90,32 +107,11 @@
           "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the genomic element to phenotype edge",
-          "example": "files_filesets/IGVFFI5135QZCS",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "The biological context of the genomic element to phenotype edge",
           "example": "human HFF-1 cell line from donor(s) IGVFDO0058YJWC"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "The biosample term of the genomic element to phenotype edge",
-          "example": "ontology_terms/CLO_0003730",
-          "pattern": "^ontology_terms/"
-        },
-        "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "The treatments term ids of the genomic element to phenotype edge"
+          "example": "ontology_terms/CLO_0003730"
         },
         "name": {
           "enum": [

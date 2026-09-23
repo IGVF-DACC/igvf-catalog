@@ -6,35 +6,48 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
-          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
+          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG",
+          "description": "SPDI of the variant on GRCm39. A VRS digest is used when the SPDI is longer than 256 characters."
         },
         "chr": {
           "type": "string",
-          "description": "Chromosome for the mm variants node",
+          "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "pos": {
           "type": "number",
-          "description": "Position for the mm variants node"
+          "description": "0-based genomic coordinate of the variant.",
+          "example": 3050706
         },
         "rsid": {
           "type": "array",
-          "description": "RSID for the mm variants node"
+          "items": {
+            "type": "string"
+          },
+          "description": "dbSNP ids from the VCF ID column. Empty when that column is '.'.",
+          "example": []
         },
         "ref": {
           "type": "string",
-          "description": "Reference for the mm variants node"
+          "description": "Reference allele, relative to C57BL/6J (GRCm39).",
+          "example": "GGGGGGGGG"
         },
         "alt": {
           "type": "string",
-          "description": "Alternate for the mm variants node"
+          "description": "Alternate allele.",
+          "example": "GGGGGGGGGG"
         },
         "organism": {
-          "type": "string",
-          "description": "Organism for the mm variants node",
           "enum": [
             "Mus musculus"
           ]
@@ -53,14 +66,14 @@
               "WSB_EiJ"
             ]
           },
-          "description": "Strain for the mm variants node",
+          "description": "Collaborative Cross founder strains that carry the alternate allele.",
           "example": [
             "129S1_SvImJ"
           ]
         },
         "qual": {
           "type": "string",
-          "description": "Quality for the mm variants node",
+          "description": "VCF QUAL score for the variant position.",
           "example": "50110.4"
         },
         "filter": {
@@ -68,11 +81,14 @@
             "string",
             "null"
           ],
-          "description": "Filter for the mm variants node"
+          "description": "VCF FILTER for the site. PASS if at least one strain call passed the release filters; LowQual otherwise. Null when the source has none."
         },
         "fi": {
-          "type": "number",
-          "description": "FI for the mm variants node",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release. Null when the FORMAT FI value is missing ('.').",
           "example": 0
         },
         "name": {
@@ -80,13 +96,13 @@
         },
         "spdi": {
           "type": "string",
-          "description": "SPDI for the mm variants node",
+          "description": "Normalized SPDI expression identifying the allele.",
           "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
         },
         "hgvs": {
           "type": "string",
-          "description": "HGVS for the mm variants node",
-          "example": "NC_000067.7: g.3050715_3050716insG"
+          "description": "Genomic HGVS notation derived from the SPDI.",
+          "example": "NC_000067.7:g.3050715_3050716insG"
         },
         "source": {
           "enum": [
