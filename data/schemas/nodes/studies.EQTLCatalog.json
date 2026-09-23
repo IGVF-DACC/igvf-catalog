@@ -6,6 +6,13 @@
       "$ref": "node.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -16,12 +23,12 @@
         },
         "pmid": {
           "type": "string",
-          "description": "The PMID of the study",
+          "description": "PubMed identifier.",
           "example": "35389779"
         },
         "study_type": {
           "type": "string",
-          "description": "The type of the study",
+          "description": "Whether the study measured expression in bulk tissue or in single cells.",
           "enum": [
             "single-cell",
             "bulk"
@@ -31,11 +38,6 @@
           "enum": [
             "EBI"
           ]
-        },
-        "source_url": {},
-        "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the study"
         }
       },
       "required": [

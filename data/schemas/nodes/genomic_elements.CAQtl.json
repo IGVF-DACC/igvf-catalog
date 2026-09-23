@@ -9,6 +9,13 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -35,12 +42,6 @@
           "enum": [
             "accessible dna elements"
           ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "example": "files_filesets/ENCFF103XRK",
-          "pattern": "^files_filesets/"
         }
       },
       "required": [

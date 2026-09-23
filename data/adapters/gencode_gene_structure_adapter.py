@@ -224,6 +224,9 @@ class GencodeStructure(BaseAdapter):
                             'inverse_name': 'contained in'
                         }
 
+                    if self.validate:
+                        self.validate_doc(to_json)
+
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
 

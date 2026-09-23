@@ -1333,6 +1333,8 @@ variant CRISPR variant phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/@@download/IGVFFI9726GFTC.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/@@download/IGVFFI1678CDBR.csv.gz
   source: IGVF
 
 # Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant_phenotype --output-bucket-key variants_phenotypes/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1344,6 +1346,8 @@ variant to phenotype CRISPR variant phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/@@download/IGVFFI9726GFTC.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/@@download/IGVFFI1678CDBR.csv.gz
   source: IGVF
   label: variant effect on phenotype
 

@@ -4,26 +4,36 @@
   "db_collection_name": "ontology_terms",
   "allOf": [
     {
-      "$ref": "node.base.json"
+      "$ref": "ontology_terms.base.json"
+    },
+    {
+      "properties": {
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
     },
     {
       "type": "object",
       "properties": {
         "_key": {
-          "example": "Oncotree_0_0"
+          "example": "Oncotree_MMB",
+          "description": "Oncotree_ plus the OncoTree code, with slash rewritten to underscore."
         },
         "name": {
-          "example": "0_0"
+          "example": "Medullomyoblastoma"
         },
         "uri": {
-          "type": "string",
-          "description": "The URI of the ontology term",
-          "example": "https://oncotree.mskcc.org/api/tumorTypes/0_0"
+          "example": "https://oncotree.mskcc.org/"
         },
         "term_id": {
-          "type": "string",
-          "description": "The ID of the ontology term",
-          "example": "0_0"
+          "example": "Oncotree_MMB"
         },
         "source": {
           "enum": [
@@ -36,8 +46,6 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the ontology term",
           "enum": [
             "biological relationship"
           ]
@@ -46,22 +54,10 @@
           "type": [
             "string",
             "null"
-          ],
-          "description": "The method of the ontology term, from the associated files_filesets record"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "The files filesets of the ontology term",
-          "example": "files_filesets/IGVFFI4975UFZM",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
           ]
         }
       },
       "required": [
-        "uri",
-        "term_id",
         "class",
         "method",
         "files_filesets"

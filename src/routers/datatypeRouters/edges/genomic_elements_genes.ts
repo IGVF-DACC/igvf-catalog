@@ -83,16 +83,31 @@ const outputFormat = z.array(z.object({
   biosample_term: z.string().nullish(),
   cell_annotation: z.string().nullish(),
   cell_annotation_term: z.string().nullish(),
+  treatments_term_ids: z.array(z.string()).nullish(),
   files_filesets: z.string(),
   crispr_modality: z.string().nullish(),
   score: z.number().nullish(),
   transcription_start_site: z.number().nullish(),
   rna_pseudobulk_tpm: z.number().nullish(),
   log2FC: z.number().nullish(),
+  log2FC_ci95_lower: z.number().nullish(),
+  log2FC_ci95_upper: z.number().nullish(),
   effect_size: z.number().nullish(),
+  effect_size_ci_95: z.number().nullish(),
   z_score: z.number().nullish(),
   t_score: z.number().nullish(),
   idr: z.number().nullish(),
+  pct_1: z.number().nullish(),
+  pct_2: z.number().nullish(),
+  num_guides: z.number().nullish(),
+  num_cells: z.number().nullish(),
+  fold_change: z.number().nullish(),
+  background_corrected_fold_change: z.number().nullish(),
+  cpm_perturb: z.number().nullish(),
+  cpm_bg: z.number().nullish(),
+  gamma_approximation_ln_p_value: z.number().nullish(),
+  hypergeometric_ln_p_value: z.number().nullish(),
+  empirical_p_value: z.number().nullish(),
   p_value: z.number().or(z.string()).nullish(),
   p_value_adj: z.number().or(z.string()).nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
@@ -207,15 +222,30 @@ function buildQuery (params: {
         'biosample_term': record.biosample_term,
         'cell_annotation': record.cell_annotation,
         'cell_annotation_term': record.cell_annotation_term,
+        'treatments_term_ids': record.treatments_term_ids,
         'crispr_modality': record.crispr_modality,
         'score': record.score,
         'transcription_start_site': record.transcription_start_site,
         'rna_pseudobulk_tpm': record.rna_pseudobulk_tpm,
         'log2FC': record.log2FC,
+        'log2FC_ci95_lower': record.log2FC_ci95_lower,
+        'log2FC_ci95_upper': record.log2FC_ci95_upper,
         'effect_size': record.effect_size,
+        'effect_size_ci_95': record.effect_size_ci_95,
         'z_score': record.z_score,
         't_score': record.t_score,
         'idr': record.idr,
+        'pct_1': record.pct_1,
+        'pct_2': record.pct_2,
+        'num_guides': record.num_guides,
+        'num_cells': record.num_cells,
+        'fold_change': record.fold_change,
+        'background_corrected_fold_change': record.background_corrected_fold_change,
+        'cpm_perturb': record.cpm_perturb,
+        'cpm_bg': record.cpm_bg,
+        'gamma_approximation_ln_p_value': record.gamma_approximation_ln_p_value,
+        'hypergeometric_ln_p_value': record.hypergeometric_ln_p_value,
+        'empirical_p_value': record.empirical_p_value,
         'p_value': record.p_value,
         'p_value_adj': record.p_value_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -516,11 +546,17 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FOR record in genomic_elements_genes
           FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
           ${pvalueFilter}
+          LET ge = DOCUMENT(record._from)
+          // Not every genomic element has a presumed promoter gene (promoter_of is
+          // optional). Without one there's no regulator gene to report, so exclude these
+          // rather than returning a GRN row with a null regulator_gene - matching
+          // regulatorQuery/regulatorResponseQuery, which already only join elements that
+          // have a promoter_of set.
+          FILTER ge.promoter_of != null
           SORT record._key
 
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-          LET ge = DOCUMENT(record._from)
           LET perturbationEfficiencyEdge = FIRST(
             FOR se IN genomic_elements_genes
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets

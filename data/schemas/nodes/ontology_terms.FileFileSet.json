@@ -4,33 +4,29 @@
   "db_collection_name": "ontology_terms",
   "allOf": [
     {
-      "$ref": "node.base.json"
+      "$ref": "ontology_terms.base.json"
     },
     {
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CL_0000746"
+          "example": "NTR_0000856"
         },
         "name": {
-          "example": "cardiac muscle cell"
+          "example": "mesendoderm"
         },
         "uri": {
-          "type": "string",
-          "description": "URI for the ontology term",
           "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         },
         "term_id": {
-          "type": "string",
-          "description": "Term ID for the ontology term",
-          "example": "CL_0000746"
+          "example": "NTR_0000856"
         },
         "synonyms": {
           "type": [
             "array",
             "null"
           ],
-          "description": "Synonyms for the ontology term"
+          "description": "Alternative names for the ontology term."
         },
         "source": {
           "enum": [
@@ -39,12 +35,10 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/sample-terms/CL_0000746"
+          "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         }
       },
       "required": [
-        "uri",
-        "term_id",
         "synonyms"
       ],
       "additionalProperties": false

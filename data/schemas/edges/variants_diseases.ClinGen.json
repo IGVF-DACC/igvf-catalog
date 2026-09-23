@@ -1,125 +1,99 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_diseases.ClinGen.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant to disease edge"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant to disease edge",
-      "example": "variants/NC_000005.10:1779518:G:A",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant to disease edge",
-      "example": "ontology_terms/MONDO:0009861",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "gene_id": {
-      "type": "string",
-      "description": "Gene ID for the variant to disease edge",
-      "example": "genes/ENSG00000171759",
-      "pattern": "^genes/"
-    },
-    "assertion": {
-      "type": "string",
-      "description": "Assertion for the variant to disease edge",
-      "enum": [
-        "Benign",
-        "Likely Benign",
-        "Likely Pathogenic",
-        "Pathogenic",
-        "Uncertain Significance"
-      ]
-    },
-    "pmids": {
-      "type": "array",
-      "description": "PMIDs for the variant to disease edge",
-      "example": [
-        "http://pubmed.ncbi.nlm.nih.gov/2574002",
-        "http://pubmed.ncbi.nlm.nih.gov/2574002",
-        "http://pubmed.ncbi.nlm.nih.gov/9450897"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variant to disease edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variant to disease edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variant to disease edge",
-      "enum": [
-        "ClinGen"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the variant to disease edge",
-      "enum": [
-        "https://search.clinicalgenome.org/kb/downloads"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the variant to disease edge, from the associated files_filesets record"
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the variant to disease edge, from the associated files_filesets record"
-    },
-    "label": {
-      "type": "string",
-      "description": "The label of the variant to disease edge; same value as method"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the variant to disease edge",
-      "example": "files_filesets/IGVFFI5852GYTT",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "source",
-    "source_url",
-    "gene_id",
-    "assertion",
-    "pmids",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "assertion, gene_id, pmids, class, method, label, files_filesets"
   },
-  "db_collection_name": "variants_diseases"
+  "db_collection_name": "variants_diseases",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "SHA-256 hash of the variant key and the disease ontology term key."
+        },
+        "_from": {
+          "example": "variants/NC_000005.10:1779518:G:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/MONDO_0009861",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "gene_id": {
+          "type": "string",
+          "description": "Ensembl gene ID",
+          "example": "genes/ENSG00000171759",
+          "pattern": "^genes/"
+        },
+        "assertion": {
+          "type": "string",
+          "description": "ACMG/AMP pathogenicity classification assigned by a ClinGen Variant Curation Expert Panel.",
+          "enum": [
+            "Benign",
+            "Likely Benign",
+            "Likely Pathogenic",
+            "Pathogenic",
+            "Uncertain Significance"
+          ]
+        },
+        "pmids": {
+          "type": "array",
+          "description": "Pubmed identifiers.",
+          "example": [
+            "http://pubmed.ncbi.nlm.nih.gov/2574002",
+            "http://pubmed.ncbi.nlm.nih.gov/2574002",
+            "http://pubmed.ncbi.nlm.nih.gov/9450897"
+          ]
+        },
+        "name": {
+          "enum": [
+            "associated with"
+          ],
+          "example": "associated with"
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with"
+          ],
+          "example": "associated with"
+        },
+        "source": {
+          "enum": [
+            "ClinGen"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://search.clinicalgenome.org/kb/downloads"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "gene_id",
+        "assertion",
+        "pmids",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

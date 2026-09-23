@@ -6,11 +6,24 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "pattern": "^coding_variants/",
@@ -36,28 +49,75 @@
         },
         "pathogenicity_score": {
           "type": "number",
-          "description": "Pathogenicity score for the coding variant phenotype edge"
+          "description": "MutPred2 pathogenicity score for the substitution, between 0 and 1. Higher values indicate greater predicted pathogenicity."
         },
         "property_scores": {
           "type": "array",
-          "description": "Property scores for the coding variant phenotype edge",
+          "description": "Molecular mechanisms MutPred2 predicts the substitution to disrupt, drawn from its 58 structural, functional, and post-translational-modification properties.",
           "items": {
-            "type": "object"
-          }
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the coding variant phenotype edge",
-          "pattern": "^files_filesets/"
+            "type": "object",
+            "properties": {
+              "Property": {
+                "type": "string",
+                "description": "MutPred2 molecular mechanism property name (e.g. VSL2B_disorder, Surface_accessibility, Stability)",
+                "example": "VSL2B_disorder"
+              },
+              "Posterior Probability": {
+                "type": "number",
+                "description": "Posterior probability that the mechanism is altered",
+                "example": 0.162
+              },
+              "P-value": {
+                "type": "number",
+                "description": "P-value for the mechanism prediction",
+                "example": 0.345
+              },
+              "Effected Position": {
+                "type": "string",
+                "description": "Affected residue position (e.g. \"Y183\"), or \"-\" for properties that describe a region rather than a single residue",
+                "example": "Y183"
+              },
+              "Type": {
+                "type": "string",
+                "description": "Direction of the predicted mechanism change",
+                "enum": [
+                  "Loss",
+                  "Gain",
+                  "Altered"
+                ],
+                "example": "Gain"
+              }
+            },
+            "required": [
+              "Property",
+              "Posterior Probability",
+              "P-value",
+              "Effected Position",
+              "Type"
+            ],
+            "additionalProperties": false
+          },
+          "example": [
+            {
+              "Property": "VSL2B_disorder",
+              "Posterior Probability": 0.162,
+              "P-value": 0.345,
+              "Effected Position": "Y183",
+              "Type": "Gain"
+            }
+          ]
         },
         "biosample_term": {
-          "type": ["string", "null"],
-          "description": "Biosample term for the coding variant phenotype edge",
-          "pattern": "^ontology_terms/"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "biological_context": {
-          "type": ["string", "null"],
-          "description": "Biological context for the coding variant phenotype edge",
+          "type": [
+            "string",
+            "null"
+          ],
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell"
         },
         "method": {
@@ -93,7 +153,6 @@
         "files_filesets",
         "biosample_term",
         "biological_context"
-
       ],
       "additionalProperties": false
     }

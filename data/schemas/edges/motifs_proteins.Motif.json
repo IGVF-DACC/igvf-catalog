@@ -1,98 +1,103 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/motifs_proteins.Motif.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the motifs to proteins edge",
-      "example": "TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519"
-    },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the motifs to proteins edge",
-      "example": "motifs/RXRA_HUMAN_HOCOMOCOv11",
-      "pattern": "^motifs/",
-      "collections": [
-        "motifs"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the motifs to proteins edge",
-      "example": "proteins/ENSP00000364519",
-      "pattern": "^proteins/ENSP[0-9]{11}$",
-      "collections": [
-        "proteins"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the motifs to proteins edge",
-      "enum": [
-        "is used by"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the motifs to proteins edge",
-      "enum": [
-        "uses"
-      ]
-    },
-    "biological_process": {
-      "type": "string",
-      "description": "The biological process of the motifs to proteins edge",
-      "enum": [
-        "ontology_terms/GO_0003677"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the motifs to proteins edge",
-      "enum": [
-        "HOCOMOCOv11"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the motifs to proteins edge, from the associated files_filesets record",
-      "enum": [
-        "observed data"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the motifs to proteins edge, from the associated files_filesets record",
-      "enum": [
-        "HOCOMOCO"
-      ]
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the motifs to proteins edge",
-      "example": "files_filesets/IGVFFI1444TRQL",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "biological_process",
-    "source",
-    "class",
-    "method",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "_id, name, inverse_name, biological_process, source, class, method, files_filesets"
   },
-  "db_collection_name": "motifs_proteins"
+  "db_collection_name": "motifs_proteins",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Motif key and Ensembl protein ID joined by an underscore.",
+          "example": "TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519"
+        },
+        "_from": {
+          "type": "string",
+          "description": "Handle of the HOCOMOCO motif.",
+          "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
+          "pattern": "^motifs/",
+          "collections": [
+            "motifs"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Handle of the Ensembl protein for the transcription factor the motif models.",
+          "example": "proteins/ENSP00000364519",
+          "pattern": "^proteins/ENSP[0-9]{11}$",
+          "collections": [
+            "proteins"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "is used by"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "uses"
+          ]
+        },
+        "biological_process": {
+          "type": "string",
+          "description": "Gene Ontology term GO:0003677 (DNA binding).",
+          "enum": [
+            "ontology_terms/GO_0003677"
+          ]
+        },
+        "source": {
+          "enum": [
+            "HOCOMOCOv11"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "enum": [
+            "HOCOMOCO"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "name",
+        "inverse_name",
+        "biological_process",
+        "source",
+        "class",
+        "method",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

@@ -6,11 +6,24 @@
       "$ref": "edges.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/coding_var_1",
@@ -45,23 +58,10 @@
             "altered due to mutation"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the coding variant to phenotype edge",
-          "example": "files_filesets/IGVFFI9499PJFU",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "The biological context of the coding variant to phenotype edge",
           "example": "U2OS"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "The biosample term of the coding variant to phenotype edge",
           "example": "ontology_terms/EFO_0002869"
         },
         "method": {

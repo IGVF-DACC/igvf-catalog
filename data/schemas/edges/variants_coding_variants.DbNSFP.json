@@ -1,93 +1,103 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_coding_variants.DbNSFP.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant to coding variant edge",
-      "example": "NC_000001.11:10202:C:A_OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+  "db_collection_name": "variants_coding_variants",
+  "allOf": [
+    {
+      "properties": {
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        }
+      }
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant to coding variant edge",
-      "example": "variants/NC_000001.11:10202:C:A",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant to coding variant edge",
-      "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
-      "pattern": "^coding_variants/",
-      "collections": [
-        "coding_variants"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variant to coding variant edge",
-      "enum": [
-        "dbNSFP 5.1a"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the variant to coding variant edge",
-      "enum": [
-        "http://database.liulab.science/dbNSFP"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variant to coding variant edge",
-      "enum": [
-        "codes for"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variant to coding variant edge",
-      "enum": [
-        "encoded by"
-      ]
-    },
-    "chr": {
-      "type": "string",
-      "description": "Chromosome for the variant to coding variant edge",
-      "example": "1"
-    },
-    "pos": {
-      "type": "number",
-      "description": "Position for the variant to coding variant edge",
-      "example": 10202
-    },
-    "ref": {
-      "type": "string",
-      "description": "Reference for the variant to coding variant edge",
-      "example": "C"
-    },
-    "alt": {
-      "type": "string",
-      "description": "Alternate for the variant to coding variant edge",
-      "example": "A"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Variant key and coding variant key joined by an underscore. Hashed with SHA-256 when the composite would exceed the 254-character key limit.",
+          "example": "NC_000001.11:10202:C:A_OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+        },
+        "_from": {
+          "type": "string",
+          "description": "Handle of the genomic variant.",
+          "example": "variants/NC_000001.11:10202:C:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "description": "Handle of the coding consequence on one transcript.",
+          "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "source": {
+          "enum": [
+            "dbNSFP 5.1a"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "http://database.liulab.science/dbNSFP"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Directional human readable label for the relationship, _from to _to.",
+          "enum": [
+            "codes for"
+          ]
+        },
+        "inverse_name": {
+          "type": "string",
+          "description": "Reversed directional human readable label for the relationship, _to to _from.",
+          "enum": [
+            "encoded by"
+          ]
+        },
+        "chr": {
+          "type": "string",
+          "description": "Chromosome of the variant as dbNSFP records it, without a chr prefix. Scaffolds and patch regions use UCSC-style names.",
+          "example": "1"
+        },
+        "pos": {
+          "type": "number",
+          "description": "0-based genomic coordinate of the variant.",
+          "example": 10202
+        },
+        "ref": {
+          "type": "string",
+          "description": "Reference allele of the genomic variant.",
+          "example": "C"
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alternate allele of the genomic variant.",
+          "example": "A"
+        }
+      },
+      "required": [
+        "_key",
+        "_from",
+        "_to",
+        "source",
+        "source_url",
+        "name",
+        "inverse_name",
+        "chr",
+        "pos",
+        "ref",
+        "alt"
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "source",
-    "source_url",
-    "name",
-    "inverse_name",
-    "chr",
-    "pos",
-    "ref",
-    "alt"
-  ],
-  "additionalProperties": false,
-  "db_collection_name": "variants_coding_variants"
+  ]
 }

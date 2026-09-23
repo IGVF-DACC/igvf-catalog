@@ -9,6 +9,13 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -29,7 +36,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Class of the element: promoter, genic, or intergenic.",
           "enum": [
             "genic",
             "intergenic",
@@ -45,12 +52,6 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "example": "files_filesets/IGVFFI5648GWQX",
-          "pattern": "^files_filesets/"
         }
       },
       "required": [

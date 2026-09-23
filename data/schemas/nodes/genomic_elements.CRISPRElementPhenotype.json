@@ -9,6 +9,13 @@
       "$ref": "genomic_elements.base.json"
     },
     {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
+    {
       "type": "object",
       "properties": {
         "_key": {
@@ -24,7 +31,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "enum": [
             "enhancer"
           ]
@@ -42,12 +49,6 @@
           "enum": [
             "tested elements"
           ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "example": "files_filesets/IGVFFI5135QZCS",
-          "pattern": "^files_filesets/"
         }
       },
       "required": [

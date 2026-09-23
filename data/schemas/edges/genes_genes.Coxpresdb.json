@@ -2,69 +2,94 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genes_genes.Coxpresdb.json",
   "allOf": [
-    { "$ref": "edges.base.json" },
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      }
+    },
     {
       "type": "object",
       "properties": {
         "_key": {
           "type": "string",
-          "description": "The unique key of the gene gene edge",
+          "description": "The two NCBI Entrez gene IDs in canonical order and coxpresdb, joined by underscores. Ensembl IDs are used instead when either gene maps to more than one Ensembl identifier.",
           "example": "80185_2222_coxpresdb"
         },
         "_from": {
-          "type": "string",
-          "description": "The from node of the gene gene edge",
+          "description": "Handle of the first gene in the pair (smaller Entrez ID).",
           "example": "genes/ENSG00000129696",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-          "collections": ["genes"]
+          "collections": [
+            "genes"
+          ]
         },
         "_to": {
-          "type": "string",
-          "description": "The to node of the gene gene edge",
-          "example": "genes/ENSG00000129696",
+          "description": "Handle of the second gene in the pair (larger Entrez ID).",
+          "example": "genes/ENSG00000079459",
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-          "collections": ["genes"]
+          "collections": [
+            "genes"
+          ]
         },
         "z_score": {
           "type": "number",
-          "description": "The z score of the gene gene edge",
-          "example": 1.23
+          "description": "COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.",
+          "example": 3.2
         },
         "associated_process": {
           "type": "string",
-          "description": "The associated process of the gene gene edge",
-          "enum": ["ontology_terms/GO_0010467"]
+          "description": "Gene Ontology term for gene expression, as a handle into ontology_terms.",
+          "enum": [
+            "ontology_terms/GO_0010467"
+          ]
         },
         "method": {
-          "enum": ["COXPRESdb"]
+          "enum": [
+            "COXPRESdb"
+          ]
         },
         "class": {
-          "enum": ["observed data"]
+          "enum": [
+            "observed data"
+          ]
         },
         "label": {
-          "enum": ["co-expression"]
+          "enum": [
+            "co-expression"
+          ]
         },
         "source": {
-          "enum": ["COXPRESdb"]
+          "enum": [
+            "COXPRESdb"
+          ]
         },
         "source_url": {
-          "enum": ["https://coxpresdb.jp/"]
+          "enum": [
+            "https://coxpresdb.jp/"
+          ]
         },
         "name": {
-          "enum": ["coexpressed with"]
+          "enum": [
+            "coexpressed with"
+          ]
         },
         "inverse_name": {
-          "enum": ["coexpressed with"]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "The files filesets of the gene gene edge",
-          "example": "files_filesets/IGVFFI3321YNBP",
-          "pattern": "^files_filesets/",
-          "collections": ["files_filesets"]
+          "enum": [
+            "coexpressed with"
+          ]
         }
       },
-      "required": ["_key", "z_score", "associated_process", "files_filesets"],
+      "required": [
+        "_key",
+        "z_score",
+        "associated_process",
+        "files_filesets"
+      ],
       "additionalProperties": false,
       "accessible_via": {
         "filter_by_range": "z_score",
