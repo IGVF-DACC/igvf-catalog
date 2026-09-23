@@ -25,7 +25,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Genomic element key, strand token, source file accession and biosample term joined by underscores."
         },
         "_from": {
@@ -43,26 +42,37 @@
           ]
         },
         "bed_score": {
+          "title": "BED Score",
           "type": "integer",
           "description": "Score column of the source BED file."
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one."
+          "description": "Strand the tile was tested in..",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence.",
+            ".": "Strand is not recorded or is not applicable."
+          }
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": "number",
           "description": "Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio."
         },
         "DNA_count": {
+          "title": "DNA Count",
           "type": "number",
           "description": "Input count (DNA), normalized to counts per million and averaged across replicates."
         },
         "RNA_count": {
+          "title": "RNA Count",
           "type": "number",
           "description": "Output count (RNA), normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -70,6 +80,7 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -77,6 +88,7 @@
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's activity. The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },
@@ -122,7 +134,6 @@
         }
       },
       "required": [
-        "_key",
         "bed_score",
         "strand",
         "log2FC",

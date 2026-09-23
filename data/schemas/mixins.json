@@ -1,5 +1,6 @@
 {
   "files_filesets": {
+    "title": "Files and File Sets",
     "description": "Reference to the File and Metadata",
     "type": "string",
     "pattern": "^files_filesets/",
@@ -9,15 +10,18 @@
     "example": "files_filesets/IGVFFI0332UGDD"
   },
   "biological_context": {
+    "title": "Biological Context",
     "description": "Plain-language summary of the experimental sample or the sample context for a prediction.",
     "type": "string"
   },
   "biosample_term": {
+    "title": "Biosample Term",
     "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
     "type": "string",
     "pattern": "^ontology_terms/"
   },
   "treatments_term_ids": {
+    "title": "Treatment Term IDs",
     "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
     "type": [
       "array",
@@ -28,35 +32,55 @@
     }
   },
   "source": {
+    "title": "Source",
     "description": "The database, dataset or organization that is a source for these data.",
     "type": "string",
     "example": "IGVF"
   },
   "source_url": {
+    "title": "Source URL",
     "description": "The URL for the source.",
     "type": "string",
     "example": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
   },
   "method": {
+    "title": "Method",
     "description": "Name of the experimental class or prediction model that produced this result.",
     "type": "string",
     "example": "MPRA"
   },
   "label": {
+    "title": "Label",
     "description": "Non-method specific human readable label for the node or edge",
     "type": "string",
     "example": "eQTL"
   },
   "class": {
-    "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+    "title": "Class",
+    "description": "The class of data this record belongs to.",
     "type": "string",
-    "example": "observed data"
+    "example": "observed data",
+    "enum_descriptions": {
+      "observed data": "A direct experimental measurement.",
+      "prediction": "An output of a computational model.",
+      "biological relationship": "A curated relationship between biological entities."
+    }
   },
   "crispr_modality": {
+    "title": "CRISPR Modality",
     "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
-    "type": "string"
+    "type": "string",
+    "enum_descriptions": {
+      "interference": "Represses target gene expression using a CRISPR-directed regulatory effector.",
+      "activation": "Increases target gene expression using a CRISPR-directed regulatory effector.",
+      "base editing": "Introduces targeted nucleotide substitutions using a base editor.",
+      "prime editing": "Introduces targeted substitutions, insertions, or deletions using a prime editor and a template-bearing guide RNA.",
+      "knockout": "Disrupts a target gene to eliminate its function.",
+      "null": "No CRISPR modality is recorded or applicable."
+    }
   },
   "organism": {
+    "title": "Organism",
     "type": "string",
     "description": "Species this annotation describes."
   }

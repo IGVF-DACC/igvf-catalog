@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
@@ -86,6 +85,7 @@
           ]
         },
         "score": {
+          "title": "Score",
           "type": [
             "number",
             "null"
@@ -93,6 +93,7 @@
           "description": "VAMP-seq abundance score: For the variant, the mean of its replicate measurements. Normalized so that the median synonymous variant scores 1 and the median nonsense variant scores 0, so lower scores mean reduced abundance of the variant protein."
         },
         "standard_error": {
+          "title": "Standard Error",
           "type": [
             "number",
             "null"
@@ -100,6 +101,7 @@
           "description": "Standard error of the overall score."
         },
         "rep1_score": {
+          "title": "Replicate 1 Score",
           "type": [
             "number",
             "null"
@@ -107,6 +109,7 @@
           "description": "Abundance score calculated for replicate 1."
         },
         "rep2_score": {
+          "title": "Replicate 2 Score",
           "type": [
             "number",
             "null"
@@ -114,6 +117,7 @@
           "description": "Abundance score calculated for replicate 2."
         },
         "rep3_score": {
+          "title": "Replicate 3 Score",
           "type": [
             "number",
             "null"
@@ -122,7 +126,6 @@
         }
       },
       "required": [
-        "_key",
         "files_filesets",
         "biosample_term",
         "biological_context"

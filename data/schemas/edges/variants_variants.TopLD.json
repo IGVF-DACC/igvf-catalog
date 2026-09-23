@@ -47,46 +47,55 @@
           ]
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the pair of variants lies on. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "negated": {
+          "title": "Negated",
           "type": "boolean",
           "description": "Sign of the Pearson correlation between the two reference alleles, as written by the adapter: true when TopLD reports +, false when it reports -.",
           "example": false
         },
         "variant_1_base_pair": {
+          "title": "Variant 1 Base Pair",
           "type": "string",
           "description": "Reference and alternate alleles of the first variant.",
           "example": "G:A"
         },
         "variant_2_base_pair": {
+          "title": "Variant 2 Base Pair",
           "type": "string",
           "description": "Reference and alternate alleles of the second variant.",
           "example": "T:C"
         },
         "variant_1_rsid": {
+          "title": "Variant 1 dbSNP ID",
           "type": "string",
           "description": "dbSNP identifier of the first variant.",
           "example": "rs1234567890"
         },
         "variant_2_rsid": {
+          "title": "Variant 2 dbSNP ID",
           "type": "string",
           "description": "dbSNP identifier of the second variant.",
           "example": "rs1234567890"
         },
         "r2": {
+          "title": "R-Squared",
           "type": "number",
           "description": "Squared Pearson correlation of the two variants on phased haplotypes, from TOPMed ancestry-specific LD.",
           "example": 0.8
         },
         "d_prime": {
+          "title": "D Prime",
           "type": "number",
           "description": "Lewontin's D' between the two variants, from TOPMed ancestry-specific LD.",
           "example": 0.8
         },
         "ancestry": {
+          "title": "Ancestry",
           "type": "string",
           "description": "Ancestry group the LD estimate was computed in.",
           "enum": [
@@ -94,7 +103,13 @@
             "EAS",
             "EUR",
             "SAS"
-          ]
+          ],
+          "enum_descriptions": {
+            "AFR": "African ancestry.",
+            "EAS": "East Asian ancestry.",
+            "EUR": "European ancestry.",
+            "SAS": "South Asian ancestry."
+          }
         },
         "label": {
           "enum": [
@@ -102,6 +117,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -109,6 +125,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [

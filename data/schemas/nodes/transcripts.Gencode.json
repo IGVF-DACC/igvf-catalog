@@ -19,6 +19,7 @@
           "example": "ENST00000456328"
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000456328.2",
@@ -28,6 +29,7 @@
           "example": "DDX11L2-202"
         },
         "transcript_type": {
+          "title": "Transcript Type",
           "type": "string",
           "description": "Biotype GENCODE assigns to the transcript.",
           "enum": [
@@ -78,38 +80,96 @@
             "unprocessed_pseudogene",
             "vault_RNA"
           ],
-          "example": "lncRNA"
+          "example": "lncRNA",
+          "enum_descriptions": {
+            "artifact": "Assembly artifact.",
+            "IG_C_gene": "Immunoglobulin constant gene.",
+            "IG_C_pseudogene": "Immunoglobulin constant pseudogene.",
+            "IG_D_gene": "Immunoglobulin diversity gene.",
+            "IG_J_gene": "Immunoglobulin joining gene.",
+            "IG_J_pseudogene": "Immunoglobulin joining pseudogene.",
+            "IG_pseudogene": "Immunoglobulin pseudogene.",
+            "IG_V_gene": "Immunoglobulin variable gene.",
+            "IG_V_pseudogene": "Immunoglobulin variable pseudogene.",
+            "lncRNA": "Long noncoding RNA.",
+            "miRNA": "MicroRNA.",
+            "misc_RNA": "Miscellaneous noncoding RNA.",
+            "Mt_rRNA": "Mitochondrial ribosomal RNA.",
+            "Mt_tRNA": "Mitochondrial transfer RNA.",
+            "non_stop_decay": "Transcript lacking a termination codon.",
+            "nonsense_mediated_decay": "Transcript predicted to undergo nonsense-mediated degradation.",
+            "processed_pseudogene": "Retrotransposed pseudogene.",
+            "processed_transcript": "Transcript without an open reading frame.",
+            "protein_coding": "Protein-encoding sequence.",
+            "protein_coding_CDS_not_defined": "Coding-gene transcript without a defined coding sequence.",
+            "protein_coding_LoF": "Reference-specific loss of protein-coding capacity.",
+            "pseudogene": "Inactivated gene copy.",
+            "retained_intron": "Transcript retaining intronic sequence.",
+            "ribozyme": "Catalytic RNA.",
+            "rRNA": "Ribosomal RNA.",
+            "rRNA_pseudogene": "Ribosomal RNA pseudogene.",
+            "scaRNA": "Small Cajal body RNA.",
+            "scRNA": "Small cytoplasmic RNA.",
+            "snoRNA": "Small nucleolar RNA.",
+            "snRNA": "Small nuclear RNA.",
+            "sRNA": "Small RNA.",
+            "TEC": "Awaiting experimental confirmation.",
+            "TR_C_gene": "T-cell receptor constant gene.",
+            "TR_D_gene": "T-cell receptor diversity gene.",
+            "TR_J_gene": "T-cell receptor joining gene.",
+            "TR_J_pseudogene": "T-cell receptor joining pseudogene.",
+            "TR_V_gene": "T-cell receptor variable gene.",
+            "TR_V_pseudogene": "T-cell receptor variable pseudogene.",
+            "transcribed_processed_pseudogene": "Transcription-supported retrotransposed pseudogene.",
+            "transcribed_unitary_pseudogene": "Transcription-supported lineage-inactivated pseudogene.",
+            "transcribed_unprocessed_pseudogene": "Transcription-supported duplication-derived pseudogene.",
+            "translated_processed_pseudogene": "Translation-supported retrotransposed pseudogene.",
+            "translated_unprocessed_pseudogene": "Translation-supported duplication-derived pseudogene.",
+            "unitary_pseudogene": "Lineage-specific gene inactivation.",
+            "unprocessed_pseudogene": "Duplication-derived pseudogene.",
+            "vault_RNA": "Vault-complex RNA."
+          }
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the transcript, 0-based and inclusive.",
           "example": 11869
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the transcript, 0-based and exclusive.",
           "example": 14409
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand the transcript is transcribed from..",
           "enum": [
             "+",
             "-"
-          ]
+          ],
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "DDX11L2"
         },
         "MANE_Select": {
+          "title": "MANE Select",
           "type": "boolean",
           "description": "Whether GENCODE tags this transcript as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.",
           "example": true
@@ -120,6 +180,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [

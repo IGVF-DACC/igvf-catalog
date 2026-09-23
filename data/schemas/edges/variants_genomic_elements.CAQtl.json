@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant SPDI, genomic element key, source-file cell label and source file accession joined by underscores."
         },
         "_from": {
@@ -40,6 +39,7 @@
           ]
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": "string",
           "description": "dbSNP id for the variant position",
           "example": "rs189800799"
@@ -85,6 +85,7 @@
           ]
         },
         "method_term": {
+          "title": "Method Term",
           "type": "string",
           "description": "Ontology term for the chromatin accessibility assay.",
           "enum": [
@@ -93,7 +94,6 @@
         }
       },
       "required": [
-        "_key",
         "rsid",
         "files_filesets",
         "biological_context",

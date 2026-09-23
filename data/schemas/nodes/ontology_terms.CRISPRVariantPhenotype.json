@@ -35,6 +35,7 @@
           "example": "NTR_0001118"
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": [
             "array",
             "null"

@@ -20,7 +20,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Complex accession and Ensembl protein ID joined by an underscore.",
           "example": "CPX-2428_ENSP00000372925"
         },
@@ -45,11 +44,13 @@
           "example": "belongs to"
         },
         "stoichiometry": {
+          "title": "Stoichiometry",
           "type": "integer",
           "description": "Number of copies of this protein in the complex. 0 means the stoichiometry is unknown.",
           "example": 1
         },
         "chain_id": {
+          "title": "Chain ID",
           "type": [
             "string",
             "null"
@@ -57,6 +58,7 @@
           "description": "UniProt chain identifier when the participant is a specific processed chain rather than the full protein. Null otherwise."
         },
         "isoform_id": {
+          "title": "Isoform ID",
           "type": [
             "string",
             "null"
@@ -64,6 +66,7 @@
           "description": "UniProt isoform number when the participant is a specific isoform. Null otherwise."
         },
         "number_of_paralogs": {
+          "title": "Number of Paralogs",
           "type": [
             "integer",
             "null"
@@ -71,6 +74,7 @@
           "description": "Count of interchangeable paralogs when this participant is a molecule set. Null for a single protein."
         },
         "paralogs": {
+          "title": "Paralogs",
           "type": [
             "array",
             "null"
@@ -82,6 +86,7 @@
           ]
         },
         "linked_features": {
+          "title": "Linked Features",
           "type": "array",
           "description": "Binding regions between this protein and other participants of the complex, taken from the Complex Portal API: each entry names a participant and the residue ranges involved.",
           "example": [
@@ -123,7 +128,6 @@
         }
       },
       "required": [
-        "_key",
         "stoichiometry",
         "chain_id",
         "isoform_id",

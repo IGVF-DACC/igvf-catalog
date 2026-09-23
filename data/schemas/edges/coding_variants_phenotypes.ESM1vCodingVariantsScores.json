@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
@@ -50,6 +49,7 @@
           ]
         },
         "esm_1v_score": {
+          "title": "ESM1v Score",
           "type": "number",
           "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
@@ -85,10 +85,12 @@
           ]
         },
         "esm1v_t33_650M_UR90S_1": {
+          "title": "ESM1v Model 1 Score",
           "type": "number",
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_1 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_2": {
+          "title": "ESM1v Model 2 Score",
           "type": [
             "number",
             "null"
@@ -96,6 +98,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_2 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_3": {
+          "title": "ESM1v Model 3 Score",
           "type": [
             "number",
             "null"
@@ -103,6 +106,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_3 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_4": {
+          "title": "ESM1v Model 4 Score",
           "type": [
             "number",
             "null"
@@ -110,6 +114,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_4 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_5": {
+          "title": "ESM1v Model 5 Score",
           "type": [
             "number",
             "null"
@@ -117,6 +122,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_5 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_1_next": {
+          "title": "ESM1v Model 1 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -124,6 +130,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_1 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_2_next": {
+          "title": "ESM1v Model 2 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -131,6 +138,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_2 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_3_next": {
+          "title": "ESM1v Model 3 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -138,6 +146,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_3 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_4_next": {
+          "title": "ESM1v Model 4 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -145,6 +154,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_4 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_5_next": {
+          "title": "ESM1v Model 5 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -165,7 +175,6 @@
         }
       },
       "required": [
-        "_key",
         "esm_1v_score",
         "files_filesets",
         "biosample_term",

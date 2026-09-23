@@ -23,7 +23,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Ensembl gene ID and Cellosaurus cell line key joined by an underscore.",
           "example": "ENSG00000189007_CVCL_1628"
         },
@@ -45,22 +44,26 @@
           "example": "OVCAR-5"
         },
         "model_id": {
+          "title": "Model ID",
           "type": "string",
           "description": "DepMap model accession for the cell line.",
           "example": "ACH-000082"
         },
         "model_type": {
+          "title": "Model Type",
           "type": "string",
           "description": "DepMap model type of the cell line.",
           "example": "HGSOC"
         },
         "cancer_term": {
+          "title": "Cancer Term",
           "type": "string",
           "description": "Oncotree ontology term of the cell line.",
           "example": "ontology_terms/Oncotree_HGSOC",
           "pattern": "^ontology_terms/Oncotree_"
         },
         "gene_dependency": {
+          "title": "Gene Dependency",
           "type": "number",
           "description": "Probability that knocking out this gene is a true genetic dependency in this cell line."
         },
@@ -75,6 +78,7 @@
           ]
         },
         "source_file": {
+          "title": "Source File",
           "type": "string",
           "description": "DepMap release file this score was read from.",
           "enum": [
@@ -110,7 +114,6 @@
         }
       },
       "required": [
-        "_key",
         "biological_context",
         "model_id",
         "model_type",

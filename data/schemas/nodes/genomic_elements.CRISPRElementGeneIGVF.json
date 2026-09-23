@@ -25,6 +25,7 @@
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "promoter_of": {
+          "title": "Promoter Of",
           "type": "string",
           "description": "The gene this element is the presumed promoter of.",
           "example": "genes/ENSG00000123685"
@@ -36,14 +37,20 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element supplied by the source.",
           "example": "promoter",
           "enum": [
             "enhancer",
             "promoter",
             "distal element"
-          ]
+          ],
+          "enum_descriptions": {
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter.",
+            "promoter": "An element associated with transcription initiation at a gene.",
+            "distal element": "An element located away from a promoter."
+          }
         },
         "source": {
           "enum": [

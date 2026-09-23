@@ -23,7 +23,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "SHA-256 hash of the source GAF annotation record together with the gene product handle."
         },
         "_to": {
@@ -42,31 +41,37 @@
           ]
         },
         "db": {
+          "title": "Database",
           "type": "string",
           "description": "Database the annotated gene product identifier is drawn from.",
           "example": "UniProtKB"
         },
         "gene_product_id": {
+          "title": "Gene Product ID",
           "type": "string",
           "description": "Identifier of the annotated gene product in that database.",
           "example": "A0A0J9YWV8"
         },
         "gene_product_symbol": {
+          "title": "Gene Product Symbol",
           "type": "string",
           "description": "Symbol of the annotated gene or gene product.",
           "example": "PHACTR4"
         },
         "gene_product_name": {
+          "title": "Gene Product Name",
           "type": "string",
           "description": "Full name of the annotated gene or gene product.",
           "example": "phosphorylated actin regulatory protein 4"
         },
         "gene_product_type": {
+          "title": "Gene Product Type",
           "type": "string",
           "description": "Class of biological entity of the annotated identifier.",
           "example": "protein"
         },
         "qualifier": {
+          "title": "Qualifier",
           "type": "array",
           "description": "Relation Ontology predicate describing how the gene product relates to the GO term. Negation is written as NOT followed by the relation, pipe-separated.",
           "example": [
@@ -74,11 +79,13 @@
           ]
         },
         "go_id": {
+          "title": "Gene Ontology ID",
           "type": "string",
           "description": "Gene Ontology identifier of the associated term.",
           "example": "GO:0005515"
         },
         "db_reference": {
+          "title": "Database Reference",
           "type": "array",
           "description": "Identifiers of the reference cited as the source of the annotation.",
           "example": [
@@ -86,11 +93,41 @@
           ]
         },
         "evidence": {
+          "title": "Evidence",
           "type": "string",
           "description": "GO evidence code supporting the annotation.",
-          "example": "IEA"
+          "example": "IEA",
+          "enum_descriptions": {
+            "EXP": "Supported by experimental results.",
+            "IDA": "Supported by a direct functional assay.",
+            "IPI": "Supported by measured physical interactions.",
+            "IMP": "Supported by a phenotype following mutation.",
+            "IGI": "Supported by observed genetic interactions.",
+            "IEP": "Supported by an observed expression pattern.",
+            "HTP": "Supported by large-scale experimental results.",
+            "HDA": "Supported by large-scale direct assays.",
+            "HMP": "Supported by large-scale mutant phenotype measurements.",
+            "HGI": "Supported by large-scale genetic interaction measurements.",
+            "HEP": "Supported by large-scale expression measurements.",
+            "IBA": "Transferred through an inferred ancestral function.",
+            "IBD": "Inferred using functions of evolutionary descendants.",
+            "IKR": "Inferred using functionally important residues.",
+            "IRD": "Inferred using rapid evolutionary divergence.",
+            "ISS": "Inferred using sequence or structural resemblance.",
+            "ISO": "Transferred using an orthologous sequence.",
+            "ISA": "Inferred using aligned sequences.",
+            "ISM": "Inferred using a sequence-based model.",
+            "IGC": "Inferred using the surrounding genomic context.",
+            "RCA": "Supported by a computational analysis reviewed by a curator.",
+            "TAS": "Based on an author claim with a traceable supporting reference.",
+            "NAS": "Based on an author claim without a traceable supporting reference.",
+            "IC": "Assigned through curator reasoning.",
+            "ND": "No supporting biological evidence is available.",
+            "IEA": "Assigned automatically without manual review of the annotation."
+          }
         },
         "with": {
+          "title": "Supporting Identifiers",
           "type": "array",
           "description": "Additional identifiers supporting the evidence, used with certain evidence codes.",
           "example": [
@@ -98,11 +135,18 @@
           ]
         },
         "aspect": {
+          "title": "Aspect",
           "type": "string",
-          "description": "Branch of the Gene Ontology the term belongs to: P for biological process, F for molecular function, or C for cellular component.",
-          "example": "P"
+          "description": "Branch of the Gene Ontology the term belongs to.",
+          "example": "P",
+          "enum_descriptions": {
+            "P": "Biological process.",
+            "F": "Molecular function.",
+            "C": "Cellular component."
+          }
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": "array",
           "description": "Alternate names the annotated gene or gene product.",
           "example": [
@@ -110,6 +154,7 @@
           ]
         },
         "taxon_id": {
+          "title": "Taxon ID",
           "type": "array",
           "description": "NCBI taxonomic identifiers of the species the gene product is found in.",
           "example": [
@@ -117,21 +162,25 @@
           ]
         },
         "date": {
+          "title": "Date",
           "type": "string",
           "description": "Date the annotation was made, as YYYYMMDD.",
           "example": "20230911"
         },
         "assigned_by": {
+          "title": "Assigned By",
           "type": "string",
           "description": "Database that made the annotation.",
           "example": "UniProt"
         },
         "annotation_extension": {
+          "title": "Annotation Extension",
           "type": "string",
           "description": "Further specification of the GO term using a Relation Ontology predicate and an additional entity.",
           "example": "occurs_in(GO:0005634)"
         },
         "gene_product_form_id": {
+          "title": "Gene Product Form ID",
           "type": "string",
           "description": "Identifier of a specific isoform or processed form when the annotation is more specific than the canonical gene product.",
           "example": "UniProtKB:C6GKH1"
@@ -190,7 +239,6 @@
         }
       },
       "required": [
-        "_key",
         "db",
         "gene_product_id",
         "gene_product_symbol",

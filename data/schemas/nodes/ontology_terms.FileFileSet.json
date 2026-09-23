@@ -22,6 +22,7 @@
           "example": "NTR_0000856"
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": [
             "array",
             "null"

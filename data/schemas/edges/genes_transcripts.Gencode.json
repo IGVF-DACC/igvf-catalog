@@ -53,6 +53,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -64,6 +65,7 @@
           "example": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz"
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -71,6 +73,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -84,11 +87,15 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for the process this edge represents. GO_0010467 is 'gene expression'.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0010467"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0010467": "Gene expression."
+          }
         }
       },
       "required": [

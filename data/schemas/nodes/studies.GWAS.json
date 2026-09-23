@@ -22,81 +22,97 @@
           "example": "GCST011427_344"
         },
         "ancestry_initial": {
+          "title": "Discovery Sample Ancestry",
           "type": "string",
           "description": "Ancestry composition of the discovery GWAS sample, as recorded by Open Targets.",
           "example": "['European=172' 'African unspecified=29' 'NR=86']"
         },
         "ancestry_replication": {
+          "title": "Replication Sample Ancestry",
           "type": "string",
           "description": "Ancestry composition of the replication GWAS sample, as recorded by Open Targets.",
           "example": "['European=172' 'African unspecified=29' 'NR=86']"
         },
         "n_cases": {
+          "title": "Number of Cases",
           "type": "string",
           "description": "Number of cases in the study.",
           "example": "1000"
         },
         "n_initial": {
+          "title": "Discovery Sample Size",
           "type": "string",
           "description": "Discovery sample size of the study.",
           "example": "1000"
         },
         "n_replication": {
+          "title": "Replication Sample Size",
           "type": "string",
           "description": "Replication sample size of the study.",
           "example": "1000"
         },
         "pmid": {
+          "title": "PubMed ID",
           "type": "string",
           "description": "PubMed identifier.",
           "example": "PMID:32778093"
         },
         "pub_author": {
+          "title": "Publication Author",
           "type": "string",
           "description": "First author of the publication.",
           "example": "John Doe"
         },
         "pub_date": {
+          "title": "Publication Date",
           "type": "string",
           "description": "Publication date.",
           "example": "2021-01-01"
         },
         "pub_journal": {
+          "title": "Publication Journal",
           "type": "string",
           "description": "Journal the study was published in.",
           "example": "Nature"
         },
         "pub_title": {
+          "title": "Publication Title",
           "type": "string",
           "description": "Title of the publication.",
           "example": "A study on the effects of GWAS"
         },
         "has_sumstats": {
+          "title": "Has Summary Statistics",
           "type": "string",
           "description": "Whether Open Targets has full summary statistics for this study.",
           "example": "true"
         },
         "num_assoc_loci": {
+          "title": "Number of Associated Loci",
           "type": "string",
           "description": "Number of independently associated loci in the study.",
           "example": "1000"
         },
         "study_source": {
+          "title": "Study Source",
           "type": "string",
           "description": "Consortium or pipeline the study was ingested from.",
           "example": "GCST"
         },
         "trait_reported": {
+          "title": "Reported Trait",
           "type": "string",
           "description": "Trait as reported by the study authors.",
           "example": "Protein quantitative trait loci (liver) [IGKC]"
         },
         "trait_efos": {
+          "title": "Trait EFO IDs",
           "type": "string",
           "description": "EFO identifiers Open Targets mapped the reported trait to.",
           "example": "['EFO_0004747']"
         },
         "trait_category": {
+          "title": "Trait Category",
           "type": "string",
           "description": "Open Targets category of the mapped trait.",
           "example": "measurement"
@@ -107,6 +123,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "Open Targets Genetics release this record was taken from.",
           "enum": [

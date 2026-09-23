@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "node.base.json",
-  "title": "Base Node Schema",
   "description": "Base schema for all node types in the IGVF Catalog. Defines common required properties.",
   "allOf": [
     {
@@ -22,6 +21,7 @@
           "description": "Unique identifier for this record within its collection. Key composition is collection-specific: a stable source accession where one exists, otherwise a composite of the fields that make the record unique."
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Human readable display name for the entity",
           "example": "TP53"

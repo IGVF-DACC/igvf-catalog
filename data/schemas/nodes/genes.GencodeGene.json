@@ -20,12 +20,14 @@
           "example": "ENSG00000290825"
         },
         "gene_id": {
+          "title": "Gene ID",
           "type": "string",
           "description": "Ensembl gene ID including its version suffix.",
           "example": "ENSG00000290825.1",
           "pattern": "^ENSG[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "gene_type": {
+          "title": "Gene Type",
           "type": "string",
           "description": "Biotype GENCODE assigns to the gene.",
           "enum": [
@@ -70,36 +72,87 @@
             "unprocessed_pseudogene",
             "vault_RNA"
           ],
-          "example": "protein_coding"
+          "example": "protein_coding",
+          "enum_descriptions": {
+            "artifact": "Assembly artifact.",
+            "IG_C_gene": "Immunoglobulin constant gene.",
+            "IG_C_pseudogene": "Immunoglobulin constant pseudogene.",
+            "IG_D_gene": "Immunoglobulin diversity gene.",
+            "IG_J_gene": "Immunoglobulin joining gene.",
+            "IG_J_pseudogene": "Immunoglobulin joining pseudogene.",
+            "IG_pseudogene": "Immunoglobulin pseudogene.",
+            "IG_V_gene": "Immunoglobulin variable gene.",
+            "IG_V_pseudogene": "Immunoglobulin variable pseudogene.",
+            "lncRNA": "Long noncoding RNA.",
+            "miRNA": "MicroRNA.",
+            "misc_RNA": "Miscellaneous noncoding RNA.",
+            "Mt_rRNA": "Mitochondrial ribosomal RNA.",
+            "Mt_tRNA": "Mitochondrial transfer RNA.",
+            "processed_pseudogene": "Retrotransposed pseudogene.",
+            "protein_coding": "Protein-encoding sequence.",
+            "pseudogene": "Inactivated gene copy.",
+            "ribozyme": "Catalytic RNA.",
+            "rRNA": "Ribosomal RNA.",
+            "rRNA_pseudogene": "Ribosomal RNA pseudogene.",
+            "scaRNA": "Small Cajal body RNA.",
+            "scRNA": "Small cytoplasmic RNA.",
+            "snoRNA": "Small nucleolar RNA.",
+            "snRNA": "Small nuclear RNA.",
+            "sRNA": "Small RNA.",
+            "TEC": "Awaiting experimental confirmation.",
+            "TR_C_gene": "T-cell receptor constant gene.",
+            "TR_D_gene": "T-cell receptor diversity gene.",
+            "TR_J_gene": "T-cell receptor joining gene.",
+            "TR_J_pseudogene": "T-cell receptor joining pseudogene.",
+            "TR_V_gene": "T-cell receptor variable gene.",
+            "TR_V_pseudogene": "T-cell receptor variable pseudogene.",
+            "transcribed_processed_pseudogene": "Transcription-supported retrotransposed pseudogene.",
+            "transcribed_unitary_pseudogene": "Transcription-supported lineage-inactivated pseudogene.",
+            "transcribed_unprocessed_pseudogene": "Transcription-supported duplication-derived pseudogene.",
+            "translated_processed_pseudogene": "Translation-supported retrotransposed pseudogene.",
+            "translated_unprocessed_pseudogene": "Translation-supported duplication-derived pseudogene.",
+            "unitary_pseudogene": "Lineage-specific gene inactivation.",
+            "unprocessed_pseudogene": "Duplication-derived pseudogene.",
+            "vault_RNA": "Vault-complex RNA."
+          }
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the gene, 0-based and inclusive.",
           "example": 11869
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the gene, 0-based and exclusive.",
           "example": 14409
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand the gene is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand the gene is transcribed from..",
           "enum": [
             "+",
             "-"
-          ]
+          ],
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "name": {
           "example": "DDX11L2"
         },
         "symbol": {
+          "title": "Symbol",
           "type": "string",
           "description": "GENCODE gene symbol.",
           "example": "DDX11L2"
@@ -110,6 +163,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -127,6 +181,7 @@
           ]
         },
         "study_sets": {
+          "title": "Study Sets",
           "type": [
             "array",
             "null"
@@ -165,6 +220,7 @@
           }
         },
         "collections": {
+          "title": "Collections",
           "type": [
             "array",
             "null"
@@ -184,17 +240,20 @@
           ]
         },
         "version_number": {
+          "title": "Version Number",
           "type": "string",
           "description": "Version suffix of the Ensembl gene ID.",
           "example": "1"
         },
         "hgnc": {
+          "title": "HGNC Gene Symbol",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "HGNC:100000",
           "pattern": "^HGNC:[0-9]+$"
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": "array",
           "description": "Alternative symbols and names for the gene, gathered from the NCBI gene info file: its synonyms, other designations, and nomenclature-authority symbol and full name.",
           "items": {
@@ -202,6 +261,7 @@
           }
         },
         "entrez": {
+          "title": "Entrez Gene ID",
           "type": "string",
           "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:'.",
           "example": "ENTREZ:100287102",

@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, Ensembl protein ID and the source name joined by underscores.",
           "example": "NC_000017.11:7166092:G:A_ENSP00000491556_UKB"
         },
@@ -41,6 +40,7 @@
           ]
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": [
             "string",
             "null"
@@ -54,26 +54,35 @@
           ]
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "beta": {
+          "title": "Beta",
           "type": "number",
           "description": "Discovery-cohort effect size of allele A1 on plasma protein level."
         },
         "se": {
+          "title": "Standard Error",
           "type": "number",
           "description": "Standard error of the discovery-cohort beta."
         },
         "regulatory_type": {
+          "title": "Regulatory Type",
           "type": "string",
-          "description": "Whether the association is cis (within 1 Mb of the gene encoding the protein) or trans.",
+          "description": "Location of the association relative to the gene encoding the measured protein.",
           "enum": [
             "cis",
             "trans"
-          ]
+          ],
+          "enum_descriptions": {
+            "cis": "The variant is within 1 Mb of the gene encoding the measured protein.",
+            "trans": "The variant is outside the cis window of the gene encoding the measured protein."
+          }
         },
         "gene": {
+          "title": "Gene",
           "type": [
             "string",
             "null"
@@ -82,6 +91,7 @@
           "example": "genes/ENSG00000165841"
         },
         "gene_consequence": {
+          "title": "Gene Consequence",
           "type": [
             "string",
             "null"
@@ -97,7 +107,10 @@
         "biosample_term": {
           "enum": [
             "ontology_terms/UBERON_0001969"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/UBERON_0001969": "Blood plasma."
+          }
         },
         "source": {
           "enum": [
@@ -131,7 +144,6 @@
         }
       },
       "required": [
-        "_key",
         "rsid",
         "neg_log10_pvalue",
         "beta",

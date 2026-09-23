@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, biosample ontology term and source file accession joined by underscores."
         },
         "_from": {
@@ -40,6 +39,7 @@
           ]
         },
         "genomic_element": {
+          "title": "Genomic Element",
           "type": [
             "string",
             "null"
@@ -52,6 +52,7 @@
           ]
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": "number",
           "description": "log2 fold change in STARR-seq reporter activity."
         },
@@ -95,7 +96,6 @@
         }
       },
       "required": [
-        "_key",
         "genomic_element",
         "log2FC",
         "biological_context",

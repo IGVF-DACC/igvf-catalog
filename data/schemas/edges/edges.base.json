@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "edge.base.json",
-  "title": "Edge Node Schema",
   "description": "Base schema for all edge types in the IGVF Catalog. Defines common required properties.",
   "allOf": [
     {
@@ -26,6 +25,10 @@
     {
       "type": "object",
       "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for this edge within its collection. Key composition is adapter-specific."
+        },
         "_from": {
           "type": "string",
           "description": "Document handle of the source node, in collection/key form."
@@ -35,17 +38,20 @@
           "description": "Document handle of the target node, in collection/key form."
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "example": "modulates expression of"
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "example": "expression modulated by"
         }
       },
       "required": [
+        "_key",
         "_from",
         "_to",
         "label",

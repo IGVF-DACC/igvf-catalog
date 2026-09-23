@@ -20,7 +20,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "GenCC submission identifier and Ensembl gene ID joined by an underscore.",
           "example": "SGC-TEST001_ENSG00000157933"
         },
@@ -41,6 +40,7 @@
           "example": "genes/ENSG00000157933"
         },
         "sgc_id": {
+          "title": "GenCC Submission ID",
           "type": "string",
           "description": "GenCC submission identifier and version number.",
           "example": "SGC-TEST001.1"
@@ -58,24 +58,28 @@
           "example": "associated_with"
         },
         "hgnc": {
+          "title": "HGNC Gene Symbol",
           "type": "string",
           "description": "HGNC gene symbol",
           "pattern": "^HGNC:[0-9]+$",
           "example": "HGNC:10896"
         },
         "gene_symbol": {
+          "title": "Gene Symbol",
           "type": "string",
           "description": "HGNC symbol from the GenCC submission.",
           "example": "SKI"
         },
         "term_name": {
+          "title": "Term Name",
           "type": "string",
           "description": "Ontology term name.",
           "example": "Shprintzen-Goldberg syndrome"
         },
         "classification": {
+          "title": "Classification",
           "type": "string",
-          "description": "GenCC evidence classification of the gene\u2013disease assertion.",
+          "description": "GenCC evidence classification of the gene–disease assertion.",
           "enum": [
             "Definitive",
             "Disputed Evidence",
@@ -86,9 +90,20 @@
             "Strong",
             "Supportive"
           ],
-          "example": "Definitive"
+          "example": "Definitive",
+          "enum_descriptions": {
+            "Definitive": "A well-established causal gene–disease relationship with convincing evidence replicated over time.",
+            "Strong": "Strong human evidence supports a causal gene–disease relationship.",
+            "Moderate": "Moderate human evidence supports a causal gene–disease relationship without contradictory evidence.",
+            "Supportive": "Evidence supports a causal gene–disease relationship, without a more specific strength classification.",
+            "Limited": "Human evidence is limited, but the proposed relationship has not been fully refuted.",
+            "Disputed Evidence": "Conflicting evidence casts doubt on the proposed gene–disease relationship.",
+            "Refuted Evidence": "Valid contradictory evidence refutes the original support for the relationship.",
+            "No Known Disease Relationship": "No established evidence supports the proposed gene–disease relationship."
+          }
         },
         "moi_id": {
+          "title": "Mode of Inheritance ID",
           "type": "string",
           "description": "HPO identifier for the asserted mode of inheritance.",
           "enum": [
@@ -103,6 +118,7 @@
           ]
         },
         "moi_name": {
+          "title": "Mode of Inheritance Name",
           "type": "string",
           "description": "HPO label for the asserted mode of inheritance.",
           "enum": [
@@ -117,6 +133,7 @@
           ]
         },
         "submitter": {
+          "title": "Submitter",
           "type": "string",
           "description": "Name of the GenCC member group that submitted the assertion.",
           "enum": [
@@ -140,6 +157,7 @@
           ]
         },
         "pmids": {
+          "title": "PubMed IDs",
           "type": "array",
           "description": "Pubmed identifiers.",
           "items": {
@@ -159,7 +177,6 @@
         }
       },
       "required": [
-        "_key",
         "sgc_id",
         "hgnc",
         "gene_symbol",

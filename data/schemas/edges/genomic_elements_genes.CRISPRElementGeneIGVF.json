@@ -28,7 +28,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
@@ -94,6 +93,7 @@
           "example": "K562"
         },
         "p_value": {
+          "title": "P-Value",
           "type": [
             "number",
             "null"
@@ -101,6 +101,7 @@
           "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
         },
         "p_value_adj": {
+          "title": "Adjusted P-Value",
           "type": [
             "number",
             "null"
@@ -108,6 +109,7 @@
           "description": "Multiple-testing-adjusted p-value when reported by the source."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -115,10 +117,12 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": [
             "number",
             "null"
@@ -126,84 +130,102 @@
           "description": "Log2 fold change of readout gene expression for the perturbation."
         },
         "log2FC_ci95_lower": {
+          "title": "Log2 Fold Change 95% Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of a 95% confidence interval for log2FC."
         },
         "log2FC_ci95_upper": {
+          "title": "Log2 Fold Change 95% Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of a 95% confidence interval for log2FC."
         },
         "pct_1": {
+          "title": "Expressing Cell Fraction in Group 1",
           "type": "number",
           "description": "Fraction of cells in the first comparison group expressing the readout gene."
         },
         "pct_2": {
+          "title": "Expressing Cell Fraction in Group 2",
           "type": "number",
           "description": "Fraction of cells in the second comparison group expressing the readout gene."
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the perturbation effect."
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Perturbation effect size on readout gene expression. Semantics depend on the source assay."
         },
         "effect_size_ci_95": {
+          "title": "Effect Size 95% Confidence Interval",
           "type": "number",
           "description": "Half-width of the 95% confidence interval on effect_size."
         },
         "num_guides": {
+          "title": "Number of Guides",
           "type": "number",
           "description": "Number of guides targeting the perturbed element."
         },
         "fold_change": {
+          "title": "Fold Change",
           "type": "number",
           "description": "Fold change of readout expression in perturbed versus background cells."
         },
         "background_corrected_fold_change": {
+          "title": "Background Corrected Fold Change",
           "type": "number",
           "description": "Fold change of readout expression in perturbed versus a matched or selected background."
         },
         "gamma_approximation_ln_p_value": {
+          "title": "Gamma Approximation Natural Log P-Value",
           "type": "number",
           "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj."
         },
         "hypergeometric_ln_p_value": {
+          "title": "Hypergeometric Natural Log P-Value",
           "type": "number",
           "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value."
         },
         "empirical_p_value": {
+          "title": "Empirical P-Value",
           "type": "number",
           "description": "Empirical p-value from random background comparison."
         },
         "cpm_perturb": {
+          "title": "Perturbed Counts per Million",
           "type": "number",
           "description": "Counts per million reads for the readout gene in perturbed cells."
         },
         "cpm_bg": {
+          "title": "Background Counts per Million",
           "type": "number",
           "description": "Counts per million reads for the readout gene in background cells."
         },
         "num_cells": {
+          "title": "Number of Cells",
           "type": "number",
           "description": "Number of cells with perturbation guides at the element."
         },
         "z_score": {
+          "title": "Z-Score",
           "type": "number",
           "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
         },
         "t_score": {
+          "title": "T-Score",
           "type": "number",
           "description": "T-statistic for the element-gene association."
         },
         "idr": {
+          "title": "Irreproducible Discovery Rate",
           "type": "number",
           "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility."
         }
       },
       "required": [
-        "_key",
         "files_filesets",
         "crispr_modality",
         "biosample_term",

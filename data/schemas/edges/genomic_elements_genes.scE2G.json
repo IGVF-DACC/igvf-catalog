@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Genomic element key, Ensembl gene ID, biosample term and cell annotation term joined by underscores.",
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX_ENSG00000000457_CL_0000336_CL_0000336"
         },
@@ -56,15 +55,18 @@
           ]
         },
         "score": {
+          "title": "Score",
           "type": "number",
           "description": "scE2G score: Probability that the element has a regulatory effect on the target gene",
           "example": 0.95
         },
         "transcription_start_site": {
+          "title": "Transcription Start Site",
           "type": "integer",
           "description": "Transcription start site of the target gene used by the model, as a 0-based coordinate."
         },
         "rna_pseudobulk_tpm": {
+          "title": "RNA Pseudobulk TPM",
           "type": [
             "number",
             "null"
@@ -86,6 +88,7 @@
           "example": "ontology_terms/CL_0000336"
         },
         "cell_annotation": {
+          "title": "Cell Annotation",
           "type": [
             "string",
             "null"
@@ -94,6 +97,7 @@
           "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
+          "title": "Cell Annotation Term",
           "type": [
             "string",
             "null"
@@ -123,7 +127,6 @@
         }
       },
       "required": [
-        "_key",
         "score",
         "transcription_start_site",
         "rna_pseudobulk_tpm",

@@ -52,6 +52,7 @@
           "example": "ontology_terms/GO_0048308"
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -65,6 +66,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -77,6 +79,7 @@
           ]
         },
         "type_uri": {
+          "title": "Type URI",
           "type": "string",
           "description": "IRI of the RDF predicate for this relationship.",
           "enum": [
@@ -85,7 +88,14 @@
             "http://purl.obolibrary.org/obo/BFO_0000051",
             "http://purl.obolibrary.org/obo/BFO_0000050",
             "http://purl.obolibrary.org/obo/RO_0001000"
-          ]
+          ],
+          "enum_descriptions": {
+            "http://www.w3.org/2000/01/rdf-schema#subClassOf": "The source term is a more specific category of the target term.",
+            "http://www.geneontology.org/formats/oboInOwl#hasDbXref": "The source term has a database cross-reference to the target.",
+            "http://purl.obolibrary.org/obo/BFO_0000051": "The source entity has the target entity as a part.",
+            "http://purl.obolibrary.org/obo/BFO_0000050": "The source entity is part of the target entity.",
+            "http://purl.obolibrary.org/obo/RO_0001000": "The source entity derives from the target entity."
+          }
         },
         "source": {
           "enum": [

@@ -17,23 +17,33 @@
       "type": "object",
       "properties": {
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the element, 0-based and inclusive."
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the element, 0-based and exclusive."
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand the element is annotated on: + for forward, - for reverse, or . where strand does not apply."
+          "description": "Strand the element is annotated on..",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence.",
+            ".": "Strand is not recorded or is not applicable."
+          }
         },
         "type": {
+          "title": "Type",
           "type": "string",
           "description": "Category of element.",
           "example": "tested elements"

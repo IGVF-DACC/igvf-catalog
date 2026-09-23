@@ -15,55 +15,66 @@
           "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "ref": {
+          "title": "Reference Sequence",
           "type": "string",
           "description": "Reference amino acid, in single-letter code.",
           "example": "Q"
         },
         "alt": {
+          "title": "Alternate Sequence",
           "type": "string",
           "description": "Alternate amino acid, in single-letter code.",
           "example": "T"
         },
         "aapos": {
+          "title": "Amino Acid Position",
           "type": "integer",
           "description": "1-based position of the substituted residue within the protein."
         },
         "refcodon": {
+          "title": "Reference Codon",
           "type": "string",
           "description": "Reference codon at the substituted position.",
           "example": "ATG"
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "DSG2"
         },
         "protein_name": {
+          "title": "Protein Name",
           "type": "string",
           "description": "UniProtKB protein name.",
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
+          "title": "Protein ID",
           "type": "string",
           "description": "Ensembl ID of the protein (without version number).",
           "example": "ENSP00000493376"
         },
         "codonpos": {
+          "title": "Codon Position",
           "type": "integer",
           "description": "Position of the variant within the codon: 1, 2 or 3. "
         },
         "hgvsc": {
+          "title": "HGVS Coding DNA Expression",
           "type": "string",
           "description": "HGVS description of the variant in the cDNA reference frame.",
           "example": "c.2617_2618delinsAC"
         },
         "hgvsp": {
+          "title": "HGVS Protein Expression",
           "type": "string",
           "description": "HGVS protein-level description of the variant.",
           "example": "p.Gln873Thr",
           "pattern": "^p."
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000261590"

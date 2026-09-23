@@ -46,6 +46,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -54,6 +55,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -62,12 +64,17 @@
           ]
         },
         "type": {
+          "title": "Type",
           "type": "string",
-          "description": "Subclass of the parent tumor type, or database cross-reference to NCIT.",
+          "description": "Relationship between the source tumor type and the target term.",
           "enum": [
             "subclass",
             "database cross-reference"
-          ]
+          ],
+          "enum_descriptions": {
+            "subclass": "The source tumor type is a subtype of the target tumor type.",
+            "database cross-reference": "A link to a corresponding term in another database."
+          }
         },
         "source": {
           "enum": [

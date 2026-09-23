@@ -52,6 +52,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -59,6 +60,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -66,11 +68,15 @@
           ]
         },
         "relationship": {
+          "title": "Relationship",
           "type": "string",
           "description": "NCI Thesaurus term for a homologous gene.",
           "enum": [
             "ontology_terms/NCIT_C79968"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/NCIT_C79968": "Homologous gene."
+          }
         },
         "source": {
           "enum": [

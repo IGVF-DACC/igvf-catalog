@@ -18,6 +18,7 @@
       "type": "object",
       "properties": {
         "equivalent_ontology_term": {
+          "title": "Equivalent Ontology Term",
           "type": [
             "string",
             "null"
@@ -26,26 +27,31 @@
           "example": "EFO_0007010"
         },
         "lead_chrom": {
+          "title": "Lead Variant Chromosome",
           "type": "string",
           "description": "Chromosome of the lead variant, without a chr prefix.",
           "example": "1"
         },
         "lead_pos": {
+          "title": "Lead Variant Position",
           "type": "number",
           "description": "Position of the lead variant, converted from the Open Targets 1-based coordinate to 0-based.",
           "example": 10000
         },
         "lead_ref": {
+          "title": "Lead Variant Reference Allele",
           "type": "string",
           "description": "Reference allele of the lead variant.",
           "example": "A"
         },
         "lead_alt": {
+          "title": "Lead Variant Alternate Allele",
           "type": "string",
           "description": "Alternate allele of the lead variant.",
           "example": "G"
         },
         "phenotype_term": {
+          "title": "Phenotype Term",
           "type": [
             "string",
             "null"
@@ -54,87 +60,104 @@
           "example": "chronic obstructive pulmonary disease"
         },
         "direction": {
+          "title": "Direction",
           "type": "string",
           "description": "Sign of the reported effect of the alternate allele on the trait.",
           "example": "+"
         },
         "beta": {
+          "title": "Beta",
           "type": "number",
           "description": "Effect size of the alternate allele on the trait.",
           "example": 0.01
         },
         "beta_ci_lower": {
+          "title": "Beta Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of the confidence interval on beta.",
           "example": 0.005
         },
         "beta_ci_upper": {
+          "title": "Beta Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of the confidence interval on beta.",
           "example": 0.015
         },
         "odds_ratio": {
+          "title": "Odds Ratio",
           "type": "number",
           "description": "Odds ratio of the alternate allele for a binary trait. 0 when the study reports a beta instead.",
           "example": 1.5
         },
         "oddsr_ci_lower": {
+          "title": "Odds Ratio Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of the confidence interval on the odds ratio.",
           "example": 1.2
         },
         "oddsr_ci_upper": {
+          "title": "Odds Ratio Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of the confidence interval on the odds ratio.",
           "example": 1.8
         },
         "p_val_mantissa": {
+          "title": "P-Value Mantissa",
           "type": "number",
           "description": "Mantissa of the association p-value.",
           "example": 0.01
         },
         "p_val_exponent": {
+          "title": "P-Value Exponent",
           "type": "number",
           "description": "Base-10 exponent of the association p-value.",
           "example": 10
         },
         "p_value": {
+          "title": "P-Value",
           "type": "number",
           "description": "Association p-value, reconstructed from mantissa and exponent.",
           "example": 0.01
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
           "example": 1
         },
         "tagged_variants": {
+          "title": "Tagged Variants",
           "type": "array",
           "description": "Variants in LD with the lead SNP.",
           "items": {
             "type": "object",
             "properties": {
               "tag_chrom": {
+                "title": "Tagged Variant Chromosome",
                 "type": "string",
                 "description": "Chromosome of the tagged variant",
                 "example": "1"
               },
               "tag_pos": {
+                "title": "Tagged Variant Position",
                 "type": "integer",
                 "description": "0-based position of the tagged variant",
                 "example": 16964110
               },
               "tag_ref": {
+                "title": "Tagged Variant Reference Allele",
                 "type": "string",
                 "description": "Reference allele of the tagged variant",
                 "example": "TTTTTC"
               },
               "tag_alt": {
+                "title": "Tagged Variant Alternate Allele",
                 "type": "string",
                 "description": "Alternate allele of the tagged variant",
                 "example": "T"
               },
               "overall_r2": {
+                "title": "Overall R-Squared",
                 "type": [
                   "string",
                   "null"
@@ -143,6 +166,7 @@
                 "example": "0.68343289"
               },
               "pics_95perc_credset": {
+                "title": "PICS 95% Credible Set Membership",
                 "type": [
                   "string",
                   "null"
@@ -151,6 +175,7 @@
                 "example": "False"
               },
               "AFR_1000G_prop": {
+                "title": "1000 Genomes AFR Allele Frequency",
                 "type": [
                   "string",
                   "null"
@@ -159,6 +184,7 @@
                 "example": "0.25"
               },
               "AMR_1000G_prop": {
+                "title": "1000 Genomes AMR Allele Frequency",
                 "type": [
                   "string",
                   "null"
@@ -167,6 +193,7 @@
                 "example": "0.25"
               },
               "EAS_1000G_prop": {
+                "title": "1000 Genomes EAS Allele Frequency",
                 "type": [
                   "string",
                   "null"
@@ -175,6 +202,7 @@
                 "example": "0.25"
               },
               "EUR_1000G_prop": {
+                "title": "1000 Genomes EUR Allele Frequency",
                 "type": [
                   "string",
                   "null"
@@ -183,6 +211,7 @@
                 "example": "0.25"
               },
               "SAS_1000G_prop": {
+                "title": "1000 Genomes SAS Allele Frequency",
                 "type": [
                   "string",
                   "null"
@@ -191,6 +220,7 @@
                 "example": "0.0"
               },
               "log10_ABF": {
+                "title": "Log10 Approximate Bayes Factor",
                 "type": [
                   "string",
                   "null"
@@ -199,6 +229,7 @@
                 "example": "NA"
               },
               "posterior_prob": {
+                "title": "Posterior Probability",
                 "type": [
                   "string",
                   "null"
@@ -273,16 +304,17 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "Open Targets Genetics release this record was taken from.",
           "example": "October 2022 (22.10)"
         },
         "_key": {
-          "type": "string",
           "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
         "study": {
+          "title": "Study",
           "type": "string",
           "description": "ID of the GWAS study.",
           "example": "studies/GCST006368"
@@ -308,7 +340,6 @@
         "neg_log10_pvalue",
         "tagged_variants",
         "version",
-        "_key",
         "study",
         "files_filesets"
       ]

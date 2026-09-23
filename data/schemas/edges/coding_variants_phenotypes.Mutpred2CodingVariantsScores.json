@@ -22,7 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
@@ -48,36 +47,43 @@
           ]
         },
         "pathogenicity_score": {
+          "title": "Pathogenicity Score",
           "type": "number",
           "description": "MutPred2 pathogenicity score for the substitution, between 0 and 1. Higher values indicate greater predicted pathogenicity."
         },
         "property_scores": {
+          "title": "Property Scores",
           "type": "array",
           "description": "Molecular mechanisms MutPred2 predicts the substitution to disrupt, drawn from its 58 structural, functional, and post-translational-modification properties.",
           "items": {
             "type": "object",
             "properties": {
               "Property": {
+                "title": "Property",
                 "type": "string",
                 "description": "MutPred2 molecular mechanism property name (e.g. VSL2B_disorder, Surface_accessibility, Stability)",
                 "example": "VSL2B_disorder"
               },
               "Posterior Probability": {
+                "title": "Posterior Probability",
                 "type": "number",
                 "description": "Posterior probability that the mechanism is altered",
                 "example": 0.162
               },
               "P-value": {
+                "title": "P-Value",
                 "type": "number",
                 "description": "P-value for the mechanism prediction",
                 "example": 0.345
               },
               "Effected Position": {
+                "title": "Affected Position",
                 "type": "string",
                 "description": "Affected residue position (e.g. \"Y183\"), or \"-\" for properties that describe a region rather than a single residue",
                 "example": "Y183"
               },
               "Type": {
+                "title": "Type",
                 "type": "string",
                 "description": "Direction of the predicted mechanism change",
                 "enum": [
@@ -85,7 +91,12 @@
                   "Gain",
                   "Altered"
                 ],
-                "example": "Gain"
+                "example": "Gain",
+                "enum_descriptions": {
+                  "Loss": "Predicted loss of the specified molecular property.",
+                  "Gain": "Predicted gain of the specified molecular property.",
+                  "Altered": "Predicted change in the specified molecular property without a gain or loss designation."
+                }
               }
             },
             "required": [
@@ -147,7 +158,6 @@
         }
       },
       "required": [
-        "_key",
         "pathogenicity_score",
         "property_scores",
         "files_filesets",
