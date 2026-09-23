@@ -4,13 +4,6 @@
   "db_collection_name": "variants",
   "allOf": [
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "chr": {
@@ -67,6 +60,9 @@
         "ca_id": {
           "type": "string",
           "description": "Canonical allele identifier assigned by the ClinGen Allele Registry."
+        },
+        "organism": {
+          "$ref": "../mixins.json#/organism"
         }
       },
       "required": [

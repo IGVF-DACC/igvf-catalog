@@ -4,16 +4,6 @@
   "db_collection_name": "ontology_terms_ontology_terms",
   "allOf": [
     {
-      "properties": {
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -74,6 +64,12 @@
             "string",
             "null"
           ]
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

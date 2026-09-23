@@ -10,13 +10,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -79,7 +72,7 @@
         },
         "association_status": {
           "type": "string",
-          "description": "Orphanet status of the gene\u2013disease relationship (Assessed or Confirmed)",
+          "description": "Orphanet status of the gene–disease relationship (Assessed or Confirmed)",
           "example": "Assessed"
         },
         "source": {
@@ -91,6 +84,9 @@
           "enum": [
             "https://www.orphadata.com/genes/"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

@@ -7,13 +7,6 @@
   "db_collection_name": "ontology_terms_ontology_terms",
   "allOf": [
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -136,6 +129,9 @@
           "enum": [
             null
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

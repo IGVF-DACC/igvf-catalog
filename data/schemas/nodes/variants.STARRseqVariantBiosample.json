@@ -9,13 +9,6 @@
       "$ref": "variants.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "source": {
@@ -26,6 +19,9 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

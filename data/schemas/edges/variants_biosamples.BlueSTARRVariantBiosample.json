@@ -6,19 +6,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -92,6 +79,15 @@
             "https://data.igvf.org/tabular-files/IGVFFI5288RAAV/",
             "https://data.igvf.org/tabular-files/IGVFFI0818FMCC/"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
         }
       },
       "required": [

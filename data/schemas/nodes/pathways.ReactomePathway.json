@@ -6,13 +6,6 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -96,6 +89,9 @@
           "description": "Gene Ontology biological process term for this pathway, as a handle into ontology_terms.",
           "example": "ontology_terms/GO_0006914",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

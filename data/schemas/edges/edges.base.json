@@ -5,25 +5,6 @@
   "description": "Base schema for all edge types in the IGVF Catalog. Defines common required properties.",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_from": {
@@ -43,6 +24,21 @@
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "example": "expression modulated by"
+        },
+        "source": {
+          "$ref": "../mixins.json#/source"
+        },
+        "source_url": {
+          "$ref": "../mixins.json#/source_url"
+        },
+        "method": {
+          "$ref": "../mixins.json#/method"
+        },
+        "label": {
+          "$ref": "../mixins.json#/label"
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
         }
       },
       "required": [

@@ -7,13 +7,6 @@
   "db_collection_name": "variants_drugs_genes",
   "allOf": [
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -78,6 +71,9 @@
           "enum": [
             "PharmGKB"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

@@ -8,13 +8,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "equivalent_ontology_term": {
@@ -286,6 +279,9 @@
           "type": "string",
           "description": "ID of the GWAS study.",
           "example": "studies/GCST006368"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

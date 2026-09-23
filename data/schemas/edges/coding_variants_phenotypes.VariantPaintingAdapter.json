@@ -6,13 +6,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -82,6 +75,9 @@
         "mislocalization_hit": {
           "type": "boolean",
           "description": "Whether the variant is classified as causing protein mislocalization based on the localization score threshold"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

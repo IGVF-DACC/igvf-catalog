@@ -7,13 +7,6 @@
   "db_collection_name": "genes_mm_genes",
   "allOf": [
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -81,6 +74,9 @@
           "enum": [
             "Homology"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

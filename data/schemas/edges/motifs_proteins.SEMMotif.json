@@ -7,13 +7,6 @@
   "db_collection_name": "motifs_proteins",
   "allOf": [
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -79,6 +72,9 @@
           "enum": [
             "SEMpl"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

@@ -9,13 +9,6 @@
       "$ref": "genomic_elements.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -52,6 +45,9 @@
         "source_url": {
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

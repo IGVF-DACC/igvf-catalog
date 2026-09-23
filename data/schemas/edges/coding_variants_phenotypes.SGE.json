@@ -6,13 +6,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -265,6 +258,9 @@
             "null"
           ],
           "description": "Count of the variant at day 13 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC."
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

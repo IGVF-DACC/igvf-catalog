@@ -6,13 +6,6 @@
       "$ref": "edges.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -103,7 +96,7 @@
             "number",
             "null"
           ],
-          "description": "IntAct MIscore from the merged table, on a 0\u20131 scale. Null when the source has none. Larger values mean more supporting evidence."
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
           "enum": [
@@ -188,6 +181,9 @@
           "enum": [
             "https://data.igvf.org/reference-files/IGVFFI4317VDGK"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
