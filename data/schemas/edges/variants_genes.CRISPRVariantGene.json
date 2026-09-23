@@ -28,8 +28,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, Ensembl gene ID and source file accession joined by underscores."
         },
         "_from": {
@@ -155,7 +153,6 @@
         }
       },
       "required": [
-        "_key",
         "effect_size",
         "log2FC",
         "neg_log10_pvalue",

@@ -28,8 +28,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP"
         },
@@ -159,7 +157,6 @@
         }
       },
       "required": [
-        "_key",
         "effect_size",
         "z_score",
         "significant",

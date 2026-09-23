@@ -26,12 +26,10 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Source term key, the relationship predicate and the target term key, joined by underscores."
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the source cell-line term.",
           "example": "ontology_terms/CVCL_JJ44",
@@ -41,7 +39,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the cross-referenced term, parent cell line, or sister cell line.",
           "example": "ontology_terms/CVCL_B854",

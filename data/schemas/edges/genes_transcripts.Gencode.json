@@ -23,13 +23,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Ensembl gene ID and Ensembl transcript ID joined by an underscore.",
           "example": "ENSG00000290825_ENST00000456328"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the gene.",
           "example": "genes/ENSG00000290825",
@@ -40,7 +38,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of a transcript of that gene.",
           "example": "transcripts/ENST00000456328",

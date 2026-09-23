@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, biosample ontology term and source file accession joined by underscores."
         },
         "_from": {
@@ -98,7 +96,6 @@
         }
       },
       "required": [
-        "_key",
         "genomic_element",
         "log2FC",
         "biological_context",

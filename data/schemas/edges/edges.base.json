@@ -25,13 +25,15 @@
     {
       "type": "object",
       "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for this edge within its collection. Key composition is adapter-specific."
+        },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the source node, in collection/key form."
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the target node, in collection/key form."
         },
@@ -49,6 +51,7 @@
         }
       },
       "required": [
+        "_key",
         "_from",
         "_to",
         "label",

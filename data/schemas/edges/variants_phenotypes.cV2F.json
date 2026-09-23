@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD"
         },
@@ -96,7 +94,6 @@
         }
       },
       "required": [
-        "_key",
         "score",
         "files_filesets",
         "biosample_term",

@@ -310,8 +310,6 @@
           "example": "October 2022 (22.10)"
         },
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
@@ -342,7 +340,6 @@
         "neg_log10_pvalue",
         "tagged_variants",
         "version",
-        "_key",
         "study",
         "files_filesets"
       ]

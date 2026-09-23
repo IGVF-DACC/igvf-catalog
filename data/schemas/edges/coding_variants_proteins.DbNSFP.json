@@ -17,7 +17,6 @@
       "type": "object",
       "properties": {
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the coding consequence.",
           "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
@@ -27,7 +26,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the protein. The adapter writes the Ensembl protein ID from dbNSFP; isoform suffixes are stripped if present.",
           "example": "proteins/ENSP00000493376",

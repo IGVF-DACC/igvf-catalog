@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the variant key, LeafCutter intron identifier and Ensembl gene ID."
         },
         "_from": {
@@ -155,7 +153,6 @@
         }
       },
       "required": [
-        "_key",
         "chr",
         "neg_log10_pvalue",
         "p_value",

@@ -28,8 +28,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Genomic element key, the Ensembl ID of the readout gene and the source file accession joined by underscores.",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA"
         },
@@ -228,7 +226,6 @@
         }
       },
       "required": [
-        "_key",
         "files_filesets",
         "crispr_modality",
         "biosample_term",

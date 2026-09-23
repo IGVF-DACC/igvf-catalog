@@ -23,8 +23,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Ensembl gene ID and Cellosaurus cell line key joined by an underscore.",
           "example": "ENSG00000189007_CVCL_1628"
         },
@@ -116,7 +114,6 @@
         }
       },
       "required": [
-        "_key",
         "biological_context",
         "model_id",
         "model_type",

@@ -17,17 +17,14 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Human genomic element key and mouse genomic element key joined by an underscore."
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the mouse genomic element."
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the paired human genomic element."
         },

@@ -23,8 +23,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, Ensembl protein ID, motif concordance with spaces rewritten to underscore, ADASTRA, and the GTRD cell identifier, joined by underscores.",
           "example": "NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520"
         },
@@ -170,7 +168,6 @@
         }
       },
       "required": [
-        "_key",
         "chr",
         "rsid",
         "motif_fc",

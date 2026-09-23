@@ -16,8 +16,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the two Ensembl gene IDs together with the supporting PubMed IDs."
         },
         "_from": {
@@ -201,7 +199,6 @@
         }
       },
       "required": [
-        "_key",
         "detection_method",
         "detection_method_code",
         "interaction_type",

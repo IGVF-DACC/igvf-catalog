@@ -17,8 +17,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, Ensembl protein ID and the GVATdb experiment identifier with dots rewritten to underscores, joined by underscores.",
           "example": "NC_000003.12:12567078:C:G_ENSP00000368332_DBD_1_1_H2"
         },
@@ -138,7 +136,6 @@
         }
       },
       "required": [
-        "_key",
         "p_value",
         "neg_log10_pvalue",
         "experiment",

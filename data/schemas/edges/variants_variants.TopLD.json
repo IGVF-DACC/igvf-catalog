@@ -24,13 +24,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "The two variant keys, each followed by its allele pair, together with the ancestry group. SHA-256 hashed when that string is 254 characters or longer.",
           "example": "NC_000001.11:911847:C:T_C:T_NC_000001.11:929838:G:A_G:A_EAS"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the source node, in collection/key form.",
           "example": "variants/NC_000001.11:10000:T:A",
@@ -40,7 +38,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the target node, in collection/key form.",
           "example": "variants/NC_000001.11:10000:T:A",

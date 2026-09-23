@@ -16,8 +16,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "The two NCBI Entrez gene IDs in canonical order and coxpresdb, joined by underscores. Ensembl IDs are used instead when either gene maps to more than one Ensembl identifier.",
           "example": "80185_2222_coxpresdb"
         },
@@ -88,7 +86,6 @@
         }
       },
       "required": [
-        "_key",
         "z_score",
         "associated_process",
         "files_filesets"

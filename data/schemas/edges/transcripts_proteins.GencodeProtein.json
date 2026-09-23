@@ -23,7 +23,6 @@
       "type": "object",
       "properties": {
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the transcript.",
           "example": "transcripts/ENST00000456328 or transcripts/ENSMUST00000456328",
@@ -34,7 +33,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the protein the transcript encodes.",
           "example": "proteins/ENSP00000456328",

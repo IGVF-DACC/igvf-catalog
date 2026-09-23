@@ -20,8 +20,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Orphanet disease term key and Ensembl gene ID joined by an underscore.",
           "example": "Orphanet_166024_ENSG00000166813"
         },
@@ -100,7 +98,6 @@
         }
       },
       "required": [
-        "_key",
         "pmids",
         "term_name",
         "gene_symbol",

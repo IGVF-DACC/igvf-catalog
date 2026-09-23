@@ -38,8 +38,9 @@ empty import blocks after removing duplicates.
 
 ## Shared definitions and local overrides
 
-Give every property a human-readable `title` in Title Case, including nested
-properties. Use the same title for the same field name across all schemas.
+Give every public property a human-readable `title` in Title Case, including
+nested properties. Internal fields whose names start with `_` must not have a
+title. Use the same title for the same field name across all schemas.
 Expand terse abbreviations (for example, `chr` becomes `Chromosome`) while
 preserving scientific acronyms and names such as HGVS and AlphaMissense.
 Define shared titles in bases or mixins and inherit them rather than repeating
@@ -75,8 +76,9 @@ meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work
 - `nodes/ontology_terms.base.json` extends `node.base.json` with required string
   fields `uri` and `term_id`. All five ontology-term schemas inherit it. Synonyms,
   classification, file metadata, and adapter-specific examples remain local.
-- `edges/edges.base.json` provides endpoints, directional names, provenance, and
-  classification fields. Node `name` means an entity display name; edge `name`
+- `edges/edges.base.json` provides the required string `_key`, endpoints,
+  directional names, provenance, and classification fields. Keep adapter-specific
+  key descriptions and examples locally. Node `name` means an entity display name; edge `name`
   and `inverse_name` describe the relationship directions.
 
 Not every edge currently inherits the edge base. Its required fields include

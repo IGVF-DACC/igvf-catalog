@@ -29,12 +29,10 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Motif key and Ensembl protein ID joined by an underscore."
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the motif, whose key is the transcription factor name followed by _SEMpl.",
           "pattern": "^motifs/",
@@ -43,7 +41,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the transcription factor protein the motif models binding for.",
           "pattern": "^proteins/",

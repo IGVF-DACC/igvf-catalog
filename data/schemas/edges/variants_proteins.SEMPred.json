@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, Ensembl protein ID and source file accession joined by underscores.",
           "example": "NC_000010.11:28801840:T:C_ENSP00000368867_IGVFFI0005WRQP"
         },
@@ -143,7 +141,6 @@
         }
       },
       "required": [
-        "_key",
         "motif",
         "ref_seq_context",
         "alt_seq_context",

@@ -25,8 +25,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant key, biosample ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:14772:C:T_EFO_0002067_IGVFFI0099XJHU"
         },
@@ -129,7 +127,6 @@
         }
       },
       "required": [
-        "_key",
         "log2FC",
         "inputCountRef",
         "inputCountAlt",

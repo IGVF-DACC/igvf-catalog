@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Genomic element key, Ensembl gene ID, biosample term and cell annotation term joined by underscores.",
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX_ENSG00000000457_CL_0000336_CL_0000336"
         },
@@ -129,7 +127,6 @@
         }
       },
       "required": [
-        "_key",
         "score",
         "transcription_start_site",
         "rna_pseudobulk_tpm",

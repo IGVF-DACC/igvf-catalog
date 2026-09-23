@@ -23,8 +23,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the source GAF annotation record together with the gene product handle."
         },
         "_to": {
@@ -208,7 +206,6 @@
         }
       },
       "required": [
-        "_key",
         "db",
         "gene_product_id",
         "gene_product_symbol",

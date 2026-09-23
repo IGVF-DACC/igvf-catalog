@@ -23,13 +23,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Source term key, the relationship predicate and the target term key, joined by underscores.",
           "example": "Oncotree_MMB_rdf-schema.subClassOf_Oncotree_EMBT"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the source OncoTree term.",
           "example": "ontology_terms/Oncotree_MMB",
@@ -39,7 +37,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the parent OncoTree term, or of the NCIT cross-reference.",
           "example": "ontology_terms/Oncotree_EMBT",

@@ -17,13 +17,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Variant key and coding variant key joined by an underscore. Hashed with SHA-256 when the composite would exceed the 254-character key limit.",
           "example": "NC_000001.11:10202:C:A_OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the genomic variant.",
           "example": "variants/NC_000001.11:10202:C:A",
@@ -33,7 +31,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the coding consequence on one transcript.",
           "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",

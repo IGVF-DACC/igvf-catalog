@@ -29,13 +29,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "Source term key, the RDF predicate key and the target term key, joined by underscores.",
           "example": "GO_0000001_rdf-schema.subClassOf_GO_0048308"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the source ontology term.",
           "pattern": "^ontology_terms/",
@@ -45,7 +43,6 @@
           "example": "ontology_terms/GO_0000001"
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the target ontology term.",
           "pattern": "^ontology_terms/",

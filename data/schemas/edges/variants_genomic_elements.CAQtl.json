@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Variant SPDI, genomic element key, source-file cell label and source file accession joined by underscores."
         },
         "_from": {
@@ -96,7 +94,6 @@
         }
       },
       "required": [
-        "_key",
         "rsid",
         "files_filesets",
         "biological_context",

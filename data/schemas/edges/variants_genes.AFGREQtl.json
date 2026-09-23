@@ -22,8 +22,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the variant key, Ensembl gene ID and dataset identifier."
         },
         "_from": {
@@ -117,7 +115,6 @@
         }
       },
       "required": [
-        "_key",
         "chr",
         "neg_log10_pvalue",
         "p_value",

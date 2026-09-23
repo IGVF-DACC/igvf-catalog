@@ -20,7 +20,6 @@
       "type": "object",
       "properties": {
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the transcript that contains the feature.",
           "example": "mm_transcripts/ENSMUST00000193812",
@@ -30,7 +29,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the sub-transcript feature.",
           "example": "mm_genes_structure/ENSMUST00000193812_ENSMUSE00001343744_exon",

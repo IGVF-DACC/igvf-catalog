@@ -20,8 +20,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the variant key and the disease ontology term key."
         },
         "_from": {
@@ -91,7 +89,6 @@
         }
       },
       "required": [
-        "_key",
         "gene_id",
         "assertion",
         "pmids",

@@ -20,8 +20,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
         },
         "_from": {
@@ -67,7 +65,6 @@
         }
       },
       "required": [
-        "_key",
         "inheritance_mode",
         "files_filesets"
       ],

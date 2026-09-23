@@ -29,13 +29,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "PharmGKB variant annotation ID and drug accession joined by an underscore.",
           "example": "1450377668_PA450373"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the source node, in collection/key form.",
           "pattern": "^variants/",
@@ -44,7 +42,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the target node, in collection/key form.",
           "pattern": "^drugs/",

@@ -29,13 +29,11 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
           "type": "string",
           "description": "The mouse and human node handles with slashes rewritten to underscores.",
           "example": "mm_genes_ENSMUSG00000024844_genes_ENSG00000175334"
         },
         "_from": {
-          "title": "Source Node",
           "type": "string",
           "description": "Handle of the human gene.",
           "example": "genes/ENSG00000175334",
@@ -45,7 +43,6 @@
           ]
         },
         "_to": {
-          "title": "Target Node",
           "type": "string",
           "description": "Handle of the mouse gene in the same MGI homology class.",
           "example": "mm_genes/ENSMUSG00000024844",

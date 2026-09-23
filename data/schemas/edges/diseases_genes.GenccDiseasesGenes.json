@@ -20,8 +20,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "GenCC submission identifier and Ensembl gene ID joined by an underscore.",
           "example": "SGC-TEST001_ENSG00000157933"
         },
@@ -169,7 +167,6 @@
         }
       },
       "required": [
-        "_key",
         "sgc_id",
         "hgnc",
         "gene_symbol",

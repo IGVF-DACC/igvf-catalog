@@ -17,8 +17,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Complex accession and ontology term key joined by an underscore.",
           "example": "CPX-1_GO_0071144"
         },
@@ -84,7 +82,6 @@
         }
       },
       "required": [
-        "_key",
         "files_filesets"
       ],
       "additionalProperties": false
