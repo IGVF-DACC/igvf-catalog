@@ -105,6 +105,7 @@
             "N",
             "Uncertain"
           ],
+<<<<<<< HEAD
           "enum_descriptions": {
             "Y": "Meets the calibrated criteria for an abundance change in either direction. Use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value to determine direction.",
             "N": "Falls within the calibrated no-change range.",
@@ -114,6 +115,14 @@
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
+=======
+          "description": "Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method.",
+          "enum_descriptions": {
+            "Y": "The variant meets the assay threshold for a significant change in protein abundance.",
+            "N": "The variant does not meet the assay threshold for a significant change in protein abundance.",
+            "Uncertain": "The assay does not confidently classify the abundance change as significant or not significant."
+          }
+>>>>>>> e601dac6 (enum_descriptions)
         }
       },
       "required": [

@@ -57,14 +57,27 @@
   },
   "class": {
     "title": "Class",
-    "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+    "description": "The class of data this record belongs to.",
     "type": "string",
-    "example": "observed data"
+    "example": "observed data",
+    "enum_descriptions": {
+      "observed data": "A direct experimental measurement.",
+      "prediction": "An output of a computational model.",
+      "biological relationship": "A curated relationship between biological entities."
+    }
   },
   "crispr_modality": {
     "title": "CRISPR Modality",
     "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
-    "type": "string"
+    "type": "string",
+    "enum_descriptions": {
+      "interference": "Represses target gene expression using a CRISPR-directed regulatory effector.",
+      "activation": "Increases target gene expression using a CRISPR-directed regulatory effector.",
+      "base editing": "Introduces targeted nucleotide substitutions using a base editor.",
+      "prime editing": "Introduces targeted substitutions, insertions, or deletions using a prime editor and a template-bearing guide RNA.",
+      "knockout": "Disrupts a target gene to eliminate its function.",
+      "null": "No CRISPR modality is recorded or applicable."
+    }
   },
   "organism": {
     "title": "Organism",

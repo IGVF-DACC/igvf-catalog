@@ -83,8 +83,8 @@
           "example": 1.795276180193825
         },
         "es_mean_alt": {
+          "title": "Mean Effect Size for Alternative Allele",
           "type": "number",
-          "title": "Mean Effect Size for Alternate Allele",
           "description": "The effect size mean for the alternate allele",
           "example": -1.7019721868875686
         },
@@ -156,10 +156,14 @@
         "biological_process": {
           "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for regulation of DNA binding.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0051101"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0051101": "Regulation of DNA binding."
+          }
+
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"

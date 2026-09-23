@@ -46,6 +46,24 @@ preserving scientific acronyms and names such as HGVS and AlphaMissense.
 Define shared titles in bases or mixins and inherit them rather than repeating
 them in local overrides.
 
+Use `enum_descriptions` for coded or otherwise non-obvious values, following
+IGVFD's format: an object mapping each value to its explanation. Put the mapping
+beside `enum` (inside `items` for array item enums). JSON object keys are strings,
+so use `"null"` or `"0"` to document null or numeric values. Keep field descriptions
+focused on the field's meaning; explain individual values in `enum_descriptions`.
+Self-explanatory names, URLs, and accessions do not need redundant explanations.
+
+Keep shared value explanations in mixins. A consuming schema can narrow its enum
+while inheriting the shared mapping; only entries for its allowed values apply.
+For existing coded fields without an enum constraint, the mapping documents known
+values without restricting validation. The loaders preserve this metadata.
+
+Interaction terminology comes from the bundled
+`data/data_loading_support_files/Biogrid_gene_gene/psi-mi.obo`. Biotype and evidence
+code explanations follow [GENCODE](https://www.gencodegenes.org/pages/biotypes.html)
+and [Gene Ontology](https://geneontology.org/docs/guide-go-evidence-codes/);
+gene–disease classifications follow [GenCC](https://thegencc.org/faq).
+
 The eleven mixins cover `files_filesets`, `biological_context`, `biosample_term`,
 `treatments_term_ids`, `source`, `source_url`, `method`, `label`, `class`,
 `crispr_modality`, and `organism`.

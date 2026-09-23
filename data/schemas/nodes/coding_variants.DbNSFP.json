@@ -52,22 +52,17 @@
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
-<<<<<<< HEAD
+          "title": "Protein ID",
           "type": [
             "string",
             "null"
           ],
           "description": "Ensembl ID of the protein (without version number). Null when dbNSFP has no protein ID, e.g. splice-site SNPs.",
-=======
-          "title": "Protein ID",
-          "type": "string",
-          "description": "Ensembl ID of the protein (without version number).",
->>>>>>> 7dd6a444 (titles)
           "example": "ENSP00000493376",
           "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
-<<<<<<< HEAD
+          "title": "HGVS Protein Expression",
           "type": [
             "string",
             "null"
@@ -76,22 +71,12 @@
           "example": "p.Met1?"
         },
         "hgvsc": {
+          "title": "HGVS Coding DNA Expression",
           "type": [
             "string",
             "null"
           ],
           "description": "HGVS description of the variant in the cDNA reference frame. Null when dbNSFP has no cDNA-level HGVS for this variant.",
-=======
-          "title": "HGVS Protein Expression",
-          "type": "string",
-          "description": "HGVS protein-level description of the variant.",
-          "example": "p.Met1?"
-        },
-        "hgvsc": {
-          "title": "HGVS Coding DNA Expression",
-          "type": "string",
-          "description": "HGVS description of the variant in the cDNA reference frame.",
->>>>>>> 7dd6a444 (titles)
           "example": "c.1A>C"
         },
         "refcodon": {
