@@ -20,11 +20,13 @@
           "pattern": "^(ENSP|ENSMUSP)[0-9]{11}$"
         },
         "MANE_Select": {
+          "title": "MANE Select",
           "type": "boolean",
           "description": "Whether GENCODE tags the transcript this protein is translated from as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.",
           "example": true
         },
         "protein_id": {
+          "title": "Protein ID",
           "type": "string",
           "description": "Ensembl ID of the protein (without version number).",
           "example": "ENSP00000493376.2 or ENSMUSP00000077785.1",
@@ -36,6 +38,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -56,6 +59,7 @@
           ]
         },
         "uniprot_collection": {
+          "title": "UniProt Collection",
           "type": "string",
           "description": "Which section of UniProtKB the mapped entries come from: Swiss-Prot for manually reviewed entries, TrEMBL for automatically annotated ones.",
           "enum": [
@@ -64,6 +68,7 @@
           ]
         },
         "uniprot_ids": {
+          "title": "UniProt IDs",
           "type": "array",
           "description": "UniProtKB accessions mapped to this Ensembl protein (isoforms specific).",
           "items": {
@@ -74,6 +79,7 @@
           ]
         },
         "uniprot_names": {
+          "title": "UniProt Names",
           "type": "array",
           "description": "UniProtKB entry names of the mapped accessions.",
           "items": {
@@ -84,17 +90,20 @@
           ]
         },
         "dbxrefs": {
+          "title": "Database Cross-References",
           "type": "array",
           "description": "Cross-references to other databases, taken from the mapped UniProtKB entries.",
           "items": {
             "type": "object",
             "properties": {
               "name": {
+                "title": "Name",
                 "type": "string",
                 "description": "Database the cross-reference points to.",
                 "example": "Ensembl"
               },
               "id": {
+                "title": "ID",
                 "type": "string",
                 "description": "Identifier of this protein in that database.",
                 "example": "ENST00000641515.2"
@@ -103,6 +112,7 @@
           }
         },
         "uniprot_full_names": {
+          "title": "UniProt Full Names",
           "type": "array",
           "description": "Recommended full protein names from the mapped UniProtKB entries",
           "items": {

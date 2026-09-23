@@ -20,6 +20,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "GenCC submission identifier and Ensembl gene ID joined by an underscore.",
           "example": "SGC-TEST001_ENSG00000157933"
@@ -41,6 +42,7 @@
           "example": "genes/ENSG00000157933"
         },
         "sgc_id": {
+          "title": "GenCC Submission ID",
           "type": "string",
           "description": "GenCC submission identifier and version number.",
           "example": "SGC-TEST001.1"
@@ -58,24 +60,28 @@
           "example": "associated_with"
         },
         "hgnc": {
+          "title": "HGNC Gene Symbol",
           "type": "string",
           "description": "HGNC gene symbol",
           "pattern": "^HGNC:[0-9]+$",
           "example": "HGNC:10896"
         },
         "gene_symbol": {
+          "title": "Gene Symbol",
           "type": "string",
           "description": "HGNC symbol from the GenCC submission.",
           "example": "SKI"
         },
         "term_name": {
+          "title": "Term Name",
           "type": "string",
           "description": "Ontology term name.",
           "example": "Shprintzen-Goldberg syndrome"
         },
         "classification": {
+          "title": "Classification",
           "type": "string",
-          "description": "GenCC evidence classification of the gene\u2013disease assertion.",
+          "description": "GenCC evidence classification of the gene–disease assertion.",
           "enum": [
             "Definitive",
             "Disputed Evidence",
@@ -89,6 +95,7 @@
           "example": "Definitive"
         },
         "moi_id": {
+          "title": "Mode of Inheritance ID",
           "type": "string",
           "description": "HPO identifier for the asserted mode of inheritance.",
           "enum": [
@@ -103,6 +110,7 @@
           ]
         },
         "moi_name": {
+          "title": "Mode of Inheritance Name",
           "type": "string",
           "description": "HPO label for the asserted mode of inheritance.",
           "enum": [
@@ -117,6 +125,7 @@
           ]
         },
         "submitter": {
+          "title": "Submitter",
           "type": "string",
           "description": "Name of the GenCC member group that submitted the assertion.",
           "enum": [
@@ -140,6 +149,7 @@
           ]
         },
         "pmids": {
+          "title": "PubMed IDs",
           "type": "array",
           "description": "Pubmed identifiers.",
           "items": {

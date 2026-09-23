@@ -30,6 +30,7 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
           "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "enum": [

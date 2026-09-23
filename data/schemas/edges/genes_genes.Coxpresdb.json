@@ -16,6 +16,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "The two NCBI Entrez gene IDs in canonical order and coxpresdb, joined by underscores. Ensembl IDs are used instead when either gene maps to more than one Ensembl identifier.",
           "example": "80185_2222_coxpresdb"
@@ -37,11 +38,13 @@
           ]
         },
         "z_score": {
+          "title": "Z-Score",
           "type": "number",
           "description": "COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.",
           "example": 3.2
         },
         "associated_process": {
+          "title": "Associated Process",
           "type": "string",
           "description": "Gene Ontology term for gene expression, as a handle into ontology_terms.",
           "enum": [

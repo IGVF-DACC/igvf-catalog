@@ -29,11 +29,13 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "The mouse and human node handles with slashes rewritten to underscores.",
           "example": "mm_genes_ENSMUSG00000024844_genes_ENSG00000175334"
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Handle of the human gene.",
           "example": "genes/ENSG00000175334",
@@ -43,6 +45,7 @@
           ]
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Handle of the mouse gene in the same MGI homology class.",
           "example": "mm_genes/ENSMUSG00000024844",
@@ -52,6 +55,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -59,6 +63,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -66,6 +71,7 @@
           ]
         },
         "relationship": {
+          "title": "Relationship",
           "type": "string",
           "description": "NCI Thesaurus term for a homologous gene.",
           "enum": [

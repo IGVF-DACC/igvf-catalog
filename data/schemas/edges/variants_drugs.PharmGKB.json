@@ -29,11 +29,13 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "PharmGKB variant annotation ID and drug accession joined by an underscore.",
           "example": "1450377668_PA450373"
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the source node, in collection/key form.",
           "pattern": "^variants/",
@@ -42,6 +44,7 @@
           ]
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the target node, in collection/key form.",
           "pattern": "^drugs/",
@@ -50,6 +53,7 @@
           ]
         },
         "gene_symbol": {
+          "title": "Gene Symbol",
           "type": "array",
           "description": "HGNC symbols of the genes PharmGKB associates with this annotation.",
           "example": [
@@ -57,37 +61,44 @@
           ]
         },
         "pmid": {
+          "title": "PubMed ID",
           "type": "string",
           "description": "PubMed identifier.",
           "example": "22587682"
         },
         "study_parameters": {
+          "title": "Study Parameters",
           "type": "array",
           "description": "Study-level details attached to the annotation. Each entry has a study parameter ID, study type, case and control counts, p-value as reported, and biogeographical group. One annotation can have several entries when the paper reports more than one analysis.",
           "items": {
             "type": "object",
             "properties": {
               "study_parameter_id": {
+                "title": "Study Parameter ID",
                 "type": "string",
                 "description": "PharmGKB study parameter set identifier",
                 "example": "1451643610"
               },
               "study_type": {
+                "title": "Study Type",
                 "type": "string",
                 "description": "Type of study (e.g. cohort, case/control, trio)",
                 "example": "cohort"
               },
               "study_cases": {
+                "title": "Study Cases",
                 "type": "string",
                 "description": "Number of study cases. Stored as a string as provided by the source, may be empty",
                 "example": "100"
               },
               "study_controls": {
+                "title": "Study Controls",
                 "type": "string",
                 "description": "Number of study controls. Stored as a string as provided by the source, may be empty",
                 "example": "149"
               },
               "p-value": {
+                "title": "P-Value",
                 "type": [
                   "string",
                   "null"
@@ -96,6 +107,7 @@
                 "example": "= 0.49"
               },
               "biogeographical_groups": {
+                "title": "Biogeographical Groups",
                 "type": "string",
                 "description": "Biogeographical group studied",
                 "example": "East Asian"
@@ -123,6 +135,7 @@
           ]
         },
         "phenotype_categories": {
+          "title": "Phenotype Categories",
           "type": "array",
           "description": "PharmGKB phenotype category of the association.",
           "items": {
@@ -138,6 +151,7 @@
           }
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -145,6 +159,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [

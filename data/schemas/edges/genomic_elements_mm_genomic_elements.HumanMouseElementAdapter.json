@@ -17,150 +17,180 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Human genomic element key and mouse genomic element key joined by an underscore."
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Handle of the mouse genomic element."
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Handle of the paired human genomic element."
         },
         "percent_identical_bp": {
+          "title": "Identical Base Pair Fraction",
           "type": "string",
           "description": "Fraction of aligned bases that are identical between the human and mouse elements.",
           "example": "0.495"
         },
         "phastCons4way": {
+          "title": "phastCons 4-Way Conservation Score",
           "type": "string",
           "description": "phastCons score of the aligned interval, computed on a 4-way alignment.",
           "example": "0"
         },
         "phyloP4way": {
+          "title": "phyloP 4-Way Conservation Score",
           "type": "string",
           "description": "phyloP score of the aligned interval, computed on a 4-way alignment.",
           "example": "0"
         },
         "cov_chromatin_accessibility": {
+          "title": "CO-V Chromatin Accessibility",
           "type": "string",
           "description": "FUNCODE conservation of variable activity (CO-V) for chromatin accessibility: the weighted Spearman correlation of accessibility across in silico matched human and mouse samples.",
           "example": "-0.08705883748059523"
         },
         "cov_chromatin_accessibility_pval": {
+          "title": "CO-V Chromatin Accessibility P-Value",
           "type": "string",
           "description": "Empirical p-value of the chromatin-accessibility CO-V score against a null of randomly paired elements.",
           "example": "0.74469"
         },
         "cov_chromatin_accessibility_fdr": {
+          "title": "CO-V Chromatin Accessibility False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the chromatin-accessibility CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-V p-value.",
           "example": "0.7880168243061526"
         },
         "cob_chromatin_accessibility": {
+          "title": "CO-B Chromatin Accessibility",
           "type": "string",
           "description": "FUNCODE conservation of baseline activity (CO-B) for chromatin accessibility: an h-index-like statistic for constitutive accessibility across tissues in both species.",
           "example": "0.45999999999999996"
         },
         "cob_chromatin_accessibility_pval": {
+          "title": "CO-B Chromatin Accessibility P-Value",
           "type": "string",
           "description": "Empirical p-value of the chromatin-accessibility CO-B score against a null of randomly paired elements.",
           "example": "0.38023"
         },
         "cob_chromatin_accessibility_fdr": {
+          "title": "CO-B Chromatin Accessibility False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the chromatin-accessibility CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-B p-value.",
           "example": "0.706372507818166"
         },
         "cov_H3K27ac": {
+          "title": "CO-V H3K27ac",
           "type": "string",
           "description": "FUNCODE CO-V for H3K27ac: the weighted Spearman correlation of H3K27ac signal across in silico matched samples.",
           "example": "-0.04897145589966213"
         },
         "cov_H3K27ac_pval": {
+          "title": "CO-V H3K27ac P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K27ac CO-V score against a null of randomly paired elements.",
           "example": "0.672636"
         },
         "cov_H3K27ac_fdr": {
+          "title": "CO-V H3K27ac False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K27ac CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K27ac CO-V p-value.",
           "example": "0.8353311889993958"
         },
         "cob_H3K27ac": {
+          "title": "CO-B H3K27ac",
           "type": "string",
           "description": "FUNCODE CO-B for H3K27ac: an h-index-like statistic for constitutive H3K27ac signal across tissues in both species.",
           "example": "0.33"
         },
         "cob_H3K27ac_pval": {
+          "title": "CO-B H3K27ac P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K27ac CO-B score against a null of randomly paired elements.",
           "example": "0.85179"
         },
         "cob_H3K27ac_fdr": {
+          "title": "CO-B H3K27ac False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K27ac CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K27ac CO-B p-value.",
           "example": "0.9741088464334399"
         },
         "cov_H3K4me1": {
+          "title": "CO-V H3K4me1",
           "type": "string",
           "description": "FUNCODE CO-V for H3K4me1: the weighted Spearman correlation of H3K4me1 signal across in silico matched samples.",
           "example": "-0.16420816777029995"
         },
         "cov_H3K4me1_pval": {
+          "title": "CO-V H3K4me1 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me1 CO-V score against a null of randomly paired elements.",
           "example": "0.833716"
         },
         "cov_H3K4me1_fdr": {
+          "title": "CO-V H3K4me1 False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me1 CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-V p-value.",
           "example": "0.9170052784062483"
         },
         "cob_H3K4me1": {
+          "title": "CO-B H3K4me1",
           "type": "string",
           "description": "FUNCODE CO-B for H3K4me1: an h-index-like statistic for constitutive H3K4me1 signal across tissues in both species.",
           "example": "0.30000000000000004"
         },
         "cob_H3K4me1_pval": {
+          "title": "CO-B H3K4me1 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me1 CO-B score against a null of randomly paired elements.",
           "example": "0.87628"
         },
         "cob_H3K4me1_fdr": {
+          "title": "CO-B H3K4me1 False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me1 CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-B p-value.",
           "example": "0.9810987190296945"
         },
         "cov_H3K4me3": {
+          "title": "CO-V H3K4me3",
           "type": "string",
           "description": "FUNCODE CO-V for H3K4me3: the weighted Spearman correlation of H3K4me3 signal across in silico matched samples.",
           "example": "-0.13407817495685007"
         },
         "cov_H3K4me3_pval": {
+          "title": "CO-V H3K4me3 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me3 CO-V score against a null of randomly paired elements.",
           "example": "0.892402"
         },
         "cov_H3K4me3_fdr": {
+          "title": "CO-V H3K4me3 False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me3 CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-V p-value.",
           "example": "0.9650710516056851"
         },
         "cob_H3K4me3": {
+          "title": "CO-B H3K4me3",
           "type": "string",
           "description": "FUNCODE CO-B for H3K4me3: an h-index-like statistic for constitutive H3K4me3 signal across tissues in both species.",
           "example": "0.35"
         },
         "cob_H3K4me3_pval": {
+          "title": "CO-B H3K4me3 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me3 CO-B score against a null of randomly paired elements.",
           "example": "0.87563"
         },
         "cob_H3K4me3_fdr": {
+          "title": "CO-B H3K4me3 False Discovery Rate",
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me3 CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-B p-value.",
           "example": "0.9758546569869605"
         },
         "source": {
@@ -172,6 +202,7 @@
           "pattern": "^https://data.igvf.org/reference-files/"
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -179,6 +210,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [

@@ -28,6 +28,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Variant key, Ensembl gene ID and source file accession joined by underscores."
         },
@@ -46,10 +47,12 @@
           ]
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": [
             "number",
             "null"
@@ -57,6 +60,7 @@
           "description": "log2 fold-change in gene expression for the effect allele relative to the other allele."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -64,6 +68,7 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -71,6 +76,7 @@
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "power": {
+          "title": "Power",
           "type": [
             "number",
             "null"
@@ -78,6 +84,7 @@
           "description": "Power to detect an effect of the size observed, from 0 to 1."
         },
         "posterior_inclusion_probability": {
+          "title": "Posterior Inclusion Probability",
           "type": [
             "number",
             "null"
@@ -85,6 +92,7 @@
           "description": "Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
         },
         "coefficient_stddev": {
+          "title": "Coefficient Standard Deviation",
           "type": [
             "number",
             "null"
@@ -92,6 +100,7 @@
           "description": "Standard deviation of the effect size estimate."
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on gene expression."
         },

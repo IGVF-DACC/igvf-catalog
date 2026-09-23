@@ -17,10 +17,12 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "The 'SEMpl_'-prefixed complex key and the Ensembl protein ID, joined by an underscore."
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the transcription factor complex.",
           "pattern": "^complexes/SEMpl_",
@@ -30,6 +32,7 @@
           "example": "complexes/SEMpl_TAL1:TCF4"
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Document handle of one protein subunit of that complex.",
           "pattern": "^proteins/",
@@ -38,6 +41,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -45,6 +49,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [

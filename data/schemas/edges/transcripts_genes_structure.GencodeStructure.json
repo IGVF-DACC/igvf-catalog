@@ -20,6 +20,7 @@
       "type": "object",
       "properties": {
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the transcript that contains the feature.",
           "example": "transcripts/ENST00000456328",
@@ -29,6 +30,7 @@
           ]
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Document handle of the sub-transcript feature.",
           "example": "genes_structure/ENST00000456328_ENSE00002234944_exon",
@@ -43,6 +45,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -60,6 +63,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -67,6 +71,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [

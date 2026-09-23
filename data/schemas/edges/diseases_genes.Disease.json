@@ -20,6 +20,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Orphanet disease term key and Ensembl gene ID joined by an underscore.",
           "example": "Orphanet_166024_ENSG00000166813"
@@ -53,6 +54,7 @@
           "example": "associated_with"
         },
         "pmids": {
+          "title": "PubMed IDs",
           "type": "array",
           "description": "Pubmed identifiers.",
           "items": {
@@ -63,23 +65,27 @@
           ]
         },
         "term_name": {
+          "title": "Term Name",
           "type": "string",
           "description": "Ontology term name.",
           "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
         },
         "gene_symbol": {
+          "title": "Gene Symbol",
           "type": "string",
           "description": "HGNC symbol of the associated gene.",
           "example": "KIF7"
         },
         "association_type": {
+          "title": "Association Type",
           "type": "string",
           "description": "Orphanet label for the role of the gene in the disease.",
           "example": "Disease-causing germline mutation(s) in"
         },
         "association_status": {
+          "title": "Association Status",
           "type": "string",
-          "description": "Orphanet status of the gene\u2013disease relationship (Assessed or Confirmed)",
+          "description": "Orphanet status of the gene–disease relationship (Assessed or Confirmed)",
           "example": "Assessed"
         },
         "source": {

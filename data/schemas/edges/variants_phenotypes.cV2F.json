@@ -22,6 +22,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD"
@@ -41,6 +42,7 @@
           ]
         },
         "score": {
+          "title": "Score",
           "type": "number",
           "description": "cV2F score: prediction value for the variant, a continuous score between 0 and 1 for how likely the variant is to be functional."
         },

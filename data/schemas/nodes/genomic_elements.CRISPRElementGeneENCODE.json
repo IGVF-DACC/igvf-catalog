@@ -25,6 +25,7 @@
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
           "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
           "enum": [

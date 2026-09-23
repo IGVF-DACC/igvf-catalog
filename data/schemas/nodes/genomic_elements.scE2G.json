@@ -35,6 +35,7 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
           "description": "Class of the element: promoter, genic, or intergenic.",
           "enum": [

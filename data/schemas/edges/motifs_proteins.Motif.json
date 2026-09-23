@@ -26,11 +26,13 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Motif key and Ensembl protein ID joined by an underscore.",
           "example": "TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519"
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Handle of the HOCOMOCO motif.",
           "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
@@ -40,6 +42,7 @@
           ]
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Handle of the Ensembl protein for the transcription factor the motif models.",
           "example": "proteins/ENSP00000364519",
@@ -49,6 +52,7 @@
           ]
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -56,6 +60,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -63,6 +68,7 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term GO:0003677 (DNA binding).",
           "enum": [

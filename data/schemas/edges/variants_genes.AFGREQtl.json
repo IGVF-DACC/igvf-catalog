@@ -22,6 +22,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "SHA-256 hash of the variant key, Ensembl gene ID and dataset identifier."
         },
@@ -50,20 +51,24 @@
           ]
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1",
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
+          "title": "P-Value",
           "type": "number",
           "description": "Nominal p-value of association between the variant and gene expression, from the African-population meta-analysis."
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Regression coefficient (beta) of the alternate allele on gene expression."
         },
@@ -103,6 +108,7 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term for regulation of gene expression.",
           "enum": [

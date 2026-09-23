@@ -22,11 +22,13 @@
           "example": "OneK1K"
         },
         "pmid": {
+          "title": "PubMed ID",
           "type": "string",
           "description": "PubMed identifier.",
           "example": "35389779"
         },
         "study_type": {
+          "title": "Study Type",
           "type": "string",
           "description": "Whether the study measured expression in bulk tissue or in single cells.",
           "enum": [

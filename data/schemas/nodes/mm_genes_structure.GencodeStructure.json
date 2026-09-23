@@ -21,21 +21,25 @@
           "example": "4933401J01Rik-201_exon_1_exon"
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the feature, 0-based and inclusive.",
           "example": 3143475
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the feature, 0-based and exclusive.",
           "example": 3144545
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
           "description": "Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
@@ -45,6 +49,7 @@
           "example": "+"
         },
         "type": {
+          "title": "Type",
           "type": "string",
           "description": "Kind of sub-transcript feature. Exons and their CDS, UTR, start_codon, and stop_codon sub-features are taken from the GENCODE annotation, and the sub-features share the exon_id of the exon they fall in. Introns are not annotated by GENCODE and are derived from the gaps between consecutive exons of a transcript.",
           "enum": [
@@ -57,31 +62,37 @@
           ]
         },
         "gene_id": {
+          "title": "Gene ID",
           "type": "string",
           "description": "Ensembl gene ID.",
           "example": "ENSMUSG00000102693"
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "4933401J01Rik"
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENSMUST00000193812"
         },
         "transcript_name": {
+          "title": "Transcript Name",
           "type": "string",
           "description": "GENCODE transcript name, which is the gene symbol followed by a transcript index.",
           "example": "4933401J01Rik-201"
         },
         "exon_number": {
+          "title": "Exon Number",
           "type": "string",
           "description": "1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, joined by an underscore.",
           "example": "1"
         },
         "exon_id": {
+          "title": "Exon ID",
           "type": "string",
           "description": "Ensembl exon ID, including its version suffix.",
           "example": "ENSMUSE00001343744.2"
@@ -92,6 +103,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [

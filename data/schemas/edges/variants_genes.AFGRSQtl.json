@@ -22,6 +22,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "SHA-256 hash of the variant key, LeafCutter intron identifier and Ensembl gene ID."
         },
@@ -50,24 +51,29 @@
           ]
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1",
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
+          "title": "P-Value",
           "type": "number",
           "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis."
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Regression coefficient (beta) of the alternate allele on the quantile-normalized intron excision ratio."
         },
         "posterior_inclusion_probability": {
+          "title": "Posterior Inclusion Probability",
           "type": [
             "number",
             "null"
@@ -75,6 +81,7 @@
           "description": "Posterior inclusion probability that this variant is causal for the splice QTL."
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": [
             "number",
             "null"
@@ -82,6 +89,7 @@
           "description": "log2 fold change of intron excision associated with the alternate allele."
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Boolean indicating the significance of the variant association with splicing."
         },
@@ -101,16 +109,19 @@
           ]
         },
         "intron_chr": {
+          "title": "Intron Chromosome",
           "type": "string",
           "description": "Chromosome of the spliced intron",
           "example": "chr1",
           "pattern": "^chr"
         },
         "intron_start": {
+          "title": "Intron Start",
           "type": "number",
           "description": "Start position of the spliced intron."
         },
         "intron_end": {
+          "title": "Intron End",
           "type": "number",
           "description": "End position of the spliced intron."
         },
@@ -135,6 +146,7 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term for regulation of RNA splicing.",
           "enum": [

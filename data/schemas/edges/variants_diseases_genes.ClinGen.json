@@ -20,6 +20,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "SHA-256 hash of the variants_diseases edge key and the Ensembl gene ID."
         },
@@ -49,6 +50,7 @@
           "example": "associated with"
         },
         "inheritance_mode": {
+          "title": "Inheritance Mode",
           "type": "string",
           "description": "Mode of inheritance for the disease the assertion applies to.",
           "example": "Autosomal recessive inheritance"

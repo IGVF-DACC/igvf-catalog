@@ -23,11 +23,13 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Ensembl gene ID and Ensembl transcript ID joined by an underscore.",
           "example": "ENSG00000290825_ENST00000456328"
         },
         "_from": {
+          "title": "Source Node",
           "type": "string",
           "description": "Document handle of the gene.",
           "example": "genes/ENSG00000290825",
@@ -38,6 +40,7 @@
           ]
         },
         "_to": {
+          "title": "Target Node",
           "type": "string",
           "description": "Document handle of a transcript of that gene.",
           "example": "transcripts/ENST00000456328",
@@ -53,6 +56,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -64,6 +68,7 @@
           "example": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz"
         },
         "name": {
+          "title": "Name",
           "type": "string",
           "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
@@ -71,6 +76,7 @@
           ]
         },
         "inverse_name": {
+          "title": "Inverse Name",
           "type": "string",
           "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
@@ -84,6 +90,7 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term for the process this edge represents. GO_0010467 is 'gene expression'.",
           "enum": [

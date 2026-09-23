@@ -23,6 +23,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Ensembl gene ID and Reactome pathway ID joined by an underscore.",
           "example": "ENSG00000290825_R-HSA-1971475"

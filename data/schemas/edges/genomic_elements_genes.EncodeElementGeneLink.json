@@ -25,6 +25,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Genomic element key, Ensembl gene ID and source file accession joined by underscores.",
           "example": "intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC"
@@ -59,6 +60,7 @@
           ]
         },
         "score": {
+          "title": "Score",
           "type": "number",
           "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene."
         },

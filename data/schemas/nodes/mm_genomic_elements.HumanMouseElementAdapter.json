@@ -17,16 +17,19 @@
       "type": "object",
       "properties": {
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Mouse chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr6"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the element, 0-based and inclusive.",
           "example": 121522229
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the mouse element on mm10, 0-based and exclusive.",
           "example": 121522428
@@ -37,6 +40,7 @@
           ]
         },
         "type": {
+          "title": "Type",
           "type": "string",
           "description": "Category of element: a mouse DNase hypersensitive site paired to a human site by FUNCODE.",
           "enum": [

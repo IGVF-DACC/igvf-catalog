@@ -22,6 +22,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Variant key, Ensembl protein ID and source file accession joined by underscores.",
           "example": "NC_000010.11:28801840:T:C_ENSP00000368867_IGVFFI0005WRQP"
@@ -67,6 +68,7 @@
           ]
         },
         "motif": {
+          "title": "Motif",
           "type": "string",
           "description": "SEMpl motif for the transcription factor.",
           "pattern": "^motifs/",
@@ -75,33 +77,40 @@
           ]
         },
         "ref_seq_context": {
+          "title": "Reference Sequence Context",
           "type": "string",
           "description": "Coordinate range on the reference genome holding the highest SEM score with the reference allele.",
           "example": "chr10:28801830-28801840"
         },
         "alt_seq_context": {
+          "title": "Alternate Sequence Context",
           "type": "string",
           "description": "Coordinate range on the reference genome holding the highest SEM score with the alternate allele. For an indel, apply the change described by the variant identifier to this reference range to recreate the alternate sequence.",
           "example": "chr10:28801830-28801840"
         },
         "ref_score": {
+          "title": "Reference Score",
           "type": "number",
           "description": "Predicted binding score at the reference allele: the transcription factor's affinity for the reference sequence, relative to its average binding affinity."
         },
         "alt_score": {
+          "title": "Alternate Score",
           "type": "number",
           "description": "Predicted binding score at the alternate allele, on the same scale as ref_score."
         },
         "variant_effect_score": {
+          "title": "Variant Effect Score",
           "type": "number",
           "description": "log2 ratio of alt_score to ref_score. Positive values mean increased preference for the alternate allele, negative values increased preference for the reference allele."
         },
         "SEMpl_annotation": {
+          "title": "SEMpl Annotation",
           "type": "string",
           "description": "Predicted effect of the variant on binding, assigned by comparing ref_score and alt_score against 2 raised to SEMpl_baseline: no_binding when neither allele binds, binding_unchanged, binding_increased, binding_decreased, binding_created when only the alternate allele binds, or binding_ablated when only the reference allele binds.",
           "example": "binding_created"
         },
         "SEMpl_baseline": {
+          "title": "SEMpl Baseline",
           "type": "number",
           "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers: a baseline where binding is not expected to occur. Binding is called only for scores above 2 raised to this value. Constant across every variant scored with the same SNP Effect Matrix."
         },
@@ -116,6 +125,7 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term for the process this edge represents. GO_0051101 is 'regulation of DNA binding'.",
           "enum": [

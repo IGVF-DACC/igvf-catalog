@@ -20,12 +20,14 @@
           "example": "ENSG00000290825"
         },
         "gene_id": {
+          "title": "Gene ID",
           "type": "string",
           "description": "Ensembl gene ID including its version suffix.",
           "example": "ENSG00000290825.1",
           "pattern": "^ENSG[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "gene_type": {
+          "title": "Gene Type",
           "type": "string",
           "description": "Biotype GENCODE assigns to the gene.",
           "enum": [
@@ -73,22 +75,26 @@
           "example": "protein_coding"
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the gene lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the gene, 0-based and inclusive.",
           "example": 11869
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the gene, 0-based and exclusive.",
           "example": 14409
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
           "description": "Strand the gene is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
@@ -100,6 +106,7 @@
           "example": "DDX11L2"
         },
         "symbol": {
+          "title": "Symbol",
           "type": "string",
           "description": "GENCODE gene symbol.",
           "example": "DDX11L2"
@@ -110,6 +117,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -127,6 +135,7 @@
           ]
         },
         "study_sets": {
+          "title": "Study Sets",
           "type": [
             "array",
             "null"
@@ -165,6 +174,7 @@
           }
         },
         "collections": {
+          "title": "Collections",
           "type": [
             "array",
             "null"
@@ -184,17 +194,20 @@
           ]
         },
         "version_number": {
+          "title": "Version Number",
           "type": "string",
           "description": "Version suffix of the Ensembl gene ID.",
           "example": "1"
         },
         "hgnc": {
+          "title": "HGNC Gene Symbol",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "HGNC:100000",
           "pattern": "^HGNC:[0-9]+$"
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": "array",
           "description": "Alternative symbols and names for the gene, gathered from the NCBI gene info file: its synonyms, other designations, and nomenclature-authority symbol and full name.",
           "items": {
@@ -202,6 +215,7 @@
           }
         },
         "entrez": {
+          "title": "Entrez Gene ID",
           "type": "string",
           "description": "Entrez gene ID for the gene, prefixed with 'ENTREZ:'.",
           "example": "ENTREZ:100287102",

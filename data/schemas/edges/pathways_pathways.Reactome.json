@@ -23,6 +23,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Parent and child Reactome pathway IDs joined by an underscore.",
           "example": "R-HSA-1971475_R-HSA-1971476"

@@ -32,6 +32,7 @@
           "example": "SMAD2-SMAD3-SMAD4 complex"
         },
         "alias": {
+          "title": "Alias",
           "type": "array",
           "description": "Regularly used synonyms for the complex.",
           "example": [
@@ -43,6 +44,7 @@
           }
         },
         "molecules": {
+          "title": "Molecules",
           "type": "array",
           "description": "Participants of the complex as recorded by Complex Portal: a UniProt accession, isoform, processed chain, molecule set, or nested complex accession, each followed by stoichiometry in parentheses. 0 means the stoichiometry is unknown.",
           "example": [
@@ -56,11 +58,13 @@
           }
         },
         "evidence_code": {
+          "title": "Evidence Code",
           "type": "string",
           "description": "Evidence and Conclusion Ontology term supporting the complex, with the ECO identifier and its label in parentheses.",
           "example": "ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)"
         },
         "experimental_evidence": {
+          "title": "Experimental Evidence",
           "type": [
             "string",
             "null"
@@ -69,11 +73,13 @@
           "example": "psi-mi:MI:0469(IntAct)"
         },
         "description": {
+          "title": "Description",
           "type": "string",
           "description": "Free-text description of the function and role of the complex.",
           "example": "A transcription factor complex which binds to the promoters of target genes and recruits co-activators and histone acetyltransferases, such as p300, CBP and P300/CBP-associated factor, facilitating transcription. In response to TGF-beta/activin-family protein binding, TGF-beta type II receptors phosphorylate TGF-beta type I receptors (ALK4, 5 and 7) which in turn phosphorylates SMAD2 on two Ser-465 and Ser-467, and SMAD3 on Ser-423 and Ser-425. This enables binding to SMAD4 to form heteromeric SMAD complexes that enter the nucleus to initiate gene transcription. Because of their relatively low DNA-binding affinity, SMAD complexes interact with a wide variety of DNA-binding proteins. Crosstalk with other signalling pathways and interaction with other DNA-binding cofactors define the specific binding patterns of SMADs; in addition, interaction with coactivators/corepressors modulates their transcriptional activity."
         },
         "complex_assembly": {
+          "title": "Complex Assembly",
           "type": [
             "string",
             "null"
@@ -82,11 +88,13 @@
           "example": "Heterotrimer"
         },
         "complex_source": {
+          "title": "Complex Source",
           "type": "string",
           "description": "IMEx database the original curator of the complex is associated with.",
           "example": "psi-mi:\"MI:0469\"(IntAct)"
         },
         "reactome_xref": {
+          "title": "Reactome Cross-Reference",
           "type": "array",
           "description": "Reactome pathway identifiers this complex is cross-referenced to, each with a qualifier in parentheses.",
           "example": [

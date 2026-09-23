@@ -16,52 +16,62 @@
           "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "ref": {
+          "title": "Reference Sequence",
           "type": "string",
           "description": "Reference amino acid, in single-letter code.",
           "example": "M"
         },
         "alt": {
+          "title": "Alternate Sequence",
           "type": "string",
           "description": "Alternate amino acid, in single-letter code.",
           "example": "L"
         },
         "aapos": {
+          "title": "Amino Acid Position",
           "type": "number",
           "description": "1-based amino acid position in the protein. -1 when the variant is a splice-site SNP (2 bp at either end of an intron).",
           "example": 1
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol.",
           "example": "OR4F5"
         },
         "protein_name": {
+          "title": "Protein Name",
           "type": "string",
           "description": "UniProtKB protein name.",
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
+          "title": "Protein ID",
           "type": "string",
           "description": "Ensembl ID of the protein (without version number).",
           "example": "ENSP00000493376",
           "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
+          "title": "HGVS Protein Expression",
           "type": "string",
           "description": "HGVS protein-level description of the variant.",
           "example": "p.Met1?"
         },
         "hgvsc": {
+          "title": "HGVS Coding DNA Expression",
           "type": "string",
           "description": "HGVS description of the variant in the cDNA reference frame.",
           "example": "c.1A>C"
         },
         "refcodon": {
+          "title": "Reference Codon",
           "type": "string",
           "description": "Reference codon at the substituted position.",
           "example": "ATG"
         },
         "codonpos": {
+          "title": "Codon Position",
           "type": [
             "number",
             "null"
@@ -70,12 +80,14 @@
           "example": 1
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000641515",
           "pattern": "^ENST[0-9]{11}$"
         },
         "SIFT_score": {
+          "title": "SIFT Score",
           "type": [
             "number",
             "null"
@@ -83,6 +95,7 @@
           "description": "SIFT score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this protein."
         },
         "SIFT4G_score": {
+          "title": "SIFT4G Score",
           "type": [
             "number",
             "null"
@@ -90,6 +103,7 @@
           "description": "SIFT 4G score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this transcript."
         },
         "Polyphen2_HDIV_score": {
+          "title": "PolyPhen-2 HumDiv Score",
           "type": [
             "number",
             "null"
@@ -97,6 +111,7 @@
           "description": "PolyPhen-2 HumDiv probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "Polyphen2_HVAR_score": {
+          "title": "PolyPhen-2 HumVar Score",
           "type": [
             "number",
             "null"
@@ -104,6 +119,7 @@
           "description": "PolyPhen-2 HumVar probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "VEST4_score": {
+          "title": "VEST4 Score",
           "type": [
             "number",
             "null"
@@ -111,6 +127,7 @@
           "description": "VEST 4.0 score from 0 to 1. Larger values are more likely to cause a functional change. Null when dbNSFP has no score."
         },
         "REVEL_score": {
+          "title": "REVEL Score",
           "type": [
             "number",
             "null"
@@ -118,6 +135,7 @@
           "description": "REVEL ensemble pathogenicity score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "MutPred_score": {
+          "title": "MutPred Score",
           "type": [
             "number",
             "null"
@@ -125,6 +143,7 @@
           "description": "MutPred score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "BayesDel_addAF_score": {
+          "title": "BayesDel Score with Allele Frequency",
           "type": [
             "number",
             "null"
@@ -132,6 +151,7 @@
           "description": "BayesDel meta-score with maximum allele frequency included. Higher values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "BayesDel_noAF_score": {
+          "title": "BayesDel Score Without Allele Frequency",
           "type": [
             "number",
             "null"
@@ -139,6 +159,7 @@
           "description": "BayesDel meta-score without maximum allele frequency. Higher values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_R_score": {
+          "title": "VARITY Rare Variant Score",
           "type": [
             "number",
             "null"
@@ -146,6 +167,7 @@
           "description": "VARITY_R pathogenicity score for rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_ER_score": {
+          "title": "VARITY Extremely Rare Variant Score",
           "type": [
             "number",
             "null"
@@ -153,6 +175,7 @@
           "description": "VARITY_ER pathogenicity score for extremely rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_R_LOO_score": {
+          "title": "VARITY Rare Variant Leave-One-Out Score",
           "type": [
             "number",
             "null"
@@ -160,6 +183,7 @@
           "description": "VARITY_R score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score."
         },
         "VARITY_ER_LOO_score": {
+          "title": "VARITY Extremely Rare Variant Leave-One-Out Score",
           "type": [
             "number",
             "null"
@@ -167,6 +191,7 @@
           "description": "VARITY_ER score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score."
         },
         "ESM1b_score": {
+          "title": "ESM1b Score",
           "type": [
             "number",
             "null"
@@ -174,6 +199,7 @@
           "description": "ESM1b log-likelihood ratio. Smaller (more negative) values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "AlphaMissense_score": {
+          "title": "AlphaMissense Score",
           "type": [
             "number",
             "null"
@@ -181,6 +207,7 @@
           "description": "AlphaMissense pathogenicity score from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "CADD_raw_score": {
+          "title": "CADD Raw Score",
           "type": [
             "number",
             "null"

@@ -22,6 +22,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
@@ -80,30 +81,37 @@
           ]
         },
         "avg_gfp": {
+          "title": "Average GFP",
           "type": "number",
           "description": "Single cell mean GFP fluorescence value per well"
         },
         "avg_mcherry": {
+          "title": "Average mCherry",
           "type": "number",
           "description": "Single cell mean mCherry fluorescence value per well"
         },
         "avg_GFP_mCherry_ratio": {
+          "title": "Average GFP to mCherry Ratio",
           "type": "number",
           "description": "Ratio of avg_gfp to avg_mcherry for the well, the abundance readout for the variant allele."
         },
         "wt_GFP_mCherry_ratio": {
+          "title": "Wild-Type GFP to mCherry Ratio",
           "type": "number",
           "description": "Ratio of avg_gfp/avg_mcherry of related wild-type measurement"
         },
         "allele_wt_ratio": {
+          "title": "Allele to Wild-Type Ratio",
           "type": "number",
           "description": "Ratio of avg_GFP_mCherry_ratio/wt_GFP_mCherry_ratio"
         },
         "dualipa_abun_score": {
+          "title": "DUAL-IPA Abundance Score",
           "type": "number",
           "description": "Abundance score for the variant: the log2 Z-score of allele_wt_ratio against the wild-type distribution, computed as (log2(allele_wt_ratio) - log2(wt_mean)) / log2(wt_std)."
         },
         "dualipa_abun_change": {
+          "title": "DUAL-IPA Abundance Change",
           "type": "string",
           "enum": [
             "Y",

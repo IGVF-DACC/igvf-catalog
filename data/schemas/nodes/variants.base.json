@@ -14,15 +14,18 @@
       "type": "object",
       "properties": {
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "pos": {
+          "title": "Position",
           "type": "number",
           "description": "0-based genomic coordinate of the variant."
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": "array",
           "description": "dbSNP id for the variant position",
           "example": [
@@ -30,41 +33,50 @@
           ]
         },
         "ref": {
+          "title": "Reference Sequence",
           "type": "string",
           "description": "Reference allele sequence at this position, empty for a pure insertion."
         },
         "alt": {
+          "title": "Alternate Sequence",
           "type": "string",
           "description": "Alternate allele sequence, empty for a pure deletion."
         },
         "qual": {
+          "title": "Variant Call Quality",
           "type": "string",
           "description": "Variant call quality score from VCF QUAL field.",
           "example": "50110.4"
         },
         "variation_type": {
+          "title": "Variation Type",
           "type": "string",
           "description": "Class of sequence change: SNP, insertion, deletion, or deletion-insertion."
         },
         "annotations": {
+          "title": "Annotations",
           "type": "object",
           "description": "Source-specific annotations parsed from FAVOR."
         },
         "spdi": {
+          "title": "SPDI Expression",
           "type": "string",
           "description": "Normalized SPDI expression identifying the allele.",
           "example": "NC_000001.11:10887495:C:T"
         },
         "hgvs": {
+          "title": "HGVS Expression",
           "type": "string",
           "description": "HGVS genomic expression for the allele.",
           "example": "NC_000067.7:g.3050715_3050716insG"
         },
         "vrs_digest": {
+          "title": "VRS Allele Digest",
           "type": "string",
           "description": "GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele."
         },
         "ca_id": {
+          "title": "Canonical Allele ID",
           "type": "string",
           "description": "Canonical allele identifier assigned by the ClinGen Allele Registry."
         }

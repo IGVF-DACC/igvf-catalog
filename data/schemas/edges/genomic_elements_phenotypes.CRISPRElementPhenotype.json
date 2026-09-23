@@ -28,6 +28,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Genomic element key and phenotype ontology term joined by an underscore.",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS_GO_0016477"
@@ -47,34 +48,42 @@
           ]
         },
         "z_score": {
+          "title": "Z-Score",
           "type": "number",
           "description": "Average phenotype z-score across guides targeting the genomic element"
         },
         "p_value": {
+          "title": "P-Value",
           "type": "number",
           "description": "P-value for the element's association with the screened phenotype."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's effect on the phenotype."
         },
         "num_guides": {
+          "title": "Number of Guides",
           "type": "number",
           "description": "Number of guides targeting the pertubed element in the screen."
         },
         "num_guides_hit": {
+          "title": "Number of Hit Guides",
           "type": "number",
           "description": "Number of guides that met hit thresholds"
         },
         "num_guides_nonhit": {
+          "title": "Number of Non-Hit Guides",
           "type": "number",
           "description": "Number of guides that did not meet hit thresholds"
         },
         "fraction_guides_hit": {
+          "title": "Fraction of Hit Guides",
           "type": "number",
           "description": "Fraction of guides that met hit thresholds"
         },

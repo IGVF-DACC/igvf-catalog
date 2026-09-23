@@ -25,6 +25,7 @@
           "example": "EH38E3951272"
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
           "description": "Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.",
           "enum": [

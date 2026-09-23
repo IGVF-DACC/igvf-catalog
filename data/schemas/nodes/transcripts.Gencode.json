@@ -19,6 +19,7 @@
           "example": "ENST00000456328"
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000456328.2",
@@ -28,6 +29,7 @@
           "example": "DDX11L2-202"
         },
         "transcript_type": {
+          "title": "Transcript Type",
           "type": "string",
           "description": "Biotype GENCODE assigns to the transcript.",
           "enum": [
@@ -81,22 +83,26 @@
           "example": "lncRNA"
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr9",
           "pattern": "^chr"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the transcript, 0-based and inclusive.",
           "example": 11869
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the transcript, 0-based and exclusive.",
           "example": 14409
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
           "description": "Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
           "enum": [
@@ -105,11 +111,13 @@
           ]
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "DDX11L2"
         },
         "MANE_Select": {
+          "title": "MANE Select",
           "type": "boolean",
           "description": "Whether GENCODE tags this transcript as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.",
           "example": true
@@ -120,6 +128,7 @@
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [

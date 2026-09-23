@@ -23,6 +23,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Variant key, Ensembl protein ID, motif concordance with spaces rewritten to underscore, ADASTRA, and the GTRD cell identifier, joined by underscores.",
           "example": "NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520"
@@ -42,67 +43,80 @@
           ]
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr15"
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": "string",
           "description": "dbSNP id for the variant position",
           "example": "rs1234567890"
         },
         "motif_fc": {
+          "title": "Motif Fold Change",
           "type": "string",
           "description": "Log2 ratio of HOCOMOCO motif p-values for the reference versus alternate allele. Positive values mean the motif prefers the alternate allele; negative values prefer the reference.",
           "example": "-0.2727347850176788"
         },
         "motif_pos": {
+          "title": "Motif Position",
           "type": "string",
           "description": "0-based position of the variant relative to the best HOCOMOCO PWM hit.",
           "example": "10"
         },
         "motif_orient": {
+          "title": "Motif Orientation",
           "type": "string",
           "description": "Strand of the best HOCOMOCO PWM hit relative to the reference assembly.",
           "example": "+"
         },
         "motif_conc": {
+          "title": "Motif Concordance",
           "type": "string",
           "description": "Whether the allelic read imbalance agrees with the motif fold-change, assessed at 25% FDR.",
           "example": "Concordant"
         },
         "motif": {
+          "title": "Motif",
           "type": "string",
           "description": "HOCOMOCO v11 motif for the transcription factor.",
           "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
           "pattern": "^motifs/"
         },
         "es_mean_ref": {
+          "title": "Mean Effect Size for Reference Allele",
           "type": "string",
           "description": "Allele-wise effect size for the reference allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger reference-allele ASB.",
           "example": "1.795276180193825"
         },
         "es_mean_alt": {
+          "title": "Mean Effect Size for Alternate Allele",
           "type": "string",
           "description": "Allele-wise effect size for the alternate allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger alternate-allele ASB.",
           "example": "-1.7019721868875686"
         },
         "p_value_adj_ref": {
+          "title": "Adjusted P-Value for Reference Allele",
           "type": "number",
-          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793
         },
         "p_value_adj_alt": {
+          "title": "Adjusted P-Value for Alternate Allele",
           "type": "number",
-          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
         "neg_log10_pvalue_adj_ref": {
+          "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
           "example": 1.7645194276538037
         },
         "neg_log10_pvalue_adj_alt": {
+          "title": "Adjusted Negative Log10 P-Value for Alternate Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
           "example": 0
@@ -147,6 +161,7 @@
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term for regulation of DNA binding.",
           "enum": [

@@ -29,6 +29,7 @@
           "example": "17-alpha-dihydroequilenin sulfate"
         },
         "drug_ontology_terms": {
+          "title": "Drug Ontology Terms",
           "type": "array",
           "description": "ChEBI ontology terms for this drug.",
           "example": [

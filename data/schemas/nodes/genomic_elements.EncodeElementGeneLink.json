@@ -38,6 +38,7 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
           "description": "Class of the element as reported by ENCODE-rE2G: a promoter, genic where it falls inside a gene body, or intergenic.",
           "enum": [
@@ -56,6 +57,7 @@
           "pattern": "^https://www.encodeproject.org/files/"
         },
         "simple_sample_summaries": {
+          "title": "Simple Sample Summaries",
           "type": [
             "array",
             "null"

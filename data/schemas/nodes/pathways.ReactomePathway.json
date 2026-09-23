@@ -66,16 +66,19 @@
           ]
         },
         "id_version": {
+          "title": "ID Version",
           "type": "string",
           "description": "Reactome stable identifier with its version suffix.",
           "example": "R-HSA-1971475.4"
         },
         "is_in_disease": {
+          "title": "Disease Pathway Status",
           "type": "boolean",
           "description": "Whether Reactome annotates this pathway as a disease pathway.",
           "example": true
         },
         "name_aliases": {
+          "title": "Name Aliases",
           "type": "array",
           "description": "Names Reactome lists for the pathway, including the display name.",
           "example": [
@@ -83,11 +86,13 @@
           ]
         },
         "is_top_level_pathway": {
+          "title": "Top-Level Pathway Status",
           "type": "boolean",
           "description": "Whether this is a Reactome top-level pathway.",
           "example": true
         },
         "disease_ontology_terms": {
+          "title": "Disease Ontology Terms",
           "type": "array",
           "description": "Disease ontology terms Reactome associates with this pathway.",
           "example": [
@@ -99,6 +104,7 @@
           }
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology biological process term for this pathway, as a handle into ontology_terms.",
           "example": "ontology_terms/GO_0006914",

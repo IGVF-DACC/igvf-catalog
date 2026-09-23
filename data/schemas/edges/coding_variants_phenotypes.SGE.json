@@ -22,6 +22,7 @@
       "type": "object",
       "properties": {
         "_key": {
+          "title": "Document Key",
           "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores.",
           "example": "PALB2_ENST00000261584_p.Met1!_c.1A-C_NCIT_C16407_IGVFFI9974PZRX"
@@ -39,6 +40,7 @@
           ]
         },
         "variants": {
+          "title": "Variants",
           "type": "string",
           "description": "Genomic variant corresponding to this coding variant.",
           "pattern": "^variants/",
@@ -96,6 +98,7 @@
           ]
         },
         "exon": {
+          "title": "Exon",
           "type": [
             "string",
             "null"
@@ -104,6 +107,7 @@
           "example": "PALB2_X13"
         },
         "target": {
+          "title": "Target",
           "type": [
             "string",
             "null"
@@ -112,6 +116,7 @@
           "example": "PALB2_X13A"
         },
         "consequence": {
+          "title": "Consequence",
           "type": [
             "string",
             "null"
@@ -120,22 +125,27 @@
           "example": "missense_variant"
         },
         "score": {
+          "title": "Score",
           "type": "number",
           "description": "SGE score: the change in variant frequency over time, as log2 fold change per day. Normalized so that the median synonymous variant scores 0, so lower scores mean reduced cell fitness."
         },
         "standard_error": {
+          "title": "Standard Error",
           "type": "number",
           "description": "Standard error of the score estimate."
         },
         "95_ci_upper": {
+          "title": "95% Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of the 95% confidence interval on score."
         },
         "95_ci_lower": {
+          "title": "95% Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of the 95% confidence interval on score."
         },
         "amino_acid_change": {
+          "title": "Amino Acid Change",
           "type": [
             "string",
             "null"
@@ -144,6 +154,7 @@
           "example": "P1153L"
         },
         "hgvs_p": {
+          "title": "HGVS Protein Expression",
           "type": [
             "string",
             "null"
@@ -152,6 +163,7 @@
           "example": "ENSP00000261584.4:p.Pro1153Leu"
         },
         "functional_consequence": {
+          "title": "Functional Consequence",
           "type": [
             "string",
             "null"
@@ -159,6 +171,7 @@
           "description": "Functional consequence assigned to the variant from its z-score: functionally_normal, indeterminate, or functionally_abnormal."
         },
         "functional_consequence_zscore": {
+          "title": "Functional Consequence Z-Score",
           "type": [
             "number",
             "null"
@@ -166,6 +179,7 @@
           "description": "Z-score of the variant's score against the distribution of expected neutral variant scores. Thresholds on this value assign functional_consequence."
         },
         "variant_qc_flag": {
+          "title": "Variant QC Flag",
           "type": [
             "string",
             "null"
@@ -173,6 +187,7 @@
           "description": "Whether the variant passes the assay QC metrics: PASS, FAIL, or LOWCOV for low coverage."
         },
         "snvlib_lib1": {
+          "title": "Plasmid Library 1 Variant Count",
           "type": [
             "number",
             "null"
@@ -180,6 +195,7 @@
           "description": "Count of the variant in the plasmid library before transfection and selection, from amplicon sequencing of the targeted region."
         },
         "snvlib_lib2": {
+          "title": "Plasmid Library 2 Variant Count",
           "type": [
             "number",
             "null"
@@ -187,6 +203,7 @@
           "description": "Count of the variant in the second plasmid library before transfection and selection. Null unless two targets overlap and the variant was assayed in both."
         },
         "D05_R1_lib1": {
+          "title": "Day 5 Replicate 1 Library 1 Count",
           "type": [
             "number",
             "null"
@@ -194,6 +211,7 @@
           "description": "Count of the variant at day 5 in replicate 1."
         },
         "D05_R1_lib2": {
+          "title": "Day 5 Replicate 1 Library 2 Count",
           "type": [
             "number",
             "null"
@@ -201,6 +219,7 @@
           "description": "Count of the variant at day 5 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D05_R2_lib1": {
+          "title": "Day 5 Replicate 2 Library 1 Count",
           "type": [
             "number",
             "null"
@@ -208,6 +227,7 @@
           "description": "Count of the variant at day 5 in replicate 2."
         },
         "D05_R2_lib2": {
+          "title": "Day 5 Replicate 2 Library 2 Count",
           "type": [
             "number",
             "null"
@@ -215,6 +235,7 @@
           "description": "Count of the variant at day 5 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D05_R3_lib1": {
+          "title": "Day 5 Replicate 3 Library 1 Count",
           "type": [
             "number",
             "null"
@@ -222,6 +243,7 @@
           "description": "Count of the variant at day 5 in replicate 3. Null when only two replicates passed QC."
         },
         "D05_R3_lib2": {
+          "title": "Day 5 Replicate 3 Library 2 Count",
           "type": [
             "number",
             "null"
@@ -229,6 +251,7 @@
           "description": "Count of the variant at day 5 in replicate 3 of the second target. Null unless two targets overlap and the variant was assayed in both. Also null when only two replicates passed QC."
         },
         "D13_R1_lib1": {
+          "title": "Day 13 Replicate 1 Library 1 Count",
           "type": [
             "number",
             "null"
@@ -236,6 +259,7 @@
           "description": "Count of the variant at day 13 in replicate 1."
         },
         "D13_R1_lib2": {
+          "title": "Day 13 Replicate 1 Library 2 Count",
           "type": [
             "number",
             "null"
@@ -243,6 +267,7 @@
           "description": "Count of the variant at day 13 in replicate 1 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D13_R2_lib1": {
+          "title": "Day 13 Replicate 2 Library 1 Count",
           "type": [
             "number",
             "null"
@@ -250,6 +275,7 @@
           "description": "Count of the variant at day 13 in replicate 2."
         },
         "D13_R2_lib2": {
+          "title": "Day 13 Replicate 2 Library 2 Count",
           "type": [
             "number",
             "null"
@@ -257,6 +283,7 @@
           "description": "Count of the variant at day 13 in replicate 2 of the second target. Null unless two targets overlap and the variant was assayed in both."
         },
         "D13_R3_lib1": {
+          "title": "Day 13 Replicate 3 Library 1 Count",
           "type": [
             "number",
             "null"
@@ -264,6 +291,7 @@
           "description": "Count of the variant at day 13 in replicate 3. Null when only two replicates passed QC."
         },
         "D13_R3_lib2": {
+          "title": "Day 13 Replicate 3 Library 2 Count",
           "type": [
             "number",
             "null"
