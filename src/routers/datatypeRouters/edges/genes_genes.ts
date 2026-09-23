@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withHgncPrefix } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
@@ -65,7 +65,7 @@ const genesGenesRelativeFormat = z.object({
   _id: z.string(),
   gene_1: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   gene_2: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
-  z_score: z.number().optional(),
+  z_score: z.number().nullish(),
   associated_process: z.string().nullish(),
   detection_method: z.string().optional(),
   detection_method_code: z.string().optional(),
@@ -133,7 +133,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, synonym } = input
-  const geneInput: paramsFormatType = { _key: gene_id, hgnc_id, name, synonyms: synonym, page: 0 }
+  const geneInput: paramsFormatType = { _key: gene_id, hgnc: hgnc_id !== undefined ? withHgncPrefix(hgnc_id as string) : undefined, name, synonyms: synonym, page: 0 }
   delete input.gene_id
   delete input.hgnc_id
   delete input.gene_name
@@ -141,7 +141,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   const associatedGeneInput: paramsFormatType = {
     _key: input.associated_gene_id,
-    hgnc_id: input.associated_hgnc_id,
+    hgnc: input.associated_hgnc_id !== undefined ? withHgncPrefix(input.associated_hgnc_id as string) : undefined,
     name: input.associated_gene_name,
     synonyms: input.associated_synonym,
     page: 0

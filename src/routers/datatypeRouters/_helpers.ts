@@ -23,6 +23,15 @@ export function distanceGeneVariant (geneStart: number, geneEnd: number, variant
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
 }
 
+// The gene schema's `hgnc` property stores IDs with an `HGNC:` prefix (e.g. `HGNC:4232`),
+// but the `hgnc_id` API param accepts the bare number. Any caller that filters on `hgnc`
+// directly (rather than delegating to geneSearch()) must apply this same prefixing or the
+// filter silently matches nothing.
+export function withHgncPrefix (hgncId: string | number): string {
+  const value = hgncId.toString()
+  return value.startsWith('HGNC') ? value : `HGNC:${value}`
+}
+
 // String filter values are interpolated directly into single-quoted AQL literals (see
 // getFilterStatements). An unescaped `'` in a value like gene_name or biological_context
 // closes the literal early, letting the rest of the value be parsed as AQL - breaking the
