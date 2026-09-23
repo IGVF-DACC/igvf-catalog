@@ -13,8 +13,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Complex accession and Ensembl protein ID joined by an underscore.",
           "example": "CPX-2428_ENSP00000372925"
         },
@@ -126,7 +124,6 @@
         }
       },
       "required": [
-        "_key",
         "stoichiometry",
         "chain_id",
         "isoform_id",

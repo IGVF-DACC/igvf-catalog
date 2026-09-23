@@ -9,8 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "title": "Document Key",
-          "type": "string",
           "description": "Genomic element key, strand token, source file accession and biosample term joined by underscores."
         },
         "_from": {
@@ -123,7 +121,6 @@
         }
       },
       "required": [
-        "_key",
         "bed_score",
         "strand",
         "log2FC",
