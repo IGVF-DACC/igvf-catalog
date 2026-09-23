@@ -9,7 +9,7 @@ import { geneFormat, geneSearch } from '../nodes/genes'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
-import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
@@ -93,6 +93,10 @@ const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRS
 const variantsGenesAFGREQtl = getSchema('data/schemas/edges/variants_genes.AFGREQtl.json')
 const variantsGenesEQTLCatalog = getSchema('data/schemas/edges/variants_genes.EQTLCatalog.json')
 const variantsGenesCRISPRVariantGene = getSchema('data/schemas/edges/variants_genes.CRISPRVariantGene.json')
+// variants_genes holds AFGR sQTL/eQTL, EBI eQTL Catalog, and CRISPR variant-gene edges.
+// Filtering must see every source's fields/ranges (e.g. IGVF CRISPR's neg_log10_pvalue,
+// EBI's posterior_inclusion_probability), not just one source's schema.
+const variantsGenesFilterSchema = getMergedCollectionSchema('edges', 'variants_genes')
 
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
@@ -478,7 +482,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
-  const edgeFilters = getFilterStatements(variantsGenesCRISPRVariantGene, input)
+  const edgeFilters = getFilterStatements(variantsGenesFilterSchema, input)
   if (!isGeneQuery) {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
     if (filesetFilter !== '') {
@@ -579,7 +583,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
-  const edgeFilters = getFilterStatements(variantsGenesCRISPRVariantGene, input)
+  const edgeFilters = getFilterStatements(variantsGenesFilterSchema, input)
   let useIndex = ''
   if (!isVariantQuery && filesetFilter !== '') {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'

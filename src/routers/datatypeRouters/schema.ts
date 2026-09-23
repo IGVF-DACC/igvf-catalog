@@ -218,3 +218,84 @@ export function getCollectionEnumValuesOrThrow (
   }
   return enumValues as [string, ...string[]]
 }
+
+/**
+ * Several Arango collections hold more than one edge/node type sharing the same
+ * db_collection_name (e.g. `variants_genes` holds AFGR sQTL/eQTL, EBI eQTL Catalog, and
+ * CRISPR variant-gene edges). Filtering (getFilterStatements) or returning
+ * (getDBReturnStatements) against just one of those source-specific schemas silently
+ * loses that schema's siblings' fields/range definitions: a field that's only a
+ * `filter_by_range` entry - or only defined at all - on another source's schema won't be
+ * recognized when the "wrong" narrow schema is picked for a query spanning the whole
+ * collection.
+ *
+ * This merges every schema in `schemaType` whose `db_collection_name` matches into a
+ * single schema exposing the union of `properties` and `accessible_via.filter_by_range`/
+ * `return` fields, so downstream helpers see every field any source in the collection can
+ * write, not just one source's subset.
+ */
+export function getMergedCollectionSchema (
+  schemaType: 'edges' | 'nodes',
+  collectionName: string
+): configType {
+  const schemaDir = path.join(SCHEMA_ROOT, schemaType)
+  const schemaFiles = fs.readdirSync(schemaDir).filter((file) => file.endsWith('.json'))
+
+  const properties: Record<string, any> = {}
+  const filterByRangeFields = new Set<string>()
+  const returnFields = new Set<string>()
+  let dbCollectionName: string | undefined
+
+  for (const file of schemaFiles) {
+    const schemaPath = `data/schemas/${schemaType}/${file}`
+    const schema = getSchema(schemaPath)
+    if (schema.db_collection_name !== collectionName) {
+      continue
+    }
+    dbCollectionName = schema.db_collection_name
+
+    for (const [propName, propValue] of Object.entries(schema.properties ?? {})) {
+      if (!(propName in properties)) {
+        properties[propName] = typeof propValue === 'object' && propValue !== null
+          ? { ...propValue }
+          : propValue
+        continue
+      }
+
+      const existingProp = properties[propName]
+      if (typeof existingProp !== 'object' || typeof propValue !== 'object' ||
+          existingProp === null || propValue === null) {
+        continue
+      }
+
+      const existingTypes = Array.isArray(existingProp.type) ? existingProp.type : [existingProp.type]
+      const newTypes = Array.isArray(propValue.type) ? propValue.type : [propValue.type]
+      const mergedTypes = Array.from(new Set([...existingTypes, ...newTypes])).filter(Boolean)
+
+      properties[propName] = {
+        ...existingProp,
+        ...propValue,
+        type: mergedTypes.length > 1 ? mergedTypes : mergedTypes[0]
+      }
+    }
+
+    const accessibleVia = (schema.accessible_via ?? {}) as Record<string, string>
+    accessibleVia.filter_by_range?.split(',').map((field) => field.trim()).filter(Boolean)
+      .forEach((field) => filterByRangeFields.add(field))
+    accessibleVia.return?.split(',').map((field) => field.trim()).filter(Boolean)
+      .forEach((field) => returnFields.add(field))
+  }
+
+  if (dbCollectionName === undefined) {
+    throw new Error(`No schema found for ${schemaType}/${collectionName}`)
+  }
+
+  return {
+    properties,
+    accessible_via: {
+      filter_by_range: Array.from(filterByRangeFields).join(', '),
+      return: Array.from(returnFields).join(', ')
+    },
+    db_collection_name: dbCollectionName
+  }
+}
