@@ -30,6 +30,7 @@ export function distanceGeneVariant (geneStart: number, geneEnd: number, variant
 export function withHgncPrefix (hgncId: string | number): string {
   const value = hgncId.toString()
   return value.startsWith('HGNC') ? value : `HGNC:${value}`
+}
 
 // String filter values are interpolated directly into single-quoted AQL literals (see
 // getFilterStatements). An unescaped `'` in a value like gene_name or biological_context
