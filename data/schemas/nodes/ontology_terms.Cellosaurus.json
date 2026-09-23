@@ -1,23 +1,21 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/ontology_terms.Cellosaurus.json",
   "allOf": [
     {
-      "$ref": "node.base.json"
+      "$ref": "ontology_terms.base.json"
     },
     {
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CVCL_JJ44"
+          "example": "CVCL_JJ44",
+          "description": "Cellosaurus accession of the cell line."
         },
         "uri": {
-          "type": "string",
-          "description": "The URI of the ontology term",
           "example": "https://www.cellosaurus.org/CVCL_JJ44"
         },
         "term_id": {
-          "type": "string",
-          "description": "The ID of the ontology term",
           "example": "CVCL_JJ44"
         },
         "name": {
@@ -28,7 +26,7 @@
             "array",
             "null"
           ],
-          "description": "The synonyms of the ontology term",
+          "description": "Alternative names for the ontology term.",
           "items": {
             "type": "string"
           }
@@ -48,7 +46,7 @@
             "array",
             "null"
           ],
-          "description": "The subset of the ontology term",
+          "description": "Cellosaurus category tags for the cell line, including cell-line class and sex of the donor. Null when the OBO entry has none.",
           "example": [
             "Induced_pluripotent_stem_cell",
             "Female"
@@ -57,30 +55,21 @@
             "type": "string"
           }
         },
-        "class": {
-          "type": "string",
-          "description": "The class of the ontology term, from the associated files_filesets record"
-        },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
-          ],
-          "description": "The method of the ontology term, from the associated files_filesets record"
+          ]
+        },
+        "class": {
+          "$ref": "../mixins.json#/class"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "The files filesets of the ontology term",
-          "example": "files_filesets/IGVFFI9279GNOP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "uri",
-        "term_id",
         "synonyms",
         "subset",
         "class",

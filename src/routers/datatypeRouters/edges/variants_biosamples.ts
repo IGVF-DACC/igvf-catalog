@@ -42,6 +42,7 @@ const returnFormat = z.object({
   genomic_element: z.string().or(genomicElementFormat).nullish(),
   strand: z.string().nullish(),
   log2FC: z.number().nullish(),
+  bed_score: z.number().nullish(),
   DNA_count_ref: z.number().nullish(),
   DNA_count_alt: z.number().nullish(),
   RNA_count_ref: z.number().nullish(),
@@ -58,7 +59,10 @@ const returnFormat = z.object({
   source: z.string(),
   source_url: z.string(),
   name: z.string(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  biological_context: z.string().nullish(),
+  biosample_term: z.string().nullish(),
+  treatments_term_ids: z.array(z.string()).nullish()
 })
 
 const variantToBiosamplesCollecionName = 'variants_biosamples'
@@ -166,30 +170,51 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     ${filterSignificant}
     SORT record._key
     LIMIT ${input.page as number * input.limit}, ${input.limit}
-    RETURN {
-      'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
-      'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
-      'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record.genomic_element'},
-      'strand': record.strand,
-      'log2FC': record.log2FC OR record.log2FoldChange,
-      'DNA_count_ref': record.DNA_count_ref or record.inputCountRef,
-      'DNA_count_alt': record.DNA_count_alt or record.inputCountAlt,
-      'RNA_count_ref': record.RNA_count_ref or record.outputCountRef,
-      'RNA_count_alt': record.RNA_count_alt or record.outputCountAlt,
-      'postProbEffect': record.postProbEffect,
-      'CI_lower_95': record.CI_lower_95,
-      'CI_upper_95': record.CI_upper_95,
-      'significant': record.significant,
-      'neg_log10_pvalue': record.neg_log10_pvalue,
-      'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
-      'label': record.label,
-      'method': record.method,
-      'class': record.class,
-      'source': record.source,
-      'source_url': record.source_url,
-      'name': record.name,
-      'files_filesets': record.files_filesets
-    }
+    LET genomic_element = ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record.genomic_element'}
+    RETURN MERGE(
+      {
+        'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
+        'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
+        'log2FC': record.log2FC OR record.log2FoldChange,
+        'label': record.label,
+        'method': record.method,
+        'class': record.class,
+        'source': record.source,
+        'source_url': record.source_url,
+        'name': record.name,
+        'files_filesets': record.files_filesets,
+        'biological_context': record.biological_context,
+        'biosample_term': record.biosample_term
+      },
+      record.method == 'BlueSTARR' ? {
+        'genomic_element': genomic_element
+      } : record.method == 'STARR-seq' ? {
+        'DNA_count_ref': record.inputCountRef,
+        'DNA_count_alt': record.inputCountAlt,
+        'RNA_count_ref': record.outputCountRef,
+        'RNA_count_alt': record.outputCountAlt,
+        'postProbEffect': record.postProbEffect,
+        'CI_lower_95': record.CI_lower_95,
+        'CI_upper_95': record.CI_upper_95,
+        'significant': record.significant,
+        'treatments_term_ids': record.treatments_term_ids
+      } : {
+        'genomic_element': genomic_element,
+        'strand': record.strand,
+        'bed_score': record.bed_score,
+        'DNA_count_ref': record.DNA_count_ref,
+        'DNA_count_alt': record.DNA_count_alt,
+        'RNA_count_ref': record.RNA_count_ref,
+        'RNA_count_alt': record.RNA_count_alt,
+        'postProbEffect': record.postProbEffect,
+        'CI_lower_95': record.CI_lower_95,
+        'CI_upper_95': record.CI_upper_95,
+        'significant': record.significant,
+        'neg_log10_pvalue': record.neg_log10_pvalue,
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
+        'treatments_term_ids': record.treatments_term_ids
+      }
+    )
   `
 
   return await ((await db.query(query)).all())

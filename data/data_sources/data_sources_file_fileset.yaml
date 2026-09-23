@@ -34,6 +34,8 @@ igvf_file_accessions:
     - IGVFFI5288RAAV
     - IGVFFI0818FMCC
     - IGVFFI3351LASN
+  Candidate Cis-Regulatory Elements:
+    - IGVFFI8753TTYC
   CRISPR element gene:
     - IGVFFI3069QCRA
     - IGVFFI5749WPVK
@@ -86,6 +88,8 @@ igvf_file_accessions:
   CRISPR variant phenotype:
     - IGVFFI2014OOZP
     - IGVFFI6803HZJG
+    - IGVFFI9726GFTC
+    - IGVFFI1678CDBR
   CRISPR variant gene:
     - IGVFFI9602ILPC
     - IGVFFI4333XLOF
@@ -2760,7 +2764,6 @@ encode_file_accessions:
     - ENCFF103XRK
     - ENCFF776CZZ
   candidate Cis-Regulatory Elements:
-    - ENCFF167FJQ
     - ENCFF420VPZ
   CRISPR enhancer perturbation screen:
     - ENCFF968BZL

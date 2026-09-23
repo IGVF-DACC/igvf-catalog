@@ -636,8 +636,6 @@ class FileFileSet:
 
         if file_object['accession'] == 'ENCFF420VPZ':
             catalog_collections = ['genomic_elements']
-        elif file_object['accession'] == 'ENCFF167FJQ':
-            catalog_collections = ['mm_genomic_elements']
         else:
             catalog_collections = FileFileSet.METHOD_TO_COLLECTIONS_ENCODE.get(
                 method, [])
@@ -782,6 +780,8 @@ class FileFileSet:
                 'Proliferation CRISPR screen',
             }):
                 method = 'CRISPR screen'
+        if file_object['accession'] == 'IGVFFI8753TTYC':
+            method = 'candidate Cis-Regulatory Elements'
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
 

@@ -23,6 +23,15 @@ export function distanceGeneVariant (geneStart: number, geneEnd: number, variant
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
 }
 
+// String filter values are interpolated directly into single-quoted AQL literals (see
+// getFilterStatements). An unescaped `'` in a value like gene_name or biological_context
+// closes the literal early, letting the rest of the value be parsed as AQL - breaking the
+// query or, worse, changing the predicate it evaluates. Escape backslashes and single
+// quotes before interpolation, mirroring AQL's own string-escaping rules.
+export function escapeAqlString (value: string | number): string {
+  return value.toString().replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+}
+
 export function validRegion (region: string): string[] | null {
   const regex: RegExp = /(chr\w+):(\d*)-(\d*)/
 
@@ -84,12 +93,12 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
 export async function verboseItems (ids: string[], schema: configType): Promise<Record<string, any>> {
   const verboseQuery = `
     FOR record in ${schema.db_collection_name as string}
-    FILTER record._id in ['${Array.from(ids).join('\',\'')}']
+    FILTER record._id in @ids
     RETURN {
       ${getDBReturnStatements(schema, true, '', [], false)}
     }`
 
-  const objs = await (await db.query(verboseQuery)).all()
+  const objs = await (await db.query(verboseQuery, { ids: Array.from(ids) })).all()
 
   if (objs.length > 0) {
     const items: Record<string, any> = {}
@@ -185,6 +194,18 @@ export function getFilterStatements (
           assertValidNumericOperand(element, rangeOperands[0])
           assertValidNumericOperand(element, rangeOperands[1])
 
+          // fieldOperands come from the DB field names this function itself builds
+          // (see preProcessRegionParam), never raw user input - but since they're
+          // interpolated as bare property names (unescapable), verify they're real
+          // schema fields rather than trusting that invariant to hold forever.
+          const schemaFields = schema.properties ? Object.keys(schema.properties) : []
+          if (!schemaFields.includes(fieldOperands[0]) || !schemaFields.includes(fieldOperands[1])) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `intersect must reference valid fields on the collection. Received: "${fieldOperands.join('-')}"`
+            })
+          }
+
           // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
           // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
           dbFilterBy.push(`record.${fieldOperands[0]} < ${rangeOperands[1]} AND record.${fieldOperands[1]} > ${rangeOperands[0]}`)
@@ -221,16 +242,16 @@ export function getFilterStatements (
         dbFilterBy.push(`record['${element}'] ${operator} ${operand}`)
       } else {
         if (element === 'dbxrefs') {
-          dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
+          dbFilterBy.push(`'${escapeAqlString(queryParams[element] as string | number)}' in record.${element}[*].id`)
         } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'array' || (schema.properties)[element].type.includes('array'))) {
-          dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
+          dbFilterBy.push(`'${escapeAqlString(queryParams[element] as string | number)}' in record.${element}`)
         } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'integer' || (schema.properties)[element].type === 'number' || (schema.properties)[element].type.includes('integer') || (schema.properties)[element].type.includes('number'))) {
           assertValidNumericOperand(element, queryParams[element]?.toString())
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
         } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'boolean' || (schema.properties)[element].type.includes('boolean'))) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
-          dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
+          dbFilterBy.push(`record.${element} == '${escapeAqlString(queryParams[element] as string | number)}'`)
         }
       }
     }

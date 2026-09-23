@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_phenotypes.cV2F.json",
   "allOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Unique identifier for the variant to phenotype edge",
+          "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD"
         },
         "_from": {
@@ -29,7 +29,7 @@
         },
         "score": {
           "type": "number",
-          "description": "Score for the variant to phenotype edge"
+          "description": "cV2F score: prediction value for the variant, a continuous score between 0 and 1 for how likely the variant is to be functional."
         },
         "source": {
           "enum": [
@@ -50,23 +50,13 @@
             "associated with"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the variant to phenotype edge",
-          "example": "files_filesets/IGVFFI0332UGDD",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "type": [
             "string",
             "null"
           ],
-          "description": "Biosample term for the variant to phenotype edge",
-          "example": "ontology_terms/UBERON_0002048",
-          "pattern": "^ontology_terms/"
+          "example": "ontology_terms/UBERON_0002048"
         },
         "method": {
           "enum": [
@@ -84,12 +74,15 @@
           ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "type": [
             "string",
             "null"
           ],
-          "description": "Biological context for the variant to phenotype edge",
           "example": "lung"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
@@ -107,5 +100,4 @@
     "return": "name, score, files_filesets, biosample_term, biological_context, method, class, label, source, source_url",
     "filter_by_range": "score"
   }
-
 }

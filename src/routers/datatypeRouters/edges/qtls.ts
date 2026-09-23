@@ -45,8 +45,8 @@ const outputFormat = z.object({
   effect_size: z.number().nullish(),
   posterior_inclusion_probability: z.number().nullish(), // EBI eQTL and spliceQTL only
   intron_chr: z.string().nullish(), // spliceQTL only
-  intron_start: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
-  intron_end: z.union([z.string(), z.number()]).nullish(), // spliceQTL only
+  intron_start: z.number().nullish(), // spliceQTL only
+  intron_end: z.number().nullish(), // spliceQTL only
   study: z.object({
     id: z.string(),
     pmid: z.string().nullish()
@@ -169,7 +169,7 @@ function qtlReturnObject (geneExpr: string, genomicElementExpr: string, proteinC
     regulatory_type: record.regulatory_type,
     gene_consequence: record.gene_consequence,
     biological_context: record.biological_context,
-    neg_log10_pvalue: record.neg_log10_pvalue or record.log10pvalue,
+    neg_log10_pvalue: record.neg_log10_pvalue,
     effect_size: HAS(record, 'effect_size') ? record.effect_size : record.beta,
     posterior_inclusion_probability: record.posterior_inclusion_probability,
     intron_chr: record.intron_chr,

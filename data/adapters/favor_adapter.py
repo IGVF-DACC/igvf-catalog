@@ -90,6 +90,9 @@ class Favor(BaseAdapter):
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
+    # validate defaults to False here (unlike BaseAdapter's default of True): FAVOR source
+    # data is known to contain records that currently fail schema validation, and
+    # validate_doc() raises rather than skips, which would abort the entire load.
     def __init__(self, filepath=None, label='favor', ca_ids_path=None, ca_ids_local_only=False, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, validate=False, **kwargs):
         # download caids from s3://igvf-catalog-source-data/hgvs_to_caid_rdict.tar.gz and untar before using this adapter.
         self.ca_ids = get_caid_provider(ca_ids_path, local=ca_ids_local_only)

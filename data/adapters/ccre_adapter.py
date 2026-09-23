@@ -41,7 +41,10 @@ class CCRE(BaseAdapter):
 
     def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filename = filepath.split('/')[-1].split('.')[0]
-        self.source_url = 'https://www.encodeproject.org/files/' + self.filename
+        if label == 'mm_genomic_element':
+            self.source_url = f'https://data.igvf.org/reference-files/{self.filename}/'
+        else:
+            self.source_url = 'https://www.encodeproject.org/files/' + self.filename
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -63,8 +66,11 @@ class CCRE(BaseAdapter):
 
             for row in reader:
                 description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
+                assembly = 'GRCm39' if self.label == 'mm_genomic_element' else 'GRCh38'
                 _props = {
-                    '_key': build_regulatory_region_id(row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + self.filename,
+                    '_key': build_regulatory_region_id(
+                        row[0], row[1], row[2], 'candidate_cis_regulatory_element', assembly
+                    ) + '_' + self.filename,
                     'name': row[3],
                     'chr': row[0],
                     'start': int(row[1]),

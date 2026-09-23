@@ -2,7 +2,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { ontologyFormat } from '../nodes/ontologies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
@@ -80,50 +80,46 @@ const outputFormat = z.object({
   effect_on_binding: z.string().nullish()
 })
 
-const apiKeyToDbFieldMap = {
-  log10pvalue: 'neg_log10_pvalue'
-}
-
-const MOTIF_LOG2FC_RETURN = "'motif_log2FC': (record.motif_fc != null && record.motif_fc != '') ? TO_NUMBER(record.motif_fc) : null"
+const MOTIF_LOG2FC_RETURN = "'motif_log2FC': record.motif_fc"
 
 const ADASTRA_SCORE_EXPR = `(
-  TO_NUMBER(record.p_value_adj_ref) < 0.05 && TO_NUMBER(record.p_value_adj_alt) < 0.05
+  record.p_value_adj_ref < 0.05 && record.p_value_adj_alt < 0.05
     ? null
     : (
-      TO_NUMBER(record.p_value_adj_ref) < 0.05
-        ? -TO_NUMBER(record.p_value_adj_ref)
-        : (TO_NUMBER(record.p_value_adj_alt) < 0.05 ? TO_NUMBER(record.p_value_adj_alt) : null)
+      record.p_value_adj_ref < 0.05
+        ? -record.p_value_adj_ref
+        : (record.p_value_adj_alt < 0.05 ? record.p_value_adj_alt : null)
     )
 )`
 
 const buildEdgeFilter = (input: paramsFormatType, nameField: 'name' | 'inverse_name'): string => {
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
-    filesetFilter = `record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    filesetFilter = `record.files_filesets == 'files_filesets/${escapeAqlString(input.files_fileset as string)}'`
     delete input.files_fileset
   }
 
   let methodFilter = ''
   let sourceFilter = ''
   if (input.method !== undefined) {
-    methodFilter = `record.method == '${input.method as string}'`
+    methodFilter = `record.method == '${escapeAqlString(input.method as string)}'`
     delete input.method
   }
 
   if (input.source !== undefined) {
-    sourceFilter = `record.source == '${input.source as string}'`
+    sourceFilter = `record.source == '${escapeAqlString(input.source as string)}'`
     delete input.source
   }
 
   let labelFilter = ''
   if (input.label !== undefined) {
-    labelFilter = `record.label == '${input.label as string}'`
+    labelFilter = `record.label == '${escapeAqlString(input.label as string)}'`
     delete input.label
   }
 
   let nameFilter = ''
   if (input.name !== undefined) {
-    nameFilter = `record.${nameField} == '${input.name as string}'`
+    nameFilter = `record.${nameField} == '${escapeAqlString(input.name as string)}'`
     delete input.name
   }
 
@@ -220,19 +216,19 @@ const buildQuery = ({
         'biosample_term': bioTerm,
         'score': ${ADASTRA_SCORE_EXPR},
         'method': record.method,
-        ${getDBReturnStatements(asbSchema, false, MOTIF_LOG2FC_RETURN, ['motif_fc'], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(asbSchema, false, MOTIF_LOG2FC_RETURN, ['motif_fc'])}
       } :
       record.source == 'GVATdb' ? {
         'method': record.method,
-        ${getDBReturnStatements(gvatdbSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(gvatdbSchema)}
       } :
       record.source == 'UKB' ? {
         'method': record.method,
-        ${getDBReturnStatements(ukbSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(ukbSchema)}
       } :
       record.source == 'IGVF' ? {
         'biosample_term': bioTerm,
-        ${getDBReturnStatements(semplSchema, false, '', [], true, apiKeyToDbFieldMap)}
+        ${getDBReturnStatements(semplSchema)}
       } : {}
     )
 `

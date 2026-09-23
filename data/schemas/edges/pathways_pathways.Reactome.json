@@ -1,108 +1,91 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/pathways_pathways.Reactome.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "The unique key of the pathway pathway edge",
-      "example": "R-HSA-1971475_R-HSA-1971476"
-    },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the pathway pathway edge",
-      "example": "pathways/R-HSA-1971475",
-      "pattern": "^pathways/R-HSA-[0-9]+$",
-      "collections": [
-        "pathways"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the pathway pathway edge",
-      "example": "pathways/R-HSA-1971476",
-      "pattern": "^pathways/R-HSA-[0-9]+$",
-      "collections": [
-        "pathways"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the pathway pathway edge",
-      "enum": [
-        "Reactome"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The source URL of the pathway pathway edge",
-      "enum": [
-        "https://reactome.org/"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the pathway pathway edge",
-      "enum": [
-        "parent of"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the pathway pathway edge",
-      "enum": [
-        "child of"
-      ]
-    },
-    "organism": {
-      "type": "string",
-      "description": "The organism of the pathway pathway edge",
-      "enum": [
-        "Homo sapiens"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "The class of the pathway pathway edge, from the associated files_filesets record",
-      "enum": [
-        "biological relationship"
-      ]
-    },
-    "method": {
-      "type": ["string", "null"],
-      "description": "The method of the pathway pathway edge, from the associated files_filesets record"
-    },
-    "label": {
-      "type": ["string", "null"],
-      "description": "The label of the pathway pathway edge, from the associated files_filesets record"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the pathway pathway edge",
-      "example": "files_filesets/IGVFFI8363VRKN",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "source",
-    "source_url",
-    "organism",
-    "class",
-    "method",
-    "label",
-    "files_filesets"
-  ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "source, source_url, organism, class, method, label, files_filesets"
   },
-  "db_collection_name": "pathways_pathways"
+  "db_collection_name": "pathways_pathways",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Parent and child Reactome pathway IDs joined by an underscore.",
+          "example": "R-HSA-1971475_R-HSA-1971476"
+        },
+        "_from": {
+          "example": "pathways/R-HSA-1971475",
+          "pattern": "^pathways/R-HSA-[0-9]+$",
+          "collections": [
+            "pathways"
+          ]
+        },
+        "_to": {
+          "example": "pathways/R-HSA-1971476",
+          "pattern": "^pathways/R-HSA-[0-9]+$",
+          "collections": [
+            "pathways"
+          ]
+        },
+        "source": {
+          "enum": [
+            "Reactome"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://reactome.org/"
+          ]
+        },
+        "name": {
+          "enum": [
+            "parent of"
+          ],
+          "example": "parent of"
+        },
+        "inverse_name": {
+          "enum": [
+            "child of"
+          ],
+          "example": "child of"
+        },
+        "organism": {
+          "$ref": "../mixins.json#/organism",
+          "enum": [
+            "Homo sapiens"
+          ]
+        },
+        "class": {
+          "enum": [
+            "biological relationship"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "_key",
+        "organism",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

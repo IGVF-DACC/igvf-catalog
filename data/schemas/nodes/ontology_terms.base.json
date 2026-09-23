@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/ontology_terms.base.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI for the ontology term."
+        },
+        "term_id": {
+          "type": "string",
+          "description": "Ontology term identifier."
+        }
+      },
+      "required": [
+        "uri",
+        "term_id"
+      ]
+    }
+  ]
+}

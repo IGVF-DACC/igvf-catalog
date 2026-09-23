@@ -280,8 +280,8 @@ def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock
         assert 'intron_start' in first_item
         assert 'intron_end' in first_item
         assert first_item['intron_chr'] == '1'
-        assert first_item['intron_start'] == '111139666'
-        assert first_item['intron_end'] == '111140038'
+        assert first_item['intron_start'] == 111139666
+        assert first_item['intron_end'] == 111140038
     finally:
         os.unlink(temp_file_path)
         os.unlink(temp_metadata_path)
