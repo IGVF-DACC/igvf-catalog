@@ -9,13 +9,6 @@
       "$ref": "genomic_elements.base.json"
     },
     {
-      "properties": {
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "source_annotation": {
@@ -53,6 +46,7 @@
           ]
         },
         "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/IGVFFI8753TTYC"
           ],

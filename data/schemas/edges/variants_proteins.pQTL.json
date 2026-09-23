@@ -9,12 +9,6 @@
       "properties": {
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
         }
       }
     },
@@ -90,11 +84,13 @@
           "example": "intergenic_variant"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "enum": [
             "blood plasma"
           ]
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "enum": [
             "ontology_terms/UBERON_0001969"
           ]

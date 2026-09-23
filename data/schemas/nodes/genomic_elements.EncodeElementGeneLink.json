@@ -12,9 +12,6 @@
       "properties": {
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
-        },
-        "treatments_term_ids": {
-          "$ref": "../mixins.json#/treatments_term_ids"
         }
       }
     },
@@ -66,6 +63,7 @@
           ]
         },
         "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "UniProtKB:P05112"
           ]

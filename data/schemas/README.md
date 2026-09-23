@@ -86,10 +86,13 @@ later definitions replace matching attribute keys, while `required` lists are
 combined and deduplicated. This is application-specific composition, not standard
 JSON Schema `allOf` intersection semantics.
 
-Keep references and local overrides in separate entries. The current resolvers
-do not preserve sibling keywords beside `$ref`. All schema files declare
-JSON Schema draft 2020-12 (`https://json-schema.org/draft/2020-12/schema`).
-Supporting `$ref` siblings is separate work.
+Keep mixin `$ref`s and local overrides on the same property object when both
+apply, for example `"source": { "$ref": "../mixins.json#/source", "enum": ["GenCC"] }`.
+Both loaders preserve sibling keywords beside `$ref` (siblings override the
+resolved mixin). Split the same property across separate `allOf` entries only
+when you intentionally rely on sequential merge without an inline `$ref`.
+All schema files declare JSON Schema draft 2020-12
+(`https://json-schema.org/draft/2020-12/schema`).
 
 When changing composition, compare resolved schemas through both loaders and
 run the focused loader tests. Shared constraint changes also need affected

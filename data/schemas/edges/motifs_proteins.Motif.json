@@ -8,15 +8,6 @@
   "allOf": [
     {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -70,16 +61,19 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "HOCOMOCOv11"
           ]
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "HOCOMOCO"
           ]

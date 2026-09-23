@@ -7,13 +7,6 @@
   "db_collection_name": "genomic_elements",
   "allOf": [
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "chr": {
@@ -39,6 +32,7 @@
           "example": "tested elements"
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "example": "MPRA"
         }
       },

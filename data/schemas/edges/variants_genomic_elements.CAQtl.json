@@ -9,12 +9,6 @@
       "properties": {
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
         }
       }
     },
@@ -69,9 +63,11 @@
           "pattern": "^https://www.encodeproject.org/files/"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "neural progenitor cell"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/CL_0011020"
         },
         "name": {

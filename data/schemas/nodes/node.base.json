@@ -6,9 +6,6 @@
   "allOf": [
     {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
         "source_url": {
           "$ref": "../mixins.json#/source_url"
         }
@@ -27,6 +24,7 @@
           "example": "TP53"
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "example": "IGVF"
         }
       },

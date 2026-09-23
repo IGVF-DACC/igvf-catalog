@@ -10,12 +10,6 @@
       "properties": {
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
         }
       }
     },
@@ -95,12 +89,12 @@
         },
         "p_value_adj_ref": {
           "type": "number",
-          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793
         },
         "p_value_adj_alt": {
           "type": "number",
-          "description": "Benjamini\u2013Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
+          "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
         "neg_log10_pvalue_adj_ref": {
@@ -114,9 +108,11 @@
           "example": 0
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "Kelly (neuroblastoma)"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/EFO_0002069"
         },
         "source": {

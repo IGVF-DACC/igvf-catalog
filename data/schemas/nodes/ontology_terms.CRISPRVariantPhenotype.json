@@ -7,19 +7,6 @@
       "$ref": "ontology_terms.base.json"
     },
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
-        "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -50,11 +37,13 @@
           "example": "https://data.igvf.org/phenotype-terms/NTR_0001118/"
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
@@ -64,6 +53,7 @@
           ]
         },
         "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets",
           "type": [
             "string",
             "null"

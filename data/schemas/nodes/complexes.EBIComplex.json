@@ -7,12 +7,6 @@
     },
     {
       "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        },
         "class": {
           "$ref": "../mixins.json#/class"
         },
@@ -109,12 +103,14 @@
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ]
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "type": [
             "string",
             "null"

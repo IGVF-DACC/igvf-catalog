@@ -73,3 +73,40 @@ test('merges mixins composed by a base schema before child overrides', () => {
   })
   expect(schema.required).toEqual(['sample'])
 })
+
+test('keeps sibling keywords beside $ref and lets them override the target', () => {
+  const schema = load({
+    properties: {
+      source: {
+        $ref: 'mixins.json#/metadata/properties/sample',
+        enum: ['GenCC'],
+        example: 'GenCC'
+      }
+    }
+  })
+  expect(schema.properties.source).toEqual({
+    description: 'Shared sample description',
+    enum: ['GenCC'],
+    example: 'GenCC'
+  })
+})
+
+test('merges $ref siblings through allOf the same as split mixin overrides', () => {
+  const joined = load({
+    allOf: [
+      {
+        properties: {
+          sample: {
+            $ref: 'mixins.json#/metadata/properties/sample',
+            enum: ['K562']
+          }
+        },
+        required: ['sample']
+      }
+    ]
+  })
+  expect(joined.properties.sample).toEqual({
+    description: 'Shared sample description',
+    enum: ['K562']
+  })
+})

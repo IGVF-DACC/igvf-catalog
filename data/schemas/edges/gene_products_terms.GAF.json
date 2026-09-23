@@ -11,9 +11,6 @@
     },
     {
       "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -137,6 +134,7 @@
           "example": "UniProtKB:C6GKH1"
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens",
             "Mus musculus"

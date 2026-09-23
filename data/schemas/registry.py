@@ -18,12 +18,41 @@ def load_registry():
 registry = load_registry()
 
 
+def expand_ref_siblings(schema):
+    """
+    Convert {$ref, ...siblings} into allOf [{$ref}, siblings].
+
+    jsonref drops keywords beside $ref; this preserves them so merge_allof_schema
+    can combine mixin definitions with local overrides (JSON Schema 2020-12).
+    """
+    if isinstance(schema, list):
+        return [expand_ref_siblings(item) for item in schema]
+    if not isinstance(schema, dict):
+        return schema
+
+    if '$ref' in schema:
+        siblings = {
+            key: expand_ref_siblings(value)
+            for key, value in schema.items()
+            if key != '$ref'
+        }
+        if siblings:
+            return {'allOf': [{'$ref': schema['$ref']}, siblings]}
+        return {'$ref': schema['$ref']}
+
+    return {
+        key: expand_ref_siblings(value)
+        for key, value in schema.items()
+    }
+
+
 def merge_allof_schema(schema):
     """
     Merge allOf schemas into a single schema.
 
     Resolve nested allOf entries before merging sequentially, so base schemas
-    can compose shared mixins too.
+    can compose shared mixins too. Also flattens property-level allOf (used when
+    $ref siblings are expanded).
 
     For properties: Child definitions are MERGED with base definitions,
     not replaced. This means:
@@ -31,7 +60,21 @@ def merge_allof_schema(schema):
     - Child adds: {enum, pattern, example}
     - Result: {type, description, enum, pattern, example}
     """
-    if not isinstance(schema, dict) or 'allOf' not in schema:
+    if not isinstance(schema, dict):
+        return schema
+
+    # Flatten allOf inside property schemas (e.g. joined mixin $ref + enum)
+    if 'properties' in schema:
+        schema = {
+            **schema,
+            'properties': {
+                key: merge_allof_schema(value) if isinstance(
+                    value, dict) else value
+                for key, value in schema['properties'].items()
+            }
+        }
+
+    if 'allOf' not in schema:
         return schema
 
     # Start with an empty merged schema
@@ -90,8 +133,8 @@ def get_schema(collection_type, collection_name, adapter_name):
     with open(schema_path, 'r') as f:
         schema = json.load(f)
 
-    # Use jsonref to resolve $ref references
-    # jsonref automatically handles file:// URIs and relative paths
+    # Preserve keywords beside $ref, then resolve references
+    schema = expand_ref_siblings(schema)
     base_uri = f'file://{os.path.dirname(schema_path)}/'
     resolved_schema = jsonref.replace_refs(schema, base_uri=base_uri)
 

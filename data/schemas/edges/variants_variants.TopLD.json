@@ -8,19 +8,6 @@
   "db_collection_name": "variants_variants",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -97,6 +84,7 @@
           ]
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "enum": [
             "linkage disequilibrium"
           ]
@@ -116,11 +104,13 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "TopLD"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "http://topld.genetics.unc.edu/"
           ]

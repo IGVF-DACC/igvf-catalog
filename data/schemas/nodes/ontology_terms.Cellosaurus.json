@@ -7,9 +7,6 @@
     },
     {
       "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
         "class": {
           "$ref": "../mixins.json#/class"
         },
@@ -69,6 +66,7 @@
           }
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"

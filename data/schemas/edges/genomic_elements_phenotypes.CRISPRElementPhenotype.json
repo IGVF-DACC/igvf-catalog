@@ -10,17 +10,8 @@
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        },
         "treatments_term_ids": {
           "$ref": "../mixins.json#/treatments_term_ids"
-        },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality"
         }
       }
     },
@@ -84,6 +75,7 @@
           ]
         },
         "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality",
           "enum": [
             "interference"
           ]
@@ -108,9 +100,11 @@
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "human HFF-1 cell line from donor(s) IGVFDO0058YJWC"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/CLO_0003730"
         },
         "name": {

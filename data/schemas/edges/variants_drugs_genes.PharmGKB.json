@@ -8,18 +8,6 @@
   "allOf": [
     {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -69,20 +57,24 @@
           "example": "ABCB1"
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "pharmGKB"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
           "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "PharmGKB"
           ]

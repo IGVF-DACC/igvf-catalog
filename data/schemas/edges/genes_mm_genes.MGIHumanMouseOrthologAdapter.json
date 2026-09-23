@@ -8,18 +8,6 @@
   "allOf": [
     {
       "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -73,19 +61,23 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "MGI"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "Homology"
           ]

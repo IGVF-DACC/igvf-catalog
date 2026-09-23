@@ -4,19 +4,6 @@
   "db_collection_name": "variants_coding_variants",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "label": {
-          "$ref": "../mixins.json#/label"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -75,16 +62,19 @@
           "example": "AC"
         },
         "label": {
+          "$ref": "../mixins.json#/label",
           "enum": [
             "codes for"
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
           ]

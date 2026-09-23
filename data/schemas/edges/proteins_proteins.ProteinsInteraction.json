@@ -7,9 +7,6 @@
     },
     {
       "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -351,7 +348,7 @@
             "number",
             "null"
           ],
-          "description": "IntAct MIscore from the merged table, on a 0\u20131 scale. Null when the source has none. Larger values mean more supporting evidence."
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
         },
         "source": {
           "enum": [
@@ -372,6 +369,7 @@
           }
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens",
             "Mus musculus"

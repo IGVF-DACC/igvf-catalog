@@ -8,12 +8,6 @@
     },
     {
       "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        },
-        "class": {
-          "$ref": "../mixins.json#/class"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -46,11 +40,13 @@
           ]
         },
         "class": {
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship"
           ]
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"

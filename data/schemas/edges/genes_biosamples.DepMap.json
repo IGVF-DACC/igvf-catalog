@@ -13,9 +13,6 @@
       "properties": {
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
         }
       }
     },
@@ -42,6 +39,7 @@
           ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "OVCAR-5"
         },
         "model_id": {

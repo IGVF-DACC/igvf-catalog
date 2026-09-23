@@ -11,9 +11,6 @@
     },
     {
       "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
@@ -64,6 +61,7 @@
           "example": "has part"
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]

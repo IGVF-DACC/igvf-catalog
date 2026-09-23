@@ -4,19 +4,6 @@
   "db_collection_name": "mm_transcripts_mm_genes_structure",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        },
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_from": {
@@ -38,6 +25,7 @@
           ]
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "GENCODE"
           ]
@@ -50,11 +38,13 @@
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Mus musculus"
           ]

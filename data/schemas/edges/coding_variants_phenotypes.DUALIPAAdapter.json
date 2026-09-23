@@ -9,12 +9,6 @@
       "properties": {
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
-        },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
         }
       }
     },
@@ -59,9 +53,11 @@
           ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "HEK293 cell line, female, Homo sapiens"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/EFO_0001182"
         },
         "method": {

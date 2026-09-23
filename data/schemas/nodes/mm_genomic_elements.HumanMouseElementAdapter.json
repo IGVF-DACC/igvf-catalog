@@ -7,13 +7,6 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "method": {
-          "$ref": "../mixins.json#/method"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "chr": {
@@ -32,6 +25,7 @@
           "example": 121522428
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "enum": [
             "integrative"
           ]

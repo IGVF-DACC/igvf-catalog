@@ -10,12 +10,6 @@
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         },
-        "biological_context": {
-          "$ref": "../mixins.json#/biological_context"
-        },
-        "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
-        },
         "treatments_term_ids": {
           "$ref": "../mixins.json#/treatments_term_ids"
         }
@@ -112,9 +106,11 @@
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/EFO_0002067"
         }
       },

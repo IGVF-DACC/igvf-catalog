@@ -4,16 +4,6 @@
   "db_collection_name": "genomic_elements_mm_genomic_elements",
   "allOf": [
     {
-      "properties": {
-        "source": {
-          "$ref": "../mixins.json#/source"
-        },
-        "source_url": {
-          "$ref": "../mixins.json#/source_url"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -55,7 +45,7 @@
         },
         "cov_chromatin_accessibility_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the chromatin-accessibility CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-V p-value.",
           "example": "0.7880168243061526"
         },
         "cob_chromatin_accessibility": {
@@ -70,7 +60,7 @@
         },
         "cob_chromatin_accessibility_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the chromatin-accessibility CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-B p-value.",
           "example": "0.706372507818166"
         },
         "cov_H3K27ac": {
@@ -85,7 +75,7 @@
         },
         "cov_H3K27ac_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K27ac CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K27ac CO-V p-value.",
           "example": "0.8353311889993958"
         },
         "cob_H3K27ac": {
@@ -100,7 +90,7 @@
         },
         "cob_H3K27ac_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K27ac CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K27ac CO-B p-value.",
           "example": "0.9741088464334399"
         },
         "cov_H3K4me1": {
@@ -115,7 +105,7 @@
         },
         "cov_H3K4me1_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me1 CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-V p-value.",
           "example": "0.9170052784062483"
         },
         "cob_H3K4me1": {
@@ -130,7 +120,7 @@
         },
         "cob_H3K4me1_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me1 CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-B p-value.",
           "example": "0.9810987190296945"
         },
         "cov_H3K4me3": {
@@ -145,7 +135,7 @@
         },
         "cov_H3K4me3_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me3 CO-V p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-V p-value.",
           "example": "0.9650710516056851"
         },
         "cob_H3K4me3": {
@@ -160,15 +150,17 @@
         },
         "cob_H3K4me3_fdr": {
           "type": "string",
-          "description": "Benjamini\u2013Hochberg FDR for the H3K4me3 CO-B p-value.",
+          "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-B p-value.",
           "example": "0.9758546569869605"
         },
         "source": {
+          "$ref": "../mixins.json#/source",
           "enum": [
             "FUNCODE"
           ]
         },
         "source_url": {
+          "$ref": "../mixins.json#/source_url",
           "pattern": "^https://data.igvf.org/reference-files/"
         },
         "name": {

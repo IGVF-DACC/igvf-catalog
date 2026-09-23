@@ -7,13 +7,6 @@
       "$ref": "node.base.json"
     },
     {
-      "properties": {
-        "organism": {
-          "$ref": "../mixins.json#/organism"
-        }
-      }
-    },
-    {
       "type": "object",
       "properties": {
         "_key": {
@@ -123,6 +116,7 @@
           ]
         },
         "organism": {
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]
