@@ -13,7 +13,8 @@ module.exports = {
   collectCoverageFrom: [
     'src/env.ts',
     'src/trpc.ts',
-    'src/routers/datatypeRouters/nodes/*.ts'
+    'src/routers/datatypeRouters/nodes/*.ts',
+    'src/routers/datatypeRouters/edges/*.ts'
   ],
   coverageReporters: ['lcov', 'text'],
   testPathIgnorePatterns: [
