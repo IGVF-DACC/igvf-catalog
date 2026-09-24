@@ -1,10 +1,11 @@
 module.exports = {
   roots: ['<rootDir>'],
   transform: {
-    '^.+\\.ts?$': 'ts-jest'
+    '^.+\\.ts?$': ['ts-jest', { isolatedModules: true }]
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  maxWorkers: 2,
   collectCoverage: true,
   clearMocks: true,
   restoreMocks: false,
