@@ -99,7 +99,14 @@ class GWAS(BaseAdapter):
         return props
 
     def process_variants_phenotypes(self, row, tagged_variants):
-        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+        try:
+            variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+        except Exception as e:
+            # e.g. an empty ref/alt allele, which build_variant_id (unlike load_variant)
+            # doesn't special-case and instead raises from the underlying VRS translator.
+            self.logger.warning(
+                f'Skipping edge - unable to build variant id for row (chr={row[4]}, pos={row[5]}, ref={row[6]}, alt={row[7]}): {e}')
+            return None
 
         if variant_id in self.invalid_variant_ids:
             return None
@@ -236,7 +243,12 @@ class GWAS(BaseAdapter):
                 continue
 
             row = row + [None] * (len(header) - len(row))
-            variant_ids.add(build_variant_id(row[4], row[5], row[6], row[7]))
+            try:
+                variant_ids.add(build_variant_id(
+                    row[4], row[5], row[6], row[7]))
+            except Exception as e:
+                self.logger.warning(
+                    f'Skipping row - unable to build variant id (chr={row[4]}, pos={row[5]}, ref={row[6]}, alt={row[7]}): {e}')
 
         loaded_ids = bulk_check_variants_in_arangodb(
             list(variant_ids), check_by='_key')
@@ -347,7 +359,12 @@ class GWAS(BaseAdapter):
                 continue
 
             # grouping tagged variants by main variant + study
-            key = self.generate_studies_variants_key(row)
+            try:
+                key = self.generate_studies_variants_key(row)
+            except Exception as e:
+                self.logger.warning(
+                    f'Skipping row - unable to build variant id for tagged variants (chr={row[4]}, pos={row[5]}, ref={row[6]}, alt={row[7]}): {e}')
+                continue
 
             # a few rows are incomplete. Filling empty values with None
             row = row + [None] * (len(header) - len(row))

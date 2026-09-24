@@ -188,6 +188,22 @@ def test_gwas_writes_edge_for_missing_but_valid_variant(gwas_files, spy_writer, 
     assert len(spy_writer.contents) > 0
 
 
+def test_gwas_skips_row_when_build_variant_id_raises(gwas_files, spy_writer, mocker, mock_variant_validation):
+    """build_variant_id() can raise directly (e.g. a bare insertion/deletion with no anchor
+    base, which used to blow up translator.translate_from) rather than returning a value for
+    validate_variants()/process_variants_phenotypes() to check against invalid_variant_ids.
+    That must not crash the whole file - it should just skip that row like any other bad id."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 side_effect=ValueError('Unable to parse data as gnomad variation'))
+    mock_variant_validation.side_effect = lambda ids, **kwargs: set()
+
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants_phenotypes', writer=spy_writer, validate=True)
+    gwas.process_file()  # must not raise
+
+    assert len(spy_writer.contents) == 0
+
+
 def test_gwas_invalid_collection(gwas_files, spy_writer):
     with pytest.raises(ValueError):
         GWAS(gwas_files['variants_to_ontology'],
