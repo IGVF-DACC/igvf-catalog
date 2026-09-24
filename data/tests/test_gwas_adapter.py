@@ -17,6 +17,16 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+@pytest.fixture(autouse=True)
+def mock_variant_validation():
+    """By default, treat every variant as already loaded so validate_variants() never calls
+    load_variant() (which needs seqrepo) or hits ArangoDB for real. Tests exercising the
+    missing/invalid-variant behavior override this mock directly."""
+    with patch('adapters.gwas_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda ids, **kwargs: set(ids)
+        yield mock_check
+
+
 @pytest.fixture
 def gwas_files():
     return {
@@ -98,6 +108,100 @@ def test_gwas_studies(gwas_files, spy_writer, mocker):
             assert 'pub_author' in data
             assert 'pub_date' in data
             assert 'source_url' in data
+
+
+def test_gwas_variants_label_writes_missing_variant(gwas_files, spy_writer, mocker, mock_variant_validation):
+    """label='variants' should load_variant() and write any variant not already in the DB."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_variant_validation.side_effect = lambda ids, **kwargs: set()  # nothing loaded yet
+    mocker.patch('adapters.gwas_adapter.load_variant', return_value=(
+        {
+            '_key': 'fake_variant_id',
+            'name': 'fake_variant_id',
+            'chr': 'chr1',
+            'pos': 100,
+            'ref': 'A',
+            'alt': 'T',
+            'variation_type': 'SNP',
+            'spdi': 'fake_variant_id',
+            'hgvs': 'chr1:g.100A>T',
+            'organism': 'Homo sapiens'
+        },
+        None
+    ))
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants', writer=spy_writer, validate=True)
+    gwas.process_file()
+
+    assert len(spy_writer.contents) > 0
+    data = json.loads(spy_writer.contents[0])
+    assert data['_key'] == 'fake_variant_id'
+    assert data['source'] == 'OpenTargets'
+    assert data['files_filesets'] == 'files_filesets/gwas_v2d_igvf_sample'
+    assert gwas.invalid_variant_ids == set()
+
+
+def test_gwas_skips_edge_for_invalid_variant(gwas_files, spy_writer, mocker, mock_variant_validation):
+    """process_variants_phenotypes should skip edges whose variant load_variant() rejects,
+    rather than writing an edge with a _from that will never resolve to a real document."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_variant_validation.side_effect = lambda ids, **kwargs: set()  # nothing loaded
+    mocker.patch('adapters.gwas_adapter.load_variant', return_value=(
+        {}, {'variant_id': 'fake_variant_id', 'reason': 'Unable to parse this variant id'}
+    ))
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants_phenotypes', writer=spy_writer, validate=True)
+    gwas.process_file()
+
+    assert gwas.invalid_variant_ids == {'fake_variant_id'}
+    assert len(spy_writer.contents) == 0
+
+
+def test_gwas_writes_edge_for_missing_but_valid_variant(gwas_files, spy_writer, mocker, mock_variant_validation):
+    """A variant that's merely missing (not invalid) must not be treated as invalid - the edge
+    should still be written normally, relying on a prior label='variants' pass to load it."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_variant_validation.side_effect = lambda ids, **kwargs: set()  # nothing loaded yet
+    mocker.patch('adapters.gwas_adapter.load_variant', return_value=(
+        {
+            '_key': 'fake_variant_id',
+            'name': 'fake_variant_id',
+            'chr': 'chr1',
+            'pos': 100,
+            'ref': 'A',
+            'alt': 'T',
+            'variation_type': 'SNP',
+            'spdi': 'fake_variant_id',
+            'hgvs': 'chr1:g.100A>T',
+            'organism': 'Homo sapiens'
+        },
+        None
+    ))
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants_phenotypes', writer=spy_writer, validate=True)
+    gwas.process_file()
+
+    assert gwas.invalid_variant_ids == set()
+    assert len(spy_writer.contents) > 0
+
+
+def test_gwas_skips_row_when_build_variant_id_raises(gwas_files, spy_writer, mocker, mock_variant_validation):
+    """build_variant_id() can raise directly (e.g. a bare insertion/deletion with no anchor
+    base, which used to blow up translator.translate_from) rather than returning a value for
+    validate_variants()/process_variants_phenotypes() to check against invalid_variant_ids.
+    That must not crash the whole file - it should just skip that row like any other bad id."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 side_effect=ValueError('Unable to parse data as gnomad variation'))
+    mock_variant_validation.side_effect = lambda ids, **kwargs: set()
+
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants_phenotypes', writer=spy_writer, validate=True)
+    gwas.process_file()  # must not raise
+
+    assert len(spy_writer.contents) == 0
 
 
 def test_gwas_invalid_collection(gwas_files, spy_writer):
