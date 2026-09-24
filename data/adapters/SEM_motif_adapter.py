@@ -181,7 +181,7 @@ class SEMMotif(BaseAdapter):
                     'source_url': self.source_url,
                     'pwm': pwm,
                     'length': length,
-                    'baseline': float(baseline),
+                    'SEMpl_baseline': float(baseline),
                     'class': self.collection_class,
                     'method': self.method,
                     'files_filesets': 'files_filesets/' + self.file_accession

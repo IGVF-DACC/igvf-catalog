@@ -58,7 +58,7 @@ def test_sem_motif_adapter_motif_with_description_header(mock_file_fileset, mock
     # regression test: some real SEMpl model files include a leading
     # '#Description: ...' line before '#BASELINE:', which used to break
     # the naive two-line header parsing (see: ValueError could not convert
-    # string to float when 'baseline' picked up the description text)
+    # string to float when 'SEMpl_baseline' picked up the description text)
     model_file = tmp_path / 'SEM_model_file_with_description.tsv.gz'
     with gzip.open(model_file, 'wt') as f:
         f.write(
@@ -74,7 +74,7 @@ def test_sem_motif_adapter_motif_with_description_header(mock_file_fileset, mock
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item['tf_name'] == 'TCF3'
-    assert first_item['baseline'] == -1.5347609999406169
+    assert first_item['SEMpl_baseline'] == -1.5347609999406169
     assert len(first_item['pwm']) == 2
 
 
