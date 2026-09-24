@@ -91,6 +91,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
   delete input.uniprot_name
   delete input.uniprot_full_name
   delete input.protein_name
+  delete input.organism
 
   const filters = getFilterStatements(proteinSchema, preProcessRegionParam(input))
   if (filters === '') {
