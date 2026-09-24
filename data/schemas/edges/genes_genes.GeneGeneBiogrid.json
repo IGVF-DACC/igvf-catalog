@@ -159,13 +159,10 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Coexpression z-score placeholder for BioGRID interactions.",
+          "description": "Placeholder set to 0 because BioGRID interactions do not have a COXPRESdb coexpression z-score.",
           "enum": [
             0
-          ],
-          "enum_descriptions": {
-            "0": "No COXPRESdb coexpression z-score is available; this value is a placeholder."
-          }
+          ]
         },
         "name": {
           "enum": [
