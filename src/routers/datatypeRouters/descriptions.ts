@@ -107,7 +107,6 @@ export const descriptions = {
   Pagination is 0-based.',
 
   transcripts: 'Retrieve transcripts. <br> \
-  Filter human transcripts by refseq_transcript_id using a versioned RefSeq RNA accession (exact match). <br> \
   Example: region = chr20:9537369-9839076, <br> \
   transcript_type = protein_coding, <br> \
   transcript_id = ENST00000443707 (Ensembl ids), <br> \
