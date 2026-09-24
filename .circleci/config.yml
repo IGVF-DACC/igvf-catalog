@@ -16,6 +16,9 @@ workflows:
       - trpc:
           requires:
             - lint
+      - trpc-integration:
+          requires:
+            - lint
 
 jobs:
   lint:
@@ -42,6 +45,21 @@ jobs:
           token: COVERALLS_REPO_TOKEN
           coverage_file: coverage/lcov.info
           fail_on_error: false
+  trpc-integration:
+    docker:
+      - image: cimg/node:20.20.2
+    working_directory: ~/igvf-catalog
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          # Hits the real shared dev ArangoDB (db-dev.catalog.igvf.org). Informational only
+          # for now (`|| true`) since it depends on an external service - promote this to a
+          # real required check once it's proven stable in CI.
+          name: Run integration tests against db-dev
+          command: npm run test:integration || true
   data:
     docker:
       - image: cimg/python:3.11
