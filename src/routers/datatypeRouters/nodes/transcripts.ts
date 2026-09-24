@@ -18,6 +18,7 @@ export const transcriptFormat = z.object({
   strand: z.string(),
   name: z.string(),
   gene_name: z.string(),
+  refseq_transcript_ids: z.array(z.string()).nullish(),
   MANE_Select: z.boolean().nullish(),
   source: z.string(),
   version: z.string(),

@@ -130,6 +130,19 @@
           "enum": [
             "Homo sapiens"
           ]
+        },
+        "refseq_transcript_ids": {
+          "type": "array",
+          "description": "Versioned RefSeq RNA accessions mapped to this transcript in GENCODE v43 metadata. Empty when no mapping is available.",
+          "items": {
+            "type": "string",
+            "pattern": "^[NX][MR]_[0-9]+\\.[0-9]+$"
+          },
+          "uniqueItems": true,
+          "example": [
+            "NR_024005.3",
+            "NR_046018.2"
+          ]
         }
       },
       "required": [
@@ -149,7 +162,7 @@
   "additionalProperties": false,
   "accessible_via": {
     "filter_by_range": "start, end",
-    "return": "_id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, MANE_Select, source, version, source_url, organism"
+    "return": "_id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, MANE_Select, source, version, source_url, organism, refseq_transcript_ids"
   },
   "db_collection_name": "transcripts"
 }

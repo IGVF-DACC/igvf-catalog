@@ -1,4 +1,6 @@
+import gzip
 import json
+from pathlib import Path
 from typing import Optional
 
 from adapters.base import BaseAdapter
@@ -22,6 +24,8 @@ class Gencode(BaseAdapter):
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
+    REFSEQ_MAPPING_PATH = Path(__file__).resolve().parents[1] / (
+        'data_loading_support_files/gencode/gencode.v43.metadata.RefSeq.gz')
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
              'coord_end': 4, 'strand': 6, 'info': 8}
@@ -80,7 +84,20 @@ class Gencode(BaseAdapter):
                 mapping_line = row.strip().split('\t')
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
+    def load_refseq_mapping(self):
+        mapping = {}
+        with gzip.open(self.REFSEQ_MAPPING_PATH, 'rt') as metadata:
+            for line in metadata:
+                transcript_id, refseq_id, *_ = line.rstrip().split('\t')
+                # The optional third column contains a RefSeq protein accession.
+                mapping.setdefault(transcript_id, set()).add(refseq_id)
+        return {transcript: sorted(refseq_ids)
+                for transcript, refseq_ids in mapping.items()}
+
     def parse(self):
+        refseq_mapping = (self.load_refseq_mapping()
+                          if self.label == 'gencode_transcript' and self.organism == 'HUMAN'
+                          else {})
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -130,6 +147,8 @@ class Gencode(BaseAdapter):
                 }
                 if self.label == 'gencode_transcript':
                     props['MANE_Select'] = info['MANE_Select']
+                    props['refseq_transcript_ids'] = refseq_mapping.get(
+                        info['transcript_id'], [])
                 if self.validate:
                     self.validate_doc(props)
                 self.writer.write(json.dumps(props))

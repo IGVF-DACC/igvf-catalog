@@ -1,3 +1,4 @@
+import gzip
 import json
 import pytest
 import tempfile
@@ -29,6 +30,7 @@ def test_gencode_adapter_transcript():
     assert 'end' in first_item
     assert 'gene_name' in first_item
     assert 'MANE_Select' in first_item
+    assert first_item['refseq_transcript_ids'] == ['NM_177990.4']
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
     assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
@@ -67,6 +69,40 @@ def test_gencode_adapter_invalid_label():
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to'):
         Gencode(filepath='./samples/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
+
+
+def test_refseq_mapping_preserves_versions_and_par_y(tmp_path, monkeypatch):
+    mapping = tmp_path / 'refseq.gz'
+    with gzip.open(mapping, 'wt') as handle:
+        handle.write('ENST00000353224.10\tNM_123.1\tNP_123.1\n'
+                     'ENST00000353224.10\tNR_456.2\n'
+                     'ENST00000353224.10\tNM_123.1\tNP_123.1\n'
+                     'ENST00000353224.10_PAR_Y\tNM_789.3\n'
+                     'ENST00000353224.9\tNM_999.1\n')
+    monkeypatch.setattr(Gencode, 'REFSEQ_MAPPING_PATH', mapping)
+    writer = SpyWriter()
+    adapter = Gencode(filepath='./samples/gencode_sample.gtf', writer=writer,
+                      validate=True)
+    assert adapter.load_refseq_mapping()['ENST00000353224.10_PAR_Y'] == [
+        'NM_789.3']
+    adapter.process_file()
+    docs = [json.loads(line) for line in writer.contents if line.strip()]
+    assert docs[0]['refseq_transcript_ids'] == ['NM_123.1', 'NR_456.2']
+    assert all(doc['refseq_transcript_ids'] == [] for doc in docs[1:])
+
+
+@pytest.mark.parametrize('label,organism,filepath', [
+    ('transcribed_to', 'HUMAN', './samples/gencode_sample.gtf'),
+    ('mm_gencode_transcript', 'MOUSE', './samples/gencode_mouse_sample.gtf'),
+])
+def test_refseq_mapping_only_loaded_for_human_nodes(label, organism, filepath):
+    writer = SpyWriter()
+    with patch.object(Gencode, 'load_refseq_mapping') as load_mapping:
+        Gencode(filepath=filepath, label=label, organism=organism,
+                writer=writer, validate=True).process_file()
+    load_mapping.assert_not_called()
+    assert all('refseq_transcript_ids' not in json.loads(line)
+               for line in writer.contents if line.strip())
 
 
 def test_gencode_adapter_initialization():
