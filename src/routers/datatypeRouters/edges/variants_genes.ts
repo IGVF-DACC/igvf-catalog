@@ -665,7 +665,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
   const inRegionQuery = `
     FOR record in genes
-    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam(input))}
+    FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(input))}
     RETURN {${getDBReturnStatements(geneSchema)}}
   `
 

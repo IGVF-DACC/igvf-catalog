@@ -5,6 +5,7 @@ module.exports = {
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  maxWorkers: 2,
   collectCoverage: true,
   clearMocks: true,
   restoreMocks: false,
@@ -13,7 +14,8 @@ module.exports = {
   collectCoverageFrom: [
     'src/env.ts',
     'src/trpc.ts',
-    'src/routers/datatypeRouters/nodes/*.ts'
+    'src/routers/datatypeRouters/nodes/*.ts',
+    'src/routers/datatypeRouters/edges/*.ts'
   ],
   coverageReporters: ['lcov', 'text'],
   testPathIgnorePatterns: [
