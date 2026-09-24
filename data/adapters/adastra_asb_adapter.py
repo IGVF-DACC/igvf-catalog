@@ -138,13 +138,13 @@ class ASB(BaseAdapter):
                         p_value_adj_alt = float(row[15])  # fdrp_bh_alt
                         neg_log10_pvalue_adj_ref = ASB.MAX_LOG10_PVALUE
                         if p_value_adj_ref > 0:
-                            neg_log10_pvalue_adj_ref = - \
-                                1 * log10(p_value_adj_ref)
+                            neg_log10_pvalue_adj_ref = 0 - \
+                                log10(p_value_adj_ref)  # prevent -0.0 values
 
                         neg_log10_pvalue_adj_alt = ASB.MAX_LOG10_PVALUE
                         if p_value_adj_alt > 0:
-                            neg_log10_pvalue_adj_alt = - \
-                                1 * log10(p_value_adj_alt)
+                            neg_log10_pvalue_adj_alt = 0 - \
+                                log10(p_value_adj_alt)
 
                         props = {
                             '_key': _key,
