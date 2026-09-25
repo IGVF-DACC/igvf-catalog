@@ -660,10 +660,12 @@ const variantSummary = publicProcedure
   .output(variantsSummaryFormat)
   .query(async ({ input }) => await variantSummarySearch(input))
 
+export const variantsAllelesFormat = z.array(z.array(z.string().or(z.number()).nullish()))
+
 const variantsAlleles = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles } })
   .input(variantsFromRegionsFormat)
-  .output(z.array(z.array(z.string().or(z.number()).nullish())))
+  .output(variantsAllelesFormat)
   .query(async ({ input }) => await variantsAllelesAggregation(input))
 
 export const variantsRouters = {
