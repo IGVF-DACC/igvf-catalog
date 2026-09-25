@@ -18,7 +18,7 @@ const linkedFeatureFormat = z.object({
 })
 
 /** Edge fields from complexes_proteins.EBIComplex accessible_via.return; only present on EBI source edges. */
-const proteinComplexFormat = z.object({
+export const proteinComplexFormat = z.object({
   protein: z.string().or(proteinFormat).optional(),
   complex: z.string().or(complexFormat).optional(),
   name: z.string(),

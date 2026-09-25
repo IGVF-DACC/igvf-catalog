@@ -47,7 +47,7 @@ const phenotypeOutputFormat = z.object({
   phenotype_name: z.string().nullish()
 })
 
-const outputFormat = z.array(z.object({
+export const outputFormat = z.array(z.object({
   name: z.string(),
   label: z.string(),
   method: z.string(),

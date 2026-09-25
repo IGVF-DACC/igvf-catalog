@@ -77,7 +77,7 @@ const geneProteinRelatedFormat = z.object({
   related: z.array(relatedProteinFormat.or(relatedGeneFormat)).nullish()
 })
 
-const sequenceVariantRelatedFormat = z.object({
+export const sequenceVariantRelatedFormat = z.object({
   sequence_variant: z.object({
     _id: z.string(),
     chr: z.string(),

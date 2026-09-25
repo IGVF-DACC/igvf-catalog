@@ -13,7 +13,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const genesTranscriptsFormat = z.object({
+export const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   version: z.string().optional(),
@@ -21,7 +21,7 @@ const genesTranscriptsFormat = z.object({
   transcript: z.string().or(transcriptFormat).optional(),
   name: z.string()
 })
-const genesProteinsFormat = z.object({
+export const genesProteinsFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
   protein: z.string().or(proteinFormat).optional()
 })

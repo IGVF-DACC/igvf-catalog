@@ -45,7 +45,7 @@ const variantsQuery = variantsCommonQueryFormat
   .merge(variantsProteinsQueryFormat)
   .merge(commonHumanEdgeParamsFormat)
 
-const outputFormat = z.object({
+export const outputFormat = z.object({
   sequence_variant: z.string().or(variantSimplifiedFormat).optional(),
   protein_complex: z.string().or(proteinFormat.omit({ dbxrefs: true })).or(complexFormat).optional(),
   biosample_term: z.string().or(ontologyFormat).nullish(),

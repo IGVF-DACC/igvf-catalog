@@ -61,7 +61,7 @@ const genomicElementsPredictionsFormat = z.object({
   })
 })
 
-const genomicElementsFromVariantsOutputFormat = z.array(z.object({
+export const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   variant: variantSimplifiedFormat,
   name: z.string(),
   label: z.string(),

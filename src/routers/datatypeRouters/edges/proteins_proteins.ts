@@ -37,7 +37,7 @@ const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
   files_fileset: z.string().trim().optional()
 })).merge(commonEdgeParamsFormat)
 
-const proteinsProteinsFormat = z.object({
+export const proteinsProteinsFormat = z.object({
   _id: z.string(),
   protein_1: z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
   protein_2: z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),

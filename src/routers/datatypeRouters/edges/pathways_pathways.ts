@@ -11,7 +11,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const pathwaysPathwaysFormat = z.object({
+export const pathwaysPathwaysFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   orgnism: z.string().optional(),

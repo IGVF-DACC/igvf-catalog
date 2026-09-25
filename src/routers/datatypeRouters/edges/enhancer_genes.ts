@@ -46,7 +46,7 @@ const geneOutputFormat = z.object({
   chr: z.string()
 })
 
-const genesGenomicElementsOutputFormat = z.array(z.object({
+export const genesGenomicElementsOutputFormat = z.array(z.object({
   gene: geneOutputFormat,
   elements: z.array(elementOutputFormat).or(elementOutputFormat)
 }))
