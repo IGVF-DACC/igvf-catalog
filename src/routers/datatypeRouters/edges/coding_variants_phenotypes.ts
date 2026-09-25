@@ -23,7 +23,7 @@ const geneQueryFormat = z.object({
   files_fileset: z.string().optional()
 })
 
-const codingVariantsPhenotypeAggregationFormat = z.object({
+export const codingVariantsPhenotypeAggregationFormat = z.object({
   method: z.string(),
   count: z.number()
 })
@@ -39,7 +39,7 @@ const fromCodingVariantsQueryFormat = z.object({
   files_fileset: z.string().optional()
 })
 
-const scoreSummaryOutputFormat = z.object({
+export const scoreSummaryOutputFormat = z.object({
   variant_id: z.string().nullish(),
   hgvsp: z.string().nullish(),
   gene_name: z.string().nullish(),
@@ -49,7 +49,7 @@ const scoreSummaryOutputFormat = z.object({
   portalLink: z.string().nullable()
 })
 
-const outputFormat = z.object({
+export const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
   // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence)

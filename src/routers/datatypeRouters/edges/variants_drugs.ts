@@ -35,7 +35,7 @@ const studyParametersDict = z.object({
   biogeographical_groups: z.string().optional()
 })
 
-const variantsToDrugsFormat = z.object({
+export const variantsToDrugsFormat = z.object({
   drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
   gene_name: z.array(z.string()).optional(),
@@ -50,7 +50,7 @@ const variantsToDrugsFormat = z.object({
   files_filesets: z.string().nullish()
 }).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
-const drugsToVariantsFormat = z.object({
+export const drugsToVariantsFormat = z.object({
   sequence_variant: z.string().or(variantFormat).optional(),
   _to: z.string(),
   gene_name: z.array(z.string()).optional(),
