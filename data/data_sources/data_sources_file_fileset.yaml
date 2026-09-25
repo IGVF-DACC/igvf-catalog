@@ -720,7 +720,7 @@ igvf_file_accessions:
     - IGVFFI9779WEGD
     - IGVFFI9815VYTN
   community reference files:
-    = IGVFFI9074FIDG
+    - IGVFFI9074FIDG
     - IGVFFI7449PKMJ
     - IGVFFI4637FWQJ
     - IGVFFI2960JTMH
