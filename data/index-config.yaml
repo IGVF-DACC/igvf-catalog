@@ -98,7 +98,7 @@ genes:
       - start, end
 
 genes_genes:
-  zkd:
+  zkd_sparse:
     fields:
       - z_score
   persistent:

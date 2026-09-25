@@ -210,7 +210,7 @@ export const descriptions = {
 
   genes_genes:
     'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
-    The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on z_score: gt (>), gte (>=), lt (<), lte (<=). z_score only exists on CoXPresdb edges; BioGRID edges do not have this field at all.<br> \
     At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
