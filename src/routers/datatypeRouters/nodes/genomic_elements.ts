@@ -9,7 +9,13 @@ import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
 
+// 'integrative' comes from genomic_elements.HumanMouseElementAdapter.json (source FUNCODE),
+// whose schema is registered but has never actually been loaded into this collection - keep
+// the schema (for whenever that data lands), but don't advertise it as a queryable method
+// until there's real data behind it.
+const UNLOADED_METHODS = new Set(['integrative'])
 const METHODS = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'method')
+  .filter((method) => !UNLOADED_METHODS.has(method)) as [string, ...string[]]
 const SOURCES = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'source')
 const TYPES = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'type')
 const SOURCE_ANNOTATIONS = getCollectionEnumValuesOrThrow('nodes', 'genomic_elements', 'source_annotation')
