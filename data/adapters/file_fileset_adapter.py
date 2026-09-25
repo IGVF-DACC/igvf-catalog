@@ -1,3 +1,4 @@
+import logging
 import requests
 import json
 from jsonschema import Draft202012Validator, ValidationError
@@ -104,6 +105,7 @@ class FileFileSet:
         self.writer = writer
         self.accessions = accessions
         self.validate = validate
+        self.logger = logging.getLogger(self.__class__.__name__)
         if self.validate:
             if self.label in ['encode_donor', 'igvf_donor']:
                 self.schema = get_schema(
@@ -187,6 +189,14 @@ class FileFileSet:
             id_type='accession',
             api_url=self.api_url
         )
+        returned_accessions = {
+            file_object['accession'] for file_object in file_objects
+        }
+        for accession in self.accessions:
+            if accession not in returned_accessions:
+                self.logger.warning(
+                    f'Skipping {accession}: not returned by public API search.'
+                )
         for file_object in file_objects:
             print(f'Processing {file_object["accession"]}')
 
