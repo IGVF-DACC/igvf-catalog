@@ -16,13 +16,19 @@
           "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "ref": {
-          "type": "string",
-          "description": "Reference amino acid, in single-letter code.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reference amino acid, in single-letter code. Null when the variant is a splice-site SNP (2 bp at either end of an intron), for which dbNSFP has no amino acid change.",
           "example": "M"
         },
         "alt": {
-          "type": "string",
-          "description": "Alternate amino acid, in single-letter code.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Alternate amino acid, in single-letter code. Null when the variant is a splice-site SNP (2 bp at either end of an intron), for which dbNSFP has no amino acid change.",
           "example": "L"
         },
         "aapos": {
@@ -41,19 +47,28 @@
           "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
-          "type": "string",
-          "description": "Ensembl ID of the protein (without version number).",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Ensembl ID of the protein (without version number). Null when dbNSFP has no protein ID, e.g. splice-site SNPs.",
           "example": "ENSP00000493376",
           "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
-          "type": "string",
-          "description": "HGVS protein-level description of the variant.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HGVS protein-level description of the variant. Null when the variant is a splice-site SNP (2 bp at either end of an intron), for which dbNSFP has no protein-level HGVS.",
           "example": "p.Met1?"
         },
         "hgvsc": {
-          "type": "string",
-          "description": "HGVS description of the variant in the cDNA reference frame.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HGVS description of the variant in the cDNA reference frame. Null when dbNSFP has no cDNA-level HGVS for this variant.",
           "example": "c.1A>C"
         },
         "refcodon": {
