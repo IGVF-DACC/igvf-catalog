@@ -74,7 +74,8 @@ const elementOutputFormat = z.object({
   chr: z.string().nullish(),
   start: z.number().nullish(),
   end: z.number().nullish(),
-  name: z.string()
+  name: z.string(),
+  source_annotation: z.string().nullish()
 })
 
 const geneOutputFormat = z.object({
