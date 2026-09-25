@@ -24,7 +24,7 @@ const INVERSE_NAMES = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 
 const MAX_LOG10_PVALUE = 400
 const MAX_SLOPE = 8.66426 // i.e. effect_size
 
-const qtlsSummaryFormat = z.object({
+export const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
   neg_log10_pvalue: z.number().nullish(),
   chr: z.string(),
@@ -57,7 +57,7 @@ const variantsGenesQueryFormat = z.object({
 const variantsQueryFormat = variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(NAMES).optional() })).merge(commonHumanEdgeParamsFormat)
 const genesQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(INVERSE_NAMES).optional() })).merge(commonHumanEdgeParamsFormat)
 
-const completeQtlsFormat = z.object({
+export const completeQtlsFormat = z.object({
   gene: z.string().or(geneFormat).nullable(),
   sequence_variant: z.string().or(variantFormat).nullable(),
   intron_chr: z.string().nullish(),
