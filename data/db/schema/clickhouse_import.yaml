@@ -178,11 +178,6 @@ variants_proteins: |
   SELECT rsid, label, source, name, inverse_name, chr, motif_fc, motif_pos, motif_orient, motif_conc, motif, biological_process, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins/*.jsonl', 'JSONEachRow');
 
-variants_proteins_terms: |
-  INSERT INTO variants_proteins_terms
-  SELECT es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_proteins_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins_terms/*.jsonl', 'JSONEachRow')
-
 # ArangoDB can't import the following JSONLs from afgr_sqtls.jsonl because they have p_value = NaN
 # 2025-01-16T00:12:10Z [11262] WARNING [e5a29] {general} at position 9463: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "8861b7bbcf84fa908e92ae868cf312551acef5cc47c39155f8ba4778800b8111", "_from": "variants/9dfc265f06997b7bf3cf476cd42499e5ee16a2293bb1e8ffbc021e0f44b9f191", "_to": "genes/ENSG00000164308", "biological_context": "lymphoblastoid cell line", "chr": "ch...
 # 2025-01-16T00:12:10Z [11262] WARNING [e5a29] {general} at position 9494: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "c3e76881c903ea2102d1264ab46b5bb3a1959330e7fcb715969e03fdb62f4933", "_from": "variants/f0871674778d8c16a33a7b948acf3889015ee7c64bd24067b0bbee59340aaaae", "_to": "genes/ENSG00000164308", "biological_context": "lymphoblastoid cell line", "chr": "ch...
