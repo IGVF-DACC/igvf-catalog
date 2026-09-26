@@ -35,6 +35,7 @@ from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.CRISPR_element_gene_ENCODE_adapter import CRISPRElementGeneENCODE
 from adapters.CRISPR_element_gene_IGVF_adapter import CRISPRElementGeneIGVF
+from adapters.CRISPR_element_element_adapter import CRISPRElementElement
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
@@ -87,6 +88,7 @@ KEY_TO_ADAPTER = {
     'encode_biosample': EncodeElementGeneLink,
     'crispr_element_gene_encode': CRISPRElementGeneENCODE,
     'crispr_element_gene_igvf': CRISPRElementGeneIGVF,
+    'crispr_element_element': CRISPRElementElement,
     'crispr_element_phenotype': CRISPRElementPhenotype,
     'crispr_variant_gene': CRISPRVariantGene,
     'crispr_variant_phenotype': CRISPRVariantPhenotype,

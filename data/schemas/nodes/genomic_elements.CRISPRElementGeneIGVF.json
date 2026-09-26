@@ -30,7 +30,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the genomic element from the source file.",
           "example": "promoter",
           "enum": [
             "enhancer",

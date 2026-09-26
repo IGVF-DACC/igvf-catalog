@@ -2056,6 +2056,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
+  genomic_elements_genomic_elements: 'Returns directed promoter-to-peak differential accessibility effects. Filter either endpoint by source_element_id/target_element_id or source_region/target_region (chr:start-end); promoter_gene_id filters the source promoter gene. IDs accept bare keys or collection/key handles. Use files_fileset=IGVFFI2419ZSGC for the Multiome Perturb-seq dataset. Numeric filters support comparisons such as log2FC=lt:0 and p_value_adj=lt:0.1. Adjusted p-values use Benjamini–Hochberg correction per guide. verbose=true expands both elements, including promoter_of. Biological context matching is exact. Results are sorted by edge key, with zero-based pages and a maximum of 500 records per page.',
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \
