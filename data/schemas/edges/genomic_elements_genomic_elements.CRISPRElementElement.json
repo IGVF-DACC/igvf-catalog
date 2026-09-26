@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/genomic_elements_genomic_elements.CRISPRElementElement.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Promoter ID, peak ID and file accession joined by underscores."
+        },
+        "_from": {
+          "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "type": "string",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+        },
+        "label": {
+          "enum": [
+            "regulatory element effect on chromatin accessibility"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates accessibility of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "accessibility modulated by"
+          ]
+        },
+        "method": {
+          "enum": [
+            "Perturb-seq",
+            "CRISPR screen"
+          ]
+        },
+        "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality",
+          "enum": [
+            "interference",
+            "activation",
+            "knockout"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/EFO_0002067"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
+          "example": "K562"
+        },
+        "p_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Nominal p-value for differential peak accessibility."
+        },
+        "p_value_adj": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Multiple-testing-adjusted p-value when reported by the source."
+        },
+        "neg_log10_pvalue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log 10 p-value of the measurement or prediction"
+        },
+        "neg_log10_pvalue_adj": {
+          "type": "number",
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+        },
+        "log2FC": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Log2 fold change in peak accessibility with a 1e-3 pseudocount (source effect_score)."
+        },
+        "significant": {
+          "type": "boolean",
+          "description": "Adjusted p-value < 0.1, matching the source accessibility call threshold."
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        }
+      },
+      "required": [
+        "_key",
+        "files_filesets",
+        "crispr_modality",
+        "biosample_term",
+        "biological_context",
+        "treatments_term_ids",
+        "significant"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements_genomic_elements"
+}
