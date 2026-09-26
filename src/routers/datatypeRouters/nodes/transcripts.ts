@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -18,6 +19,7 @@ export const transcriptFormat = z.object({
   strand: z.string(),
   name: z.string(),
   gene_name: z.string(),
+  refseq_transcript_ids: z.array(z.string()).nullish(),
   MANE_Select: z.boolean().nullish(),
   source: z.string(),
   version: z.string(),
@@ -65,12 +67,22 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanTranscriptSchema
 
   if (input.organism === 'Mus musculus') {
+    if (input.refseq_transcript_id !== undefined) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'RefSeq transcript lookup is only available for Homo sapiens.' })
+    }
     schema = mouseTranscriptSchema
   }
 
   delete input.organism
 
-  if (input.transcript_id !== undefined) {
+  if (input.refseq_transcript_id !== undefined) {
+    input.refseq_transcript_ids = input.refseq_transcript_id
+    delete input.refseq_transcript_id
+    if (input.transcript_id !== undefined) {
+      input._key = input.transcript_id
+      delete input.transcript_id
+    }
+  } else if (input.transcript_id !== undefined) {
     return await findTranscriptByID(input.transcript_id as string, schema)
   }
 
@@ -79,7 +91,10 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
 
 const transcripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
-  .input(transcriptsCommonQueryFormat.merge(commonNodesParamsFormat))
+  .input(transcriptsCommonQueryFormat.merge(commonNodesParamsFormat).extend({
+    refseq_transcript_id: z.string().trim().regex(/^[NX][MR]_\d+\.\d+$/)
+      .describe('Versioned RefSeq RNA accession; exact match, human transcripts only.').optional()
+  }))
   .output(z.array(transcriptFormat))
   .query(async ({ input }) => await transcriptSearch(input))
 

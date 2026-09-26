@@ -834,6 +834,7 @@ igvf_file_accessions:
     - IGVFFI3624EMSN
     - IGVFFI2284ZDWV
     - IGVFFI7217ZMJZ
+    - IGVFFI9820RGXX # GENCODE v43 RefSeq mapping (not yet released)
     - IGVFFI0314GYGG
     - IGVFFI2080RTXB
     - IGVFFI8525TBYT
