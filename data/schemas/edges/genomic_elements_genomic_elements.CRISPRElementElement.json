@@ -58,9 +58,7 @@
         "crispr_modality": {
           "$ref": "../mixins.json#/crispr_modality",
           "enum": [
-            "interference",
-            "activation",
-            "knockout"
+            "interference"
           ]
         },
         "class": {
@@ -88,7 +86,7 @@
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Benjamini–Hochberg-adjusted p-value, corrected per guide."
         },
         "neg_log10_pvalue": {
           "type": [
@@ -106,7 +104,7 @@
             "number",
             "null"
           ],
-          "description": "Log2 fold change in peak accessibility with a 1e-3 pseudocount (source effect_score)."
+          "description": "Log2 fold change in peak accessibility with a 1e-3 pseudocount."
         },
         "significant": {
           "type": "boolean",

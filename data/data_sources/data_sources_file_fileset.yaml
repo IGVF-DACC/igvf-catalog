@@ -82,6 +82,8 @@ igvf_file_accessions:
     - IGVFFI4081AUXT
     - IGVFFI2104BKIF
     - IGVFFI0192YMEY
+  CRISPR element element:
+    - IGVFFI2419ZSGC
   CRISPR element phenotype:
     - IGVFFI5135QZCS
     - IGVFFI9584UDAS
@@ -2767,4 +2769,3 @@ encode_file_accessions:
     - ENCFF420VPZ
   CRISPR enhancer perturbation screen:
     - ENCFF968BZL
-    - IGVFFI2419ZSGC
