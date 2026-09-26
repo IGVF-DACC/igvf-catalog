@@ -82,15 +82,15 @@
         },
         "wt_GFP_mCherry_ratio": {
           "type": "number",
-          "description": "Ratio of avg_gfp/avg_mcherry of related wild-type measurement"
+          "description": "GFP-to-mCherry fluorescence ratio of the matched wild-type (WT) reference. WT reference selection, replicate aggregation and quality-control criteria are dataset-specific."
         },
         "allele_wt_ratio": {
           "type": "number",
-          "description": "Ratio of avg_GFP_mCherry_ratio/wt_GFP_mCherry_ratio"
+          "description": "Variant-to-WT fluorescence ratio, calculated as avg_GFP_mCherry_ratio / wt_GFP_mCherry_ratio. Values below 1 indicate lower protein abundance than the matched WT reference; values above 1 indicate higher abundance."
         },
         "dualipa_abun_score": {
           "type": "number",
-          "description": "Abundance score for the variant: the log2 Z-score of allele_wt_ratio against the wild-type distribution, computed as (log2(allele_wt_ratio) - log2(wt_mean)) / log2(wt_std)."
+          "description": "Z-score of the log2 variant-to-WT fluorescence ratio, calculated as (log2(allele_wt_ratio) - mu_wt) / sigma_wt. mu_wt and sigma_wt are the mean and standard deviation of log2-transformed WT:WT reference ratios; their values and calibration scope are dataset-specific. Lower scores indicate lower protein abundance; higher scores indicate higher abundance. A variant-to-WT ratio of 1 corresponds to -mu_wt / sigma_wt, not necessarily zero, so score sign alone does not determine direction relative to WT."
         },
         "dualipa_abun_change": {
           "type": "string",
@@ -99,7 +99,7 @@
             "N",
             "Uncertain"
           ],
-          "description": "Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method."
+          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds. Y indicates an abundance change in either direction; N indicates the calibrated no-change range; Uncertain indicates values between the change and no-change ranges. Y does not specify direction: use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
