@@ -61,5 +61,8 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "genomic_elements"
+  "db_collection_name": "genomic_elements",
+  "accessible_via": {
+    "filter_by_range": "start, end"
+  }
 }
