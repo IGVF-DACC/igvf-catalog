@@ -20,7 +20,8 @@ from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_acc
 # Emit promoter -> peak edges in genomic_elements_genomic_elements, with the gene
 # hyperedge on the promoter node as promoter_of: genes/<Ensembl ID>.
 # effect_score is accessibility log2 fold change with a 1e-3 pseudocount, unlike
-# the companion expression file's z-score. The source calls use adjusted p < 0.1.
+# the companion expression file's z-score. p_val_adj is Benjamini–Hochberg-adjusted,
+# corrected per guide. All rows in IGVFFI2419ZSGC satisfy p_val_adj < 0.1.
 # Keep all input rows; reject duplicate promoter/peak pairs instead of choosing
 # a guide arbitrarily. Metadata and promoter gene membership require the catalog.
 
