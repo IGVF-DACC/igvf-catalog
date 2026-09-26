@@ -24,13 +24,12 @@
         },
         "method": {
           "enum": [
-            "Perturb-seq",
-            "CRISPR screen"
+            "Perturb-seq"
           ]
         },
         "source_annotation": {
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element.",
           "example": "promoter",
           "enum": [
             "promoter",
