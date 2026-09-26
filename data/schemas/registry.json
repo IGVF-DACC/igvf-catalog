@@ -34,7 +34,8 @@
             "CRISPRElementPhenotype": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
             "scE2G": "schemas/nodes/genomic_elements.scE2G.json",
             "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
-            "MPRAAdapter": "schemas/nodes/genomic_elements.MPRAAdapter.json"
+            "MPRAAdapter": "schemas/nodes/genomic_elements.MPRAAdapter.json",
+            "CRISPRElementElement": "schemas/nodes/genomic_elements.CRISPRElementElement.json"
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
@@ -220,8 +221,9 @@
         },
         "variants_variants": {
             "TopLD": "schemas/edges/variants_variants.TopLD.json"
+        },
+        "genomic_elements_genomic_elements": {
+            "CRISPRElementElement": "schemas/edges/genomic_elements_genomic_elements.CRISPRElementElement.json"
         }
-
     }
-
 }

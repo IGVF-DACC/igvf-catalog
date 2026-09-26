@@ -2345,3 +2345,19 @@ coding variant to phenotype ESM:
     - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
   threshold: -0.6931 # only load rows with score < log(0.5)
+
+genomic_element IGVF CRISPR accessibility:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter crispr_element_element --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/crispr_element_element_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2419ZSGC/@@download/IGVFFI2419ZSGC.tsv.gz
+
+genomic_element_genomic_element IGVF CRISPR accessibility:
+  collection: genomic_elements_genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter crispr_element_element --source-url {source_url} --filepath {datafile} --label genomic_element_genomic_element --output-bucket-key genomic_elements_genomic_elements/crispr_element_element_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2419ZSGC/@@download/IGVFFI2419ZSGC.tsv.gz
