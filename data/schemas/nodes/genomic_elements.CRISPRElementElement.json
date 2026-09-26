@@ -29,7 +29,7 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Annotation of the element.",
+          "description": "Annotation of the genomic element from the source file.",
           "example": "promoter",
           "enum": [
             "promoter",
@@ -42,7 +42,7 @@
           ]
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+          "example": "https://data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "type": {
           "enum": [
