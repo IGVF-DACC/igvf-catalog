@@ -51,8 +51,7 @@
         },
         "method": {
           "enum": [
-            "Perturb-seq",
-            "CRISPR screen"
+            "Perturb-seq"
           ]
         },
         "crispr_modality": {
