@@ -40,7 +40,8 @@ def test_nodes_and_edges():
     assert edges[0]['log2FC'] == pytest.approx(4.777302097678887)
     assert 'z_score' not in edges[0]
     assert edges[2]['p_value_adj'] > 0.05
-    assert edges[2]['significant'] is True
+    assert edges[0]['significant'] is True
+    assert edges[2]['significant'] is False
 
 
 @pytest.mark.parametrize('change,match', [('duplicate', 'Duplicate promoter-peak'), ('gene', 'Invalid promoter gene'), ('interval', 'Invalid genomic interval'), ('nan', 'Non-finite'), ('pvalue', 'P-values must'), ('header', 'missing columns')])

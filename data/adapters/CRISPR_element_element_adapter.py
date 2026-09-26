@@ -22,13 +22,14 @@ from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_acc
 # effect_score is accessibility log2 fold change with a 1e-3 pseudocount, unlike
 # the companion expression file's z-score. p_val_adj is Benjamini–Hochberg-adjusted,
 # corrected per guide. All rows in IGVFFI2419ZSGC satisfy p_val_adj < 0.1.
+# Catalog significance uses adjusted p < 0.05, matching the element-gene adapter.
 # Keep all input rows; reject duplicate promoter/peak pairs instead of choosing
 # a guide arbitrarily. Metadata and promoter gene membership require the catalog.
 
 
 class CRISPRElementElement(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_genomic_element']
-    SIGNIFICANCE_THRESHOLD = 0.1
+    SIGNIFICANCE_THRESHOLD = CRISPRElementGeneIGVF.SIGNIFICANCE_THRESHOLD
     REQUIRED_COLUMNS = {
         'effect_score', 'p_val', 'p_val_adj', 'chr', 'start', 'end',
         'intended_target_name', 'intended_target_chr',

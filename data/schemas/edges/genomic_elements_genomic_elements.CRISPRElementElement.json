@@ -108,7 +108,7 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Adjusted p-value < 0.1, matching the source accessibility call threshold."
+          "description": "Adjusted p-value < 0.05, matching the catalog element-gene significance threshold."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
@@ -129,5 +129,8 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "genomic_elements_genomic_elements"
+  "db_collection_name": "genomic_elements_genomic_elements",
+  "accessible_via": {
+    "filter_by_range": "log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj"
+  }
 }

@@ -23,6 +23,7 @@ import { pathwaysPathwaysRouters } from './pathways_pathways'
 import { codingVariantsPhenotypesRouters } from './coding_variants_phenotypes'
 import { genesCodingVariantsRouters } from './genes_coding_variants'
 import { variantsBiosamplesRouters } from './variants_biosamples'
+import { genomicElementsGenomicElementsRouters } from './genomic_elements_genomic_elements'
 import { genomicElementsGenesRouters } from './genomic_elements_genes'
 import { variantsGenomicElementsGenesRouters } from './variants_genomic_elements_genes'
 import { genomicElementsPhenotypesRouters } from './genomic_elements_phenotypes'
@@ -55,6 +56,7 @@ export const edgeRouters = {
   ...genesCodingVariantsRouters,
   ...variantsBiosamplesRouters,
   ...genomicElementsGenesRouters,
+  ...genomicElementsGenomicElementsRouters,
   ...variantsGenomicElementsGenesRouters,
   ...genomicElementsPhenotypesRouters,
   ...qtlsRouters
