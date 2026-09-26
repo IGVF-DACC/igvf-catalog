@@ -99,7 +99,12 @@
             "N",
             "Uncertain"
           ],
-          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds. Y indicates an abundance change in either direction; N indicates the calibrated no-change range; Uncertain indicates values between the change and no-change ranges. Y does not specify direction: use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value."
+          "enum_descriptions": {
+            "Y": "Meets the calibrated criteria for an abundance change in either direction. Use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value to determine direction.",
+            "N": "Falls within the calibrated no-change range.",
+            "Uncertain": "Falls between the calibrated change and no-change ranges."
+          },
+          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
