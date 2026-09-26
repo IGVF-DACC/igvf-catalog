@@ -1,6 +1,5 @@
 import gzip
 import json
-from pathlib import Path
 from typing import Optional
 
 from adapters.base import BaseAdapter
@@ -24,13 +23,12 @@ class Gencode(BaseAdapter):
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
-    REFSEQ_MAPPING_PATH = Path(__file__).resolve().parents[1] / (
-        'data_loading_support_files/gencode/gencode.v43.metadata.RefSeq.gz')
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
              'coord_end': 4, 'strand': 6, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, validate=False, reference_filepath=None, **kwargs):
+        self.reference_filepath = reference_filepath
         self.organism = organism
         self.transcript_endpoint = 'transcripts/'
         self.gene_endpoint = 'genes/'
@@ -86,7 +84,13 @@ class Gencode(BaseAdapter):
 
     def load_refseq_mapping(self):
         mapping = {}
-        with gzip.open(self.REFSEQ_MAPPING_PATH, 'rt') as metadata:
+        if not self.reference_filepath:
+            raise ValueError(
+                'reference_filepath is required for human transcripts '
+                '(GENCODE RefSeq mapping, IGVFFI9820RGXX).')
+        opener = gzip.open if str(
+            self.reference_filepath).endswith('.gz') else open
+        with opener(self.reference_filepath, 'rt') as metadata:
             for line in metadata:
                 transcript_id, refseq_id, *_ = line.rstrip().split('\t')
                 # The optional third column contains a RefSeq protein accession.
