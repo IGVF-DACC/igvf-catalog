@@ -19,7 +19,7 @@ from db.arango_db import ArangoDB
 # MORF overexpression screens measuring a constant readout gene.
 # DESeq2 differential ORF quantifications are joined to the ORF/transcript table
 # supplied by the caller via MORF_id. Catalog transcript nodes use Ensembl
-# (ENST) keys. RefSeq-only ORFs use GENCODE v43 cross-references.
+# (ENST) keys. RefSeq-only ORFs use cross-references on Catalog transcripts.
 
 # Example DESeq2 row (IGVFFI6734IWRB / IGVFFI6032GREJ):
 # rowID  baseMean  log2FoldChange  lfcSE  stat  pvalue  padj
@@ -36,15 +36,13 @@ _REFSEQ_RE = re.compile(r'(?:N[MR]|X[MR])_\d+(?:\.\d+)?')
 _NA_VALUES = frozenset({'', 'NA', 'NaN', 'nan', 'None', '.'})
 
 
-class MORFTranscriptGene(BaseAdapter):
-    ALLOWED_LABELS = ['transcript_gene']
+class MORFGeneGene(BaseAdapter):
+    ALLOWED_LABELS = ['gene_gene']
     SOURCE = 'IGVF'
-    COLLECTION_LABEL = 'transcript effect on gene expression'
+    COLLECTION_LABEL = 'gene overexpression effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
     MAX_LOG10_PVALUE = 240
     CONTROL_MORF_IDS = frozenset({'GFP_1', 'mCherry_1'})
-    REFSEQ_MAPPING_PATH = Path(__file__).resolve(
-    ).parents[1] / 'data_loading_support_files/MORF_screen/gencode.v43.metadata.RefSeq.gz'
     EXCLUSION_PATH = Path(__file__).resolve(
     ).parents[1] / 'data_loading_support_files/MORF_screen/excluded_constructs.tsv'
     # Both current files sort on TOX-GFP (same readout as CRISPR-SURF IGVFFI4396TZAN).
@@ -110,7 +108,7 @@ class MORFTranscriptGene(BaseAdapter):
         return 'edges'
 
     def _get_collection_name(self):
-        return 'transcripts_genes'
+        return 'genes_genes'
 
     @staticmethod
     def _file_accession(source_url: Optional[str], field: str) -> str:
@@ -239,33 +237,32 @@ class MORFTranscriptGene(BaseAdapter):
             return
         requested = {ref.split('.')[0] for orf in missing
                      for ref in orf['refseq_transcript_ids']}
+        db = ArangoDB().get_igvf_connection()
+        ready = list(db.aql.execute(
+            'FOR t IN transcripts FILTER HAS(t, "refseq_transcript_ids") '
+            'LIMIT 1 RETURN true'))
+        if not ready:
+            raise ValueError(
+                'Catalog transcripts lack refseq_transcript_ids. '
+                'Load the transcript updates from PR #894 before adapting MORF.')
         mapping = {}
-        with self._open_file(self.REFSEQ_MAPPING_PATH) as metadata:
-            for line in metadata:
-                transcript, *refs = line.rstrip().split('\t')
-                transcript = re.sub(r'\.[0-9]+(?=_PAR_Y$|$)', '', transcript)
-                if not _ENST_RE.fullmatch(transcript):
-                    raise ValueError(
-                        f'Invalid transcript in {self.REFSEQ_MAPPING_PATH}: {transcript!r}')
-                for ref in refs:
-                    accession = ref.split('.')[0]
-                    if accession in requested:
-                        mapping.setdefault(accession, set()).add(transcript)
-        candidates = sorted({t for transcripts in mapping.values()
-                            for t in transcripts})
-        valid = set()
-        if candidates:
-            db = ArangoDB().get_igvf_connection()
-            valid = set(db.aql.execute(
-                'FOR t IN transcripts FILTER t._key IN @ids RETURN t._key',
-                bind_vars={'ids': candidates}))
+        for record in db.aql.execute(
+            'FOR t IN transcripts '
+            'FOR ref IN (t.refseq_transcript_ids || []) '
+            'LET accession = FIRST(SPLIT(ref, ".")) '
+            'FILTER accession IN @accessions '
+            'RETURN DISTINCT {accession: accession, transcript: t._key}',
+            bind_vars={'accessions': sorted(requested)}
+        ):
+            mapping.setdefault(record['accession'], set()).add(
+                record['transcript'])
         for orf in missing:
             # Accept all RefSeq versions, preserving the supplied versioned IDs.
             transcripts = {t for ref in orf['refseq_transcript_ids']
                            for t in mapping.get(ref.split('.')[0], set())}
-            orf['ensembl_transcript_ids'] = sorted(transcripts & valid)
+            orf['ensembl_transcript_ids'] = sorted(transcripts)
             if orf['ensembl_transcript_ids']:
-                orf['transcript_mapping_method'] = 'GENCODE v43 RefSeq accession without version'
+                orf['transcript_mapping_method'] = 'Catalog transcript RefSeq accession without version'
 
     def _resolve_missing_orf_genes(self, orfs):
         """Resolve names, then synonyms; disambiguate using all listed transcripts.
@@ -316,6 +313,34 @@ class MORFTranscriptGene(BaseAdapter):
                 self.logger.warning('Unresolved ORF gene for %s (%s)',
                                     orf['morf_id'], orf['orf_gene_symbol'])
 
+    def _load_transcript_genes(self, orfs):
+        ids = sorted({f'transcripts/{t}' for orf in orfs.values()
+                      for t in orf['ensembl_transcript_ids']})
+        if not ids:
+            return {}
+        db = ArangoDB().get_igvf_connection()
+        parents = {}
+        for record in db.aql.execute(
+            'FOR t IN transcripts FILTER t._id IN @ids '
+            'FOR e IN genes_transcripts FILTER e._to == t._id '
+            'RETURN {transcript: t._key, gene: PARSE_IDENTIFIER(e._from).key}',
+            bind_vars={'ids': ids}
+        ):
+            parents.setdefault(record['transcript'], set()).add(record['gene'])
+        return parents
+
+    def _validate_gene_transcripts(self, orf, parents):
+        gene = orf['orf_gene']
+        if not gene or not self.gene_validator.validate(gene):
+            raise ValueError(
+                f'{orf["morf_id"]}: missing or invalid source gene {gene!r}')
+        for transcript in orf['ensembl_transcript_ids']:
+            if parents.get(transcript) != {gene}:
+                raise ValueError(
+                    f'{orf["morf_id"]}: gene {gene} does not uniquely match '
+                    f'transcript {transcript} in Catalog genes_transcripts '
+                    f'(found {sorted(parents.get(transcript, set()))})')
+
     def _write_doc(self, props: dict) -> None:
         if self.validate:
             self.validate_doc(props)
@@ -362,6 +387,7 @@ class MORFTranscriptGene(BaseAdapter):
         orfs = {key: orf for key, orf in orfs.items() if key not in exclusions}
         self._resolve_missing_transcripts(orfs)
         self._resolve_missing_orf_genes(orfs)
+        transcript_genes = self._load_transcript_genes(orfs)
         missing_ensembl = []
         missing_reference = []
         na_stats = []
@@ -419,6 +445,8 @@ class MORFTranscriptGene(BaseAdapter):
                     na_stats.append(row_id)
                     continue
 
+                self._validate_gene_transcripts(orf, transcript_genes)
+
                 significant = (
                     p_value_adj is not None
                     and p_value_adj < self.SIGNIFICANCE_THRESHOLD
@@ -429,10 +457,11 @@ class MORFTranscriptGene(BaseAdapter):
                 for transcript_id in ensembl_ids:
                     self._write_doc({
                         '_key': (
-                            f'{transcript_id}_{self.readout_gene}_'
+                            f'{orf["orf_gene"]}_{self.readout_gene}_{transcript_id}_'
                             f'{self.file_accession}_{orf["morf_id"]}'
                         ),
-                        '_from': f'transcripts/{transcript_id}',
+                        '_from': f'genes/{orf["orf_gene"]}',
+                        'transcript': f'transcripts/{transcript_id}',
                         '_to': f'genes/{self.readout_gene}',
                         'log2FC': log2fc,
                         'log2FC_se': stats['lfcSE'],

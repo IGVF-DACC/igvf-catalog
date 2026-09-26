@@ -4,14 +4,17 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { transcriptFormat } from '../nodes/transcripts'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
-const MAX_PAGE_SIZE = 100
+const MAX_PAGE_SIZE = 500
 
 const HumangenesGenesSchema = getSchema('data/schemas/edges/genes_genes.GeneGeneBiogrid.json') // union of properties from coxpresdb & biogrid
+const morfSchema = getSchema('data/schemas/edges/genes_genes.MORFGeneGene.json')
+const transcriptSchema = getSchema('data/schemas/nodes/transcripts.Gencode.json')
 const MousegenesGenesSchema = getSchema('data/schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json')
 const CoXPresdbSchema = getSchema('data/schemas/edges/genes_genes.Coxpresdb.json') // human coexpredb
 const HumangenesSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
@@ -42,6 +45,16 @@ const methodsEnum = methods as [string, ...string[]]
 
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
+    transcript_id: z.string().trim().optional(),
+    morf_id: z.string().trim().optional(),
+    log2FC: z.string().trim().optional(),
+    neg_log10_pvalue: z.string().trim().optional(),
+    neg_log10_pvalue_adj: z.string().trim().optional(),
+    p_value: z.string().trim().optional(),
+    p_value_adj: z.string().trim().optional(),
+    significant: z.enum(['true']).optional(),
+    biological_context: z.string().optional(),
+    biosample_term: z.string().optional(),
     associated_gene_id: z.string().trim().optional(),
     associated_hgnc_id: z.string().trim().optional(),
     associated_gene_name: z.string().trim().optional(),
@@ -60,6 +73,24 @@ const genesGenesRelativeFormat = z.object({
   _id: z.string(),
   gene_1: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   gene_2: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
+  transcript: z.string().or(transcriptFormat.partial()).nullish(),
+  morf_id: z.string().nullish(),
+  orf_gene: z.string().nullish(),
+  ensembl_transcript_ids: z.array(z.string()).nullish(),
+  refseq_transcript_ids: z.array(z.string()).nullish(),
+  transcript_mapping_method: z.string().nullish(),
+  log2FC: z.number().nullish(),
+  log2FC_se: z.number().nullish(),
+  base_mean: z.number().nullish(),
+  p_value: z.number().nullish(),
+  p_value_adj: z.number().nullish(),
+  neg_log10_pvalue: z.number().nullish(),
+  neg_log10_pvalue_adj: z.number().nullish(),
+  significant: z.boolean().nullish(),
+  biological_context: z.string().nullish(),
+  biosample_term: z.string().nullish(),
+  treatments_term_ids: z.array(z.string()).nullish(),
+  crispr_modality: z.string().nullish(),
   z_score: z.number().optional(),
   associated_process: z.string().nullish(),
   detection_method: z.string().optional(),
@@ -82,10 +113,11 @@ function validateInput (input: paramsFormatType): void {
   const isInvalidGeneFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   const isInvalidAssociatedGeneFilter = Object.keys(input).every(item => !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].includes(item))
 
-  if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter) {
+  const hasEdgeFilter = ['transcript_id', 'morf_id', 'files_fileset', 'method'].some(key => input[key] !== undefined)
+  if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter && !hasEdgeFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one gene must be defined.'
+      message: 'Define a gene, associated gene, transcript_id, morf_id, files_fileset, or method.'
     })
   }
 
@@ -115,6 +147,11 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     genesGenesSchema = MousegenesGenesSchema
   }
   delete input.organism
+
+  if (input.transcript_id !== undefined) {
+    input.transcript = `transcripts/${(input.transcript_id as string).replace(/\.\d+(?=_PAR_Y$|$)/, '')}`
+    delete input.transcript_id
+  }
 
   if (input.files_fileset !== undefined) {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
@@ -147,14 +184,22 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   const filters = []
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
   const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
-  const edgeFilters = getFilterStatements(genesGenesSchema, input)
+  const edgeFilterSchema = {
+    ...genesGenesSchema,
+    properties: { ...genesGenesSchema.properties, ...CoXPresdbSchema.properties, ...morfSchema.properties },
+    accessible_via: {
+      ...genesGenesSchema.accessible_via,
+      filter_by_range: `z_score, ${morfSchema.accessible_via?.filter_by_range as string}`
+    }
+  }
+  const edgeFilters = getFilterStatements(edgeFilterSchema, input)
 
   if (gene) {
-    filters.push('(record._from == gene._id OR record._to == gene._id)')
+    filters.push('(record._from == gene._id OR (record.source != \'IGVF\' AND record._to == gene._id))')
   }
 
   if (associatedGene) {
-    filters.push('(record._from == associatedGene._id OR record._to == associatedGene._id)')
+    filters.push('(record._to == associatedGene._id OR (record.source != \'IGVF\' AND record._from == associatedGene._id))')
   }
 
   if (edgeFilters) {
@@ -194,7 +239,9 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       'name': record.name,
       'gene_1': ${input.verbose === 'true' ? `(${sourceVerboseQuery})` : 'record._from'},
       'gene_2': ${input.verbose === 'true' ? `(${targetVerboseQuery})` : 'record._to'}},
-      (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}})))
+      (record.source == 'IGVF' ? MERGE({${getDBReturnStatements(morfSchema)}}, {
+        transcript: ${input.verbose === 'true' ? `(FIRST(FOR transcriptRecord IN transcripts FILTER transcriptRecord._id == record.transcript RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'transcriptRecord')}}))` : 'record.transcript'}
+      }) : record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}})))
   `
 
   return await (await db.query(query)).all()

@@ -209,59 +209,12 @@ export const descriptions = {
     Pagination is 0-based.',
 
   genes_genes:
-    'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
-    The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
-    The limit parameter controls the page size and can not exceed 100. <br> \
-    Pagination is 0-based. <br> <br> \
-    ' + examples([
-      {
-        id: 'biogrid',
-        label: 'BioGRID',
-        examples: [
-          {
-            label: 'Single result',
-            items: [
-              'gene_id = ENSG00000112592',
-              'associated_gene_id = ENSG00000163132',
-              'source = BioGRID',
-              'files_fileset = IGVFFI4317VDGK'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'gene_id = ENSG00000112592',
-              'source = BioGRID'
-            ]
-          }
-        ]
-      },
-      {
-        id: 'coxpresdb',
-        label: 'COXPRESdb',
-        examples: [
-          {
-            label: 'Single result',
-            items: [
-              'gene_id = ENSG00000153048',
-              'associated_gene_id = ENSG00000233369',
-              'source = COXPRESdb'
-            ]
-          },
-          {
-            label: 'Group results',
-            items: [
-              'gene_id = ENSG00000153048',
-              'source = COXPRESdb'
-            ]
-          }
-        ]
-      }
-    ],
-    'Examples by source',
-    'These examples are grouped by source; use the <code>source</code> filter to return data from a specific source.'
-    ),
+    'Retrieve gene–gene associations, including MORF gene overexpression effects.<br> \
+    For IGVF effects, gene_id identifies the overexpressed gene and associated_gene_id identifies the readout gene.<br> \
+    BioGRID and COXPRESdb associations remain searchable from either gene.<br> \
+    Define a gene, associated gene, transcript_id, morf_id, files_fileset, or method.<br> \
+    Set verbose=true to expand gene and transcript links; significant=true filters significant effects.<br> \
+    Each MORF transcript link retains the shared construct morf_id. Pagination is 0-based; maximum page size is 500.',
 
   variants: 'Retrieve genetic variants.<br> \
   Example: organism = Homo sapiens or Mus musculus.<br> \
@@ -2053,34 +2006,6 @@ export const descriptions = {
     method = CRISPR screen, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI9584UDAS. <br> \
-    The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based.',
-
-  transcripts_genes_effects:
-    'Retrieve genes whose expression is modulated by overexpressed transcripts (MORF screens).<br> \
-    At least one of these properties must be defined: transcript_id, gene_id, morf_id, files_fileset, or method. <br> \
-    Set significant = true to return only associations with adjusted p-value &lt; 0.05.<br> \
-    Set verbose = true to retrieve full info on the transcript and gene.<br> \
-    Example: transcript_id = ENST00000619387, <br> \
-    gene_id = ENSG00000198846 (TOX), <br> \
-    morf_id = AATF_1, <br> \
-    method = MORF screen, <br> \
-    files_fileset = IGVFFI6734IWRB, <br> \
-    significant = true. <br> \
-    The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based.',
-
-  genes_transcripts_effects:
-    'Retrieve overexpressed transcripts associated with a readout gene (MORF screens).<br> \
-    At least one of these properties must be defined: gene_id, transcript_id, morf_id, files_fileset, or method. <br> \
-    Set significant = true to return only associations with adjusted p-value &lt; 0.05.<br> \
-    Set verbose = true to retrieve full info on the transcript and gene.<br> \
-    Example: gene_id = ENSG00000198846 (TOX), <br> \
-    transcript_id = ENST00000619387, <br> \
-    morf_id = AATF_1, <br> \
-    method = MORF screen, <br> \
-    files_fileset = IGVFFI6734IWRB, <br> \
-    significant = true. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 

@@ -26,7 +26,6 @@ import { variantsBiosamplesRouters } from './variants_biosamples'
 import { genomicElementsGenesRouters } from './genomic_elements_genes'
 import { variantsGenomicElementsGenesRouters } from './variants_genomic_elements_genes'
 import { genomicElementsPhenotypesRouters } from './genomic_elements_phenotypes'
-import { transcriptsGenesEffectsRouters } from './transcripts_genes_effects'
 import { qtlsRouters } from './qtls'
 
 export const edgeRouters = {
@@ -58,6 +57,5 @@ export const edgeRouters = {
   ...genomicElementsGenesRouters,
   ...variantsGenomicElementsGenesRouters,
   ...genomicElementsPhenotypesRouters,
-  ...transcriptsGenesEffectsRouters,
   ...qtlsRouters
 }

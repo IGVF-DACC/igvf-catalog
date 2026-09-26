@@ -121,7 +121,8 @@
         },
         "genes_genes": {
             "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
-            "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
+            "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json",
+            "MORFGeneGene": "schemas/edges/genes_genes.MORFGeneGene.json"
         },
         "genes_mm_genes": {
             "MGIHumanMouseOrthologAdapter": "schemas/edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json"
@@ -167,9 +168,6 @@
         },
         "proteins_proteins": {
             "ProteinsInteraction": "schemas/edges/proteins_proteins.ProteinsInteraction.json"
-        },
-        "transcripts_genes": {
-            "MORFTranscriptGene": "schemas/edges/transcripts_genes.MORFTranscriptGene.json"
         },
         "transcripts_genes_structure": {
             "GencodeStructure": "schemas/edges/transcripts_genes_structure.GencodeStructure.json"
@@ -224,7 +222,5 @@
         "variants_variants": {
             "TopLD": "schemas/edges/variants_variants.TopLD.json"
         }
-
     }
-
 }

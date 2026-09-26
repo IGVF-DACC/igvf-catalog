@@ -1322,23 +1322,23 @@ genomic element to phenotype CRISPR element phenotype:
   label: regulatory element effect on phenotype
 
 # Prerequisite: load files_filesets for MORF screen accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.MORF screen).
-# Portal files must have catalog_collections including transcripts_genes.
+# Portal files must have catalog_collections including genes_genes.
 # ORF transcript table IGVFFI2373SYJW is a reference file, not a files_filesets load.
-# RefSeq-only constructs use bundled data_loading_support_files/MORF_screen/gencode.v43.metadata.RefSeq.gz.
+# Requires transcripts.refseq_transcript_ids from PR #894 to be loaded.
 # RefSeq accession versions are ignored; recovered ENSTs must exist in Catalog transcripts.
-# Example: python3 data_parser.py --adapter morf_transcript_gene --source-url https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/ --filepath ~/dataset/IGVFFI6734IWRB.tsv.gz --reference-filepath ~/dataset/IGVFFI2373SYJW.tsv.gz --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/ --label transcript_gene --output-bucket-key transcripts_genes/morf_transcript_gene_IGVFFI6734IWRB.jsonl --output-bucket igvf-catalog-parsed-collections
-transcript to gene MORF screen:
-  collection: transcripts_genes
+# Example: python3 data_parser.py --adapter morf_gene_gene --source-url https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/ --filepath ~/dataset/IGVFFI6734IWRB.tsv.gz --reference-filepath ~/dataset/IGVFFI2373SYJW.tsv.gz --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/ --label gene_gene --output-bucket-key genes_genes/morf_gene_gene_IGVFFI6734IWRB.jsonl --output-bucket igvf-catalog-parsed-collections
+gene to gene MORF screen:
+  collection: genes_genes
   params:
     - label
   command: >
-    python3 data_parser.py --adapter morf_transcript_gene
+    python3 data_parser.py --adapter morf_gene_gene
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label transcript_gene
-    --output-bucket-key transcripts_genes/morf_transcript_gene_{datafile_accession}.jsonl
+    --label gene_gene
+    --output-bucket-key genes_genes/morf_gene_gene_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/@@download/IGVFFI6734IWRB.tsv.gz
@@ -1348,7 +1348,7 @@ transcript to gene MORF screen:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/@@download/IGVFFI2373SYJW.tsv.gz
       reference_source_url: https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/
   source: IGVF
-  label: transcript effect on gene expression
+  label: gene overexpression effect on gene expression
 
 # Prerequisite: load files_filesets for CRISPR variant-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR variant phenotype)
 # Portal files must have catalog_collections including variants and variants_phenotypes.

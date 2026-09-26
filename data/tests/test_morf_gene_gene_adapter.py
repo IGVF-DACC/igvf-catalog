@@ -3,7 +3,7 @@ import math
 import pytest
 from unittest.mock import MagicMock, patch
 
-from adapters.MORF_transcript_gene_adapter import MORFTranscriptGene
+from adapters.MORF_gene_gene_adapter import MORFGeneGene
 from adapters.writer import SpyWriter
 
 DESEQ_PATH = './samples/morf_transcript_gene_deseq2.example.tsv'
@@ -14,7 +14,7 @@ REFERENCE_SOURCE_URL = 'https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/'
 
 @pytest.fixture
 def mock_file_fileset():
-    with patch('adapters.MORF_transcript_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.MORF_gene_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'MORF screen',
             'class': 'observed data',
@@ -29,7 +29,7 @@ def mock_file_fileset():
 
 @pytest.fixture
 def mock_gene_validator():
-    with patch('adapters.MORF_transcript_gene_adapter.GeneValidator') as mock_validator:
+    with patch('adapters.MORF_gene_gene_adapter.GeneValidator') as mock_validator:
         mock_validator.return_value = MagicMock(
             validate=MagicMock(return_value=True)
         )
@@ -37,9 +37,9 @@ def mock_gene_validator():
 
 
 def _build_adapter(writer, **kwargs):
-    return MORFTranscriptGene(
+    return MORFGeneGene(
         filepath=kwargs.get('filepath', DESEQ_PATH),
-        label=kwargs.get('label', 'transcript_gene'),
+        label=kwargs.get('label', 'gene_gene'),
         source_url=kwargs.get('source_url', SOURCE_URL),
         writer=writer,
         validate=kwargs.get('validate', True),
@@ -53,7 +53,7 @@ def _parsed_docs(writer):
     return [json.loads(item) for item in writer.contents]
 
 
-def test_morf_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_gene_validator):
+def test_morf_gene_gene_writes_ensembl_edges(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
     adapter = _build_adapter(writer)
     adapter.process_file()
@@ -61,15 +61,16 @@ def test_morf_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_gene_
     docs = _parsed_docs(writer)
     keys = {doc['_key'] for doc in docs}
     assert keys == {
-        'ENST00000619387_ENSG00000198846_IGVFFI6734IWRB_AATF_1',
-        'ENST00000450518_ENSG00000198846_IGVFFI6734IWRB_ACTL6A_1',
-        'ENST00000392662_ENSG00000198846_IGVFFI6734IWRB_ACTL6A_1',
-        'ENST00000511061_ENSG00000198846_IGVFFI6734IWRB_NKX2_1_1',
-        'ENST00000403290_ENSG00000198846_IGVFFI6734IWRB_ARNTL_1',
+        'ENSG00000275700_ENSG00000198846_ENST00000619387_IGVFFI6734IWRB_AATF_1',
+        'ENSG00000136518_ENSG00000198846_ENST00000450518_IGVFFI6734IWRB_ACTL6A_1',
+        'ENSG00000136518_ENSG00000198846_ENST00000392662_IGVFFI6734IWRB_ACTL6A_1',
+        'ENSG00000136352_ENSG00000198846_ENST00000511061_IGVFFI6734IWRB_NKX2_1_1',
+        'ENSG00000133794_ENSG00000198846_ENST00000403290_IGVFFI6734IWRB_ARNTL_1',
     }
 
     aatf = next(doc for doc in docs if doc['morf_id'] == 'AATF_1')
-    assert aatf['_from'] == 'transcripts/ENST00000619387'
+    assert aatf['_from'] == 'genes/ENSG00000275700'
+    assert aatf['transcript'] == 'transcripts/ENST00000619387'
     assert aatf['_to'] == 'genes/ENSG00000198846'
     assert aatf['log2FC'] == pytest.approx(-0.786997515211818)
     assert aatf['log2FC_se'] == pytest.approx(0.699309113088129)
@@ -83,7 +84,7 @@ def test_morf_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_gene_
     assert aatf['refseq_transcript_ids'] == ['NM_012138']
     assert aatf['method'] == 'MORF screen'
     assert aatf['crispr_modality'] is None
-    assert aatf['label'] == 'transcript effect on gene expression'
+    assert aatf['label'] == 'gene overexpression effect on gene expression'
     assert aatf['name'] == 'modulates expression of'
     assert aatf['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/'
     assert aatf['files_filesets'] == 'files_filesets/IGVFFI6734IWRB'
@@ -91,7 +92,7 @@ def test_morf_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_gene_
     assert aatf['biological_context'] == 'CD8-positive, alpha-beta T cell'
 
 
-def test_morf_transcript_gene_joins_hyphenated_row_ids(mock_file_fileset, mock_gene_validator):
+def test_morf_gene_gene_joins_hyphenated_row_ids(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
     adapter = _build_adapter(writer)
     adapter.process_file()
@@ -100,17 +101,17 @@ def test_morf_transcript_gene_joins_hyphenated_row_ids(mock_file_fileset, mock_g
         doc for doc in _parsed_docs(writer) if doc['morf_id'] == 'NKX2_1_1')
     assert nkx['significant'] is True
     assert nkx['log2FC'] == pytest.approx(1.2)
-    assert nkx['_from'] == 'transcripts/ENST00000511061'
+    assert nkx['transcript'] == 'transcripts/ENST00000511061'
 
 
-def test_morf_transcript_gene_emits_one_edge_per_ensembl_transcript(mock_file_fileset, mock_gene_validator):
+def test_morf_gene_gene_emits_one_edge_per_ensembl_transcript(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
     adapter = _build_adapter(writer)
     adapter.process_file()
 
     actl = [
         doc for doc in _parsed_docs(writer) if doc['morf_id'] == 'ACTL6A_1']
-    assert {doc['_from'] for doc in actl} == {
+    assert {doc['transcript'] for doc in actl} == {
         'transcripts/ENST00000450518',
         'transcripts/ENST00000392662',
     }
@@ -121,18 +122,18 @@ def test_morf_transcript_gene_emits_one_edge_per_ensembl_transcript(mock_file_fi
     )
 
 
-def test_morf_transcript_gene_allows_null_orf_gene(mock_file_fileset, mock_gene_validator):
+def test_morf_gene_gene_resolves_missing_orf_gene(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
     adapter = _build_adapter(writer)
     adapter.process_file()
 
     arntl = next(
         doc for doc in _parsed_docs(writer) if doc['morf_id'] == 'ARNTL_1')
-    assert arntl['orf_gene'] is None
-    assert arntl['_from'] == 'transcripts/ENST00000403290'
+    assert arntl['orf_gene'] == 'ENSG00000133794'
+    assert arntl['_from'] == 'genes/ENSG00000133794'
 
 
-def test_morf_transcript_gene_flags_refseq_only_orfs(mock_file_fileset, mock_gene_validator, caplog):
+def test_morf_gene_gene_flags_refseq_only_orfs(mock_file_fileset, mock_gene_validator, caplog):
     writer = SpyWriter()
     adapter = _build_adapter(writer)
     adapter.process_file()
@@ -145,7 +146,7 @@ def test_morf_transcript_gene_flags_refseq_only_orfs(mock_file_fileset, mock_gen
     assert 'NM_004301.4' in caplog.text
 
 
-def test_morf_transcript_gene_skips_na_deseq_stats(mock_file_fileset, mock_gene_validator, caplog):
+def test_morf_gene_gene_skips_na_deseq_stats(mock_file_fileset, mock_gene_validator, caplog):
     caplog.set_level('INFO')
     writer = SpyWriter()
     adapter = _build_adapter(writer)
@@ -155,7 +156,7 @@ def test_morf_transcript_gene_skips_na_deseq_stats(mock_file_fileset, mock_gene_
     assert 'missing DESeq2 log2FoldChange' in caplog.text
 
 
-def test_morf_transcript_gene_chronic_accession(mock_file_fileset, mock_gene_validator):
+def test_morf_gene_gene_chronic_accession(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
     adapter = _build_adapter(
         writer,
@@ -168,18 +169,18 @@ def test_morf_transcript_gene_chronic_accession(mock_file_fileset, mock_gene_val
     assert '_IGVFFI6032GREJ_' in first['_key']
 
 
-def test_morf_transcript_gene_invalid_label(mock_file_fileset, mock_gene_validator):
+def test_morf_gene_gene_invalid_label(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label'):
         _build_adapter(writer, label='invalid_label')
 
 
-def test_morf_transcript_gene_unsupported_accession(mock_file_fileset):
+def test_morf_gene_gene_unsupported_accession(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Unsupported file accession'):
-        MORFTranscriptGene(
+        MORFGeneGene(
             filepath=DESEQ_PATH,
-            label='transcript_gene',
+            label='gene_gene',
             source_url='https://data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
             reference_filepath=ORF_PATH,
@@ -187,26 +188,26 @@ def test_morf_transcript_gene_unsupported_accession(mock_file_fileset):
         )
 
 
-def test_morf_transcript_gene_requires_reference_filepath(mock_file_fileset):
+def test_morf_gene_gene_requires_reference_filepath(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='reference_filepath is required'):
-        MORFTranscriptGene(
+        MORFGeneGene(
             filepath=DESEQ_PATH,
-            label='transcript_gene',
+            label='gene_gene',
             source_url=SOURCE_URL,
             writer=writer,
         )
 
 
-def test_morf_transcript_gene_invalid_readout_gene(mock_file_fileset):
+def test_morf_gene_gene_invalid_readout_gene(mock_file_fileset):
     writer = SpyWriter()
-    with patch('adapters.MORF_transcript_gene_adapter.GeneValidator') as mock_validator:
+    with patch('adapters.MORF_gene_gene_adapter.GeneValidator') as mock_validator:
         mock_validator.return_value = MagicMock(
             validate=MagicMock(return_value=False)
         )
-        adapter = MORFTranscriptGene(
+        adapter = MORFGeneGene(
             filepath=DESEQ_PATH,
-            label='transcript_gene',
+            label='gene_gene',
             source_url=SOURCE_URL,
             writer=writer,
             validate=False,
@@ -219,7 +220,7 @@ def test_morf_transcript_gene_invalid_readout_gene(mock_file_fileset):
 
 @pytest.fixture(autouse=True)
 def mock_gene_maps():
-    with patch('adapters.MORF_transcript_gene_adapter.get_gene_map_from_arangodb', return_value={}) as mapping:
+    with patch('adapters.MORF_gene_gene_adapter.get_gene_map_from_arangodb', return_value={'ARNTL': ['ENSG00000133794']}) as mapping:
         yield mapping
 
 
@@ -228,7 +229,7 @@ def test_missing_gene_name_then_synonym(mock_gene_maps):
         {'CURRENT': ['ENSG00000000001']}, {'OLD': ['ENSG00000000002']}]
     orfs = {name: {'morf_id': name, 'orf_gene': None, 'orf_gene_symbol': name,
                    'ensembl_transcript_ids': []} for name in ['CURRENT', 'OLD', 'GFP_1', 'mCherry_1']}
-    adapter = MORFTranscriptGene.__new__(MORFTranscriptGene)
+    adapter = MORFGeneGene.__new__(MORFGeneGene)
     adapter._resolve_missing_orf_genes(orfs)
     assert orfs['CURRENT']['orf_gene'] == 'ENSG00000000001'
     assert orfs['OLD']['orf_gene'] == 'ENSG00000000002'
@@ -247,9 +248,9 @@ def test_ambiguous_gene_requires_consistent_transcripts(mock_gene_maps, parents,
         {}, {'OLD': ['ENSG00000000001', 'ENSG00000000002']}]
     orf = {'morf_id': 'OLD_1', 'orf_gene': None, 'orf_gene_symbol': 'OLD',
            'ensembl_transcript_ids': ['ENST00000000001', 'ENST00000000002']}
-    adapter = MORFTranscriptGene.__new__(MORFTranscriptGene)
-    with patch('adapters.MORF_transcript_gene_adapter.ArangoDB') as db, patch.object(
-        MORFTranscriptGene, 'logger', create=True
+    adapter = MORFGeneGene.__new__(MORFGeneGene)
+    with patch('adapters.MORF_gene_gene_adapter.ArangoDB') as db, patch.object(
+        MORFGeneGene, 'logger', create=True
     ):
         db.return_value.get_igvf_connection.return_value.aql.execute.return_value = [
             {'transcript': 'transcripts/' + t, 'gene': 'genes/' + g}
@@ -277,7 +278,7 @@ def test_reference_url_required(mock_file_fileset, mock_gene_validator, url):
 
 
 def test_transcript_parser_rejects_partial_ids():
-    assert MORFTranscriptGene._parse_transcript_ids(
+    assert MORFGeneGene._parse_transcript_ids(
         'ENST000000000010,xENST00000000001,ENST00000000001.bad,'
         'ENST00000000002.3,ENST00000000002.4,NM_123.1,NM_123.1'
     ) == (['ENST00000000002'], ['NM_123.1'])
@@ -334,19 +335,25 @@ def test_null_pvalues_are_preserved(tmp_path, mock_file_fileset, mock_gene_valid
 
 @pytest.fixture(autouse=True)
 def mock_transcript_database():
-    with patch('adapters.MORF_transcript_gene_adapter.ArangoDB') as db:
-        db.return_value.get_igvf_connection.return_value.aql.execute.return_value = []
+    with patch('adapters.MORF_gene_gene_adapter.ArangoDB') as db:
+        def execute(query, **kwargs):
+            if 'HAS(t,' in query:
+                return [True]
+            if 'FOR e IN genes_transcripts FILTER e._to == t._id' in query:
+                return [{'transcript': t, 'gene': g} for t, g in {
+                    'ENST00000619387': 'ENSG00000275700',
+                    'ENST00000450518': 'ENSG00000136518',
+                    'ENST00000392662': 'ENSG00000136518',
+                    'ENST00000511061': 'ENSG00000136352',
+                    'ENST00000403290': 'ENSG00000133794'
+                }.items()]
+            return []
+        db.return_value.get_igvf_connection.return_value.aql.execute.side_effect = execute
         yield db
 
 
 def test_refseq_fallback_ignores_versions_and_filters_catalog(tmp_path, mock_transcript_database):
-    path = tmp_path / 'mapping.tsv'
-    path.write_text('ENST00000000001.2\tNM_123.2\tNP_123.1\n'
-                    'ENST00000000002.1\tNM_123.3\n'
-                    'ENST00000000003.1\tNM_123.3\n'
-                    'ENST00000000001.2_PAR_Y\tNM_123.4\n')
-    adapter = MORFTranscriptGene.__new__(MORFTranscriptGene)
-    adapter.REFSEQ_MAPPING_PATH = path
+    adapter = MORFGeneGene.__new__(MORFGeneGene)
 
     def orf(name, transcripts, refs):
         return {'morf_id': name, 'ensembl_transcript_ids': transcripts,
@@ -355,13 +362,15 @@ def test_refseq_fallback_ignores_versions_and_filters_catalog(tmp_path, mock_tra
             'supplied': orf('TEST_2', ['ENST00000000004'], ['NM_123.1']),
             'unmatched': orf('TEST_3', [], ['NM_999.1']),
             'control': orf('GFP_1', [], ['NM_123.1'])}
-    mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute.return_value = [
-        'ENST00000000001', 'ENST00000000001_PAR_Y', 'ENST00000000002']
+    query = mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute
+    query.side_effect = [[True], [
+        {'accession': 'NM_123', 'transcript': t} for t in
+        ['ENST00000000001', 'ENST00000000001_PAR_Y', 'ENST00000000002']]]
     adapter._resolve_missing_transcripts(orfs)
     assert orfs['missing']['ensembl_transcript_ids'] == [
         'ENST00000000001', 'ENST00000000001_PAR_Y', 'ENST00000000002']
     assert orfs['missing']['refseq_transcript_ids'] == ['NM_123.1']
-    assert orfs['missing']['transcript_mapping_method'] == 'GENCODE v43 RefSeq accession without version'
+    assert orfs['missing']['transcript_mapping_method'] == 'Catalog transcript RefSeq accession without version'
     assert orfs['supplied']['ensembl_transcript_ids'] == ['ENST00000000004']
     assert orfs['unmatched']['ensembl_transcript_ids'] == []
     assert orfs['control']['ensembl_transcript_ids'] == []
@@ -371,7 +380,7 @@ def test_refseq_fallback_ignores_versions_and_filters_catalog(tmp_path, mock_tra
 def empty_exclusion_file(tmp_path, monkeypatch):
     path = tmp_path / 'exclusions.tsv'
     path.write_text('screen_accession\tMORF_id\treason\n')
-    monkeypatch.setattr(MORFTranscriptGene, 'EXCLUSION_PATH', path)
+    monkeypatch.setattr(MORFGeneGene, 'EXCLUSION_PATH', path)
     return path
 
 
@@ -397,3 +406,48 @@ def test_excluded_constructs_do_not_reach_mapping(empty_exclusion_file, mock_fil
     with patch.object(adapter, '_resolve_missing_transcripts') as resolve:
         adapter.process_file()
     assert 'ACTL6A_2' not in resolve.call_args.args[0]
+
+
+@pytest.mark.parametrize('parents', [{}, {'ENST00000619387': {'ENSG00000000001'}}])
+def test_gene_transcript_mismatch_fails(mock_file_fileset, mock_gene_validator, parents):
+    adapter = _build_adapter(SpyWriter())
+    with patch.object(adapter, '_load_transcript_genes', return_value=parents):
+        with pytest.raises(ValueError, match='does not uniquely match'):
+            adapter.process_file()
+
+
+def test_missing_source_gene_fails(mock_file_fileset, mock_gene_validator, mock_gene_maps):
+    mock_gene_maps.return_value = {}
+    adapter = _build_adapter(SpyWriter())
+    with pytest.raises(ValueError, match='missing or invalid source gene'):
+        adapter.process_file()
+
+
+def test_refseq_requires_updated_transcript_nodes(mock_file_fileset, mock_gene_validator, mock_transcript_database):
+    query = mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute
+    query.side_effect = [[]]
+    adapter = _build_adapter(SpyWriter())
+    with pytest.raises(ValueError, match='PR #894'):
+        adapter.process_file()
+
+
+def test_catalog_refseq_mapping_emits_valid_gene_hyperedge(mock_file_fileset, mock_gene_validator, mock_transcript_database):
+    query = mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute
+    original = query.side_effect
+
+    def execute(aql, **kwargs):
+        if 'RETURN DISTINCT {accession:' in aql:
+            assert kwargs['bind_vars']['accessions'] == ['NM_004301']
+            return [{'accession': 'NM_004301', 'transcript': 'ENST00000450518'}]
+        return original(aql, **kwargs)
+
+    query.side_effect = execute
+    writer = SpyWriter()
+    _build_adapter(writer).process_file()
+    recovered = next(d for d in _parsed_docs(
+        writer) if d['morf_id'] == 'ACTL6A_2')
+    assert recovered['_from'] == 'genes/ENSG00000136518'
+    assert recovered['_to'] == 'genes/ENSG00000198846'
+    assert recovered['transcript'] == 'transcripts/ENST00000450518'
+    assert recovered['refseq_transcript_ids'] == ['NM_004301.4']
+    assert recovered['transcript_mapping_method'] == 'Catalog transcript RefSeq accession without version'
