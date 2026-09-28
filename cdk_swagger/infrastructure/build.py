@@ -10,6 +10,9 @@ from infrastructure.naming import prepend_branch_name
 from infrastructure.tags import add_tags_to_stack
 
 from infrastructure.stacks.pipeline import pipeline_stack_factory
+from infrastructure.stacks.demos_dashboard import DemosDashboardStack
+
+from infrastructure.constructs.existing.catalog_dev import US_WEST_2 as CATALOG_DEV_US_WEST_2
 
 from dataclasses import dataclass
 
@@ -67,7 +70,20 @@ def add_deploy_pipeline_stack_to_app(app: App, config: PipelineConfig) -> None:
     add_tags_to_stack(pipeline, config)
 
 
+def add_demos_dashboard_stack_to_app(app: App) -> None:
+    DemosDashboardStack(
+        app,
+        prepend_project_name('DemosDashboardStack'),
+        env=CATALOG_DEV_US_WEST_2,
+    )
+
+
 def build(app: App) -> None:
+    # The demos dashboard is a standalone, non-per-branch stack: deploy it with
+    # `cdk deploy -c stack=demos-dashboard` instead of `-c branch=$BRANCH`.
+    if app.node.try_get_context('stack') == 'demos-dashboard':
+        add_demos_dashboard_stack_to_app(app)
+        return
     args = get_args(app)
     config = get_config(args)
     add_deploy_pipeline_stack_to_app(app, config)

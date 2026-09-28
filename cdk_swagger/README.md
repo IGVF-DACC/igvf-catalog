@@ -206,6 +206,24 @@ Then use this new branch to deploy your pipeline.
 
 In config, if you want to enable cloudfront and waf, set the boolean. Note that WAF will only be enabled if cloudfront is enabled. These settings cannot be changed in place without manually deleting Route53 records between deployments, which is not recommended.
 
+## Demos dashboard
+
+There's a standalone dashboard that lists every currently active demo (branch, URL, deploy status, and the last-deployed commit hash), since it's otherwise hard to tell when a given demo is ready. It's a small Lambda (behind an API Gateway HTTP API, no custom domain) that reads CloudFormation/CodePipeline directly — see `infrastructure/constructs/demos_dashboard.py` and `lambda/demos_dashboard/handler.py`.
+
+Unlike demo/dev/production stacks, it isn't tied to a branch, so it's deployed with a `stack` context key instead of `branch`:
+
+```bash
+cdk deploy -c stack=demos-dashboard --profile igvf-dev
+```
+
+The deploy output includes `DashboardUrl` (open this in a browser) and `CredentialsSecretArn`. The dashboard is protected with HTTP Basic Auth; fetch the generated username/password with:
+
+```bash
+aws secretsmanager get-secret-value --secret-id <CredentialsSecretArn> --profile igvf-dev --query SecretString --output text
+```
+
+This only needs to be deployed once — it isn't per-branch and doesn't need redeploying when demo stacks come and go.
+
 ## Useful commands
 
 * `cdk ls`          list all stacks in the app
