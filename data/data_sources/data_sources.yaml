@@ -1889,6 +1889,21 @@ study:
   source: OpenTargets
   version: October 2022 (22.10)
 
+# Run this BEFORE "variant to phenotype" below: it loads any variant referenced by this GWAS
+# file that isn't already in the variants collection, so the variants_phenotypes edges created
+# next don't end up with a dangling _from reference.
+# Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath IGVFFI1309WDQG.tsv --output-bucket-key variants/gwas_variants.jsonl --label variants
+variant:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath {variant_to_ontology_datafile} --output-bucket-key variants/gwas_variants.jsonl --label variants
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
+  source: OpenTargets
+  version: October 2022 (22.10)
+
 # Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath IGVFFI1309WDQG.tsv --output-bucket-key variants_phenotypes/gwas_variants_phenotypes.jsonl --label variants_phenotypes
 variant to phenotype:
   collection: variants_phenotypes
