@@ -56,6 +56,7 @@ from adapters.gencc_diseases_genes_adapter import GenccDiseasesGenes
 from adapters.scE2G_adapter import scE2G
 from adapters.DUAL_IPA_coding_variant_scores_adapter import DUALIPAAdapter
 from adapters.variant_painting_coding_variant_scores_adapter import VariantPaintingAdapter
+from adapters.semi_qY2H_adapter import SemiQY2H
 
 KEY_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -148,7 +149,12 @@ KEY_TO_ADAPTER = {
     'gencc_disease_gene': GenccDiseasesGenes,
     'scE2G': scE2G,
     'dual_ipa_coding_variant_phenotype': DUALIPAAdapter,
+<<<<<<< HEAD
     'variant_painting_coding_variant_phenotype': VariantPaintingAdapter
+=======
+    'semi_qy2h_protein_protein': SemiQY2H,
+    'semi_qy2h_coding_variant_phenotype': SemiQY2H,
+>>>>>>> 96dcb9fb (DSERV-1268-vidal-y2h)
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
