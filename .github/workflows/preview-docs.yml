@@ -1,0 +1,107 @@
+name: Preview Docs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'src/**'
+      - 'docs/**'
+      - 'fern/**'
+      - 'data/schemas/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/preview-docs.yml'
+
+concurrency:
+  group: preview-docs-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Pull requests from forks don't receive the FERN_TOKEN secret.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate OpenAPI spec
+        run: npm run openapi:generate
+
+      - name: Setup Fern CLI
+        uses: fern-api/setup-fern-cli@v1
+
+      - name: Generate preview
+        id: generate-docs
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          PREVIEW_ID: pr-${{ github.event.pull_request.number }}
+        run: |
+          fern generate --docs --preview --id "$PREVIEW_ID" 2>&1 | tee fern-output.log
+          URL=$(sed 's/\x1b\[[0-9;]*m//g' fern-output.log | grep -oE 'Published docs to https://[^ ]+' | head -1 | sed 's/^Published docs to //')
+          if [ -z "$URL" ]; then
+            echo "Could not find the preview URL in the Fern output" >&2
+            exit 1
+          fi
+          echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Find pages changed in this PR
+        id: page-links
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PREVIEW_URL: ${{ steps.generate-docs.outputs.preview_url }}
+        run: |
+          CHANGED_FILES=$(git diff --name-only "origin/${BASE_REF}...HEAD" -- '*.md' '*.mdx' || true)
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "page_links=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          BASE_URL=$(echo "$PREVIEW_URL" | grep -oE 'https?://[^/]+')
+          FILES_PARAM=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')
+          RESPONSE=$(curl -sf -H "FERN_TOKEN: $FERN_TOKEN" "${PREVIEW_URL}/api/fern-docs/get-slug-for-file?files=${FILES_PARAM}") || {
+            echo "page_links=" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          PAGE_LINKS=$(echo "$RESPONSE" | jq -r --arg url "$BASE_URL" \
+            '.mappings[] | select(.slug != null) | "- [\(.slug)](\($url)/\(.slug))"')
+          {
+            echo "page_links<<EOF"
+            echo "$PAGE_LINKS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write comment
+        env:
+          PREVIEW_URL: ${{ steps.generate-docs.outputs.preview_url }}
+          PAGE_LINKS: ${{ steps.page-links.outputs.page_links }}
+        run: |
+          echo "**Docs preview:** <${PREVIEW_URL}>" > comment.md
+          if [ -n "$PAGE_LINKS" ]; then
+            echo "" >> comment.md
+            echo "Pages changed in this PR:" >> comment.md
+            echo "$PAGE_LINKS" >> comment.md
+          fi
+
+      - name: Post PR comment
+        uses: thollander/actions-comment-pull-request@v2.4.3
+        with:
+          filePath: comment.md
+          comment_tag: fern-preview
+          mode: upsert
