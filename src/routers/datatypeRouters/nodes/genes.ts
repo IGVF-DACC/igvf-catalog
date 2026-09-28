@@ -12,7 +12,6 @@ const MAX_PAGE_SIZE = 500
 
 const humanGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const mouseGeneSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
-const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 
 const GENE_TYPES = getCollectionEnumValuesOrThrow('nodes', 'genes', 'gene_type')
 const GENE_COLLECTIONS = getCollectionEnumValuesOrThrow('nodes', 'genes', 'collections')
@@ -65,7 +64,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
 
   const inRegionQuery = `
     FOR record in genes
-    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam(input))}
+    FILTER ${getFilterStatements(humanGeneSchema, preProcessRegionParam(input))}
     RETURN {${getDBReturnStatements(humanGeneSchema)}}
   `
 
