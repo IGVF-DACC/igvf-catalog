@@ -90,7 +90,7 @@ def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker, mock
     assert len(spy_writer.contents) > 0
     first_item = json.loads(spy_writer.contents[0])
     assert isinstance(first_item, dict)
-    assert set(first_item.keys()) == {'_key', '_from', '_to', 'gene_name', 'pmid',
+    assert set(first_item.keys()) == {'_key', '_from', '_to', 'gene_names', 'pmid',
                                       'study_parameters', 'phenotype_categories', 'name', 'inverse_name', 'source', 'source_url',
                                       'class', 'method', 'files_filesets'}
     assert first_item['_from'].startswith('variants/')
