@@ -385,7 +385,7 @@ def test_exclusions_are_screen_specific_and_normalized(empty_exclusion_file, moc
     docs = _parsed_docs(writer)
     assert not any(d['morf_id'] == 'NKX2_1_1' for d in docs)
     assert any(d['morf_id'] == 'AATF_1' for d in docs)
-    assert 'manual_exclusion' in caplog.text
+    assert 'Excluded ' not in caplog.text
 
 
 def test_excluded_constructs_do_not_reach_mapping(empty_exclusion_file, mock_file_fileset, mock_gene_validator):

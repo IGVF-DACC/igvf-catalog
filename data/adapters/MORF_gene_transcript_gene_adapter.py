@@ -378,8 +378,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
                     continue
                 normalized = self._normalize_morf_id(row_id)
                 if normalized in exclusions:
-                    self.logger.info('Excluded %s from %s: %s',
-                                     row_id, self.file_accession, exclusions[normalized])
                     continue
                 if normalized in self.CONTROL_MORF_IDS:
                     continue

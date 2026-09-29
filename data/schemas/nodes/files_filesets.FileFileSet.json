@@ -141,6 +141,7 @@
             "candidate Cis-Regulatory Elements",
             "eQTL",
             "elements",
+            "genes",
             "pQTL",
             "scATAC-seq",
             "scE2G",
