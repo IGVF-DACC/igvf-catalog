@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withHgncPrefix } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
@@ -708,7 +708,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   let isElementQuery = false
   if (input.region !== undefined) {
     isElementQuery = true
-    const elementInput: paramsFormatType = { region: input.region, type: input.region_type, source_annotation: input.source_annotation, page: 0 }
+    const elementInput: paramsFormatType = { region: input.region, type: input.region_type, page: 0 }
     const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(elementInput))
     const elementQuery = `
       FOR record IN ${genomicElementCollectionName}
@@ -718,12 +718,18 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     elementIDs = await (await db.query(elementQuery)).all()
     delete input.region
     delete input.region_type
+  }
+
+  let sourceAnnotationFilter = ''
+  if (input.source_annotation !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    sourceAnnotationFilter = `DOCUMENT(record._from).source_annotation == '${escapeAqlString(input.source_annotation as string)}'`
     delete input.source_annotation
   }
 
   const edgeFilter = buildEdgeFilter(input)
   const elementFilter = isElementQuery ? 'record._from IN @elementIDs' : ''
-  const baseFilter = buildCombinedFilter(elementFilter, edgeFilter)
+  const baseFilter = [elementFilter, edgeFilter, sourceAnnotationFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
   const combinedFilter = biologicalContext
     ? buildCombinedFilter(baseFilter, `record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`)
     : baseFilter
