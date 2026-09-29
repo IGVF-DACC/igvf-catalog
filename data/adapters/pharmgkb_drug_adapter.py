@@ -297,7 +297,7 @@ class PharmGKB(BaseAdapter):
                                             '_key': edge_key,
                                             '_from': _from,
                                             '_to': _to,
-                                            'gene_name': gene_names,
+                                            'gene_names': gene_names,
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
                                             'phenotype_categories': _normalize_phenotype_categories(variant_drug_row[5]),
