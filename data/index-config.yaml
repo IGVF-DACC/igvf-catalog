@@ -339,6 +339,7 @@ studies:
 transcripts:
   persistent:
     fields:
+      - refseq_transcript_ids[*]
       - chr, gene_name, name, transcript_type
       - gene_name, name, transcript_type
       - name, transcript_type
