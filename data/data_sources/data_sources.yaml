@@ -1296,8 +1296,6 @@ genomic element to gene IGVF CRISPR E2G:
   source: IGVF
   label: str # element effect on gene expression of {readout_gene}
 
-# Prerequisite: load files_filesets for CRISPR element-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR element phenotype)
-# Portal files must have catalog_collections including genomic_elements and genomic_elements_phenotypes.
 # Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element CRISPR element phenotype:
   collection: genomic_elements
@@ -1323,11 +1321,6 @@ genomic element to phenotype CRISPR element phenotype:
   source: IGVF
   label: regulatory element effect on phenotype
 
-# Prerequisite: load files_filesets for MORF screen accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.MORF screen).
-# Portal files must have catalog_collections including genes_transcripts_genes.
-# ORF transcript table IGVFFI2373SYJW is a reference file, not a files_filesets load.
-# Requires transcripts.refseq_transcript_ids and existing genes_transcripts edges to be loaded.
-# RefSeq accession versions are ignored; recovered ENSTs must exist in Catalog transcripts.
 # Example: python3 data_parser.py --adapter morf_gene_transcript_gene --source-url https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/ --filepath ~/dataset/IGVFFI6734IWRB.tsv.gz --reference-filepath ~/dataset/IGVFFI2373SYJW.tsv.gz --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/ --label gene_transcript_gene --output-bucket-key genes_transcripts_genes/morf_gene_transcript_gene_IGVFFI6734IWRB.jsonl --output-bucket igvf-catalog-parsed-collections
 gene transcript to gene MORF screen:
   collection: genes_transcripts_genes
@@ -1352,9 +1345,6 @@ gene transcript to gene MORF screen:
   source: IGVF
   label: gene overexpression effect on gene expression
 
-# Prerequisite: load files_filesets for CRISPR variant-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR variant phenotype)
-# Portal files must have catalog_collections including variants and variants_phenotypes.
-# NTR phenotype terms (LDL-C uptake / NTR:0001118) are written by this adapter via --label ontology_term.
 # Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant --output-bucket-key variants/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
 variant CRISPR variant phenotype:
   collection: variants
@@ -1390,7 +1380,6 @@ ontology term CRISPR variant phenotype NTR:
   command: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ' ' --label ontology_term --output-bucket-key ontology_terms/crispr_variant_phenotype_NTR_0001118.jsonl --output-bucket igvf-catalog-parsed-collections
   source: IGVF
 
-# Prerequisite: load files_filesets for scE2G accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.scE2G)
 # Example: python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI5648GWQX
 # Example: python3 data_parser.py --adapter scE2G --filepath ~/dataset/IGVFFI5648GWQX.tsv.gz --label genomic_element --output-bucket-key genomic_elements/scE2G_genomic_elements_IGVFFI5648GWQX.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element IGVF scE2G:
