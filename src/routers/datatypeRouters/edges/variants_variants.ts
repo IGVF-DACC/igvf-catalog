@@ -58,6 +58,7 @@ const variantsVariantsFormat = z.object({
   ancestry: z.string().nullable(),
   d_prime: z.number().nullable(),
   r2: z.number().nullable(),
+  positive_corr: z.boolean().nullable(),
   label: z.string(),
   variant_1_base_pair: z.string(),
   variant_1_rsid: z.string(),
