@@ -109,11 +109,6 @@ genes_genes:
 genes_transcripts_genes:
   persistent:
     fields:
-      - files_filesets, _key
-      - _from, files_filesets
-      - _to, files_filesets
-      - _from, significant
-      - _to, significant
       - method, files_filesets
       - morf_id
   zkd_sparse:
