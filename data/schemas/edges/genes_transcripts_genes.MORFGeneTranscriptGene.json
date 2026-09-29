@@ -19,7 +19,7 @@
           "collections": [
             "genes_transcripts"
           ],
-          "description": "Existing Catalog gene-to-transcript edge for the overexpressed construct.",
+          "description": "Gene-to-transcript edge for the overexpressed construct.",
           "example": "genes_transcripts/ENSG00000275700_ENST00000619387"
         },
         "_to": {
