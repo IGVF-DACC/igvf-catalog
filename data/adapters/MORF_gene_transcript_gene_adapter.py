@@ -211,7 +211,9 @@ class MORFGeneTranscriptGene(BaseAdapter):
     def _load_exclusions(self):
         exclusions = {}
         with self._open_file(self.EXCLUSION_PATH) as handle:
-            reader = csv.DictReader(handle, delimiter='\t')
+            reader = csv.DictReader(
+                (line for line in handle if not line.lstrip().startswith('#')),
+                delimiter='\t')
             self._check_columns(reader, {'screen_accession', 'MORF_id', 'reason'},
                                 self.EXCLUSION_PATH)
             for row in reader:
@@ -347,30 +349,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
             self.validate_doc(props)
         self.writer.write(json.dumps(props, allow_nan=False) + '\n')
 
-    def _log_skipped(self, missing_ensembl: list[str], missing_reference: list[str], na_stats: list[str]) -> None:
-        if missing_ensembl:
-            self.logger.warning(
-                'Flagged %d ORF(s) in %s with no Ensembl transcript ID; '
-                'skipped until reconciliation: %s',
-                len(missing_ensembl),
-                self.file_accession,
-                ', '.join(missing_ensembl),
-            )
-        if missing_reference:
-            self.logger.warning(
-                'Skipped %d row(s) in %s with no matching MORF_id in the ORF '
-                'reference: %s',
-                len(missing_reference),
-                self.file_accession,
-                ', '.join(missing_reference),
-            )
-        if na_stats:
-            self.logger.info(
-                'Skipped %d ORF(s) in %s with missing DESeq2 log2FoldChange.',
-                len(na_stats),
-                self.file_accession,
-            )
-
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
@@ -389,9 +367,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
         self._resolve_missing_transcripts(orfs)
         self._resolve_missing_orf_genes(orfs)
         transcript_genes = self._load_transcript_genes(orfs)
-        missing_ensembl = []
-        missing_reference = []
-        na_stats = []
 
         with self._open_file(self.filepath) as deseq_file:
             reader = csv.DictReader(deseq_file, delimiter='\t')
@@ -415,18 +390,19 @@ class MORFGeneTranscriptGene(BaseAdapter):
                 seen_ids.add(normalized)
                 orf = orfs.get(normalized)
                 if orf is None:
-                    missing_reference.append(row_id)
-                    continue
+                    raise ValueError(
+                        f'{self.file_accession}: {row_id}: no matching MORF_id in reference. '
+                        f'Reconcile it or record an explicit exclusion in {self.EXCLUSION_PATH}.')
 
                 ensembl_ids = orf['ensembl_transcript_ids']
                 if not ensembl_ids:
                     refseq_label = ','.join(
                         orf['refseq_transcript_ids']) or 'none'
                     symbol = orf['orf_gene_symbol'] or ''
-                    missing_ensembl.append(
-                        f'{orf["morf_id"]} ({symbol} {refseq_label})'.strip()
-                    )
-                    continue
+                    raise ValueError(
+                        f'{self.file_accession}: {orf["morf_id"]} ({symbol} {refseq_label}): '
+                        'no Catalog transcript resolved. Reconcile it or record an '
+                        f'explicit exclusion in {self.EXCLUSION_PATH}.')
 
                 try:
                     stats = {field: self._parse_optional_float(row.get(field))
@@ -443,8 +419,9 @@ class MORFGeneTranscriptGene(BaseAdapter):
                         f'{self.filepath}: row {row_id!r}: {error}') from error
                 log2fc = stats['log2FoldChange']
                 if log2fc is None:
-                    na_stats.append(row_id)
-                    continue
+                    raise ValueError(
+                        f'{self.file_accession}: {row_id}: missing DESeq2 log2FoldChange. '
+                        f'Record an explicit exclusion in {self.EXCLUSION_PATH}.')
 
                 self._validate_gene_transcripts(orf, transcript_genes)
 
@@ -490,5 +467,4 @@ class MORFGeneTranscriptGene(BaseAdapter):
                         'treatments_term_ids': self.treatments_term_ids,
                     })
 
-        self._log_skipped(missing_ensembl, missing_reference, na_stats)
         self.gene_validator.log()

@@ -133,27 +133,18 @@ def test_morf_gene_transcript_gene_resolves_missing_orf_gene(mock_file_fileset, 
     assert arntl['_from'] == 'genes_transcripts/existing_ENST00000403290'
 
 
-def test_morf_gene_transcript_gene_flags_refseq_only_orfs(mock_file_fileset, mock_gene_validator, caplog):
-    writer = SpyWriter()
-    adapter = _build_adapter(writer)
-    adapter.process_file()
-
-    docs = _parsed_docs(writer)
-    assert all(doc['morf_id'] not in {'ACTL6A_2', 'GFP_1'} for doc in docs)
-    assert 'Flagged 1 ORF(s)' in caplog.text
-    assert 'ACTL6A_2' in caplog.text
-    assert 'GFP_1' not in caplog.text
-    assert 'NM_004301.4' in caplog.text
+def test_unlisted_unresolved_transcript_fails(mock_file_fileset, mock_gene_validator, empty_exclusion_file):
+    empty_exclusion_file.write_text('screen_accession\tMORF_id\treason\n')
+    with pytest.raises(ValueError, match='ACTL6A_2.*no Catalog transcript resolved'):
+        _build_adapter(SpyWriter()).process_file()
 
 
-def test_morf_gene_transcript_gene_skips_na_deseq_stats(mock_file_fileset, mock_gene_validator, caplog):
-    caplog.set_level('INFO')
-    writer = SpyWriter()
-    adapter = _build_adapter(writer)
-    adapter.process_file()
-
-    assert all(doc['morf_id'] != 'ARID1B_1' for doc in _parsed_docs(writer))
-    assert 'missing DESeq2 log2FoldChange' in caplog.text
+def test_unlisted_missing_statistics_fail(mock_file_fileset, mock_gene_validator, empty_exclusion_file):
+    lines = empty_exclusion_file.read_text().splitlines()
+    empty_exclusion_file.write_text(
+        '\n'.join(line for line in lines if 'ARID1B_1' not in line) + '\n')
+    with pytest.raises(ValueError, match='ARID1B_1.*missing DESeq2 log2FoldChange'):
+        _build_adapter(SpyWriter()).process_file()
 
 
 def test_morf_gene_transcript_gene_chronic_accession(mock_file_fileset, mock_gene_validator):
@@ -379,7 +370,11 @@ def test_refseq_fallback_ignores_versions_and_filters_catalog(tmp_path, mock_tra
 @pytest.fixture(autouse=True)
 def empty_exclusion_file(tmp_path, monkeypatch):
     path = tmp_path / 'exclusions.tsv'
-    path.write_text('screen_accession\tMORF_id\treason\n')
+    path.write_text('screen_accession\tMORF_id\treason\n'
+                    'IGVFFI6734IWRB\tACTL6A_2\tno_transcript\n'
+                    'IGVFFI6032GREJ\tACTL6A_2\tno_transcript\n'
+                    'IGVFFI6734IWRB\tARID1B_1\tmissing_log2FoldChange\n'
+                    'IGVFFI6032GREJ\tARID1B_1\tmissing_log2FoldChange\n')
     monkeypatch.setattr(MORFGeneTranscriptGene, 'EXCLUSION_PATH', path)
     return path
 
@@ -388,7 +383,9 @@ def test_exclusions_are_screen_specific_and_normalized(empty_exclusion_file, moc
     empty_exclusion_file.write_text(
         'screen_accession\tMORF_id\treason\n'
         'IGVFFI6734IWRB\tNKX2-1_1\tmanual_exclusion\n'
-        'IGVFFI6032GREJ\tAATF_1\tother_screen\n')
+        'IGVFFI6032GREJ\tAATF_1\tother_screen\n'
+        'IGVFFI6734IWRB\tACTL6A_2\tno_transcript\n'
+        'IGVFFI6734IWRB\tARID1B_1\tmissing_log2FoldChange\n')
     caplog.set_level('INFO')
     writer = SpyWriter()
     adapter = _build_adapter(writer)
@@ -401,7 +398,7 @@ def test_exclusions_are_screen_specific_and_normalized(empty_exclusion_file, moc
 
 def test_excluded_constructs_do_not_reach_mapping(empty_exclusion_file, mock_file_fileset, mock_gene_validator):
     empty_exclusion_file.write_text(
-        'screen_accession\tMORF_id\treason\nIGVFFI6734IWRB\tACTL6A_2\tno_transcript\n')
+        'screen_accession\tMORF_id\treason\nIGVFFI6734IWRB\tACTL6A_2\tno_transcript\nIGVFFI6734IWRB\tARID1B_1\tmissing_log2FoldChange\n')
     adapter = _build_adapter(SpyWriter())
     with patch.object(adapter, '_resolve_missing_transcripts') as resolve:
         adapter.process_file()
@@ -423,7 +420,8 @@ def test_missing_source_gene_fails(mock_file_fileset, mock_gene_validator, mock_
         adapter.process_file()
 
 
-def test_refseq_requires_updated_transcript_nodes(mock_file_fileset, mock_gene_validator, mock_transcript_database):
+def test_refseq_requires_updated_transcript_nodes(mock_file_fileset, mock_gene_validator, mock_transcript_database, empty_exclusion_file):
+    empty_exclusion_file.write_text('screen_accession\tMORF_id\treason\n')
     query = mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute
     query.side_effect = [[]]
     adapter = _build_adapter(SpyWriter())
@@ -431,7 +429,9 @@ def test_refseq_requires_updated_transcript_nodes(mock_file_fileset, mock_gene_v
         adapter.process_file()
 
 
-def test_catalog_refseq_mapping_emits_valid_gene_hyperedge(mock_file_fileset, mock_gene_validator, mock_transcript_database):
+def test_catalog_refseq_mapping_emits_valid_gene_hyperedge(mock_file_fileset, mock_gene_validator, mock_transcript_database, empty_exclusion_file):
+    empty_exclusion_file.write_text(
+        'screen_accession\tMORF_id\treason\nIGVFFI6734IWRB\tARID1B_1\tmissing_log2FoldChange\n')
     query = mock_transcript_database.return_value.get_igvf_connection.return_value.aql.execute
     original = query.side_effect
 
@@ -462,3 +462,21 @@ def test_multiple_source_edges_are_rejected(mock_file_fileset, mock_gene_validat
         {'gene': 'ENSG00000275700', 'edge_id': 'genes_transcripts/second'}]}
     with pytest.raises(ValueError, match='does not uniquely match'):
         adapter._validate_gene_transcripts(orf, parents)
+
+
+def test_unlisted_missing_reference_fails(tmp_path, mock_file_fileset, mock_gene_validator):
+    path = tmp_path / 'unknown.tsv'
+    path.write_text(
+        'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tpvalue\tpadj\nUNKNOWN_1\t1\t1\t1\t0.5\t0.5\n')
+    with pytest.raises(ValueError, match='UNKNOWN_1.*no matching MORF_id'):
+        _build_adapter(SpyWriter(), filepath=str(path)).process_file()
+
+
+def test_exclusion_comment_header(mock_file_fileset, mock_gene_validator, empty_exclusion_file):
+    empty_exclusion_file.write_text(
+        '# Reasons are documented once here.\n'
+        '# no_transcript: no Catalog transcript mapping.\n'
+        'screen_accession\tMORF_id\treason\n'
+        'IGVFFI6734IWRB\tACTL6A_2\tno_transcript\n')
+    assert _build_adapter(SpyWriter())._load_exclusions() == {
+        'ACTL6A_2': 'no_transcript'}
