@@ -41,12 +41,9 @@ const outputFormat = z.object({
   transcript: z.string().or(transcriptFormat.partial()).nullable(),
   associated_gene: z.string().or(geneFormat.partial()).nullable(),
   morf_id: z.string(),
-  orf_gene: z.string(),
-  ensembl_transcript_ids: z.array(z.string()),
-  refseq_transcript_ids: z.array(z.string()),
   transcript_mapping_method: z.string(),
   log2FC: z.number(),
-  log2FC_se: z.number().nullish(),
+  standard_error: z.number().nullish(),
   base_mean: z.number().nullish(),
   p_value: z.number().nullish(),
   p_value_adj: z.number().nullish(),
@@ -62,8 +59,7 @@ const outputFormat = z.object({
   files_filesets: z.string(),
   biological_context: z.string(),
   biosample_term: z.string(),
-  treatments_term_ids: z.array(z.string()).nullish(),
-  crispr_modality: z.string().nullish()
+  treatments_term_ids: z.array(z.string()).nullish()
 })
 
 async function findEffects (input: paramsFormatType): Promise<any[]> {

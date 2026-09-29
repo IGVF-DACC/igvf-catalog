@@ -99,7 +99,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
         self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
         self.biosample_term = self.file_fileset['samples'][0]
         self.treatments_term_ids = self.file_fileset.get('treatments_term_ids')
-        self.crispr_modality = self.file_fileset.get('crispr_modality')
         self.edge_class = self.file_fileset.get('class') or 'observed data'
 
         super().__init__(filepath, label, writer, validate)
@@ -431,17 +430,17 @@ class MORFGeneTranscriptGene(BaseAdapter):
                 )
                 # Preserve every listed ENST for transcript-level discovery.
                 # These edges share one construct measurement, identified by
-                # (file_accession, morf_id), and the full source transcript list.
+                # (file_accession, morf_id).
                 for transcript_id in ensembl_ids:
                     self._write_doc({
                         '_key': (
-                            f'{orf["orf_gene"]}_{self.readout_gene}_{transcript_id}_'
+                            f'{orf["orf_gene"]}_{transcript_id}_{self.readout_gene}_'
                             f'{self.file_accession}_{orf["morf_id"]}'
                         ),
                         '_from': transcript_genes[transcript_id][0]['edge_id'],
                         '_to': f'genes/{self.readout_gene}',
                         'log2FC': log2fc,
-                        'log2FC_se': stats['lfcSE'],
+                        'standard_error': stats['lfcSE'],
                         'base_mean': stats['baseMean'],
                         'p_value': p_value,
                         'p_value_adj': p_value_adj,
@@ -449,9 +448,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
                         'neg_log10_pvalue_adj': neg_log10_pvalue_adj,
                         'significant': significant,
                         'morf_id': orf['morf_id'],
-                        'orf_gene': orf['orf_gene'],
-                        'ensembl_transcript_ids': ensembl_ids,
-                        'refseq_transcript_ids': orf['refseq_transcript_ids'],
                         'transcript_mapping_method': orf.get('transcript_mapping_method', 'supplied ENST'),
                         'class': self.edge_class,
                         'label': self.COLLECTION_LABEL,
@@ -461,7 +457,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
                         'method': self.method,
-                        'crispr_modality': self.crispr_modality,
                         'biological_context': self.simple_sample_summaries[0],
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,

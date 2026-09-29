@@ -61,29 +61,26 @@ def test_morf_gene_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_
     docs = _parsed_docs(writer)
     keys = {doc['_key'] for doc in docs}
     assert keys == {
-        'ENSG00000275700_ENSG00000198846_ENST00000619387_IGVFFI6734IWRB_AATF_1',
-        'ENSG00000136518_ENSG00000198846_ENST00000450518_IGVFFI6734IWRB_ACTL6A_1',
-        'ENSG00000136518_ENSG00000198846_ENST00000392662_IGVFFI6734IWRB_ACTL6A_1',
-        'ENSG00000136352_ENSG00000198846_ENST00000511061_IGVFFI6734IWRB_NKX2_1_1',
-        'ENSG00000133794_ENSG00000198846_ENST00000403290_IGVFFI6734IWRB_ARNTL_1',
+        'ENSG00000275700_ENST00000619387_ENSG00000198846_IGVFFI6734IWRB_AATF_1',
+        'ENSG00000136518_ENST00000450518_ENSG00000198846_IGVFFI6734IWRB_ACTL6A_1',
+        'ENSG00000136518_ENST00000392662_ENSG00000198846_IGVFFI6734IWRB_ACTL6A_1',
+        'ENSG00000136352_ENST00000511061_ENSG00000198846_IGVFFI6734IWRB_NKX2_1_1',
+        'ENSG00000133794_ENST00000403290_ENSG00000198846_IGVFFI6734IWRB_ARNTL_1',
     }
 
     aatf = next(doc for doc in docs if doc['morf_id'] == 'AATF_1')
     assert aatf['_from'] == 'genes_transcripts/existing_ENST00000619387'
-    assert 'transcript' not in aatf
+    assert not {'transcript', 'orf_gene', 'ensembl_transcript_ids',
+                'refseq_transcript_ids', 'crispr_modality', 'log2FC_se'} & aatf.keys()
     assert aatf['_to'] == 'genes/ENSG00000198846'
     assert aatf['log2FC'] == pytest.approx(-0.786997515211818)
-    assert aatf['log2FC_se'] == pytest.approx(0.699309113088129)
+    assert aatf['standard_error'] == pytest.approx(0.699309113088129)
     assert aatf['p_value'] == pytest.approx(0.260422575712608)
     assert aatf['p_value_adj'] == pytest.approx(0.997637901873519)
     assert aatf['neg_log10_pvalue'] == pytest.approx(
         -math.log10(0.260422575712608))
     assert aatf['significant'] is False
-    assert aatf['orf_gene'] == 'ENSG00000275700'
-    assert aatf['ensembl_transcript_ids'] == ['ENST00000619387']
-    assert aatf['refseq_transcript_ids'] == ['NM_012138']
     assert aatf['method'] == 'MORF screen'
-    assert aatf['crispr_modality'] is None
     assert aatf['label'] == 'gene overexpression effect on gene expression'
     assert aatf['name'] == 'modulates expression of'
     assert aatf['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/'
@@ -115,11 +112,7 @@ def test_morf_gene_transcript_gene_emits_one_edge_per_ensembl_transcript(mock_fi
         'genes_transcripts/existing_ENST00000450518',
         'genes_transcripts/existing_ENST00000392662',
     }
-    assert all(
-        doc['ensembl_transcript_ids'] == [
-            'ENST00000450518', 'ENST00000392662']
-        for doc in actl
-    )
+    assert len(actl) == 2
 
 
 def test_morf_gene_transcript_gene_resolves_missing_orf_gene(mock_file_fileset, mock_gene_validator):
@@ -129,7 +122,6 @@ def test_morf_gene_transcript_gene_resolves_missing_orf_gene(mock_file_fileset, 
 
     arntl = next(
         doc for doc in _parsed_docs(writer) if doc['morf_id'] == 'ARNTL_1')
-    assert arntl['orf_gene'] == 'ENSG00000133794'
     assert arntl['_from'] == 'genes_transcripts/existing_ENST00000403290'
 
 
@@ -449,7 +441,6 @@ def test_catalog_refseq_mapping_emits_valid_gene_hyperedge(mock_file_fileset, mo
     assert recovered['_from'] == 'genes_transcripts/existing_ENST00000450518'
     assert recovered['_to'] == 'genes/ENSG00000198846'
     assert 'transcript' not in recovered
-    assert recovered['refseq_transcript_ids'] == ['NM_004301.4']
     assert recovered['transcript_mapping_method'] == 'Catalog transcript RefSeq accession without version'
 
 
