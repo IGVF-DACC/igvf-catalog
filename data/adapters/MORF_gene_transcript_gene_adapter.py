@@ -36,8 +36,8 @@ _REFSEQ_RE = re.compile(r'(?:N[MR]|X[MR])_\d+(?:\.\d+)?')
 _NA_VALUES = frozenset({'', 'NA', 'NaN', 'nan', 'None', '.'})
 
 
-class MORFGeneGene(BaseAdapter):
-    ALLOWED_LABELS = ['gene_gene']
+class MORFGeneTranscriptGene(BaseAdapter):
+    ALLOWED_LABELS = ['gene_transcript_gene']
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'gene overexpression effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
@@ -108,7 +108,7 @@ class MORFGeneGene(BaseAdapter):
         return 'edges'
 
     def _get_collection_name(self):
-        return 'genes_genes'
+        return 'genes_transcripts_genes'
 
     @staticmethod
     def _file_accession(source_url: Optional[str], field: str) -> str:
@@ -323,10 +323,10 @@ class MORFGeneGene(BaseAdapter):
         for record in db.aql.execute(
             'FOR t IN transcripts FILTER t._id IN @ids '
             'FOR e IN genes_transcripts FILTER e._to == t._id '
-            'RETURN {transcript: t._key, gene: PARSE_IDENTIFIER(e._from).key}',
+            'RETURN {transcript: t._key, gene: PARSE_IDENTIFIER(e._from).key, edge_id: e._id}',
             bind_vars={'ids': ids}
         ):
-            parents.setdefault(record['transcript'], set()).add(record['gene'])
+            parents.setdefault(record['transcript'], []).append(record)
         return parents
 
     def _validate_gene_transcripts(self, orf, parents):
@@ -335,11 +335,12 @@ class MORFGeneGene(BaseAdapter):
             raise ValueError(
                 f'{orf["morf_id"]}: missing or invalid source gene {gene!r}')
         for transcript in orf['ensembl_transcript_ids']:
-            if parents.get(transcript) != {gene}:
+            links = parents.get(transcript, [])
+            if len(links) != 1 or links[0]['gene'] != gene:
                 raise ValueError(
                     f'{orf["morf_id"]}: gene {gene} does not uniquely match '
                     f'transcript {transcript} in Catalog genes_transcripts '
-                    f'(found {sorted(parents.get(transcript, set()))})')
+                    f'(found {links})')
 
     def _write_doc(self, props: dict) -> None:
         if self.validate:
@@ -460,8 +461,7 @@ class MORFGeneGene(BaseAdapter):
                             f'{orf["orf_gene"]}_{self.readout_gene}_{transcript_id}_'
                             f'{self.file_accession}_{orf["morf_id"]}'
                         ),
-                        '_from': f'genes/{orf["orf_gene"]}',
-                        'transcript': f'transcripts/{transcript_id}',
+                        '_from': transcript_genes[transcript_id][0]['edge_id'],
                         '_to': f'genes/{self.readout_gene}',
                         'log2FC': log2fc,
                         'log2FC_se': stats['lfcSE'],

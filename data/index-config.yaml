@@ -101,13 +101,14 @@ genes_genes:
   zkd:
     fields:
       - z_score
-  zkd_sparse:
-    fields:
-      - log2FC, neg_log10_pvalue_adj
   persistent:
     fields:
       - interaction_type[*], source
       - source
+
+genes_transcripts_genes:
+  persistent:
+    fields:
       - files_filesets, _key
       - _from, files_filesets
       - _to, files_filesets
@@ -115,7 +116,9 @@ genes_genes:
       - _to, significant
       - method, files_filesets
       - morf_id
-      - transcript
+  zkd_sparse:
+    fields:
+      - log2FC, neg_log10_pvalue_adj
 
 genes_structure:
   persistent:

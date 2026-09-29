@@ -29,7 +29,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/ontology-terms', tag: 'Nodes' },
   { path: '/studies', tag: 'Nodes' },
   // IGVF Data
-  { path: '/genes/genes', tag: 'IGVF Data' },
+  { path: '/genes/transcripts/genes', tag: 'IGVF Data' },
   { path: '/variants/genomic-elements', tag: 'IGVF Data' },
   { path: '/variants/genes', tag: 'IGVF Data' },
   { path: '/variants/proteins', tag: 'IGVF Data' },
@@ -84,6 +84,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/genes/transcripts', tag: 'Biological Context Data' },
   { path: '/genes/proteins', tag: 'Biological Context Data' },
   { path: '/genes/pathways', tag: 'Biological Context Data' },
+  { path: '/genes/genes', tag: 'Biological Context Data' },
   { path: '/genes/diseases', tag: 'Biological Context Data' },
   { path: '/transcripts/genes', tag: 'Biological Context Data' },
   { path: '/transcripts/proteins', tag: 'Biological Context Data' },

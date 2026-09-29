@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/genes_genes.MORFGeneGene.json",
+  "$id": "schemas/edges/genes_transcripts_genes.MORFGeneTranscriptGene.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -15,11 +15,12 @@
         },
         "_from": {
           "type": "string",
-          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "pattern": "^genes_transcripts/[^/]+$",
           "collections": [
-            "genes"
+            "genes_transcripts"
           ],
-          "example": "genes/ENSG00000275700"
+          "description": "Existing Catalog gene-to-transcript edge for the overexpressed construct.",
+          "example": "genes_transcripts/ENSG00000275700_ENST00000619387"
         },
         "_to": {
           "example": "genes/ENSG00000198846",
@@ -183,14 +184,6 @@
             "Catalog transcript RefSeq accession without version"
           ],
           "description": "Whether transcript IDs were supplied or recovered from Catalog transcript RefSeq cross-references, ignoring accession versions."
-        },
-        "transcript": {
-          "type": "string",
-          "pattern": "^transcripts/ENST[0-9]{11}(?:_PAR_Y)?$",
-          "collections": [
-            "transcripts"
-          ],
-          "description": "Overexpressed transcript associated with this gene-to-gene effect."
         }
       },
       "required": [
@@ -203,15 +196,14 @@
         "files_filesets",
         "biological_context",
         "biosample_term",
-        "treatments_term_ids",
-        "transcript"
+        "treatments_term_ids"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
     "filter_by_range": "log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, base_mean",
-    "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_se, base_mean, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, morf_id, orf_gene, ensembl_transcript_ids, refseq_transcript_ids, transcript_mapping_method, transcript"
+    "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_se, base_mean, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, morf_id, orf_gene, ensembl_transcript_ids, refseq_transcript_ids, transcript_mapping_method"
   },
-  "db_collection_name": "genes_genes"
+  "db_collection_name": "genes_transcripts_genes"
 }
