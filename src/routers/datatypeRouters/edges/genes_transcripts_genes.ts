@@ -19,8 +19,8 @@ const inputFormat = z.object({
   gene_id: identifier,
   gene_name: identifier,
   transcript_id: identifier,
-  associated_gene_id: identifier,
-  associated_gene_name: identifier,
+  readout_gene_id: identifier,
+  readout_gene_name: identifier,
   morf_id: identifier,
   files_fileset: identifier,
   method: z.enum(methods).optional(),
@@ -39,7 +39,7 @@ const outputFormat = z.object({
   gene_transcript: z.string(),
   gene: z.string().or(geneFormat.partial()).nullable(),
   transcript: z.string().or(transcriptFormat.partial()).nullable(),
-  associated_gene: z.string().or(geneFormat.partial()).nullable(),
+  readout_gene: z.string().or(geneFormat.partial()).nullable(),
   morf_id: z.string(),
   transcript_mapping_method: z.string(),
   log2FC: z.number(),
@@ -63,7 +63,7 @@ const outputFormat = z.object({
 })
 
 async function findEffects (input: paramsFormatType): Promise<any[]> {
-  const required = ['gene_id', 'gene_name', 'transcript_id', 'associated_gene_id', 'associated_gene_name', 'morf_id', 'files_fileset', 'method']
+  const required = ['gene_id', 'gene_name', 'transcript_id', 'readout_gene_id', 'readout_gene_name', 'morf_id', 'files_fileset', 'method']
   if (!required.some(key => input[key] !== undefined)) {
     throw new TRPCError({ code: 'BAD_REQUEST', message: `Define at least one of: ${required.join(', ')}.` })
   }
@@ -75,7 +75,7 @@ async function findEffects (input: paramsFormatType): Promise<any[]> {
   const endpoints: Record<string, [string, string]> = {
     gene_id: ['relationship._from', 'genes/'],
     transcript_id: ['relationship._to', 'transcripts/'],
-    associated_gene_id: ['record._to', 'genes/']
+    readout_gene_id: ['record._to', 'genes/']
   }
   for (const [key, [field, prefix]] of Object.entries(endpoints)) {
     if (input[key] !== undefined) {
@@ -83,7 +83,7 @@ async function findEffects (input: paramsFormatType): Promise<any[]> {
       bindVars[key] = prefix + String(input[key]).replace(/\.\d+(?=_PAR_Y$|$)/, '')
     }
   }
-  for (const [key, field] of Object.entries({ gene_name: 'DOCUMENT(relationship._from).name', associated_gene_name: 'DOCUMENT(record._to).name' })) {
+  for (const [key, field] of Object.entries({ gene_name: 'DOCUMENT(relationship._from).name', readout_gene_name: 'DOCUMENT(record._to).name' })) {
     if (input[key] !== undefined) {
       filters.push(`${field} == @${key}`)
       bindVars[key] = input[key]
@@ -126,7 +126,7 @@ async function findEffects (input: paramsFormatType): Promise<any[]> {
       gene_transcript: record._from,
       gene: ${verbose ? expand('relationship._from', geneSchema) : 'relationship._from'},
       transcript: ${verbose ? expand('relationship._to', transcriptSchema) : 'relationship._to'},
-      associated_gene: ${verbose ? expand('record._to', geneSchema) : 'record._to'}
+      readout_gene: ${verbose ? expand('record._to', geneSchema) : 'record._to'}
     })`
   return await (await db.query(query, bindVars)).all()
 }

@@ -11,14 +11,14 @@ beforeEach(() => {
 })
 
 it('queries an edge-to-gene relationship with independent source, transcript and readout filters', async () => {
-  await call({ gene_id: 'ENSG00000275700.1', transcript_id: 'ENST00000619387.2', associated_gene_id: 'ENSG00000198846', page: 0 })
+  await call({ gene_id: 'ENSG00000275700.1', transcript_id: 'ENST00000619387.2', readout_gene_id: 'ENSG00000198846', page: 0 })
   const [query, vars] = (db.query as jest.Mock).mock.calls[0]
   expect(query).toContain('FOR record IN genes_transcripts_genes')
   expect(query).toContain('LET relationship = DOCUMENT(record._from)')
   expect(query).toContain('relationship._from == @gene_id')
   expect(query).toContain('relationship._to == @transcript_id')
-  expect(query).toContain('record._to == @associated_gene_id')
-  expect(vars).toMatchObject({ gene_id: 'genes/ENSG00000275700', transcript_id: 'transcripts/ENST00000619387', associated_gene_id: 'genes/ENSG00000198846' })
+  expect(query).toContain('record._to == @readout_gene_id')
+  expect(vars).toMatchObject({ gene_id: 'genes/ENSG00000275700', transcript_id: 'transcripts/ENST00000619387', readout_gene_id: 'genes/ENSG00000198846' })
 })
 
 it('uses bind parameters for construct strings, numeric filters and pagination', async () => {
@@ -45,7 +45,7 @@ it('returns the relationship ID and all three node handles', async () => {
     gene_transcript: 'genes_transcripts/existing_edge',
     gene: 'genes/ENSG00000275700',
     transcript: 'transcripts/ENST00000619387',
-    associated_gene: 'genes/ENSG00000198846',
+    readout_gene: 'genes/ENSG00000198846',
     morf_id: 'AATF_1',
     transcript_mapping_method: 'supplied ENST',
     standard_error: 0.5,
