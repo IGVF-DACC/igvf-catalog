@@ -82,16 +82,6 @@ const outputFormat = z.object({
 
 const MOTIF_LOG2FC_RETURN = "'motif_log2FC': record.motif_fc"
 
-const ADASTRA_SCORE_EXPR = `(
-  record.p_value_adj_ref < 0.05 && record.p_value_adj_alt < 0.05
-    ? null
-    : (
-      record.p_value_adj_ref < 0.05
-        ? -record.p_value_adj_ref
-        : (record.p_value_adj_alt < 0.05 ? record.p_value_adj_alt : null)
-    )
-)`
-
 const buildEdgeFilter = (input: paramsFormatType, nameField: 'name' | 'inverse_name'): string => {
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
@@ -214,7 +204,6 @@ const buildQuery = ({
     RETURN MERGE(base,
       record.source == 'ADASTRA' ? {
         'biosample_term': bioTerm,
-        'score': ${ADASTRA_SCORE_EXPR},
         'method': record.method,
         ${getDBReturnStatements(asbSchema, false, MOTIF_LOG2FC_RETURN, ['motif_fc'])}
       } :

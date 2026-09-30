@@ -50,6 +50,25 @@ class ASB(BaseAdapter):
         """Get collection based on label."""
         return 'variants_proteins'
 
+    @staticmethod
+    def _compute_score(p_value_adj_ref, p_value_adj_alt):
+        """Directional ASB significance score.
+
+        Negative FDR-adjusted p-value when only the reference allele is
+        significant (< 0.05), positive when only the alternate allele is,
+        or None when both or neither are significant (no single direction
+        to report).
+        """
+        ref_significant = p_value_adj_ref < 0.05
+        alt_significant = p_value_adj_alt < 0.05
+        if ref_significant and alt_significant:
+            return None
+        if ref_significant:
+            return -p_value_adj_ref
+        if alt_significant:
+            return p_value_adj_alt
+        return None
+
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
         with open(ASB.TF_ID_MAPPING_PATH, 'r') as tf_uniprot_id_mapfile:
@@ -146,6 +165,9 @@ class ASB(BaseAdapter):
                             neg_log10_pvalue_adj_alt = 0 - \
                                 log10(p_value_adj_alt)
 
+                        score = ASB._compute_score(
+                            p_value_adj_ref, p_value_adj_alt)
+
                         props = {
                             '_key': _key,
                             '_from': _from,
@@ -163,6 +185,7 @@ class ASB(BaseAdapter):
                             'p_value_adj_alt': p_value_adj_alt,
                             'neg_log10_pvalue_adj_ref': neg_log10_pvalue_adj_ref,
                             'neg_log10_pvalue_adj_alt': neg_log10_pvalue_adj_alt,
+                            'score': score,
                             'biological_context': cell_gtrd_name,
                             'biosample_term': 'ontology_terms/' + cell_ontology_id,
                             'source': ASB.SOURCE,

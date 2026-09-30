@@ -165,6 +165,71 @@ def test_adastra_asb_adapter_caps_zero_fdrp_instead_of_infinity(mock_build_varia
         json.dumps(item, allow_nan=False)
 
 
+@pytest.fixture
+def directional_score_archive(tmp_path):
+    """Archive with rows covering every branch of ASB._compute_score:
+    ref-only significant, alt-only significant, both significant, neither."""
+    rows = [
+        # fdrp_bh_ref=0.01 (col 13), fdrp_bh_alt=0.5 (col 15) -> ref-only significant
+        'chr19\t9435653.0\trs1\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.01\t'
+        '0.9967883068007664\t0.5\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+        # fdrp_bh_ref=0.5, fdrp_bh_alt=0.02 -> alt-only significant
+        'chr19\t9435654.0\trs2\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.5\t'
+        '0.9967883068007664\t0.02\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+        # fdrp_bh_ref=0.01, fdrp_bh_alt=0.01 -> both significant
+        'chr19\t9435655.0\trs3\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.01\t'
+        '0.9967883068007664\t0.01\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+        # fdrp_bh_ref=0.5, fdrp_bh_alt=0.5 -> neither significant
+        'chr19\t9435656.0\trs4\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.5\t'
+        '0.9967883068007664\t0.5\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+    ]
+    tsv_path = tmp_path / 'ATF1_HUMAN@HepG2__hepatoblastoma_.tsv'
+    tsv_path.write_text(f'{ASB_HEADER}\n' + '\n'.join(rows) + '\n')
+
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(str(tsv_path),
+                    arcname='ATF1_HUMAN@HepG2__hepatoblastoma_.tsv')
+    return str(archive_filepath)
+
+
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_computes_directional_score(mock_build_variant_id, mock_file_fileset, mock_protein_map, directional_score_archive):
+    """score should be the negative ref p-value, the positive alt p-value, or
+    None when both or neither allele is significant - computed at load time
+    rather than by the API router."""
+    mock_build_variant_id.side_effect = [
+        'NC_000019.10:9435653:C:A',
+        'NC_000019.10:9435654:C:A',
+        'NC_000019.10:9435655:C:A',
+        'NC_000019.10:9435656:C:A',
+    ]
+
+    adapter = ASB(filepath=directional_score_archive,
+                  label='asb', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    items_by_from = {
+        json.loads(content)['_from']: json.loads(content)
+        for content in non_empty_contents
+    }
+
+    assert items_by_from['variants/NC_000019.10:9435653:C:A']['score'] == -0.01
+    assert items_by_from['variants/NC_000019.10:9435654:C:A']['score'] == 0.02
+    assert items_by_from['variants/NC_000019.10:9435655:C:A']['score'] is None
+    assert items_by_from['variants/NC_000019.10:9435656:C:A']['score'] is None
+
+
 @patch('adapters.adastra_asb_adapter.build_variant_id')
 def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
     """Test process_file method with mocked protein mapping"""
