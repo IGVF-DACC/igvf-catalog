@@ -1,0 +1,30 @@
+name: Clean Up Docs Preview
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # The Fern CLI reads the organization from fern/fern.config.json.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Fern CLI
+        uses: fern-api/setup-fern-cli@v1
+
+      - name: Delete preview
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          PREVIEW_ID: pr-${{ github.event.pull_request.number }}
+        run: fern docs preview delete --id "$PREVIEW_ID" || echo "No preview to delete for $PREVIEW_ID"
