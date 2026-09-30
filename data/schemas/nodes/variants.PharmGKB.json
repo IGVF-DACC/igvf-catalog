@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/variants.PharmGKB.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "pharmGKB"
+          ]
+        },
+        "source_url": {
+          "example": "https://www.pharmgkb.org/variant/rs5031016",
+          "pattern": "^https://www.pharmgkb.org/variant/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

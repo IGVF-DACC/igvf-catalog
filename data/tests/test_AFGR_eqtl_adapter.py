@@ -13,8 +13,20 @@ def mock_igvf_metadata(mock_request):
     }
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.AFGR_eqtl_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 @patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_eqtl_adapter_AFGR_eqtl(mock_request, mocker):
+def test_AFGR_eqtl_adapter_AFGR_eqtl(mock_request, mock_bulk_check_variants, mocker):
     mock_igvf_metadata(mock_request)
     writer = SpyWriter()
     mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
@@ -38,7 +50,7 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl(mock_request, mocker):
 
 
 @patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_eqtl_adapter_key_includes_file_accession(mock_request, mocker):
+def test_AFGR_eqtl_adapter_key_includes_file_accession(mock_request, mock_bulk_check_variants, mocker):
     """Different file accessions must produce different edge keys for the same pair."""
     import hashlib
     mock_igvf_metadata(mock_request)
@@ -101,7 +113,7 @@ def test_AFGR_eqtl_adapter_validate_doc_invalid():
 
 
 @patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mock_request, mocker):
+def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mock_request, mock_bulk_check_variants, mocker):
     mock_igvf_metadata(mock_request)
     writer = SpyWriter()
     mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
@@ -116,6 +128,66 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mock_request, mocker):
                            label='AFGR_eqtl', writer=writer, validate=True)
         adapter.process_file()
         assert len(writer.contents) == 0
+
+
+@patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
+def test_AFGR_eqtl_adapter_skips_edge_when_variant_not_loaded(mock_request, mock_bulk_check_variants, mocker):
+    """A variant that isn't already in the variants collection must be
+    skipped, not turned into a dangling edge."""
+    mock_igvf_metadata(mock_request)
+    writer = SpyWriter()
+    mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+
+    with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+
+        adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+                           label='AFGR_eqtl', writer=writer, validate=True)
+        adapter.process_file()
+        assert len(writer.contents) == 0
+
+
+@patch('adapters.AFGR_eqtl_adapter.load_variant')
+@patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
+def test_AFGR_eqtl_adapter_variants_label_creates_missing_variant(mock_request, mock_load_variant, mock_bulk_check_variants, mocker):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection."""
+    mock_igvf_metadata(mock_request)
+    writer = SpyWriter()
+    mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({
+        '_key': 'fake_variant_id',
+        'name': 'fake_variant_id',
+        'chr': 'chr1',
+        'pos': 16102,
+        'ref': 'T',
+        'alt': 'G',
+        'variation_type': 'SNP',
+        'spdi': 'fake_variant_id',
+        'hgvs': 'fake_hgvs',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+                       label='variants', writer=writer, validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in writer.contents if content.strip()]
+    # Same mocked variant id is produced for every row - written_variant_keys
+    # must dedupe it down to a single node.
+    assert len(non_empty_contents) == 1
+    item = json.loads(non_empty_contents[0])
+    assert item['_key'] == 'fake_variant_id'
+    assert item['source'] == AFGREQtl.SOURCE
+    assert item['source_url'] == AFGREQtl.SOURCE_URL
 
 
 @patch('adapters.AFGR_eqtl_adapter.get_file_fileset_by_accession_in_arangodb')
