@@ -7,6 +7,7 @@ from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
+    bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
 )
 from adapters.protein_map import ProteinMap
@@ -132,13 +133,44 @@ class ASB(BaseAdapter):
             with open(input_filepath, 'r') as asb:
                 asb_csv = csv.reader(asb, delimiter='\t')
                 next(asb_csv)
+
+                # This adapter never creates variant nodes itself (ADASTRA
+                # variants are expected to already be loaded, e.g. from
+                # FAVOR/dbSNP) - so unlike load_variant()-based adapters that
+                # can insert a missing-but-valid variant, the only safe move
+                # for a variant that doesn't exist yet is to skip the edge
+                # rather than emit a dangling _from reference.
+                rows_by_variant_id = []
                 for row in asb_csv:
                     chr, pos, rsid, ref, alt = row[:5]
                     # some files have decimal '.0' in position column
                     pos = int(float(pos))
-                    variant_id = build_variant_id(
-                        chr, pos, ref, alt, 'GRCh38'
-                    )
+                    try:
+                        variant_id = build_variant_id(
+                            chr, pos, ref, alt, 'GRCh38'
+                        )
+                    except Exception as e:
+                        self.logger.warning(
+                            f'Skipping row - unable to build variant id (chr={chr}, pos={pos}, ref={ref}, alt={alt}): {e}')
+                        continue
+                    rows_by_variant_id.append((variant_id, row))
+
+                if not rows_by_variant_id:
+                    continue
+
+                loaded_variants = bulk_check_variants_in_arangodb(
+                    list({variant_id for variant_id,
+                         _ in rows_by_variant_id}),
+                    check_by='_key',
+                )
+                skipped_missing = 0
+
+                for variant_id, row in rows_by_variant_id:
+                    if variant_id not in loaded_variants:
+                        skipped_missing += 1
+                        continue
+                    chr, pos, rsid, ref, alt = row[:5]
+                    pos = int(float(pos))
 
                     ensembl_ids = self.protein_map.get(tf_uniprot_id)
                     if ensembl_ids is None:
@@ -204,5 +236,9 @@ class ASB(BaseAdapter):
 
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
+
+                if skipped_missing:
+                    self.logger.warning(
+                        f'Skipped {skipped_missing} row(s) in {filename} - variant not found in variants collection')
 
         self.protein_map.log(self.logger)

@@ -42,6 +42,18 @@ def mock_protein_map():
         yield mock_get
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.adastra_asb_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 def test_adastra_asb_adapter_invalid_label(sample_archive):
     """Test invalid label handling"""
     with pytest.raises(ValueError, match='Invalid label'):
@@ -49,7 +61,7 @@ def test_adastra_asb_adapter_invalid_label(sample_archive):
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, sample_archive):
     """Test processing file with asb label"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -116,6 +128,25 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
         adapter.validate_doc(invalid_doc)
 
 
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_skips_edge_when_variant_not_loaded(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, sample_archive, caplog):
+    """ADASTRA never creates variant nodes itself, so a variant that isn't
+    already in the variants collection must be skipped, not turned into a
+    dangling edge."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+
+    adapter = ASB(filepath=sample_archive,
+                  label='asb', writer=SpyWriter(), validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+    assert 'variant not found in variants collection' in caplog.text
+
+
 ASB_HEADER = (
     '#chr\tpos\tID\tref\talt\trepeat_type\tmean_BAD\tmean_SNP_per_segment\t'
     'total_cover\tn_aggregated\tes_mean_ref\tes_mean_alt\tlogitp_ref\t'
@@ -145,7 +176,7 @@ def zero_fdrp_archive(tmp_path):
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_caps_zero_fdrp_instead_of_infinity(mock_build_variant_id, mock_file_fileset, mock_protein_map, zero_fdrp_archive):
+def test_adastra_asb_adapter_caps_zero_fdrp_instead_of_infinity(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, zero_fdrp_archive):
     """When fdrp_bh is 0, neg_log10_pvalue_adj must be capped, not float('inf')."""
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -202,7 +233,7 @@ def directional_score_archive(tmp_path):
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_computes_directional_score(mock_build_variant_id, mock_file_fileset, mock_protein_map, directional_score_archive):
+def test_adastra_asb_adapter_computes_directional_score(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, directional_score_archive):
     """score should be the negative ref p-value, the positive alt p-value, or
     None when both or neither allele is significant - computed at load time
     rather than by the API router."""
@@ -231,7 +262,7 @@ def test_adastra_asb_adapter_computes_directional_score(mock_build_variant_id, m
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, sample_archive):
     """Test process_file method with mocked protein mapping"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
