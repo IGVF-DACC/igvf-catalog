@@ -328,6 +328,86 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
     assert len(adapter.writer.contents) == 0
 
 
+@patch('adapters.adastra_asb_adapter.load_variant')
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_variants_label_creates_missing_variant(mock_build_variant_id, mock_load_variant, mock_file_fileset, mock_bulk_check_variants, sample_archive):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection, tagged with ADASTRA's
+    source and the per-cell GTRD source_url."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000019.10:9435653:C:A',
+        'name': 'NC_000019.10:9435653:C:A',
+        'chr': 'chr19',
+        'pos': 9435653,
+        'ref': 'C',
+        'alt': 'A',
+        'variation_type': 'SNP',
+        'spdi': 'NC_000019.10:9435653:C:A',
+        'hgvs': 'NC_000019.10:g.9435654C>A',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    adapter = ASB(filepath=sample_archive,
+                  label='variants', writer=SpyWriter(), validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    # Same mocked variant id is produced for every row across both sample
+    # files - written_variant_keys must dedupe it down to a single node.
+    assert len(non_empty_contents) == 1
+
+    item = json.loads(non_empty_contents[0])
+    assert item['_key'] == 'NC_000019.10:9435653:C:A'
+    assert item['source'] == ASB.SOURCE
+    assert item['source_url'].startswith(
+        'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=')
+    assert item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
+
+
+@patch('adapters.adastra_asb_adapter.load_variant')
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_variants_label_skips_already_loaded(mock_build_variant_id, mock_load_variant, mock_file_fileset, mock_bulk_check_variants, sample_archive):
+    """A variant that's already in the collection shouldn't be re-emitted as
+    a node."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+
+    adapter = ASB(filepath=sample_archive,
+                  label='variants', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+    mock_load_variant.assert_not_called()
+
+
+@patch('adapters.adastra_asb_adapter.load_variant')
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_variants_label_skips_invalid_variant(mock_build_variant_id, mock_load_variant, mock_file_fileset, mock_bulk_check_variants, sample_archive, caplog):
+    """A variant that load_variant() rejects (e.g. ref allele mismatch)
+    should be logged and skipped, not written as a node."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({}, {
+        'variant_id': 'NC_000019-9435653-C-A',
+        'reason': 'Ref allele mismatch',
+    })
+
+    adapter = ASB(filepath=sample_archive,
+                  label='variants', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+    assert 'Ref allele mismatch' in caplog.text
+
+
 @patch('adapters.adastra_asb_adapter.build_variant_id')
 def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""

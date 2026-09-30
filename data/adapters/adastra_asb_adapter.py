@@ -9,6 +9,7 @@ from adapters.helpers import (
     build_variant_id,
     bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
+    load_variant,
 )
 from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
@@ -23,7 +24,7 @@ from adapters.writer import Writer
 
 class ASB(BaseAdapter):
     # 1-based coordinate system
-    ALLOWED_LABELS = ['asb']
+    ALLOWED_LABELS = ['asb', 'variants']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
@@ -42,14 +43,15 @@ class ASB(BaseAdapter):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
         self.file_accession = get_file_accession(filepath)
+        self.written_variant_keys = set()
 
     def _get_schema_type(self):
-        """This adapter creates edges."""
-        return 'edges'
+        """Return schema type based on label."""
+        return 'nodes' if self.label == 'variants' else 'edges'
 
     def _get_collection_name(self):
         """Get collection based on label."""
-        return 'variants_proteins'
+        return 'variants' if self.label == 'variants' else 'variants_proteins'
 
     @staticmethod
     def _compute_score(p_value_adj_ref, p_value_adj_alt):
@@ -103,7 +105,8 @@ class ASB(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
-        self.protein_map = ProteinMap(organism='Homo sapiens')
+        if self.label == 'asb':
+            self.protein_map = ProteinMap(organism='Homo sapiens')
 
         for input_filepath in get_files_from_folder(self.filepath):
             filename = input_filepath.name
@@ -134,12 +137,11 @@ class ASB(BaseAdapter):
                 asb_csv = csv.reader(asb, delimiter='\t')
                 next(asb_csv)
 
-                # This adapter never creates variant nodes itself (ADASTRA
-                # variants are expected to already be loaded, e.g. from
-                # FAVOR/dbSNP) - so unlike load_variant()-based adapters that
-                # can insert a missing-but-valid variant, the only safe move
-                # for a variant that doesn't exist yet is to skip the edge
-                # rather than emit a dangling _from reference.
+                # ADASTRA variants are expected to already be loaded, e.g.
+                # from FAVOR/dbSNP. Missing-but-valid ones are only created
+                # via a separate run with label='variants' - the 'asb' pass
+                # only skips the edge, rather than emitting a dangling _from
+                # reference.
                 rows_by_variant_id = []
                 for row in asb_csv:
                     chr, pos, rsid, ref, alt = row[:5]
@@ -163,6 +165,12 @@ class ASB(BaseAdapter):
                          _ in rows_by_variant_id}),
                     check_by='_key',
                 )
+
+                if self.label == 'variants':
+                    self.write_missing_variants(
+                        rows_by_variant_id, loaded_variants, cell_gtrd_id)
+                    continue
+
                 skipped_missing = 0
 
                 for variant_id, row in rows_by_variant_id:
@@ -241,4 +249,28 @@ class ASB(BaseAdapter):
                     self.logger.warning(
                         f'Skipped {skipped_missing} row(s) in {filename} - variant not found in variants collection')
 
-        self.protein_map.log(self.logger)
+        if self.label == 'asb':
+            self.protein_map.log(self.logger)
+
+    def write_missing_variants(self, rows_by_variant_id, loaded_variants, cell_gtrd_id):
+        for variant_id, row in rows_by_variant_id:
+            if variant_id in loaded_variants or variant_id in self.written_variant_keys:
+                continue
+            self.written_variant_keys.add(variant_id)
+
+            chr, pos, rsid, ref, alt = row[:5]
+            pos = int(float(pos))
+            variant_props, skipped = load_variant(f'{chr}-{pos}-{ref}-{alt}')
+            if variant_props:
+                variant_props.update({
+                    'source': ASB.SOURCE,
+                    'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                })
+                if self.validate:
+                    self.validate_doc(variant_props)
+                self.writer.write(json.dumps(variant_props))
+                self.writer.write('\n')
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
