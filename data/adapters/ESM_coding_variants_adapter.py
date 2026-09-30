@@ -6,7 +6,14 @@ import re
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import AA_TABLE, split_spdi, build_variant_coding_variant_key, convert_aa_letter_code_and_Met1, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    AA_TABLE,
+    split_spdi,
+    build_variant_coding_variant_key,
+    bulk_check_variants_in_arangodb,
+    convert_aa_letter_code_and_Met1,
+    get_file_fileset_by_accession_in_arangodb,
+)
 from adapters.writer import Writer
 
 # works in similar way to mutpred2 adapter
@@ -37,6 +44,7 @@ class ESM1vCodingVariantsScores(BaseAdapter):
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES = 'predicted protein variant effect'
     COLLECTION_LABEL_VARIANTS_CODING_VARIANTS = 'codes for'
+    CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         # filepath is the enumerated mapping file (e.g. ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz);
@@ -78,117 +86,157 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                 if file_set_accession:
                     self.writer.add_tag(
                         'portal_accessions', file_set_accession)
+            chunk = []
             for row in map_csv:
-                # trim version number in ENST
-                mutation_ids = [
-                    re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
-                coding_variant_ids = [convert_aa_letter_code_and_Met1(
-                    mutation_id) for mutation_id in mutation_ids]
-                variant_ids = row['spdi_ids'].split(',')
                 if self.label == 'variants_coding_variants':
-                    for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
-                        chr, pos, ref, alt = split_spdi(variant_id)
-                        _props = {
-                            '_key': build_variant_coding_variant_key(variant_id, coding_variant_id),
-                            '_from': 'variants/' + variant_id,
-                            '_to': 'coding_variants/' + coding_variant_id,
-                            'name': 'codes for',
-                            'inverse_name': 'encoded by',
-                            'chr': chr,
-                            'pos': pos,  # 0-indexed
-                            'ref': ref,
-                            'alt': alt,
-                            'source': self.SOURCE,
-                            'source_url': self.source_url,
-                            'label': self.COLLECTION_LABEL_VARIANTS_CODING_VARIANTS
-                        }
-                        if self.validate:
-                            self.validate_doc(_props)
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
-                elif self.label == 'variants':
-                    hgvsg_ids = row['hgvsg_ids'].split(',')
-                    for variant_id, hgvsg in zip(variant_ids, hgvsg_ids):
-                        chr, pos, ref, alt = split_spdi(variant_id)
-                        _props = {
-                            '_key': variant_id,  # don't have long spdi to convert
-                            'name': variant_id,
-                            'chr': chr,
-                            'pos': pos,
-                            'ref': ref,
-                            'alt': alt,
-                            'variation_type': 'SNP' if len(ref) == 1 else 'deletion-insertion',
-                            'spdi': variant_id,
-                            'hgvs': hgvsg,
-                            'organism': 'Homo sapiens',
-                            'source': self.SOURCE,
-                            'source_url': self.source_url
-                        }
-                        if self.validate:
-                            self.validate_doc(_props)
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
-                elif self.label == 'coding_variants':
-                    for i, coding_variant_id in enumerate(coding_variant_ids):
-                        matches = re.findall(
-                            r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
-                        aa_ref, aa_pos, aa_alt = matches[0]
-                        aa_change = row['aa_change'].split('.')[1]
-                        if aa_change.startswith('Met1'):
-                            aa_change = 'Met1?'  # to match with dbNSFP
-                        _props = {
-                            '_key': coding_variant_id,
-                            'name': coding_variant_id,
-                            'ref': AA_TABLE[aa_ref],
-                            'alt': AA_TABLE[aa_alt],
-                            'aapos': int(aa_pos),
-                            'refcodon': row['codon_ref'],
-                            'gene_name': coding_variant_id.split('_')[0],
-                            'protein_id': row['protein_id'].split('.')[0],
-                            'protein_name': row['protein_name'],
-                            'codonpos': int(row['codon_positions'].split(',')[i]),
-                            'hgvsc': row['hgvsc_ids'].split(',')[i].replace('-', '>'),
-                            'hgvsp': 'p.' + aa_change,
-                            'transcript_id': row['transcript_id'].split('.')[0],
-                            'source': self.SOURCE,
-                            'source_url': self.source_url
+                    chunk.append(row)
+                    if len(chunk) >= self.CHUNK_SIZE:
+                        self.process_variants_coding_variants_chunk(chunk)
+                        chunk = []
+                    continue
+                self.parse_row(row)
+            if chunk:
+                self.process_variants_coding_variants_chunk(chunk)
 
-                        }
-                        if self.validate:
-                            self.validate_doc(_props)
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
-                elif self.label == 'coding_variants_phenotypes':
-                    score = float(row['combined_score'])
-                    # only load rows with score < log(0.5)
-                    if score < -0.6931:
-                        for coding_variant_id in coding_variant_ids:
-                            _props = {
-                                '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.file_accession]),
-                                '_from': 'coding_variants/' + coding_variant_id,
-                                '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                                'name': self.PHENOTYPE_EDGE_NAME,
-                                'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
-                                'esm_1v_score': score,  # property scores passing threshold
-                                'files_filesets': 'files_filesets/' + self.file_accession,
-                                'method': self.file_fileset.get('method'),
-                                'label': self.COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES,
-                                'class': self.file_fileset.get('class'),
-                                'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
-                                'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
-                                'source': self.SOURCE,
-                                'source_url': self.source_url
-                            }
-                            for field in self.MAPPING_FILE_HEADER:
-                                # also load intermediate scores from model for now, could skip if not useful
-                                if field.startswith('esm1v'):
-                                    prop = {}
-                                    value = row[field]
-                                    prop[field] = float(
-                                        value) if value != '' else None
-                                    _props.update(prop)
+    def process_variants_coding_variants_chunk(self, chunk):
+        pending_edges = []
+        for row in chunk:
+            mutation_ids = [
+                re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
+            coding_variant_ids = [convert_aa_letter_code_and_Met1(
+                mutation_id) for mutation_id in mutation_ids]
+            variant_ids = row['spdi_ids'].split(',')
+            for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
+                pending_edges.append((variant_id, coding_variant_id))
 
-                            if self.validate:
-                                self.validate_doc(_props)
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
+        if not pending_edges:
+            return
+
+        loaded_variants = bulk_check_variants_in_arangodb(
+            list({variant_id for variant_id, _ in pending_edges}),
+            check_by='_key',
+        )
+
+        skipped_missing = 0
+        for variant_id, coding_variant_id in pending_edges:
+            if variant_id not in loaded_variants:
+                skipped_missing += 1
+                continue
+            chr, pos, ref, alt = split_spdi(variant_id)
+            _props = {
+                '_key': build_variant_coding_variant_key(variant_id, coding_variant_id),
+                '_from': 'variants/' + variant_id,
+                '_to': 'coding_variants/' + coding_variant_id,
+                'name': 'codes for',
+                'inverse_name': 'encoded by',
+                'chr': chr,
+                'pos': pos,  # 0-indexed
+                'ref': ref,
+                'alt': alt,
+                'source': self.SOURCE,
+                'source_url': self.source_url,
+                'label': self.COLLECTION_LABEL_VARIANTS_CODING_VARIANTS
+            }
+            if self.validate:
+                self.validate_doc(_props)
+            self.writer.write(json.dumps(_props))
+            self.writer.write('\n')
+
+        if skipped_missing:
+            self.logger.warning(
+                f'Skipped {skipped_missing} row(s) - variant not found in variants collection')
+
+    def parse_row(self, row):
+        # trim version number in ENST
+        mutation_ids = [
+            re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
+        coding_variant_ids = [convert_aa_letter_code_and_Met1(
+            mutation_id) for mutation_id in mutation_ids]
+        variant_ids = row['spdi_ids'].split(',')
+
+        if self.label == 'variants':
+            hgvsg_ids = row['hgvsg_ids'].split(',')
+            for variant_id, hgvsg in zip(variant_ids, hgvsg_ids):
+                chr, pos, ref, alt = split_spdi(variant_id)
+                _props = {
+                    '_key': variant_id,  # don't have long spdi to convert
+                    'name': variant_id,
+                    'chr': chr,
+                    'pos': pos,
+                    'ref': ref,
+                    'alt': alt,
+                    'variation_type': 'SNP' if len(ref) == 1 else 'deletion-insertion',
+                    'spdi': variant_id,
+                    'hgvs': hgvsg,
+                    'organism': 'Homo sapiens',
+                    'source': self.SOURCE,
+                    'source_url': self.source_url
+                }
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
+        elif self.label == 'coding_variants':
+            for i, coding_variant_id in enumerate(coding_variant_ids):
+                matches = re.findall(
+                    r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
+                aa_ref, aa_pos, aa_alt = matches[0]
+                aa_change = row['aa_change'].split('.')[1]
+                if aa_change.startswith('Met1'):
+                    aa_change = 'Met1?'  # to match with dbNSFP
+                _props = {
+                    '_key': coding_variant_id,
+                    'name': coding_variant_id,
+                    'ref': AA_TABLE[aa_ref],
+                    'alt': AA_TABLE[aa_alt],
+                    'aapos': int(aa_pos),
+                    'refcodon': row['codon_ref'],
+                    'gene_name': coding_variant_id.split('_')[0],
+                    'protein_id': row['protein_id'].split('.')[0],
+                    'protein_name': row['protein_name'],
+                    'codonpos': int(row['codon_positions'].split(',')[i]),
+                    'hgvsc': row['hgvsc_ids'].split(',')[i].replace('-', '>'),
+                    'hgvsp': 'p.' + aa_change,
+                    'transcript_id': row['transcript_id'].split('.')[0],
+                    'source': self.SOURCE,
+                    'source_url': self.source_url
+
+                }
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
+        elif self.label == 'coding_variants_phenotypes':
+            score = float(row['combined_score'])
+            # only load rows with score < log(0.5)
+            if score < -0.6931:
+                for coding_variant_id in coding_variant_ids:
+                    _props = {
+                        '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.file_accession]),
+                        '_from': 'coding_variants/' + coding_variant_id,
+                        '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                        'name': self.PHENOTYPE_EDGE_NAME,
+                        'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
+                        'esm_1v_score': score,  # property scores passing threshold
+                        'files_filesets': 'files_filesets/' + self.file_accession,
+                        'method': self.file_fileset.get('method'),
+                        'label': self.COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES,
+                        'class': self.file_fileset.get('class'),
+                        'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
+                        'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
+                        'source': self.SOURCE,
+                        'source_url': self.source_url
+                    }
+                    for field in self.MAPPING_FILE_HEADER:
+                        # also load intermediate scores from model for now, could skip if not useful
+                        if field.startswith('esm1v'):
+                            prop = {}
+                            value = row[field]
+                            prop[field] = float(
+                                value) if value != '' else None
+                            _props.update(prop)
+
+                    if self.validate:
+                        self.validate_doc(_props)
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')

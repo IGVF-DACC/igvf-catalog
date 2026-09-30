@@ -2,7 +2,14 @@ import json
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_coding_variant_key, build_variant_id, CHR_MAP, build_hgvs_from_spdi
+from adapters.helpers import (
+    build_variant_coding_variant_key,
+    build_variant_id,
+    bulk_check_variants_in_arangodb,
+    CHR_MAP,
+    build_hgvs_from_spdi,
+    load_variant,
+)
 from adapters.writer import Writer
 
 # Sample file - file has 709 columns:
@@ -12,14 +19,19 @@ from adapters.writer import Writer
 
 
 class DbNSFP(BaseAdapter):
-    ALLOWED_LABELS = ['coding_variants', 'variants_coding_variants']
+    # coding_variants_proteins is deprecated - not in the database anymore
+    ALLOWED_LABELS = ['coding_variants', 'variants_coding_variants', 'variants']
+    CHUNK_SIZE = 6500
+    SOURCE = 'dbNSFP 5.1a'
+    SOURCE_URL = 'http://database.liulab.science/dbNSFP'
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
+        self.written_variant_keys = set()
 
     def _get_schema_type(self):
         """Return schema type based on label."""
-        if self.label == 'coding_variants':
+        if self.label in ('coding_variants', 'variants'):
             return 'nodes'
         else:
             return 'edges'
@@ -76,8 +88,188 @@ class DbNSFP(BaseAdapter):
 
         return data_lines
 
-    def parse(self):
+    @staticmethod
+    def data(data_line, pos):
+        # '.' is equivalent to None in this dataset
+        return data_line[pos] if data_line[pos] != '.' else None
 
+    @staticmethod
+    def long_data(data_line, pos):
+        try:
+            value = data_line[pos]
+
+            # a few terms have a trailing ';', e.g. '0.489;', in rows with no need of breakdown
+            # removing ; in that case:
+            if value[-1] == ';':
+                value = value[:-1]
+
+            return float(value) if value != '.' and value != '.;' else None
+        except:
+            return None
+
+    def build_coding_variant_key(self, data_line):
+        data = DbNSFP.data
+        long_data = DbNSFP.long_data
+
+        aapos = long_data(data_line, 11)
+        gene_name = data(data_line, 12)
+        transcript_id = data(data_line, 14)
+        hgvsp = data(data_line, 19)
+        hgvs = data(data_line, 20)
+
+        if hgvs is None:
+            # basic format `chr:pos:ref:alt` to reuse hgvs builder method
+            spdi = CHR_MAP['GRCh38'].get(
+                data(data_line, 0)) + ':' + str(int(data(data_line, 1)) - 1) + ':' + data(data_line, 2) + ':' + data(data_line, 3)
+            # creates hgvs.g
+            hgvs = build_hgvs_from_spdi(spdi)
+
+        # gene_name + transcript_id + hgvsp + hgvs + splicing (in case aapos == -1)
+        key = gene_name + '_' + transcript_id + '_' + \
+            (hgvsp or '') + '_' + (hgvs or '')
+        if aapos == -1:
+            key += '_splicing'
+
+        key = key.replace('?', '!').replace('>', '-')
+        return key, aapos, gene_name, transcript_id, hgvsp
+
+    def write_coding_variant_record(self, data_line):
+        data = DbNSFP.data
+        long_data = DbNSFP.long_data
+        key, aapos, gene_name, transcript_id, hgvsp = self.build_coding_variant_key(
+            data_line)
+
+        ref = data(data_line, 4)
+        alt = data(data_line, 5)
+        if alt == 'X':
+            alt = '*'
+        if ref == 'X':
+            ref = '*'
+
+        to_json = {
+            '_key': key,
+            'name': key,
+            'ref': ref,
+            'alt': alt,
+            'aapos': aapos,  # 1-based
+            'gene_name': gene_name,
+            'protein_name': data(data_line, 17),
+            'protein_id': data(data_line, 15),
+            'hgvsc': data(data_line, 20),
+            'hgvsp': hgvsp,
+            'refcodon': data(data_line, 28),
+            'codonpos': long_data(data_line, 29),
+            'transcript_id': transcript_id,
+            'SIFT_score': long_data(data_line, 46),
+            'SIFT4G_score': long_data(data_line, 49),
+            'Polyphen2_HDIV_score': long_data(data_line, 52),
+            'Polyphen2_HVAR_score': long_data(data_line, 55),
+            'VEST4_score': long_data(data_line, 70),
+            'REVEL_score': long_data(data_line, 85),
+            'MutPred_score': long_data(data_line, 87),
+            'BayesDel_addAF_score': long_data(data_line, 104),
+            'BayesDel_noAF_score': long_data(data_line, 107),
+            'VARITY_R_score': long_data(data_line, 116),
+            'VARITY_ER_score': long_data(data_line, 118),
+            'VARITY_R_LOO_score': long_data(data_line, 120),
+            'VARITY_ER_LOO_score': long_data(data_line, 122),
+            'ESM1b_score': long_data(data_line, 124),
+            'AlphaMissense_score': long_data(data_line, 127),
+            'CADD_raw_score': long_data(data_line, 142),
+            'source': DbNSFP.SOURCE,
+            'source_url': DbNSFP.SOURCE_URL
+        }
+        if self.validate:
+            self.validate_doc(to_json)
+        self.writer.write(json.dumps(to_json))
+        self.writer.write('\n')
+
+    def write_variants_coding_variants_edge(self, variant_id, data_line):
+        data = DbNSFP.data
+        long_data = DbNSFP.long_data
+        key, *_ = self.build_coding_variant_key(data_line)
+
+        to_json = {
+            '_from': 'variants/' + variant_id,
+            '_to': 'coding_variants/' + key,
+            '_key': build_variant_coding_variant_key(variant_id, key),
+            'source': DbNSFP.SOURCE,
+            'source_url': DbNSFP.SOURCE_URL,
+            'name': 'codes for',
+            'inverse_name': 'encoded by',
+            'chr': data(data_line, 0),
+            # originally 1-based => 0-based
+            'pos': long_data(data_line, 1) - 1,
+            'ref': data(data_line, 2),
+            'alt': data(data_line, 3),
+        }
+        if self.validate:
+            self.validate_doc(to_json)
+        self.writer.write(json.dumps(to_json))
+        self.writer.write('\n')
+
+    def write_missing_variants(self, rows_by_variant_id, loaded_variants):
+        for variant_id, data_line in rows_by_variant_id:
+            if variant_id in loaded_variants or variant_id in self.written_variant_keys:
+                continue
+            self.written_variant_keys.add(variant_id)
+
+            chr, pos, ref, alt = data_line[0], data_line[1], data_line[2], data_line[3]
+            variant_props, skipped = load_variant(f'{chr}-{pos}-{ref}-{alt}')
+            if variant_props:
+                variant_props.update({
+                    'source': DbNSFP.SOURCE,
+                    'source_url': DbNSFP.SOURCE_URL,
+                })
+                if self.validate:
+                    self.validate_doc(variant_props)
+                self.writer.write(json.dumps(variant_props))
+                self.writer.write('\n')
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
+
+    def process_variant_chunk(self, chunk):
+        rows_by_variant_id = []
+        for data_line in chunk:
+            try:
+                variant_id = build_variant_id(
+                    data_line[0],
+                    data_line[1],  # 1-based
+                    data_line[2],
+                    data_line[3]
+                )
+            except Exception as e:
+                self.logger.warning(
+                    f'Skipping row - unable to build variant id (chr={data_line[0]}, pos={data_line[1]}, ref={data_line[2]}, alt={data_line[3]}): {e}')
+                continue
+            rows_by_variant_id.append((variant_id, data_line))
+
+        if not rows_by_variant_id:
+            return
+
+        loaded_variants = bulk_check_variants_in_arangodb(
+            list({variant_id for variant_id, _ in rows_by_variant_id}),
+            check_by='_key',
+        )
+
+        if self.label == 'variants':
+            self.write_missing_variants(rows_by_variant_id, loaded_variants)
+            return
+
+        skipped_missing = 0
+        for variant_id, data_line in rows_by_variant_id:
+            if variant_id not in loaded_variants:
+                skipped_missing += 1
+                continue
+            self.write_variants_coding_variants_edge(variant_id, data_line)
+
+        if skipped_missing:
+            self.logger.warning(
+                f'Skipped {skipped_missing} row(s) - variant not found in variants collection')
+
+    def parse(self):
+        chunk = []
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
                 continue
@@ -90,108 +282,13 @@ class DbNSFP(BaseAdapter):
                 data_lines = [original_data_line]
 
             for data_line in data_lines:
-                variant_id = build_variant_id(
-                    data_line[0],
-                    data_line[1],  # 1-based
-                    data_line[2],
-                    data_line[3]
-                )
-
-                # '.' is equivalent to None in this dataset
-                def data(pos):
-                    return data_line[pos] if data_line[pos] != '.' else None
-
-                def long_data(pos):
-                    try:
-                        value = data_line[pos]
-
-                        # a few terms have a trailing ';', e.g. '0.489;', in rows with no need of breakdown
-                        # removing ; in that case:
-                        if value[-1] == ';':
-                            value = value[:-1]
-
-                        return float(value) if value != '.' and value != '.;' else None
-                    except:
-                        return None
-
-                aapos = long_data(11)
-                gene_name = data(12)
-                transcript_id = data(14)
-                hgvsp = data(19)
-                hgvs = data(20)
-
-                if hgvs is None:
-                    # basic format `chr:pos:ref:alt` to reuse hgvs builder method
-                    spdi = CHR_MAP['GRCh38'].get(
-                        data(0)) + ':' + str(int(data(1)) - 1) + ':' + data(2) + ':' + data(3)
-                    # creates hgvs.g
-                    hgvs = build_hgvs_from_spdi(spdi)
-
-                # gene_name + transcript_id + hgvsp + hgvs + splicing (in case aapos == -1)
-                key = gene_name + '_' + transcript_id + '_' + \
-                    (hgvsp or '') + '_' + (hgvs or '')
-                if aapos == -1:
-                    key += '_splicing'
-
-                key = key.replace('?', '!').replace('>', '-')
-
-                if self.label == 'variants_coding_variants':
-                    to_json = {
-                        '_from': 'variants/' + variant_id,
-                        '_to': 'coding_variants/' + key,
-                        '_key': build_variant_coding_variant_key(variant_id, key),
-                        'source': 'dbNSFP 5.1a',
-                        'source_url': 'http://database.liulab.science/dbNSFP',
-                        'name': 'codes for',
-                        'inverse_name': 'encoded by',
-                        'chr': data(0),
-                        # originally 1-based => 0-based
-                        'pos': long_data(1) - 1,
-                        'ref': data(2),
-                        'alt': data(3),
-                    }
+                if self.label in ('variants_coding_variants', 'variants'):
+                    chunk.append(data_line)
+                    if len(chunk) >= DbNSFP.CHUNK_SIZE:
+                        self.process_variant_chunk(chunk)
+                        chunk = []
                 else:
-                    ref = data(4)
-                    alt = data(5)
-                    if alt == 'X':
-                        alt = '*'
-                    if ref == 'X':
-                        ref = '*'
+                    self.write_coding_variant_record(data_line)
 
-                    to_json = {
-                        '_key': key,
-                        'name': key,
-                        'ref': ref,
-                        'alt': alt,
-                        'aapos': aapos,  # 1-based
-                        'gene_name': gene_name,
-                        'protein_name': data(17),
-                        'protein_id': data(15),
-                        'hgvsc': data(20),
-                        'hgvsp': hgvsp,
-                        'refcodon': data(28),
-                        'codonpos': long_data(29),
-                        'transcript_id': transcript_id,
-                        'SIFT_score': long_data(46),
-                        'SIFT4G_score': long_data(49),
-                        'Polyphen2_HDIV_score': long_data(52),
-                        'Polyphen2_HVAR_score': long_data(55),
-                        'VEST4_score': long_data(70),
-                        'REVEL_score': long_data(85),
-                        'MutPred_score': long_data(87),
-                        'BayesDel_addAF_score': long_data(104),
-                        'BayesDel_noAF_score': long_data(107),
-                        'VARITY_R_score': long_data(116),
-                        'VARITY_ER_score': long_data(118),
-                        'VARITY_R_LOO_score': long_data(120),
-                        'VARITY_ER_LOO_score': long_data(122),
-                        'ESM1b_score': long_data(124),
-                        'AlphaMissense_score': long_data(127),
-                        'CADD_raw_score': long_data(142),
-                        'source': 'dbNSFP 5.1a',
-                        'source_url': 'http://database.liulab.science/dbNSFP'
-                    }
-                if self.validate:
-                    self.validate_doc(to_json)
-                self.writer.write(json.dumps(to_json))
-                self.writer.write('\n')
+        if chunk:
+            self.process_variant_chunk(chunk)

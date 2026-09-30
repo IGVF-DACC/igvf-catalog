@@ -6,7 +6,11 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    bulk_check_variants_in_arangodb,
+    get_file_fileset_by_accession_in_arangodb,
+    load_variant,
+)
 from adapters.protein_map import ProteinMap
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
@@ -27,7 +31,9 @@ from adapters.protein_map import ProteinMap
 
 
 class SEMPred(BaseAdapter):
-    ALLOWED_LABELS = ['sem_predicted_asb']
+    ALLOWED_LABELS = ['sem_predicted_asb', 'variants']
+    CHUNK_SIZE = 6500
+    SOURCE = 'IGVF'
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
@@ -38,16 +44,17 @@ class SEMPred(BaseAdapter):
             sem_provenance_path).split('.')[0]
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.written_variant_keys = set()
 
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
-        """Return schema type."""
-        return 'edges'
+        """Return schema type based on label."""
+        return 'nodes' if self.label == 'variants' else 'edges'
 
     def _get_collection_name(self):
-        """Get collection name."""
-        return 'variants_proteins'
+        """Get collection based on label."""
+        return 'variants' if self.label == 'variants' else 'variants_proteins'
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -68,19 +75,26 @@ class SEMPred(BaseAdapter):
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
         self.writer.add_tag('portal_accessions', self.sem_provenance_accession)
-        self.load_tf_id_mapping()
-        self.protein_map = ProteinMap(organism='Homo sapiens')
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
+
+        if self.label == 'sem_predicted_asb':
+            self.load_tf_id_mapping()
+            self.protein_map = ProteinMap(organism='Homo sapiens')
+
         with gzip.open(self.filepath, 'rt') as sem_file:
             sem_csv = csv.reader(sem_file, delimiter='\t')
             tf_name = None
+            tf_keys = None
+            chunk = []
 
             for row in sem_csv:
                 if row[0].startswith('#'):
+                    if self.label != 'sem_predicted_asb':
+                        continue
                     if row[0].startswith('#TFName: '):
                         tf_name = row[0].replace('#TFName: ', '')
                         tf_id = self.tf_id_mapping.get(tf_name)
@@ -90,6 +104,8 @@ class SEMPred(BaseAdapter):
                             ensembl_ids = self.protein_map.get(
                                 tf_id.split('/')[1])
                             if ensembl_ids is None:
+                                if chunk:
+                                    self.process_chunk(chunk)
                                 self.protein_map.log(self.logger)
                                 return
                             else:
@@ -99,44 +115,98 @@ class SEMPred(BaseAdapter):
                         continue
                 elif row[0] == 'chr':
                     continue
-                else:
-                    if row[-2] in SEMPred.BINDING_EFFECT_LIST:
-                        variant_id = row[2]
-                        # did precheck for all input variants in IGVFFI6807FCZT.tsv.gz, all are valid and loaded from favor, so skipping checking here
-                        _from = 'variants/' + variant_id
+                elif row[-2] in SEMPred.BINDING_EFFECT_LIST:
+                    chunk.append((row, tf_name, tf_keys))
+                    if len(chunk) >= SEMPred.CHUNK_SIZE:
+                        self.process_chunk(chunk)
+                        chunk = []
+            if chunk:
+                self.process_chunk(chunk)
 
-                        for tf_key in tf_keys:  # one uniprot id possible map to multiple ENSP ids
-                            _to = tf_key  # either complexes/ or proteins/
-                            _key = '_'.join(
-                                [variant_id, tf_key.split('/')[-1], self.file_accession])
+        if self.label == 'sem_predicted_asb':
+            self.protein_map.log(self.logger)
 
-                            _props = {
-                                '_key': _key,
-                                '_from': _from,
-                                '_to': _to,
-                                'label': 'predicted allele-specific binding',
-                                'method': self.file_fileset['method'],
-                                'class': self.file_fileset['class'],
-                                'biosample_term': self.file_fileset['samples'][0] if self.file_fileset.get('samples') else None,
-                                'biological_context': self.file_fileset['simple_sample_summaries'][0] if self.file_fileset.get('simple_sample_summaries') else None,
-                                'motif': 'motifs/' + tf_name + '_SEMpl',
-                                'ref_seq_context': row[5],
-                                'alt_seq_context': row[6],
-                                'ref_score': float(row[7]),
-                                'alt_score': float(row[8]),
-                                'variant_effect_score': float(row[9]),
-                                # 'p_value': row[10], # skipped, all N/A
-                                'SEMpl_annotation': row[11],
-                                'SEMpl_baseline': float(row[12]),
-                                'files_filesets': 'files_filesets/' + self.file_accession,
-                                'name': 'modulates binding of',
-                                'inverse_name': 'binding modulated by',
-                                'biological_process': 'ontology_terms/GO_0051101',
-                                'source': 'IGVF',
-                                'source_url': self.source_url
-                            }
-                            if self.validate:
-                                self.validate_doc(_props)
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-        self.protein_map.log(self.logger)
+    def process_chunk(self, chunk):
+        rows_by_variant_id = [(row[2], row, tf_name, tf_keys)
+                              for row, tf_name, tf_keys in chunk]
+
+        loaded_variants = bulk_check_variants_in_arangodb(
+            list({variant_id for variant_id, _, _, _ in rows_by_variant_id}),
+            check_by='_key',
+        )
+
+        if self.label == 'variants':
+            self.write_missing_variants(
+                [(variant_id, row) for variant_id, row, _, _ in rows_by_variant_id], loaded_variants)
+            return
+
+        skipped_missing = 0
+        for variant_id, row, tf_name, tf_keys in rows_by_variant_id:
+            if variant_id not in loaded_variants:
+                skipped_missing += 1
+                continue
+            self.write_edges(variant_id, row, tf_name, tf_keys)
+
+        if skipped_missing:
+            self.logger.warning(
+                f'Skipped {skipped_missing} row(s) - variant not found in variants collection')
+
+    def write_edges(self, variant_id, row, tf_name, tf_keys):
+        _from = 'variants/' + variant_id
+
+        for tf_key in tf_keys:  # one uniprot id possible map to multiple ENSP ids
+            _to = tf_key  # either complexes/ or proteins/
+            _key = '_'.join(
+                [variant_id, tf_key.split('/')[-1], self.file_accession])
+
+            _props = {
+                '_key': _key,
+                '_from': _from,
+                '_to': _to,
+                'label': 'predicted allele-specific binding',
+                'method': self.file_fileset['method'],
+                'class': self.file_fileset['class'],
+                'biosample_term': self.file_fileset['samples'][0] if self.file_fileset.get('samples') else None,
+                'biological_context': self.file_fileset['simple_sample_summaries'][0] if self.file_fileset.get('simple_sample_summaries') else None,
+                'motif': 'motifs/' + tf_name + '_SEMpl',
+                'ref_seq_context': row[5],
+                'alt_seq_context': row[6],
+                'ref_score': float(row[7]),
+                'alt_score': float(row[8]),
+                'variant_effect_score': float(row[9]),
+                # 'p_value': row[10], # skipped, all N/A
+                'SEMpl_annotation': row[11],
+                'SEMpl_baseline': float(row[12]),
+                'files_filesets': 'files_filesets/' + self.file_accession,
+                'name': 'modulates binding of',
+                'inverse_name': 'binding modulated by',
+                'biological_process': 'ontology_terms/GO_0051101',
+                'source': SEMPred.SOURCE,
+                'source_url': self.source_url
+            }
+            if self.validate:
+                self.validate_doc(_props)
+            self.writer.write(json.dumps(_props))
+            self.writer.write('\n')
+
+    def write_missing_variants(self, rows_by_variant_id, loaded_variants):
+        for variant_id, row in rows_by_variant_id:
+            if variant_id in loaded_variants or variant_id in self.written_variant_keys:
+                continue
+            self.written_variant_keys.add(variant_id)
+
+            chr, pos, ref, alt = row[0], row[1], row[3], row[4]
+            variant_props, skipped = load_variant(f'{chr}-{pos}-{ref}-{alt}')
+            if variant_props:
+                variant_props.update({
+                    'source': SEMPred.SOURCE,
+                    'source_url': self.source_url,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                })
+                if self.validate:
+                    self.validate_doc(variant_props)
+                self.writer.write(json.dumps(variant_props))
+                self.writer.write('\n')
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")

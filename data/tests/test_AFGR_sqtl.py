@@ -13,8 +13,20 @@ def mock_igvf_metadata(mock_request):
     }
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.AFGR_sqtl_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 @patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mocker):
+def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mock_bulk_check_variants, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
@@ -66,7 +78,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_term_validate_doc_invalid(mock_request, moc
 
 
 @patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mocker):
+def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mock_bulk_check_variants, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
@@ -78,6 +90,64 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mocker):
                            label='AFGR_sqtl', writer=writer, validate=True)
         adapter.process_file()
         assert len(writer.contents) == 0
+
+
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
+def test_AFGR_sqtl_adapter_skips_edge_when_variant_not_loaded(mock_request, mock_bulk_check_variants, mocker):
+    """A variant that isn't already in the variants collection must be
+    skipped, not turned into a dangling edge."""
+    mock_igvf_metadata(mock_request)
+    mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    writer = SpyWriter()
+    with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+        adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+                           label='AFGR_sqtl', writer=writer, validate=True)
+        adapter.process_file()
+        assert len(writer.contents) == 0
+
+
+@patch('adapters.AFGR_sqtl_adapter.load_variant')
+@patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
+def test_AFGR_sqtl_adapter_variants_label_creates_missing_variant(mock_request, mock_load_variant, mock_bulk_check_variants, mocker):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection."""
+    mock_igvf_metadata(mock_request)
+    mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({
+        '_key': 'fake_variant_id',
+        'name': 'fake_variant_id',
+        'chr': 'chr1',
+        'pos': 88337,
+        'ref': 'G',
+        'alt': 'A',
+        'variation_type': 'SNP',
+        'spdi': 'fake_variant_id',
+        'hgvs': 'fake_hgvs',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    writer = SpyWriter()
+    adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+                       label='variants', writer=writer, validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in writer.contents if content.strip()]
+    # Same mocked variant id is produced for every row - written_variant_keys
+    # must dedupe it down to a single node.
+    assert len(non_empty_contents) == 1
+    item = json.loads(non_empty_contents[0])
+    assert item['_key'] == 'fake_variant_id'
+    assert item['source'] == AFGRSQtl.SOURCE
+    assert item['source_url'] == AFGRSQtl.SOURCE_URL
 
 
 @patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
@@ -110,7 +180,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_skip_alt_star(mock_request):
 
 
 @patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_sqtl_adapter_no_gene_mapping(mock_request, mocker):
+def test_AFGR_sqtl_adapter_no_gene_mapping(mock_request, mock_bulk_check_variants, mocker):
     """Test that introns without gene mapping are skipped (covers lines 78-79)"""
     mock_igvf_metadata(mock_request)
     writer = SpyWriter()

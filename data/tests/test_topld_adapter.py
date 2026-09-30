@@ -1,7 +1,20 @@
 import json
+from unittest.mock import patch
 from adapters.topld_adapter import TopLD
 from adapters.writer import SpyWriter
 import pytest
+
+
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.topld_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
 
 
 def test_topld_adapter_initialization():
@@ -20,7 +33,7 @@ def test_topld_adapter_initialization():
     assert adapter.writer == writer
 
 
-def test_topld_adapter_process_file(mocker):
+def test_topld_adapter_process_file(mocker, mock_bulk_check_variants):
     mocker.patch('adapters.topld_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
@@ -62,6 +75,70 @@ def test_topld_adapter_process_file(mocker):
     assert first_item['inverse_name'] == 'correlated with'
     assert first_item['source'] == 'TopLD'
     assert first_item['source_url'] == 'http://topld.genetics.unc.edu/'
+
+
+def test_topld_adapter_skips_edge_when_variant_not_loaded(mocker, mock_bulk_check_variants):
+    """An edge must be skipped, not emitted with a dangling reference, when
+    either endpoint variant isn't already in the variants collection."""
+    mocker.patch('adapters.topld_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    writer = SpyWriter()
+    adapter = TopLD(filepath='./samples/topld_sample.csv',
+                    annotation_filepath='./samples/topld_info_annotation.csv',
+                    chr='chr22',
+                    ancestry='SAS',
+                    writer=writer,
+                    validate=True)
+
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+
+
+def test_topld_adapter_variants_label_creates_missing_variant(mocker, mock_bulk_check_variants):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection."""
+    mocker.patch('adapters.topld_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    mock_load_variant = mocker.patch('adapters.topld_adapter.load_variant')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({
+        '_key': 'fake_variant_id',
+        'name': 'fake_variant_id',
+        'chr': 'chr22',
+        'pos': 8549508,
+        'ref': 'C',
+        'alt': 'A',
+        'variation_type': 'SNP',
+        'spdi': 'fake_variant_id',
+        'hgvs': 'fake_hgvs',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    writer = SpyWriter()
+    adapter = TopLD(filepath='./samples/topld_sample.csv',
+                    annotation_filepath='./samples/topld_info_annotation.csv',
+                    chr='chr22',
+                    ancestry='SAS',
+                    label='variants',
+                    writer=writer,
+                    validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in writer.contents if content.strip()]
+    # Same mocked variant id is produced for every row - written_variant_keys
+    # must dedupe it down to a single node.
+    assert len(non_empty_contents) == 1
+    item = json.loads(non_empty_contents[0])
+    assert item['_key'] == 'fake_variant_id'
+    assert item['source'] == TopLD.SOURCE
+    assert item['source_url'] == TopLD.SOURCE_URL
 
 
 def test_topld_adapter_process_annotations(mocker):
