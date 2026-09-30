@@ -53,6 +53,12 @@ const returnFormat = z.object({
   significant: z.boolean().nullish(),
   neg_log10_pvalue: z.number().nullish(),
   neg_log10_pvalue_adj: z.number().nullish(),
+  biosample_term: z.string().nullish(),
+  biological_context: z.string().nullish(),
+  phenotype: z.string().nullish(),
+  VCP: z.number().nullish(),
+  gene: z.string().nullish(),
+  trait_name: z.string().nullish(),
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
@@ -198,6 +204,11 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
         'CI_upper_95': record.CI_upper_95,
         'significant': record.significant,
         'treatments_term_ids': record.treatments_term_ids
+      } : record.method == 'ColocBoost' ? {
+        'phenotype': record.phenotype,
+        'VCP': record.VCP,
+        'gene': record.gene,
+        'trait_name': record.trait_name
       } : {
         'genomic_element': genomic_element,
         'strand': record.strand,
