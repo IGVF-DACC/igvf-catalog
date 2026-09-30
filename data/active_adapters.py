@@ -138,7 +138,6 @@ KEY_TO_ADAPTER = {
     'variant_disease_gene': ClinGen,
     'mpra': MPRAAdapter,
     'bluestarr_variant_biosample': BlueSTARRVariantBiosample,
-    'igvf_variant_gene_crispr': IGVFV2GCRISPR,
     'colocboost_variant_biosample': ColocBoostVariantBiosample,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
