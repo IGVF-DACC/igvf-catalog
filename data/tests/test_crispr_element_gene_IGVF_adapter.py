@@ -1683,3 +1683,38 @@ def test_igvf_e2g_0192_configured_skip_row_omits_missing_target_gene(
     parsed = [json.loads(line) for line in writer.contents if line.strip()]
     assert len(parsed) == 1
     assert parsed[0]['_to'] == 'genes/ENSG00000139618'
+
+
+@pytest.mark.parametrize('label,collection', [
+    ('genomic_element', 'mm_genomic_elements'),
+    ('genomic_element_gene', 'mm_genomic_elements_mm_genes'),
+])
+def test_mouse_in_vivo_perturb_seq(mock_file_fileset_perturb_seq, tmp_path, label, collection):
+    test_file = tmp_path / 'mouse.tsv.gz'
+    with gzip.open(test_file, 'wt') as output:
+        output.write('intended_target_name\tIntended_target_gene_id\tguide_id(s)\ttargeting_chr\ttargeting_start\ttargeting_end\tgene_id\tgene_symbol\tsceptre_log2_fc\tsceptre_p_value\tsceptre_adj_p_value\tsignificant\ttype\n')
+        output.write('Tgfbr2\tENSMUSG00000032440.14\tTgfbr2_3\tchr9\t116004181\t116004247\tENSMUSG00000026043.19\tCol3a1\t-0.285580125563423\t1e-250\t5.5685e-246\tTRUE\tIndirect_targeting\n')
+    writer = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as validator:
+        validator.return_value.validate.side_effect = lambda gene: gene in {
+            'ENSMUSG00000032440', 'ENSMUSG00000026043'}
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(test_file), label=label,
+            source_url='https://data.igvf.org/tabular-files/IGVFFI9159XDOS/',
+            writer=writer, validate=True)
+        assert adapter._get_collection_name() == collection
+        validator.assert_called_once_with('mm_genes')
+        adapter.process_file()
+    doc = json.loads(writer.contents[0])
+    element_key = 'CRISPR_chr9_116004181_116004247_GRCm39_IGVFFI9159XDOS'
+    assert doc['method'] == 'Perturb-seq'
+    if label == 'genomic_element':
+        assert doc['_key'] == element_key
+        assert doc['promoter_of'] == 'mm_genes/ENSMUSG00000032440'
+    else:
+        assert doc['_from'] == 'mm_genomic_elements/' + element_key
+        assert doc['_to'] == 'mm_genes/ENSMUSG00000026043'
+        assert doc['log2FC'] == -0.285580125563423
+        assert doc['p_value'] == 1e-250
+        assert doc['p_value_adj'] == 5.5685e-246
+        assert doc['significant'] is True

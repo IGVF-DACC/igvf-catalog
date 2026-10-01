@@ -2057,6 +2057,7 @@ export const descriptions = {
 
   genomic_elements_phenotypes:
     'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     At least one of these properties must be defined: region, files_fileset, phenotype_id, phenotype_name, or method. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
@@ -2084,6 +2085,7 @@ export const descriptions = {
 
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \

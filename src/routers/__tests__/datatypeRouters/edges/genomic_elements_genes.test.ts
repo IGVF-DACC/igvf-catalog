@@ -251,3 +251,52 @@ describe('genomicElementsGenesRouters.grn', () => {
     ).rejects.toThrow(TRPCError)
   })
 })
+
+describe('mouse element-gene routing', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it.each(['genomicElementsFromGenes', 'genesFromGenomicElements'] as const)(
+    '%s keeps exact and fallback queries in mouse collections', async (endpoint) => {
+      const query = jest.spyOn(dbModule.db, 'query')
+        .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+      const input = {
+        organism: 'Mus musculus',
+        method: 'Perturb-seq',
+        biological_context: 'aortic smooth muscle cell',
+        verbose: 'true',
+        page: 0
+      }
+      await genomicElementsGenesRouters[endpoint]({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      expect(query).toHaveBeenCalledTimes(4)
+      query.mock.calls.forEach(([aql], index) => {
+        const text = String(aql)
+        expect(text).toContain(index === 0
+          ? 'FOR record IN mm_genomic_elements_mm_genes'
+          : 'FOR record IN mm_genomic_elements_mm_genes_text_en_no_stem_inverted_search_alias')
+        expect(text).toContain('FOR gene IN mm_genes')
+        expect(text).toContain('FOR element IN mm_genomic_elements')
+        expect(text).not.toMatch(/FOR (?:record|gene|element) IN (?:genes|genomic_elements)\b/)
+      })
+    }
+  )
+
+  it('resolves mouse genes and binds mouse document IDs', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'ENSMUSG00000026043' }]) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { organism: 'Mus musculus', gene_id: 'ENSMUSG00000026043', page: 0 }
+    await genomicElementsGenesRouters.genomicElementsFromGenes({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    expect(String(query.mock.calls[0][0])).toContain('mm_genes')
+    expect(query.mock.calls[1][1]).toEqual({ geneIDs: ['mm_genes/ENSMUSG00000026043'] })
+  })
+
+  it('resolves regions against mouse elements', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['mm_genomic_elements/test']) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { organism: 'Mus musculus', region: 'chr9:116004181-116004247', page: 0 }
+    await genomicElementsGenesRouters.genesFromGenomicElements({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    expect(String(query.mock.calls[0][0])).toContain('FOR record IN mm_genomic_elements')
+    expect(query.mock.calls[1][1]).toEqual({ elementIDs: ['mm_genomic_elements/test'] })
+  })
+})

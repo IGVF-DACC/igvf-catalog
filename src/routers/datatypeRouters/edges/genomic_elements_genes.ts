@@ -6,7 +6,7 @@ import { geneSearch } from '../nodes/genes'
 import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
+import { commonEdgeParamsFormat, commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow, getMergedCollectionSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
@@ -23,6 +23,25 @@ const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneCollectionName = geneSchema.db_collection_name as string
+
+const humanRouting = {
+  edgeCollection: genomicElementToGeneCollectionName,
+  elementCollection: genomicElementCollectionName,
+  geneCollection: geneCollectionName,
+  elementSchema: genomicElementSchema,
+  geneSchema,
+  filterSchema: genomicElementsGenesFilterSchema
+}
+const mouseRouting = {
+  edgeCollection: 'mm_genomic_elements_mm_genes',
+  elementCollection: 'mm_genomic_elements',
+  geneCollection: 'mm_genes',
+  elementSchema: getSchema('data/schemas/nodes/mm_genomic_elements.CRISPRElementGeneIGVF.json'),
+  geneSchema: getSchema('data/schemas/nodes/mm_genes.GencodeGene.json'),
+  filterSchema: getMergedCollectionSchema('edges', 'mm_genomic_elements_mm_genes')
+}
+type Routing = typeof humanRouting
+const getRouting = (organism: unknown): Routing => organism === 'Mus musculus' ? mouseRouting : humanRouting
 
 const edgeQueryFormat = z.object({
   method: z.enum(METHODS).optional(),
@@ -44,7 +63,7 @@ const edgeQueryFormat = z.object({
   idr: z.string().trim().optional()
 })
 
-const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonEdgeParamsFormat)
 
 const gnrGeneQueryFormat = z.object({
   regulator_gene_id: z.string().optional(),
@@ -66,7 +85,7 @@ const gnrGeneQueryFormat = z.object({
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
 }).merge(edgeQueryFormat)
-  .merge(commonHumanEdgeParamsFormat)
+  .merge(commonEdgeParamsFormat)
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -155,7 +174,7 @@ const grnOutputFormat = z.object({
   perturbation_efficiency_significant: z.boolean().nullish()
 })
 
-const buildEdgeFilter = (input: paramsFormatType): string => {
+const buildEdgeFilter = (input: paramsFormatType, routing: Routing): string => {
   if (input.files_fileset !== undefined) {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
@@ -168,7 +187,7 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
     input.cell_annotation_term = `ontology_terms/${input.cell_annotation_term as string}`
   }
   // edge filters are the same for all methods
-  const filters = getFilterStatements(genomicElementsGenesFilterSchema, input)
+  const filters = getFilterStatements(routing.filterSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
@@ -193,6 +212,7 @@ function applyLimit (input: paramsFormatType): number {
 }
 
 function buildQuery (params: {
+  routing: Routing
   collectionName: string
   searchClause?: string
   combinedFilter: string
@@ -202,7 +222,7 @@ function buildQuery (params: {
   edgeNameField: 'name' | 'inverse_name'
   sortByKey?: boolean
 }): string {
-  const { collectionName, searchClause, combinedFilter, page, limit, verbose, edgeNameField, sortByKey } = params
+  const { routing, collectionName, searchClause, combinedFilter, page, limit, verbose, edgeNameField, sortByKey } = params
   const sortClause = sortByKey ? 'SORT record._key' : ''
   return `
     LET edgeRecords = (
@@ -215,8 +235,8 @@ function buildQuery (params: {
     )
     LET geneIDs = UNIQUE(edgeRecords[*]._to)
     LET elementIDs = UNIQUE(edgeRecords[*]._from)
-    LET geneLookup = ${verbose ? `(FOR gene IN ${geneCollectionName} FILTER gene._id IN geneIDs RETURN { [gene._id]: {${getDBReturnStatements(geneSchema).replaceAll('record', 'gene')}} })` : '[]'}
-    LET elementLookup = ${verbose ? `(FOR element IN ${genomicElementCollectionName} FILTER element._id IN elementIDs RETURN { [element._id]: {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'element')}} })` : '[]'}
+    LET geneLookup = ${verbose ? `(FOR gene IN ${routing.geneCollection} FILTER gene._id IN geneIDs RETURN { [gene._id]: {${getDBReturnStatements(routing.geneSchema).replaceAll('record', 'gene')}} })` : '[]'}
+    LET elementLookup = ${verbose ? `(FOR element IN ${routing.elementCollection} FILTER element._id IN elementIDs RETURN { [element._id]: {${getDBReturnStatements(routing.elementSchema).replaceAll('record', 'element')}} })` : '[]'}
     LET geneMap = MERGE(geneLookup)
     LET elementMap = MERGE(elementLookup)
     FOR record IN edgeRecords
@@ -275,6 +295,7 @@ const executeElementsGenesQuery = async (query: string, bindVars?: Record<string
 }
 
 const executeExactMatchQuery = async ({
+  routing,
   combinedFilter,
   page,
   limit,
@@ -282,6 +303,7 @@ const executeExactMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   combinedFilter: string
   page: number
   limit: number
@@ -290,7 +312,8 @@ const executeExactMatchQuery = async ({
   bindVars?: Record<string, unknown>
 }): Promise<any[]> => {
   const query = buildQuery({
-    collectionName: genomicElementToGeneCollectionName,
+    routing,
+    collectionName: routing.edgeCollection,
     combinedFilter,
     page,
     limit,
@@ -302,6 +325,7 @@ const executeExactMatchQuery = async ({
 }
 
 const executePrefixMatchQuery = async ({
+  routing,
   searchViewName,
   combinedFilter,
   biologicalContext,
@@ -311,6 +335,7 @@ const executePrefixMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   searchViewName: string
   combinedFilter: string
   biologicalContext: string
@@ -322,6 +347,7 @@ const executePrefixMatchQuery = async ({
 }): Promise<any[]> => {
   const searchVal = biologicalContext.replace(/"/g, '\\"')
   const query = buildQuery({
+    routing,
     collectionName: searchViewName,
     searchClause: `SEARCH STARTS_WITH(record.biological_context, "${searchVal}")`,
     combinedFilter,
@@ -334,6 +360,7 @@ const executePrefixMatchQuery = async ({
 }
 
 const executeTokenMatchQuery = async ({
+  routing,
   searchViewName,
   combinedFilter,
   biologicalContext,
@@ -343,6 +370,7 @@ const executeTokenMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   searchViewName: string
   combinedFilter: string
   biologicalContext: string
@@ -354,6 +382,7 @@ const executeTokenMatchQuery = async ({
 }): Promise<any[]> => {
   const searchVal = biologicalContext.replace(/"/g, '\\"')
   const query = buildQuery({
+    routing,
     collectionName: searchViewName,
     searchClause: `SEARCH ANALYZER(TOKENS("${searchVal}", "text_en_no_stem") ALL IN record.biological_context, "text_en_no_stem")`,
     combinedFilter,
@@ -366,6 +395,7 @@ const executeTokenMatchQuery = async ({
 }
 
 const executeLevenshteinMatchQuery = async ({
+  routing,
   searchViewName,
   combinedFilter,
   biologicalContext,
@@ -375,6 +405,7 @@ const executeLevenshteinMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   searchViewName: string
   combinedFilter: string
   biologicalContext: string
@@ -386,6 +417,7 @@ const executeLevenshteinMatchQuery = async ({
 }): Promise<any[]> => {
   const searchVal = biologicalContext.replace(/"/g, '\\"')
   const query = buildQuery({
+    routing,
     collectionName: searchViewName,
     searchClause: `SEARCH LEVENSHTEIN_MATCH(record.biological_context, "${searchVal}", 1, false)`,
     combinedFilter,
@@ -430,6 +462,8 @@ function elementQueryValidation (input: paramsFormatType): void {
 }
 
 async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any> {
+  const organism = input.organism ?? 'Homo sapiens'
+  const routing = getRouting(organism)
   delete input.organism
   geneQueryValidation(input)
   const limit = applyLimit(input)
@@ -439,16 +473,16 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   let geneIDs: string[] = []
   const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
-    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, synonym: input.synonym, organism: 'Homo sapiens', page: 0 }
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, synonym: input.synonym, organism: organism as string, page: 0 }
     delete input.gene_id
     delete input.hgnc_id
     delete input.synonym
     delete input.gene_name
     const genes = await geneSearch(geneInput)
-    geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
+    geneIDs = genes.map(gene => `${routing.geneCollection}/${gene._id as string}`)
   }
 
-  const edgeFilter = buildEdgeFilter(input)
+  const edgeFilter = buildEdgeFilter(input, routing)
   const geneFilter = isGeneQuery ? 'record._to IN @geneIDs' : ''
   const baseFilter = buildCombinedFilter(geneFilter, edgeFilter)
   const combinedFilter = biologicalContext
@@ -456,9 +490,10 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     : baseFilter
   const verbose = input.verbose === 'true'
   const bindVars = isGeneQuery ? { geneIDs } : undefined
-  const searchViewName = `${genomicElementToGeneCollectionName}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${routing.edgeCollection}_text_en_no_stem_inverted_search_alias`
 
   const exactObjects = await executeExactMatchQuery({
+    routing,
     combinedFilter,
     page: input.page as number,
     limit,
@@ -472,6 +507,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   const prefixMatchObjects = await executePrefixMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -486,6 +522,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   const tokenMatchObjects = await executeTokenMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -500,6 +537,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   return await executeLevenshteinMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -698,6 +736,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
+  const organism = input.organism ?? 'Homo sapiens'
+  const routing = getRouting(organism)
   delete input.organism
   elementQueryValidation(input)
   const limit = applyLimit(input)
@@ -709,9 +749,9 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   if (input.region !== undefined) {
     isElementQuery = true
     const elementInput: paramsFormatType = { region: input.region, type: input.region_type, page: 0 }
-    const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(elementInput))
+    const genomicElementsFilters = getFilterStatements(routing.elementSchema, preProcessRegionParam(elementInput))
     const elementQuery = `
-      FOR record IN ${genomicElementCollectionName}
+      FOR record IN ${routing.elementCollection}
       FILTER ${genomicElementsFilters}
       RETURN record._id
     `
@@ -727,7 +767,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     delete input.source_annotation
   }
 
-  const edgeFilter = buildEdgeFilter(input)
+  const edgeFilter = buildEdgeFilter(input, routing)
   const elementFilter = isElementQuery ? 'record._from IN @elementIDs' : ''
   const baseFilter = [elementFilter, edgeFilter, sourceAnnotationFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
   const combinedFilter = biologicalContext
@@ -735,9 +775,10 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     : baseFilter
   const verbose = input.verbose === 'true'
   const bindVars = isElementQuery ? { elementIDs } : undefined
-  const searchViewName = `${genomicElementToGeneCollectionName}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${routing.edgeCollection}_text_en_no_stem_inverted_search_alias`
 
   const exactObjects = await executeExactMatchQuery({
+    routing,
     combinedFilter,
     page: input.page as number,
     limit,
@@ -750,6 +791,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   const prefixMatchObjects = await executePrefixMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -764,6 +806,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   const tokenMatchObjects = await executeTokenMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -778,6 +821,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   return await executeLevenshteinMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
