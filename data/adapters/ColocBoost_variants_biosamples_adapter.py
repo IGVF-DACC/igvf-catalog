@@ -60,8 +60,10 @@ class ColocBoostVariantBiosample(BaseAdapter):
             # Drop any such lines so csv.DictReader picks up the actual header.
             lines = (line for line in colocboost_tsv if not line.startswith('#'))
             reader = csv.DictReader(lines, delimiter='\t')
+            # Files are expected to have at most one row per
+            # (variant, gene, trait); rows are not merged.
             rows = self.normalize_rows(list(reader))
-            rows = self.merge_duplicate_rows(rows)
+            self.warn_duplicate_rows(rows)
 
         chunk_size = 6500
         for i in range(0, len(rows), chunk_size):
@@ -88,58 +90,25 @@ class ColocBoostVariantBiosample(BaseAdapter):
             row['UBERONTerm'] = row.get('BiosampleTerm', '')
         return rows
 
-    @staticmethod
-    def merge_duplicate_rows(rows):
+    def warn_duplicate_rows(self, rows):
         """
-        Some ColocBoost files repeat the same (variant, gene, trait) across
-        multiple rows with different, overlapping biosample lists and
-        different VCP values. Merge those into a single row: union the
-        (UBERONTerm, BiosampleTermName) pairs and take the max VCP.
-        Files are fairly small so we can do this in memory.
-
-        Rows with mismatched UBERONTerm/BiosampleTermName lengths are passed
-        through unmerged so process_edge_chunk's existing length check still
-        catches and skips them.
+        ColocBoost files are expected to have at most one row per
+        (variant, gene) in each file split by traits. Warn if that assumption is violated.
         """
-        merged = {}
-        order = []
+        seen = set()
+        duplicate_keys = set()
         for row in rows:
-            uberon_terms = [t.strip()
-                            for t in row['UBERONTerm'].split(';') if t.strip()]
-            biosample_names = [
-                t.strip() for t in row['BiosampleTermName'].split(';') if t.strip()]
-
-            if len(uberon_terms) != len(biosample_names):
-                order.append(object())
-                merged[order[-1]] = row
-                continue
-
             key = (row['SPDI_ID'], row['GeneEnsembl'],
                    row['TraitName'], row['OntologyTerm'])
-            pairs = list(zip(uberon_terms, biosample_names))
+            if key in seen:
+                duplicate_keys.add(key)
+            seen.add(key)
 
-            if key not in merged:
-                merged_row = dict(row)
-                merged_row['_pairs'] = list(dict.fromkeys(pairs))
-                merged[key] = merged_row
-                order.append(key)
-            else:
-                merged_row = merged[key]
-                if float(row['VCP']) > float(merged_row['VCP']):
-                    merged_row['VCP'] = row['VCP']
-                for pair in pairs:
-                    if pair not in merged_row['_pairs']:
-                        merged_row['_pairs'].append(pair)
-
-        merged_rows = []
-        for key in order:
-            row = merged[key]
-            pairs = row.pop('_pairs', None)
-            if pairs is not None:
-                row['UBERONTerm'] = ';'.join(p[0] for p in pairs)
-                row['BiosampleTermName'] = ';'.join(p[1] for p in pairs)
-            merged_rows.append(row)
-        return merged_rows
+        if duplicate_keys:
+            self.logger.warning(
+                f'Found {len(duplicate_keys)} (variant, gene, trait) '
+                f'combinations repeated across multiple rows in {self.file_accession}'
+            )
 
     def process_variant_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
@@ -232,7 +201,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
                     'phenotype': phenotype,
                     'VCP': float(row['VCP']),
                     'gene': gene,
-                    'trait_name': row['TraitName'],
+                    'phenotype_name': row['TraitName'],
                     'label': self.collection_label,
                     'method': self.method,
                     'class': self.collection_class,
