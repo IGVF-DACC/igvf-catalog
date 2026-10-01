@@ -209,6 +209,31 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
+  genes_transcripts_genes: 'Retrieve MORF gene overexpression effects through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; readout_gene_id identifies the readout gene. Filter by a source gene, transcript, readout gene, morf_id, files_fileset, or method. Set verbose=true to expand gene and transcript nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+    {
+      id: 'morf-screen',
+      label: 'MORF screen',
+      examples: [
+        {
+          label: 'AATF transcript overexpression effect on TOX',
+          items: [
+            'gene_id = ENSG00000275700',
+            'transcript_id = ENST00000619387',
+            'readout_gene_id = ENSG00000198846',
+            'files_fileset = IGVFFI6734IWRB'
+          ]
+        },
+        {
+          label: 'All MORF effects on TOX',
+          items: [
+            'readout_gene_id = ENSG00000198846',
+            'method = MORF screen'
+          ]
+        }
+      ]
+    }
+  ]),
+
   genes_genes:
     'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
     The following parameters can be used to set thresholds on z_score: gt (>), gte (>=), lt (<), lte (<=). z_score only exists on CoXPresdb edges; BioGRID edges do not have this field at all.<br> \

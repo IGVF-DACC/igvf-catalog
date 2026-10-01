@@ -106,6 +106,15 @@ genes_genes:
       - interaction_type[*], source
       - source
 
+genes_transcripts_genes:
+  persistent:
+    fields:
+      - method, files_filesets
+      - morf_id
+  zkd_sparse:
+    fields:
+      - log2FC, neg_log10_pvalue_adj
+
 genes_structure:
   persistent:
     fields:

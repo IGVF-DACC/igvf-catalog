@@ -221,8 +221,9 @@
         },
         "variants_variants": {
             "TopLD": "schemas/edges/variants_variants.TopLD.json"
+        },
+        "genes_transcripts_genes": {
+            "MORFGeneTranscriptGene": "schemas/edges/genes_transcripts_genes.MORFGeneTranscriptGene.json"
         }
-
     }
-
 }

@@ -1,3 +1,4 @@
+import { genesTranscriptsGenesRouters } from './genes_transcripts_genes'
 import { genesGenesEdgeRouters } from './genes_genes'
 import { genesTranscriptsRouters } from './genes_transcripts'
 import { ontologyTermsEdgeRouters } from './ontology_terms_ontology_terms'
@@ -29,6 +30,7 @@ import { genomicElementsPhenotypesRouters } from './genomic_elements_phenotypes'
 import { qtlsRouters } from './qtls'
 
 export const edgeRouters = {
+  ...genesTranscriptsGenesRouters,
   ...genesTranscriptsRouters,
   ...transcriptsProteinsRouters,
   ...variantsVariantsRouters,
