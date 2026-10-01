@@ -13,7 +13,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "SHA-256 hash of the variant key and the disease ontology term key."
         },
         "_from": {
@@ -31,12 +30,14 @@
           ]
         },
         "gene_id": {
+          "title": "Gene ID",
           "type": "string",
           "description": "Ensembl gene ID",
           "example": "genes/ENSG00000171759",
           "pattern": "^genes/"
         },
         "assertion": {
+          "title": "Assertion",
           "type": "string",
           "description": "ACMG/AMP pathogenicity classification assigned by a ClinGen Variant Curation Expert Panel.",
           "enum": [
@@ -48,6 +49,7 @@
           ]
         },
         "pmids": {
+          "title": "PubMed IDs",
           "type": "array",
           "description": "Pubmed identifiers.",
           "example": [
@@ -83,7 +85,6 @@
         }
       },
       "required": [
-        "_key",
         "gene_id",
         "assertion",
         "pmids",
