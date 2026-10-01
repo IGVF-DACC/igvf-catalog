@@ -130,7 +130,7 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_split_spdi, mock_b
     assert item['phenotype'] == 'ontology_terms/EFO_0006340'
     assert item['VCP'] == 0.9993
     assert item['gene'] == 'genes/ENSG00000134245'
-    assert item['trait_name'] == 'mean arterial pressure'
+    assert item['phenotype_name'] == 'mean arterial pressure'
     assert item['label'] == 'predicted variant effect on phenotype'
     assert item['method'] == 'ColocBoost'
     assert item['class'] == 'prediction'

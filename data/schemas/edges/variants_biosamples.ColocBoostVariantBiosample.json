@@ -55,9 +55,9 @@
           "pattern": "^genes/",
           "collections": ["genes"]
         },
-        "trait_name": {
+        "phenotype_name": {
           "type": "string",
-          "description": "Trait name for the variants to biosamples edge"
+          "description": "Phenotype name for the variants to biosamples edge"
         },
         "label": {
           "enum": [
@@ -110,7 +110,7 @@
         "phenotype",
         "VCP",
         "gene",
-        "trait_name",
+        "phenotype_name",
         "source_url",
         "files_filesets"
       ],
