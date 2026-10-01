@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
+  "$id": "schemas/nodes/genomic_elements.CRISPRElementElement.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -12,21 +12,28 @@
       "type": "object",
       "properties": {
         "_key": {
-          "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "name": {
-          "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
+        },
+        "promoter_of": {
+          "type": "string",
+          "description": "The gene this element is the presumed promoter of.",
+          "example": "genes/ENSG00000123685"
         },
         "method": {
           "enum": [
-            "CRISPR screen"
+            "Perturb-seq"
           ]
         },
         "source_annotation": {
           "type": "string",
           "description": "Annotation of the genomic element from the source file.",
+          "example": "promoter",
           "enum": [
-            "enhancer"
+            "promoter",
+            "accessible element"
           ]
         },
         "source": {
@@ -35,8 +42,7 @@
           ]
         },
         "source_url": {
-          "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
-          "pattern": "^https://data.igvf.org/tabular-files/"
+          "example": "https://data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "type": {
           "enum": [
@@ -54,5 +60,8 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "genomic_elements"
+  "db_collection_name": "genomic_elements",
+  "accessible_via": {
+    "filter_by_range": "start, end"
+  }
 }
