@@ -218,7 +218,8 @@
               "SGE Pipeline",
               "Snakemake",
               "statsmodels",
-              "Straw"
+              "Straw",
+              "snapATAC2"
             ]
           }
         },
