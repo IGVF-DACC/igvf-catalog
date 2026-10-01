@@ -300,3 +300,35 @@ describe('mouse element-gene routing', () => {
     expect(query.mock.calls[1][1]).toEqual({ elementIDs: ['mm_genomic_elements/test'] })
   })
 })
+
+describe('GRN organism routing', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it.each([
+    { regulator_gene_id: 'ENSMUSG00000032440' },
+    { response_gene_id: 'ENSMUSG00000026043' },
+    { regulator_gene_id: 'ENSMUSG00000032440', response_gene_id: 'ENSMUSG00000026043' }
+  ])('routes mouse GRN queries and self-effects: %j', async (genes) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { ...genes, organism: 'Mus musculus', neg_log10_pvalue: 'gte:2', page: 1, limit: 10 }
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    const aql = String(query.mock.calls[0][0])
+    expect(aql).toContain('IN mm_genes')
+    expect(aql).toContain('in mm_genomic_elements_mm_genes')
+    expect(aql).toContain('FOR se IN mm_genomic_elements_mm_genes')
+    expect(aql).toContain('ge.promoter_of')
+    expect(aql).toContain('LIMIT 10, 10')
+    expect(aql).not.toMatch(/\b(?:IN|in) (?:genes|genomic_elements|genomic_elements_genes)\b/)
+    if ('regulator_gene_id' in genes) expect(aql).toMatch(/(?:IN|in) mm_genomic_elements\s/)
+  })
+
+  it('defaults to human collections', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { regulator_gene_id: 'ENSG00000123685' }
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    expect(String(query.mock.calls[0][0])).toContain('FOR gene IN genes')
+    expect(String(query.mock.calls[0][0])).toContain('FOR se IN genomic_elements_genes')
+  })
+})

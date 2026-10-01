@@ -6,14 +6,13 @@ import { geneSearch } from '../nodes/genes'
 import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonEdgeParamsFormat, commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
+import { commonEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow, getMergedCollectionSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
-const genomicElementsGenesCrisprElementGeneIgvfSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json')
 // genomic_elements_genes holds ENCODE E-G links, IGVF CRISPR, scE2G, and ENCODE CRISPR
 // element-gene edges. Filtering must see every source's fields/ranges (e.g. IGVF's
 // z_score/idr/neg_log10_pvalue), not just the ENCODE CRISPR schema's subset.
@@ -80,7 +79,7 @@ const gnrGeneQueryFormat = z.object({
   files_fileset: z.string().optional(),
   significant: z.enum(['true']).optional(),
   crispr_modality: z.enum(['knockout', 'interference', 'activation']).optional()
-}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
+}).merge(commonEdgeParamsFormat).omit({ verbose: true })
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -550,11 +549,13 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
 }
 
 async function grnSearch (input: paramsFormatType): Promise<any> {
+  const organism = input.organism ?? 'Homo sapiens'
+  const routing = getRouting(organism)
   grnQueryValidation(input)
   const limit = applyLimit(input)
 
-  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id !== undefined ? withHgncPrefix(input.regulator_hgnc_id as string) : undefined, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: 'Homo sapiens', page: 0 }
-  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id !== undefined ? withHgncPrefix(input.response_hgnc_id as string) : undefined, name: input.response_gene_name, synonyms: input.response_synonym, organism: 'Homo sapiens', page: 0 }
+  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id !== undefined ? withHgncPrefix(input.regulator_hgnc_id as string) : undefined, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: organism as string, page: 0 }
+  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id !== undefined ? withHgncPrefix(input.response_hgnc_id as string) : undefined, name: input.response_gene_name, synonyms: input.response_synonym, organism: organism as string, page: 0 }
 
   const hasRegulatorInput = Object.keys(regulatorGeneInput).some(key => !['organism', 'page'].includes(key) && regulatorGeneInput[key] !== undefined)
   const hasResponseInput = Object.keys(responseGeneInput).some(key => !['organism', 'page'].includes(key) && responseGeneInput[key] !== undefined)
@@ -568,7 +569,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilters.neg_log10_pvalue_adj = input.neg_log10_pvalue_adj
   }
   if (Object.keys(pvalueFilters).length > 0) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsGenesCrisprElementGeneIgvfSchema, pvalueFilters)}`
+    pvalueFilter = `FILTER ${getFilterStatements(routing.filterSchema, pvalueFilters)}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
@@ -592,10 +593,10 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   }
 
   const responseQuery = `
-    FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
+    FOR gene IN ${routing.geneCollection}
+        FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
-        FOR record in genomic_elements_genes
+        FOR record in ${routing.edgeCollection}
           FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
           ${pvalueFilter}
           LET ge = DOCUMENT(record._from)
@@ -610,7 +611,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
           LET perturbationEfficiencyEdge = FIRST(
-            FOR se IN genomic_elements_genes
+            FOR se IN ${routing.edgeCollection}
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
               LIMIT 1
               RETURN se
@@ -637,20 +638,20 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   `
 
   const regulatorQuery = `
-    FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
+    FOR gene IN ${routing.geneCollection}
+        FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
 
-        FOR ge in genomic_elements
+        FOR ge in ${routing.elementCollection}
           FILTER ge.promoter_of == gene._id
 
-          FOR record in genomic_elements_genes
+          FOR record in ${routing.edgeCollection}
             FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
             ${pvalueFilter}
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
             LET perturbationEfficiencyEdge = FIRST(
-              FOR se IN genomic_elements_genes
+              FOR se IN ${routing.edgeCollection}
                 FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
                 LIMIT 1
                 RETURN se
@@ -677,23 +678,23 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   `
 
   const regulatorResponseQuery = `
-    FOR regulator_gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}
+    FOR regulator_gene IN ${routing.geneCollection}
+        FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}
 
-        FOR response_gene IN genes
-            FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
+        FOR response_gene IN ${routing.geneCollection}
+            FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
-            FOR record in genomic_elements_genes
+            FOR record in ${routing.edgeCollection}
               FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
               ${pvalueFilter}
 
-              FOR ge IN genomic_elements
+              FOR ge IN ${routing.elementCollection}
                 FILTER ge._id == record._from AND ge.promoter_of == regulator_gene._id
                 SORT record._key
                 LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
                 LET perturbationEfficiencyEdge = FIRST(
-                  FOR se IN genomic_elements_genes
+                  FOR se IN ${routing.edgeCollection}
                     FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
                     LIMIT 1
                     RETURN se

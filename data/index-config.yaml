@@ -168,6 +168,7 @@ mm_genes_structure:
 mm_genomic_elements:
   persistent:
     fields:
+      - promoter_of
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
