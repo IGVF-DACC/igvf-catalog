@@ -162,7 +162,7 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert 'label' in first_item
     assert first_item['label'] == 'variant effect on gene expression'
     assert first_item['source_url'] == adapter.source_url
-    assert first_item['method'] == 'Variant-EFFECTS'
+    assert first_item['method'] == 'CRISPR screen'
     assert first_item['crispr_modality'] == 'prime editing'
     assert first_item['class'] == 'observed data'
     assert first_item['biological_context'] == 'donor:human'

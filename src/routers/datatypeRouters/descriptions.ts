@@ -347,7 +347,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens (including Variant-EFFECTS) from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
@@ -406,14 +406,14 @@ export const descriptions = {
             items: [
               'spdi = NC_000010.11:79347741:AGGT:TCAG',
               'effect_size = lt:-0.6',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
               'region = chr10:79347740-79347749 (maximum length: 10kb)',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -451,7 +451,7 @@ export const descriptions = {
     ]),
 
   genes_variants:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by Ensembl gene ids.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens (including Variant-EFFECTS) from IGVF, by Ensembl gene ids.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, synonym, method, or files_fileset. <br> \
@@ -511,14 +511,14 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000108179',
               'neg_log10_pvalue = gt:13.1',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
               'synonym = PPIF',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           }
         ]

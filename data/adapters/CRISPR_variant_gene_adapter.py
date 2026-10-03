@@ -48,6 +48,8 @@ class CRISPRVariantGene(BaseAdapter):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.method = self.file_fileset['method']
+        if self.method == 'Variant-EFFECTS':
+            self.method = 'CRISPR screen'
         self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
         self.biosample_term = self.file_fileset['samples'][0]
         self.treatments_term_ids = self.file_fileset['treatments_term_ids']
