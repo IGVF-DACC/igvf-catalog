@@ -43,7 +43,7 @@ def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
     with patch('adapters.CRISPR_variant_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
-            'method': 'Variant-EFFECTS',
+            'method': 'CRISPR screen',
             'simple_sample_summaries': ['donor:human'],
             'samples': ['ontology_terms/EFO_0001253'],
             'treatments_term_ids': [],
