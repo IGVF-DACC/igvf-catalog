@@ -345,7 +345,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens (including Variant-EFFECTS) from IGVF, by variants.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
