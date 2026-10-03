@@ -24,9 +24,9 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element, usually candidate enhancer, promoter, distal or accessible element.",
           "enum": [
-            "enhancer"
+            "candidate enhancer"
           ]
         },
         "source": {

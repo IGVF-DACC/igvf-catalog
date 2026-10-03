@@ -778,6 +778,7 @@ class FileFileSet:
                 'CRISPR FlowFISH screen',
                 'Migration CRISPR screen',
                 'Proliferation CRISPR screen',
+                'Variant-EFFECTS',
             }):
                 method = 'CRISPR screen'
         if file_object['accession'] == 'IGVFFI8753TTYC':
