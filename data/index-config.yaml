@@ -168,6 +168,7 @@ mm_genes_structure:
 mm_genomic_elements:
   persistent:
     fields:
+      - promoter_of
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
@@ -324,6 +325,21 @@ genomic_elements_genes:
       - method, source, _key
       - _from, _to, files_filesets
 
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
+mm_genomic_elements_mm_genes:
+  # IGVFFI9159XDOS: 257,900 edges, 19 promoters, 14,690 response genes.
+  # One dataset: method/source/fileset/context indexes add little selectivity.
+  # Endpoint indexes support filtering and _key pagination in either direction.
+  persistent:
+    fields:
+      - _from, _key
+      - _to, _key
+
+  # Required by the API's biological-context search fallback queries.
   inverted:
     fields: biological_context
     analyzers:

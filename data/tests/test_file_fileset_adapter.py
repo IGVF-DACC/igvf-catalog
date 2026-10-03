@@ -413,7 +413,8 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
     assert props['method'] == 'CRISPR screen'
 
 
-def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq():
+@pytest.mark.parametrize('assay_title', ['Multiome Perturb-seq', 'in vivo Perturb-seq'])
+def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq(assay_title):
     file_object = {
         '@id': '/tabular-files/IGVFFI0000MULT/',
         'accession': 'IGVFFI0000MULT',
@@ -438,7 +439,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
             with patch.object(
                     FileFileSet,
                     'parse_analysis_set_igvf',
-                    return_value=({'Multiome Perturb-seq'}, {'OBI:0002629'})):
+                    return_value=({assay_title}, {'OBI:0002629'})):
                 with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
                     with patch.object(
                         FileFileSet,
@@ -454,7 +455,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
                     ):
                         props, _, _ = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
-    assert props['preferred_assay_titles'] == ['Multiome Perturb-seq']
+    assert props['preferred_assay_titles'] == [assay_title]
     assert props['method'] == 'Perturb-seq'
     assert props['software'] == ['SciPy']
 

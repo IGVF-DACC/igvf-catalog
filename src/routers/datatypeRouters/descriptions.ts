@@ -1912,6 +1912,7 @@ export const descriptions = {
 
   grn:
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
     crispr_modality accepts knockout, interference, or activation.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -1964,6 +1965,7 @@ export const descriptions = {
 
   genes_genomic_elements:
     'Retrieve genomic elements and gene pairs by querying genes.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     One of these fields is required: gene_id, hgnc_id, gene_name, synonym, method, or files_fileset. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -2084,6 +2086,7 @@ export const descriptions = {
 
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
