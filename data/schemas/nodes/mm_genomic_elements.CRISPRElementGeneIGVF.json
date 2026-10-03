@@ -30,12 +30,10 @@
         },
         "source_annotation": {
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the targeted element as a promoter.",
           "example": "promoter",
           "enum": [
-            "enhancer",
-            "promoter",
-            "distal element"
+            "promoter"
           ]
         },
         "source": {

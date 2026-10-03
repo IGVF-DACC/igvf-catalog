@@ -331,20 +331,15 @@ genomic_elements_genes:
       - text_en_no_stem
 
 mm_genomic_elements_mm_genes:
+  # IGVFFI9159XDOS: 257,900 edges, 19 promoters, 14,690 response genes.
+  # One dataset: method/source/fileset/context indexes add little selectivity.
+  # Endpoint indexes support filtering and _key pagination in either direction.
   persistent:
     fields:
-      - method, files_filesets
-      - method, _key
-      - source, files_filesets
-      - files_filesets
-      - files_filesets, _key
-      - _from, files_filesets
+      - _from, _key
       - _to, _key
-      - biosample_term, biological_context, source, method, files_filesets
-      - biological_context, source, method, files_filesets
-      - method, source, _key
-      - _from, _to, files_filesets
 
+  # Required by the API's biological-context search fallback queries.
   inverted:
     fields: biological_context
     analyzers:
