@@ -167,7 +167,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_enhancer_only_genomic_elem
     assert len(parsed) == 1
     first_item = parsed[0]
     assert first_item['_key'] == 'CRISPR_chr22_36387779_36388133_GRCh38_IGVFFI6296RCJK'
-    assert first_item['source_annotation'] == 'enhancer'
+    assert first_item['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in first_item
 
 
@@ -319,7 +319,7 @@ def test_crispr_element_gene_igvf_adapter_tap_seq_direct_targeting_genomic_eleme
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     assert len(parsed) == 1
     first_item = parsed[0]
-    assert first_item['source_annotation'] == 'enhancer'
+    assert first_item['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in first_item
 
 
@@ -414,7 +414,7 @@ def test_igvf_e2g_teloHAEC_flowfish_enhancer_edge_uses_intended_target_name_inte
         ).process_file()
 
     node = json.loads(writer2.contents[0])
-    assert node['source_annotation'] == 'enhancer'
+    assert node['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in node
     assert node['chr'] == 'chr1'
     assert node['start'] == 1000
@@ -594,7 +594,7 @@ def test_igvf_e2g_scaled_screen_uses_genomic_element_for_source_annotation(
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     enhancer = next(item for item in parsed if item['chr'] == 'chr10')
     promoter = next(item for item in parsed if item['chr'] == 'chr9')
-    assert enhancer['source_annotation'] == 'enhancer'
+    assert enhancer['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in enhancer
     assert promoter['source_annotation'] == 'promoter'
     assert promoter['promoter_of'] == 'genes/ENSG00000097007'
@@ -685,7 +685,7 @@ def test_igvf_e2g_wtc11_uses_genomic_element_for_source_annotation(
     enhancer = next(item for item in parsed if item['chr'] == 'chr1')
     assert promoter['source_annotation'] == 'promoter'
     assert promoter['promoter_of'] == 'genes/ENSG00000151650'
-    assert enhancer['source_annotation'] == 'enhancer'
+    assert enhancer['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in enhancer
 
 
