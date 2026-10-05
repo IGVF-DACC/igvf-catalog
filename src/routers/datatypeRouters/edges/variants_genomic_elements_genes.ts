@@ -31,7 +31,8 @@ const genomicElementOutputFormat = z.object({
   end: z.number(),
   type: z.string().nullish(),
   source: z.string().nullish(),
-  source_url: z.string().nullish()
+  source_url: z.string().nullish(),
+  source_annotation: z.string().nullish()
 })
 
 const outputFormat = z.array(z.object({
@@ -147,7 +148,8 @@ function buildMainQuery (nearbyGenes: boolean, edgeFilters: string): string {
           end: ge.end,
           type: ge.type,
           source: ge.source,
-          source_url: ge.source_url
+          source_url: ge.source_url,
+          source_annotation: ge.source_annotation
         },
         gene: {
           _id: targetGene._key,

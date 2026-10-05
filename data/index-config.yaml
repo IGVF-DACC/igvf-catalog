@@ -98,13 +98,22 @@ genes:
       - start, end
 
 genes_genes:
-  zkd:
+  zkd_sparse:
     fields:
       - z_score
   persistent:
     fields:
       - interaction_type[*], source
       - source
+
+genes_transcripts_genes:
+  persistent:
+    fields:
+      - method, files_filesets
+      - morf_id
+  zkd_sparse:
+    fields:
+      - log2FC, neg_log10_pvalue_adj
 
 genes_structure:
   persistent:
@@ -339,6 +348,7 @@ studies:
 transcripts:
   persistent:
     fields:
+      - refseq_transcript_ids[*]
       - chr, gene_name, name, transcript_type
       - gene_name, name, transcript_type
       - name, transcript_type
