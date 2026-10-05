@@ -23,6 +23,29 @@ describe('genesPathwaysRouters (integration)', () => {
     }
   })
 
+  it('pathwaysFromGenes returns schema-valid pathways for a real gene region', async () => {
+    // chr16:30114104-30123506 is the exact span of ENSG00000102882 (MAPK3), the same gene
+    // used by gene_id above, so region search is exercised against the same known data.
+    const input = { region: 'chr16:30114104-30123506', organism: 'Homo sapiens', page: 0, limit: 10 }
+    const result: any = await genesPathwaysRouters.pathwaysFromGenes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBeGreaterThan(0)
+
+    for (const record of result) {
+      const parsed = genesPathwaysFormat.safeParse(record)
+      if (!parsed.success) {
+        throw new Error(`Output validation failed for pathwaysFromGenes (region) record: ${parsed.error.toString()}`)
+      }
+    }
+  })
+
   it('genesFromPathways returns schema-valid genes for a real pathway', async () => {
     const input = { pathway_id: 'R-HSA-5675221', organism: 'Homo sapiens', page: 0, limit: 10 }
     const result: any = await genesPathwaysRouters.genesFromPathways({
