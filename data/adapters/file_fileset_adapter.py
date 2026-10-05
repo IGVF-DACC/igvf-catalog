@@ -136,10 +136,12 @@ class FileFileSet:
         ids: list[str],
         fields: list[str] | None = None,
         id_type: str = 'accession',
-        api_url: str = IGVF_API
+        api_url: str = IGVF_API,
+        object_type: str | None = None
     ) -> list[dict]:
-        if id_type not in ['accession', '@id']:
-            raise ValueError('id_type must be "accession" or "@id".')
+        if id_type not in ['accession', '@id', 'dbxrefs']:
+            raise ValueError(
+                'id_type must be "accession", "@id", or "dbxrefs".')
         fields = fields or []
         if not ids:
             return []
@@ -147,15 +149,16 @@ class FileFileSet:
             ids = sorted(ids)
         else:
             ids = list(ids)
-        batch_size = 50 if id_type == 'accession' else 20
+        batch_size = 20 if id_type == '@id' else 50
         fields_query = '&'.join(f'field={field}' for field in fields)
+        type_query = f'type={object_type}' if object_type else ''
         objects: list[dict] = []
         for start in range(0, len(ids), batch_size):
             batch_ids = ids[start:start + batch_size]
             ids_query = '&'.join(
                 f'{id_type}={item_id}' for item_id in batch_ids)
             query = '&'.join(part for part in [
-                             ids_query, fields_query] if part)
+                             type_query, ids_query, fields_query] if part)
             url = f'{api_url}search/?{query}&format=json&limit=all'
             response = requests.get(url)
             objects.extend(response.json().get('@graph', []))
@@ -197,12 +200,16 @@ class FileFileSet:
                 self.logger.warning(
                     f'Skipping {accession}: not returned by public API search.'
                 )
+        igvf_dbxrefs = {}
+        if self.label == 'encode_file_fileset':
+            igvf_dbxrefs = self.get_igvf_dbxrefs_encode(
+                sorted(returned_accessions))
         for file_object in file_objects:
             print(f'Processing {file_object["accession"]}')
 
             if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
                 props, donors, sample_types, disease_ids = self.query_fileset_files_props_encode(
-                    file_object)
+                    file_object, igvf_dbxrefs.get(file_object['accession']))
             else:
                 props, donors, sample_types = self.query_fileset_files_props_igvf(
                     file_object)
@@ -595,7 +602,39 @@ class FileFileSet:
         return preferred_assay_titles, assay_term_ids
 
     @staticmethod
-    def query_fileset_files_props_encode(file_object):
+    def get_igvf_dbxrefs_encode(encode_accessions):
+        igvf_file_objects = FileFileSet.get_batch_objects(
+            [f'ENCODE:{accession}' for accession in encode_accessions],
+            fields=['accession', 'file_set', 'dbxrefs'],
+            id_type='dbxrefs',
+            api_url=FileFileSet.IGVF_API,
+            object_type='File'
+        )
+        matches = {accession: [] for accession in encode_accessions}
+        for igvf_file_object in igvf_file_objects:
+            for dbxref in igvf_file_object.get('dbxrefs', []):
+                if not dbxref.startswith('ENCODE:'):
+                    continue
+                encode_accession = dbxref.split(':', 1)[1]
+                if encode_accession in matches:
+                    matches[encode_accession].append(igvf_file_object)
+        igvf_dbxrefs = {}
+        for encode_accession, igvf_matches in matches.items():
+            if len(igvf_matches) != 1:
+                igvf_accessions = sorted(
+                    match['accession'] for match in igvf_matches)
+                raise ValueError(
+                    f'Expected exactly one IGVF file with dbxref ENCODE:{encode_accession}, '
+                    f'found {len(igvf_matches)}: {igvf_accessions}.')
+            igvf_file_object = igvf_matches[0]
+            igvf_dbxrefs[encode_accession] = {
+                'dbxref_name': igvf_file_object['accession'],
+                'dbxref_fileset_id': igvf_file_object['file_set']['accession']
+            }
+        return igvf_dbxrefs
+
+    @staticmethod
+    def query_fileset_files_props_encode(file_object, igvf_dbxref=None):
         source_url = urljoin(FileFileSet.ENCODE_SOURCE_URL, file_object['@id'])
         href = file_object.get('href')
         download_link = urljoin(FileFileSet.ENCODE_API, href)
@@ -671,6 +710,7 @@ class FileFileSet:
                         FileFileSet.ENCODE_API, href)
                     break
 
+        igvf_dbxref = igvf_dbxref or {}
         props = {
             '_key': file_object['accession'],
             'name': file_object['accession'],
@@ -695,7 +735,9 @@ class FileFileSet:
             'cell_annotation_term': None,
             'genome_browser_link': genome_browser_link,
             'crispr_modality': crispr_modality,
-            'browser_index_file': None
+            'browser_index_file': None,
+            'dbxref_name': igvf_dbxref.get('dbxref_name'),
+            'dbxref_fileset_id': igvf_dbxref.get('dbxref_fileset_id')
         }
         return props, donor_ids, all_sample_types, disease_ids
 

@@ -388,6 +388,22 @@
           ],
           "description": "Version of the external data source",
           "example": "File generated on 2023-10-10"
+        },
+        "dbxref_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Accession of the IGVF Portal file mirroring this ENCODE file.",
+          "example": "IGVFFI2331IRGH"
+        },
+        "dbxref_fileset_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Accession of the IGVF Portal file set containing the mirrored file.",
+          "example": "IGVFDS5514HTXN"
         }
       },
       "required": [
