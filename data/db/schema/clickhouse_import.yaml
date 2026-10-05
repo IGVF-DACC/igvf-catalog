@@ -64,7 +64,7 @@ genes_transcripts: |
   FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl');
   INSERT INTO genes_transcripts
   SELECT source, version, source_url, name, inverse_name, biological_process, organism, _key as id, NULL, NULL, splitByString('/', assumeNotNull(_to))[2] as mm_transcripts_id, splitByString('/', assumeNotNull(_from))[2] as mm_genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/mm_genes_transcripts_IGVFFI2412FAXG.vcf.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/mm_genes_transcripts_IGVFFI5842FWGQ.vcf.jsonl');
 
 genes_structure: |
   INSERT INTO genes_structure
