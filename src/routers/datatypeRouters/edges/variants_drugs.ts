@@ -31,7 +31,7 @@ const studyParametersDict = z.object({
   study_type: z.string().optional(),
   study_cases: z.string().optional(),
   study_controls: z.string().optional(),
-  'p-value': z.string().optional(),
+  'p-value': z.string().nullish(),
   biogeographical_groups: z.string().optional()
 })
 
