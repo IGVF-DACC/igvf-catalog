@@ -75,6 +75,11 @@
           "description": "Orphanet status of the gene–disease relationship (Assessed or Confirmed)",
           "example": "Assessed"
         },
+        "method": {
+          "enum": [
+            "Orphanet"
+          ]
+        },
         "source": {
           "enum": [
             "Orphanet"

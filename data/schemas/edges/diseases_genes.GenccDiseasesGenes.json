@@ -142,6 +142,11 @@
             "28106320"
           ]
         },
+        "method": {
+          "enum": [
+            "GenCC"
+          ]
+        },
         "source": {
           "enum": [
             "GenCC"

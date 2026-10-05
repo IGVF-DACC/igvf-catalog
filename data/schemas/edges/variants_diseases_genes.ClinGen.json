@@ -46,6 +46,11 @@
           "description": "Mode of inheritance for the disease the assertion applies to.",
           "example": "Autosomal recessive inheritance"
         },
+        "method": {
+          "enum": [
+            "ClinGen"
+          ]
+        },
         "source": {
           "enum": [
             "ClinGen"
