@@ -128,10 +128,11 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
     Example: gene_name = ATF3, <br> \
     hgnc_id = HGNC:28208, <br> \
     synonym = CKLF, <br> \
+    region = chr3:193593143-193697811, <br> \
     organism = Homo sapiens, <br> \
     gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -150,9 +151,10 @@ export const descriptions = {
 
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
   Example: gene_name = ATF3, <br> \
   synonym = CKLF, <br> \
+  region = chr3:193593143-193697811, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc_id = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -1390,11 +1392,12 @@ export const descriptions = {
 
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
   Example: gene_id = ENSG00000183840, <br> \
   hgnc_id = HGNC:4496, <br> \
   gene_name = GPR39, <br> \
-  synonym = ZnR. <br> \
+  synonym = ZnR, <br> \
+  region = chr16:30114104-30123506. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
