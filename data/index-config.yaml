@@ -303,6 +303,7 @@ genomic_elements_biosamples:
       - source, source_url, files_filesets
       - source_url, files_filesets
       - files_filesets
+      - method, _key
   zkd:
     fields:
       - log2FC
