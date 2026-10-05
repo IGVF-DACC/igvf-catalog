@@ -14,7 +14,7 @@ const edgeCollectionName = 'ontology_terms_ontology_terms'
 const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
 const ontologyTermCollectionName = ontologyTermSchema.db_collection_name as string
 
-const ontologyRelativeFormat = z.object({
+export const ontologyRelativeFormat = z.object({
   term: ontologyFormat,
   relationship_type: z.string().nullable()
 })

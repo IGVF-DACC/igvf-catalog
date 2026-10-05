@@ -104,7 +104,7 @@ const igvfVariantPhenotypeFormat = z.object({
   phenotype_id: z.string().nullable()
 })
 
-const variantPhenotypeFormat = gwasVariantPhenotypeFormat.or(igvfVariantPhenotypeFormat)
+export const variantPhenotypeFormat = gwasVariantPhenotypeFormat.or(igvfVariantPhenotypeFormat)
 
 const variantVerboseFields = '{_id: variant._key, chr: variant.chr, pos: variant.pos, alt: variant.alt, ref: variant.ref, rsid: variant.rsid, spdi: variant.spdi, hgvs: variant.hgvs, ca_id: variant.ca_id}'
 

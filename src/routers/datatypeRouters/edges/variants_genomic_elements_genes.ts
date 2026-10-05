@@ -35,7 +35,7 @@ const genomicElementOutputFormat = z.object({
   source_annotation: z.string().nullish()
 })
 
-const outputFormat = z.array(z.object({
+export const outputFormat = z.array(z.object({
   variant: variantSimplifiedFormat,
   distance_to_tss: z.number().nullish(),
   genomic_element: genomicElementOutputFormat,
