@@ -33,7 +33,7 @@
           "example": "promoter",
           "enum": [
             "promoter",
-            "accessible element"
+            "accessible dna elements"
           ]
         },
         "source": {
