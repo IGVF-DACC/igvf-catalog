@@ -336,6 +336,13 @@ def test_eqtl_catalog_adapter_skips_edge_when_variant_not_loaded(mock_gene_valid
 def test_eqtl_catalog_adapter_variants_label_creates_missing_variant(mocker):
     """label='variants' should create a variant node for a valid variant
     that isn't already in the variants collection."""
+    # build_variant_id() calls get_seqrepo() unconditionally, even for simple SNVs that
+    # don't end up needing it - without this mock, environments without a real SeqRepo
+    # install (e.g. CI) raise there, which process_variant_chunk silently catches and
+    # treats as "skip this row", making the test fail with an empty writer instead of
+    # erroring loudly.
+    mock_seqrepo = MagicMock()
+    mocker.patch('adapters.helpers.get_seqrepo', return_value=mock_seqrepo)
     mock_bulk_check_variants = mocker.patch(
         'adapters.eqtl_catalog_adapter.bulk_check_variants_in_arangodb')
     mock_bulk_check_variants.return_value = set()
