@@ -9,10 +9,12 @@
       "type": "object",
       "properties": {
         "uri": {
+          "title": "URI",
           "type": "string",
           "description": "URI for the ontology term."
         },
         "term_id": {
+          "title": "Term ID",
           "type": "string",
           "description": "Ontology term identifier."
         }

@@ -290,7 +290,7 @@ node	mm_variants.MouseGenomesProjectAdapter	filter	VCF FILTER for the site. PASS
 node	mm_variants.MouseGenomesProjectAdapter	fi	Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release.
 node	mm_variants.MouseGenomesProjectAdapter	name	Human readable display name for the entity
 node	mm_variants.MouseGenomesProjectAdapter	spdi	Normalized SPDI expression identifying the allele.
-node	mm_variants.MouseGenomesProjectAdapter	hgvs	Genomic HGVS notation derived from the SPDI.
+node	mm_variants.MouseGenomesProjectAdapter	hgvs	HGVS genomic expression for the allele.
 node	mm_variants.MouseGenomesProjectAdapter	source	The database, dataset or organization that is a source for these data.
 node	mm_variants.MouseGenomesProjectAdapter	source_url	The URL for the source.
 node	motifs.Motif	source	The database, dataset or organization that is a source for these data.
