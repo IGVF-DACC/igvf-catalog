@@ -710,7 +710,6 @@ class FileFileSet:
                         FileFileSet.ENCODE_API, href)
                     break
 
-        igvf_dbxref = igvf_dbxref or {}
         props = {
             '_key': file_object['accession'],
             'name': file_object['accession'],
@@ -735,10 +734,11 @@ class FileFileSet:
             'cell_annotation_term': None,
             'genome_browser_link': genome_browser_link,
             'crispr_modality': crispr_modality,
-            'browser_index_file': None,
-            'dbxref_name': igvf_dbxref.get('dbxref_name'),
-            'dbxref_fileset_id': igvf_dbxref.get('dbxref_fileset_id')
+            'browser_index_file': None
         }
+        if igvf_dbxref:
+            props['dbxref_name'] = igvf_dbxref['dbxref_name']
+            props['dbxref_fileset_id'] = igvf_dbxref['dbxref_fileset_id']
         return props, donor_ids, all_sample_types, disease_ids
 
     @staticmethod

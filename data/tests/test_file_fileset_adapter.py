@@ -939,8 +939,8 @@ def test_query_fileset_files_props_encode():
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect):
         props, _, _, _ = FileFileSet.query_fileset_files_props_encode(
             file_object)
-    assert props['dbxref_name'] is None
-    assert props['dbxref_fileset_id'] is None
+    assert 'dbxref_name' not in props
+    assert 'dbxref_fileset_id' not in props
 
 
 def test_adapter_init_validate():
