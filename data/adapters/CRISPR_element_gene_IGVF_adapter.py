@@ -785,10 +785,20 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         colmap: Dict[str, Optional[int]],
         *,
         is_scaled_screen: bool,
+        target_interval: str,
         intended_target_name: str,
         intended_target_gene_raw: str,
         readout_gene: str,
     ) -> Tuple[Optional[str], str]:
+        override = self.file_config.get('promoter_overrides', {}).get(
+            target_interval)
+        if override is not None:
+            promoter_gene = self._normalize_ensembl_gene_id(
+                override['gene_id'])
+            if not self._is_ensembl_gene_id(promoter_gene) or not self.gene_validator.validate(promoter_gene):
+                self._row_load_error(
+                    f'invalid promoter override gene {promoter_gene!r}.')
+            return promoter_gene, 'promoter'
         if is_scaled_screen:
             return self._scaled_screen_promoter_gene_and_source_annotation(
                 row,
@@ -950,6 +960,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         row,
                         colmap,
                         is_scaled_screen=is_scaled_screen,
+                        target_interval=f'{intended_target_chr}:{intended_target_start}-{intended_target_end}',
                         intended_target_name=intended_target_name,
                         intended_target_gene_raw=intended_target_gene_raw,
                         readout_gene=readout_gene,

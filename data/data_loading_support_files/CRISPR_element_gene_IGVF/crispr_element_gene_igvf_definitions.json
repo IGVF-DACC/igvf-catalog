@@ -873,48 +873,48 @@
       "targeted_element_types": [
         "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI0629LUWT": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
         "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI6843QWSB": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
         "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI5749FOUE": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
         "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI6600VCYY": {
       "layout": "tap_seq_sceptre_power_XX",
