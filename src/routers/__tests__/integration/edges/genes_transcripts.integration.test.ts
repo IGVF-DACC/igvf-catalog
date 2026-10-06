@@ -26,6 +26,29 @@ describe('genesTranscriptsRouters (integration)', () => {
     }
   })
 
+  it('transcriptsFromGenes returns schema-valid transcripts for a real gene region', async () => {
+    // chr3:193593143-193697811 is the exact span of ENSG00000198836 (OPA1), the same gene
+    // used by gene_id above, so region search is exercised against the same known data.
+    const input = { region: 'chr3:193593143-193697811', organism: 'Homo sapiens', page: 0, limit: 10 }
+    const result: any = await genesTranscriptsRouters.transcriptsFromGenes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBeGreaterThan(0)
+
+    for (const record of result) {
+      const parsed = genesTranscriptsFormat.safeParse(record)
+      if (!parsed.success) {
+        throw new Error(`Output validation failed for transcriptsFromGenes (region) record: ${parsed.error.toString()}`)
+      }
+    }
+  })
+
   it('genesFromTranscripts returns schema-valid genes for a real transcript', async () => {
     const input = { transcript_id: 'ENST00000361510', organism: 'Homo sapiens', page: 0, limit: 10 }
     const result: any = await genesTranscriptsRouters.genesFromTranscripts({
@@ -64,6 +87,28 @@ describe('genesTranscriptsRouters (integration)', () => {
       const parsed = genesProteinsFormat.safeParse(record)
       if (!parsed.success) {
         throw new Error(`Output validation failed for proteinsFromGenes record: ${parsed.error.toString()}`)
+      }
+    }
+  })
+
+  it('proteinsFromGenes returns schema-valid proteins for a real gene region', async () => {
+    // Same ENSG00000198836 (OPA1) span as the transcriptsFromGenes region test above.
+    const input = { region: 'chr3:193593143-193697811', organism: 'Homo sapiens', page: 0, limit: 10 }
+    const result: any = await genesTranscriptsRouters.proteinsFromGenes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBeGreaterThan(0)
+
+    for (const record of result) {
+      const parsed = genesProteinsFormat.safeParse(record)
+      if (!parsed.success) {
+        throw new Error(`Output validation failed for proteinsFromGenes (region) record: ${parsed.error.toString()}`)
       }
     }
   })
