@@ -59,4 +59,36 @@ describe('variantsDrugsRouters (integration)', () => {
       }
     }
   })
+
+  // Regression test: variants_drugs/1451237464_PA448515 (one of the ~37 PharmGKB edges off
+  // this variant) has study_parameters[0]['p-value'] == null in the DB - PharmGKB rows where
+  // the p-value couldn't be parsed are stored that way rather than dropped. 'p-value' used to
+  // be typed z.string().optional() here, which only accepts undefined, not null, so this exact
+  // query 500'd with "Output validation failed" in production. limit is set above the real
+  // total (37) so the null record is guaranteed to be in the page regardless of sort order.
+  it('drugsFromVariants succeeds when a PharmGKB study_parameters entry has a null p-value', async () => {
+    const input = { spdi: 'NC_000006.12:18130686:T:C', organism: 'Homo sapiens', page: 0, limit: 100 }
+    const result: any = await variantsDrugsRouters.drugsFromVariants({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBeGreaterThan(0)
+
+    for (const record of result) {
+      const parsed = variantsToDrugsPostTransformFormat.safeParse(record)
+      if (!parsed.success) {
+        throw new Error(`Output validation failed for drugsFromVariants record: ${parsed.error.toString()}`)
+      }
+    }
+
+    const nullPValueRecord = result.find((record: any) =>
+      record.study_parameters?.some((sp: any) => sp['p-value'] === null)
+    )
+    expect(nullPValueRecord).toBeDefined()
+  })
 })
