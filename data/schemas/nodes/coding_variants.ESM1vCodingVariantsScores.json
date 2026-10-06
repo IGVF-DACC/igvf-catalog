@@ -61,13 +61,13 @@
           "description": "Position of the variant within the codon: 1, 2 or 3. "
         },
         "hgvsc": {
-          "title": "HGVS Coding DNA Expression",
+          "title": "HGVS cDNA Frame",
           "type": "string",
           "description": "HGVS description of the variant in the cDNA reference frame.",
           "example": "c.2617_2618delinsAC"
         },
         "hgvsp": {
-          "title": "HGVS Protein Expression",
+          "title": "HGVS Protein Frame",
           "type": "string",
           "description": "HGVS protein-level description of the variant.",
           "example": "p.Gln873Thr",

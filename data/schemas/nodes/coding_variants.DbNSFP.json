@@ -62,7 +62,7 @@
           "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
-          "title": "HGVS Protein Expression",
+          "title": "HGVS Protein Frame",
           "type": [
             "string",
             "null"
@@ -71,7 +71,7 @@
           "example": "p.Met1?"
         },
         "hgvsc": {
-          "title": "HGVS Coding DNA Expression",
+          "title": "HGVS cDNA Frame",
           "type": [
             "string",
             "null"

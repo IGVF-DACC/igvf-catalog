@@ -48,7 +48,7 @@
           "example": "ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)"
         },
         "experimental_evidence": {
-          "title": "Experimental Evidence",
+          "title": "PSI-MI Experimental Evidence",
           "type": [
             "string",
             "null"

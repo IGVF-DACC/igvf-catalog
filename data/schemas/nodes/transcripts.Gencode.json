@@ -163,7 +163,7 @@
           "example": "DDX11L2"
         },
         "MANE_Select": {
-          "title": "MANE Select",
+          "title": "MANE Select?",
           "type": "boolean",
           "description": "Whether GENCODE tags this transcript as MANE Select: the single transcript per protein-coding gene that Ensembl and RefSeq agree on as the representative isoform.",
           "example": true

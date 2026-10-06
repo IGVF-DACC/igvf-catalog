@@ -1,6 +1,6 @@
 {
   "files_filesets": {
-    "title": "Files and File Sets",
+    "title": "Data File Accession",
     "description": "Reference to the File and Metadata",
     "type": "string",
     "pattern": "^files_filesets/",
@@ -38,7 +38,7 @@
     "example": "IGVF"
   },
   "source_url": {
-    "title": "Source URL",
+    "title": "URL",
     "description": "The URL for the source.",
     "type": "string",
     "example": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP"
@@ -67,7 +67,7 @@
     }
   },
   "crispr_modality": {
-    "title": "CRISPR Modality",
+    "title": "CRISPR Perturbation",
     "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
     "type": "string",
     "enum_descriptions": {

@@ -254,7 +254,7 @@
           }
         },
         "simple_sample_summaries": {
-          "title": "Simple Sample Summaries",
+          "title": "Biosample Summaries",
           "type": [
             "array",
             "null"

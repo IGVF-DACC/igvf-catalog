@@ -37,7 +37,7 @@
           "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on the phenotype."
         },

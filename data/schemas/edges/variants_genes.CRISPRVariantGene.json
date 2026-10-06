@@ -79,7 +79,7 @@
           "description": "Standard deviation of the effect size estimate."
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on gene expression."
         },

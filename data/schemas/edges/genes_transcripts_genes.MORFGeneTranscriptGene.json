@@ -35,7 +35,7 @@
           "description": "DESeq2 log2 fold-change of ORF abundance in high versus low readout-gene FACS bins. Positive values indicate enrichment with higher readout-gene expression."
         },
         "base_mean": {
-          "title": "Base Mean",
+          "title": "Base DESeq2 mean",
           "type": [
             "number",
             "null"
@@ -75,7 +75,7 @@
           "description": "Negative log10 of p_value_adj."
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Whether the adjusted p-value is below 0.05."
         },

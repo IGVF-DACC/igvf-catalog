@@ -43,7 +43,7 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
+          "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -51,7 +51,7 @@
             "number",
             "null"
           ],
-          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "description": "Benjamini\u2013Hochberg FDR of the differential-expression test. Null when the source has none.",
           "example": 0.004023984
         },
         "neg_log10_pvalue": {
@@ -71,7 +71,7 @@
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element-gene interactions.",
           "example": true

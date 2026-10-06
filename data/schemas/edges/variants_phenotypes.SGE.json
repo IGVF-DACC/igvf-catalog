@@ -136,7 +136,7 @@
           "example": "P1153L"
         },
         "hgvsp": {
-          "title": "HGVS Protein Expression",
+          "title": "HGVS Protein Frame",
           "type": [
             "string",
             "null"

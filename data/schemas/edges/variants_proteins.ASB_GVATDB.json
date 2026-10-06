@@ -43,7 +43,7 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "experiment": {
-          "title": "Experiment",
+          "title": "GVATdb Experiment ID",
           "type": "string",
           "description": "GVATdb experiment identifier.",
           "example": "DBD.1.1.H2"

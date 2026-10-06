@@ -65,7 +65,7 @@
           ]
         },
         "phenotypic_features": {
-          "title": "Phenotypic Features",
+          "title": "Phenotypes",
           "type": [
             "array",
             "null"

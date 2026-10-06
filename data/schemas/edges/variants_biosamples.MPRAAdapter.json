@@ -92,7 +92,7 @@
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },

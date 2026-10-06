@@ -58,13 +58,13 @@
           "description": "Source-specific annotations parsed from FAVOR."
         },
         "spdi": {
-          "title": "SPDI Expression",
+          "title": "SPDI",
           "type": "string",
           "description": "Normalized SPDI expression identifying the allele.",
           "example": "NC_000001.11:10887495:C:T"
         },
         "hgvs": {
-          "title": "HGVS Expression",
+          "title": "HGVS",
           "type": "string",
           "description": "HGVS genomic expression for the allele.",
           "example": "NC_000067.7:g.3050715_3050716insG"

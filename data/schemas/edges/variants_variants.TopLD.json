@@ -70,13 +70,13 @@
           "example": "rs1234567890"
         },
         "r2": {
-          "title": "R-Squared",
+          "title": "R2",
           "type": "number",
           "description": "Squared Pearson correlation of the two variants on phased haplotypes, from TOPMed ancestry-specific LD.",
           "example": 0.8
         },
         "d_prime": {
-          "title": "D Prime",
+          "title": "D'",
           "type": "number",
           "description": "Lewontin's D' between the two variants, from TOPMed ancestry-specific LD.",
           "example": 0.8

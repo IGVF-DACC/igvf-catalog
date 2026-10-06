@@ -150,7 +150,7 @@
           "description": "Univariate z-score of the variant."
         },
         "credible_set_min_r2": {
-          "title": "Credible Set Minimum R-Squared",
+          "title": "Credible Set Minimum R2",
           "type": "number",
           "description": "Smallest linkage-disequilibrium r2 between any two variants in the credible set."
         },

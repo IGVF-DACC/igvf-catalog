@@ -42,7 +42,7 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's effect on the phenotype."
         },

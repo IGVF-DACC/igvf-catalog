@@ -65,7 +65,7 @@
           "description": "Posterior probability that the variant has a regulatory effect."
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicating the significance of the variant effect, based on the posterior probability."
         },

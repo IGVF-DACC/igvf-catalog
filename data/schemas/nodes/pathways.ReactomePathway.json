@@ -58,13 +58,13 @@
           "example": "R-HSA-1971475.4"
         },
         "is_in_disease": {
-          "title": "Disease Pathway Status",
+          "title": "Disease Pathway?",
           "type": "boolean",
           "description": "Whether Reactome annotates this pathway as a disease pathway.",
           "example": true
         },
         "name_aliases": {
-          "title": "Name Aliases",
+          "title": "Aliases",
           "type": "array",
           "description": "Names Reactome lists for the pathway, including the display name.",
           "example": [
@@ -72,7 +72,7 @@
           ]
         },
         "is_top_level_pathway": {
-          "title": "Top-Level Pathway Status",
+          "title": "Top-Level Pathway?",
           "type": "boolean",
           "description": "Whether this is a Reactome top-level pathway.",
           "example": true

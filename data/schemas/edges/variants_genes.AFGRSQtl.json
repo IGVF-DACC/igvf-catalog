@@ -79,7 +79,7 @@
           "description": "log2 fold change of intron excision associated with the alternate allele."
         },
         "significant": {
-          "title": "Significant",
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicating the significance of the variant association with splicing."
         },
