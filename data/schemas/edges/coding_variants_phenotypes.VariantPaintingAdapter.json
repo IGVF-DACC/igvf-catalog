@@ -73,7 +73,7 @@
           "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant"
         },
         "mislocalization_hit": {
-          "title": "Mislocalization Hit",
+          "title": "Mislocalization Hit?",
           "type": "boolean",
           "description": "Whether the variant is classified as causing protein mislocalization based on the localization score threshold"
         },

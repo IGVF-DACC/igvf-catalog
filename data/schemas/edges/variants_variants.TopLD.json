@@ -40,7 +40,7 @@
           "example": "chr1"
         },
         "negated": {
-          "title": "Negated",
+          "title": "Positive Correlation?",
           "type": "boolean",
           "description": "Sign of the Pearson correlation between the two reference alleles, as written by the adapter: true when TopLD reports +, false when it reports -.",
           "example": false
