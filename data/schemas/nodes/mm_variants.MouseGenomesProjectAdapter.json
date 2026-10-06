@@ -106,7 +106,7 @@
         "hgvs": {
           "title": "HGVS",
           "type": "string",
-          "description": "Genomic HGVS notation derived from the SPDI.",
+          "description": "HGVS genomic expression for the allele.",
           "example": "NC_000067.7:g.3050715_3050716insG"
         },
         "source": {

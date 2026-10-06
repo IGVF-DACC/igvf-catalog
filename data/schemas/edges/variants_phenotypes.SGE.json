@@ -141,7 +141,7 @@
             "string",
             "null"
           ],
-          "description": "HGVS protein notation for the variants to phenotypes edge",
+          "description": "HGVS protein-level description of the variant.",
           "example": "ENSP00000261584.4:p.Pro1153Leu"
         },
         "functional_consequence": {
