@@ -34,7 +34,7 @@ class SemiQY2H(BaseAdapter):
     CODING_VARIANTS_PPI_EDGE_INVERSE_NAME = 'interaction modulated by'
     CODING_VARIANTS_PHENOTYPES_EDGE_NAME = 'mutational effect'
     CODING_VARIANTS_PHENOTYPES_EDGE_INVERSE_NAME = 'altered due to mutation'
-    COLLECTION_LABEL = 'semi-quantitative yeast two-hybrid'
+    COLLECTION_LABEL = 'protein variant effect'
 
     def __init__(self, filepath, label='coding_variants_PPI', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
@@ -186,7 +186,7 @@ class SemiQY2H(BaseAdapter):
             coding_variant_key = coding_variant_keys[0]
 
             _props = {
-                '_key': '_'.join([coding_variant_key, self.PROTEIN_BINDING_TERM, self.file_accession]),
+                '_key': coding_variant_key + '_' + self.file_accession,
                 '_from': 'coding_variants/' + coding_variant_key,
                 '_to': 'ontology_terms/' + self.PROTEIN_BINDING_TERM,
                 'name': self.CODING_VARIANTS_PHENOTYPES_EDGE_NAME,
