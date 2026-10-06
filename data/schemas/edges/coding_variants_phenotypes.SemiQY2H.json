@@ -37,7 +37,7 @@
         },
         "source_url": {
           "enum": [
-            "https://data.igvf.org/tabular-files/IGVFFI0709BESF"
+            "https://data.igvf.org/tabular-files/IGVFFI7393MGJK"
           ]
         },
         "name": {
@@ -66,7 +66,7 @@
         "files_filesets": {
           "type": "string",
           "description": "File and fileset reference for this edge",
-          "example": "files_filesets/IGVFFI0709BESF",
+          "example": "files_filesets/IGVFFI7393MGJK",
           "pattern": "^files_filesets/",
           "collections": [
             "files_filesets"
