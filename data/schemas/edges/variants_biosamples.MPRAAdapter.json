@@ -9,7 +9,8 @@
       "type": "object",
       "properties": {
         "_key": {
-          "description": "Variant key, genomic element key, strand token, biosample term and source file accession joined by underscores, hashed with SHA-256 when the composite would exceed the key length limit."
+          "type": "string",
+          "description": "Variant key, genomic element key (including strand), biosample term and source file accession joined by underscores, hashed with SHA-256 when the composite would exceed the key length limit."
         },
         "_from": {
           "example": "variants/NC_000009.12:136248440:T:C",

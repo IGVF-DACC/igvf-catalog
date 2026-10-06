@@ -1299,7 +1299,7 @@ export const descriptions = {
   The limit parameter controls the page size of related items and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
+  genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
   Example: region_type = tested elements, <br> \
   region = chr10:100038743-100038963. <br> \
@@ -1309,7 +1309,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
-  biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
+  biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
   Example: biosample_name = hepg2, <br> \
   method = MPRA, <br> \
@@ -1797,7 +1797,7 @@ export const descriptions = {
   dataset = VAMP-seq',
 
   variants_biosamples:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1865,7 +1865,7 @@ export const descriptions = {
     ]),
 
   biosamples_variants:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: biosample_id or biosample_name. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
