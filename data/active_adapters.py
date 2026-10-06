@@ -152,7 +152,7 @@ KEY_TO_ADAPTER = {
     'scE2G': scE2G,
     'dual_ipa_coding_variant_phenotype': DUALIPAAdapter,
     'variant_painting_coding_variant_phenotype': VariantPaintingAdapter,
-    'semi_qy2h_protein_protein': SemiQY2H,
+    'semi_qy2h_coding_variant_ppi': SemiQY2H,
     'semi_qy2h_coding_variant_phenotype': SemiQY2H,
 }
 

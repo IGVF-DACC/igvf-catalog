@@ -7,7 +7,7 @@ from typing import Optional
 import requests
 
 from adapters.base import BaseAdapter
-from adapters.helpers import bulk_query_coding_variants_from_spdi_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import bulk_query_coding_variants_from_spdi_in_arangodb, bulk_query_proteins_proteins_edge_keys_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Vidal lab semi-quantitative Y2H (semi-qY2H) coding variant perturbation assay
@@ -24,18 +24,19 @@ from adapters.writer import Writer
 
 
 class SemiQY2H(BaseAdapter):
-    ALLOWED_LABELS = ['proteins_proteins', 'coding_variants_phenotypes']
+    ALLOWED_LABELS = ['coding_variants_PPI', 'coding_variants_phenotypes']
     SOURCE = 'IGVF'
     IGVF_API = 'https://api.data.igvf.org'
     ORF_SEARCH_CHUNK_SIZE = 100
 
     PROTEIN_BINDING_TERM = 'GO_0005515'  # protein binding
-    PROTEINS_PROTEINS_EDGE_NAME = 'physically interacts with'
+    CODING_VARIANTS_PPI_EDGE_NAME = 'modulates interaction of'
+    CODING_VARIANTS_PPI_EDGE_INVERSE_NAME = 'interaction modulated by'
     CODING_VARIANTS_PHENOTYPES_EDGE_NAME = 'mutational effect'
     CODING_VARIANTS_PHENOTYPES_EDGE_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL = 'semi-quantitative yeast two-hybrid'
 
-    def __init__(self, filepath, label='proteins_proteins', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label='coding_variants_PPI', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
@@ -91,12 +92,12 @@ class SemiQY2H(BaseAdapter):
                 f'file_fileset not found for {self.file_accession}, file_fileset fields will be None')
             file_fileset = {}
 
-        if self.label == 'proteins_proteins':
-            self.parse_proteins_proteins(file_fileset)
+        if self.label == 'coding_variants_PPI':
+            self.parse_coding_variants_PPI(file_fileset)
         else:
             self.parse_coding_variants_phenotypes(file_fileset)
 
-    def parse_proteins_proteins(self, file_fileset):
+    def parse_coding_variants_PPI(self, file_fileset):
         with gzip.open(self.filepath, 'rt') as edge_file:
             rows = [row for row in csv.DictReader(
                 edge_file, delimiter='\t') if row['allele_type'] == 'variant']
@@ -104,6 +105,17 @@ class SemiQY2H(BaseAdapter):
         interactor_protein_map = self.get_interactor_protein_map(
             {row['interactor_id'] for row in rows})
         coding_variant_map = self.get_coding_variant_map(rows)
+
+        protein_pairs = set()
+        for row in rows:
+            interactor_protein_id = interactor_protein_map.get(
+                row['interactor_id'])
+            if interactor_protein_id is None:
+                continue
+            protein_id, _ = self.parse_hgvs_protein(row['hgvs_protein'])
+            protein_pairs.add((protein_id, interactor_protein_id))
+        ppi_edge_map = bulk_query_proteins_proteins_edge_keys_in_arangodb(
+            protein_pairs)
 
         for row in rows:
             interactor_protein_id = interactor_protein_map.get(
@@ -121,13 +133,19 @@ class SemiQY2H(BaseAdapter):
                     f"Skipping {row['ccsb_mutation_id']}: no coding variant found for {row['spdi']}, {protein_id}, {hgvsp}")
                 continue
 
+            ppi_edge_keys = ppi_edge_map.get(
+                (protein_id, interactor_protein_id))
+            if not ppi_edge_keys:
+                self.logger.warning(
+                    f"Skipping {row['ccsb_mutation_id']}: no proteins_proteins edge found for {protein_id}, {interactor_protein_id}")
+                continue
+
             _props = {
                 '_key': row['ccsb_mutation_id'] + '_' + row['interactor_id'],
-                '_from': 'proteins/' + protein_id,
-                '_to': 'proteins/' + interactor_protein_id,
-                'name': self.PROTEINS_PROTEINS_EDGE_NAME,
-                'inverse_name': self.PROTEINS_PROTEINS_EDGE_NAME,
-                'coding_variants': 'coding_variants/' + coding_variant_keys[0],
+                '_from': 'coding_variants/' + coding_variant_keys[0],
+                '_to': 'proteins_proteins/' + ppi_edge_keys[0],
+                'name': self.CODING_VARIANTS_PPI_EDGE_NAME,
+                'inverse_name': self.CODING_VARIANTS_PPI_EDGE_INVERSE_NAME,
                 'consensus_score': float(row['consensus_score']),
                 'wt_consensus_score': float(row['wt_consensus_score']),
                 'log2FC': float(row['log2fc']),

@@ -93,6 +93,9 @@
         }
     },
     "edges": {
+        "coding_variants_PPI": {
+            "SemiQY2H": "schemas/edges/coding_variants_PPI.SemiQY2H.json"
+        },
         "coding_variants_phenotypes": {
             "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
             "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
@@ -172,8 +175,7 @@
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         },
         "proteins_proteins": {
-            "ProteinsInteraction": "schemas/edges/proteins_proteins.ProteinsInteraction.json",
-            "SemiQY2H": "schemas/edges/proteins_proteins.SemiQY2H.json"
+            "ProteinsInteraction": "schemas/edges/proteins_proteins.ProteinsInteraction.json"
         },
         "transcripts_genes_structure": {
             "GencodeStructure": "schemas/edges/transcripts_genes_structure.GencodeStructure.json"
