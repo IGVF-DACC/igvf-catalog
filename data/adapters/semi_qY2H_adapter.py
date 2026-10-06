@@ -13,12 +13,12 @@ from adapters.writer import Writer
 # Vidal lab semi-quantitative Y2H (semi-qY2H) coding variant perturbation assay
 # https://data.igvf.org/analysis-sets/IGVFDS9876GIEQ/
 
-# Example rows from IGVFFI1611ZIBI.tsv.gz (semi-qY2H edge-perturbation scores):
+# Example rows from IGVFFI2460BBXY.tsv.gz (semi-qY2H edge-perturbation scores):
 # spdi	symbol	ensembl_gene_id	ccsb_mutation_id	CCSB_referenece_orf_id	hgvs_orf	hgvs_protein	allele_type	interactor_id	interactor_symbol	interactor_ensembl_gene_id	consensus_score	wt_consensus_score	log2fc
 # 	ACSF3	ENSG00000176715		CCSBORF71337			reference	CCSBORF54668	KRT40	ENSG00000204889	311.16	311.16	0
 # NC_000016.10:89102664:C:T	ACSF3	ENSG00000176715	CCSBVarC003578	CCSBORF71337	728C>T	ENSP00000320646.4:p.Pro243Leu	variant	CCSBORF54668	KRT40	ENSG00000204889	26.99	311.16	-3.48
 
-# Example rows from IGVFFI0709BESF.tsv.gz (semi-qY2H edgotyping scores):
+# Example rows from IGVFFI7393MGJK.tsv.gz (semi-qY2H edgotyping scores):
 # spdi	symbol	ensembl_gene_id	ccsb_mutation_id	CCSB_referenece_orf_id	hgvs_orf	hgvs_protein	norm_dist_rms
 # NC_000016.10:89102664:C:T	ACSF3	ENSG00000176715	CCSBVarC003578	CCSBORF71337	728C>T	ENSP00000320646.4:p.Pro243Leu	0.3868541857467328
 
