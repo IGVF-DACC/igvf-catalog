@@ -335,6 +335,7 @@ igvf_file_accessions:
     - IGVFFI0218RAAG
     - IGVFFI1255MQGI
   SEM motif:
+    - IGVFFI4892QCRR
     - IGVFFI5615JDRZ
     - IGVFFI8706ANLY
     - IGVFFI2972JEVI
@@ -723,6 +724,7 @@ igvf_file_accessions:
     - IGVFFI9779WEGD
     - IGVFFI9815VYTN
   community reference files:
+    - IGVFFI9074FIDG
     - IGVFFI7449PKMJ
     - IGVFFI4637FWQJ
     - IGVFFI2960JTMH
@@ -872,7 +874,6 @@ igvf_file_accessions:
     - IGVFFI7019IZDF
     - IGVFFI3693WSFI
     - IGVFFI3237WUWL
-
     - IGVFFI9678CVIS
     - IGVFFI8431OEKU
     - IGVFFI0865ANAN
