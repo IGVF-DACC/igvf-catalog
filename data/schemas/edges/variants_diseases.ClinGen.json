@@ -68,6 +68,11 @@
           ],
           "example": "associated with"
         },
+        "method": {
+          "enum": [
+            "ClinGen"
+          ]
+        },
         "source": {
           "enum": [
             "ClinGen"
