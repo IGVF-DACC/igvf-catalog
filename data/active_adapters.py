@@ -130,7 +130,6 @@ KEY_TO_ADAPTER = {
     'mm_orthologs': MGIHumanMouseOrthologAdapter,
     'coding_variants': DbNSFP,
     'variants_coding_variants': DbNSFP,
-    'coding_variants_proteins': DbNSFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,

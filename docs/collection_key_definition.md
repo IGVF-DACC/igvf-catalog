@@ -50,7 +50,6 @@ write into one collection, each has its own schema and its own key composition.
 | `coding_variants_phenotypes` | edge | `SGE` | `edges/coding_variants_phenotypes.SGE.json` |
 | `coding_variants_phenotypes` | edge | `VAMPAdapter` | `edges/coding_variants_phenotypes.VAMPAdapter.json` |
 | `coding_variants_phenotypes` | edge | `VariantPaintingAdapter` | `edges/coding_variants_phenotypes.VariantPaintingAdapter.json` |
-| `coding_variants_proteins` | edge | `DbNSFP` | `edges/coding_variants_proteins.DbNSFP.json` |
 | `complexes_proteins` | edge | `EBIComplex` | `edges/complexes_proteins.EBIComplex.json` |
 | `complexes_proteins` | edge | `SEMMotif` | `edges/complexes_proteins.SEMMotif.json` |
 | `complexes_terms` | edge | `EBIComplex` | `edges/complexes_terms.EBIComplex.json` |

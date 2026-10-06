@@ -43,27 +43,6 @@ def test_dbNSFP_adapter_variants_coding_variants(mocker):
     assert first_item['source'] == 'dbNSFP 5.1a'
 
 
-def test_dbNSFP_adapter_coding_variants_proteins(mocker):
-    mocker.patch('adapters.dbNSFP_adapter.build_variant_id',
-                 return_value='fake_variant_id')
-    writer = SpyWriter()
-
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
-                     label='coding_variants_proteins', writer=writer, validate=True)
-    adapter.process_file()
-
-    assert len(writer.contents) > 1
-    first_item = json.loads(writer.contents[0])
-
-    assert '_from' in first_item
-    assert '_to' in first_item
-    assert 'name' in first_item
-    assert 'inverse_name' in first_item
-    assert 'type' in first_item
-    assert 'source' in first_item
-    assert first_item['source'] == 'dbNSFP 5.1a'
-
-
 def test_dbNSFP_adapter_multiple_records():
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample')
     data_line = ['Y', '2786989', 'C', 'A', 'X', 'Y', '.', 'Y', '2655030', 'Y', '2715030', '205;206', 'SRY;SRY',
@@ -97,7 +76,7 @@ def test_dbNSFP_adapter_initialization():
 def test_dbNSFP_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
-                     label='coding_variants_proteins', writer=writer, validate=True)
+                     label='variants_coding_variants', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

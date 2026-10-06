@@ -101,9 +101,6 @@
             "DUALIPAAdapter": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
             "VariantPaintingAdapter": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json"
         },
-        "coding_variants_proteins": {
-            "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
-        },
         "complexes_proteins": {
             "EBIComplex": "schemas/edges/complexes_proteins.EBIComplex.json",
             "SEMMotif": "schemas/edges/complexes_proteins.SEMMotif.json"
