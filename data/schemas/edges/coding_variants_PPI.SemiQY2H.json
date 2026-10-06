@@ -67,7 +67,7 @@
         },
         "label": {
           "enum": [
-            "semi-quantitative yeast two-hybrid"
+            "protein variant effect"
           ]
         },
         "class": {
