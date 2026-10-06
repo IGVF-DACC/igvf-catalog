@@ -151,12 +151,12 @@ KEY_TO_ADAPTER = {
     'gencc_disease_gene': GenccDiseasesGenes,
     'scE2G': scE2G,
     'dual_ipa_coding_variant_phenotype': DUALIPAAdapter,
-<<<<<<< HEAD
+    << << << < HEAD
     'variant_painting_coding_variant_phenotype': VariantPaintingAdapter
-=======
+    == == == =
     'semi_qy2h_protein_protein': SemiQY2H,
     'semi_qy2h_coding_variant_phenotype': SemiQY2H,
->>>>>>> 96dcb9fb (DSERV-1268-vidal-y2h)
+    >>>>>> > 96dcb9fb(DSERV-1268-vidal-y2h)
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
