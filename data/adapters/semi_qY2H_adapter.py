@@ -132,6 +132,9 @@ class SemiQY2H(BaseAdapter):
                 self.logger.warning(
                     f"Skipping {row['ccsb_mutation_id']}: no coding variant found for {row['spdi']}, {protein_id}, {hgvsp}")
                 continue
+            if len(coding_variant_keys) > 1:
+                self.logger.warning(
+                    f"Multiple coding variants found for {row['spdi']}, {protein_id}, {hgvsp}: {coding_variant_keys}, using {coding_variant_keys[0]}")
 
             ppi_edge_keys = ppi_edge_map.get(
                 (protein_id, interactor_protein_id))
@@ -140,27 +143,28 @@ class SemiQY2H(BaseAdapter):
                     f"Skipping {row['ccsb_mutation_id']}: no proteins_proteins edge found for {protein_id}, {interactor_protein_id}")
                 continue
 
-            _props = {
-                '_key': row['ccsb_mutation_id'] + '_' + row['interactor_id'],
-                '_from': 'coding_variants/' + coding_variant_keys[0],
-                '_to': 'proteins_proteins/' + ppi_edge_keys[0],
-                'name': self.CODING_VARIANTS_PPI_EDGE_NAME,
-                'inverse_name': self.CODING_VARIANTS_PPI_EDGE_INVERSE_NAME,
-                'consensus_score': float(row['consensus_score']),
-                'wt_consensus_score': float(row['wt_consensus_score']),
-                'log2FC': float(row['log2fc']),
-                'molecular_function': 'ontology_terms/' + self.PROTEIN_BINDING_TERM,
-                'method': file_fileset.get('method'),
-                'label': self.COLLECTION_LABEL,
-                'class': file_fileset.get('class'),
-                'source': self.SOURCE,
-                'source_url': self.source_url,
-                'files_filesets': 'files_filesets/' + self.file_accession
-            }
-            if self.validate:
-                self.validate_doc(_props)
-            self.writer.write(json.dumps(_props))
-            self.writer.write('\n')
+            for ppi_edge_key in ppi_edge_keys:
+                _props = {
+                    '_key': coding_variant_keys[0] + '_' + ppi_edge_key + '_' + self.file_accession,
+                    '_from': 'coding_variants/' + coding_variant_keys[0],
+                    '_to': 'proteins_proteins/' + ppi_edge_key,
+                    'name': self.CODING_VARIANTS_PPI_EDGE_NAME,
+                    'inverse_name': self.CODING_VARIANTS_PPI_EDGE_INVERSE_NAME,
+                    'consensus_score': float(row['consensus_score']),
+                    'wt_consensus_score': float(row['wt_consensus_score']),
+                    'log2FC': float(row['log2fc']),
+                    'molecular_function': 'ontology_terms/' + self.PROTEIN_BINDING_TERM,
+                    'method': file_fileset.get('method'),
+                    'label': self.COLLECTION_LABEL,
+                    'class': file_fileset.get('class'),
+                    'source': self.SOURCE,
+                    'source_url': self.source_url,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                }
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
 
     def parse_coding_variants_phenotypes(self, file_fileset):
         with gzip.open(self.filepath, 'rt') as edgotyping_file:
@@ -176,6 +180,9 @@ class SemiQY2H(BaseAdapter):
                 self.logger.warning(
                     f"Skipping {row['ccsb_mutation_id']}: no coding variant found for {row['spdi']}, {protein_id}, {hgvsp}")
                 continue
+            if len(coding_variant_keys) > 1:
+                self.logger.warning(
+                    f"Multiple coding variants found for {row['spdi']}, {protein_id}, {hgvsp}: {coding_variant_keys}, using {coding_variant_keys[0]}")
             coding_variant_key = coding_variant_keys[0]
 
             _props = {
