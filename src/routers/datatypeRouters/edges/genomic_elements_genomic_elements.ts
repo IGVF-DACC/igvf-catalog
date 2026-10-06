@@ -13,10 +13,8 @@ const edgeSchema = getSchema('data/schemas/edges/genomic_elements_genomic_elemen
 const elementSchema = getSchema('data/schemas/nodes/genomic_elements.CRISPRElementElement.json')
 const textFilter = z.string().trim().min(1).optional()
 const inputFormat = commonHumanEdgeParamsFormat.extend({
-  source_element_id: textFilter,
-  target_element_id: textFilter,
-  source_region: textFilter,
-  target_region: textFilter,
+  perturbed_region: textFilter,
+  accessible_region: textFilter,
   promoter_gene_id: textFilter,
   files_fileset: textFilter,
   biosample_term: textFilter,
@@ -73,8 +71,8 @@ const genomicElementsFromGenomicElements = publicProcedure
   .input(inputFormat)
   .output(outputFormat)
   .query(async ({ input }) => {
-    if (![input.source_element_id, input.target_element_id, input.source_region, input.target_region, input.promoter_gene_id, input.files_fileset, input.method].some(value => value !== undefined)) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Define at least one source_element_id, target_element_id, source_region, target_region, promoter_gene_id, files_fileset, or method.' })
+    if (![input.perturbed_region, input.accessible_region, input.promoter_gene_id, input.files_fileset, input.method].some(value => value !== undefined)) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Define at least one perturbed_region, accessible_region, promoter_gene_id, files_fileset, or method.' })
     }
     const filters: string[] = []
     const bindVars: Record<string, unknown> = {
@@ -82,8 +80,6 @@ const genomicElementsFromGenomicElements = publicProcedure
       limit: Math.min(input.limit ?? QUERY_LIMIT, 500)
     }
     const equalityFilters = {
-      _from: input.source_element_id === undefined ? undefined : handle('genomic_elements', input.source_element_id),
-      _to: input.target_element_id === undefined ? undefined : handle('genomic_elements', input.target_element_id),
       files_filesets: input.files_fileset === undefined ? undefined : handle('files_filesets', input.files_fileset),
       biosample_term: input.biosample_term === undefined ? undefined : handle('ontology_terms', input.biosample_term),
       biological_context: input.biological_context,
@@ -108,7 +104,7 @@ const genomicElementsFromGenomicElements = publicProcedure
     if (metrics !== '') filters.push(metrics)
     // Region and promoter-gene filters act on the nodes, before edge pagination.
     const nodeQueries: string[] = []
-    for (const [side, region, endpoint] of [['source', input.source_region, '_from'], ['target', input.target_region, '_to']] as const) {
+    for (const [side, region, endpoint] of [['source', input.perturbed_region, '_from'], ['target', input.accessible_region, '_to']] as const) {
       const nodeFilters: string[] = []
       if (region !== undefined) nodeFilters.push(getFilterStatements(elementSchema, preProcessRegionParam({ region })))
       if (side === 'source' && input.promoter_gene_id !== undefined) {

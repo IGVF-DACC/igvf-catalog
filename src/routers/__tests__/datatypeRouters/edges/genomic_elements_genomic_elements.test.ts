@@ -10,18 +10,16 @@ beforeEach(() => {
   jest.spyOn(db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
 })
 
-it('filters both endpoints and preserves false significance with bound values', async () => {
-  await call({ source_element_id: 'promoter', target_element_id: 'genomic_elements/peak', files_fileset: 'IGVFFI2419ZSGC', significant: 'false', biological_context: 'a"\\b', page: 2, limit: 1000 })
+it('filters file metadata and preserves false significance with bound values', async () => {
+  await call({ files_fileset: 'IGVFFI2419ZSGC', significant: 'false', biological_context: 'a"\\b', page: 2, limit: 1000 })
   const [query, vars] = (db.query as jest.Mock).mock.calls[0]
-  expect(query).toContain('record._from == @_from')
-  expect(query).toContain('record._to == @_to')
   expect(query).toContain('SORT record._key')
   expect(query).not.toContain('a"\\b')
-  expect(vars).toMatchObject({ _from: 'genomic_elements/promoter', _to: 'genomic_elements/peak', files_filesets: 'files_filesets/IGVFFI2419ZSGC', significant: false, biological_context: 'a"\\b', offset: 1000, limit: 500 })
+  expect(vars).toMatchObject({ files_filesets: 'files_filesets/IGVFFI2419ZSGC', significant: false, biological_context: 'a"\\b', offset: 1000, limit: 500 })
 })
 
 it('combines node overlap and promoter-gene filters before pagination', async () => {
-  await call({ source_region: 'chr14:100238144-100239154', target_region: 'chr1:3586345-3586846', promoter_gene_id: 'ENSG00000100811', verbose: 'true', p_value_adj: 'lt:0.1', log2FC: 'lt:0' })
+  await call({ perturbed_region: 'chr14:100238144-100239154', accessible_region: 'chr1:3586345-3586846', promoter_gene_id: 'ENSG00000100811', verbose: 'true', p_value_adj: 'lt:0.1', log2FC: 'lt:0' })
   const [query, vars] = (db.query as jest.Mock).mock.calls[0]
   expect(query).toContain('record.start < 100239154 AND record.end > 100238144')
   expect(query).toContain('record.start < 3586846 AND record.end > 3586345')
@@ -45,7 +43,7 @@ it('returns accessibility metrics and verbose promoter gene links', async () => 
 
 it.each([
   {}, { page: -1, method: 'Perturb-seq' }, { limit: 0, method: 'Perturb-seq' },
-  { source_region: 'invalid' }, { source_element_id: '' },
+  { perturbed_region: 'invalid' }, { accessible_region: 'invalid' }, { source_element_id: 'promoter' }, { target_element_id: 'peak' },
   { method: 'Perturb-seq', p_value_adj: 'lt:0 RETURN 1' }
 ])('rejects invalid or unbounded inputs: %j', async input => {
   await expect(call(input)).rejects.toThrow()

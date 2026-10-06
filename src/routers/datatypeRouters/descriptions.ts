@@ -2090,7 +2090,7 @@ export const descriptions = {
   genomic_elements_genomic_elements:
     'Retrieve promoter perturbation effects on chromatin accessibility at target peaks.<br> \
     Source elements identify perturbed promoters; target elements identify readout peaks. \
-    Filter by a source or target element ID, source_region or target_region (chr:start-end), promoter_gene_id, files_fileset, or method. \
+    Filter by perturbed_region (promoter) or accessible_region (readout peak), using chr:start-end, promoter_gene_id, files_fileset, or method. \
     Set verbose=true to expand both genomic elements. \
     Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
       {
@@ -2107,7 +2107,7 @@ export const descriptions = {
           {
             label: 'Query by readout peak region',
             items: [
-              'target_region = chr1:3586345-3586846',
+              'accessible_region = chr1:3586345-3586846',
               'method = Perturb-seq'
             ]
           },
