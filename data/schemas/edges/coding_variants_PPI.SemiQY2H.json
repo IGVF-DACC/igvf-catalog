@@ -20,7 +20,7 @@
           ]
         },
         "_to": {
-          "description": "The proteins_proteins interaction edge that this coding variant was tested against",
+          "description": "The binary protein-protein interaction edge that this coding variant was tested against",
           "example": "proteins_proteins/000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4",
           "pattern": "^proteins_proteins/",
           "collections": [
