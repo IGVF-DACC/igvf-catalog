@@ -30,10 +30,12 @@
           ]
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": "number",
           "description": "DESeq2 log2 fold-change of ORF abundance in high versus low readout-gene FACS bins. Positive values indicate enrichment with higher readout-gene expression."
         },
         "base_mean": {
+          "title": "Base Mean",
           "type": [
             "number",
             "null"
@@ -41,6 +43,7 @@
           "description": "DESeq2 mean normalized ORF counts across samples."
         },
         "p_value": {
+          "title": "P-Value",
           "type": [
             "number",
             "null"
@@ -48,6 +51,7 @@
           "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association."
         },
         "p_value_adj": {
+          "title": "Adjusted P-Value",
           "type": [
             "number",
             "null"
@@ -55,6 +59,7 @@
           "description": "DESeq2 Benjamini-Hochberg adjusted p-value."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -62,6 +67,7 @@
           "description": "Negative log10 of p_value."
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -69,10 +75,12 @@
           "description": "Negative log10 of p_value_adj."
         },
         "significant": {
+          "title": "Significant",
           "type": "boolean",
           "description": "Whether the adjusted p-value is below 0.05."
         },
         "morf_id": {
+          "title": "MORF ID",
           "type": "string",
           "description": "ORF construct identifier from the MORF library (DESeq2 rowID / ORF table MORF_id).",
           "example": "AATF_1"
@@ -124,6 +132,7 @@
           ]
         },
         "transcript_mapping_method": {
+          "title": "Transcript Mapping Method",
           "type": "string",
           "enum": [
             "supplied ENST",
@@ -132,6 +141,7 @@
           "description": "Whether transcript IDs were supplied or recovered from Catalog transcript RefSeq cross-references, ignoring accession versions."
         },
         "standard_error": {
+          "title": "Standard Error",
           "type": [
             "number",
             "null"
