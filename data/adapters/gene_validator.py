@@ -2,7 +2,10 @@ from db.arango_db import ArangoDB
 
 
 class GeneValidator:
-    def __init__(self):
+    def __init__(self, collection='genes'):
+        if collection not in {'genes', 'mm_genes'}:
+            raise ValueError(f'Unsupported gene collection: {collection}')
+        self.collection = collection
         self._valid_gene_ids = None  # Lazy loading - will be loaded on first use
         self.invalid_gene_ids = set()
 
@@ -11,7 +14,7 @@ class GeneValidator:
         if self._valid_gene_ids is None:
             db = ArangoDB().get_igvf_connection()
             cursor = db.aql.execute(
-                'FOR gene IN genes RETURN gene._key'
+                f'FOR gene IN {self.collection} RETURN gene._key'
             )
             self._valid_gene_ids = set(cursor)
         return self._valid_gene_ids

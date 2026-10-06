@@ -198,9 +198,9 @@
     },
     "notes": "No readout gene, log2FC, or uncorrected p_value in this layout. Use file-level readout_gene. FDR is used only to keep the most stringent call per region. Stop is BED exclusive end and is used as-is. Deconvolved_Signal_Mean is SURF beta (effect_size), not DESeq2 log2FC."
   },
-  "parse_perturb_seq": {
-    "uuid": "0447d492-9a9c-4ac9-8299-ac6f0e785920",
-    "title": "Global_differential_quantification_output file format specification for Parse Perturb-seq",
+  "global_differential": {
+    "uuid": ["0447d492-9a9c-4ac9-8299-ac6f0e785920", "a5630990-f4cb-48fd-8a03-c81507d4214f"],
+    "title": "Global_differential_quantification_output file format specification for (Parse) Perturb-seq",
     "lab": "thomas-quertermous",
     "columns": {
       "intended_target_name": "Name of target element, i.e. {chr}:{start}-{end}. Same as in guide metadata file",
@@ -682,6 +682,11 @@
     }
   },
   "files": {
+    "IGVFFI9159XDOS": {
+      "layout": "global_differential",
+      "assembly": "GRCm39",
+      "targeted_element_types": ["promoter"]
+    },
     "IGVFFI3069QCRA": {
       "layout": "t_cell",
       "targeted_element_types": [
@@ -714,13 +719,13 @@
       ]
     },
     "IGVFFI6376HTIF": {
-      "layout": "parse_perturb_seq",
+      "layout": "global_differential",
       "targeted_element_types": [
         "promoter"
       ]
     },
     "IGVFFI0206LUDV": {
-      "layout": "parse_perturb_seq",
+      "layout": "global_differential",
       "targeted_element_types": [
         "promoter"
       ],

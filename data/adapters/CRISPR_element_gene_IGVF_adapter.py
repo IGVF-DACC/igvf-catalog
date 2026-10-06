@@ -36,7 +36,7 @@ CRISPR_E2G_LAYOUTS, CRISPR_E2G_FILE_CONFIG = _load_crispr_e2g_definitions()
 _HG38_INTERVAL_RE = re.compile(
     r'^(?P<c>chr[^:]+):(?P<s1>\d+)-(?P<s2>\d+)$'
 )
-_ENSEMBL_GENE_ID_RE = re.compile(r'^ENSG[0-9]{11}(?:_PAR_Y)?$')
+_ENSEMBL_GENE_ID_RE = re.compile(r'^(?:ENSG|ENSMUSG)[0-9]{11}(?:_PAR_Y)?$')
 
 # Colmap keys that map row columns but are not edge metric properties.
 _IGVF_E2G_LAYOUT_KEYS = frozenset({
@@ -90,7 +90,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         normalized = gene_id.strip().rstrip(');,')
         # Accept IDs like ENSG00000174038.13 by stripping version suffix.
         normalized = re.sub(
-            r'^(ENSG[0-9]{11}(?:_PAR_Y)?)\.[0-9]+$',
+            r'^((?:ENSG|ENSMUSG)[0-9]{11}(?:_PAR_Y)?)\.[0-9]+$',
             r'\1',
             normalized
         )
@@ -611,12 +611,13 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         method: str,
         crispr_modality: str,
         metrics: dict,
+        gene_collection: str = 'genes',
     ) -> dict:
         """Build a genomic_elements_genes edge (see CRISPRElementGeneIGVF schema)."""
         edge = {
             '_key': _key,
             '_from': _from,
-            '_to': f'genes/{readout_gene}',
+            '_to': f'{gene_collection}/{readout_gene}',
             'source': CRISPRElementGeneIGVF.SOURCE,
             'source_url': source_url,
             'files_filesets': f'files_filesets/{file_accession}',
@@ -821,9 +822,12 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.gene_validator = GeneValidator()
-        super().__init__(filepath, label, writer, validate)
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
+        self.assembly = self.file_config.get('assembly', 'GRCh38')
+        self.gene_collection = 'mm_genes' if self.assembly == 'GRCm39' else 'genes'
+        self.element_collection = 'mm_genomic_elements' if self.assembly == 'GRCm39' else 'genomic_elements'
+        self.gene_validator = GeneValidator(self.gene_collection)
+        super().__init__(filepath, label, writer, validate)
         if not self.file_config:
             self.logger.warning(
                 'No CRISPR E2G file config for accession %s; '
@@ -857,9 +861,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     def _get_collection_name(self):
         """Get collection based on label."""
         if self.label == 'genomic_element':
-            return 'genomic_elements'
+            return self.element_collection
         else:
-            return 'genomic_elements_genes'
+            return f'{self.element_collection}_{self.gene_collection}'
 
     def parse(self):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -963,6 +967,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         intended_target_start,
                         intended_target_end,
                         'CRISPR',
+                        assembly=self.assembly,
                     )
                     genomic_coordinates_to_element_id[element_coordinates] = element_id
                 else:
@@ -979,7 +984,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     _props = self._genomic_element_gene_edge(
                         _key=_id,
                         _from=(
-                            'genomic_elements/' + element_id + '_'
+                            self.element_collection + '/' + element_id + '_'
                             + self.file_accession
                         ),
                         readout_gene=readout_gene,
@@ -989,6 +994,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         method=method,
                         crispr_modality=crispr_modality,
                         metrics=metrics,
+                        gene_collection=self.gene_collection,
                     )
                     if is_scaled_screen:
                         current = scaled_screen_best_edges.get(_id)
@@ -1047,5 +1053,5 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         if not promoter_gene:
                             raise ValueError(
                                 f'Promoter element {_id} is missing promoter_gene.')
-                        _props['promoter_of'] = f'genes/{promoter_gene}'
+                        _props['promoter_of'] = f'{self.gene_collection}/{promoter_gene}'
                     self._write_doc(_props)
