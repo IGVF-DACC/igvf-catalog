@@ -45,13 +45,15 @@
         "mm_genomic_elements": {
             "CRISPRElementGeneIGVF": "schemas/nodes/mm_genomic_elements.CRISPRElementGeneIGVF.json",
             "CCRE": "schemas/nodes/mm_genomic_elements.CCRE.json",
-            "HumanMouseElementAdapter": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json"
+            "HumanMouseElementAdapter": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json",
+            "MPRAAdapter": "schemas/nodes/mm_genomic_elements.MPRAAdapter.json"
         },
         "mm_transcripts": {
             "Gencode": "schemas/nodes/mm_transcripts.Gencode.json"
         },
         "mm_variants": {
-            "MouseGenomesProjectAdapter": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json"
+            "MouseGenomesProjectAdapter": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json",
+            "MPRAAdapter": "schemas/nodes/mm_variants.MPRAAdapter.json"
         },
         "motifs": {
             "Motif": "schemas/nodes/motifs.Motif.json",
@@ -225,6 +227,12 @@
         },
         "genes_transcripts_genes": {
             "MORFGeneTranscriptGene": "schemas/edges/genes_transcripts_genes.MORFGeneTranscriptGene.json"
+        },
+        "mm_genomic_elements_biosamples": {
+            "MPRAAdapter": "schemas/edges/mm_genomic_elements_biosamples.MPRAAdapter.json"
+        },
+        "mm_variants_biosamples": {
+            "MPRAAdapter": "schemas/edges/mm_variants_biosamples.MPRAAdapter.json"
         }
     }
 }

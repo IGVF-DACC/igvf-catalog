@@ -534,3 +534,29 @@ variants_variants:
     fields:
       - r2
       - d_prime
+
+
+mm_genomic_elements_biosamples:
+  persistent:
+    fields:
+      - type, source, source_url, files_filesets
+      - source, source_url, files_filesets
+      - source_url, files_filesets
+      - files_filesets
+      - method, _key
+  zkd:
+    fields:
+      - log2FC
+
+
+mm_variants_biosamples:
+  persistent:
+    fields:
+      - _to, genomic_element
+      - _from, genomic_element
+      - method, files_filesets
+      - files_filesets
+      - method, _key
+      - files_filesets, _key
+      - source, files_filesets, method
+      - source, class, files_filesets, method

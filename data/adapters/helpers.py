@@ -426,7 +426,7 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
             return None
 
 
-def split_spdi(spdi):
+def split_spdi(spdi, assembly='GRCh38'):
     if not spdi.startswith('NC_'):
         print('Error: unsupported accession format.')
         return None
@@ -437,6 +437,14 @@ def split_spdi(spdi):
         pos_start = int(parts[1])
         ref = parts[2]
         alt = parts[3]
+
+        if assembly != 'GRCh38':
+            chromosomes = {refseq: chrom for chrom, refseq in CHR_MAP[assembly].items()
+                           if chrom.startswith('chr')}
+            if accession not in chromosomes:
+                raise ValueError(
+                    f'Accession {accession} does not belong to {assembly}')
+            return chromosomes[accession], pos_start, ref, alt
 
         # Extract chromosome number from RefSeq accession
         chr_num = int(accession.split('.')[0].split('_')[1])
@@ -457,11 +465,14 @@ def split_spdi(spdi):
         return None
 
 
-def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files_filesets=None):
+def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files_filesets=None, collection='variants'):
     db = ArangoDB().get_igvf_connection()
 
     if check_by not in ('_key', 'spdi'):
         raise ValueError("check_by must be '_key' or 'spdi'")
+
+    if collection not in ('variants', 'mm_variants'):
+        raise ValueError('Unsupported variant collection')
 
     bind_vars = {'ids': identifiers}
     if excluded_files_filesets:
@@ -471,11 +482,11 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files
         else:
             excluded_set = {excluded_files_filesets}
 
-        query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN [v._key, v.files_filesets]'
+        query = f'FOR v IN {collection} FILTER v.{check_by} IN @ids RETURN [v._key, v.files_filesets]'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
         return {key for key, fs in cursor if fs not in excluded_set}
     else:
-        query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN v._key'
+        query = f'FOR v IN {collection} FILTER v.{check_by} IN @ids RETURN v._key'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
         return set(cursor)
 
@@ -800,6 +811,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
         The input variant can be in spdi format: NC_000001.11:10887495:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
         By default: validate ref allele for both SNVs and indels, and skip those failed validation variants instead of correcting the ref allele for them automatically.
     '''
+    species = 'mouse' if assembly == 'GRCm39' else 'human'
     variant_json = {}
     skipped_message = None
     format = None
@@ -808,7 +820,10 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if len(variant_id.split(':')) == 4:
         format = 'spdi'
         chr_spdi = variant_id.split(':')[0]
-        chr, pos_start, ref, alt = split_spdi(variant_id)
+        parsed = split_spdi(variant_id, assembly=assembly)
+        if parsed is None:
+            return {}, {'variant_id': variant_id, 'reason': 'Unable to parse SPDI for assembly'}
+        chr, pos_start, ref, alt = parsed
     elif len(variant_id.split('-')) == 4:
         format = 'vcf'
         chr, pos_start, ref, alt = variant_id.split('-')
@@ -831,7 +846,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
                                'reason': 'Ref allele and alt allele both empty'}
             return variant_json, skipped_message
         elif ref == '' or alt == '':
-            ref_genome = get_ref_seq_by_spdi(variant_id)
+            ref_genome = get_ref_seq_by_spdi(variant_id, species=species)
             if ref != ref_genome:
                 skipped_message = {'variant_id': variant_id,
                                    'reason': 'Ref allele mismatch'}
@@ -844,7 +859,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
         if format == 'spdi':
             pos_start = pos_start + 1
         if seq_repo is None:
-            seq_repo = get_seqrepo('human')
+            seq_repo = get_seqrepo(species)
         if translator is None:
             translator = AlleleTranslator(SeqRepoDataProxy(seq_repo))
         try:
@@ -857,8 +872,12 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if len(spdi) < 254:
         _id = spdi
     else:
-        allele = build_allele(chr, pos_start, ref,
-                              alt, translator, seq_repo, assembly)
+        if assembly == 'GRCm39':
+            allele = build_allele_mouse(
+                chr, pos_start, ref, alt, translator, assembly)
+        else:
+            allele = build_allele(chr, pos_start, ref,
+                                  alt, translator, seq_repo, assembly)
         _id = allele.digest
 
     variation_type = 'SNP'  # should be SNV more broadly
@@ -886,7 +905,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
         'variation_type': variation_type,
         'spdi': spdi,
         'hgvs': build_hgvs_from_spdi(spdi),
-        'organism': 'Homo sapiens'
+        'organism': 'Mus musculus' if species == 'mouse' else 'Homo sapiens'
     }
     return variant_json, skipped_message
 

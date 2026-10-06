@@ -1571,6 +1571,9 @@ genomic element igvf mpra:
     --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    # IGVFDS6236SIMG assays human sequences (GRCh38) in mouse cells.
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8967CJTO/@@download/IGVFFI8967CJTO.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1843KICT/@@download/IGVFFI1843KICT.bed.gz
@@ -1609,6 +1612,9 @@ genomic element to biosample igvf mpra:
     --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    # IGVFDS6236SIMG assays human sequences (GRCh38) in mouse cells.
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8967CJTO/@@download/IGVFFI8967CJTO.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1843KICT/@@download/IGVFFI1843KICT.bed.gz
@@ -1647,6 +1653,9 @@ genomic element from variants igvf mpra:
     --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    # IGVFDS6236SIMG assays human sequences (GRCh38) in mouse cells.
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7473KZAS/@@download/IGVFFI7473KZAS.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4134MFLL/@@download/IGVFFI4134MFLL.bed.gz
@@ -1686,6 +1695,9 @@ variant igvf mpra:
     --output-bucket-key variants/mpra_variants_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    # IGVFDS6236SIMG assays human sequences (GRCh38) in mouse cells.
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7473KZAS/@@download/IGVFFI7473KZAS.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4134MFLL/@@download/IGVFFI4134MFLL.bed.gz
@@ -1723,6 +1735,9 @@ variant to biosample igvf mpra:
     --output-bucket-key variants_biosamples/mpra_variants_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    # IGVFDS6236SIMG assays human sequences (GRCh38) in mouse cells.
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7473KZAS/@@download/IGVFFI7473KZAS.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4134MFLL/@@download/IGVFFI4134MFLL.bed.gz
@@ -1741,6 +1756,131 @@ variant to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
+
+  source: IGVF
+  label: variant effect on regulatory element activity
+
+
+mouse genomic element igvf mpra:
+  collection: mm_genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element
+    --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4607JYJD/@@download/IGVFFI4607JYJD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0975AQKF/@@download/IGVFFI0975AQKF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4261NSQZ/@@download/IGVFFI4261NSQZ.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4845SDZI/@@download/IGVFFI4845SDZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+
+  source: IGVF
+  threshold: 1
+  type: tested elements
+
+
+mouse genomic element to biosample igvf mpra:
+  collection: mm_genomic_elements_biosamples
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element_biosample
+    --output-bucket-key mm_genomic_elements_biosamples/mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4607JYJD/@@download/IGVFFI4607JYJD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0975AQKF/@@download/IGVFFI0975AQKF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4261NSQZ/@@download/IGVFFI4261NSQZ.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4845SDZI/@@download/IGVFFI4845SDZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+
+  source: IGVF
+  threshold: 1
+  label: regulatory reference element activity
+
+
+mouse genomic element from variants igvf mpra:
+  collection: mm_genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element_from_variant
+    --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2111LQGF/@@download/IGVFFI2111LQGF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4261NSQZ/@@download/IGVFFI4261NSQZ.tsv.gz
+
+  source: IGVF
+  threshold: 1
+  type: tested elements
+
+
+mouse variant igvf mpra:
+  collection: mm_variants
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label variant
+    --output-bucket-key mm_variants/mpra_variants_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2111LQGF/@@download/IGVFFI2111LQGF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4261NSQZ/@@download/IGVFFI4261NSQZ.tsv.gz
+
+  source: IGVF
+  threshold: 1
+
+
+mouse variant to biosample igvf mpra:
+  collection: mm_variants_biosamples
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label variant_biosample
+    --output-bucket-key mm_variants_biosamples/mpra_variants_biosamples_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2111LQGF/@@download/IGVFFI2111LQGF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4261NSQZ/@@download/IGVFFI4261NSQZ.tsv.gz
 
   source: IGVF
   label: variant effect on regulatory element activity

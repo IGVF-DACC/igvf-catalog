@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schemas/edges/variants_biosamples.MPRAAdapter.json",
+  "$id": "schemas/edges/mm_variants_biosamples.MPRAAdapter.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -13,10 +13,10 @@
           "description": "Variant key, genomic element key (including strand), biosample term and source file accession joined by underscores, hashed with SHA-256 when the composite would exceed the key length limit."
         },
         "_from": {
-          "example": "variants/NC_000009.12:136248440:T:C",
-          "pattern": "^variants/",
+          "example": "mm_variants/NC_000009.12:136248440:T:C",
+          "pattern": "^mm_variants/",
           "collections": [
-            "variants"
+            "mm_variants"
           ]
         },
         "_to": {
@@ -27,88 +27,69 @@
           ]
         },
         "genomic_element": {
-          "title": "Genomic Element",
           "type": "string",
           "description": "Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample.",
-          "example": "genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH",
-          "pattern": "^genomic_elements/",
+          "example": "mm_genomic_elements/MPRA_chr9_136886228_136886428_GRCm39_IGVFFI4914OUJH",
+          "pattern": "^mm_genomic_elements/",
           "collections": [
-            "genomic_elements"
+            "mm_genomic_elements"
           ]
         },
         "strand": {
-          "title": "Strand",
           "type": "string",
-          "description": "Strand the tile was tested in..",
+          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
           "enum": [
             "+",
             "-",
             "."
           ],
-          "example": "+",
-          "enum_descriptions": {
-            "+": "Forward strand of the reference sequence.",
-            "-": "Reverse strand of the reference sequence.",
-            ".": "Strand is not recorded or is not applicable."
-          }
+          "example": "+"
         },
         "bed_score": {
-          "title": "BED Score",
           "type": "number",
           "description": "Score column of the source BED file."
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
           "type": "number",
           "description": "Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space."
         },
         "DNA_count_ref": {
-          "title": "DNA Count for Reference Allele",
           "type": "number",
           "description": "Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
         "RNA_count_ref": {
-          "title": "RNA Count for Reference Allele",
           "type": "number",
           "description": "Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
         "DNA_count_alt": {
-          "title": "DNA Count for Alternate Allele",
           "type": "number",
           "description": "Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "RNA_count_alt": {
-          "title": "RNA Count for Alternate Allele",
           "type": "number",
           "description": "Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
-          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },
         "postProbEffect": {
-          "title": "Posterior Probability of Effect",
           "type": "number",
           "description": "Posterior probability that the variant has a regulatory effect."
         },
         "CI_lower_95": {
-          "title": "95% Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
-          "title": "95% Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of a 95% interval for the variant effect."
         },
@@ -166,6 +147,7 @@
         }
       },
       "required": [
+        "_key",
         "label",
         "significant",
         "files_filesets",
@@ -192,5 +174,5 @@
   "accessible_via": {
     "return": "strand, log2FC, bed_score, DNA_count_ref, RNA_count_ref, DNA_count_alt, RNA_count_alt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
   },
-  "db_collection_name": "variants_biosamples"
+  "db_collection_name": "mm_variants_biosamples"
 }

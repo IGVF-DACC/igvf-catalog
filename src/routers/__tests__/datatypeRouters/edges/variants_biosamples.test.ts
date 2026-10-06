@@ -127,3 +127,58 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
     ).rejects.toThrow(TRPCError)
   })
 })
+
+describe('mouse MPRA variant routing', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it('uses mouse variant lookup, edges, element filter and verbose collections', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['mm_variants/NC_000067.7:11:A:C']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = {
+      spdi: 'NC_000067.7:11:A:C',
+      organism: 'Mus musculus',
+      element_id: 'MPRA_chr1_10_20_GRCm39_plus_DESIGN',
+      verbose: 'true',
+      page: 0
+    }
+    await variantsBiosamplesRouters.biosamplesFromVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+    expect(query.mock.calls[0][0]).toContain('FOR record IN mm_variants')
+    const edgeQuery = query.mock.calls[1][0] as string
+    expect(edgeQuery).toContain('FOR record IN mm_variants_biosamples')
+    expect(edgeQuery).toContain("record._from IN ['mm_variants/NC_000067.7:11:A:C']")
+    expect(edgeQuery).toContain("record.genomic_element == 'mm_genomic_elements/MPRA_chr1_10_20_GRCm39_plus_DESIGN'")
+    expect(edgeQuery).toContain('FOR otherRecord IN mm_variants')
+    expect(edgeQuery).toContain('FOR otherRecord IN mm_genomic_elements')
+    expect(edgeQuery).toContain('FOR otherRecord IN ontology_terms')
+  })
+
+  it('routes biosample searches to mouse edges and verbose node collections', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'CL_0000001' }]) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { biosample_id: 'CL_0000001', organism: 'Mus musculus', verbose: 'true', page: 0 }
+    await variantsBiosamplesRouters.variantsFromBiosamples({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+    const edgeQuery = query.mock.calls[1][0] as string
+    expect(edgeQuery).toContain('FOR record IN mm_variants_biosamples')
+    expect(edgeQuery).toContain("record._to IN ['ontology_terms/CL_0000001']")
+    expect(edgeQuery).toContain('FOR otherRecord IN mm_variants')
+    expect(edgeQuery).toContain('FOR otherRecord IN mm_genomic_elements')
+  })
+
+  it.each(['Homo sapiens', 'Mus musculus'])('routes file-only searches for %s', async (organism) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { organism, files_fileset: 'IGVFFI2111LQGF', page: 0 }
+    await variantsBiosamplesRouters.biosamplesFromVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+    const prefix = organism === 'Mus musculus' ? 'mm_' : ''
+    expect(query.mock.calls[0][0]).toContain(`FOR record IN ${prefix}variants_biosamples`)
+    expect(query.mock.calls[0][0]).toContain("record.files_filesets == 'files_filesets/IGVFFI2111LQGF'")
+  })
+})
