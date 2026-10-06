@@ -44,7 +44,10 @@ MOCKED_CODING_VARIANTS = {
 }
 
 MOCKED_PPI_EDGES = {
-    ('ENSP00000320646', 'ENSP00000366984'): ['000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4'],
+    ('ENSP00000320646', 'ENSP00000366984'): [
+        '000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4',
+        '111112a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4',
+    ],
 }
 
 MOCKED_FILE_FILESET = {
@@ -74,12 +77,21 @@ def test_process_file_coding_variants_PPI(
         adapter.process_file()
 
     records = [json.loads(c) for c in writer.contents if c != '\n']
-    assert len(records) == 1
+    # row A matches two proteins_proteins edges -> one coding_variants_PPI edge per match
+    assert len(records) == 2
+
+    expected_ppi_keys = {
+        '000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4',
+        '111112a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4',
+    }
+    assert {r['_to'].split('/')[1] for r in records} == expected_ppi_keys
+    assert {r['_key'] for r in records} == {
+        'ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T_' + key + '_IGVFFI2460BBXY'
+        for key in expected_ppi_keys
+    }
 
     record = records[0]
-    assert record['_key'] == 'CCSBVarC003578_CCSBORF54668'
     assert record['_from'] == 'coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T'
-    assert record['_to'] == 'proteins_proteins/000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4'
     assert record['name'] == 'modulates interaction of'
     assert record['inverse_name'] == 'interaction modulated by'
     assert record['consensus_score'] == 26.99
@@ -99,14 +111,20 @@ def test_process_file_coding_variants_PPI(
 
 
 @patch('adapters.semi_qY2H_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_FILE_FILESET)
-@patch('adapters.semi_qY2H_adapter.bulk_query_proteins_proteins_edge_keys_in_arangodb', return_value={})
-@patch('adapters.semi_qY2H_adapter.bulk_query_coding_variants_from_spdi_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
+@patch('adapters.semi_qY2H_adapter.bulk_query_proteins_proteins_edge_keys_in_arangodb', return_value=MOCKED_PPI_EDGES)
+@patch('adapters.semi_qY2H_adapter.bulk_query_coding_variants_from_spdi_in_arangodb')
 @patch('adapters.semi_qY2H_adapter.requests.get')
 @patch('gzip.open', new_callable=mock_open, read_data=PPI_TSV)
-def test_no_ppi_edge_found_is_skipped_and_warned(
+def test_multiple_coding_variants_logs_warning_and_uses_first_PPI(
     mock_gzip_open, mock_requests_get, mock_coding_variants, mock_ppi_edges, mock_file_fileset, caplog
 ):
     mock_requests_get.return_value.json.return_value = MOCKED_ORF_PROTEIN_MAP
+    mock_coding_variants.return_value = {
+        ('NC_000016.10:89102664:C:T', 'ENSP00000320646', 'p.Pro243Leu'): [
+            'ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T',
+            'ACSF3_ENST99999999_p.Pro243Leu_c.728C-T',
+        ],
+    }
 
     writer = SpyWriter()
     adapter = SemiQY2H(
@@ -118,9 +136,15 @@ def test_no_ppi_edge_found_is_skipped_and_warned(
     with caplog.at_level('WARNING'):
         adapter.process_file()
 
-    records = [c for c in writer.contents if c != '\n']
-    assert len(records) == 0
-    assert 'no proteins_proteins edge found for ENSP00000320646, ENSP00000366984' in caplog.text
+    records = [json.loads(c) for c in writer.contents if c != '\n']
+    assert len(records) == 2
+    assert all(
+        r['_from'] == 'coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T' for r in records)
+    assert (
+        'Multiple coding variants found for NC_000016.10:89102664:C:T, ENSP00000320646, p.Pro243Leu: '
+        "['ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T', 'ACSF3_ENST99999999_p.Pro243Leu_c.728C-T'], "
+        'using ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T'
+    ) in caplog.text
 
 
 @patch('adapters.semi_qY2H_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_FILE_FILESET)
@@ -156,22 +180,6 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     assert record['source'] == 'IGVF'
     assert record['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7393MGJK'
     assert record['files_filesets'] == 'files_filesets/IGVFFI7393MGJK'
-
-
-@patch('adapters.semi_qY2H_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_FILE_FILESET)
-@patch('adapters.semi_qY2H_adapter.bulk_query_coding_variants_from_spdi_in_arangodb', return_value={})
-@patch('gzip.open', new_callable=mock_open, read_data=PHENOTYPES_TSV)
-def test_missing_coding_variant_is_skipped(mock_gzip_open, mock_bulk_query, mock_file_fileset):
-    writer = SpyWriter()
-    adapter = SemiQY2H(
-        'IGVFFI7393MGJK.tsv.gz',
-        label='coding_variants_phenotypes',
-        writer=writer,
-        validate=True
-    )
-    adapter.process_file()
-    records = [c for c in writer.contents if c != '\n']
-    assert len(records) == 0
 
 
 def test_invalid_label():

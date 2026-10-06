@@ -763,11 +763,6 @@ def bulk_query_proteins_proteins_edge_keys_in_arangodb(protein_id_pairs):
             if r['edge_key'] not in mappings[key]:
                 mappings[key].append(r['edge_key'])
 
-    for key, values in mappings.items():
-        if len(values) > 1:
-            print(
-                f'WARNING: multiple proteins_proteins edges found for {key}: {values}')
-
     return mappings
 
 
