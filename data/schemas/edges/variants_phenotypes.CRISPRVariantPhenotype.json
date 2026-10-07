@@ -34,8 +34,7 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one.",
-          "threshold": "Not used to assign significant; the adapter uses the 95% effect-size confidence interval even when this statistic is available."
+          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
         },
         "significant": {
           "title": "Significant?",
@@ -83,8 +82,7 @@
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source.",
-          "threshold": "Not used to assign significant; the adapter uses the 95% effect-size confidence interval even when this statistic is available."
+          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source."
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -92,8 +90,7 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of the multiple-testing-adjusted p-value when reported by the source.",
-          "threshold": "Not used to assign significant; the adapter uses the 95% effect-size confidence interval even when this statistic is available."
+          "description": "Negative log10 of the multiple-testing-adjusted p-value when reported by the source."
         },
         "method": {
           "enum": [

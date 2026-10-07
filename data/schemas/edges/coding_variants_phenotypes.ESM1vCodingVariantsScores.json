@@ -38,8 +38,7 @@
         "esm_1v_score": {
           "title": "ESM1v Score",
           "type": "number",
-          "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness.",
-          "threshold": "No ESM-1v score cutoff or statistical significance call is applied by the adapter. No universal decision threshold is documented; the ESM-1b cutoff must not be applied to ESM-1v."
+          "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets",
@@ -174,6 +173,5 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "coding_variants_phenotypes",
-  "threshold": "No ESM-1v score cutoff or statistical significance call is applied by the adapter. No universal decision threshold is documented; the ESM-1b cutoff must not be applied to ESM-1v."
+  "db_collection_name": "coding_variants_phenotypes"
 }

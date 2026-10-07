@@ -68,7 +68,7 @@
           "type": "string",
           "description": "Whether the allelic read imbalance agrees with the motif fold-change.",
           "example": "Concordant",
-          "threshold": "Source motif-concordance classification is assessed at 25% FDR and is preserved by the adapter; this is separate from the per-allele 5% FDR binding criterion."
+          "threshold": "The source motif-concordance classification is assessed at 25% FDR; this is separate from the adapter’s strict 5% FDR criterion for the directional score."
         },
         "motif": {
           "title": "Motif",
@@ -94,36 +94,37 @@
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793,
-          "threshold": "Upstream allele-specific binding criterion: FDR <= 0.05 for this allele; 0.05 < FDR <= 0.25 is the undefined band. The adapter does not filter on this value."
+          "threshold": "Used to derive the directional score: this allele is significant when p_value_adj_ref < 0.05. See score.threshold for how the two allele-specific calls are combined."
         },
         "p_value_adj_alt": {
           "title": "Adjusted P-Value for Alternate Allele",
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0,
-          "threshold": "Upstream allele-specific binding criterion: FDR <= 0.05 for this allele; 0.05 < FDR <= 0.25 is the undefined band. The adapter does not filter on this value."
+          "threshold": "Used to derive the directional score: this allele is significant when p_value_adj_alt < 0.05. See score.threshold for how the two allele-specific calls are combined."
         },
         "score": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Directional ASB significance score: negative FDR-adjusted p-value when only the reference allele is significant (< 0.05), positive when only the alternate allele is significant, or null when both or neither are significant.",
-          "example": -0.0171981040581793
+          "description": "Directional ASB significance score: the signed FDR-adjusted p-value for the uniquely significant allele, negative for reference and positive for alternate; null when no single direction can be assigned.",
+          "example": -0.0171981040581793,
+          "threshold": "For the directional score, the adapter tests p_value_adj_ref < 0.05 and p_value_adj_alt < 0.05 separately. Exactly one allele must pass: score is -p_value_adj_ref for reference-only significance and +p_value_adj_alt for alternate-only significance; both or neither passing gives null. A p-value equal to 0.05 does not pass. This determines the score and does not filter rows."
         },
         "neg_log10_pvalue_adj_ref": {
           "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
           "example": 1.7645194276538037,
-          "threshold": "Upstream FDR <= 0.05 corresponds to a value >= -log10(0.05), approximately 1.30103. Evaluated separately for each allele; no additional adapter filter."
+          "threshold": "The directional-score criterion p_value_adj_ref < 0.05 corresponds to a value > -log10(0.05), approximately 1.30103. The adapter evaluates the original adjusted p-value."
         },
         "neg_log10_pvalue_adj_alt": {
           "title": "Adjusted Negative Log10 P-Value for Alternate Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
           "example": 0,
-          "threshold": "Upstream FDR <= 0.05 corresponds to a value >= -log10(0.05), approximately 1.30103. Evaluated separately for each allele; no additional adapter filter."
+          "threshold": "The directional-score criterion p_value_adj_alt < 0.05 corresponds to a value > -log10(0.05), approximately 1.30103. The adapter evaluates the original adjusted p-value."
         },
         "biological_context": {
           "$ref": "../mixins.json#/biological_context",
@@ -205,5 +206,6 @@
   "accessible_via": {
     "simplified_return": "motif, source",
     "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, score, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
-  }
+  },
+  "threshold": "For the directional score, the adapter tests p_value_adj_ref < 0.05 and p_value_adj_alt < 0.05 separately. Exactly one allele must pass: score is -p_value_adj_ref for reference-only significance and +p_value_adj_alt for alternate-only significance; both or neither passing gives null. A p-value equal to 0.05 does not pass. This determines the score and does not filter rows."
 }

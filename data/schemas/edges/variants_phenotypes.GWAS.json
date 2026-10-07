@@ -110,15 +110,13 @@
           "title": "P-Value",
           "type": "number",
           "description": "Association p-value, reconstructed from mantissa and exponent.",
-          "example": 0.01,
-          "threshold": "The adapter applies no p_value cutoff. The supplied review reports genome-wide-significant source data at p_value <= 5e-8 (neg_log10_pvalue >= approximately 7.30103), but that is an upstream selection criterion to confirm for each input dataset, not an adapter-enforced filter."
+          "example": 0.01
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
-          "example": 1,
-          "threshold": "The adapter applies no p_value cutoff. The supplied review reports genome-wide-significant source data at p_value <= 5e-8 (neg_log10_pvalue >= approximately 7.30103), but that is an upstream selection criterion to confirm for each input dataset, not an adapter-enforced filter."
+          "example": 1
         },
         "tagged_variants": {
           "title": "Tagged Variants",
@@ -347,6 +345,5 @@
   "accessible_via": {
     "filter_by_range": "neg_log10_pvalue",
     "return": "name, study, source, source_url, files_filesets, class, method, label, version, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_value, neg_log10_pvalue, oddsr_ci_lower, oddsr_ci_upper"
-  },
-  "threshold": "The adapter applies no p_value cutoff. The supplied review reports genome-wide-significant source data at p_value <= 5e-8 (neg_log10_pvalue >= approximately 7.30103), but that is an upstream selection criterion to confirm for each input dataset, not an adapter-enforced filter."
+  }
 }

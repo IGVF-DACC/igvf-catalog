@@ -50,14 +50,12 @@
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction",
-          "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Nominal p-value of association between the variant and gene expression, from the African-population meta-analysis.",
-          "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+          "description": "Nominal p-value of association between the variant and gene expression, from the African-population meta-analysis."
         },
         "effect_size": {
           "title": "Effect Size",
@@ -132,6 +130,5 @@
     "filter_by_range": "neg_log10_pvalue, effect_size",
     "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
     "return": "chr, neg_log10_pvalue, p_value, effect_size, source, class, method, label, source_url, files_filesets, biological_context, biosample_term"
-  },
-  "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+  }
 }
