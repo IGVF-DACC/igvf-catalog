@@ -116,15 +116,13 @@
           "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
-          "example": 1.7645194276538037,
-          "threshold": "The directional-score criterion p_value_adj_ref < 0.05 corresponds to a value > -log10(0.05), approximately 1.30103. The adapter evaluates the original adjusted p-value."
+          "example": 1.7645194276538037
         },
         "neg_log10_pvalue_adj_alt": {
           "title": "Adjusted Negative Log10 P-Value for Alternate Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
-          "example": 0,
-          "threshold": "The directional-score criterion p_value_adj_alt < 0.05 corresponds to a value > -log10(0.05), approximately 1.30103. The adapter evaluates the original adjusted p-value."
+          "example": 0
         },
         "biological_context": {
           "$ref": "../mixins.json#/biological_context",

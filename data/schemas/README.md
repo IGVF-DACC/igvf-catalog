@@ -99,6 +99,9 @@ it. When a significance call uses multiple fields, document which source formats
 use each field, their precedence, strict/inclusive boundaries, and missing-value
 behavior on the decision field. Do not add schema-level `threshold` annotations
 or annotate unrelated fields merely to say they are not used in that decision.
+Omit `threshold` on alternate representations and supporting fields when the
+cutoff is applied to another field; document it on the tested field and the
+resulting decision field instead.
 
 A missing adapter filter does not establish that a dataset is unthresholded.
 Predictive files may already be selected upstream. Investigate source-file

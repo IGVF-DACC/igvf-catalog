@@ -100,14 +100,12 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction",
-          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
-          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "log2FC": {
           "title": "Log2 Fold Change",
@@ -171,14 +169,12 @@
         "gamma_approximation_ln_p_value": {
           "title": "Gamma Approximation ln P-Value",
           "type": "number",
-          "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj.",
-          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
+          "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj."
         },
         "hypergeometric_ln_p_value": {
           "title": "Hypergeometric ln P-Value",
           "type": "number",
-          "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value.",
-          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
+          "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value."
         },
         "empirical_p_value": {
           "title": "Empirical P-Value",
