@@ -46,6 +46,7 @@ const variantsVariantsSummaryFormat = z.object({
   ancestry: z.string(),
   d_prime: z.number().nullish(),
   r2: z.number().nullish(),
+  positive_corr: z.boolean().nullish(),
   'sequence variant': z.string().or(variantSimplifiedFormat),
   predictions: z.object({
     qtls: z.array(qtlsFormat).nullish(),
@@ -168,6 +169,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       'ancestry': record.ancestry,
       'd_prime': record.d_prime,
       'r2': record.r2,
+      'positive_corr': record.positive_corr,
       'sequence variant': MERGE(variant, { predictions: { qtls, tf_binding } })
     }
   `
