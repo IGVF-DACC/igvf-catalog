@@ -2142,17 +2142,6 @@ coding variant:
    - s3://igvf-catalog-source-data/dbNSFP5.1a_grch38.gz # reference file IGVFFI3605PGCI
   source: dbNSFP 5.1a
 
-# Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key coding_variants_proteins/chr1.jsonl --collection coding_variants_proteins
-coding variant to protein:
-  collection: coding_variants_proteins
-  params:
-    - collection
-  pypy3: false
-  command: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_proteins/{datafile}.jsonl --collection coding_variants_proteins
-  datafiles:
-    - s3://igvf-catalog-source-data/dbNSFP5.1a_grch38.gz # reference file IGVFFI3605PGCI
-  source: dbNSFP 5.1a
-
 # Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key variants_coding_variants/chr1.jsonl --collection variants_coding_variants
 variants to coding variant:
   collection: variants_coding_variants

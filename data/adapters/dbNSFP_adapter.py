@@ -12,8 +12,7 @@ from adapters.writer import Writer
 
 
 class DbNSFP(BaseAdapter):
-    ALLOWED_LABELS = ['coding_variants',
-                      'coding_variants_proteins', 'variants_coding_variants']
+    ALLOWED_LABELS = ['coding_variants', 'variants_coding_variants']
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
@@ -150,25 +149,6 @@ class DbNSFP(BaseAdapter):
                         'pos': long_data(1) - 1,
                         'ref': data(2),
                         'alt': data(3),
-                    }
-                # deprecated - not in the database anymore
-                elif self.label == 'coding_variants_proteins':
-                    protein_id = data(15)
-                    if not protein_id:
-                        continue
-
-                    # removing possible isoform numbers. Example: P19367-4 => P19367
-                    if '-' in protein_id:
-                        protein_id = protein_id.split('-')[0]
-
-                    to_json = {
-                        '_from': 'coding_variants/' + key,
-                        '_to': 'proteins/' + protein_id,
-                        'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
-                        'name': 'variant of',
-                        'inverse_name': 'has variant',
-                        'source': 'dbNSFP 5.1a',
-                        'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 else:
                     ref = data(4)
