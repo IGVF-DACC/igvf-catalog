@@ -224,7 +224,7 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
     biosample_term_key = 'CL_0000679'
-    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_plus_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
@@ -656,7 +656,7 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, labe
                return_value={spdi} if label == 'variant_biosample' else set()) as check, \
             patch('adapters.mpra_adapter.load_variant', return_value=(variant, None)) as load:
         adapter = MPRAAdapter(
-            filepath=str(effects), label=label, writer=writer, validate=True,
+            filepath=str(effects), label=label, writer=writer, validate=True, organism='MOUSE',
             source_url='https://data.igvf.org/tabular-files/IGVFFI2111LQGF/',
             reference_filepath=str(design),
             reference_source_url='https://data.igvf.org/tabular-files/IGVFFI4261NSQZ/',
@@ -675,7 +675,7 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, labe
         elif label == 'variant_biosample':
             assert record['_from'] == f'mm_variants/{spdi}'
             assert record['genomic_element'] == f'mm_genomic_elements/{element_key}'
-            assert record['_key'] == f'{spdi}_{element_key}_CL_0000679_IGVFFI2111LQGF'
+            assert record['_key'] == f'{spdi}_{element_key}_plus_CL_0000679_IGVFFI2111LQGF'
         if label in ('variant', 'variant_biosample'):
             assert check.call_args.kwargs['collection'] == 'mm_variants'
             load.assert_called_once_with(spdi, assembly='GRCm39')
@@ -741,3 +741,15 @@ def test_mouse_satmut_maps_changed_bases_to_named_reference_tile(tmp_path, mock_
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0])['_from'].startswith(
         'mm_genomic_elements/MPRA_chr1_10_20_GRCm39_')
+
+
+@pytest.mark.parametrize('organism', ['HUMAN', 'mouse', 'mm_'])
+def test_mouse_mpra_rejects_inconsistent_organism(tmp_path, organism):
+    design = tmp_path / 'design.tsv'
+    design.write_text('ref\nGRCm39\n')
+    with pytest.raises(ValueError, match='Organism must be MOUSE'):
+        MPRAAdapter(
+            filepath='unused.bed', label='genomic_element',
+            source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
+            reference_filepath=str(design), organism=organism,
+        )
