@@ -415,16 +415,20 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
 
 
 @pytest.mark.parametrize('assay_title', ['Multiome Perturb-seq', 'in vivo Perturb-seq'])
-def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq(assay_title):
+@pytest.mark.parametrize('accession, expected_method', [
+    ('IGVFFI0000MULT', 'Perturb-seq'),
+    ('IGVFFI2419ZSGC', 'Multiome Perturb-seq'),
+])
+def test_query_fileset_files_props_igvf_multiome_method_override(assay_title, accession, expected_method):
     file_object = {
-        '@id': '/tabular-files/IGVFFI0000MULT/',
-        'accession': 'IGVFFI0000MULT',
+        '@id': f'/tabular-files/{accession}/',
+        'accession': accession,
         'catalog_class': 'observed data',
         'catalog_collections': ['genomic_elements'],
         'file_set': {
             '@id': '/analysis-sets/IGVFDS0000MULT/'
         },
-        'href': '/tabular-files/IGVFFI0000MULT/@@download/IGVFFI0000MULT.tsv.gz'
+        'href': f'/tabular-files/{accession}/@@download/{accession}.tsv.gz'
     }
     fileset_object = {
         'accession': 'IGVFDS0000MULT',
@@ -457,7 +461,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
                         props, _, _ = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
     assert props['preferred_assay_titles'] == [assay_title]
-    assert props['method'] == 'Perturb-seq'
+    assert props['method'] == expected_method
     assert props['software'] == ['SciPy']
 
 

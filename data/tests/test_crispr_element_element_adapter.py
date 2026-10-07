@@ -15,7 +15,7 @@ def parse(label, filepath=SAMPLE):
     with patch(f'{MODULE}.GeneValidator') as validator, patch(f'{MODULE}.get_file_fileset_by_accession_in_arangodb') as metadata:
         validator.return_value.validate.return_value = True
         metadata.return_value = {
-            'method': 'Perturb-seq', 'class': 'observed data',
+            'method': 'Multiome Perturb-seq', 'class': 'observed data',
             'crispr_modality': 'interference',
             'simple_sample_summaries': ['hTERT RPE-1 cell'],
             'samples': ['ontology_terms/CLO_0004290'],

@@ -792,6 +792,10 @@ class FileFileSet:
                 'Variant-EFFECTS',
             }):
                 method = 'CRISPR screen'
+        # Only the accessibility file uses this method; the companion expression
+        # file shares the assay title but retains the Perturb-seq method.
+        if file_object['accession'] == 'IGVFFI2419ZSGC':
+            method = 'Multiome Perturb-seq'
         if file_object['accession'] == 'IGVFFI8753TTYC':
             method = 'candidate Cis-Regulatory Elements'
 
