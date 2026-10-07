@@ -27,7 +27,7 @@
           "type": "string",
           "description": "Annotation of the element supplied by the source.",
           "enum": [
-            "enhancer"
+            "candidate enhancer"
           ],
           "enum_descriptions": {
             "enhancer": "An element annotated as potentially regulating transcription from a promoter."

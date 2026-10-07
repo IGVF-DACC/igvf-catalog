@@ -301,7 +301,7 @@
       "readout_gene": "TargetGeneID",
       "source_annotation": "type",
       "source_annotation_map": {
-        "putative_enhancer": "enhancer",
+        "putative_enhancer": "candidate enhancer",
         "CCND1_TSS": "promoter",
         "KITLG_TSS": "promoter",
         "SSFA2_TSS": "promoter",
@@ -374,7 +374,7 @@
       "readout_gene": "TargetGeneID",
       "source_annotation": "type",
       "source_annotation_map": {
-        "putative_enhancer": "enhancer",
+        "putative_enhancer": "candidate enhancer",
         "TSS": "promoter"
       },
       "metrics": {
@@ -702,7 +702,7 @@
     "IGVFFI6296RCJK": {
       "layout": "mechanoenhancer",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
       "skip_rows": [
         {
@@ -748,7 +748,7 @@
       "layout": "scaled_screen",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI0830FXFI": {
@@ -791,14 +791,14 @@
       "layout": "crudo_tap_seq",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI7280ZZFA": {
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ],
       "skip_rows": [
         {
@@ -813,137 +813,137 @@
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI7810AFPF": {
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI3340LKKZ": {
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI6120DUWX": {
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI7675NPYB": {
       "layout": "crudo_flowfish",
       "targeted_element_types": [
         "promoter",
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI8719HCYX": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI4404SMPQ": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI1068KEUM": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI9298BISV": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI9134FSCT": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI0629LUWT": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI6843QWSB": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI5749FOUE": {
       "layout": "teloHAEC_flowfish",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
-      "skip_rows": [
-        {
-          "intended_target_name": "chr7:150993445-150994053",
-          "notes": "Mislabeled as enhancer in data file; this is actually a TSS/promoter."
+      "promoter_overrides": {
+        "chr7:150993445-150994053": {
+          "gene_id": "ENSG00000164867",
+          "notes": "Mislabeled as enhancer in the source file; retain as the NOS3 promoter."
         }
-      ]
+      }
     },
     "IGVFFI6600VCYY": {
       "layout": "tap_seq_sceptre_power_XX",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI7195XKBC": {
       "layout": "tap_seq_sceptre_power_XX",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI9246AJEK": {
       "layout": "tap_seq_sceptre_power_XX",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI3434YAPX": {
       "layout": "tap_seq_sceptre_power_XX",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI1168JUYR": {
       "layout": "tap_seq_sceptre_power_XX",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI4773CPYN": {
@@ -1086,45 +1086,45 @@
     "IGVFFI4396TZAN": {
       "layout": "crispr_surf",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
       "readout_gene": "ENSG00000198846"
     },
     "IGVFFI6649RDHW": {
       "layout": "bulk_mechanoenhancer",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ],
       "readout_gene": "ENSG00000100345"
     },
     "IGVFFI9490RJAU": {
       "layout": "fractel",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI4427JNUK": {
       "layout": "fractel",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI4766SRSA": {
       "layout": "fractel",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI1600ZEPT": {
       "layout": "fractel",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI4093WUVB": {
       "layout": "fractel",
       "targeted_element_types": [
-        "enhancer"
+        "candidate enhancer"
       ]
     },
     "IGVFFI7368COWA": {

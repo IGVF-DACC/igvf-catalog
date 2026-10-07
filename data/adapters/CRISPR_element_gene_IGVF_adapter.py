@@ -172,7 +172,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 source_annotation_raw,
                 source_annotation_map.get(source_annotation_raw.lower()),
             )
-        return source_annotation_raw.lower()
+        return ('candidate enhancer' if source_annotation_raw.lower() == 'enhancer'
+                else source_annotation_raw.lower())
 
     def _skip_column_value_matches(
         self,
@@ -216,11 +217,11 @@ class CRISPRElementGeneIGVF(BaseAdapter):
 
     @staticmethod
     def _non_promoter_source_annotation(targeted_element_types: list) -> str:
-        """Label used for non-promoter elements (enhancer, distal element, etc.)."""
+        """Label used for non-promoter elements (candidate enhancer, distal element, etc.)."""
         for annotation in targeted_element_types:
             if annotation != 'promoter':
                 return annotation
-        return 'enhancer'
+        return 'candidate enhancer'
 
     def _promoter_gene_and_source_annotation(
         self,
@@ -279,7 +280,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             colmap,
             missing_column_error='missing source annotation column.',
         )
-        if source_annotation in {'enhancer', 'distal element'}:
+        if source_annotation in {'candidate enhancer', 'distal element'}:
             return None, source_annotation
         if source_annotation != 'promoter':
             source_idx = colmap['source_annotation']
@@ -696,8 +697,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 'missing genomic_element column for scaled screen.'
             ),
         )
-        if source_annotation == 'enhancer':
-            return None, 'enhancer'
+        if source_annotation == 'candidate enhancer':
+            return None, 'candidate enhancer'
         if source_annotation != 'promoter':
             source_idx = colmap['source_annotation']
             self._row_load_error(
@@ -784,10 +785,20 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         colmap: Dict[str, Optional[int]],
         *,
         is_scaled_screen: bool,
+        target_interval: str,
         intended_target_name: str,
         intended_target_gene_raw: str,
         readout_gene: str,
     ) -> Tuple[Optional[str], str]:
+        override = self.file_config.get('promoter_overrides', {}).get(
+            target_interval)
+        if override is not None:
+            promoter_gene = self._normalize_ensembl_gene_id(
+                override['gene_id'])
+            if not self._is_ensembl_gene_id(promoter_gene) or not self.gene_validator.validate(promoter_gene):
+                self._row_load_error(
+                    f'invalid promoter override gene {promoter_gene!r}.')
+            return promoter_gene, 'promoter'
         if is_scaled_screen:
             return self._scaled_screen_promoter_gene_and_source_annotation(
                 row,
@@ -831,7 +842,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         if not self.file_config:
             self.logger.warning(
                 'No CRISPR E2G file config for accession %s; '
-                'using promoter/enhancer per-row heuristic. Add this file under '
+                'using promoter/candidate enhancer per-row heuristic. Add this file under '
                 '"files" in crispr_element_gene_igvf_definitions.json.',
                 self.file_accession,
             )
@@ -848,7 +859,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             self.layout = layout
         targeted_element_types = self.file_config.get('targeted_element_types')
         if not targeted_element_types:
-            targeted_element_types = ['promoter', 'enhancer']
+            targeted_element_types = ['promoter', 'candidate enhancer']
         self.targeted_element_types = targeted_element_types
 
     def _get_schema_type(self):
@@ -949,6 +960,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         row,
                         colmap,
                         is_scaled_screen=is_scaled_screen,
+                        target_interval=f'{intended_target_chr}:{intended_target_start}-{intended_target_end}',
                         intended_target_name=intended_target_name,
                         intended_target_gene_raw=intended_target_gene_raw,
                         readout_gene=readout_gene,

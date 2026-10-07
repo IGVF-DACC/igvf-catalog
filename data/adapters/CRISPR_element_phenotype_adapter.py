@@ -153,7 +153,7 @@ class CRISPRElementPhenotype(BaseAdapter):
                 'end': end,
                 'method': self.method,
                 'type': 'tested elements',
-                'source_annotation': 'enhancer',
+                'source_annotation': 'candidate enhancer',
                 'source': self.SOURCE,
                 'source_url': self.source_url,
                 'files_filesets': f'files_filesets/{self.file_accession}',

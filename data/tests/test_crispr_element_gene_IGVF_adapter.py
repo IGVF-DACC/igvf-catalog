@@ -167,7 +167,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_enhancer_only_genomic_elem
     assert len(parsed) == 1
     first_item = parsed[0]
     assert first_item['_key'] == 'CRISPR_chr22_36387779_36388133_GRCh38_IGVFFI6296RCJK'
-    assert first_item['source_annotation'] == 'enhancer'
+    assert first_item['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in first_item
 
 
@@ -319,7 +319,7 @@ def test_crispr_element_gene_igvf_adapter_tap_seq_direct_targeting_genomic_eleme
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     assert len(parsed) == 1
     first_item = parsed[0]
-    assert first_item['source_annotation'] == 'enhancer'
+    assert first_item['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in first_item
 
 
@@ -414,7 +414,7 @@ def test_igvf_e2g_teloHAEC_flowfish_enhancer_edge_uses_intended_target_name_inte
         ).process_file()
 
     node = json.loads(writer2.contents[0])
-    assert node['source_annotation'] == 'enhancer'
+    assert node['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in node
     assert node['chr'] == 'chr1'
     assert node['start'] == 1000
@@ -594,7 +594,7 @@ def test_igvf_e2g_scaled_screen_uses_genomic_element_for_source_annotation(
     parsed = [json.loads(item) for item in writer.contents if item.strip()]
     enhancer = next(item for item in parsed if item['chr'] == 'chr10')
     promoter = next(item for item in parsed if item['chr'] == 'chr9')
-    assert enhancer['source_annotation'] == 'enhancer'
+    assert enhancer['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in enhancer
     assert promoter['source_annotation'] == 'promoter'
     assert promoter['promoter_of'] == 'genes/ENSG00000097007'
@@ -685,7 +685,7 @@ def test_igvf_e2g_wtc11_uses_genomic_element_for_source_annotation(
     enhancer = next(item for item in parsed if item['chr'] == 'chr1')
     assert promoter['source_annotation'] == 'promoter'
     assert promoter['promoter_of'] == 'genes/ENSG00000151650'
-    assert enhancer['source_annotation'] == 'enhancer'
+    assert enhancer['source_annotation'] == 'candidate enhancer'
     assert 'promoter_of' not in enhancer
 
 
@@ -1718,3 +1718,49 @@ def test_mouse_in_vivo_perturb_seq(mock_file_fileset_perturb_seq, tmp_path, labe
         assert doc['p_value'] == 1e-250
         assert doc['p_value_adj'] == 5.5685e-246
         assert doc['significant'] is True
+
+
+@pytest.mark.parametrize('accession', [
+    'IGVFFI9134FSCT', 'IGVFFI0629LUWT', 'IGVFFI6843QWSB', 'IGVFFI5749FOUE',
+])
+def test_flowfish_promoter_override_retains_nodes_and_edges(
+        accession, mock_file_fileset_facs_screen, tmp_path):
+    test_file = tmp_path / 'flowfish.csv.gz'
+    with gzip.open(test_file, 'wt', encoding='utf-8-sig') as out:
+        out.write(
+            'intended_target_name,targeting_chr,targeting_start,targeting_end,'
+            'type,gene_id,log2_fc,p_value,adj_p_value\n'
+            'chr7:150992690-150993190,chr7,150992690,150993190,enhancer,'
+            'ENSG00000164867,-0.5,0.01,0.02\n'
+            'chr7:150993445-150994053,chr7,150993445,150994053,enhancer,'
+            'ENSG00000164867,-1.768807043,1.64e-17,1.72e-16\n'
+        )
+    outputs = {}
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as validator:
+        validator.return_value.validate.return_value = True
+        for label in ['genomic_element', 'genomic_element_gene']:
+            writer = SpyWriter()
+            CRISPRElementGeneIGVF(
+                filepath=str(test_file),
+                source_url=f'https://data.igvf.org/tabular-files/{accession}/',
+                label=label, writer=writer, validate=True,
+            ).process_file()
+            outputs[label] = [json.loads(line)
+                              for line in writer.contents if line.strip()]
+    nodes = outputs['genomic_element']
+    edges = outputs['genomic_element_gene']
+    assert len(nodes) == len(edges) == 2
+    enhancer, promoter = nodes
+    assert enhancer['source_annotation'] == 'candidate enhancer'
+    assert 'promoter_of' not in enhancer
+    key = f'CRISPR_chr7_150993445_150994053_GRCh38_{accession}'
+    assert promoter['_key'] == key
+    assert promoter['source_annotation'] == 'promoter'
+    assert promoter['promoter_of'] == 'genes/ENSG00000164867'
+    edge = next(e for e in edges if e['_from'] == f'genomic_elements/{key}')
+    assert edge[
+        '_key'] == f'CRISPR_chr7_150993445_150994053_GRCh38_ENSG00000164867_{accession}'
+    assert edge['_to'] == 'genes/ENSG00000164867'
+    assert edge['log2FC'] == -1.768807043
+    assert edge['p_value'] == 1.64e-17
+    assert edge['p_value_adj'] == 1.72e-16

@@ -22,7 +22,7 @@
           "type": "string",
           "description": "Annotation of the element supplied by the source.",
           "enum": [
-            "enhancer",
+            "candidate enhancer",
             "negative control"
           ],
           "enum_descriptions": {

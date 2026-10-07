@@ -35,7 +35,7 @@
           "description": "Annotation of the element supplied by the source.",
           "example": "promoter",
           "enum": [
-            "enhancer",
+            "candidate enhancer",
             "promoter",
             "distal element"
           ],
