@@ -225,6 +225,5 @@
     "filter_by_range": "start, end",
     "return": "_id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, MANE_Select, source, version, source_url, organism, refseq_transcript_ids"
   },
-  "db_collection_name": "transcripts",
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in genes_transcripts.Gencode.json; presence of an entity does not imply a significant association."
+  "db_collection_name": "transcripts"
 }

@@ -53,6 +53,5 @@
   "accessible_via": {
     "return": "_id, name, pmid, study_type, source, source_url, files_filesets"
   },
-  "db_collection_name": "studies",
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in variants_genes.EQTLCatalog.json; presence of an entity does not imply a significant association."
+  "db_collection_name": "studies"
 }

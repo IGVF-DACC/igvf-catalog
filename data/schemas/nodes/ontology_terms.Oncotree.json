@@ -56,6 +56,5 @@
       ],
       "additionalProperties": false
     }
-  ],
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in ontology_terms_ontology_terms.Oncotree.json; presence of an entity does not imply a significant association."
+  ]
 }

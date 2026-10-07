@@ -47,6 +47,5 @@
       }
     }
   ],
-  "db_collection_name": "motifs",
-  "threshold": "No motif-match significance cutoff is applied: this collection stores HOCOMOCO matrices, not scored sequence matches. Motif-scanning recommendations such as a per-motif p-value cutoff do not filter these records."
+  "db_collection_name": "motifs"
 }

@@ -107,8 +107,7 @@
             "number",
             "null"
           ],
-          "description": "SIFT score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this protein.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "SIFT score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this protein."
         },
         "SIFT4G_score": {
           "title": "SIFT4G Score",
@@ -116,8 +115,7 @@
             "number",
             "null"
           ],
-          "description": "SIFT 4G score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this transcript.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "SIFT 4G score from 0 to 1. Smaller values are more likely damaging. Null when dbNSFP has no score for this transcript."
         },
         "Polyphen2_HDIV_score": {
           "title": "PolyPhen-2 HumDiv Score",
@@ -125,8 +123,7 @@
             "number",
             "null"
           ],
-          "description": "PolyPhen-2 HumDiv probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "PolyPhen-2 HumDiv probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "Polyphen2_HVAR_score": {
           "title": "PolyPhen-2 HumVar Score",
@@ -134,8 +131,7 @@
             "number",
             "null"
           ],
-          "description": "PolyPhen-2 HumVar probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "PolyPhen-2 HumVar probability from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "VEST4_score": {
           "title": "VEST4 Score",
@@ -143,8 +139,7 @@
             "number",
             "null"
           ],
-          "description": "VEST 4.0 score from 0 to 1. Larger values are more likely to cause a functional change. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "VEST 4.0 score from 0 to 1. Larger values are more likely to cause a functional change. Null when dbNSFP has no score."
         },
         "REVEL_score": {
           "title": "REVEL Score",
@@ -152,8 +147,7 @@
             "number",
             "null"
           ],
-          "description": "REVEL ensemble pathogenicity score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "REVEL ensemble pathogenicity score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "MutPred_score": {
           "title": "MutPred Score",
@@ -161,8 +155,7 @@
             "number",
             "null"
           ],
-          "description": "MutPred score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "MutPred score from 0 to 1. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "BayesDel_addAF_score": {
           "title": "BayesDel Score with Allele Frequency",
@@ -170,8 +163,7 @@
             "number",
             "null"
           ],
-          "description": "BayesDel meta-score with maximum allele frequency included. Higher values are more likely pathogenic. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "BayesDel meta-score with maximum allele frequency included. Higher values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "BayesDel_noAF_score": {
           "title": "BayesDel Score Without Allele Frequency",
@@ -179,8 +171,7 @@
             "number",
             "null"
           ],
-          "description": "BayesDel meta-score without maximum allele frequency. Higher values are more likely pathogenic. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "BayesDel meta-score without maximum allele frequency. Higher values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_R_score": {
           "title": "VARITY Rare Variant Score",
@@ -188,8 +179,7 @@
             "number",
             "null"
           ],
-          "description": "VARITY_R pathogenicity score for rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "VARITY_R pathogenicity score for rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_ER_score": {
           "title": "VARITY Extremely Rare Variant Score",
@@ -197,8 +187,7 @@
             "number",
             "null"
           ],
-          "description": "VARITY_ER pathogenicity score for extremely rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "VARITY_ER pathogenicity score for extremely rare missense variants, from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "VARITY_R_LOO_score": {
           "title": "VARITY Rare Variant Leave-One-Out Score",
@@ -206,8 +195,7 @@
             "number",
             "null"
           ],
-          "description": "VARITY_R score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "VARITY_R score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score."
         },
         "VARITY_ER_LOO_score": {
           "title": "VARITY Extremely Rare Variant Leave-One-Out Score",
@@ -215,8 +203,7 @@
             "number",
             "null"
           ],
-          "description": "VARITY_ER score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "VARITY_ER score with leave-one-variant-out scoring of training variants, from 0 to 1. Null when dbNSFP has no score."
         },
         "ESM1b_score": {
           "title": "ESM1b Score",
@@ -224,8 +211,7 @@
             "number",
             "null"
           ],
-          "description": "ESM1b log-likelihood ratio. Smaller (more negative) values are more likely pathogenic. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "ESM1b log-likelihood ratio. Smaller (more negative) values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "AlphaMissense_score": {
           "title": "AlphaMissense Score",
@@ -233,8 +219,7 @@
             "number",
             "null"
           ],
-          "description": "AlphaMissense pathogenicity score from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "AlphaMissense pathogenicity score from 0 to 1. Larger values are more likely pathogenic. Null when dbNSFP has no score."
         },
         "CADD_raw_score": {
           "title": "CADD Raw Score",
@@ -242,8 +227,7 @@
             "number",
             "null"
           ],
-          "description": "CADD raw score. Larger values are more likely damaging. Null when dbNSFP has no score.",
-          "threshold": "No cutoff is applied to this predictor by the dbNSFP adapter. An upstream decision threshold is not specified here; interpretation must use this predictor and version rather than a shared pathogenicity cutoff."
+          "description": "CADD raw score. Larger values are more likely damaging. Null when dbNSFP has no score."
         },
         "source": {
           "enum": [
@@ -292,6 +276,5 @@
     "filter_by_range": "aapos",
     "return": "_id, name, ref, alt, protein_name, protein_id, gene_name, transcript_id, aapos, hgvsp, hgvsc, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, AlphaMissense_score, CADD_raw_score, source, source_url"
   },
-  "db_collection_name": "coding_variants",
-  "threshold": "The adapter preserves available predictor scores without applying a pathogenicity or statistical significance cutoff. Decision thresholds depend on the predictor and version; there is no common cutoff across these fields."
+  "db_collection_name": "coding_variants"
 }

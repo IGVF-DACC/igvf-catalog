@@ -64,6 +64,5 @@
   "accessible_via": {
     "return": "_id, name, drug_ontology_terms, source, source_url, class, method, files_filesets"
   },
-  "db_collection_name": "drugs",
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in variants_drugs_genes.PharmGKB.json, variants_drugs.PharmGKB.json; presence of an entity does not imply a significant association."
+  "db_collection_name": "drugs"
 }

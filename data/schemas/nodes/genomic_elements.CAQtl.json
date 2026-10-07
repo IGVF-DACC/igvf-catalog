@@ -46,6 +46,5 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "genomic_elements",
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in variants_genomic_elements.CAQtl.json; presence of an entity does not imply a significant association."
+  "db_collection_name": "genomic_elements"
 }
