@@ -117,6 +117,7 @@ class MPRAAdapter(BaseAdapter):
         writer: Optional[Writer] = None,
         reference_filepath: Optional[str] = None,
         validate=False,
+        organism=None,
         **kwargs
     ):
         self.file_accession = get_file_accession(filepath)
@@ -148,6 +149,10 @@ class MPRAAdapter(BaseAdapter):
             )
 
         self.assembly = self._read_design_assembly(reference_filepath)
+        expected_organism = 'MOUSE' if self.assembly == 'GRCm39' else 'HUMAN'
+        if organism is not None and organism != expected_organism:
+            raise ValueError(
+                f'Organism must be {expected_organism} for MPRA design assembly {self.assembly}; got {organism!r}')
         prefix = 'mm_' if self.assembly == 'GRCm39' else ''
         self.element_collection = f'{prefix}genomic_elements'
         self.variant_collection = f'{prefix}variants'
@@ -777,6 +782,7 @@ class MPRAAdapter(BaseAdapter):
                 edge_key = '_'.join([
                     variant_id,
                     element_id,
+                    self.strand_token(element_strand),
                     biosample_term_key,
                     self.file_accession,
                 ])
