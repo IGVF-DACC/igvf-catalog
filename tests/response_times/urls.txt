@@ -110,13 +110,13 @@ https://api.catalogkg.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG0000
 https://api.catalogkg.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000196584&verbose=true&page=0
 https://api.catalogkg.igvf.org/api/coding-variants/phenotypes-count?gene_id=ENSG00000165841
 https://api.catalogkg.igvf.org/api/variants/phenotypes/score-summary?variant_id=NC_000018.10%3A31546002%3ACA%3AGT
-https://api.catalogkg.igvf.org/api/variants/genes?method=Variant-EFFECTS
+https://api.catalogkg.igvf.org/api/variants/genes?method=CRISPR%20screen
 https://api.catalogkg.igvf.org/api/variants/proteins?method=SEMVAR
 https://api.catalogkg.igvf.org/api/variants/phenotypes?method=cV2F
 https://api.catalogkg.igvf.org/api/variants/biosamples?method=STARR-seq
 https://api.catalogkg.igvf.org/api/variants/genomic-elements?method=caQTL
 https://api.catalogkg.igvf.org/api/coding-variants/phenotypes?method=VAMP-seq
-https://api.catalogkg.igvf.org/api/genes/variants?method=Variant-EFFECTS
+https://api.catalogkg.igvf.org/api/genes/variants?method=CRISPR%20screen
 https://api.catalogkg.igvf.org/api/genes/genomic-elements?method=ENCODE-rE2G
 https://api.catalogkg.igvf.org/api/proteins/variants?method=SEMVAR
 https://api.catalogkg.igvf.org/api/genomic-elements?method=ENCODE-rE2G
@@ -126,7 +126,8 @@ https://api.catalogkg.igvf.org/api/genomic-elements/biosamples?method=MPRA
 https://api.catalogkg.igvf.org/api/phenotypes/variants?method=cV2F
 https://api.catalogkg.igvf.org/api/phenotypes/coding-variants?method=VAMP-seq
 https://api.catalogkg.igvf.org/api/files-filesets?method=Variant-EFFECTS
-https://api.catalogkg.igvf.org/api/biosamples/variants?biosample_id=EFO_0002067&method=STARR-seq&page=0
+https://api.catalogkg.igvf.org/api/files-filesets?method=CRISPR%20screen
+https://api.catalogkg.igvf.org/api/biosamples/variants?method=STARR-seq
 https://api.catalogkg.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000186092&page=0&limit=8&method=MutPred2
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?neg_log10_pvalue_adj=gte%3A1&regulator_gene_id=ENSG00000152284&page=0
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?response_gene_id=ENSG00000152284&page=0

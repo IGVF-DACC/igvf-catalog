@@ -39,7 +39,8 @@ const elementOutputFormat = z.object({
   chr: z.string().nullish(),
   start: z.number().nullish(),
   end: z.number().nullish(),
-  name: z.string()
+  name: z.string(),
+  source_annotation: z.string().nullish()
 })
 
 const phenotypeOutputFormat = z.object({
@@ -47,7 +48,7 @@ const phenotypeOutputFormat = z.object({
   phenotype_name: z.string().nullish()
 })
 
-const outputFormat = z.array(z.object({
+export const outputFormat = z.array(z.object({
   name: z.string(),
   label: z.string(),
   method: z.string(),

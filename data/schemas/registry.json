@@ -43,6 +43,7 @@
             "GencodeStructure": "schemas/nodes/mm_genes_structure.GencodeStructure.json"
         },
         "mm_genomic_elements": {
+            "CRISPRElementGeneIGVF": "schemas/nodes/mm_genomic_elements.CRISPRElementGeneIGVF.json",
             "CCRE": "schemas/nodes/mm_genomic_elements.CCRE.json",
             "HumanMouseElementAdapter": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json"
         },
@@ -78,6 +79,7 @@
         },
         "variants": {
             "Favor": "schemas/nodes/variants.Favor.json",
+            "ASB": "schemas/nodes/variants.ASB.json",
             "cV2F": "schemas/nodes/variants.cV2F.json",
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
             "MPRAAdapter": "schemas/nodes/variants.MPRAAdapter.json",
@@ -99,9 +101,6 @@
             "SGE": "schemas/edges/coding_variants_phenotypes.SGE.json",
             "DUALIPAAdapter": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
             "VariantPaintingAdapter": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json"
-        },
-        "coding_variants_proteins": {
-            "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
         },
         "complexes_proteins": {
             "EBIComplex": "schemas/edges/complexes_proteins.EBIComplex.json",
@@ -147,6 +146,9 @@
         },
         "genomic_elements_mm_genomic_elements": {
             "HumanMouseElementAdapter": "schemas/edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json"
+        },
+        "mm_genomic_elements_mm_genes": {
+            "CRISPRElementGeneIGVF": "schemas/edges/mm_genomic_elements_mm_genes.CRISPRElementGeneIGVF.json"
         },
         "mm_genes_mm_genes": {
             "GeneGeneBiogrid": "schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json"
@@ -221,8 +223,9 @@
         },
         "variants_variants": {
             "TopLD": "schemas/edges/variants_variants.TopLD.json"
+        },
+        "genes_transcripts_genes": {
+            "MORFGeneTranscriptGene": "schemas/edges/genes_transcripts_genes.MORFGeneTranscriptGene.json"
         }
-
     }
-
 }

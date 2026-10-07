@@ -1,3 +1,4 @@
+import gzip
 import json
 from typing import Optional
 
@@ -26,7 +27,8 @@ class Gencode(BaseAdapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
              'coord_end': 4, 'strand': 6, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, validate=False, reference_filepath=None, **kwargs):
+        self.reference_filepath = reference_filepath
         self.organism = organism
         self.transcript_endpoint = 'transcripts/'
         self.gene_endpoint = 'genes/'
@@ -80,7 +82,26 @@ class Gencode(BaseAdapter):
                 mapping_line = row.strip().split('\t')
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
+    def load_refseq_mapping(self):
+        mapping = {}
+        if not self.reference_filepath:
+            raise ValueError(
+                'reference_filepath is required for human transcripts '
+                '(GENCODE RefSeq mapping, IGVFFI9820RGXX).')
+        opener = gzip.open if str(
+            self.reference_filepath).endswith('.gz') else open
+        with opener(self.reference_filepath, 'rt') as metadata:
+            for line in metadata:
+                transcript_id, refseq_id, *_ = line.rstrip().split('\t')
+                # The optional third column contains a RefSeq protein accession.
+                mapping.setdefault(transcript_id, set()).add(refseq_id)
+        return {transcript: sorted(refseq_ids)
+                for transcript, refseq_ids in mapping.items()}
+
     def parse(self):
+        refseq_mapping = (self.load_refseq_mapping()
+                          if self.label == 'gencode_transcript' and self.organism == 'HUMAN'
+                          else {})
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -130,6 +151,8 @@ class Gencode(BaseAdapter):
                 }
                 if self.label == 'gencode_transcript':
                     props['MANE_Select'] = info['MANE_Select']
+                    props['refseq_transcript_ids'] = refseq_mapping.get(
+                        info['transcript_id'], [])
                 if self.validate:
                     self.validate_doc(props)
                 self.writer.write(json.dumps(props))

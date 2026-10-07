@@ -4,11 +4,13 @@
   "type": "object",
   "properties": {
     "tf_name": {
+      "title": "Transcription Factor Name",
       "type": "string",
       "description": "Name of the transcription factor whose binding preference the motif describes.",
       "example": "ATF1_HUMAN"
     },
     "pwm": {
+      "title": "Position Weight Matrix",
       "type": "array",
       "description": "Position weight matrix for the motif: an N-by-4 matrix with one row per motif position and one score per nucleotide.",
       "items": {
@@ -19,6 +21,7 @@
       }
     },
     "length": {
+      "title": "Length",
       "type": "number",
       "description": "Number of positions in the motif, equal to the number of rows in pwm."
     }

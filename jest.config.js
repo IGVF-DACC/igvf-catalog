@@ -24,7 +24,8 @@ module.exports = {
     '/coverage/',
     '/cdk_swagger/cdk.out/',
     '\\.d\\.ts$',
-    '\\.d\\.js$'
+    '\\.d\\.js$',
+    '/__tests__/integration/'
   ],
   modulePathIgnorePatterns: [
     '/dist/',

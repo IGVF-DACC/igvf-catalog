@@ -303,11 +303,6 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
-  let useIndex = ''
-  if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
-  }
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -321,7 +316,7 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantCollectionName} ${useIndex}
+    FOR record IN ${variantCollectionName}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
@@ -660,10 +655,12 @@ const variantSummary = publicProcedure
   .output(variantsSummaryFormat)
   .query(async ({ input }) => await variantSummarySearch(input))
 
+export const variantsAllelesFormat = z.array(z.array(z.string().or(z.number()).nullish()))
+
 const variantsAlleles = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles } })
   .input(variantsFromRegionsFormat)
-  .output(z.array(z.array(z.string().or(z.number()).nullish())))
+  .output(variantsAllelesFormat)
   .query(async ({ input }) => await variantsAllelesAggregation(input))
 
 export const variantsRouters = {

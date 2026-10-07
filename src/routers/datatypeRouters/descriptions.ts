@@ -110,6 +110,7 @@ export const descriptions = {
   Example: region = chr20:9537369-9839076, <br> \
   transcript_type = protein_coding, <br> \
   transcript_id = ENST00000443707 (Ensembl ids), <br> \
+  refseq_transcript_id = NM_177990.4, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -127,10 +128,11 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
     Example: gene_name = ATF3, <br> \
     hgnc_id = HGNC:28208, <br> \
     synonym = CKLF, <br> \
+    region = chr3:193593143-193697811, <br> \
     organism = Homo sapiens, <br> \
     gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -149,9 +151,10 @@ export const descriptions = {
 
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
   Example: gene_name = ATF3, <br> \
   synonym = CKLF, <br> \
+  region = chr3:193593143-193697811, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc_id = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -208,9 +211,34 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
+  genes_transcripts_genes: 'Retrieve MORF gene overexpression effects through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; readout_gene_id identifies the readout gene. Filter by a source gene, transcript, readout gene, morf_id, files_fileset, or method. Set verbose=true to expand gene and transcript nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+    {
+      id: 'morf-screen',
+      label: 'MORF screen',
+      examples: [
+        {
+          label: 'AATF transcript overexpression effect on TOX',
+          items: [
+            'gene_id = ENSG00000275700',
+            'transcript_id = ENST00000619387',
+            'readout_gene_id = ENSG00000198846',
+            'files_fileset = IGVFFI6734IWRB'
+          ]
+        },
+        {
+          label: 'All MORF effects on TOX',
+          items: [
+            'readout_gene_id = ENSG00000198846',
+            'method = MORF screen'
+          ]
+        }
+      ]
+    }
+  ]),
+
   genes_genes:
     'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
-    The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on z_score: gt (>), gte (>=), lt (<), lte (<=). z_score only exists on CoXPresdb edges; BioGRID edges do not have this field at all.<br> \
     At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -319,7 +347,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
@@ -378,14 +406,14 @@ export const descriptions = {
             items: [
               'spdi = NC_000010.11:79347741:AGGT:TCAG',
               'effect_size = lt:-0.6',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
               'region = chr10:79347740-79347749 (maximum length: 10kb)',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -423,7 +451,7 @@ export const descriptions = {
     ]),
 
   genes_variants:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by Ensembl gene ids.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens from IGVF, by Ensembl gene ids.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, synonym, method, or files_fileset. <br> \
@@ -483,14 +511,14 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000108179',
               'neg_log10_pvalue = gt:13.1',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
               'synonym = PPIF',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -1364,11 +1392,12 @@ export const descriptions = {
 
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
   Example: gene_id = ENSG00000183840, <br> \
   hgnc_id = HGNC:4496, <br> \
   gene_name = GPR39, <br> \
-  synonym = ZnR. <br> \
+  synonym = ZnR, <br> \
+  region = chr16:30114104-30123506. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -1886,6 +1915,7 @@ export const descriptions = {
 
   grn:
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
     crispr_modality accepts knockout, interference, or activation.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -1938,6 +1968,7 @@ export const descriptions = {
 
   genes_genomic_elements:
     'Retrieve genomic elements and gene pairs by querying genes.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     One of these fields is required: gene_id, hgnc_id, gene_name, synonym, method, or files_fileset. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -2058,6 +2089,7 @@ export const descriptions = {
 
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \

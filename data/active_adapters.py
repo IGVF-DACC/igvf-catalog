@@ -45,6 +45,7 @@ from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
 from adapters.CRISPR_variant_gene_adapter import CRISPRVariantGene
+from adapters.MORF_gene_transcript_gene_adapter import MORFGeneTranscriptGene
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
@@ -90,6 +91,7 @@ KEY_TO_ADAPTER = {
     'crispr_element_phenotype': CRISPRElementPhenotype,
     'crispr_variant_gene': CRISPRVariantGene,
     'crispr_variant_phenotype': CRISPRVariantPhenotype,
+    'morf_gene_transcript_gene': MORFGeneTranscriptGene,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,
@@ -128,7 +130,6 @@ KEY_TO_ADAPTER = {
     'mm_orthologs': MGIHumanMouseOrthologAdapter,
     'coding_variants': DbNSFP,
     'variants_coding_variants': DbNSFP,
-    'coding_variants_proteins': DbNSFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,

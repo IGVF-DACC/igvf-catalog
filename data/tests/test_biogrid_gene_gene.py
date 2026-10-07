@@ -23,7 +23,11 @@ def test_biogrid_gene_gene_adapter_gene_gene_biogrid(mock_file_fileset):
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 2
-    assert len(first_item) == 20
+    assert len(first_item) == 19
+    # z_score used to be a fake 0 written only to share a ZKD index with COXPRESdb; dropped
+    # since it made z_score range-filterable across BioGRID edges too, matching values that
+    # were never real.
+    assert 'z_score' not in first_item
     assert first_item['source'] == 'BioGRID'
     assert first_item['confidence_value_biogrid'] is None
     assert first_item['class'] == 'observed data'
@@ -40,7 +44,7 @@ def test_biogrid_gene_gene_adapter_mouse_gene_gene_biogrid(mock_file_fileset):
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 14
-    assert len(first_item) == 20
+    assert len(first_item) == 19
     assert first_item['source'] == 'BioGRID'
     assert first_item['class'] == 'observed data'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI1165YVBA'

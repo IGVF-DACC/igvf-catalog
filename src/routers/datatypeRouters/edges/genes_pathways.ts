@@ -12,7 +12,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const genesPathwaysFormat = z.object({
+export const genesPathwaysFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   orgnism: z.string().optional(),
@@ -34,7 +34,7 @@ const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.jso
 const pathwayCollectionName = pathwaySchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym', 'region'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -60,12 +60,13 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, region, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, region, organism, page: 0 }
 
   delete input.hgnc_id
   delete input.gene_name
   delete input.synonym
+  delete input.region
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)

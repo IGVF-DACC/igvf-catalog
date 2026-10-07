@@ -110,22 +110,17 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
   const codingVariantInput = pickCodingVariantFilters(input)
   const filters = getFilterStatements(codingVariantSchema, codingVariantInput)
   const query = `
-  LET codingVariants = (
-    FOR record IN ${codingVariantCollectionName}
-      FILTER ${filters}
-      SORT record.gene_name, record.aapos
-      RETURN record._id
-  )
+  FOR record IN ${codingVariantCollectionName}
+    FILTER ${filters}
+    FOR edge IN ${variantCodingVariantCollectionName}
+      FILTER edge._to == record._id
+      LET otherRecord = DOCUMENT(edge._from)
+      FILTER otherRecord != null
+      COLLECT variant = otherRecord
+      SORT variant._key
+      LIMIT ${input.page as number * limit}, ${limit}
 
-  FOR record IN ${variantCodingVariantCollectionName}
-    FILTER record._to IN codingVariants
-    LET otherRecord = DOCUMENT(record._from)
-    FILTER otherRecord != null
-    COLLECT variant = otherRecord
-    SORT variant._key
-    LIMIT ${input.page as number * limit}, ${limit}
-
-    RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}}
+      RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}}
 `
   return await (await db.query(query)).all()
 }

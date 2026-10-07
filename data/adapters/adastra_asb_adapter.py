@@ -7,7 +7,9 @@ from adapters.archive_utils import get_file_accession, get_files_from_folder
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
+    bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
+    load_variant,
 )
 from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
@@ -22,12 +24,13 @@ from adapters.writer import Writer
 
 class ASB(BaseAdapter):
     # 1-based coordinate system
-    ALLOWED_LABELS = ['asb']
+    ALLOWED_LABELS = ['asb', 'variants']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
+    MAX_LOG10_PVALUE = 400  # cap when fdrp_bh is 0 (same as AFGR/eQTL Catalog)
 
     def __init__(
         self,
@@ -40,14 +43,34 @@ class ASB(BaseAdapter):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
         self.file_accession = get_file_accession(filepath)
+        self.written_variant_keys = set()
 
     def _get_schema_type(self):
-        """This adapter creates edges."""
-        return 'edges'
+        """Return schema type based on label."""
+        return 'nodes' if self.label == 'variants' else 'edges'
 
     def _get_collection_name(self):
         """Get collection based on label."""
-        return 'variants_proteins'
+        return 'variants' if self.label == 'variants' else 'variants_proteins'
+
+    @staticmethod
+    def _compute_score(p_value_adj_ref, p_value_adj_alt):
+        """Directional ASB significance score.
+
+        Negative FDR-adjusted p-value when only the reference allele is
+        significant (< 0.05), positive when only the alternate allele is,
+        or None when both or neither are significant (no single direction
+        to report).
+        """
+        ref_significant = p_value_adj_ref < 0.05
+        alt_significant = p_value_adj_alt < 0.05
+        if ref_significant and alt_significant:
+            return None
+        if ref_significant:
+            return -p_value_adj_ref
+        if alt_significant:
+            return p_value_adj_alt
+        return None
 
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
@@ -82,7 +105,8 @@ class ASB(BaseAdapter):
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
-        self.protein_map = ProteinMap(organism='Homo sapiens')
+        if self.label == 'asb':
+            self.protein_map = ProteinMap(organism='Homo sapiens')
 
         for input_filepath in get_files_from_folder(self.filepath):
             filename = input_filepath.name
@@ -112,13 +136,49 @@ class ASB(BaseAdapter):
             with open(input_filepath, 'r') as asb:
                 asb_csv = csv.reader(asb, delimiter='\t')
                 next(asb_csv)
+
+                # ADASTRA variants are expected to already be loaded, e.g.
+                # from FAVOR/dbSNP. Missing-but-valid ones are only created
+                # via a separate run with label='variants' - the 'asb' pass
+                # only skips the edge, rather than emitting a dangling _from
+                # reference.
+                rows_by_variant_id = []
                 for row in asb_csv:
                     chr, pos, rsid, ref, alt = row[:5]
                     # some files have decimal '.0' in position column
                     pos = int(float(pos))
-                    variant_id = build_variant_id(
-                        chr, pos, ref, alt, 'GRCh38'
-                    )
+                    try:
+                        variant_id = build_variant_id(
+                            chr, pos, ref, alt, 'GRCh38'
+                        )
+                    except Exception as e:
+                        self.logger.warning(
+                            f'Skipping row - unable to build variant id (chr={chr}, pos={pos}, ref={ref}, alt={alt}): {e}')
+                        continue
+                    rows_by_variant_id.append((variant_id, row))
+
+                if not rows_by_variant_id:
+                    continue
+
+                loaded_variants = bulk_check_variants_in_arangodb(
+                    list({variant_id for variant_id,
+                         _ in rows_by_variant_id}),
+                    check_by='_key',
+                )
+
+                if self.label == 'variants':
+                    self.write_missing_variants(
+                        rows_by_variant_id, loaded_variants, cell_gtrd_id)
+                    continue
+
+                skipped_missing = 0
+
+                for variant_id, row in rows_by_variant_id:
+                    if variant_id not in loaded_variants:
+                        skipped_missing += 1
+                        continue
+                    chr, pos, rsid, ref, alt = row[:5]
+                    pos = int(float(pos))
 
                     ensembl_ids = self.protein_map.get(tf_uniprot_id)
                     if ensembl_ids is None:
@@ -135,15 +195,18 @@ class ASB(BaseAdapter):
 
                         p_value_adj_ref = float(row[13])  # fdrp_bh_ref
                         p_value_adj_alt = float(row[15])  # fdrp_bh_alt
-                        neg_log10_pvalue_adj_ref = float('inf')
+                        neg_log10_pvalue_adj_ref = ASB.MAX_LOG10_PVALUE
                         if p_value_adj_ref > 0:
-                            neg_log10_pvalue_adj_ref = - \
-                                1 * log10(p_value_adj_ref)
+                            neg_log10_pvalue_adj_ref = 0 - \
+                                log10(p_value_adj_ref)  # prevent -0.0 values
 
-                        neg_log10_pvalue_adj_alt = float('inf')
+                        neg_log10_pvalue_adj_alt = ASB.MAX_LOG10_PVALUE
                         if p_value_adj_alt > 0:
-                            neg_log10_pvalue_adj_alt = - \
-                                1 * log10(p_value_adj_alt)
+                            neg_log10_pvalue_adj_alt = 0 - \
+                                log10(p_value_adj_alt)
+
+                        score = ASB._compute_score(
+                            p_value_adj_ref, p_value_adj_alt)
 
                         props = {
                             '_key': _key,
@@ -162,6 +225,7 @@ class ASB(BaseAdapter):
                             'p_value_adj_alt': p_value_adj_alt,
                             'neg_log10_pvalue_adj_ref': neg_log10_pvalue_adj_ref,
                             'neg_log10_pvalue_adj_alt': neg_log10_pvalue_adj_alt,
+                            'score': score,
                             'biological_context': cell_gtrd_name,
                             'biosample_term': 'ontology_terms/' + cell_ontology_id,
                             'source': ASB.SOURCE,
@@ -181,4 +245,32 @@ class ASB(BaseAdapter):
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
 
-        self.protein_map.log(self.logger)
+                if skipped_missing:
+                    self.logger.warning(
+                        f'Skipped {skipped_missing} row(s) in {filename} - variant not found in variants collection')
+
+        if self.label == 'asb':
+            self.protein_map.log(self.logger)
+
+    def write_missing_variants(self, rows_by_variant_id, loaded_variants, cell_gtrd_id):
+        for variant_id, row in rows_by_variant_id:
+            if variant_id in loaded_variants or variant_id in self.written_variant_keys:
+                continue
+            self.written_variant_keys.add(variant_id)
+
+            chr, pos, rsid, ref, alt = row[:5]
+            pos = int(float(pos))
+            variant_props, skipped = load_variant(f'{chr}-{pos}-{ref}-{alt}')
+            if variant_props:
+                variant_props.update({
+                    'source': ASB.SOURCE,
+                    'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                })
+                if self.validate:
+                    self.validate_doc(variant_props)
+                self.writer.write(json.dumps(variant_props))
+                self.writer.write('\n')
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")

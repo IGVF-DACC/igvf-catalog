@@ -13,6 +13,7 @@
     "start": "node dist/src/index.js",
     "lint": "eslint --ext \".js,.ts\" --report-unused-disable-directives src",
     "build": "tsc",
+    "test:integration": "jest --config jest.integration.config.js",
     "test": "jest"
   },
   "repository": {

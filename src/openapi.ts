@@ -151,7 +151,7 @@ if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
     title: 'IGVF Catalog',
     description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
     version: '1.2.0',
-    docsUrl: 'https://api.catalog.igvf.org/openapi',
+    docsUrl: 'https://api.catalogkg.igvf.org/openapi',
     baseUrl,
     tags: [...OPENAPI_TAG_ORDER]
   }

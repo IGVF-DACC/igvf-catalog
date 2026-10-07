@@ -290,7 +290,7 @@ node	mm_variants.MouseGenomesProjectAdapter	filter	VCF FILTER for the site. PASS
 node	mm_variants.MouseGenomesProjectAdapter	fi	Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release.
 node	mm_variants.MouseGenomesProjectAdapter	name	Human readable display name for the entity
 node	mm_variants.MouseGenomesProjectAdapter	spdi	Normalized SPDI expression identifying the allele.
-node	mm_variants.MouseGenomesProjectAdapter	hgvs	Genomic HGVS notation derived from the SPDI.
+node	mm_variants.MouseGenomesProjectAdapter	hgvs	HGVS genomic expression for the allele.
 node	mm_variants.MouseGenomesProjectAdapter	source	The database, dataset or organization that is a source for these data.
 node	mm_variants.MouseGenomesProjectAdapter	source_url	The URL for the source.
 node	motifs.Motif	source	The database, dataset or organization that is a source for these data.
@@ -579,11 +579,6 @@ edge	coding_variants_phenotypes.VariantPaintingAdapter	label	Non-method specific
 edge	coding_variants_phenotypes.VariantPaintingAdapter	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
 edge	coding_variants_phenotypes.VariantPaintingAdapter	localization_score	XGBoost classifier score measuring the probability of protein mislocalization caused by the variant
 edge	coding_variants_phenotypes.VariantPaintingAdapter	mislocalization_hit	Whether the variant is classified as causing protein mislocalization based on the localization score threshold
-edge	coding_variants_proteins.DbNSFP	type	Whether the consequence is a protein-coding amino-acid change or a splice-site SNP (aapos = -1).
-edge	coding_variants_proteins.DbNSFP	name	Directional human readable label for the relationship, _from to _to.
-edge	coding_variants_proteins.DbNSFP	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
-edge	coding_variants_proteins.DbNSFP	source	The database, dataset or organization that is a source for these data.
-edge	coding_variants_proteins.DbNSFP	source_url	The URL for the source.
 edge	complexes_proteins.EBIComplex	name	Directional human readable label for the relationship, _from to _to.
 edge	complexes_proteins.EBIComplex	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
 edge	complexes_proteins.EBIComplex	stoichiometry	Number of copies of this protein in the complex. 0 means the stoichiometry is unknown.
