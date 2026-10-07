@@ -6,16 +6,18 @@ import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { getFilterStatements, preProcessRegionParam } from '../_helpers'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
+import { geneFormat } from '../nodes/genes'
 import { descriptions } from '../descriptions'
 
 const collection = 'genomic_elements_genomic_elements'
 const edgeSchema = getSchema('data/schemas/edges/genomic_elements_genomic_elements.CRISPRElementElement.json')
 const elementSchema = getSchema('data/schemas/nodes/genomic_elements.CRISPRElementElement.json')
 const textFilter = z.string().trim().min(1).optional()
-const inputFormat = commonHumanEdgeParamsFormat.extend({
+const inputFormat = z.object({
   perturbed_region: textFilter,
   accessible_region: textFilter,
   promoter_gene_id: textFilter,
+  promoter_gene_name: textFilter,
   files_fileset: textFilter,
   biosample_term: textFilter,
   biological_context: textFilter,
@@ -28,6 +30,7 @@ const inputFormat = commonHumanEdgeParamsFormat.extend({
   p_value_adj: textFilter,
   neg_log10_pvalue: textFilter,
   neg_log10_pvalue_adj: textFilter,
+  ...commonHumanEdgeParamsFormat.shape,
   page: z.number().int().nonnegative().default(0),
   limit: z.number().int().positive().optional()
 })
@@ -39,7 +42,7 @@ const elementFormat = z.object({
   end: z.number(),
   type: z.string().nullish(),
   source_annotation: z.string().nullish(),
-  promoter_of: z.string().nullish()
+  promoter_of: z.string().or(geneFormat).nullish()
 })
 const outputFormat = z.array(z.object({
   source_genomic_element: z.string().or(elementFormat),
@@ -71,8 +74,8 @@ const genomicElementsFromGenomicElements = publicProcedure
   .input(inputFormat)
   .output(outputFormat)
   .query(async ({ input }) => {
-    if (![input.perturbed_region, input.accessible_region, input.promoter_gene_id, input.files_fileset, input.method].some(value => value !== undefined)) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Define at least one perturbed_region, accessible_region, promoter_gene_id, files_fileset, or method.' })
+    if (![input.perturbed_region, input.accessible_region, input.promoter_gene_id, input.promoter_gene_name, input.files_fileset, input.method].some(value => value !== undefined)) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Define at least one perturbed_region, accessible_region, promoter_gene_id, promoter_gene_name, files_fileset, or method.' })
     }
     const filters: string[] = []
     const bindVars: Record<string, unknown> = {
@@ -104,6 +107,10 @@ const genomicElementsFromGenomicElements = publicProcedure
     if (metrics !== '') filters.push(metrics)
     // Region and promoter-gene filters act on the nodes, before edge pagination.
     const nodeQueries: string[] = []
+    if (input.promoter_gene_name !== undefined) {
+      nodeQueries.push('LET promoterGeneIDs = (FOR gene IN genes FILTER gene.name == @promoterGeneName RETURN gene._id)')
+      bindVars.promoterGeneName = input.promoter_gene_name
+    }
     for (const [side, region, endpoint] of [['source', input.perturbed_region, '_from'], ['target', input.accessible_region, '_to']] as const) {
       const nodeFilters: string[] = []
       if (region !== undefined) nodeFilters.push(getFilterStatements(elementSchema, preProcessRegionParam({ region })))
@@ -111,13 +118,16 @@ const genomicElementsFromGenomicElements = publicProcedure
         nodeFilters.push('record.promoter_of == @promoterGene')
         bindVars.promoterGene = handle('genes', input.promoter_gene_id)
       }
+      if (side === 'source' && input.promoter_gene_name !== undefined) {
+        nodeFilters.push('record.promoter_of IN promoterGeneIDs')
+      }
       if (nodeFilters.length > 0) {
         nodeQueries.push(`LET ${side}IDs = (FOR record IN genomic_elements FILTER ${nodeFilters.join(' AND ')} RETURN record._id)`)
         filters.push(`record.${endpoint} IN ${side}IDs`)
       }
     }
     const expanded = (endpoint: string): string => input.verbose === 'true'
-      ? `KEEP(DOCUMENT(record.${endpoint}), '_id', 'name', 'chr', 'start', 'end', 'type', 'source_annotation', 'promoter_of')`
+      ? `MERGE(KEEP(DOCUMENT(record.${endpoint}), '_id', 'name', 'chr', 'start', 'end', 'type', 'source_annotation'), { promoter_of: DOCUMENT(record.${endpoint}).promoter_of == null ? null : DOCUMENT(DOCUMENT(record.${endpoint}).promoter_of) })`
       : `record.${endpoint}`
     const fields = Object.keys(outputFormat.element.shape).filter(field => !['source_genomic_element', 'target_genomic_element'].includes(field))
     const cursor = await db.query(`

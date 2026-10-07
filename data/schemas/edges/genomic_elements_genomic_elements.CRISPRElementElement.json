@@ -51,7 +51,7 @@
         },
         "method": {
           "enum": [
-            "Perturb-seq"
+            "Multiome Perturb-seq"
           ]
         },
         "crispr_modality": {

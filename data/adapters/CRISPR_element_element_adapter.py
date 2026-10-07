@@ -29,6 +29,8 @@ from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_acc
 
 class CRISPRElementElement(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_genomic_element']
+    # File metadata groups this assay under Perturb-seq; retain its specific method.
+    METHOD = 'Multiome Perturb-seq'
     SIGNIFICANCE_THRESHOLD = CRISPRElementGeneIGVF.SIGNIFICANCE_THRESHOLD
     REQUIRED_COLUMNS = {
         'effect_score', 'p_val', 'p_val_adj', 'chr', 'start', 'end',
@@ -65,7 +67,7 @@ class CRISPRElementElement(BaseAdapter):
         key = f'{element_id}_{self.file_accession}'
         doc = {
             '_key': key, 'name': key, 'chr': chrom, 'start': start, 'end': end,
-            'method': self.file_fileset['method'],
+            'method': self.METHOD,
             'source_annotation': 'promoter' if gene else 'accessible dna elements',
             'source': 'IGVF', 'source_url': self.source_url,
             'type': 'tested elements',
@@ -128,7 +130,7 @@ class CRISPRElementElement(BaseAdapter):
                             'name': 'modulates accessibility of',
                             'inverse_name': 'accessibility modulated by',
                             'class': self.file_fileset['class'],
-                            'method': self.file_fileset['method'],
+                            'method': self.METHOD,
                             'crispr_modality': self.file_fileset.get('crispr_modality'),
                             'biological_context': self.file_fileset['simple_sample_summaries'][0],
                             'biosample_term': self.file_fileset['samples'][0],

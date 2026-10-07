@@ -2090,31 +2090,32 @@ export const descriptions = {
   genomic_elements_genomic_elements:
     'Retrieve promoter perturbation effects on chromatin accessibility at target peaks.<br> \
     Source elements identify perturbed promoters; target elements identify readout peaks. \
-    Filter by perturbed_region (promoter) or accessible_region (readout peak), using chr:start-end, promoter_gene_id, files_fileset, or method. \
-    Set verbose=true to expand both genomic elements. \
+    Filter by perturbed_region (promoter) or accessible_region (readout peak), using chr:start-end, promoter_gene_name or promoter_gene_id, files_fileset, or method. \
+    Set verbose=true to expand both genomic elements and the linked promoter gene record. \
     Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
       {
         id: 'perturb-seq',
-        label: 'Perturb-seq',
+        label: 'Multiome Perturb-seq',
         examples: [
           {
             label: 'Query by perturbed gene',
             items: [
-              'promoter_gene_id = ENSG00000100811',
-              'method = Perturb-seq'
+              'promoter_gene_name = YY1',
+              'method = Multiome Perturb-seq',
+              'files_fileset = IGVFFI2419ZSGC'
             ]
           },
           {
             label: 'Query by readout peak region',
             items: [
               'accessible_region = chr1:3586345-3586846',
-              'method = Perturb-seq'
+              'method = Multiome Perturb-seq'
             ]
           },
           {
             label: 'Accessibility decreases with adjusted p-value below 0.1',
             items: [
-              'method = Perturb-seq',
+              'method = Multiome Perturb-seq',
               'log2FC = lt:0',
               'p_value_adj = lt:0.1'
             ]

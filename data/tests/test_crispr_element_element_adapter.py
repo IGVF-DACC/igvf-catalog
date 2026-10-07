@@ -31,6 +31,8 @@ def test_nodes_and_edges():
     edges = parse('genomic_element_genomic_element')
     assert len(nodes) == 4
     assert len(edges) == 3
+    assert all(node['method'] == 'Multiome Perturb-seq' for node in nodes)
+    assert all(edge['method'] == 'Multiome Perturb-seq' for edge in edges)
     promoters = [node for node in nodes if 'promoter_of' in node]
     assert len(promoters) == 1
     assert promoters[0]['promoter_of'] == 'genes/ENSG00000100811'

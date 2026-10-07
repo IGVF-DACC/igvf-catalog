@@ -29,23 +29,36 @@ it('combines node overlap and promoter-gene filters before pagination', async ()
   expect(query).toContain("record['p_value_adj'] < 0.1")
   expect(query).toContain("record['log2FC'] < 0")
   expect(query).toContain('KEEP(DOCUMENT(record._from)')
-  expect(query).toContain("'promoter_of'")
+  expect(query).toContain('promoter_of: DOCUMENT(record._from).promoter_of == null ? null : DOCUMENT(DOCUMENT(record._from).promoter_of)')
   expect(vars.promoterGene).toBe('genes/ENSG00000100811')
   expect(query.indexOf('record._to IN targetIDs')).toBeLessThan(query.indexOf('LIMIT @offset'))
 })
 
 it('returns accessibility metrics and verbose promoter gene links', async () => {
-  const element = { _id: 'genomic_elements/promoter', name: 'promoter', chr: 'chr14', start: 1, end: 2, promoter_of: 'genes/ENSG00000100811' }
-  const record = { source_genomic_element: element, target_genomic_element: 'genomic_elements/peak', name: 'modulates accessibility of', inverse_name: 'accessibility modulated by', label: 'regulatory element effect on chromatin accessibility', class: 'observed data', method: 'Perturb-seq', source: 'IGVF', source_url: 'https://data.igvf.org/tabular-files/IGVFFI2419ZSGC/', files_filesets: 'files_filesets/IGVFFI2419ZSGC', p_value_adj: 0.07, log2FC: -1.3, significant: false }
+  const element = { _id: 'genomic_elements/promoter', name: 'promoter', chr: 'chr14', start: 1, end: 2, promoter_of: { _id: 'genes/ENSG00000100811', name: 'YY1', chr: 'chr14', start: 1, end: 2, gene_type: 'protein_coding', source: 'GENCODE', version: 'v43', source_url: 'https://www.gencodegenes.org/' } }
+  const record = { source_genomic_element: element, target_genomic_element: 'genomic_elements/peak', name: 'modulates accessibility of', inverse_name: 'accessibility modulated by', label: 'regulatory element effect on chromatin accessibility', class: 'observed data', method: 'Multiome Perturb-seq', source: 'IGVF', source_url: 'https://data.igvf.org/tabular-files/IGVFFI2419ZSGC/', files_filesets: 'files_filesets/IGVFFI2419ZSGC', p_value_adj: 0.07, log2FC: -1.3, significant: false }
   jest.spyOn(db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue([record]) } as any)
   expect(await call({ files_fileset: 'IGVFFI2419ZSGC', verbose: 'true' })).toEqual([record])
 })
 
 it.each([
-  {}, { page: -1, method: 'Perturb-seq' }, { limit: 0, method: 'Perturb-seq' },
+  {}, { page: -1, method: 'Multiome Perturb-seq' }, { limit: 0, method: 'Multiome Perturb-seq' },
   { perturbed_region: 'invalid' }, { accessible_region: 'invalid' }, { source_element_id: 'promoter' }, { target_element_id: 'peak' },
-  { method: 'Perturb-seq', p_value_adj: 'lt:0 RETURN 1' }
+  { method: 'Multiome Perturb-seq', p_value_adj: 'lt:0 RETURN 1' }
 ])('rejects invalid or unbounded inputs: %j', async input => {
   await expect(call(input)).rejects.toThrow()
   expect(db.query).not.toHaveBeenCalled()
+})
+
+it('resolves promoter gene names with bound parameters and combines name and ID filters', async () => {
+  await call({ promoter_gene_name: 'YY1', promoter_gene_id: 'ENSG00000100811' })
+  const [query, vars] = (db.query as jest.Mock).mock.calls[0]
+  expect(query).toContain('gene.name == @promoterGeneName')
+  expect(query).toContain('record.promoter_of IN promoterGeneIDs')
+  expect(query).toContain('record.promoter_of == @promoterGene')
+  expect(vars).toMatchObject({ promoterGeneName: 'YY1', promoterGene: 'genes/ENSG00000100811' })
+})
+
+it('accepts a promoter gene name as the only selection filter', async () => {
+  await expect(call({ promoter_gene_name: 'YY1' })).resolves.toEqual([])
 })

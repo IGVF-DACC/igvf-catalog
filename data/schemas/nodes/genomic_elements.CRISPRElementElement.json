@@ -24,7 +24,7 @@
         },
         "method": {
           "enum": [
-            "Perturb-seq"
+            "Multiome Perturb-seq"
           ]
         },
         "source_annotation": {
