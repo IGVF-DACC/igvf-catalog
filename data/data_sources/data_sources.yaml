@@ -569,6 +569,21 @@ variant to protein association:
     - https://api.data.igvf.org/reference-files/IGVFFI2053GDNI/@@download/IGVFFI2053GDNI.csv.gz # pQTL_UKB.csv.gz
   source: UKB
 
+# Run this BEFORE "allele specific binding" below: it loads any variant referenced by this
+# ADASTRA file that isn't already in the variants collection, so the variants_proteins edges
+# created next don't end up with a dangling _from reference.
+# Example: the adapter extracts the tarball and its nested zip archive
+# python3 data_parser.py --adapter allele_specific_binding --label variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5943XCOS.tar.gz --output-bucket-key variants/adastra_variants_IGVFFI5943XCOS.jsonl
+allele specific binding variants:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter allele_specific_binding --label variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/adastra_variants_IGVFFI5943XCOS.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
+  source: ADASTRA allele-specific TF binding calls
+
 # Example: the adapter extracts the tarball and its nested zip archive
 # python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5943XCOS.tar.gz --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
 # ATTENTION: run "awk '!seen[$0]++' asb_IGVFFI5943XCOS.jsonl > asb_IGVFFI5943XCOS_uniq.jsonl" to remove duplicate lines from sqtls.

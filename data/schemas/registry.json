@@ -79,6 +79,7 @@
         },
         "variants": {
             "Favor": "schemas/nodes/variants.Favor.json",
+            "ASB": "schemas/nodes/variants.ASB.json",
             "cV2F": "schemas/nodes/variants.cV2F.json",
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
             "MPRAAdapter": "schemas/nodes/variants.MPRAAdapter.json",

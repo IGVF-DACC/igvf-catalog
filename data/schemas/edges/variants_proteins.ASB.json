@@ -100,6 +100,14 @@
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Directional ASB significance score: negative FDR-adjusted p-value when only the reference allele is significant (< 0.05), positive when only the alternate allele is significant, or null when both or neither are significant.",
+          "example": -0.0171981040581793
+        },
         "neg_log10_pvalue_adj_ref": {
           "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
@@ -181,6 +189,7 @@
         "es_mean_alt",
         "neg_log10_pvalue_adj_ref",
         "neg_log10_pvalue_adj_alt",
+        "score",
         "biological_context",
         "biosample_term",
         "biological_process",
@@ -191,6 +200,6 @@
   ],
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
+    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, score, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
   }
 }
