@@ -185,6 +185,5 @@
   "accessible_via": {
     "return": "strand, log2FC, bed_score, inputCountRef, outputCountRef, inputCountAlt, outputCountAlt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
   },
-  "db_collection_name": "variants_biosamples",
-  "threshold": "The adapter sets significant to true when neg_log10_pvalue_adj is available and >= 1 (adjusted p-value/q-value <= 0.1); otherwise false. The unadjusted neg_log10_pvalue is not a fallback. This labels significance and does not filter out nonsignificant rows."
+  "db_collection_name": "variants_biosamples"
 }

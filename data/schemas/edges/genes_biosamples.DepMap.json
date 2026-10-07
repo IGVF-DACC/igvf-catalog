@@ -119,6 +119,5 @@
       ],
       "additionalProperties": false
     }
-  ],
-  "threshold": "Load filter: only gene-cell pairs with gene_dependency >= 0.5 are retained by the adapter. This is a dependency probability cutoff, not a p-value threshold."
+  ]
 }

@@ -97,6 +97,5 @@
       }
     }
   ],
-  "db_collection_name": "genes_genes",
-  "threshold": "Load filter: only pairs with abs(z_score) >= 3 are retained by the adapter, including both positive and negative scores."
+  "db_collection_name": "genes_genes"
 }
