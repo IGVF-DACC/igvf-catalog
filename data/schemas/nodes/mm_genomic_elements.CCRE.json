@@ -65,5 +65,6 @@
     "filter_by_range": "start, end",
     "return": "_id, name, chr, start, end, type, source_annotation, type, source, source_url"
   },
-  "db_collection_name": "mm_genomic_elements"
+  "db_collection_name": "mm_genomic_elements",
+  "threshold": "Not applicable to these entity records. No statistical significance call is assigned; thresholds for measured or predicted relationships are documented on the corresponding edge schemas."
 }

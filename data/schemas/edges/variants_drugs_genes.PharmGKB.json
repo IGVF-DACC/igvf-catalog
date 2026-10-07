@@ -94,5 +94,6 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "threshold": "Curated pharmacogenomic associations are loaded without a numerical significance filter. Per-study p-value strings, when present in nested study records, are preserved rather than compared with a universal cutoff."
 }

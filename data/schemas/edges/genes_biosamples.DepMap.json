@@ -56,7 +56,8 @@
         "gene_dependency": {
           "title": "Gene Dependency",
           "type": "number",
-          "description": "Probability that knocking out this gene is a true genetic dependency in this cell line."
+          "description": "Probability that knocking out this gene is a true genetic dependency in this cell line.",
+          "threshold": "Load filter: only gene-cell pairs with gene_dependency >= 0.5 are retained by the adapter. This is a dependency probability cutoff, not a p-value threshold."
         },
         "source": {
           "enum": [
@@ -118,5 +119,6 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "threshold": "Load filter: only gene-cell pairs with gene_dependency >= 0.5 are retained by the adapter. This is a dependency probability cutoff, not a p-value threshold."
 }

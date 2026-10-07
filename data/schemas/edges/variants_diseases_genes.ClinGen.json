@@ -71,5 +71,6 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "threshold": "Not applicable as a numerical significance threshold. Source disease-association assertions/classifications are curated categories; the adapter does not derive them from a shared score or p-value cutoff."
 }

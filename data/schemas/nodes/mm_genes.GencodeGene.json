@@ -162,5 +162,6 @@
     "simplified_return": "_id, chr, gene_id, mgi, name, organism",
     "return": "_id, chr, start, end, gene_id, mgi, entrez, name, gene_type, source, version, source_url, organism"
   },
-  "db_collection_name": "mm_genes"
+  "db_collection_name": "mm_genes",
+  "threshold": "Not applicable to these entity records. No statistical significance call is assigned; thresholds for measured or predicted relationships are documented on the corresponding edge schemas."
 }

@@ -34,5 +34,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "variants"
+  "db_collection_name": "variants",
+  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in variants_coding_variants.Mutpred2CodingVariantsScores.json, coding_variants_phenotypes.Mutpred2CodingVariantsScores.json; presence of an entity does not imply a significant association."
 }

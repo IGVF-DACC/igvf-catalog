@@ -36,7 +36,8 @@
         "pathogenicity_score": {
           "title": "Pathogenicity Score",
           "type": "number",
-          "description": "MutPred2 pathogenicity score for the substitution, between 0 and 1. Higher values indicate greater predicted pathogenicity."
+          "description": "MutPred2 pathogenicity score for the substitution, between 0 and 1. Higher values indicate greater predicted pathogenicity.",
+          "threshold": "No pathogenicity-score cutoff is applied by the adapter. The mechanism-level Posterior Probability >= 0.25 and P-value < 0.05 filters apply to property_scores, not to this score. Published pathogenicity decision cutoffs depend on the desired false-positive rate and are not load filters."
         },
         "property_scores": {
           "title": "Property Scores",
@@ -103,7 +104,8 @@
               "Effected Position": "Y183",
               "Type": "Gain"
             }
-          ]
+          ],
+          "threshold": "Upstream mapping preparation retains predicted mechanisms only when Posterior Probability >= 0.25 and P-value < 0.05. This filters property_scores entries, not pathogenicity_score; the adapter applies no additional pathogenicity-score cutoff."
         },
         "biosample_term": {
           "$ref": "../mixins.json#/biosample_term",
@@ -159,5 +161,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "coding_variants_phenotypes"
+  "db_collection_name": "coding_variants_phenotypes",
+  "threshold": "Upstream mapping preparation retains predicted mechanisms only when Posterior Probability >= 0.25 and P-value < 0.05. This filters property_scores entries, not pathogenicity_score; the adapter applies no additional pathogenicity-score cutoff."
 }

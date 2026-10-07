@@ -117,5 +117,6 @@
   "accessible_via": {
     "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, biological_process, id_version, organism, class, method, label, files_filesets, source, source_url"
   },
-  "db_collection_name": "pathways"
+  "db_collection_name": "pathways",
+  "threshold": "Not applicable to these entity records. No statistical significance call is assigned; thresholds for measured or predicted relationships are documented on the corresponding edge schemas."
 }

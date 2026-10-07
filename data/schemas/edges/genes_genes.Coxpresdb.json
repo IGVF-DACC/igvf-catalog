@@ -32,7 +32,8 @@
           "title": "Z-Score",
           "type": "number",
           "description": "COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.",
-          "example": 3.2
+          "example": 3.2,
+          "threshold": "Load filter: only pairs with abs(z_score) >= 3 are retained by the adapter, including both positive and negative scores."
         },
         "associated_process": {
           "title": "Associated Process",
@@ -96,5 +97,6 @@
       }
     }
   ],
-  "db_collection_name": "genes_genes"
+  "db_collection_name": "genes_genes",
+  "threshold": "Load filter: only pairs with abs(z_score) >= 3 are retained by the adapter, including both positive and negative scores."
 }

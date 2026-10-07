@@ -43,7 +43,8 @@
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "threshold": "The adapter preserves the source neg_log10_pvalue without a numerical significance filter. The upstream study cutoff is not documented in the adapter; an observed minimum in a sample is not an established threshold."
         },
         "beta": {
           "title": "Beta",
@@ -154,5 +155,6 @@
     "name": "variants_proteins",
     "return": "label, neg_log10_pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type, files_filesets"
   },
-  "db_collection_name": "variants_proteins"
+  "db_collection_name": "variants_proteins",
+  "threshold": "The adapter preserves the source neg_log10_pvalue without a numerical significance filter. The upstream study cutoff is not documented in the adapter; an observed minimum in a sample is not an established threshold."
 }

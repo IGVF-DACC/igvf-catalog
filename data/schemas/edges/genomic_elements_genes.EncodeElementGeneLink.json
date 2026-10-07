@@ -44,7 +44,8 @@
         "score": {
           "title": "Score",
           "type": "number",
-          "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene."
+          "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene.",
+          "threshold": "Upstream model-specific score thresholds define the published thresholded links; the adapter applies no additional score filter. ENCODE-rE2G thresholds at 70% recall are: extended 0.336, dhs_h3k27ac_megamap 0.217, dhs_megamap 0.201, atac_megamap 0.179, atac_intact_hic 0.232, dhs_intact_hic 0.243, atac_h3k27ac_megamap 0.203, and atac_h3k27ac_intact_hic 0.259. Scores above the applicable threshold are called links. Use the source file/model version to select the threshold; there is no universal cutoff and this list is not exhaustive."
         },
         "source": {
           "enum": [
@@ -97,5 +98,6 @@
     "filter_by_range": "score",
     "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, score"
   },
-  "db_collection_name": "genomic_elements_genes"
+  "db_collection_name": "genomic_elements_genes",
+  "threshold": "Upstream model-specific score thresholds define the published thresholded links; the adapter applies no additional score filter. ENCODE-rE2G thresholds at 70% recall are: extended 0.336, dhs_h3k27ac_megamap 0.217, dhs_megamap 0.201, atac_megamap 0.179, atac_intact_hic 0.232, dhs_intact_hic 0.243, atac_h3k27ac_megamap 0.203, and atac_h3k27ac_intact_hic 0.259. Scores above the applicable threshold are called links. Use the source file/model version to select the threshold; there is no universal cutoff and this list is not exhaustive."
 }

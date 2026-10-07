@@ -24,7 +24,8 @@
           "title": "SEMpl Baseline",
           "type": "number",
           "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers.",
-          "example": -0.671761
+          "example": -0.671761,
+          "threshold": "Upstream SEMVAR binding criterion: an allele binding score > 2^SEMpl_baseline, using the baseline for that motif. The motif adapter stores this reference without applying a significance filter to motif records."
         },
         "class": {
           "$ref": "../mixins.json#/class",
@@ -54,5 +55,6 @@
     }
   ],
   "additionalProperties": false,
-  "db_collection_name": "motifs"
+  "db_collection_name": "motifs",
+  "threshold": "No significance filter is applied to motif records. SEMpl_baseline supplies a motif-specific binding reference used by SEMVAR predictions; it is not a global p-value threshold."
 }

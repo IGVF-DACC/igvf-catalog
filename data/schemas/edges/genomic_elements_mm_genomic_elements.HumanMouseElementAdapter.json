@@ -46,13 +46,15 @@
           "title": "CO-V Chromatin Accessibility P-Value",
           "type": "string",
           "description": "Empirical p-value of the chromatin-accessibility CO-V score against a null of randomly paired elements.",
-          "example": "0.74469"
+          "example": "0.74469",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_chromatin_accessibility_fdr": {
           "title": "CO-V Chromatin Accessibility False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-V p-value.",
-          "example": "0.7880168243061526"
+          "example": "0.7880168243061526",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_chromatin_accessibility": {
           "title": "CO-B Chromatin Accessibility",
@@ -64,13 +66,15 @@
           "title": "CO-B Chromatin Accessibility P-Value",
           "type": "string",
           "description": "Empirical p-value of the chromatin-accessibility CO-B score against a null of randomly paired elements.",
-          "example": "0.38023"
+          "example": "0.38023",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_chromatin_accessibility_fdr": {
           "title": "CO-B Chromatin Accessibility False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the chromatin-accessibility CO-B p-value.",
-          "example": "0.706372507818166"
+          "example": "0.706372507818166",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_H3K27ac": {
           "title": "CO-V H3K27ac",
@@ -82,13 +86,15 @@
           "title": "CO-V H3K27ac P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K27ac CO-V score against a null of randomly paired elements.",
-          "example": "0.672636"
+          "example": "0.672636",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_H3K27ac_fdr": {
           "title": "CO-V H3K27ac False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the H3K27ac CO-V p-value.",
-          "example": "0.8353311889993958"
+          "example": "0.8353311889993958",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_H3K27ac": {
           "title": "CO-B H3K27ac",
@@ -100,13 +106,15 @@
           "title": "CO-B H3K27ac P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K27ac CO-B score against a null of randomly paired elements.",
-          "example": "0.85179"
+          "example": "0.85179",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_H3K27ac_fdr": {
           "title": "CO-B H3K27ac False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the H3K27ac CO-B p-value.",
-          "example": "0.9741088464334399"
+          "example": "0.9741088464334399",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_H3K4me1": {
           "title": "CO-V H3K4me1",
@@ -118,13 +126,15 @@
           "title": "CO-V H3K4me1 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me1 CO-V score against a null of randomly paired elements.",
-          "example": "0.833716"
+          "example": "0.833716",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_H3K4me1_fdr": {
           "title": "CO-V H3K4me1 False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-V p-value.",
-          "example": "0.9170052784062483"
+          "example": "0.9170052784062483",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_H3K4me1": {
           "title": "CO-B H3K4me1",
@@ -136,13 +146,15 @@
           "title": "CO-B H3K4me1 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me1 CO-B score against a null of randomly paired elements.",
-          "example": "0.87628"
+          "example": "0.87628",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_H3K4me1_fdr": {
           "title": "CO-B H3K4me1 False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the H3K4me1 CO-B p-value.",
-          "example": "0.9810987190296945"
+          "example": "0.9810987190296945",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_H3K4me3": {
           "title": "CO-V H3K4me3",
@@ -154,13 +166,15 @@
           "title": "CO-V H3K4me3 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me3 CO-V score against a null of randomly paired elements.",
-          "example": "0.892402"
+          "example": "0.892402",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cov_H3K4me3_fdr": {
           "title": "CO-V H3K4me3 False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-V p-value.",
-          "example": "0.9650710516056851"
+          "example": "0.9650710516056851",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_H3K4me3": {
           "title": "CO-B H3K4me3",
@@ -172,13 +186,15 @@
           "title": "CO-B H3K4me3 P-Value",
           "type": "string",
           "description": "Empirical p-value of the H3K4me3 CO-B score against a null of randomly paired elements.",
-          "example": "0.87563"
+          "example": "0.87563",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "cob_H3K4me3_fdr": {
           "title": "CO-B H3K4me3 False Discovery Rate",
           "type": "string",
           "description": "Benjamini–Hochberg FDR for the H3K4me3 CO-B p-value.",
-          "example": "0.9758546569869605"
+          "example": "0.9758546569869605",
+          "threshold": "No cutoff is applied to this source statistic by the adapter; an upstream significance threshold is not documented."
         },
         "source": {
           "$ref": "../mixins.json#/source",
@@ -245,5 +261,6 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "threshold": "The adapter preserves the source conservation, chromatin covariation, and cobinding statistics without applying a p-value or FDR cutoff. No numerical significance threshold is documented for these associations."
 }

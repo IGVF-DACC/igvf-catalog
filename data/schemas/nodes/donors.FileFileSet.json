@@ -95,5 +95,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "donors"
+  "db_collection_name": "donors",
+  "threshold": "Not applicable to these entity records. No statistical significance call is assigned; thresholds for measured or predicted relationships are documented on the corresponding edge schemas."
 }

@@ -66,8 +66,9 @@
         "motif_conc": {
           "title": "Motif Concordance",
           "type": "string",
-          "description": "Whether the allelic read imbalance agrees with the motif fold-change, assessed at 25% FDR.",
-          "example": "Concordant"
+          "description": "Whether the allelic read imbalance agrees with the motif fold-change.",
+          "example": "Concordant",
+          "threshold": "Source motif-concordance classification is assessed at 25% FDR and is preserved by the adapter; this is separate from the per-allele 5% FDR binding criterion."
         },
         "motif": {
           "title": "Motif",
@@ -92,13 +93,15 @@
           "title": "Adjusted P-Value for Reference Allele",
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
-          "example": 0.0171981040581793
+          "example": 0.0171981040581793,
+          "threshold": "Upstream allele-specific binding criterion: FDR <= 0.05 for this allele; 0.05 < FDR <= 0.25 is the undefined band. The adapter does not filter on this value."
         },
         "p_value_adj_alt": {
           "title": "Adjusted P-Value for Alternate Allele",
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
-          "example": 1.0
+          "example": 1.0,
+          "threshold": "Upstream allele-specific binding criterion: FDR <= 0.05 for this allele; 0.05 < FDR <= 0.25 is the undefined band. The adapter does not filter on this value."
         },
         "score": {
           "type": [
@@ -112,13 +115,15 @@
           "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
-          "example": 1.7645194276538037
+          "example": 1.7645194276538037,
+          "threshold": "Upstream FDR <= 0.05 corresponds to a value >= -log10(0.05), approximately 1.30103. Evaluated separately for each allele; no additional adapter filter."
         },
         "neg_log10_pvalue_adj_alt": {
           "title": "Adjusted Negative Log10 P-Value for Alternate Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
-          "example": 0
+          "example": 0,
+          "threshold": "Upstream FDR <= 0.05 corresponds to a value >= -log10(0.05), approximately 1.30103. Evaluated separately for each allele; no additional adapter filter."
         },
         "biological_context": {
           "$ref": "../mixins.json#/biological_context",
@@ -171,7 +176,6 @@
           "enum_descriptions": {
             "ontology_terms/GO_0051101": "Regulation of DNA binding."
           }
-
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
