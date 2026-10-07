@@ -156,6 +156,5 @@
   "accessible_via": {
     "name": "variants_proteins",
     "return": "label, method, class, source, source_url, neg_log10_pvalue_adj, p_value, neg_log10_pvalue, files_filesets"
-  },
-  "threshold": "The SNP-SELEX study defines significant preferential binding by PBS p_value < 0.01 together with OBS oligo_pval < 0.05. These are upstream significance criteria, not additional catalog load filters; p_value_adj is not part of this rule. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC9367673/."
+  }
 }

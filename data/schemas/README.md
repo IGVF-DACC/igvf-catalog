@@ -88,8 +88,8 @@ meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work
 
 ## Threshold and significance documentation
 
-Use an optional `threshold` string only when an actual selection or significance
-rule is established for an edge dataset or field. Omit the property entirely
+Use an optional field-level `threshold` string only when an actual selection or
+significance rule is established for an edge field. Omit the property entirely
 when no cutoff applies or the cutoff has not yet been established. Do not use
 placeholder values such as "none", "unknown", or "not applicable". Node schemas,
 including their fields, do not track `threshold`.
@@ -97,9 +97,8 @@ including their fields, do not track `threshold`.
 Keep the field's meaning in `description`; put the cutoff in `threshold` beside
 it. When a significance call uses multiple fields, document which source formats
 use each field, their precedence, strict/inclusive boundaries, and missing-value
-behavior on the decision field. A top-level edge annotation can summarize the
-rule for the dataset. Do not annotate unrelated fields merely to say they are
-not used in that decision.
+behavior on the decision field. Do not add schema-level `threshold` annotations
+or annotate unrelated fields merely to say they are not used in that decision.
 
 A missing adapter filter does not establish that a dataset is unthresholded.
 Predictive files may already be selected upstream. Investigate source-file

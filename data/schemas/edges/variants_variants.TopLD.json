@@ -154,6 +154,5 @@
       ],
       "additionalProperties": false
     }
-  ],
-  "threshold": "Upstream TopLD pair selection requires r2 >= 0.2. The project methods page currently specifies pairs within 500 kb; the previously quoted 1 Mb window is not assumed for every release. No additional r2 cutoff is applied by the adapter. Source: https://topld.genetics.unc.edu/about.php."
+  ]
 }

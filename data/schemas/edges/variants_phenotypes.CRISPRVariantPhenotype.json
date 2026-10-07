@@ -171,6 +171,5 @@
     "filter_by_range": "effect_size, z_score, p_value_adj, neg_log10_pvalue_adj",
     "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
   },
-  "db_collection_name": "variants_phenotypes",
-  "threshold": "The adapter sets significant to true when both effect_size_ci95_lower and effect_size_ci95_upper are available and the 95% interval excludes zero: lower > 0 or upper < 0. It uses the source interval when both bounds are present; otherwise it derives effect_size +/- 1.96 times the configured source standard deviation (mu_sd_adj) when available. Missing bounds without that fallback give false. z_score, p_value_adj, and neg_log10_pvalue_adj do not determine significant. Nonsignificant rows are retained."
+  "db_collection_name": "variants_phenotypes"
 }

@@ -169,6 +169,5 @@
     "filter_by_range": "effect_size, neg_log10_pvalue, posterior_inclusion_probability, log2FC",
     "simplified_return": "label, source, effect_size, biological_context",
     "return": "effect_size, log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, power, posterior_inclusion_probability, coefficient_stddev, significant, source, label, method, crispr_modality, class, source_url, files_filesets, biological_context, biosample_term"
-  },
-  "threshold": "For Variant-EFFECTS files, significant is true when neg_log10_pvalue_adj is available and 10^(-neg_log10_pvalue_adj) < 0.05. For CRISPR-Millipede files, significant is true when posterior_inclusion_probability is available and > 0.1. A missing/null statistic for the applicable file format gives false; there is no fallback to the other format or to unadjusted p-values. Nonsignificant rows are retained."
+  }
 }

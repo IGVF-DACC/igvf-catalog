@@ -168,6 +168,5 @@
     "name": "variants_proteins",
     "return": "label, method, class, biological_context, biosample_term, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, files_filesets, source, source_url"
   },
-  "db_collection_name": "variants_proteins",
-  "threshold": "Binding is called upstream when an allele binding score is > 2^SEMpl_baseline, using the baseline for that motif rather than a universal cutoff. The adapter filters on the supplied SEMpl_annotation, retaining only binding_ablated, binding_decreased, binding_created, and binding_increased; it does not recompute these classifications or apply a p-value cutoff."
+  "db_collection_name": "variants_proteins"
 }

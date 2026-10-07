@@ -102,6 +102,5 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "variants_biosamples",
-  "threshold": "Upstream selection for BlueSTARR v0.1.1 K562 predictions (IGVFFI5288RAAV): abs(log2FC) > 0.1. The IGVF file description explicitly specifies |effect| > 0.1 and filtered = true. This effect-size cutoff is applied before catalog loading."
+  "db_collection_name": "variants_biosamples"
 }

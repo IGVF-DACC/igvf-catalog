@@ -99,6 +99,5 @@
   "accessible_via": {
     "return": "name, score, files_filesets, biosample_term, biological_context, method, class, label, source, source_url",
     "filter_by_range": "score"
-  },
-  "threshold": "Source files IGVFFI1931RMNE (sample-agnostic) and IGVFFI4594QVDO (K562) declare PredictionValue threshold 0.75 in their headers but contain scores below 0.75. The catalog adapter applies the selection: score >= 0.75. This is a classifier-score cutoff; these source files are not prefiltered to that cutoff."
+  }
 }

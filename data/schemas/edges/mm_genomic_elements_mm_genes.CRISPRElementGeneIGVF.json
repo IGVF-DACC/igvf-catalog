@@ -216,6 +216,5 @@
     "filter_by_range": "log2FC, effect_size, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
     "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_ci95_lower, log2FC_ci95_upper, effect_size, effect_size_ci_95, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, pct_1, pct_2, num_guides, num_cells, fold_change, background_corrected_fold_change, z_score, t_score, idr, cpm_perturb, cpm_bg, gamma_approximation_ln_p_value, hypergeometric_ln_p_value"
   },
-  "db_collection_name": "mm_genomic_elements_mm_genes",
-  "threshold": "The adapter sets significant using the first available statistic: p_value_adj < 0.05; otherwise p_value < 0.05; otherwise abs(z_score) >= 1.959963984540054 (approximately 1.96). A present p-value takes precedence even when it is not significant. If all three are missing/null, significant is false. This labels significance and does not filter out nonsignificant rows."
+  "db_collection_name": "mm_genomic_elements_mm_genes"
 }

@@ -206,6 +206,5 @@
   "accessible_via": {
     "simplified_return": "motif, source",
     "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, score, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
-  },
-  "threshold": "For the directional score, the adapter tests p_value_adj_ref < 0.05 and p_value_adj_alt < 0.05 separately. Exactly one allele must pass: score is -p_value_adj_ref for reference-only significance and +p_value_adj_alt for alternate-only significance; both or neither passing gives null. A p-value equal to 0.05 does not pass. This determines the score and does not filter rows."
+  }
 }

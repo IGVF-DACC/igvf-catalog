@@ -136,6 +136,5 @@
     "filter_by_range": "score",
     "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, cell_annotation, cell_annotation_term, score, transcription_start_site, rna_pseudobulk_tpm"
   },
-  "db_collection_name": "genomic_elements_genes",
-  "threshold": "Upstream thresholded predictions use the source file ScoreThreshold. IGVFFI5648GWQX and IGVFFI0793NWFM declare scE2G v1.2.0 and ScoreThreshold 0.177; IGVFFI5648GWQX also identifies multiome_powerlaw_v3. The verified model directories specify multiome_powerlaw_v3 0.177, multiome_megamap_v3 0.173, scATAC_powerlaw_v3 0.174, and scATAC_megamap_v3 0.187. Match the file header and model version; do not substitute a cutoff from a different model. See ../threshold-evidence.md for source/version evidence and the remaining historical boundary verification."
+  "db_collection_name": "genomic_elements_genes"
 }
