@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/coding_variants_PPI.SemiQY2H.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the coding variant to PPI edge"
+        },
+        "_from": {
+          "example": "coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "description": "The binary protein-protein interaction edge that this coding variant was tested against",
+          "example": "proteins_proteins/000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4",
+          "pattern": "^proteins_proteins/",
+          "collections": [
+            "proteins_proteins"
+          ]
+        },
+        "consensus_score": {
+          "type": "number",
+          "description": "Consensus growth score for the variant PPI, arbitrary units in 0-800 range, higher values indicating stronger protein-protein interaction"
+        },
+        "wt_consensus_score": {
+          "type": "number",
+          "description": "Consensus growth score for the corresponding reference PPI"
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "Log2 fold change, log2((consensus_score + 1) / (wt_consensus_score + 1))"
+        },
+        "molecular_function": {
+          "type": "string",
+          "description": "The molecular function being tested by this coding variant to PPI edge",
+          "enum": [
+            "ontology_terms/GO_0005515"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates interaction of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "interaction modulated by"
+          ]
+        },
+        "method": {
+          "type": "string",
+          "description": "The method of the coding variant to PPI edge"
+        },
+        "label": {
+          "enum": [
+            "protein variant effect"
+          ]
+        },
+        "class": {
+          "type": "string",
+          "description": "The class of the coding variant to PPI edge"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the coding variant to PPI edge",
+          "example": "files_filesets/IGVFFI2460BBXY",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI2460BBXY"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "consensus_score",
+        "wt_consensus_score",
+        "log2FC",
+        "molecular_function",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "return": "_from, _to, consensus_score, wt_consensus_score, log2FC, molecular_function, source, name, inverse_name, method, label, class, source_url, files_filesets"
+  },
+  "db_collection_name": "coding_variants_PPI"
+}

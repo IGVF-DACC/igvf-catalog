@@ -2200,6 +2200,28 @@ coding variant to phenotype Variant painting:
     - https://api.data.igvf.org/tabular-files/IGVFFI9499PJFU/@@download/IGVFFI9499PJFU.tsv.gz
   source: IGVF
 
+# Example: python3 data_parser.py --adapter semi_qy2h_coding_variant_ppi --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2460BBXY.tsv.gz --output-bucket-key coding_variants_PPI/coding_variants_PPI_semi_qY2H_IGVFFI2460BBXY.jsonl --label coding_variants_PPI
+coding variant to PPI semi-qY2H:
+  collection: coding_variants_PPI
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter semi_qy2h_coding_variant_ppi --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_PPI/coding_variants_PPI_semi_qY2H_{datafile}.jsonl --label coding_variants_PPI
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2460BBXY/@@download/IGVFFI2460BBXY.tsv.gz
+  source: IGVF
+
+# Example: python3 data_parser.py --adapter semi_qy2h_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7393MGJK.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_semi_qY2H_IGVFFI7393MGJK.jsonl --label coding_variants_phenotypes
+coding variant to phenotype semi-qY2H:
+  collection: coding_variants_phenotypes
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter semi_qy2h_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_phenotypes_semi_qY2H_{datafile}.jsonl --label coding_variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI7393MGJK/@@download/IGVFFI7393MGJK.tsv.gz
+  source: IGVF
+
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants
 variants SGE:
   collection: variants

@@ -727,6 +727,45 @@ def bulk_query_coding_variants_from_spdi_in_arangodb(spdi_protein_hgvsp_triples)
     return mappings
 
 
+def bulk_query_proteins_proteins_edge_keys_in_arangodb(protein_id_pairs):
+    # given pairs of protein_id (ENSP, no version), find the proteins_proteins
+    # edge connecting them, matching _from/_to in either direction
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'a': protein_a, 'b': protein_b}
+        for protein_a, protein_b in protein_id_pairs
+    ]
+
+    query = '''
+    FOR pair IN @pairs
+        FOR e IN proteins_proteins
+        FILTER (e._from == CONCAT('proteins/', pair.a) AND e._to == CONCAT('proteins/', pair.b))
+            OR (e._from == CONCAT('proteins/', pair.b) AND e._to == CONCAT('proteins/', pair.a))
+        RETURN {
+            a: pair.a,
+            b: pair.b,
+            edge_key: e._key
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    mappings = {}
+    for r in results:
+        key = (r['a'], r['b'])
+        if key not in mappings:
+            mappings[key] = [r['edge_key']]
+        else:
+            if r['edge_key'] not in mappings[key]:
+                mappings[key].append(r['edge_key'])
+
+    return mappings
+
+
 def build_coding_variant_id(variant_id, protein_id, transcript_id, gene_id):
     key = variant_id + '_' + protein_id + '_' + transcript_id + '_' + gene_id
     return hashlib.sha256(key.encode()).hexdigest()

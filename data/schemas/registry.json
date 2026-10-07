@@ -93,13 +93,17 @@
         }
     },
     "edges": {
+        "coding_variants_PPI": {
+            "SemiQY2H": "schemas/edges/coding_variants_PPI.SemiQY2H.json"
+        },
         "coding_variants_phenotypes": {
             "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
             "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
             "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
             "SGE": "schemas/edges/coding_variants_phenotypes.SGE.json",
             "DUALIPAAdapter": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
-            "VariantPaintingAdapter": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json"
+            "VariantPaintingAdapter": "schemas/edges/coding_variants_phenotypes.VariantPaintingAdapter.json",
+            "SemiQY2H": "schemas/edges/coding_variants_phenotypes.SemiQY2H.json"
         },
         "complexes_proteins": {
             "EBIComplex": "schemas/edges/complexes_proteins.EBIComplex.json",
