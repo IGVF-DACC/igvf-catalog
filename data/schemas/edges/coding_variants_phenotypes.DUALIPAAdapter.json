@@ -95,12 +95,13 @@
         "dualipa_abun_score": {
           "title": "DUAL-IPA Abundance Score",
           "type": "number",
-          "description": "Z-score of the log2 variant-to-WT fluorescence ratio, calculated as (log2(allele_wt_ratio) - mu_wt) / sigma_wt. mu_wt and sigma_wt are the mean and standard deviation of log2-transformed WT:WT reference ratios; their values and calibration scope are dataset-specific. Lower scores indicate lower protein abundance; higher scores indicate higher abundance. A variant-to-WT ratio of 1 corresponds to -mu_wt / sigma_wt, not necessarily zero, so score sign alone does not determine direction relative to WT."
+          "description": "Z-score of the log2 variant-to-WT fluorescence ratio, calculated as (log2(allele_wt_ratio) - mu_wt) / sigma_wt. mu_wt and sigma_wt are the mean and standard deviation of log2-transformed WT:WT reference ratios; their values and calibration scope are dataset-specific. Lower scores indicate lower protein abundance; higher scores indicate higher abundance. A variant-to-WT ratio of 1 corresponds to -mu_wt / sigma_wt, not necessarily zero, so score sign alone does not determine direction relative to WT.",
+          "threshold": "The adapter preserves dualipa_abun_change from the source and applies no additional score filter. Source classifications use dataset-specific log-likelihood-ratio-calibrated thresholds; their numerical values are not documented in the adapter. A variant-to-WT ratio of 1 is a reference value, not a significance cutoff."
         },
         "dualipa_abun_change": {
           "title": "DUAL-IPA Abundance Change",
           "type": "string",
-          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds.",
+          "description": "Abundance-change classification assigned by the source dataset.",
           "enum": [
             "Y",
             "N",
@@ -110,7 +111,8 @@
             "Y": "Meets the calibrated criteria for an abundance change in either direction. Use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value to determine direction.",
             "N": "Falls within the calibrated no-change range.",
             "Uncertain": "Falls between the calibrated change and no-change ranges."
-          }
+          },
+          "threshold": "The adapter preserves dualipa_abun_change from the source and applies no additional score filter. Source classifications use dataset-specific log-likelihood-ratio-calibrated thresholds; their numerical values are not documented in the adapter. A variant-to-WT ratio of 1 is a reference value, not a significance cutoff."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
@@ -131,5 +133,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "coding_variants_phenotypes"
+  "db_collection_name": "coding_variants_phenotypes",
+  "threshold": "The adapter preserves dualipa_abun_change from the source and applies no additional score filter. Source classifications use dataset-specific log-likelihood-ratio-calibrated thresholds; their numerical values are not documented in the adapter. A variant-to-WT ratio of 1 is a reference value, not a significance cutoff."
 }

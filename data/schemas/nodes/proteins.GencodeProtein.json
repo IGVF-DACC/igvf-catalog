@@ -131,5 +131,6 @@
     "simplified_return": "_id, name, uniprot_names",
     "return": "_id, name, uniprot_names, uniprot_full_names, uniprot_ids, MANE_Select, organism, source, source_url, dbxrefs"
   },
-  "db_collection_name": "proteins"
+  "db_collection_name": "proteins",
+  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in transcripts_proteins.GencodeProtein.json; presence of an entity does not imply a significant association."
 }

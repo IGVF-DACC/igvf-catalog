@@ -415,5 +415,6 @@
   "accessible_via": {
     "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, cell_annotation_term, genome_browser_link, browser_index_file, crispr_modality"
   },
-  "db_collection_name": "files_filesets"
+  "db_collection_name": "files_filesets",
+  "threshold": "Not applicable to these entity records. No statistical significance call is assigned; thresholds for measured or predicted relationships are documented on the corresponding edge schemas."
 }

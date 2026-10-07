@@ -82,7 +82,8 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
+          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay.",
+          "threshold": "Used only when p_value_adj is missing/null: significant is true for p_value < 0.05."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -90,7 +91,8 @@
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Multiple-testing-adjusted p-value when reported by the source.",
+          "threshold": "Used first when available: significant is true for p_value_adj < 0.05."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -98,12 +100,14 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
         },
         "log2FC": {
           "title": "Log2 Fold Change",
@@ -136,7 +140,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the perturbation effect."
+          "description": "Boolean indicator of the significance of the perturbation effect.",
+          "threshold": "The adapter sets significant using the first available statistic: p_value_adj < 0.05; otherwise p_value < 0.05; otherwise abs(z_score) >= 1.959963984540054 (approximately 1.96). A present p-value takes precedence even when it is not significant. If all three are missing/null, significant is false. This labels significance and does not filter out nonsignificant rows."
         },
         "effect_size": {
           "title": "Effect Size",
@@ -166,17 +171,20 @@
         "gamma_approximation_ln_p_value": {
           "title": "Gamma Approximation ln P-Value",
           "type": "number",
-          "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj."
+          "description": "Natural log (ln) of pySpade Significance_score. Used to derive p_value_adj.",
+          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
         },
         "hypergeometric_ln_p_value": {
           "title": "Hypergeometric ln P-Value",
           "type": "number",
-          "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value."
+          "description": "Natural log (ln) of pySpade log(pval)-hypergeom. Used to derive p_value.",
+          "threshold": "Significance is evaluated on the corresponding p_value or p_value_adj after source-format conversion; see significant.threshold for precedence and cutoffs."
         },
         "empirical_p_value": {
           "title": "Empirical P-Value",
           "type": "number",
-          "description": "Empirical p-value from random background comparison."
+          "description": "Empirical p-value from random background comparison.",
+          "threshold": "No cutoff on this field is used by the adapter to assign significant; see significant.threshold for the applied precedence."
         },
         "cpm_perturb": {
           "title": "Perturbed Counts per Million",
@@ -196,17 +204,20 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
+          "description": "Phenotype or effect z-score for the element-gene association when reported by the source.",
+          "threshold": "Used only when both p_value_adj and p_value are missing/null: significant is true for abs(z_score) >= 1.959963984540054 (approximately 1.96)."
         },
         "t_score": {
           "title": "T-Score",
           "type": "number",
-          "description": "T-statistic for the element-gene association."
+          "description": "T-statistic for the element-gene association.",
+          "threshold": "No cutoff on this field is used by the adapter to assign significant; see significant.threshold for the applied precedence."
         },
         "idr": {
           "title": "Irreproducible Discovery Rate",
           "type": "number",
-          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility."
+          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility.",
+          "threshold": "No cutoff on this field is used by the adapter to assign significant; see significant.threshold for the applied precedence."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
@@ -230,5 +241,6 @@
     "filter_by_range": "log2FC, effect_size, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
     "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_ci95_lower, log2FC_ci95_upper, effect_size, effect_size_ci_95, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, pct_1, pct_2, num_guides, num_cells, fold_change, background_corrected_fold_change, z_score, t_score, idr, cpm_perturb, cpm_bg, gamma_approximation_ln_p_value, hypergeometric_ln_p_value"
   },
-  "db_collection_name": "genomic_elements_genes"
+  "db_collection_name": "genomic_elements_genes",
+  "threshold": "The adapter sets significant using the first available statistic: p_value_adj < 0.05; otherwise p_value < 0.05; otherwise abs(z_score) >= 1.959963984540054 (approximately 1.96). A present p-value takes precedence even when it is not significant. If all three are missing/null, significant is false. This labels significance and does not filter out nonsignificant rows."
 }

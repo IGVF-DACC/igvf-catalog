@@ -34,12 +34,14 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
+          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one.",
+          "threshold": "Not used to assign significant; the adapter uses the 95% effect-size confidence interval even when this statistic is available."
         },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the variant effect on the phenotype."
+          "description": "Boolean indicator of the significance of the variant effect on the phenotype.",
+          "threshold": "The adapter sets significant to true when both effect_size_ci95_lower and effect_size_ci95_upper are available and the 95% interval excludes zero: lower > 0 or upper < 0. It uses the source interval when both bounds are present; otherwise it derives effect_size +/- 1.96 times the configured source standard deviation (mu_sd_adj) when available. Missing bounds without that fallback give false. z_score, p_value_adj, and neg_log10_pvalue_adj do not determine significant. Nonsignificant rows are retained."
         },
         "num_guides": {
           "title": "Number of Guides",
@@ -63,7 +65,8 @@
             "number",
             "null"
           ],
-          "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
+          "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation.",
+          "threshold": "Both interval bounds must be available; significant is true if effect_size_ci95_lower > 0 or effect_size_ci95_upper < 0. An interval touching zero is not significant."
         },
         "effect_size_ci95_upper": {
           "title": "Effect Size 95% Confidence Interval Upper Bound",
@@ -71,7 +74,8 @@
             "number",
             "null"
           ],
-          "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
+          "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation.",
+          "threshold": "Both interval bounds must be available; significant is true if effect_size_ci95_lower > 0 or effect_size_ci95_upper < 0. An interval touching zero is not significant."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -79,7 +83,8 @@
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source."
+          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source.",
+          "threshold": "Not used to assign significant; the adapter uses the 95% effect-size confidence interval even when this statistic is available."
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -87,7 +92,8 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of the multiple-testing-adjusted p-value when reported by the source."
+          "description": "Negative log10 of the multiple-testing-adjusted p-value when reported by the source.",
+          "threshold": "Not used to assign significant; the adapter uses the 95% effect-size confidence interval even when this statistic is available."
         },
         "method": {
           "enum": [
@@ -168,5 +174,6 @@
     "filter_by_range": "effect_size, z_score, p_value_adj, neg_log10_pvalue_adj",
     "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
   },
-  "db_collection_name": "variants_phenotypes"
+  "db_collection_name": "variants_phenotypes",
+  "threshold": "The adapter sets significant to true when both effect_size_ci95_lower and effect_size_ci95_upper are available and the 95% interval excludes zero: lower > 0 or upper < 0. It uses the source interval when both bounds are present; otherwise it derives effect_size +/- 1.96 times the configured source standard deviation (mu_sd_adj) when available. Missing bounds without that fallback give false. z_score, p_value_adj, and neg_log10_pvalue_adj do not determine significant. Nonsignificant rows are retained."
 }

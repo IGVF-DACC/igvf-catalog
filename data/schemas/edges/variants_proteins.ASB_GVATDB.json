@@ -30,12 +30,14 @@
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Monte-Carlo p-value of the preferential binding score."
+          "description": "Monte-Carlo p-value of the preferential binding score.",
+          "threshold": "Upstream GVATdb preferential-binding criterion reported in the review: PBS p_value < 0.01 together with OBS oligo_pval < 0.05. The adapter preserves these statistics and p_value_adj without an additional significance filter; no adjusted-p-value cutoff is implemented."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
           "type": "number",
-          "description": "FDR of the preferential binding score."
+          "description": "FDR of the preferential binding score.",
+          "threshold": "No adjusted-p-value cutoff is applied by the adapter; the reported upstream criterion uses p_value and oligo_pval."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -62,7 +64,8 @@
         "oligo_pval": {
           "title": "Oligo P-Value",
           "type": "number",
-          "description": "P-value of the oligo binding score."
+          "description": "P-value of the oligo binding score.",
+          "threshold": "Upstream GVATdb preferential-binding criterion reported in the review: PBS p_value < 0.01 together with OBS oligo_pval < 0.05. The adapter preserves these statistics and p_value_adj without an additional significance filter; no adjusted-p-value cutoff is implemented."
         },
         "ref_auc": {
           "title": "Reference Area Under the Curve",
@@ -154,5 +157,6 @@
   "accessible_via": {
     "name": "variants_proteins",
     "return": "label, method, class, source, source_url, neg_log10_pvalue_adj, p_value, neg_log10_pvalue, files_filesets"
-  }
+  },
+  "threshold": "Upstream GVATdb preferential-binding criterion reported in the review: PBS p_value < 0.01 together with OBS oligo_pval < 0.05. The adapter preserves these statistics and p_value_adj without an additional significance filter; no adjusted-p-value cutoff is implemented."
 }

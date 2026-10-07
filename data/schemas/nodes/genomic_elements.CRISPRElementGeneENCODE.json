@@ -46,5 +46,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "genomic_elements"
+  "db_collection_name": "genomic_elements",
+  "threshold": "No numerical threshold is applied to element records. The adapter assigns source_annotation = candidate enhancer when the source Significant column is TRUE for any tested gene, and negative control otherwise; it does not recalculate the source significance call."
 }

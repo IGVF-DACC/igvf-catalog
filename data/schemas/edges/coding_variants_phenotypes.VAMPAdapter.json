@@ -79,7 +79,8 @@
             "number",
             "null"
           ],
-          "description": "VAMP-seq abundance score: For the variant, the mean of its replicate measurements. Normalized so that the median synonymous variant scores 1 and the median nonsense variant scores 0, so lower scores mean reduced abundance of the variant protein."
+          "description": "VAMP-seq abundance score: For the variant, the mean of its replicate measurements. Normalized so that the median synonymous variant scores 1 and the median nonsense variant scores 0, so lower scores mean reduced abundance of the variant protein.",
+          "threshold": "No score cutoff or significance call is applied by the adapter for VAMP-seq or VAMP-seq (MultiSTEP). Classification thresholds depend on the assayed gene, reference distribution, and dataset. Published PTEN/TPMT abundance cutoffs must not be generalized to the CYP2C19 or F9 datasets handled here; scores of 0 and 1 are reference anchors, not significance cutoffs."
         },
         "standard_error": {
           "title": "Standard Error",
@@ -125,5 +126,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "coding_variants_phenotypes"
+  "db_collection_name": "coding_variants_phenotypes",
+  "threshold": "No score cutoff or significance call is applied by the adapter for VAMP-seq or VAMP-seq (MultiSTEP). Classification thresholds depend on the assayed gene, reference distribution, and dataset. Published PTEN/TPMT abundance cutoffs must not be generalized to the CYP2C19 or F9 datasets handled here; scores of 0 and 1 are reference anchors, not significance cutoffs."
 }

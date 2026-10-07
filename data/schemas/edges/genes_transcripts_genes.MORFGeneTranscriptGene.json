@@ -48,7 +48,8 @@
             "number",
             "null"
           ],
-          "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association."
+          "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association.",
+          "threshold": "No cutoff is applied to this field to assign significant; it is not a fallback for a missing adjusted p-value."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -56,7 +57,8 @@
             "number",
             "null"
           ],
-          "description": "DESeq2 Benjamini-Hochberg adjusted p-value."
+          "description": "DESeq2 Benjamini-Hochberg adjusted p-value.",
+          "threshold": "Used for significant when available: p_value_adj < 0.05."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -77,7 +79,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Whether the adjusted p-value is below 0.05."
+          "description": "Boolean indicator of the significance of the transcript perturbation effect on gene expression.",
+          "threshold": "The adapter sets significant to true when p_value_adj is available and < 0.05; otherwise false. It does not fall back to p_value. Nonsignificant rows are retained."
         },
         "morf_id": {
           "title": "MORF ID",
@@ -166,5 +169,6 @@
     "filter_by_range": "log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, base_mean",
     "return": "class, label, name, method, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, standard_error, base_mean, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, morf_id, transcript_mapping_method"
   },
-  "db_collection_name": "genes_transcripts_genes"
+  "db_collection_name": "genes_transcripts_genes",
+  "threshold": "The adapter sets significant to true when p_value_adj is available and < 0.05; otherwise false. It does not fall back to p_value. Nonsignificant rows are retained."
 }

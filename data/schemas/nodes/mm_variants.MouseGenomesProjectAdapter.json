@@ -142,5 +142,6 @@
     "simplified_return": "_id, chr, pos, rsid, ref, alt, strain, spdi, hgvs",
     "return": "_id, chr, pos, rsid, ref, alt, organism, name, spdi, hgvs, qual, filter, fi, strain, source, source_url"
   },
-  "db_collection_name": "mm_variants"
+  "db_collection_name": "mm_variants",
+  "threshold": "No statistical significance cutoff is applied. The adapter retains nonmissing, non-reference genotype calls (excluding ./. and 0/0); source filter and fi quality annotations are preserved without a numerical cutoff."
 }

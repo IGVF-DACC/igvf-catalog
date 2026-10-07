@@ -35,5 +35,6 @@
     "simplified_return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, ca_id",
     "return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, ca_id, qual, filter, organism, source, source_url, annotations, files_filesets"
   },
-  "db_collection_name": "variants"
+  "db_collection_name": "variants",
+  "threshold": "Not applicable to these entity records. No statistical significance call is assigned; thresholds for measured or predicted relationships are documented on the corresponding edge schemas."
 }

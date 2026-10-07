@@ -122,17 +122,20 @@
         "posterior_inclusion_probability": {
           "title": "Posterior Inclusion Probability",
           "type": "number",
-          "description": "Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping."
+          "description": "Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping.",
+          "threshold": "The adapter loads the supplied fine-mapping records without a p_value, z_score, posterior_inclusion_probability, or credible_set_min_r2 cutoff. Credible-set selection is performed upstream and depends on the source dataset; no additional universal significance threshold is documented."
         },
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Nominal p-value of association between the variant and the molecular trait."
+          "description": "Nominal p-value of association between the variant and the molecular trait.",
+          "threshold": "The adapter loads the supplied fine-mapping records without a p_value, z_score, posterior_inclusion_probability, or credible_set_min_r2 cutoff. Credible-set selection is performed upstream and depends on the source dataset; no additional universal significance threshold is documented."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "threshold": "The adapter loads the supplied fine-mapping records without a p_value, z_score, posterior_inclusion_probability, or credible_set_min_r2 cutoff. Credible-set selection is performed upstream and depends on the source dataset; no additional universal significance threshold is documented."
         },
         "effect_size": {
           "title": "Effect Size",
@@ -147,12 +150,14 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Univariate z-score of the variant."
+          "description": "Univariate z-score of the variant.",
+          "threshold": "The adapter loads the supplied fine-mapping records without a p_value, z_score, posterior_inclusion_probability, or credible_set_min_r2 cutoff. Credible-set selection is performed upstream and depends on the source dataset; no additional universal significance threshold is documented."
         },
         "credible_set_min_r2": {
           "title": "Credible Set Minimum R2",
           "type": "number",
-          "description": "Smallest linkage-disequilibrium r2 between any two variants in the credible set."
+          "description": "Smallest linkage-disequilibrium r2 between any two variants in the credible set.",
+          "threshold": "The adapter loads the supplied fine-mapping records without a p_value, z_score, posterior_inclusion_probability, or credible_set_min_r2 cutoff. Credible-set selection is performed upstream and depends on the source dataset; no additional universal significance threshold is documented."
         },
         "region": {
           "title": "Region",
@@ -212,5 +217,6 @@
     "filter_by_range": "neg_log10_pvalue",
     "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context, files_filesets",
     "return": "neg_log10_pvalue, p_value, posterior_inclusion_probability, effect_size, standard_error, z_score, credible_set_min_r2, study, source, class, method, label, source_url, biological_context, biosample_term, files_filesets"
-  }
+  },
+  "threshold": "The adapter loads the supplied fine-mapping records without a p_value, z_score, posterior_inclusion_probability, or credible_set_min_r2 cutoff. Credible-set selection is performed upstream and depends on the source dataset; no additional universal significance threshold is documented."
 }

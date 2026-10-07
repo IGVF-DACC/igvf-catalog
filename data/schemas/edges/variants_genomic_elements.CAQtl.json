@@ -95,5 +95,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "variants_genomic_elements"
+  "db_collection_name": "variants_genomic_elements",
+  "threshold": "The adapter loads the supplied ENCODE caQTL associations without a numerical significance filter and emits no p-value or significance field. Upstream selection criteria are not documented in the adapter."
 }

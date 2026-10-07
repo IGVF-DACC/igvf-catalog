@@ -123,7 +123,8 @@
             "number",
             "null"
           ],
-          "description": "BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence."
+          "description": "BioGRID confidence score from the merged table. Null when the source has none. Larger values mean higher reported confidence.",
+          "threshold": "Source interaction records are loaded without a numerical confidence cutoff. confidence_value_biogrid and confidence_value_intact are retained when available; their source-specific scales do not define a shared significance threshold."
         },
         "confidence_value_intact": {
           "title": "IntAct Confidence Value",
@@ -131,7 +132,8 @@
             "number",
             "null"
           ],
-          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence."
+          "description": "IntAct MIscore from the merged table, on a 0–1 scale. Null when the source has none. Larger values mean more supporting evidence.",
+          "threshold": "Source interaction records are loaded without a numerical confidence cutoff. confidence_value_biogrid and confidence_value_intact are retained when available; their source-specific scales do not define a shared significance threshold."
         },
         "source": {
           "enum": [
@@ -264,5 +266,6 @@
   "accessible_via": {
     "return": "detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, label, method, class, source, pmids, files_filesets, source_url"
   },
-  "db_collection_name": "genes_genes"
+  "db_collection_name": "genes_genes",
+  "threshold": "Source interaction records are loaded without a numerical confidence cutoff. confidence_value_biogrid and confidence_value_intact are retained when available; their source-specific scales do not define a shared significance threshold."
 }

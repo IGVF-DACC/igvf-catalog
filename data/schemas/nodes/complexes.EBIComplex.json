@@ -141,5 +141,6 @@
   "accessible_via": {
     "return": "_id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, class, method, label, files_filesets, source, source_url"
   },
-  "db_collection_name": "complexes"
+  "db_collection_name": "complexes",
+  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in complexes_terms.EBIComplex.json, complexes_proteins.EBIComplex.json; presence of an entity does not imply a significant association."
 }

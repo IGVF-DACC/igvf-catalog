@@ -70,12 +70,14 @@
         "localization_score": {
           "title": "Localization Score",
           "type": "number",
-          "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant"
+          "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant",
+          "threshold": "The adapter preserves the source mislocalization_hit boolean and localization_score without applying a score filter or recalculating the hit. The upstream numerical cutoff is not documented; a sampled minimum near 0.5 does not establish a cutoff."
         },
         "mislocalization_hit": {
           "title": "Mislocalization Hit?",
           "type": "boolean",
-          "description": "Whether the variant is classified as causing protein mislocalization based on the localization score threshold"
+          "description": "Whether the source classifies the variant as causing protein mislocalization.",
+          "threshold": "The adapter preserves the source mislocalization_hit boolean and localization_score without applying a score filter or recalculating the hit. The upstream numerical cutoff is not documented; a sampled minimum near 0.5 does not establish a cutoff."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
@@ -91,5 +93,6 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "coding_variants_phenotypes"
+  "db_collection_name": "coding_variants_phenotypes",
+  "threshold": "The adapter preserves the source mislocalization_hit boolean and localization_score without applying a score filter or recalculating the hit. The upstream numerical cutoff is not documented; a sampled minimum near 0.5 does not establish a cutoff."
 }

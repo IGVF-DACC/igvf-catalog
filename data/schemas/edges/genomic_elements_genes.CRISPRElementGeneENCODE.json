@@ -74,7 +74,8 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element-gene interactions.",
-          "example": true
+          "example": true,
+          "threshold": "The adapter preserves the source Significant column (TRUE becomes true); it does not recalculate significance from p_value, p_value_adj, effect_size, or confidence intervals. The numerical cutoff is source-dataset-specific and is not documented in the adapter. Nonsignificant rows are retained."
         },
         "method": {
           "enum": [
@@ -160,5 +161,6 @@
     "filter_by_range": "effect_size, log2FC",
     "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, log2FC, p_value"
   },
-  "db_collection_name": "genomic_elements_genes"
+  "db_collection_name": "genomic_elements_genes",
+  "threshold": "The adapter preserves the source Significant column (TRUE becomes true); it does not recalculate significance from p_value, p_value_adj, effect_size, or confidence intervals. The numerical cutoff is source-dataset-specific and is not documented in the adapter. Nonsignificant rows are retained."
 }
