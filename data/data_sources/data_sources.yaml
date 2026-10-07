@@ -1760,6 +1760,63 @@ variant to biosample igvf mpra:
   source: IGVF
   label: variant effect on regulatory element activity
 
+
+mouse genomic element igvf mpra:
+  collection: mm_genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --organism MOUSE
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element
+    --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4607JYJD/@@download/IGVFFI4607JYJD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4845SDZI/@@download/IGVFFI4845SDZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+
+  source: IGVF
+  threshold: 1
+  type: tested elements
+
+
+mouse genomic element to biosample igvf mpra:
+  collection: mm_genomic_elements_biosamples
+  params:
+    - label
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --organism MOUSE
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element_biosample
+    --output-bucket-key mm_genomic_elements_biosamples/mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4607JYJD/@@download/IGVFFI4607JYJD.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4845SDZI/@@download/IGVFFI4845SDZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+
+  source: IGVF
+  threshold: 1
+  label: regulatory reference element activity
+
+
 # Three files under IGVFDS8793NHEL (unified MPRA adapter; no reference file for ENCODE)
 # Examples:
 # python3 data_parser.py --adapter mpra --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/'

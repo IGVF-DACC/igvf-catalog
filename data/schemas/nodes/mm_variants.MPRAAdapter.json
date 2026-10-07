@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/mm_variants.MPRAAdapter.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "organism": {
+          "enum": [
+            "Mus musculus"
+          ]
+        }
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false,
+      "db_collection_name": "mm_variants"
+    }
+  ],
+  "db_collection_name": "mm_variants"
+}

@@ -466,3 +466,40 @@ def test_get_gene_map_from_arangodb_flattens_array_fields():
         assert result['FOO'] == ['ENSG00000000001']
         assert result['BAR'] == ['ENSG00000000001', 'ENSG00000000002']
         assert not any('ENSG00000000003' in ids for ids in result.values())
+
+
+@pytest.mark.parametrize('spdi,chromosome', [
+    ('NC_000067.7:11:A:C', 'chr1'),
+    ('NC_000086.8:11:A:C', 'chrX'),
+    ('NC_000087.8:11:A:C', 'chrY'),
+])
+def test_load_mouse_variant_uses_mouse_reference(spdi, chromosome):
+    with patch('adapters.helpers.get_seqrepo') as seqrepo, \
+            patch('adapters.helpers.AlleleTranslator') as translator:
+        variant, skipped = load_variant(
+            spdi, assembly='GRCm39', validate_SNV=False)
+    assert skipped is None
+    assert variant['chr'] == chromosome
+    assert variant['organism'] == 'Mus musculus'
+    assert variant['spdi'] == spdi
+    assert variant['pos'] == 11
+    seqrepo.assert_called_once_with('mouse')
+    translator.assert_called_once()
+
+
+def test_load_mouse_deletion_uses_mouse_reference():
+    with patch('adapters.helpers.get_ref_seq_by_spdi', return_value='A') as reference:
+        variant, skipped = load_variant('NC_000067.7:11:A:', assembly='GRCm39')
+    assert skipped is None
+    assert variant['organism'] == 'Mus musculus'
+    assert variant['variation_type'] == 'deletion'
+    reference.assert_called_once_with('NC_000067.7:11:A:', species='mouse')
+
+
+def test_bulk_check_mouse_variants_queries_mouse_collection():
+    with patch('adapters.helpers.ArangoDB') as arango:
+        execute = arango.return_value.get_igvf_connection.return_value.aql.execute
+        execute.return_value = ['NC_000067.7:11:A:C']
+        assert bulk_check_variants_in_arangodb(
+            ['NC_000067.7:11:A:C'], collection='mm_variants') == {'NC_000067.7:11:A:C'}
+        assert 'FOR v IN mm_variants ' in execute.call_args.args[0]

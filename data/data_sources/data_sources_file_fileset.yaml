@@ -599,6 +599,9 @@ igvf_file_accessions:
     - IGVFFI8105TNNO
   MPRA:
     reporter genomic element effects:
+      - IGVFFI3406MEAD
+      - IGVFFI4607JYJD
+      - IGVFFI4845SDZI
       - IGVFFI8207IHFY
       - IGVFFI1843KICT
       - IGVFFI9459EBKC
@@ -619,6 +622,8 @@ igvf_file_accessions:
       - IGVFFI4328UUGV
       - IGVFFI2950PCZI
     MPRA sequence designs:
+      - IGVFFI1204BCKQ
+      - IGVFFI4103SCUB
       - IGVFFI4914OUJH
       - IGVFFI7321WGMD
       - IGVFFI1436TRIH

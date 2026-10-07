@@ -7,7 +7,7 @@ import { ontologyFormat } from '../nodes/ontologies'
 import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
+import { commonBiosamplesQueryFormat, commonEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 50
@@ -40,8 +40,8 @@ const genomicElementCollectionName = genomicElementSchema.db_collection_name as 
 const biosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
 const biosampleCollectionName = biosampleSchema.db_collection_name as string
 
-const genomicElementVerboseQuery = `
-  FOR otherRecord IN ${genomicElementCollectionName}
+const genomicElementVerboseQuery = (elementCollection: string): string => `
+  FOR otherRecord IN ${elementCollection}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
   RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
 `
@@ -51,6 +51,9 @@ const biosampleVerboseQuery = `
   RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
 `
 async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType): Promise<any[]> {
+  const mouse = input.organism === 'Mus musculus'
+  const elementCollection = mouse ? 'mm_genomic_elements' : genomicElementCollectionName
+  const edgeCollection = mouse ? 'mm_genomic_elements_biosamples' : genomicElementToBiosampleCollectionName
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -121,13 +124,13 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
       )
     `}
 
-    FOR record IN ${genomicElementToBiosampleCollectionName}
+    FOR record IN ${edgeCollection}
       FILTER ${empty ? '' : 'record._to IN targets'} ${filesetFilter} ${methodFilter} ${sourceInputFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
-        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
+        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery(elementCollection)})[0]` : 'record._from'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
         'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -140,6 +143,9 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
 }
 
 async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType): Promise<any[]> {
+  const mouse = input.organism === 'Mus musculus'
+  const elementCollection = mouse ? 'mm_genomic_elements' : genomicElementCollectionName
+  const edgeCollection = mouse ? 'mm_genomic_elements_biosamples' : genomicElementToBiosampleCollectionName
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -195,18 +201,18 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
     ? ''
     : `
       LET sources = (
-        FOR record in ${genomicElementCollectionName}
+        FOR record in ${elementCollection}
         ${sourceFilters}
         RETURN record._id
       )
     `}
 
-    FOR record IN ${genomicElementToBiosampleCollectionName}
+    FOR record IN ${edgeCollection}
       FILTER ${empty ? '' : 'record._from IN sources'} ${filesetFilter} ${methodFilter} ${sourceInputFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
+        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery(elementCollection)})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
         'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
@@ -227,9 +233,8 @@ const genomicBiosamplesQuery = genomicElementCommonQueryFormat
     source: z.enum(SOURCES).optional(),
     files_fileset: z.string().optional()
   }))
-  .merge(commonHumanEdgeParamsFormat).omit({
-    source_annotation: true,
-    organism: true
+  .merge(commonEdgeParamsFormat).omit({
+    source_annotation: true
   // eslint-disable-next-line @typescript-eslint/naming-convention
   }).transform(({ region_type, ...rest }) => ({
     type: region_type,
@@ -241,7 +246,7 @@ const biosamplesGenomicElementsQuery = commonBiosamplesQueryFormat.merge(z.objec
   source: z.enum(SOURCES).optional(),
   files_fileset: z.string().optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, ...rest }) => ({
+})).merge(commonEdgeParamsFormat).transform(({ biosample_name, ...rest }) => ({
   name: biosample_name, ...rest
 }))
 

@@ -623,3 +623,133 @@ def test_validate_doc_invalid(mock_file_fileset):
     }
     with pytest.raises(ValueError, match='Document validation failed:'):
         adapter.validate_doc(invalid_doc)
+
+
+@pytest.mark.parametrize('label,collection', [
+    ('genomic_element', 'mm_genomic_elements'),
+    ('genomic_element_biosample', 'mm_genomic_elements_biosamples'),
+    ('genomic_element_from_variant', 'mm_genomic_elements'),
+    ('variant', 'mm_variants'),
+    ('variant_biosample', 'mm_variants_biosamples'),
+])
+def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, label, collection):
+    spdi = 'NC_000067.7:11:A:C'
+    design = tmp_path / 'design.tsv'
+    design.write_text(
+        'name\tref\tchr\tstart\tend\tstrand\tSPDI\tallele\tvariant_pos\n'
+        f'ref_tile\tGRCm39\tchr1\t10\t20\t+\t["{spdi}"]\t["ref"]\t[1]\n'
+    )
+    effects = tmp_path / 'effects.bed'
+    if label in ('genomic_element', 'genomic_element_biosample'):
+        effects.write_text(
+            'chr1\t10\t20\tref_tile\t100\t+\t0.25\t1\t2\t3\t1.5\n')
+    else:
+        effects.write_text(
+            f'chr1\t11\t12\t{spdi}\t100\t+\t0.25\t1\t2\t3\t4\t5\t6\t0.9\t0.1\t0.4\t1\tA\tC\n')
+    variant = {
+        '_key': spdi, 'name': spdi, 'spdi': spdi, 'chr': 'chr1', 'pos': 11,
+        'ref': 'A', 'alt': 'C', 'variation_type': 'SNP',
+        'hgvs': 'NC_000067.7:g.12A>C', 'organism': 'Mus musculus',
+    }
+    writer = SpyWriter()
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb',
+               return_value={spdi} if label == 'variant_biosample' else set()) as check, \
+            patch('adapters.mpra_adapter.load_variant', return_value=(variant, None)) as load:
+        adapter = MPRAAdapter(
+            filepath=str(effects), label=label, writer=writer, validate=True, organism='MOUSE',
+            source_url='https://data.igvf.org/tabular-files/IGVFFI2111LQGF/',
+            reference_filepath=str(design),
+            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI4261NSQZ/',
+        )
+        assert adapter._get_collection_name() == collection
+        assert adapter.schema['db_collection_name'] == collection
+        adapter.process_file()
+        records = [json.loads(row) for row in writer.contents]
+        assert len(records) == 1
+        record = records[0]
+        element_key = 'MPRA_chr1_10_20_GRCm39_plus_IGVFFI4261NSQZ'
+        if label in ('genomic_element', 'genomic_element_from_variant'):
+            assert record['_key'] == element_key
+        elif label == 'genomic_element_biosample':
+            assert record['_from'] == f'mm_genomic_elements/{element_key}'
+        elif label == 'variant_biosample':
+            assert record['_from'] == f'mm_variants/{spdi}'
+            assert record['genomic_element'] == f'mm_genomic_elements/{element_key}'
+            assert record['_key'] == f'{spdi}_{element_key}_plus_CL_0000679_IGVFFI2111LQGF'
+        if label in ('variant', 'variant_biosample'):
+            assert check.call_args.kwargs['collection'] == 'mm_variants'
+            load.assert_called_once_with(spdi, assembly='GRCm39')
+
+
+def test_mpra_rejects_mixed_design_assemblies(tmp_path):
+    design = tmp_path / 'design.tsv'
+    design.write_text('ref\nGRCh38\nGRCm39\n')
+    with pytest.raises(ValueError, match='mixed MPRA design assemblies'):
+        MPRAAdapter._read_design_assembly(design)
+
+
+def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
+    design = tmp_path / 'design.tsv'
+    design.write_text(
+        'name\tref\tclass\tchr\tstart\tend\tstrand\tallele\n'
+        'mouse_tile\tGRCm39\ttest\tchr1\t10\t20\t+\tNA\n'
+        'human_control\tGRCh38\telement active control\tchr2\t30\t40\t+\tNA\n'
+    )
+    effects = tmp_path / 'effects.bed'
+    effects.write_text(
+        'chr1\t10\t20\tmouse_tile\t100\t+\t1\t2\t3\t4\t5\n'
+        'chr2\t30\t40\thuman_control\t100\t+\t1\t2\t3\t4\t5\n'
+    )
+    for label in ('genomic_element', 'genomic_element_biosample'):
+        writer = SpyWriter()
+        adapter = MPRAAdapter(
+            filepath=str(effects), label=label, writer=writer, validate=True,
+            source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
+            reference_filepath=str(design),
+            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1204BCKQ/',
+        )
+        adapter.process_file()
+        assert adapter.assembly == 'GRCm39'
+        assert len(writer.contents) == 1
+        assert 'GRCm39' in json.loads(writer.contents[0])['_key']
+
+
+@pytest.mark.parametrize('strand', ['+', '-'])
+def test_mouse_satmut_maps_changed_bases_to_named_reference_tile(tmp_path, mock_file_fileset, strand):
+    design = tmp_path / 'design.tsv'
+    # ALT precedes WT and covers only the changed base, not the full tile.
+    design.write_text(
+        'name\tref\tclass\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
+        f'tile::2_Mismatch_C_1\tGRCm39\ttest\tchr1\t11\t12\t{strand}\t["alt"]\t["NC_000067.7:11:A:C"]\t[1]\n'
+        f'tile::WT_NA_NA_NA\tGRCm39\telement active control\tchr1\t10\t20\t{strand}\t["ref"]\tNA\tNA\n'
+    )
+    effects = tmp_path / 'effects.bed'
+    effects.write_text(
+        f'chr1\t10\t20\ttile::WT_NA_NA_NA\t100\t{strand}\t1\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(
+        filepath=str(effects), label='genomic_element_biosample', writer=writer, validate=True,
+        source_url='https://data.igvf.org/tabular-files/IGVFFI0975AQKF/',
+        reference_filepath=str(design),
+        reference_source_url='https://data.igvf.org/tabular-files/IGVFFI4261NSQZ/',
+    )
+    assert adapter.variant_to_element['NC_000067.7:11:A:C'] == {
+        ('chr1', '10', '20', strand)}
+    assert adapter.variant_pos_to_element[('NC_000067.7:11:A:C', 1)] == {
+        ('chr1', '10', '20', strand)}
+    adapter.process_file()
+    assert len(writer.contents) == 1
+    assert json.loads(writer.contents[0])['_from'].startswith(
+        'mm_genomic_elements/MPRA_chr1_10_20_GRCm39_')
+
+
+@pytest.mark.parametrize('organism', ['HUMAN', 'mouse', 'mm_'])
+def test_mouse_mpra_rejects_inconsistent_organism(tmp_path, organism):
+    design = tmp_path / 'design.tsv'
+    design.write_text('ref\nGRCm39\n')
+    with pytest.raises(ValueError, match='Organism must be MOUSE'):
+        MPRAAdapter(
+            filepath='unused.bed', label='genomic_element',
+            source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
+            reference_filepath=str(design), organism=organism,
+        )

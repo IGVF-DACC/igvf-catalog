@@ -7,7 +7,7 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
-import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { commonEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
@@ -22,7 +22,7 @@ const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),
   biosample_name: z.string().trim().optional(),
   files_fileset: z.string().optional()
-}).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat)
+}).merge(variantsBiosamplesQueryFormat).merge(commonEdgeParamsFormat)
 
 const genomicElementFormat = z.object({
   _id: z.string(),
@@ -100,8 +100,8 @@ function getLimit (input: paramsFormatType): number {
   }
 }
 
-const variantVerboseQuery = `
-FOR otherRecord IN ${variantCollectionName}
+const variantVerboseQuery = (mouse: boolean): string => `
+FOR otherRecord IN ${mouse ? 'mm_variants' : variantCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
 RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
 `
@@ -112,13 +112,15 @@ FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(BiosampleSchema).replaceAll('record', 'otherRecord')}}
 `
 
-const genomicElementVerboseQuery = `
-FOR otherRecord IN ${genomicElementsCollectionName}
+const genomicElementVerboseQuery = (mouse: boolean): string => `
+FOR otherRecord IN ${mouse ? 'mm_genomic_elements' : genomicElementsCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record.genomic_element).key
 RETURN {${getDBReturnStatements(genomicElementsSchema).replaceAll('record', 'otherRecord')}}
 `
 
 async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantIds: string[] | undefined, biosampleIds: string[] | undefined): Promise<any[]> {
+  const mouse = input.organism === 'Mus musculus'
+  const elementCollection = mouse ? 'mm_genomic_elements' : genomicElementsCollectionName
   input.limit = getLimit(input)
 
   let filesetFilter = ''
@@ -153,7 +155,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
 
   let filterGenomicElements = ''
   if (input.element_id !== undefined) {
-    filterGenomicElements = `FILTER record.genomic_element == 'genomic_elements/${input.element_id as string}'`
+    filterGenomicElements = `FILTER record.genomic_element == '${elementCollection}/${input.element_id as string}'`
     delete input.element_id
   }
 
@@ -164,16 +166,16 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
   }
 
   const query = `
-    FOR record IN ${variantToBiosamplesCollecionName as string}
+    FOR record IN ${mouse ? 'mm_variants_biosamples' : variantToBiosamplesCollecionName}
     FILTER ${filterCondition} ${methodFilter} ${filesetFilter}
     ${filterGenomicElements}
     ${filterSignificant}
     SORT record._key
     LIMIT ${input.page as number * input.limit}, ${input.limit}
-    LET genomic_element = ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record.genomic_element'}
+    LET genomic_element = ${input.verbose === 'true' ? `(${genomicElementVerboseQuery(mouse)})[0]` : 'record.genomic_element'}
     RETURN MERGE(
       {
-        'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
+        'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery(mouse)})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'log2FC': record.log2FC OR record.log2FoldChange,
         'label': record.label,
@@ -222,7 +224,6 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
 
 async function findVariantsFromBiosamplesSearch (input: paramsFormatType): Promise<any[]> {
   biosampleQueryValidation(input)
-  delete input.organism
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const biosampleInput: paramsFormatType = (({ biosample_id, biosample_name }) => ({ term_id: biosample_id, name: biosample_name, page: 0 }))(input)
   delete input.biosample_id
@@ -241,7 +242,6 @@ async function findVariantsFromBiosamplesSearch (input: paramsFormatType): Promi
 
 async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   variantQueryValidation(input)
-  delete input.organism
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, region, ca_id }) => ({ variant_id, spdi, hgvs, rsid, region, ca_id }))(input)
   delete input.variant_id
@@ -255,7 +255,7 @@ async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promis
   if (Object.values(variantInput).every(v => v === undefined)) {
     variantIDs = undefined
   } else {
-    variantIDs = await variantIDSearch(variantInput)
+    variantIDs = await variantIDSearch({ ...variantInput, organism: input.organism })
   }
 
   return await executeVariantsBiosamplesQuery(input, variantIDs, undefined)
@@ -269,7 +269,7 @@ const variantsFromBiosamples = publicProcedure
 
 const biosamplesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/biosamples', description: descriptions.variants_biosamples } })
-  .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsBiosamplesQueryFormat).merge(commonEdgeParamsFormat))
   .output(z.array(returnFormat))
   .query(async ({ input }) => await findBiosamplesFromVariantSearch(input))
 

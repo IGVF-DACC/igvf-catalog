@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/mm_genomic_elements.MPRAAdapter.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "MPRA_chr1_10410_10610_GRCm39_ENCFF769REH"
+        },
+        "name": {
+          "example": "MPRA_chr1_10410_10610_GRCm39_ENCFF769REH"
+        },
+        "strand": {
+          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
+          "enum": [
+            "+",
+            "-",
+            "."
+          ]
+        },
+        "method": {
+          "enum": [
+            "MPRA"
+          ]
+        },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://www.encodeproject.org/files/ENCFF769REH/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "files_filesets",
+        "strand"
+      ],
+      "additionalProperties": false,
+      "db_collection_name": "mm_genomic_elements"
+    }
+  ],
+  "db_collection_name": "mm_genomic_elements"
+}
