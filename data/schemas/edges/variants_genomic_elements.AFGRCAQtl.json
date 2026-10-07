@@ -34,14 +34,12 @@
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction",
-          "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Nominal p-value of association between the variant and chromatin accessibility of the peak.",
-          "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+          "description": "Nominal p-value of association between the variant and chromatin accessibility of the peak."
         },
         "beta": {
           "title": "Beta",
@@ -112,6 +110,5 @@
   "accessible_via": {
     "filter_by_range": "neg_log10_pvalue, p_value, beta",
     "return": "neg_log10_pvalue, p_value, beta, source, label, source_url, files_filesets, biological_context, biosample_term, name, inverse_name, method"
-  },
-  "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+  }
 }

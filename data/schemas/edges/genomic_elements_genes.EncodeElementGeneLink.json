@@ -45,7 +45,7 @@
           "title": "Score",
           "type": "number",
           "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene.",
-          "threshold": "Upstream model-specific score thresholds define the published thresholded links; the adapter applies no additional score filter. ENCODE-rE2G thresholds at 70% recall are: extended 0.336, dhs_h3k27ac_megamap 0.217, dhs_megamap 0.201, atac_megamap 0.179, atac_intact_hic 0.232, dhs_intact_hic 0.243, atac_h3k27ac_megamap 0.203, and atac_h3k27ac_intact_hic 0.259. Scores above the applicable threshold are called links. Use the source file/model version to select the threshold; there is no universal cutoff and this list is not exhaustive."
+          "threshold": "Upstream ENCODE-rE2G thresholded element-gene links use model-specific score cutoffs calibrated to 70% recall. The inspected filtering code retains score >= the model threshold. Verified model thresholds: dhs_megamap 0.201, dhs_h3k27ac_megamap 0.217, dhs_intact_hic 0.243, dhs_h3k27ac_intact_hic 0.298, atac_megamap 0.179, atac_h3k27ac_megamap 0.203, atac_intact_hic 0.232, atac_h3k27ac_intact_hic 0.259, and extended 0.336. ENCFF003BKC is explicitly a thresholded element-gene file; match each input file to its model/version before choosing a cutoff. See ../threshold-evidence.md for the inspected code revision and remaining file-to-model verification."
         },
         "source": {
           "enum": [
@@ -99,5 +99,5 @@
     "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, score"
   },
   "db_collection_name": "genomic_elements_genes",
-  "threshold": "Upstream model-specific score thresholds define the published thresholded links; the adapter applies no additional score filter. ENCODE-rE2G thresholds at 70% recall are: extended 0.336, dhs_h3k27ac_megamap 0.217, dhs_megamap 0.201, atac_megamap 0.179, atac_intact_hic 0.232, dhs_intact_hic 0.243, atac_h3k27ac_megamap 0.203, and atac_h3k27ac_intact_hic 0.259. Scores above the applicable threshold are called links. Use the source file/model version to select the threshold; there is no universal cutoff and this list is not exhaustive."
+  "threshold": "Upstream ENCODE-rE2G thresholded element-gene links use model-specific score cutoffs calibrated to 70% recall. The inspected filtering code retains score >= the model threshold. Verified model thresholds: dhs_megamap 0.201, dhs_h3k27ac_megamap 0.217, dhs_intact_hic 0.243, dhs_h3k27ac_intact_hic 0.298, atac_megamap 0.179, atac_h3k27ac_megamap 0.203, atac_intact_hic 0.232, atac_h3k27ac_intact_hic 0.259, and extended 0.336. ENCFF003BKC is explicitly a thresholded element-gene file; match each input file to its model/version before choosing a cutoff. See ../threshold-evidence.md for the inspected code revision and remaining file-to-model verification."
 }

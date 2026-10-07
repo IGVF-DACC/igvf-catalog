@@ -100,6 +100,5 @@
       ],
       "additionalProperties": false
     }
-  ],
-  "threshold": "Not applicable to this relationship: no statistical significance call or numerical score cutoff is applied by the adapter."
+  ]
 }

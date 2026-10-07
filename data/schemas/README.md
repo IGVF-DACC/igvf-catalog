@@ -88,61 +88,40 @@ meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work
 
 ## Threshold and significance documentation
 
-Every concrete edge schema has a top-level `threshold` string. It
-documents that schema's source-specific selection/significance criteria, or
-explicitly states that they are unknown or not applicable. Base schemas and
-mixins do not supply a default: sharing a collection does not mean that two
-adapters use the same thresholds. Node schemas do not track `threshold`,
-including on individual fields.
+Use an optional `threshold` string only when an actual selection or significance
+rule is established for an edge dataset or field. Omit the property entirely
+when no cutoff applies or the cutoff has not yet been established. Do not use
+placeholder values such as "none", "unknown", or "not applicable". Node schemas,
+including their fields, do not track `threshold`.
 
-Add a `threshold` string beside `description` on edge fields that participate in a
-decision, especially `significant`, classification fields, and predictive
-scores. Keep the field's meaning in `description` and the decision rule in
-`threshold`. For example:
+Keep the field's meaning in `description`; put the cutoff in `threshold` beside
+it. When a significance call uses multiple fields, document which source formats
+use each field, their precedence, strict/inclusive boundaries, and missing-value
+behavior on the decision field. A top-level edge annotation can summarize the
+rule for the dataset. Do not annotate unrelated fields merely to say they are
+not used in that decision.
 
-```json
-"significant": {
-  "title": "Significant?",
-  "type": "boolean",
-  "description": "Boolean indicator of the significance of the perturbation effect.",
-  "threshold": "Use p_value_adj < 0.05 when available; otherwise p_value < 0.05; otherwise abs(z_score) >= 1.959963984540054. If all three are missing/null, false."
-}
-```
+A missing adapter filter does not establish that a dataset is unthresholded.
+Predictive files may already be selected upstream. Investigate source-file
+headers, portal metadata, format specifications, and the versioned generating
+workflow before recording a cutoff. Distinguish upstream file selection,
+catalog preparation/load filters, and significance calls that retain all rows.
+A score range or observed sample minimum alone does not establish a threshold.
+The supplied method-score review is a set of research leads, not authoritative
+threshold documentation.
 
-State which fields apply to each source format, the order of precedence,
-strict/inclusive boundaries, and missing-value behavior. Distinguish a load
-filter (rows are excluded), a significance/classification call (rows may be
-retained regardless of the call), and upstream guidance (not recalculated by
-the adapter). A source-supplied boolean does not imply that the adapter applies
-its own p-value cutoff. Score bounds, reference anchors, and observed sample
-minima are not significance thresholds.
+Record supporting sources, file accessions, model versions, the scope of data
+checks, and unresolved questions in [threshold-evidence.md](threshold-evidence.md).
+Omission of `threshold` must not be interpreted as proof that no upstream filter
+exists. Keep unresolved investigation notes in that evidence document rather
+than in placeholder schema annotations.
 
-`threshold` is documentation metadata, not a stored document property, a JSON
-Schema validation constraint, or an executable adapter setting. Do not add it
-to `properties`, `required`, or `accessible_via.return` as a data field. These
-annotations are maintained separately from adapter constants; changing them
-does not change loading behavior. Read the source-specific schema when
-interpreting thresholds; a merged collection schema cannot express all
-adapters' rules as one shared cutoff.
-
-The initial audit used the adapter implementations and the supplied method-score
-review. Adapter behavior takes precedence when the review describes an older
-implementation. In particular, CRISPR variant-phenotype calls use confidence
-intervals, CRISPR-Millipede uses posterior inclusion probability, and COXPRESdb
-filters the absolute z-score. Unknown upstream cutoffs remain explicitly
-undocumented, including source-supplied ENCODE/phenotype CRISPR calls, DUAL-IPA,
-Variant Painting, and dataset-specific SGE/VAMP-seq classifications.
-
-Predictive-model context comes from the
-[ENCODE-rE2G model documentation](https://github.com/EngreitzLab/ENCODE_rE2G)
-and [model directories](https://github.com/EngreitzLab/ENCODE_rE2G/tree/main/models),
-and the [scE2G model documentation](https://github.com/EngreitzLab/scE2G)
-and [model directories](https://github.com/EngreitzLab/scE2G/tree/main/models).
-The review's model-specific cutoffs are recorded as upstream guidance, not
-adapter constants. Confirm the model/version and source file before applying
-them to a dataset. MutPred2's mechanism filter is also documented in
-`data/data_loading_support_files/run_parallel_mapping_mutpred2.py`; it does
-not impose a cutoff on the overall pathogenicity score.
+`threshold` is documentation metadata, not a stored document field, JSON Schema
+validation constraint, or executable adapter setting. Do not add a data property
+named `threshold` to `properties`, `required`, or `accessible_via.return`.
+Annotations remain separate from adapter constants and do not change loading
+behavior. Consult the source-specific schema; a merged collection schema cannot
+represent all adapters' cutoffs as one shared rule.
 
 ## Base schemas
 

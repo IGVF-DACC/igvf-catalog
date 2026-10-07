@@ -166,8 +166,7 @@
         },
         "empirical_p_value": {
           "type": "number",
-          "description": "Empirical p-value from random background comparison.",
-          "threshold": "No cutoff on this field is used by the adapter to assign significant; see significant.threshold for the applied precedence."
+          "description": "Empirical p-value from random background comparison."
         },
         "cpm_perturb": {
           "type": "number",
@@ -188,13 +187,11 @@
         },
         "t_score": {
           "type": "number",
-          "description": "T-statistic for the element-gene association.",
-          "threshold": "No cutoff on this field is used by the adapter to assign significant; see significant.threshold for the applied precedence."
+          "description": "T-statistic for the element-gene association."
         },
         "idr": {
           "type": "number",
-          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility.",
-          "threshold": "No cutoff on this field is used by the adapter to assign significant; see significant.threshold for the applied precedence."
+          "description": "Irreproducible discovery rate for the element-gene association when reported by the source. Lower values indicate higher cross-replicate reproducibility."
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"

@@ -48,8 +48,7 @@
             "number",
             "null"
           ],
-          "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association.",
-          "threshold": "No cutoff is applied to this field to assign significant; it is not a fallback for a missing adjusted p-value."
+          "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",

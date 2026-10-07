@@ -43,7 +43,7 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
+          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -51,7 +51,7 @@
             "number",
             "null"
           ],
-          "description": "Benjamini\u2013Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
           "example": 0.004023984
         },
         "neg_log10_pvalue": {
@@ -74,8 +74,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element-gene interactions.",
-          "example": true,
-          "threshold": "The adapter preserves the source Significant column (TRUE becomes true); it does not recalculate significance from p_value, p_value_adj, effect_size, or confidence intervals. The numerical cutoff is source-dataset-specific and is not documented in the adapter. Nonsignificant rows are retained."
+          "example": true
         },
         "method": {
           "enum": [
@@ -161,6 +160,5 @@
     "filter_by_range": "effect_size, log2FC",
     "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, log2FC, p_value"
   },
-  "db_collection_name": "genomic_elements_genes",
-  "threshold": "The adapter preserves the source Significant column (TRUE becomes true); it does not recalculate significance from p_value, p_value_adj, effect_size, or confidence intervals. The numerical cutoff is source-dataset-specific and is not documented in the adapter. Nonsignificant rows are retained."
+  "db_collection_name": "genomic_elements_genes"
 }

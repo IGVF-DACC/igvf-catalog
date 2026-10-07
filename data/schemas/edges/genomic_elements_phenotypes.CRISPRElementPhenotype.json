@@ -44,8 +44,7 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the element's effect on the phenotype.",
-          "threshold": "The adapter preserves mig_significant for migration screens or growth_significant for proliferation screens. The source defines the significance and guide-hit criteria; their numerical cutoffs are not documented in the adapter. Neither p_value nor z_score is thresholded again, and nonsignificant rows are retained."
+          "description": "Boolean indicator of the significance of the element's effect on the phenotype."
         },
         "num_guides": {
           "title": "Number of Guides",
@@ -55,20 +54,17 @@
         "num_guides_hit": {
           "title": "Number of Hit Guides",
           "type": "number",
-          "description": "Number of guides classified as hits by the source.",
-          "threshold": "Source-defined guide-hit criteria; numerical cutoffs are not documented in the adapter. These counts/fractions are not used to recalculate significant."
+          "description": "Number of guides classified as hits by the source."
         },
         "num_guides_nonhit": {
           "title": "Number of Non-Hit Guides",
           "type": "number",
-          "description": "Number of guides classified as non-hits by the source.",
-          "threshold": "Source-defined guide-hit criteria; numerical cutoffs are not documented in the adapter. These counts/fractions are not used to recalculate significant."
+          "description": "Number of guides classified as non-hits by the source."
         },
         "fraction_guides_hit": {
           "title": "Fraction of Hit Guides",
           "type": "number",
-          "description": "Fraction of guides classified as hits by the source.",
-          "threshold": "Source-defined guide-hit criteria; numerical cutoffs are not documented in the adapter. These counts/fractions are not used to recalculate significant."
+          "description": "Fraction of guides classified as hits by the source."
         },
         "method": {
           "enum": [
@@ -146,6 +142,5 @@
     "filter_by_range": "z_score, p_value, neg_log10_pvalue",
     "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, num_guides_hit, num_guides_nonhit, fraction_guides_hit"
   },
-  "db_collection_name": "genomic_elements_phenotypes",
-  "threshold": "The adapter preserves mig_significant for migration screens or growth_significant for proliferation screens. The source defines the significance and guide-hit criteria; their numerical cutoffs are not documented in the adapter. Neither p_value nor z_score is thresholded again, and nonsignificant rows are retained."
+  "db_collection_name": "genomic_elements_phenotypes"
 }

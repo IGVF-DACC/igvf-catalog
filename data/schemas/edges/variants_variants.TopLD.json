@@ -74,14 +74,13 @@
           "type": "number",
           "description": "Squared Pearson correlation of the two variants on phased haplotypes, from TOPMed ancestry-specific LD.",
           "example": 0.8,
-          "threshold": "The review reports upstream TopLD data selection at r2 >= 0.2 for variant pairs within 1 Mb. The adapter applies no additional r2 or d_prime cutoff. These are linkage-disequilibrium measures, not statistical significance calls; an absent pair must not be interpreted as r2 = 0."
+          "threshold": "Upstream TopLD pair selection requires r2 >= 0.2. The project methods page currently specifies pairs within 500 kb; the previously quoted 1 Mb window is not assumed for every release. No additional r2 cutoff is applied by the adapter. Source: https://topld.genetics.unc.edu/about.php."
         },
         "d_prime": {
           "title": "D'",
           "type": "number",
           "description": "Lewontin's D' between the two variants, from TOPMed ancestry-specific LD.",
-          "example": 0.8,
-          "threshold": "No d_prime cutoff is applied by the adapter; upstream pair selection is described under r2.threshold."
+          "example": 0.8
         },
         "ancestry": {
           "title": "Ancestry",
@@ -156,5 +155,5 @@
       "additionalProperties": false
     }
   ],
-  "threshold": "The review reports upstream TopLD data selection at r2 >= 0.2 for variant pairs within 1 Mb. The adapter applies no additional r2 or d_prime cutoff. These are linkage-disequilibrium measures, not statistical significance calls; an absent pair must not be interpreted as r2 = 0."
+  "threshold": "Upstream TopLD pair selection requires r2 >= 0.2. The project methods page currently specifies pairs within 500 kb; the previously quoted 1 Mb window is not assumed for every release. No additional r2 cutoff is applied by the adapter. Source: https://topld.genetics.unc.edu/about.php."
 }

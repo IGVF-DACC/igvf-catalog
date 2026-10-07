@@ -114,8 +114,7 @@
         "score": {
           "title": "Score",
           "type": "number",
-          "description": "SGE score: the change in variant frequency over time, as log2 fold change per day. Normalized so that the median synonymous variant scores 0, so lower scores mean reduced cell fitness.",
-          "threshold": "The adapter preserves functional_consequence and functional_consequence_zscore from the source without recalculating classifications or applying a score filter. Numerical classification cutoffs are dataset-specific and are not documented in the adapter; BRCA1/BRCA2 thresholds from other SGE studies must not be assumed for the PALB2 source format."
+          "description": "SGE score: the change in variant frequency over time, as log2 fold change per day. Normalized so that the median synonymous variant scores 0, so lower scores mean reduced cell fitness."
         },
         "standard_error": {
           "title": "Standard Error",
@@ -161,8 +160,7 @@
             "functionally_normal": "The variant is classified as having normal function under the assay thresholds.",
             "indeterminate": "The assay does not confidently classify the variant as functionally normal or abnormal.",
             "functionally_abnormal": "The variant is classified as having abnormal function under the assay thresholds."
-          },
-          "threshold": "The adapter preserves functional_consequence and functional_consequence_zscore from the source without recalculating classifications or applying a score filter. Numerical classification cutoffs are dataset-specific and are not documented in the adapter; BRCA1/BRCA2 thresholds from other SGE studies must not be assumed for the PALB2 source format."
+          }
         },
         "functional_consequence_zscore": {
           "title": "Functional Consequence Z-Score",
@@ -170,8 +168,7 @@
             "number",
             "null"
           ],
-          "description": "Z-score of the variant's score against the distribution of expected neutral variant scores.",
-          "threshold": "The adapter preserves functional_consequence and functional_consequence_zscore from the source without recalculating classifications or applying a score filter. Numerical classification cutoffs are dataset-specific and are not documented in the adapter; BRCA1/BRCA2 thresholds from other SGE studies must not be assumed for the PALB2 source format."
+          "description": "Z-score of the variant's score against the distribution of expected neutral variant scores."
         },
         "variant_qc_flag": {
           "title": "Variant QC Flag",
@@ -337,6 +334,5 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "coding_variants_phenotypes",
-  "threshold": "The adapter preserves functional_consequence and functional_consequence_zscore from the source without recalculating classifications or applying a score filter. Numerical classification cutoffs are dataset-specific and are not documented in the adapter; BRCA1/BRCA2 thresholds from other SGE studies must not be assumed for the PALB2 source format."
+  "db_collection_name": "coding_variants_phenotypes"
 }

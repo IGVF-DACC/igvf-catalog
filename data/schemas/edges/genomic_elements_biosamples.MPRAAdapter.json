@@ -61,8 +61,7 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction",
-          "threshold": "No cutoff is applied to this field; it is not used as a fallback for significant."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",

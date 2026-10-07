@@ -50,14 +50,12 @@
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction",
-          "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+          "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis.",
-          "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis."
         },
         "effect_size": {
           "title": "Effect Size",
@@ -70,8 +68,7 @@
             "number",
             "null"
           ],
-          "description": "Posterior inclusion probability that this variant is causal for the splice QTL.",
-          "threshold": "Not populated or thresholded by the current AFGR sQTL adapter."
+          "description": "Posterior inclusion probability that this variant is causal for the splice QTL."
         },
         "log2FC": {
           "title": "Log2 Fold Change",
@@ -84,8 +81,7 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicating the significance of the variant association with splicing.",
-          "threshold": "Not populated by the current AFGR sQTL adapter; no significance cutoff is implemented. Do not infer a significance call from the presence of this schema field."
+          "description": "Boolean indicating the significance of the variant association with splicing."
         },
         "class": {
           "enum": [
@@ -175,6 +171,5 @@
     "simplified_return": "class, method, label, source, neg_log10_pvalue, biological_context",
     "return": "intron_chr, intron_start, intron_end, effect_size, neg_log10_pvalue, source, class, method, label, p_value, chr, source_url, files_filesets, biological_context, biosample_term"
   },
-  "db_collection_name": "variants_genes",
-  "threshold": "No p-value, effect-size, or posterior-probability significance filter is applied by the adapter. Any upstream selection is source-file-specific; no universal numerical cutoff is documented."
+  "db_collection_name": "variants_genes"
 }

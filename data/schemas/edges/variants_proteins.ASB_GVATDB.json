@@ -31,13 +31,12 @@
           "title": "P-Value",
           "type": "number",
           "description": "Monte-Carlo p-value of the preferential binding score.",
-          "threshold": "Upstream GVATdb preferential-binding criterion reported in the review: PBS p_value < 0.01 together with OBS oligo_pval < 0.05. The adapter preserves these statistics and p_value_adj without an additional significance filter; no adjusted-p-value cutoff is implemented."
+          "threshold": "The SNP-SELEX study defines significant preferential binding by PBS p_value < 0.01 together with OBS oligo_pval < 0.05. These are upstream significance criteria, not additional catalog load filters; p_value_adj is not part of this rule. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC9367673/."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
           "type": "number",
-          "description": "FDR of the preferential binding score.",
-          "threshold": "No adjusted-p-value cutoff is applied by the adapter; the reported upstream criterion uses p_value and oligo_pval."
+          "description": "FDR of the preferential binding score."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -65,7 +64,7 @@
           "title": "Oligo P-Value",
           "type": "number",
           "description": "P-value of the oligo binding score.",
-          "threshold": "Upstream GVATdb preferential-binding criterion reported in the review: PBS p_value < 0.01 together with OBS oligo_pval < 0.05. The adapter preserves these statistics and p_value_adj without an additional significance filter; no adjusted-p-value cutoff is implemented."
+          "threshold": "The SNP-SELEX study defines significant preferential binding by PBS p_value < 0.01 together with OBS oligo_pval < 0.05. These are upstream significance criteria, not additional catalog load filters; p_value_adj is not part of this rule. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC9367673/."
         },
         "ref_auc": {
           "title": "Reference Area Under the Curve",
@@ -158,5 +157,5 @@
     "name": "variants_proteins",
     "return": "label, method, class, source, source_url, neg_log10_pvalue_adj, p_value, neg_log10_pvalue, files_filesets"
   },
-  "threshold": "Upstream GVATdb preferential-binding criterion reported in the review: PBS p_value < 0.01 together with OBS oligo_pval < 0.05. The adapter preserves these statistics and p_value_adj without an additional significance filter; no adjusted-p-value cutoff is implemented."
+  "threshold": "The SNP-SELEX study defines significant preferential binding by PBS p_value < 0.01 together with OBS oligo_pval < 0.05. These are upstream significance criteria, not additional catalog load filters; p_value_adj is not part of this rule. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC9367673/."
 }
