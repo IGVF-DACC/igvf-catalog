@@ -60,6 +60,5 @@
       "additionalProperties": false
     }
   ],
-  "db_collection_name": "mm_genomic_elements",
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in genomic_elements_genes.CRISPRElementGeneIGVF.json, mm_genomic_elements_mm_genes.CRISPRElementGeneIGVF.json; presence of an entity does not imply a significant association."
+  "db_collection_name": "mm_genomic_elements"
 }

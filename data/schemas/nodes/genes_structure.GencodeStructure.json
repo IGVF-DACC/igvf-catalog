@@ -147,6 +147,5 @@
     "simplified_return": "_id, chr, start, end, name, organism",
     "return": "_id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism"
   },
-  "db_collection_name": "genes_structure",
-  "threshold": "No separate statistical significance call is assigned to these entity records. Source association filters and significance criteria are documented in mm_transcripts_mm_genes_structure.GencodeStructure.json, transcripts_genes_structure.GencodeStructure.json; presence of an entity does not imply a significant association."
+  "db_collection_name": "genes_structure"
 }

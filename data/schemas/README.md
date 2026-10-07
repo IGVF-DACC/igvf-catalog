@@ -88,13 +88,14 @@ meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work
 
 ## Threshold and significance documentation
 
-Every concrete node and edge schema has a top-level `threshold` string. It
+Every concrete edge schema has a top-level `threshold` string. It
 documents that schema's source-specific selection/significance criteria, or
 explicitly states that they are unknown or not applicable. Base schemas and
 mixins do not supply a default: sharing a collection does not mean that two
-adapters use the same thresholds.
+adapters use the same thresholds. Node schemas do not track `threshold`,
+including on individual fields.
 
-Add a `threshold` string beside `description` on fields that participate in a
+Add a `threshold` string beside `description` on edge fields that participate in a
 decision, especially `significant`, classification fields, and predictive
 scores. Keep the field's meaning in `description` and the decision rule in
 `threshold`. For example:
