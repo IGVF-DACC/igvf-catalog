@@ -100,7 +100,7 @@
         "dualipa_abun_change": {
           "title": "DUAL-IPA Abundance Change",
           "type": "string",
-          "description": "Abundance-change classification assigned by the source dataset.",
+          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds.",
           "enum": [
             "Y",
             "N",
