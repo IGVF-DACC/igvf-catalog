@@ -642,6 +642,10 @@ allele specific binding:
 # Run this BEFORE "allele specific binding gvatdb" below: it loads any variant referenced by
 # this GVATdb file that isn't already in the variants collection, so the variants_proteins
 # edges created next don't end up with a dangling _from reference.
+# NOTE: does not need to be run regularly for now - a full pass over GVATdb's already-loaded
+# edges found no variants missing from the variants collection (unlike AFGR_caqtl/AFGR_eqtl/
+# AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have missing variants and need this
+# label run as part of their regular load).
 # Example: python3 data_parser.py --adapter allele_specific_binding_GVATdb --label variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8897VGII.tsv --output-bucket-key variants/asb_gvatdb_variants.jsonl
 allele specific binding gvatdb variants:
   collection: variants
@@ -1113,6 +1117,10 @@ genomic element AFGR:
 # Run this BEFORE "variant to genomic element encode caqtl" below: it loads any variant
 # referenced by these ENCODE caQTL files that isn't already in the variants collection, so the
 # variants_genomic_elements edges created next don't end up with a dangling _from reference.
+# NOTE: does not need to be run regularly for now - a full pass over ENCODE caQTL's already-
+# loaded edges found no variants missing from the variants collection (unlike AFGR_caqtl/
+# AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have missing variants and need
+# this label run as part of their regular load).
 # Examples:
 # python3 data_parser.py --adapter caqtl --label variants --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF103XRK.bed --output-bucket-key variants/encode_caqtl_variants_IGVFFI3609TLOA.jsonl --source "PMID:34017130"
 # python3 data_parser.py --adapter caqtl --label variants --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF776CZZ.bed --output-bucket-key variants/encode_caqtl_variants_IGVFFI7251ORJT.jsonl --source "PMID:34038741"
@@ -2349,6 +2357,10 @@ coding variant:
 # Run this BEFORE "variants to coding variant" below: it loads any variant referenced by this
 # dbNSFP file that isn't already in the variants collection, so the variants_coding_variants
 # edges created next don't end up with a dangling _from reference.
+# NOTE: does not need to be run regularly for now - a full pass over dbNSFP's already-loaded
+# edges found no variants missing from the variants collection (unlike AFGR_caqtl/AFGR_eqtl/
+# AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have missing variants and need this
+# label run as part of their regular load).
 # Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key variants/chr1.jsonl --label variants
 dbNSFP variants:
   collection: variants

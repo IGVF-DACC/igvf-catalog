@@ -31,6 +31,10 @@ from adapters.protein_map import ProteinMap
 
 
 class SEMPred(BaseAdapter):
+    # label=variants does not need to be run regularly for this adapter for now - a full pass
+    # over its already-loaded edges found no variants missing from the variants collection
+    # (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have
+    # missing variants and need label=variants run as part of their regular load).
     ALLOWED_LABELS = ['sem_predicted_asb', 'variants']
     CHUNK_SIZE = 6500
     SOURCE = 'IGVF'

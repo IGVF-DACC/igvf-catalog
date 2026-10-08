@@ -29,6 +29,10 @@ class ASB_GVATDB(BaseAdapter):
     # smallest pvalue in this file is 0, the second smallest pvalue is 1e-05, so we will replace 0 with 1e-05 to calculate log10pvalue
     # so the max log10pvalue is 5.
     MAX_LOG10_PVALUE = 5
+    # label=variants does not need to be run regularly for this adapter for now - a full pass
+    # over its already-loaded edges found no variants missing from the variants collection
+    # (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have
+    # missing variants and need label=variants run as part of their regular load).
     ALLOWED_LABELS = ['variant_protein', 'variants']
     CHUNK_SIZE = 6500
 

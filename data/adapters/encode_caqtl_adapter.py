@@ -27,6 +27,10 @@ from adapters.writer import Writer
 class CAQtl(BaseAdapter):
     # 1-based coordinate system
 
+    # label=variants does not need to be run regularly for this adapter for now - a full pass
+    # over its already-loaded edges found no variants missing from the variants collection
+    # (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have
+    # missing variants and need label=variants run as part of their regular load).
     ALLOWED_LABELS = ['genomic_element', 'encode_caqtl', 'variants']
     CHUNK_SIZE = 6500
     CLASS_NAME = 'accessible_dna_element'

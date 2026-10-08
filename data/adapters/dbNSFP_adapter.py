@@ -20,6 +20,10 @@ from adapters.writer import Writer
 
 class DbNSFP(BaseAdapter):
     # coding_variants_proteins is deprecated - not in the database anymore
+    # label=variants does not need to be run regularly for this adapter for now - a full pass
+    # over its already-loaded edges found no variants missing from the variants collection
+    # (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have
+    # missing variants and need label=variants run as part of their regular load).
     ALLOWED_LABELS = ['coding_variants', 'variants_coding_variants', 'variants']
     CHUNK_SIZE = 6500
     SOURCE = 'dbNSFP 5.1a'

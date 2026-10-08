@@ -493,6 +493,10 @@ SEM complex to protein:
     - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
   source: IGVF
 
+# NOTE: label=variants does not need to be run regularly for this adapter for now - a full
+# pass over SEM's already-loaded edges found no variants missing from the variants collection
+# (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have missing
+# variants and need label=variants run as part of their regular load).
 # Example: python3 data_parser.py --adapter SEM_variant_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2943RVII.tsv.gz --sem_provenance_path IGVFFI4892QCRR.tsv.gz --output-bucket-key variants_proteins/SEMpl_IGVFFI2943RVII.jsonl
 SEM predicted allele specific binding:
   collection: variants_proteins
