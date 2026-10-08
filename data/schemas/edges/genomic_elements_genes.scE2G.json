@@ -46,7 +46,7 @@
           "type": "number",
           "description": "scE2G score: Probability that the element has a regulatory effect on the target gene",
           "example": 0.95,
-          "threshold": "Selected upstream using the source file ScoreThreshold: 0.177 for IGVFFI5648GWQX and IGVFFI0793NWFM (scE2G v1.2.0). Other models and versions vary; see ../threshold-evidence.md."
+          "threshold": "Selected using the source file ScoreThreshold: 0.177 for IGVFFI5648GWQX and IGVFFI0793NWFM (scE2G v1.2.0). Other models and versions vary; see ../threshold-evidence.md."
         },
         "transcription_start_site": {
           "title": "Transcription Start Site",

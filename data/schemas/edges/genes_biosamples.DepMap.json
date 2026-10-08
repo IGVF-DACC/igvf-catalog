@@ -57,7 +57,7 @@
           "title": "Gene Dependency",
           "type": "number",
           "description": "Probability that knocking out this gene is a true genetic dependency in this cell line.",
-          "threshold": "Gene-cell pairs retained by the adapter when gene_dependency >= 0.5."
+          "threshold": "Gene-cell pairs retained when gene_dependency >= 0.5."
         },
         "source": {
           "enum": [

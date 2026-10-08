@@ -97,6 +97,8 @@ their fields, do not track `threshold`.
 
 Keep the field's meaning in `description`; put the cutoff in `threshold` beside
 it. Keep threshold phrases brief: state the rule and any necessary conditions.
+Describe the data rule without implementation references such as "by the
+adapter" or "upstream"; record where the rule is applied in the evidence notes.
 Keep source citations, research history, and detailed evidence in
 `threshold-evidence.md`. When a significance call uses multiple fields, document which source formats
 use each field, their precedence, strict/inclusive boundaries, and missing-value
