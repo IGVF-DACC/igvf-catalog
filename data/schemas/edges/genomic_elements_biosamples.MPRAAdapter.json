@@ -74,7 +74,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the element's activity. The threshold is: a neg_log10_pvalue_adj of 1 or more."
+          "description": "Boolean indicator of the significance of the element's activity.",
+          "threshold": "True when neg_log10_pvalue_adj is available and >= 1; otherwise false."
         },
         "label": {
           "enum": [

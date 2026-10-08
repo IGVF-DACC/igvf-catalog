@@ -30,7 +30,8 @@
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Monte-Carlo p-value of the preferential binding score."
+          "description": "Monte-Carlo p-value of the preferential binding score.",
+          "threshold": "Significant when PBS p_value < 0.01 and OBS oligo_pval < 0.05."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -40,7 +41,8 @@
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "max_value": 5
         },
         "experiment": {
           "title": "GVATdb Experiment ID",
@@ -62,7 +64,8 @@
         "oligo_pval": {
           "title": "Oligo P-Value",
           "type": "number",
-          "description": "P-value of the oligo binding score."
+          "description": "P-value of the oligo binding score.",
+          "threshold": "Significant when PBS p_value < 0.01 and OBS oligo_pval < 0.05."
         },
         "ref_auc": {
           "title": "Reference Area Under the Curve",
@@ -82,7 +85,8 @@
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "max_value": 2
         },
         "source": {
           "enum": [

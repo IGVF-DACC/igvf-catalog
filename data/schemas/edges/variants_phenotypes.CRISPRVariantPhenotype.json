@@ -39,7 +39,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the variant effect on the phenotype."
+          "description": "Boolean indicator of the significance of the variant effect on the phenotype.",
+          "threshold": "True when both 95% interval bounds are available and (lower > 0 or upper < 0); otherwise false. Missing source intervals use effect_size +/- 1.96 * mu_sd_adj when available."
         },
         "num_guides": {
           "title": "Number of Guides",

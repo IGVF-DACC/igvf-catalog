@@ -73,7 +73,8 @@
           "title": "R2",
           "type": "number",
           "description": "Squared Pearson correlation of the two variants on phased haplotypes, from TOPMed ancestry-specific LD.",
-          "example": 0.8
+          "example": 0.8,
+          "threshold": "Source row retained when r2 >= 0.2."
         },
         "d_prime": {
           "title": "D'",

@@ -96,11 +96,13 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "max_value": 240
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "max_value": 240
         },
         "log2FC": {
           "type": [
@@ -127,7 +129,8 @@
         },
         "significant": {
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the perturbation effect."
+          "description": "Boolean indicator of the significance of the perturbation effect.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "effect_size": {
           "type": "number",

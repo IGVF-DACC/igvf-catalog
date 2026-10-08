@@ -103,7 +103,8 @@
               "Effected Position": "Y183",
               "Type": "Gain"
             }
-          ]
+          ],
+          "threshold": "Mechanism retained when its Posterior Probability >= 0.25 and P-value < 0.05."
         },
         "biosample_term": {
           "$ref": "../mixins.json#/biosample_term",
