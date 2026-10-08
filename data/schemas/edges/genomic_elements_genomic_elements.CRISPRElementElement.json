@@ -10,110 +10,152 @@
       "properties": {
         "_key": {
           "type": "string",
-          "description": "Promoter ID, peak ID and file accession joined by underscores."
+          "description": "Promoter ID, peak ID and file accession joined by underscores.",
+          "title": "Key"
         },
         "_from": {
           "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
           "pattern": "^genomic_elements/",
           "collections": [
             "genomic_elements"
-          ]
+          ],
+          "title": "Source Genomic Element"
         },
         "_to": {
           "type": "string",
           "pattern": "^genomic_elements/",
           "collections": [
             "genomic_elements"
-          ]
+          ],
+          "title": "Target Genomic Element"
         },
         "source": {
           "enum": [
             "IGVF"
-          ]
+          ],
+          "title": "Source",
+          "enum_descriptions": {
+            "IGVF": "Impact of Genomic Variation on Function Consortium."
+          }
         },
         "source_url": {
-          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/",
+          "title": "Source URL"
         },
         "label": {
           "enum": [
             "regulatory element effect on chromatin accessibility"
-          ]
+          ],
+          "title": "Label",
+          "enum_descriptions": {
+            "regulatory element effect on chromatin accessibility": "Effect of perturbing a regulatory element on accessibility at a readout peak."
+          }
         },
         "name": {
           "enum": [
             "modulates accessibility of"
-          ]
+          ],
+          "title": "Name",
+          "enum_descriptions": {
+            "modulates accessibility of": "The perturbed element affects accessibility of the target peak."
+          }
         },
         "inverse_name": {
           "enum": [
             "accessibility modulated by"
-          ]
+          ],
+          "title": "Inverse Name",
+          "enum_descriptions": {
+            "accessibility modulated by": "Accessibility of the peak is affected by perturbation of the source element."
+          }
         },
         "method": {
           "enum": [
             "Multiome Perturb-seq"
-          ]
+          ],
+          "title": "Method",
+          "enum_descriptions": {
+            "Multiome Perturb-seq": "CRISPR perturbation with paired single-cell gene expression and chromatin accessibility measurements."
+          }
         },
         "crispr_modality": {
           "$ref": "../mixins.json#/crispr_modality",
           "enum": [
             "interference"
-          ]
+          ],
+          "title": "CRISPR Modality",
+          "enum_descriptions": {
+            "interference": "CRISPR interference that represses the targeted locus."
+          }
         },
         "class": {
           "enum": [
             "observed data"
-          ]
+          ],
+          "title": "Class",
+          "enum_descriptions": {
+            "observed data": "Data derived from experimental measurements."
+          }
         },
         "biosample_term": {
           "$ref": "../mixins.json#/biosample_term",
-          "example": "ontology_terms/EFO_0002067"
+          "example": "ontology_terms/EFO_0002067",
+          "title": "Biosample Term"
         },
         "biological_context": {
           "$ref": "../mixins.json#/biological_context",
-          "example": "K562"
+          "example": "K562",
+          "title": "Biological Context"
         },
         "p_value": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Nominal p-value for differential peak accessibility."
+          "description": "Nominal p-value for differential peak accessibility.",
+          "title": "P-Value"
         },
         "p_value_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Benjamini–Hochberg-adjusted p-value, corrected per guide."
+          "description": "Benjamini–Hochberg-adjusted p-value, corrected per guide.",
+          "title": "Adjusted P-Value"
         },
         "neg_log10_pvalue": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "title": "Negative Log10 P-Value"
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "title": "Negative Log10 Adjusted P-Value"
         },
         "log2FC": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Log2 fold change in peak accessibility with a 1e-3 pseudocount."
+          "description": "Log2 fold change in peak accessibility with a 1e-3 pseudocount.",
+          "title": "Log2 Fold Change"
         },
         "significant": {
           "type": "boolean",
-          "description": "Adjusted p-value < 0.05, matching the catalog element-gene significance threshold."
+          "description": "Adjusted p-value < 0.05, matching the catalog element-gene significance threshold.",
+          "title": "Significant"
         },
         "files_filesets": {
-          "$ref": "../mixins.json#/files_filesets"
+          "$ref": "../mixins.json#/files_filesets",
+          "title": "Files and Filesets"
         },
         "treatments_term_ids": {
-          "$ref": "../mixins.json#/treatments_term_ids"
+          "$ref": "../mixins.json#/treatments_term_ids",
+          "title": "Treatment Term IDs"
         }
       },
       "required": [

@@ -35,6 +35,12 @@ def test_nodes_and_edges():
     assert all(edge['method'] == 'Multiome Perturb-seq' for edge in edges)
     promoters = [node for node in nodes if 'promoter_of' in node]
     assert len(promoters) == 1
+    assert promoters[0]['type'] == 'tested elements'
+    assert promoters[0]['source_annotation'] == 'promoter'
+    peaks = [node for node in nodes if 'promoter_of' not in node]
+    assert len(peaks) == 3
+    assert all(node['type'] == 'accessible dna elements' for node in peaks)
+    assert all('source_annotation' not in node for node in peaks)
     assert promoters[0]['promoter_of'] == 'genes/ENSG00000100811'
     assert promoters[0]['start'] == 100238144
     ids = {f'genomic_elements/{node["_key"]}' for node in nodes}

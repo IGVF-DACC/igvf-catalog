@@ -66,12 +66,12 @@ class CRISPRElementElement(BaseAdapter):
         doc = {
             '_key': key, 'name': key, 'chr': chrom, 'start': start, 'end': end,
             'method': self.file_fileset['method'],
-            'source_annotation': 'promoter' if gene else 'accessible dna elements',
             'source': 'IGVF', 'source_url': self.source_url,
-            'type': 'tested elements',
+            'type': 'tested elements' if gene else 'accessible dna elements',
             'files_filesets': f'files_filesets/{self.file_accession}',
         }
         if gene:
+            doc['source_annotation'] = 'promoter'
             doc['promoter_of'] = f'genes/{gene}'
         return element_id, doc
 
