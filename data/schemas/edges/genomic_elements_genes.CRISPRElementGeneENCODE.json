@@ -74,7 +74,8 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element-gene interactions.",
-          "example": true
+          "example": true,
+          "threshold": "unknown"
         },
         "method": {
           "enum": [

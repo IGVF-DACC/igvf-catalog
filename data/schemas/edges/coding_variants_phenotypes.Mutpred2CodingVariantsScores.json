@@ -104,7 +104,7 @@
               "Type": "Gain"
             }
           ],
-          "threshold": "Catalog mapping preparation retains each property_scores mechanism only when its Posterior Probability >= 0.25 and P-value < 0.05. The original IGVFFI6893ZOAA file contains mechanisms failing these criteria. This is a mechanism-entry filter, not a variant-row or pathogenicity_score filter; rows with no passing mechanisms can retain an empty property_scores list."
+          "threshold": "Mechanism retained when its Posterior Probability >= 0.25 and P-value < 0.05."
         },
         "biosample_term": {
           "$ref": "../mixins.json#/biosample_term",

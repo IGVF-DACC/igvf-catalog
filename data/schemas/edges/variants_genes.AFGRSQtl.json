@@ -81,7 +81,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicating the significance of the variant association with splicing."
+          "description": "Boolean indicating the significance of the variant association with splicing.",
+          "threshold": "unknown"
         },
         "class": {
           "enum": [

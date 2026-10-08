@@ -75,7 +75,8 @@
         "mislocalization_hit": {
           "title": "Mislocalization Hit?",
           "type": "boolean",
-          "description": "Whether the source classifies the variant as causing protein mislocalization."
+          "description": "Whether the source classifies the variant as causing protein mislocalization.",
+          "threshold": "unknown"
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
