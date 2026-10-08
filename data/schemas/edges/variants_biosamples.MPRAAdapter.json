@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_biosamples.MPRAAdapter.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, genomic element key, strand token, biosample term and source file accession joined by underscores, hashed with SHA-256 when the composite would exceed the key length limit."
         },
         "_from": {
@@ -27,6 +26,7 @@
           ]
         },
         "genomic_element": {
+          "title": "Genomic Element",
           "type": "string",
           "description": "Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample.",
           "example": "genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH",
@@ -36,132 +36,135 @@
           ]
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
-          "enum": ["+", "-", "."],
-          "example": "+"
+          "description": "Strand the tile was tested in..",
+          "enum": [
+            "+",
+            "-",
+            "."
+          ],
+          "example": "+",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence.",
+            ".": "Strand is not recorded or is not applicable."
+          }
         },
         "bed_score": {
+          "title": "BED Score",
           "type": "number",
           "description": "Score column of the source BED file."
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": "number",
           "description": "Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space."
         },
         "DNA_count_ref": {
+          "title": "DNA Count for Reference Allele",
           "type": "number",
           "description": "Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
         "RNA_count_ref": {
+          "title": "RNA Count for Reference Allele",
           "type": "number",
           "description": "Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
         "DNA_count_alt": {
+          "title": "DNA Count for Alternate Allele",
           "type": "number",
           "description": "Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "RNA_count_alt": {
+          "title": "RNA Count for Alternate Allele",
           "type": "number",
           "description": "Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more."
         },
         "postProbEffect": {
+          "title": "Posterior Probability of Effect",
           "type": "number",
           "description": "Posterior probability that the variant has a regulatory effect."
         },
         "CI_lower_95": {
+          "title": "95% Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
+          "title": "95% Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of a 95% interval for the variant effect."
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on regulatory element activity"
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates regulatory activity of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulatory activity modulated by"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "MPRA"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI1323RCIE",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": ["string", "null"],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
+          "type": [
+            "string",
+            "null"
+          ],
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/UBERON_0002048"
         },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
+          "$ref": "../mixins.json#/treatments_term_ids"
         }
       },
       "required": [
-        "_key",
         "label",
         "significant",
         "files_filesets",

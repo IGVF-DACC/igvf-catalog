@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.CRISPRElementGeneIGVF.json",
   "allOf": [
     {
@@ -15,39 +15,42 @@
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA"
         },
         "promoter_of": {
+          "title": "Promoter Of",
           "type": "string",
           "description": "The gene this element is the presumed promoter of.",
           "example": "genes/ENSG00000123685"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "Perturb-seq",
             "CRISPR screen"
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element supplied by the source.",
           "example": "promoter",
           "enum": [
-            "enhancer",
+            "candidate enhancer",
             "promoter",
             "distal element"
-          ]
+          ],
+          "enum_descriptions": {
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter.",
+            "promoter": "An element associated with transcription initiation at a gene.",
+            "distal element": "An element located away from a promoter."
+          }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/"
         },
         "type": {
@@ -56,10 +59,7 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI3069QCRA",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

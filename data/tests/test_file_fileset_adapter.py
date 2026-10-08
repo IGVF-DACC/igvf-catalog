@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
@@ -413,7 +414,8 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
     assert props['method'] == 'CRISPR screen'
 
 
-def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq():
+@pytest.mark.parametrize('assay_title', ['Multiome Perturb-seq', 'in vivo Perturb-seq'])
+def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq(assay_title):
     file_object = {
         '@id': '/tabular-files/IGVFFI0000MULT/',
         'accession': 'IGVFFI0000MULT',
@@ -438,7 +440,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
             with patch.object(
                     FileFileSet,
                     'parse_analysis_set_igvf',
-                    return_value=({'Multiome Perturb-seq'}, {'OBI:0002629'})):
+                    return_value=({assay_title}, {'OBI:0002629'})):
                 with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
                     with patch.object(
                         FileFileSet,
@@ -454,7 +456,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
                     ):
                         props, _, _ = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
-    assert props['preferred_assay_titles'] == ['Multiome Perturb-seq']
+    assert props['preferred_assay_titles'] == [assay_title]
     assert props['method'] == 'Perturb-seq'
     assert props['software'] == ['SciPy']
 
@@ -927,3 +929,38 @@ def test_process_file():
     assert len(write.contents) == 1
     assert json.loads(write.contents[0]) == {'_key': 'NTR_0002067', 'name': 'K562', 'term_id': 'NTR_0002067', 'synonyms': ['GM05372', 'GM05372E', 'K-562', 'K-562 cell',
                                                                                                                            'K562 cell'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/sample-terms/NTR_0002067/', 'uri': 'https://data.igvf.org/sample-terms/NTR_0002067/'}
+
+
+def test_process_file_warns_when_accession_skipped(caplog):
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['IGVFFI5688VHRS', 'IGVFFI9074FIDG'],
+        label='igvf_file_fileset',
+        writer=writer,
+        validate=False,
+    )
+    with patch.object(
+        FileFileSet,
+        'get_batch_objects',
+        return_value=[{
+            'accession': 'IGVFFI5688VHRS',
+            '@id': '/reference-files/IGVFFI5688VHRS/',
+            'href': '/reference-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.tsv.gz',
+            'file_set': {'@id': '/curated-sets/IGVFDS0000TEST/'},
+            'catalog_collections': ['studies'],
+            'catalog_class': 'observed data',
+            'catalog_method': 'eQTL Catalogue',
+        }],
+    ), patch.object(
+        FileFileSet,
+        'query_fileset_files_props_igvf',
+        return_value=({'_key': 'IGVFFI5688VHRS'}, set(), set()),
+    ):
+        with caplog.at_level(logging.WARNING, logger='FileFileSet'):
+            adapter.process_file()
+
+    assert any(
+        'Skipping IGVFFI9074FIDG' in record.message
+        for record in caplog.records
+    )
+    assert len(writer.contents) == 1

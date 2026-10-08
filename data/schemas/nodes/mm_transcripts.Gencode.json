@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/mm_transcripts.Gencode.json",
   "allOf": [
     {
@@ -12,57 +13,67 @@
           "example": "ENSMUST00000161581"
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENSMUST00000161581.2",
           "pattern": "^ENSMUST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "Gm1992-201"
         },
         "transcript_type": {
+          "title": "Transcript Type",
           "type": "string",
           "description": "Biotype GENCODE assigns to the transcript.",
           "example": "lncRNA"
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the transcript lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1",
           "pattern": "^chr"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the transcript, 0-based and inclusive.",
           "example": 3536809
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the transcript, 0-based and exclusive.",
           "example": 3583776
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand the transcript is transcribed from: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand the transcript is transcribed from..",
           "enum": [
             "+",
             "-"
           ],
-          "example": "+"
+          "example": "+",
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol",
           "example": "Gm1992"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -70,14 +81,12 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Mus musculus"
           ]

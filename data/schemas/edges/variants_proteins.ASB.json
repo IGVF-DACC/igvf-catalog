@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "edges/variants_proteins.ASB.json",
   "db_collection_name": "variants_proteins",
   "allOf": [
@@ -10,7 +10,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, Ensembl protein ID, motif concordance with spaces rewritten to underscore, ADASTRA, and the GTRD cell identifier, joined by underscores.",
           "example": "NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520"
         },
@@ -29,141 +28,156 @@
           ]
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr15"
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": "string",
           "description": "dbSNP id for the variant position",
           "example": "rs1234567890"
         },
         "motif_fc": {
-          "type": "string",
+          "title": "Motif Fold Change",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Log2 ratio of HOCOMOCO motif p-values for the reference versus alternate allele. Positive values mean the motif prefers the alternate allele; negative values prefer the reference.",
-          "example": "-0.2727347850176788"
+          "example": -0.2727347850176788
         },
         "motif_pos": {
-          "type": "string",
+          "title": "Motif Position",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "0-based position of the variant relative to the best HOCOMOCO PWM hit.",
-          "example": "10"
+          "example": 10
         },
         "motif_orient": {
+          "title": "Motif Orientation",
           "type": "string",
           "description": "Strand of the best HOCOMOCO PWM hit relative to the reference assembly.",
           "example": "+"
         },
         "motif_conc": {
+          "title": "Motif Concordance",
           "type": "string",
           "description": "Whether the allelic read imbalance agrees with the motif fold-change, assessed at 25% FDR.",
           "example": "Concordant"
         },
         "motif": {
+          "title": "Motif",
           "type": "string",
           "description": "HOCOMOCO v11 motif for the transcription factor.",
           "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
           "pattern": "^motifs/"
         },
         "es_mean_ref": {
-          "type": "string",
-          "description": "Allele-wise effect size for the reference allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger reference-allele ASB.",
-          "example": "1.795276180193825"
+          "type": "number",
+          "title": "Mean Effect Size for Reference Allele",
+          "description": "The effect size mean for the reference allele",
+          "example": 1.795276180193825
         },
         "es_mean_alt": {
-          "type": "string",
-          "description": "Allele-wise effect size for the alternate allele: weighted mean of log2(observed/expected) allelic read counts. Larger values mean stronger alternate-allele ASB.",
-          "example": "-1.7019721868875686"
+          "title": "Mean Effect Size for Alternative Allele",
+          "type": "number",
+          "description": "The effect size mean for the alternate allele",
+          "example": -1.7019721868875686
         },
         "p_value_adj_ref": {
+          "title": "Adjusted P-Value for Reference Allele",
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793
         },
         "p_value_adj_alt": {
+          "title": "Adjusted P-Value for Alternate Allele",
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0
         },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Directional ASB significance score: negative FDR-adjusted p-value when only the reference allele is significant (< 0.05), positive when only the alternate allele is significant, or null when both or neither are significant.",
+          "example": -0.0171981040581793
+        },
         "neg_log10_pvalue_adj_ref": {
+          "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
           "example": 1.7645194276538037
         },
         "neg_log10_pvalue_adj_alt": {
+          "title": "Adjusted Negative Log10 P-Value for Alternate Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
           "example": 0
         },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "example": "Kelly (neuroblastoma)"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/EFO_0002069",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/EFO_0002069"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ADASTRA"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=520"
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "allele-specific binding"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ADASTRA"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates binding of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "binding modulated by"
           ]
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
-          "description": "Gene Ontology term for regulation of DNA binding.",
+          "description": "Gene Ontology term for the process this edge represents.",
           "enum": [
             "ontology_terms/GO_0051101"
-          ]
+          ],
+          "enum_descriptions": {
+            "ontology_terms/GO_0051101": "Regulation of DNA binding."
+          }
+
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI5943XCOS",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "_key",
         "chr",
         "rsid",
         "motif_fc",
@@ -175,6 +189,7 @@
         "es_mean_alt",
         "neg_log10_pvalue_adj_ref",
         "neg_log10_pvalue_adj_alt",
+        "score",
         "biological_context",
         "biosample_term",
         "biological_process",
@@ -185,6 +200,6 @@
   ],
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
+    "return": "motif, motif_fc, neg_log10_pvalue_adj_ref, neg_log10_pvalue_adj_alt, score, biological_context, label, biosample_term, source, source_url, method, class, files_filesets"
   }
 }

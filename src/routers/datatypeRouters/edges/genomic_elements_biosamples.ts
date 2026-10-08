@@ -15,7 +15,7 @@ const MAX_PAGE_SIZE = 50
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosamples', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_biosamples', 'source')
 
-const genomicElementsToBiosampleFormat = z.object({
+export const genomicElementsToBiosampleFormat = z.object({
   log2FC: z.number().nullable(),
   strand: z.string().nullable(),
   neg_log10_pvalue: z.number().nullable(),

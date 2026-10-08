@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.scE2G.json",
   "allOf": [
     {
@@ -15,11 +15,9 @@
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "promoter_chr1_169893055_169894554_GRCh38_IGVFFI5648GWQX"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "scE2G"
           ]
@@ -30,31 +28,33 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Class of the element: promoter, genic, or intergenic.",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
             "genic",
             "intergenic",
             "promoter",
             "enhancer"
-          ]
+          ],
+          "enum_descriptions": {
+            "genic": "An element within a gene body.",
+            "intergenic": "An element between annotated genes.",
+            "promoter": "An element associated with transcription initiation at a gene.",
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter."
+          }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5648GWQX",
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI5648GWQX",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

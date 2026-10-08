@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_genes.EQTLCatalog.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "SHA-256 hash of the variant key, Ensembl gene ID and eQTL Catalogue dataset identifier."
         },
         "_from": {
@@ -27,159 +26,161 @@
           ]
         },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "example": "macrophage"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/CL_0000235",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/CL_0000235"
         },
         "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology term for the process this edge represents: regulation of gene expression for eQTLs, regulation of RNA splicing for spliceQTLs.",
           "example": "ontology_terms/GO_0010468",
           "pattern": "^ontology_terms/"
         },
         "study": {
+          "title": "Study",
           "type": "string",
           "description": "ID of the QTL study.",
           "example": "studies/QTS000001",
           "pattern": "^studies/"
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "eQTL",
             "spliceQTL"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "EBI"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz"
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "eQTL",
             "spliceQTL"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI2520EPCL",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression of",
             "modulates splicing of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "expression modulated by",
             "splicing modulated by"
           ]
         },
         "molecular_trait_id": {
+          "title": "Molecular Trait ID",
           "type": "string",
           "description": "Identifier of the molecular trait used for QTL mapping: an Ensembl gene ID for gene-expression QTLs, or a Leafcutter intron cluster ID for splice QTLs.",
           "example": "ENSG00000230489"
         },
         "gene_id": {
+          "title": "Gene ID",
           "type": "string",
           "description": "Ensembl gene ID.",
           "example": "ENSG00000230489"
         },
         "credible_set_id": {
+          "title": "Credible Set ID",
           "type": "string",
           "description": "SuSiE credible-set identifier for this signal within the dataset.",
           "example": "ENSG00000230489_L1"
         },
         "variant_chromosome_position_ref_alt": {
+          "title": "Variant Chromosome, Position, Reference, and Alternate Alleles",
           "type": "string",
           "description": "Variant identifier as chromosome, position, reference and alternate alleles, underscore-separated, on GRCh38.",
           "example": "chr1_108004887_G_T"
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": "string",
           "description": "dbSNP id for the variant position",
           "example": "rs1936009"
         },
         "credible_set_size": {
+          "title": "Credible Set Size",
           "type": "integer",
           "description": "Number of variants in the SuSiE credible set."
         },
         "posterior_inclusion_probability": {
+          "title": "Posterior Inclusion Probability",
           "type": "number",
           "description": "Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping."
         },
         "p_value": {
+          "title": "P-Value",
           "type": "number",
           "description": "Nominal p-value of association between the variant and the molecular trait."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Regression coefficient of the alternate allele on the molecular trait."
         },
         "standard_error": {
+          "title": "Standard Error",
           "type": "number",
           "description": "Standard error of the effect size."
         },
         "z_score": {
+          "title": "Z-Score",
           "type": "number",
           "description": "Univariate z-score of the variant."
         },
         "credible_set_min_r2": {
+          "title": "Credible Set Minimum R2",
           "type": "number",
           "description": "Smallest linkage-disequilibrium r2 between any two variants in the credible set."
         },
         "region": {
+          "title": "Region",
           "type": "string",
           "description": "Genomic interval that was fine-mapped.",
           "example": "chr1:106964443-108964443"
         },
         "intron_chr": {
+          "title": "Intron Chromosome",
           "type": "string",
           "description": "Chromosome of the spliced intron, as recorded in the molecular trait identifier, without a chr prefix.",
           "example": "1"
         },
         "intron_start": {
+          "title": "Intron Start",
           "type": "number",
           "description": "Start position of the spliced intron."
         },
         "intron_end": {
+          "title": "Intron End",
           "type": "number",
           "description": "End position of the spliced intron."
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "_key",
         "biological_context",
         "biological_process",
         "study",

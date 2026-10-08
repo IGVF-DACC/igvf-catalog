@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
   "allOf": [
     {
@@ -15,11 +15,9 @@
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ENCODE-rE2G"
           ]
@@ -30,32 +28,31 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Class of the element as reported by ENCODE-rE2G: a promoter, genic where it falls inside a gene body, or intergenic.",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
             "genic",
             "intergenic",
             "promoter"
-          ]
+          ],
+          "enum_descriptions": {
+            "genic": "An element within a gene body.",
+            "intergenic": "An element between annotated genes.",
+            "promoter": "An element associated with transcription initiation at a gene."
+          }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/ENCFF003BKC",
-          "pattern": "^files_filesets/"
-        },
         "simple_sample_summaries": {
+          "title": "Biosample Summaries",
           "type": [
             "array",
             "null"
@@ -66,14 +63,13 @@
           ]
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "UniProtKB:P05112"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

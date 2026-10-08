@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "nodes/mm_genomic_elements.HumanMouseElementAdapter.json",
   "db_collection_name": "mm_genomic_elements",
   "allOf": [
@@ -10,28 +10,31 @@
       "type": "object",
       "properties": {
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Mouse chromosome the element lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr6"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the element, 0-based and inclusive.",
           "example": 121522229
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the mouse element on mm10, 0-based and exclusive.",
           "example": 121522428
         },
         "method": {
-          "type": "string",
-          "description": "Name of the experimental class or prediction model that produced this result.",
+          "$ref": "../mixins.json#/method",
           "enum": [
             "integrative"
           ]
         },
         "type": {
+          "title": "Type",
           "type": "string",
           "description": "Category of element: a mouse DNase hypersensitive site paired to a human site by FUNCODE.",
           "enum": [
@@ -39,13 +42,11 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "FUNCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "pattern": "^https://data.igvf.org/reference-files/"
         }
       },
@@ -61,6 +62,6 @@
   "additionalProperties": false,
   "accessible_via": {
     "filter_by_range": "start, end",
-    "return": "_id, chr, start, end, method, type, source, source_url, name"
+    "return": "_id, chr, start, end, method, type, source, source_url, name, source_annotation"
   }
 }

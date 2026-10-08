@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
@@ -27,64 +26,59 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "mutational effect"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "altered due to mutation"
           ]
         },
         "esm_1v_score": {
+          "title": "ESM1v Score",
           "type": "number",
           "description": "Combined ESM-1v score for the substitution: the mean of the five model scores. Negative scores indicate greater predicted deleteriousness."
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/IGVFFI8105TNNO"
-          ]
-
+          ],
+          "example": "files_filesets/IGVFFI8105TNNO"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ESM-1v"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted protein variant effect"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
           ]
         },
         "esm1v_t33_650M_UR90S_1": {
+          "title": "ESM1v Model 1 Score",
           "type": "number",
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_1 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_2": {
+          "title": "ESM1v Model 2 Score",
           "type": [
             "number",
             "null"
@@ -92,6 +86,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_2 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_3": {
+          "title": "ESM1v Model 3 Score",
           "type": [
             "number",
             "null"
@@ -99,6 +94,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_3 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_4": {
+          "title": "ESM1v Model 4 Score",
           "type": [
             "number",
             "null"
@@ -106,6 +102,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_4 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_5": {
+          "title": "ESM1v Model 5 Score",
           "type": [
             "number",
             "null"
@@ -113,6 +110,7 @@
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_5 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_1_next": {
+          "title": "ESM1v Model 1 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -120,6 +118,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_1 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_2_next": {
+          "title": "ESM1v Model 2 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -127,6 +126,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_2 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_3_next": {
+          "title": "ESM1v Model 3 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -134,6 +134,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_3 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_4_next": {
+          "title": "ESM1v Model 4 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -141,6 +142,7 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_4 model for the later segment of an overlap."
         },
         "esm1v_t33_650M_UR90S_5_next": {
+          "title": "ESM1v Model 5 Score for Later Overlap Segment",
           "type": [
             "number",
             "null"
@@ -148,22 +150,21 @@
           "description": "Masked-marginals score from the esm1v_t33_650M_UR90S_5 model for the later segment of an overlap."
         },
         "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term",
           "type": [
             "string",
             "null"
-          ],
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for"
+          ]
         },
         "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
           "type": [
             "string",
             "null"
-          ],
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record."
+          ]
         }
       },
       "required": [
-        "_key",
         "esm_1v_score",
         "files_filesets",
         "biosample_term",

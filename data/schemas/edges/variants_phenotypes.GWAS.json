@@ -1,166 +1,232 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "edges/variants_phenotypes.GWAS.json",
   "db_collection_name": "variants_phenotypes",
   "type": "object",
   "allOf": [
-    { "$ref": "edges.base.json" },
+    {
+      "$ref": "edges.base.json"
+    },
     {
       "type": "object",
       "properties": {
         "equivalent_ontology_term": {
-          "type": ["string", "null"],
+          "title": "Equivalent Ontology Term",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The other of the MONDO or EFO identifiers for the same trait, when both are present.",
           "example": "EFO_0007010"
         },
         "lead_chrom": {
+          "title": "Lead Variant Chromosome",
           "type": "string",
           "description": "Chromosome of the lead variant, without a chr prefix.",
           "example": "1"
         },
         "lead_pos": {
+          "title": "Lead Variant Position",
           "type": "number",
           "description": "Position of the lead variant, converted from the Open Targets 1-based coordinate to 0-based.",
           "example": 10000
         },
         "lead_ref": {
+          "title": "Lead Variant Reference Allele",
           "type": "string",
           "description": "Reference allele of the lead variant.",
           "example": "A"
         },
         "lead_alt": {
+          "title": "Lead Variant Alternate Allele",
           "type": "string",
           "description": "Alternate allele of the lead variant.",
           "example": "G"
         },
         "phenotype_term": {
-          "type": ["string", "null"],
+          "title": "Phenotype Term",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Ontology term for the phenotype, trait or disease.",
           "example": "chronic obstructive pulmonary disease"
         },
         "direction": {
+          "title": "Direction",
           "type": "string",
           "description": "Sign of the reported effect of the alternate allele on the trait.",
           "example": "+"
         },
         "beta": {
+          "title": "Beta",
           "type": "number",
           "description": "Effect size of the alternate allele on the trait.",
           "example": 0.01
         },
         "beta_ci_lower": {
+          "title": "Beta Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of the confidence interval on beta.",
           "example": 0.005
         },
         "beta_ci_upper": {
+          "title": "Beta Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of the confidence interval on beta.",
           "example": 0.015
         },
         "odds_ratio": {
+          "title": "Odds Ratio",
           "type": "number",
           "description": "Odds ratio of the alternate allele for a binary trait. 0 when the study reports a beta instead.",
           "example": 1.5
         },
         "oddsr_ci_lower": {
+          "title": "Odds Ratio Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of the confidence interval on the odds ratio.",
           "example": 1.2
         },
         "oddsr_ci_upper": {
+          "title": "Odds Ratio Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of the confidence interval on the odds ratio.",
           "example": 1.8
         },
         "p_val_mantissa": {
+          "title": "P-Value Mantissa",
           "type": "number",
           "description": "Mantissa of the association p-value.",
           "example": 0.01
         },
         "p_val_exponent": {
+          "title": "P-Value Exponent",
           "type": "number",
           "description": "Base-10 exponent of the association p-value.",
           "example": 10
         },
         "p_value": {
+          "title": "P-Value",
           "type": "number",
           "description": "Association p-value, reconstructed from mantissa and exponent.",
           "example": 0.01
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
           "example": 1
         },
         "tagged_variants": {
+          "title": "Tagged Variants",
           "type": "array",
           "description": "Variants in LD with the lead SNP.",
           "items": {
             "type": "object",
             "properties": {
               "tag_chrom": {
+                "title": "Tagged Variant Chromosome",
                 "type": "string",
                 "description": "Chromosome of the tagged variant",
                 "example": "1"
               },
               "tag_pos": {
+                "title": "Tagged Variant Position",
                 "type": "integer",
                 "description": "0-based position of the tagged variant",
                 "example": 16964110
               },
               "tag_ref": {
+                "title": "Tagged Variant Reference Allele",
                 "type": "string",
                 "description": "Reference allele of the tagged variant",
                 "example": "TTTTTC"
               },
               "tag_alt": {
+                "title": "Tagged Variant Alternate Allele",
                 "type": "string",
                 "description": "Alternate allele of the tagged variant",
                 "example": "T"
               },
               "overall_r2": {
-                "type": ["string", "null"],
+                "title": "Overall R-Squared",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "Overall LD r2 with the lead variant. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.68343289"
               },
               "pics_95perc_credset": {
-                "type": ["string", "null"],
+                "title": "PICS 95% Credible Set Membership",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "Whether the tagged variant is in the PICS 95% credible set. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "False"
               },
               "AFR_1000G_prop": {
-                "type": ["string", "null"],
+                "title": "1000 Genomes AFR Allele Frequency",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes AFR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "AMR_1000G_prop": {
-                "type": ["string", "null"],
+                "title": "1000 Genomes AMR Allele Frequency",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes AMR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "EAS_1000G_prop": {
-                "type": ["string", "null"],
+                "title": "1000 Genomes EAS Allele Frequency",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes EAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "EUR_1000G_prop": {
-                "type": ["string", "null"],
+                "title": "1000 Genomes EUR Allele Frequency",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes EUR superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.25"
               },
               "SAS_1000G_prop": {
-                "type": ["string", "null"],
+                "title": "1000 Genomes SAS Allele Frequency",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "1000 Genomes SAS superpopulation allele frequency proportion. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "0.0"
               },
               "log10_ABF": {
-                "type": ["string", "null"],
+                "title": "Log10 Approximate Bayes Factor",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "Log10 approximate Bayes factor. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "NA"
               },
               "posterior_prob": {
-                "type": ["string", "null"],
+                "title": "Posterior Probability",
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "PICS posterior probability. Stored as a string as provided by the source (may be \"NA\"), or null when the source row is truncated",
                 "example": "NA"
               }
@@ -201,63 +267,53 @@
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "GWAS"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "GWAS"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "OpenTargets"
           ]
         },
-        "source_url": {
-          "type": "string",
-          "description": "The URL for the source."
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata"
-        },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "Open Targets Genetics release this record was taken from.",
           "example": "October 2022 (22.10)"
         },
         "_key": {
-          "type": "string",
           "description": "SHA-256 hash of the variant key, phenotype ontology term key, study identifier and source name.",
           "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
         },
         "study": {
+          "title": "Study",
           "type": "string",
           "description": "ID of the GWAS study.",
           "example": "studies/GCST006368"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
@@ -280,7 +336,6 @@
         "neg_log10_pvalue",
         "tagged_variants",
         "version",
-        "_key",
         "study",
         "files_filesets"
       ]

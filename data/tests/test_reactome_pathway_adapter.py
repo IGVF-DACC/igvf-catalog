@@ -133,8 +133,8 @@ def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, moc
             'ontology_terms/DOID_12345']
 
         # Check GO biological process
-        assert 'go_biological_process' in first_item
-        assert first_item['go_biological_process'] == 'ontology_terms/GO_0006914'
+        assert 'biological_process' in first_item
+        assert first_item['biological_process'] == 'ontology_terms/GO_0006914'
 
 
 def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, mock_response_data_no_disease, mock_file_fileset):
@@ -184,8 +184,8 @@ def test_reactome_pathway_adapter_without_disease(mock_sample_file, spy_writer, 
         assert 'disease_ontology_terms' not in first_item
 
         # Check GO biological process
-        assert 'go_biological_process' in first_item
-        assert first_item['go_biological_process'] == 'ontology_terms/GO_0006914'
+        assert 'biological_process' in first_item
+        assert first_item['biological_process'] == 'ontology_terms/GO_0006914'
 
 
 def test_reactome_pathway_adapter_404_response(mock_sample_file, spy_writer, mock_file_fileset):

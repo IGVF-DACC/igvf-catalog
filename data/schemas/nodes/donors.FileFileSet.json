@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/donors.FileFileSet.json",
+  "$id": "schemas/nodes/donors.FileFileSet.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -12,10 +12,10 @@
           "example": "ENCDO374BBL"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "ENCDO374BBL"
         },
         "sex": {
+          "title": "Sex",
           "type": [
             "string",
             "null"
@@ -30,6 +30,7 @@
           ]
         },
         "age": {
+          "title": "Age",
           "type": [
             "string",
             "null"
@@ -38,6 +39,7 @@
           "example": "35"
         },
         "age_units": {
+          "title": "Age Units",
           "type": [
             "string",
             "null"
@@ -52,6 +54,7 @@
           ]
         },
         "ethnicities": {
+          "title": "Ethnicities",
           "type": [
             "array",
             "null"
@@ -62,6 +65,7 @@
           ]
         },
         "phenotypic_features": {
+          "title": "Phenotypes",
           "type": [
             "array",
             "null"
@@ -72,14 +76,12 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE",
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/human-donors/ENCDO374BBL/"
         }
       },

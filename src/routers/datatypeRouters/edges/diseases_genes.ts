@@ -36,10 +36,10 @@ const variantReturnFormat = z.object({
   hgvs: z.string().optional()
 })
 
-const diseasesToGenesFormat = z.object({
+export const diseasesToGenesFormat = z.object({
   pmids: z.array(z.string()).nullish(),
   term_name: z.string().optional(),
-  gene_symbol: z.string().optional(),
+  gene_name: z.string().optional(),
   association_type: z.string().nullish(), // Orphanet only
   association_status: z.string().nullish(), // Orphanet only
   sgc_id: z.string().nullish(), // GenCC only

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.CCRE.json",
   "allOf": [
     {
@@ -15,10 +15,10 @@
           "example": "candidate_cis_regulatory_element_chr1_16097_16381_GRCh38_ENCFF420VPZ"
         },
         "name": {
-          "example": "EH38E3951272",
-          "description": "Human readable display name for the entity"
+          "example": "EH38E3951272"
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
           "description": "Cell-type-agnostic SCREEN class of the cCRE, as the short code followed by its SCREEN label. Assigned from chromatin accessibility, H3K4me3, H3K27ac, CTCF, and transcription-factor binding, plus distance to the nearest TSS.",
           "enum": [
@@ -33,7 +33,6 @@
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "candidate Cis-Regulatory Elements"
           ]
@@ -44,23 +43,21 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://www.encodeproject.org/files/ENCFF420VPZ"
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
+          "$ref": "../mixins.json#/files_filesets",
           "enum": [
             "files_filesets/ENCFF420VPZ"
-          ]
+          ],
+          "example": "files_filesets/ENCFF420VPZ"
         }
       },
       "required": [

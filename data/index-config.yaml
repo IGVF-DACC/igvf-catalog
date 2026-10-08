@@ -98,13 +98,22 @@ genes:
       - start, end
 
 genes_genes:
-  zkd:
+  zkd_sparse:
     fields:
       - z_score
   persistent:
     fields:
       - interaction_type[*], source
       - source
+
+genes_transcripts_genes:
+  persistent:
+    fields:
+      - method, files_filesets
+      - morf_id
+  zkd_sparse:
+    fields:
+      - log2FC, neg_log10_pvalue_adj
 
 genes_structure:
   persistent:
@@ -159,6 +168,7 @@ mm_genes_structure:
 mm_genomic_elements:
   persistent:
     fields:
+      - promoter_of
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
@@ -230,7 +240,7 @@ pathways:
   persistent:
     fields:
       - name
-      - go_biological_process
+      - biological_process
       - is_top_level_pathway, is_in_disease, species
       - is_in_disease, species
       - species
@@ -294,6 +304,7 @@ genomic_elements_biosamples:
       - source, source_url, files_filesets
       - source_url, files_filesets
       - files_filesets
+      - method, _key
   zkd:
     fields:
       - log2FC
@@ -313,7 +324,23 @@ genomic_elements_genes:
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
       - method, source, _key
+      - _from, _to, files_filesets
 
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
+mm_genomic_elements_mm_genes:
+  # IGVFFI9159XDOS: 257,900 edges, 19 promoters, 14,690 response genes.
+  # One dataset: method/source/fileset/context indexes add little selectivity.
+  # Endpoint indexes support filtering and _key pagination in either direction.
+  persistent:
+    fields:
+      - _from, _key
+      - _to, _key
+
+  # Required by the API's biological-context search fallback queries.
   inverted:
     fields: biological_context
     analyzers:
@@ -338,6 +365,7 @@ studies:
 transcripts:
   persistent:
     fields:
+      - refseq_transcript_ids[*]
       - chr, gene_name, name, transcript_type
       - gene_name, name, transcript_type
       - name, transcript_type

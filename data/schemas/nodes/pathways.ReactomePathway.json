@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/pathways.ReactomePathway.json",
   "allOf": [
     {
@@ -12,63 +13,58 @@
           "example": "R-HSA-1971475"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "A tetrasaccharide linker sequence is required for GAG synthesis"
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship"
           ]
         },
         "method": {
-          "type": ["string", "null"],
-          "description": "Name of the experimental class or prediction model that produced this result."
+          "$ref": "../mixins.json#/method",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "label": {
-          "type": ["string", "null"],
-          "description": "Non-method specific human readable label for the node or edge"
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI6981KOFP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
+          "$ref": "../mixins.json#/label",
+          "type": [
+            "string",
+            "null"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "Reactome"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://reactome.org/"
           ]
         },
         "id_version": {
+          "title": "ID Version",
           "type": "string",
           "description": "Reactome stable identifier with its version suffix.",
           "example": "R-HSA-1971475.4"
         },
         "is_in_disease": {
+          "title": "Disease Pathway?",
           "type": "boolean",
           "description": "Whether Reactome annotates this pathway as a disease pathway.",
           "example": true
         },
         "name_aliases": {
+          "title": "Aliases",
           "type": "array",
           "description": "Names Reactome lists for the pathway, including the display name.",
           "example": [
@@ -76,11 +72,13 @@
           ]
         },
         "is_top_level_pathway": {
+          "title": "Top-Level Pathway?",
           "type": "boolean",
           "description": "Whether this is a Reactome top-level pathway.",
           "example": true
         },
         "disease_ontology_terms": {
+          "title": "Disease Ontology Terms",
           "type": "array",
           "description": "Disease ontology terms Reactome associates with this pathway.",
           "example": [
@@ -91,11 +89,15 @@
             "pattern": "^ontology_terms/[A-Z0-9_]+$"
           }
         },
-        "go_biological_process": {
+        "biological_process": {
+          "title": "Biological Process",
           "type": "string",
           "description": "Gene Ontology biological process term for this pathway, as a handle into ontology_terms.",
           "example": "ontology_terms/GO_0006914",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
@@ -113,7 +115,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, class, method, label, files_filesets, source, source_url"
+    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, biological_process, id_version, organism, class, method, label, files_filesets, source, source_url"
   },
   "db_collection_name": "pathways"
 }

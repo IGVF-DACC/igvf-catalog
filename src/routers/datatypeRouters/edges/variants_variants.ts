@@ -54,7 +54,7 @@ const variantsVariantsSummaryFormat = z.object({
   })
 })
 
-const variantsVariantsFormat = z.object({
+export const variantsVariantsFormat = z.object({
   chr: z.string().nullable(),
   ancestry: z.string().nullable(),
   d_prime: z.number().nullable(),

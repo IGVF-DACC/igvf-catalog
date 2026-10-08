@@ -64,7 +64,7 @@ genes_transcripts: |
   FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl');
   INSERT INTO genes_transcripts
   SELECT source, version, source_url, name, inverse_name, biological_process, organism, _key as id, NULL, NULL, splitByString('/', assumeNotNull(_to))[2] as mm_transcripts_id, splitByString('/', assumeNotNull(_from))[2] as mm_genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/mm_genes_transcripts_IGVFFI2412FAXG.vcf.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/mm_genes_transcripts_IGVFFI5842FWGQ.vcf.jsonl');
 
 genes_structure: |
   INSERT INTO genes_structure
@@ -132,7 +132,7 @@ genes_pathways: |
 
 pathways: |
   INSERT INTO pathways
-  SELECT id_version, name, is_in_disease, name_aliases, organism, disease_ontology_terms, go_biological_process, is_top_lvel_pathway, source, source_url, _key as id
+  SELECT id_version, name, is_in_disease, name_aliases, organism, disease_ontology_terms, biological_process, is_top_lvel_pathway, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/pathways/*.jsonl');
 
 pathways_pathways: |
@@ -177,11 +177,6 @@ variants_proteins: |
   INSERT INTO variants_proteins
   SELECT rsid, label, source, name, inverse_name, chr, motif_fc, motif_pos, motif_orient, motif_conc, motif, biological_process, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins/*.jsonl', 'JSONEachRow');
-
-variants_proteins_terms: |
-  INSERT INTO variants_proteins_terms
-  SELECT es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_proteins_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins_terms/*.jsonl', 'JSONEachRow')
 
 # ArangoDB can't import the following JSONLs from afgr_sqtls.jsonl because they have p_value = NaN
 # 2025-01-16T00:12:10Z [11262] WARNING [e5a29] {general} at position 9463: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "8861b7bbcf84fa908e92ae868cf312551acef5cc47c39155f8ba4778800b8111", "_from": "variants/9dfc265f06997b7bf3cf476cd42499e5ee16a2293bb1e8ffbc021e0f44b9f191", "_to": "genes/ENSG00000164308", "biological_context": "lymphoblastoid cell line", "chr": "ch...

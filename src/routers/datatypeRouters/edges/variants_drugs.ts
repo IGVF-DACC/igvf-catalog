@@ -31,14 +31,14 @@ const studyParametersDict = z.object({
   study_type: z.string().optional(),
   study_cases: z.string().optional(),
   study_controls: z.string().optional(),
-  'p-value': z.string().optional(),
+  'p-value': z.string().nullish(),
   biogeographical_groups: z.string().optional()
 })
 
-const variantsToDrugsFormat = z.object({
+export const variantsToDrugsFormat = z.object({
   drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
-  gene_symbol: z.array(z.string()).optional(),
+  gene_names: z.array(z.string()).optional(),
   pmid: z.string().optional(),
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),
@@ -50,10 +50,10 @@ const variantsToDrugsFormat = z.object({
   files_filesets: z.string().nullish()
 }).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
-const drugsToVariantsFormat = z.object({
+export const drugsToVariantsFormat = z.object({
   sequence_variant: z.string().or(variantFormat).optional(),
   _to: z.string(),
-  gene_symbol: z.array(z.string()).optional(),
+  gene_names: z.array(z.string()).optional(),
   pmid: z.string().optional(),
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),

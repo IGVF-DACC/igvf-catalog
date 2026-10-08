@@ -3,23 +3,44 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
-import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
+import { commonEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
+import { getSchema, getCollectionEnumValuesOrThrow, getMergedCollectionSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'method')
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_genes', 'source')
 
-const genomicElementsGenesCrisprElementGeneEncodeSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneENCODE.json')
-const genomicElementsGenesCrisprElementGeneIgvfSchema = getSchema('data/schemas/edges/genomic_elements_genes.CRISPRElementGeneIGVF.json')
+// genomic_elements_genes holds ENCODE E-G links, IGVF CRISPR, scE2G, and ENCODE CRISPR
+// element-gene edges. Filtering must see every source's fields/ranges (e.g. IGVF's
+// z_score/idr/neg_log10_pvalue), not just the ENCODE CRISPR schema's subset.
+const genomicElementsGenesFilterSchema = getMergedCollectionSchema('edges', 'genomic_elements_genes')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneCollectionName = geneSchema.db_collection_name as string
+
+const humanRouting = {
+  edgeCollection: genomicElementToGeneCollectionName,
+  elementCollection: genomicElementCollectionName,
+  geneCollection: geneCollectionName,
+  elementSchema: genomicElementSchema,
+  geneSchema,
+  filterSchema: genomicElementsGenesFilterSchema
+}
+const mouseRouting = {
+  edgeCollection: 'mm_genomic_elements_mm_genes',
+  elementCollection: 'mm_genomic_elements',
+  geneCollection: 'mm_genes',
+  elementSchema: getSchema('data/schemas/nodes/mm_genomic_elements.CRISPRElementGeneIGVF.json'),
+  geneSchema: getSchema('data/schemas/nodes/mm_genes.GencodeGene.json'),
+  filterSchema: getMergedCollectionSchema('edges', 'mm_genomic_elements_mm_genes')
+}
+type Routing = typeof humanRouting
+const getRouting = (organism: unknown): Routing => organism === 'Mus musculus' ? mouseRouting : humanRouting
 
 const edgeQueryFormat = z.object({
   method: z.enum(METHODS).optional(),
@@ -28,10 +49,20 @@ const edgeQueryFormat = z.object({
   biological_context: z.string().optional(),
   cell_annotation: z.string().optional(),
   cell_annotation_term: z.string().optional(),
-  source: z.enum(SOURCES).optional()
+  source: z.enum(SOURCES).optional(),
+  // range-filterable across the sources sharing this collection (see
+  // genomicElementsGenesFilterSchema) - score (ENCODE/scE2G), effect_size/log2FC (ENCODE
+  // CRISPR), neg_log10_pvalue/neg_log10_pvalue_adj/z_score/idr (IGVF CRISPR)
+  score: z.string().trim().optional(),
+  effect_size: z.string().trim().optional(),
+  log2FC: z.string().trim().optional(),
+  neg_log10_pvalue: z.string().trim().optional(),
+  neg_log10_pvalue_adj: z.string().trim().optional(),
+  z_score: z.string().trim().optional(),
+  idr: z.string().trim().optional()
 })
 
-const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonEdgeParamsFormat)
 
 const gnrGeneQueryFormat = z.object({
   regulator_gene_id: z.string().optional(),
@@ -48,12 +79,12 @@ const gnrGeneQueryFormat = z.object({
   files_fileset: z.string().optional(),
   significant: z.enum(['true']).optional(),
   crispr_modality: z.enum(['knockout', 'interference', 'activation']).optional()
-}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
+}).merge(commonEdgeParamsFormat).omit({ verbose: true })
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
 }).merge(edgeQueryFormat)
-  .merge(commonHumanEdgeParamsFormat)
+  .merge(commonEdgeParamsFormat)
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -61,7 +92,8 @@ const elementOutputFormat = z.object({
   chr: z.string().nullish(),
   start: z.number().nullish(),
   end: z.number().nullish(),
-  name: z.string()
+  name: z.string(),
+  source_annotation: z.string().nullish()
 })
 
 const geneOutputFormat = z.object({
@@ -72,7 +104,7 @@ const geneOutputFormat = z.object({
   chr: z.string()
 })
 
-const outputFormat = z.array(z.object({
+export const outputFormat = z.array(z.object({
   name: z.string(),
   label: z.string(),
   method: z.string(),
@@ -83,16 +115,31 @@ const outputFormat = z.array(z.object({
   biosample_term: z.string().nullish(),
   cell_annotation: z.string().nullish(),
   cell_annotation_term: z.string().nullish(),
+  treatments_term_ids: z.array(z.string()).nullish(),
   files_filesets: z.string(),
   crispr_modality: z.string().nullish(),
   score: z.number().nullish(),
   transcription_start_site: z.number().nullish(),
   rna_pseudobulk_tpm: z.number().nullish(),
   log2FC: z.number().nullish(),
+  log2FC_ci95_lower: z.number().nullish(),
+  log2FC_ci95_upper: z.number().nullish(),
   effect_size: z.number().nullish(),
+  effect_size_ci_95: z.number().nullish(),
   z_score: z.number().nullish(),
   t_score: z.number().nullish(),
   idr: z.number().nullish(),
+  pct_1: z.number().nullish(),
+  pct_2: z.number().nullish(),
+  num_guides: z.number().nullish(),
+  num_cells: z.number().nullish(),
+  fold_change: z.number().nullish(),
+  background_corrected_fold_change: z.number().nullish(),
+  cpm_perturb: z.number().nullish(),
+  cpm_bg: z.number().nullish(),
+  gamma_approximation_ln_p_value: z.number().nullish(),
+  hypergeometric_ln_p_value: z.number().nullish(),
+  empirical_p_value: z.number().nullish(),
   p_value: z.number().or(z.string()).nullish(),
   p_value_adj: z.number().or(z.string()).nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
@@ -102,7 +149,7 @@ const outputFormat = z.array(z.object({
   gene: z.string().or(geneOutputFormat)
 }))
 
-const grnOutputFormat = z.object({
+export const grnOutputFormat = z.object({
   response_gene: z.string(),
   genomic_element: z.object({
     chr: z.string(),
@@ -126,7 +173,7 @@ const grnOutputFormat = z.object({
   perturbation_efficiency_significant: z.boolean().nullish()
 })
 
-const buildEdgeFilter = (input: paramsFormatType): string => {
+const buildEdgeFilter = (input: paramsFormatType, routing: Routing): string => {
   if (input.files_fileset !== undefined) {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
@@ -139,7 +186,7 @@ const buildEdgeFilter = (input: paramsFormatType): string => {
     input.cell_annotation_term = `ontology_terms/${input.cell_annotation_term as string}`
   }
   // edge filters are the same for all methods
-  const filters = getFilterStatements(genomicElementsGenesCrisprElementGeneEncodeSchema, input)
+  const filters = getFilterStatements(routing.filterSchema, input)
   delete input.files_fileset
   delete input.biosample_term
   delete input.biological_context
@@ -164,6 +211,7 @@ function applyLimit (input: paramsFormatType): number {
 }
 
 function buildQuery (params: {
+  routing: Routing
   collectionName: string
   searchClause?: string
   combinedFilter: string
@@ -173,7 +221,7 @@ function buildQuery (params: {
   edgeNameField: 'name' | 'inverse_name'
   sortByKey?: boolean
 }): string {
-  const { collectionName, searchClause, combinedFilter, page, limit, verbose, edgeNameField, sortByKey } = params
+  const { routing, collectionName, searchClause, combinedFilter, page, limit, verbose, edgeNameField, sortByKey } = params
   const sortClause = sortByKey ? 'SORT record._key' : ''
   return `
     LET edgeRecords = (
@@ -186,8 +234,8 @@ function buildQuery (params: {
     )
     LET geneIDs = UNIQUE(edgeRecords[*]._to)
     LET elementIDs = UNIQUE(edgeRecords[*]._from)
-    LET geneLookup = ${verbose ? `(FOR gene IN ${geneCollectionName} FILTER gene._id IN geneIDs RETURN { [gene._id]: {${getDBReturnStatements(geneSchema).replaceAll('record', 'gene')}} })` : '[]'}
-    LET elementLookup = ${verbose ? `(FOR element IN ${genomicElementCollectionName} FILTER element._id IN elementIDs RETURN { [element._id]: {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'element')}} })` : '[]'}
+    LET geneLookup = ${verbose ? `(FOR gene IN ${routing.geneCollection} FILTER gene._id IN geneIDs RETURN { [gene._id]: {${getDBReturnStatements(routing.geneSchema).replaceAll('record', 'gene')}} })` : '[]'}
+    LET elementLookup = ${verbose ? `(FOR element IN ${routing.elementCollection} FILTER element._id IN elementIDs RETURN { [element._id]: {${getDBReturnStatements(routing.elementSchema).replaceAll('record', 'element')}} })` : '[]'}
     LET geneMap = MERGE(geneLookup)
     LET elementMap = MERGE(elementLookup)
     FOR record IN edgeRecords
@@ -207,15 +255,30 @@ function buildQuery (params: {
         'biosample_term': record.biosample_term,
         'cell_annotation': record.cell_annotation,
         'cell_annotation_term': record.cell_annotation_term,
+        'treatments_term_ids': record.treatments_term_ids,
         'crispr_modality': record.crispr_modality,
         'score': record.score,
         'transcription_start_site': record.transcription_start_site,
         'rna_pseudobulk_tpm': record.rna_pseudobulk_tpm,
         'log2FC': record.log2FC,
+        'log2FC_ci95_lower': record.log2FC_ci95_lower,
+        'log2FC_ci95_upper': record.log2FC_ci95_upper,
         'effect_size': record.effect_size,
+        'effect_size_ci_95': record.effect_size_ci_95,
         'z_score': record.z_score,
         't_score': record.t_score,
         'idr': record.idr,
+        'pct_1': record.pct_1,
+        'pct_2': record.pct_2,
+        'num_guides': record.num_guides,
+        'num_cells': record.num_cells,
+        'fold_change': record.fold_change,
+        'background_corrected_fold_change': record.background_corrected_fold_change,
+        'cpm_perturb': record.cpm_perturb,
+        'cpm_bg': record.cpm_bg,
+        'gamma_approximation_ln_p_value': record.gamma_approximation_ln_p_value,
+        'hypergeometric_ln_p_value': record.hypergeometric_ln_p_value,
+        'empirical_p_value': record.empirical_p_value,
         'p_value': record.p_value,
         'p_value_adj': record.p_value_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -231,6 +294,7 @@ const executeElementsGenesQuery = async (query: string, bindVars?: Record<string
 }
 
 const executeExactMatchQuery = async ({
+  routing,
   combinedFilter,
   page,
   limit,
@@ -238,6 +302,7 @@ const executeExactMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   combinedFilter: string
   page: number
   limit: number
@@ -246,7 +311,8 @@ const executeExactMatchQuery = async ({
   bindVars?: Record<string, unknown>
 }): Promise<any[]> => {
   const query = buildQuery({
-    collectionName: genomicElementToGeneCollectionName,
+    routing,
+    collectionName: routing.edgeCollection,
     combinedFilter,
     page,
     limit,
@@ -258,6 +324,7 @@ const executeExactMatchQuery = async ({
 }
 
 const executePrefixMatchQuery = async ({
+  routing,
   searchViewName,
   combinedFilter,
   biologicalContext,
@@ -267,6 +334,7 @@ const executePrefixMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   searchViewName: string
   combinedFilter: string
   biologicalContext: string
@@ -278,6 +346,7 @@ const executePrefixMatchQuery = async ({
 }): Promise<any[]> => {
   const searchVal = biologicalContext.replace(/"/g, '\\"')
   const query = buildQuery({
+    routing,
     collectionName: searchViewName,
     searchClause: `SEARCH STARTS_WITH(record.biological_context, "${searchVal}")`,
     combinedFilter,
@@ -290,6 +359,7 @@ const executePrefixMatchQuery = async ({
 }
 
 const executeTokenMatchQuery = async ({
+  routing,
   searchViewName,
   combinedFilter,
   biologicalContext,
@@ -299,6 +369,7 @@ const executeTokenMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   searchViewName: string
   combinedFilter: string
   biologicalContext: string
@@ -310,6 +381,7 @@ const executeTokenMatchQuery = async ({
 }): Promise<any[]> => {
   const searchVal = biologicalContext.replace(/"/g, '\\"')
   const query = buildQuery({
+    routing,
     collectionName: searchViewName,
     searchClause: `SEARCH ANALYZER(TOKENS("${searchVal}", "text_en_no_stem") ALL IN record.biological_context, "text_en_no_stem")`,
     combinedFilter,
@@ -322,6 +394,7 @@ const executeTokenMatchQuery = async ({
 }
 
 const executeLevenshteinMatchQuery = async ({
+  routing,
   searchViewName,
   combinedFilter,
   biologicalContext,
@@ -331,6 +404,7 @@ const executeLevenshteinMatchQuery = async ({
   edgeNameField,
   bindVars
 }: {
+  routing: Routing
   searchViewName: string
   combinedFilter: string
   biologicalContext: string
@@ -342,6 +416,7 @@ const executeLevenshteinMatchQuery = async ({
 }): Promise<any[]> => {
   const searchVal = biologicalContext.replace(/"/g, '\\"')
   const query = buildQuery({
+    routing,
     collectionName: searchViewName,
     searchClause: `SEARCH LEVENSHTEIN_MATCH(record.biological_context, "${searchVal}", 1, false)`,
     combinedFilter,
@@ -386,6 +461,8 @@ function elementQueryValidation (input: paramsFormatType): void {
 }
 
 async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any> {
+  const organism = input.organism ?? 'Homo sapiens'
+  const routing = getRouting(organism)
   delete input.organism
   geneQueryValidation(input)
   const limit = applyLimit(input)
@@ -395,16 +472,16 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   let geneIDs: string[] = []
   const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
   if (isGeneQuery) {
-    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, synonym: input.synonym, organism: 'Homo sapiens', page: 0 }
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, synonym: input.synonym, organism: organism as string, page: 0 }
     delete input.gene_id
     delete input.hgnc_id
     delete input.synonym
     delete input.gene_name
     const genes = await geneSearch(geneInput)
-    geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
+    geneIDs = genes.map(gene => `${routing.geneCollection}/${gene._id as string}`)
   }
 
-  const edgeFilter = buildEdgeFilter(input)
+  const edgeFilter = buildEdgeFilter(input, routing)
   const geneFilter = isGeneQuery ? 'record._to IN @geneIDs' : ''
   const baseFilter = buildCombinedFilter(geneFilter, edgeFilter)
   const combinedFilter = biologicalContext
@@ -412,9 +489,10 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     : baseFilter
   const verbose = input.verbose === 'true'
   const bindVars = isGeneQuery ? { geneIDs } : undefined
-  const searchViewName = `${genomicElementToGeneCollectionName}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${routing.edgeCollection}_text_en_no_stem_inverted_search_alias`
 
   const exactObjects = await executeExactMatchQuery({
+    routing,
     combinedFilter,
     page: input.page as number,
     limit,
@@ -428,6 +506,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   const prefixMatchObjects = await executePrefixMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -442,6 +521,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   const tokenMatchObjects = await executeTokenMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -456,6 +536,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   return await executeLevenshteinMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -468,11 +549,13 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
 }
 
 async function grnSearch (input: paramsFormatType): Promise<any> {
+  const organism = input.organism ?? 'Homo sapiens'
+  const routing = getRouting(organism)
   grnQueryValidation(input)
   const limit = applyLimit(input)
 
-  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: 'Homo sapiens', page: 0 }
-  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id, name: input.response_gene_name, synonyms: input.response_synonym, organism: 'Homo sapiens', page: 0 }
+  const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id !== undefined ? withHgncPrefix(input.regulator_hgnc_id as string) : undefined, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: organism as string, page: 0 }
+  const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id !== undefined ? withHgncPrefix(input.response_hgnc_id as string) : undefined, name: input.response_gene_name, synonyms: input.response_synonym, organism: organism as string, page: 0 }
 
   const hasRegulatorInput = Object.keys(regulatorGeneInput).some(key => !['organism', 'page'].includes(key) && regulatorGeneInput[key] !== undefined)
   const hasResponseInput = Object.keys(responseGeneInput).some(key => !['organism', 'page'].includes(key) && responseGeneInput[key] !== undefined)
@@ -486,7 +569,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilters.neg_log10_pvalue_adj = input.neg_log10_pvalue_adj
   }
   if (Object.keys(pvalueFilters).length > 0) {
-    pvalueFilter = `FILTER ${getFilterStatements(genomicElementsGenesCrisprElementGeneIgvfSchema, pvalueFilters)}`
+    pvalueFilter = `FILTER ${getFilterStatements(routing.filterSchema, pvalueFilters)}`
   }
 
   let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
@@ -510,19 +593,25 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   }
 
   const responseQuery = `
-    FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
+    FOR gene IN ${routing.geneCollection}
+        FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
-        FOR record in genomic_elements_genes
+        FOR record in ${routing.edgeCollection}
           FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
           ${pvalueFilter}
+          LET ge = DOCUMENT(record._from)
+          // Not every genomic element has a presumed promoter gene (promoter_of is
+          // optional). Without one there's no regulator gene to report, so exclude these
+          // rather than returning a GRN row with a null regulator_gene - matching
+          // regulatorQuery/regulatorResponseQuery, which already only join elements that
+          // have a promoter_of set.
+          FILTER ge.promoter_of != null
           SORT record._key
 
           LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
-          LET ge = DOCUMENT(record._from)
           LET perturbationEfficiencyEdge = FIRST(
-            FOR se IN genomic_elements_genes
+            FOR se IN ${routing.edgeCollection}
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
               LIMIT 1
               RETURN se
@@ -549,20 +638,20 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   `
 
   const regulatorQuery = `
-    FOR gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
+    FOR gene IN ${routing.geneCollection}
+        FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'gene')}
 
-        FOR ge in genomic_elements
+        FOR ge in ${routing.elementCollection}
           FILTER ge.promoter_of == gene._id
 
-          FOR record in genomic_elements_genes
+          FOR record in ${routing.edgeCollection}
             FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
             ${pvalueFilter}
             SORT record._key
             LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
             LET perturbationEfficiencyEdge = FIRST(
-              FOR se IN genomic_elements_genes
+              FOR se IN ${routing.edgeCollection}
                 FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
                 LIMIT 1
                 RETURN se
@@ -589,23 +678,23 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
   `
 
   const regulatorResponseQuery = `
-    FOR regulator_gene IN genes
-        FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}
+    FOR regulator_gene IN ${routing.geneCollection}
+        FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}
 
-        FOR response_gene IN genes
-            FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
+        FOR response_gene IN ${routing.geneCollection}
+            FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
-            FOR record in genomic_elements_genes
+            FOR record in ${routing.edgeCollection}
               FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
               ${pvalueFilter}
 
-              FOR ge IN genomic_elements
+              FOR ge IN ${routing.elementCollection}
                 FILTER ge._id == record._from AND ge.promoter_of == regulator_gene._id
                 SORT record._key
                 LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
                 LET perturbationEfficiencyEdge = FIRST(
-                  FOR se IN genomic_elements_genes
+                  FOR se IN ${routing.edgeCollection}
                     FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
                     LIMIT 1
                     RETURN se
@@ -648,6 +737,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
+  const organism = input.organism ?? 'Homo sapiens'
+  const routing = getRouting(organism)
   delete input.organism
   elementQueryValidation(input)
   const limit = applyLimit(input)
@@ -658,30 +749,37 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   let isElementQuery = false
   if (input.region !== undefined) {
     isElementQuery = true
-    const elementInput: paramsFormatType = { region: input.region, type: input.region_type, source_annotation: input.source_annotation, page: 0 }
-    const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(elementInput))
+    const elementInput: paramsFormatType = { region: input.region, type: input.region_type, page: 0 }
+    const genomicElementsFilters = getFilterStatements(routing.elementSchema, preProcessRegionParam(elementInput))
     const elementQuery = `
-      FOR record IN ${genomicElementCollectionName}
+      FOR record IN ${routing.elementCollection}
       FILTER ${genomicElementsFilters}
       RETURN record._id
     `
     elementIDs = await (await db.query(elementQuery)).all()
     delete input.region
     delete input.region_type
+  }
+
+  let sourceAnnotationFilter = ''
+  if (input.source_annotation !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    sourceAnnotationFilter = `DOCUMENT(record._from).source_annotation == '${escapeAqlString(input.source_annotation as string)}'`
     delete input.source_annotation
   }
 
-  const edgeFilter = buildEdgeFilter(input)
+  const edgeFilter = buildEdgeFilter(input, routing)
   const elementFilter = isElementQuery ? 'record._from IN @elementIDs' : ''
-  const baseFilter = buildCombinedFilter(elementFilter, edgeFilter)
+  const baseFilter = [elementFilter, edgeFilter, sourceAnnotationFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
   const combinedFilter = biologicalContext
     ? buildCombinedFilter(baseFilter, `record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`)
     : baseFilter
   const verbose = input.verbose === 'true'
   const bindVars = isElementQuery ? { elementIDs } : undefined
-  const searchViewName = `${genomicElementToGeneCollectionName}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${routing.edgeCollection}_text_en_no_stem_inverted_search_alias`
 
   const exactObjects = await executeExactMatchQuery({
+    routing,
     combinedFilter,
     page: input.page as number,
     limit,
@@ -694,6 +792,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   const prefixMatchObjects = await executePrefixMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -708,6 +807,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   const tokenMatchObjects = await executeTokenMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,
@@ -722,6 +822,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   return await executeLevenshteinMatchQuery({
+    routing,
     searchViewName,
     combinedFilter: baseFilter,
     biologicalContext,

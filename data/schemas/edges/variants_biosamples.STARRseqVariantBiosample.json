@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, biosample ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:14772:C:T_EFO_0002067_IGVFFI0099XJHU"
         },
@@ -26,115 +25,100 @@
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression in"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulatory activity modulated by"
           ]
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": "number",
           "description": "Log2 fold change for variant effect on gene expression."
         },
         "inputCountRef": {
+          "title": "Input Count for Reference Allele",
           "type": "number",
           "description": "Input count for the reference allele."
         },
         "inputCountAlt": {
+          "title": "Input Count for Alternate Allele",
           "type": "number",
           "description": "Input count for the alternative allele."
         },
         "outputCountRef": {
+          "title": "Output Count for Reference Allele",
           "type": "number",
           "description": "Output count for the reference allele."
         },
         "outputCountAlt": {
+          "title": "Output Count for Alternate Allele",
           "type": "number",
           "description": "Output count for the alternative allele."
         },
         "postProbEffect": {
+          "title": "Posterior Probability of Effect",
           "type": "number",
           "description": "Posterior probability that the variant has a regulatory effect."
         },
         "significant": {
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicating the significance of the variant effect, based on the posterior probability."
         },
         "CI_lower_95": {
+          "title": "95% Confidence Interval Lower Bound",
           "type": "number",
           "description": "Lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
+          "title": "95% Confidence Interval Upper Bound",
           "type": "number",
           "description": "Upper bound of a 95% interval for the variant effect."
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on regulatory element activity"
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "STARR-seq"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI7664HHXI",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI7664HHXI",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/EFO_0002067",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/EFO_0002067"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
+          "$ref": "../mixins.json#/treatments_term_ids"
         }
       },
       "required": [
-        "_key",
         "log2FC",
         "inputCountRef",
         "inputCountAlt",

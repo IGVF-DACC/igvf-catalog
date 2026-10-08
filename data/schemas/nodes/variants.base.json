@@ -1,77 +1,98 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/variants.base.json",
-  "type": "object",
-  "properties": {
-    "chr": {
-      "type": "string",
-      "description": "Chromosome the variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
-      "example": "chr1"
-    },
-    "pos": {
-      "type": "number",
-      "description": "0-based genomic coordinate of the variant."
-    },
-    "rsid": {
-      "type": "array",
-      "description": "dbSNP id for the variant position",
-      "example": [
-        "rs6054257"
-      ]
-    },
-    "ref": {
-      "type": "string",
-      "description": "Reference allele sequence at this position, empty for a pure insertion."
-    },
-    "alt": {
-      "type": "string",
-      "description": "Alternate allele sequence, empty for a pure deletion."
-    },
-    "qual": {
-      "type": "string",
-      "description": "Variant call quality score from VCF QUAL field.",
-      "example": "50110.4"
-    },
-    "variation_type": {
-      "type": "string",
-      "description": "Class of sequence change: SNP, insertion, deletion, or deletion-insertion."
-    },
-    "annotations": {
+  "db_collection_name": "variants",
+  "allOf": [
+    {
       "type": "object",
-      "description": "Source-specific annotations parsed from FAVOR."
-    },
-    "spdi": {
-      "type": "string",
-      "description": "Normalized SPDI expression identifying the allele.",
-      "example": "NC_000001.11:10887495:C:T"
-    },
-    "hgvs": {
-      "type": "string",
-      "description": "HGVS genomic expression for the allele.",
-      "example": "NC_000067.7:g.3050715_3050716insG"
-    },
-    "vrs_digest": {
-      "type": "string",
-      "description": "GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele."
-    },
-    "ca_id": {
-      "type": "string",
-      "description": "Canonical allele identifier assigned by the ClinGen Allele Registry."
-    },
-    "organism": {
-      "type": "string",
-      "description": "Species this annotation describes."
+      "properties": {
+        "chr": {
+          "title": "Chromosome",
+          "type": "string",
+          "description": "Chromosome the variant lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
+          "example": "chr1"
+        },
+        "pos": {
+          "title": "Position",
+          "type": "number",
+          "description": "0-based genomic coordinate of the variant."
+        },
+        "rsid": {
+          "title": "dbSNP ID",
+          "type": "array",
+          "description": "dbSNP id for the variant position",
+          "example": [
+            "rs6054257"
+          ]
+        },
+        "ref": {
+          "title": "Reference Sequence",
+          "type": "string",
+          "description": "Reference allele sequence at this position, empty for a pure insertion."
+        },
+        "alt": {
+          "title": "Alternate Sequence",
+          "type": "string",
+          "description": "Alternate allele sequence, empty for a pure deletion."
+        },
+        "qual": {
+          "title": "Variant Call Quality",
+          "type": "string",
+          "description": "Variant call quality score from VCF QUAL field.",
+          "example": "50110.4"
+        },
+        "variation_type": {
+          "title": "Variation Type",
+          "type": "string",
+          "description": "Class of sequence change.",
+          "enum_descriptions": {
+            "SNP": "A single-nucleotide substitution.",
+            "deletion-insertion": "Replacement of a reference sequence with an alternate sequence.",
+            "insertion": "Addition of sequence relative to the reference.",
+            "deletion": "Removal of sequence relative to the reference."
+          }
+        },
+        "annotations": {
+          "title": "Annotations",
+          "type": "object",
+          "description": "Source-specific annotations parsed from FAVOR."
+        },
+        "spdi": {
+          "title": "SPDI",
+          "type": "string",
+          "description": "Normalized SPDI expression identifying the allele.",
+          "example": "NC_000001.11:10887495:C:T"
+        },
+        "hgvs": {
+          "title": "HGVS",
+          "type": "string",
+          "description": "HGVS genomic expression for the allele.",
+          "example": "NC_000067.7:g.3050715_3050716insG"
+        },
+        "vrs_digest": {
+          "title": "VRS Allele Digest",
+          "type": "string",
+          "description": "GA4GH Variation Representation Specification allele digest, a hash that is stable across equivalent representations of the same allele."
+        },
+        "ca_id": {
+          "title": "Canonical Allele ID",
+          "type": "string",
+          "description": "Canonical allele identifier assigned by the ClinGen Allele Registry."
+        },
+        "organism": {
+          "$ref": "../mixins.json#/organism"
+        }
+      },
+      "required": [
+        "chr",
+        "pos",
+        "ref",
+        "alt",
+        "variation_type",
+        "spdi",
+        "hgvs",
+        "organism"
+      ]
     }
-  },
-  "required": [
-    "chr",
-    "pos",
-    "ref",
-    "alt",
-    "variation_type",
-    "spdi",
-    "hgvs",
-    "organism"
-  ],
-  "db_collection_name": "variants"
+  ]
 }

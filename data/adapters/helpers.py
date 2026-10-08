@@ -233,6 +233,20 @@ def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
 
 
 def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', validate_SNV=False, correct_ref_allele=True):
+    # A bare insertion/deletion with no anchor base (ref or alt == '') can't be expressed as
+    # gnomad-style "chr-pos-ref-alt" notation - translator.translate_from raises trying to parse
+    # it. Handle it directly against the reference sequence instead, same as load_variant() does
+    # for spdi-formatted input.
+    if ref == '' or alt == '':
+        chr_ref = CHR_MAP[assembly][chr]
+        pos_spdi = int(pos) - 1
+        if ref:
+            ref_genome = seq_repo[chr_ref][pos_spdi:pos_spdi + len(ref)]
+            if ref != ref_genome:
+                raise ValueError(
+                    f'Ref allele mismatch: expected {ref_genome} but got {ref} at {chr_ref}:{pos_spdi}')
+        return f'{chr_ref}:{pos_spdi}:{ref}:{alt}'
+
     # Only use translator if the ref or alt is more than one base, or validate_SNV is True
     if len(ref) == 1 and len(alt) == 1 and validate_SNV != True:
         chr_ref = CHR_MAP[assembly][chr]

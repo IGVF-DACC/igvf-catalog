@@ -23,7 +23,7 @@ const geneQueryFormat = z.object({
   files_fileset: z.string().optional()
 })
 
-const codingVariantsPhenotypeAggregationFormat = z.object({
+export const codingVariantsPhenotypeAggregationFormat = z.object({
   method: z.string(),
   count: z.number()
 })
@@ -39,7 +39,7 @@ const fromCodingVariantsQueryFormat = z.object({
   files_fileset: z.string().optional()
 })
 
-const scoreSummaryOutputFormat = z.object({
+export const scoreSummaryOutputFormat = z.object({
   variant_id: z.string().nullish(),
   hgvsp: z.string().nullish(),
   gene_name: z.string().nullish(),
@@ -49,7 +49,7 @@ const scoreSummaryOutputFormat = z.object({
   portalLink: z.string().nullable()
 })
 
-const outputFormat = z.object({
+export const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
   // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence)
@@ -125,20 +125,20 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
   } else if (input.phenotype_name !== undefined) {
     phenotypeQuery = `
       FOR record IN ontology_terms
-      FILTER record.name == "${input.phenotype_name as string}"
+      FILTER record.name == @phenotypeName
       RETURN record._id
     `
-    const phenotypes = await (await db.query(phenotypeQuery)).all()
+    const phenotypes = await (await db.query(phenotypeQuery, { phenotypeName: input.phenotype_name as string })).all()
     if (phenotypes.length !== 0) {
       phenotypeIds = `${JSON.stringify(phenotypes)}`
     } else {
       phenotypeQuery = `
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.phenotype_name as string}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS(@phenotypeName, "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
       `
-      const phenotypes = await (await db.query(phenotypeQuery)).all()
+      const phenotypes = await (await db.query(phenotypeQuery, { phenotypeName: input.phenotype_name as string })).all()
       phenotypeIds = `${JSON.stringify(phenotypes)}`
     }
   }

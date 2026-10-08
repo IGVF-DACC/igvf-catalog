@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/files_filesets.FileFileSet.json",
+  "$id": "schemas/nodes/files_filesets.FileFileSet.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -12,15 +12,16 @@
           "example": "ENCFF004PFU"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "ENCFF004PFU"
         },
         "file_set_id": {
+          "title": "File Set ID",
           "type": "string",
           "description": "Accession of the file set that contains this file: the unique identifier used to reference that file set on the source portal.",
           "example": "ENCSR359DFW"
         },
         "lab": {
+          "title": "Laboratory",
           "type": "string",
           "description": "Lab associated with the submission.",
           "enum": [
@@ -52,6 +53,7 @@
           "example": "jesse-engreitz"
         },
         "preferred_assay_titles": {
+          "title": "Preferred Assay Titles",
           "type": [
             "array",
             "null"
@@ -67,8 +69,10 @@
               "electroporated MPRA",
               "lentiMPRA",
               "Migration CRISPR screen",
+              "MORF screen",
               "MPRA",
               "Multiome Perturb-seq",
+              "in vivo Perturb-seq",
               "Perturb-seq",
               "Parse Perturb-seq",
               "Proliferation CRISPR screen",
@@ -88,6 +92,7 @@
           ]
         },
         "assay_term_ids": {
+          "title": "Assay Term IDs",
           "type": [
             "array",
             "null"
@@ -101,11 +106,11 @@
           }
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ],
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ADASTRA",
             "BlueSTARR",
@@ -122,6 +127,7 @@
             "HOCOMOCO",
             "Homology",
             "MPRA",
+            "MORF screen",
             "MutPred2",
             "Orphanet",
             "Perturb-seq",
@@ -131,15 +137,16 @@
             "SGE",
             "STARR-seq",
             "TopLD",
+            "training data for predictive models",
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant painting via fluorescence",
-            "Variant-EFFECTS",
             "cV2F",
             "caQTL",
             "candidate Cis-Regulatory Elements",
             "eQTL",
             "elements",
+            "genes",
             "pQTL",
             "scATAC-seq",
             "scE2G",
@@ -149,8 +156,7 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship",
             "observed data",
@@ -158,6 +164,7 @@
           ]
         },
         "software": {
+          "title": "Software",
           "type": [
             "array",
             "null"
@@ -216,6 +223,7 @@
           }
         },
         "samples": {
+          "title": "Samples",
           "type": [
             "array",
             "null"
@@ -230,6 +238,7 @@
           }
         },
         "sample_ids": {
+          "title": "Sample IDs",
           "type": [
             "array",
             "null"
@@ -245,6 +254,7 @@
           }
         },
         "simple_sample_summaries": {
+          "title": "Biosample Summaries",
           "type": [
             "array",
             "null"
@@ -255,6 +265,7 @@
           ]
         },
         "donors": {
+          "title": "Donors",
           "type": [
             "array",
             "null"
@@ -269,16 +280,13 @@
           }
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "CHEBI:15367"
           ]
         },
         "publication": {
+          "title": "Publication",
           "type": [
             "string",
             "null"
@@ -287,6 +295,7 @@
           "example": "PMID:34017130"
         },
         "collections": {
+          "title": "Collections",
           "type": "array",
           "items": {
             "type": "string",
@@ -298,7 +307,6 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE",
             "IGVF",
@@ -306,7 +314,6 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/",
           "type": [
             "string",
@@ -314,11 +321,13 @@
           ]
         },
         "download_link": {
+          "title": "Download Link",
           "type": "string",
           "description": "The download path to obtain the file from the source portal.",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "cell_annotation": {
+          "title": "Cell Annotation",
           "type": [
             "string",
             "null"
@@ -327,6 +336,7 @@
           "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
+          "title": "Cell Annotation Term",
           "type": [
             "string",
             "null"
@@ -336,6 +346,7 @@
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
         "genome_browser_link": {
+          "title": "Genome Browser Link",
           "type": [
             "string",
             "null"
@@ -344,6 +355,7 @@
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "browser_index_file": {
+          "title": "Browser Index File",
           "type": [
             "string",
             "null"
@@ -352,11 +364,11 @@
           "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
         },
         "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality",
           "type": [
             "string",
             "null"
           ],
-          "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
           "enum": [
             null,
             "interference",
@@ -368,6 +380,7 @@
           "example": "interference"
         },
         "version": {
+          "title": "Version",
           "type": [
             "string",
             "null"

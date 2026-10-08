@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json",
   "allOf": [
     {
@@ -13,38 +13,46 @@
           "description": "SPDI of the variant on GRCm39. A VRS digest is used when the SPDI is longer than 256 characters."
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome of the variant, prefixed with chr. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "pos": {
+          "title": "Position",
           "type": "number",
           "description": "0-based genomic coordinate of the variant.",
           "example": 3050706
         },
         "rsid": {
+          "title": "dbSNP ID",
           "type": "array",
-          "description": "dbSNP id for the variant position",
+          "items": {
+            "type": "string"
+          },
+          "description": "dbSNP ids from the VCF ID column. Empty when that column is '.'.",
           "example": []
         },
         "ref": {
+          "title": "Reference Sequence",
           "type": "string",
           "description": "Reference allele, relative to C57BL/6J (GRCm39).",
           "example": "GGGGGGGGG"
         },
         "alt": {
+          "title": "Alternate Sequence",
           "type": "string",
           "description": "Alternate allele.",
           "example": "GGGGGGGGGG"
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Mus musculus"
           ]
         },
         "strain": {
+          "title": "Strain",
           "type": "array",
           "items": {
             "type": "string",
@@ -64,11 +72,13 @@
           ]
         },
         "qual": {
+          "title": "Variant Call Quality",
           "type": "string",
           "description": "VCF QUAL score for the variant position.",
           "example": "50110.4"
         },
         "filter": {
+          "title": "Filter",
           "type": [
             "string",
             "null"
@@ -76,32 +86,35 @@
           "description": "VCF FILTER for the site. PASS if at least one strain call passed the release filters; LowQual otherwise. Null when the source has none."
         },
         "fi": {
-          "type": "number",
-          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release.",
+          "title": "Filter Index",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Per-strain filter index from the VCF FORMAT field: 1 if the genotype passed all filters, 0 if it failed one or more. Heterozygous calls are marked 0 in this release. Null when the FORMAT FI value is missing ('.').",
           "example": 0
         },
         "name": {
-          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG",
-          "description": "Human readable display name for the entity"
+          "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
         },
         "spdi": {
+          "title": "SPDI",
           "type": "string",
           "description": "Normalized SPDI expression identifying the allele.",
           "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
         },
         "hgvs": {
+          "title": "HGVS",
           "type": "string",
-          "description": "Genomic HGVS notation derived from the SPDI.",
+          "description": "HGVS genomic expression for the allele.",
           "example": "NC_000067.7:g.3050715_3050716insG"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "MOUSE GENOMES PROJECT"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/mousegenomes/"
           ]

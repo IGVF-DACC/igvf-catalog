@@ -390,21 +390,23 @@ gene:
     - https://api.data.igvf.org/reference-files/IGVFFI7344CFHT/@@download/IGVFFI7344CFHT.tsv.gz # gene alias support file: Homo_sapiens.gene_info.gz
   source: GENCODE
 
-# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts/transcripts_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_transcript --organism HUMAN
+# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts/transcripts_IGVFFI7217ZMJZ.jsonl --label gencode_transcript --organism HUMAN --reference-filepath ~/dataset/IGVFFI9820RGXX.tsv.gz
 transcript:
   collection: transcripts
   params:
     - label
     - organism
-  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts/transcripts_{datafile}.jsonl --label gencode_transcript --organism {organism}
+    - reference_filepath
+  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts/transcripts_{datafile}.jsonl --label gencode_transcript --organism {organism} --reference-filepath {reference_filepath}
   pypy3: false
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
+  file_mappings:
+    - datafile: https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
+      reference_filepath: https://api.data.igvf.org/reference-files/IGVFFI9820RGXX/@@download/IGVFFI9820RGXX.tsv.gz # GENCODE v43 RefSeq mapping
   source: GENCODE
 
 # Example:
 # python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl --label transcribed_to --organism HUMAN
-# python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2412FAXG.gtf --output-bucket-key genes_transcripts/mm_genes_transcripts_IGVFFI2412FAXG.vcf.jsonl --label transcribed_to --organism MOUSE
+# python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key genes_transcripts/mm_genes_transcripts_IGVFFI5842FWGQ.vcf.jsonl --label transcribed_to --organism MOUSE
 transcribed to:
   collection: genes_transcripts
   params:
@@ -414,7 +416,7 @@ transcribed to:
   pypy3: false
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
-    - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
 
 # Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label gene_structure
@@ -438,15 +440,15 @@ transcript contains gene structure:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
   source: GENCODE
 
-# Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2412FAXG.gtf --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI2412FAXG.jsonl --label mm_transcript_contains_mm_gene_structure
+# Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI5842FWGQ.jsonl --label mm_transcript_contains_mm_gene_structure
 mouse transcript contains mouse gene structure:
   collection: mm_transcripts_mm_genes_structure
   params:
     - label
   pypy3: false
-  command: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI2412FAXG.jsonl --label mm_transcript_contains_mm_gene_structure
+  command: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI5842FWGQ.jsonl --label mm_transcript_contains_mm_gene_structure
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
@@ -566,6 +568,21 @@ variant to protein association:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2053GDNI/@@download/IGVFFI2053GDNI.csv.gz # pQTL_UKB.csv.gz
   source: UKB
+
+# Run this BEFORE "allele specific binding" below: it loads any variant referenced by this
+# ADASTRA file that isn't already in the variants collection, so the variants_proteins edges
+# created next don't end up with a dangling _from reference.
+# Example: the adapter extracts the tarball and its nested zip archive
+# python3 data_parser.py --adapter allele_specific_binding --label variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5943XCOS.tar.gz --output-bucket-key variants/adastra_variants_IGVFFI5943XCOS.jsonl
+allele specific binding variants:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter allele_specific_binding --label variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/adastra_variants_IGVFFI5943XCOS.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
+  source: ADASTRA allele-specific TF binding calls
 
 # Example: the adapter extracts the tarball and its nested zip archive
 # python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5943XCOS.tar.gz --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
@@ -1294,8 +1311,6 @@ genomic element to gene IGVF CRISPR E2G:
   source: IGVF
   label: str # element effect on gene expression of {readout_gene}
 
-# Prerequisite: load files_filesets for CRISPR element-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR element phenotype)
-# Portal files must have catalog_collections including genomic_elements and genomic_elements_phenotypes.
 # Example: python3 data_parser.py --adapter crispr_element_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/ --filepath ~/dataset/IGVFFI5135QZCS.tsv.gz --label genomic_element --output-bucket-key genomic_elements/crispr_element_phenotype_IGVFFI5135QZCS.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element CRISPR element phenotype:
   collection: genomic_elements
@@ -1321,9 +1336,30 @@ genomic element to phenotype CRISPR element phenotype:
   source: IGVF
   label: regulatory element effect on phenotype
 
-# Prerequisite: load files_filesets for CRISPR variant-phenotype accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.CRISPR variant phenotype)
-# Portal files must have catalog_collections including variants and variants_phenotypes.
-# NTR phenotype terms (LDL-C uptake / NTR:0001118) are written by this adapter via --label ontology_term.
+# Example: python3 data_parser.py --adapter morf_gene_transcript_gene --source-url https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/ --filepath ~/dataset/IGVFFI6734IWRB.tsv.gz --reference-filepath ~/dataset/IGVFFI2373SYJW.tsv.gz --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/ --label gene_transcript_gene --output-bucket-key genes_transcripts_genes/morf_gene_transcript_gene_IGVFFI6734IWRB.jsonl --output-bucket igvf-catalog-parsed-collections
+gene transcript to gene MORF screen:
+  collection: genes_transcripts_genes
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter morf_gene_transcript_gene
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label gene_transcript_gene
+    --output-bucket-key genes_transcripts_genes/morf_gene_transcript_gene_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/@@download/IGVFFI6734IWRB.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/@@download/IGVFFI2373SYJW.tsv.gz
+      reference_source_url: https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6032GREJ/@@download/IGVFFI6032GREJ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/@@download/IGVFFI2373SYJW.tsv.gz
+      reference_source_url: https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/
+  source: IGVF
+  label: gene overexpression effect on gene expression
+
 # Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant --output-bucket-key variants/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
 variant CRISPR variant phenotype:
   collection: variants
@@ -1333,6 +1369,8 @@ variant CRISPR variant phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/@@download/IGVFFI9726GFTC.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/@@download/IGVFFI1678CDBR.csv.gz
   source: IGVF
 
 # Example: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ~/dataset/IGVFFI2014OOZP.csv.gz --label variant_phenotype --output-bucket-key variants_phenotypes/crispr_variant_phenotype_IGVFFI2014OOZP.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1344,6 +1382,8 @@ variant to phenotype CRISPR variant phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/@@download/IGVFFI2014OOZP.csv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6803HZJG/@@download/IGVFFI6803HZJG.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/@@download/IGVFFI9726GFTC.csv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/@@download/IGVFFI1678CDBR.csv.gz
   source: IGVF
   label: variant effect on phenotype
 
@@ -1355,7 +1395,6 @@ ontology term CRISPR variant phenotype NTR:
   command: python3 data_parser.py --adapter crispr_variant_phenotype --source-url https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/ --filepath ' ' --label ontology_term --output-bucket-key ontology_terms/crispr_variant_phenotype_NTR_0001118.jsonl --output-bucket igvf-catalog-parsed-collections
   source: IGVF
 
-# Prerequisite: load files_filesets for scE2G accessions first (see data_sources_file_fileset.yaml igvf_file_accessions.scE2G)
 # Example: python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI5648GWQX
 # Example: python3 data_parser.py --adapter scE2G --filepath ~/dataset/IGVFFI5648GWQX.tsv.gz --label genomic_element --output-bucket-key genomic_elements/scE2G_genomic_elements_IGVFFI5648GWQX.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element IGVF scE2G:
@@ -1885,6 +1924,21 @@ study:
   source: OpenTargets
   version: October 2022 (22.10)
 
+# Run this BEFORE "variant to phenotype" below: it loads any variant referenced by this GWAS
+# file that isn't already in the variants collection, so the variants_phenotypes edges created
+# next don't end up with a dangling _from reference.
+# Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath IGVFFI1309WDQG.tsv --output-bucket-key variants/gwas_variants.jsonl --label variants
+variant:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath {variant_to_ontology_datafile} --output-bucket-key variants/gwas_variants.jsonl --label variants
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
+  source: OpenTargets
+  version: October 2022 (22.10)
+
 # Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --filepath IGVFFI1309WDQG.tsv --output-bucket-key variants_phenotypes/gwas_variants_phenotypes.jsonl --label variants_phenotypes
 variant to phenotype:
   collection: variants_phenotypes
@@ -2028,42 +2082,42 @@ gene to term:
   source: DepMap
   threshold: 0.5
 
-# Example: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2412FAXG.gtf --output-bucket-key mm_genes/mm_genes_IGVFFI2412FAXG.jsonl --label mm_gencode_gene --gene-alias-file-path ~/dataset/IGVFFI3741KWFZ.tsv.gz
+# Example: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key mm_genes/mm_genes_IGVFFI5842FWGQ.jsonl --label mm_gencode_gene --gene-alias-file-path ~/dataset/IGVFFI3741KWFZ.tsv.gz
 gene mouse:
   collection: mm_genes
   params:
     - label
     - gene_alias_file_path
   pypy3: true
-  command: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes/mm_genes_IGVFFI2412FAXG.jsonl --label mm_gencode_gene --gene-alias-file-path {gene_alias_datafile}
+  command: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes/mm_genes_IGVFFI5842FWGQ.jsonl --label mm_gencode_gene --gene-alias-file-path {gene_alias_datafile}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3741KWFZ/@@download/IGVFFI3741KWFZ.tsv.gz # Mus_musculus.gene_info.gz
     - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
   version: vM36
 
-# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2412FAXG.gtf --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI2412FAXG.jsonl --label mm_gencode_transcript --organism MOUSE
+# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI5842FWGQ.jsonl --label mm_gencode_transcript --organism MOUSE
 transcript mouse:
   collection: mm_transcripts
   params:
     - label
     - organism
   pypy3: false
-  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI2412FAXG.jsonl --label mm_gencode_transcript --organism {organism}
+  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI5842FWGQ.jsonl --label mm_gencode_transcript --organism {organism}
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
   version: vM36
 
-# Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2412FAXG.gtf --output-bucket-key mm_genes_structure/mm_genes_structure_IGVFFI2412FAXG.vcf.jsonl --label mm_gene_structure
+# Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key mm_genes_structure/mm_genes_structure_IGVFFI5842FWGQ.vcf.jsonl --label mm_gene_structure
 mouse gene structure:
   collection: mm_genes_structure
   pypy3: false
   params:
     - label
-  command: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes_structure/mm_genes_structure_IGVFFI2412FAXG.vcf.jsonl --label mm_gene_structure
+  command: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes_structure/mm_genes_structure_IGVFFI5842FWGQ.vcf.jsonl --label mm_gene_structure
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
   version: vM36
 
@@ -2101,17 +2155,6 @@ coding variant:
   pypy3: false
   datafiles:
    - s3://igvf-catalog-source-data/dbNSFP5.1a_grch38.gz # reference file IGVFFI3605PGCI
-  source: dbNSFP 5.1a
-
-# Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key coding_variants_proteins/chr1.jsonl --collection coding_variants_proteins
-coding variant to protein:
-  collection: coding_variants_proteins
-  params:
-    - collection
-  pypy3: false
-  command: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_proteins/{datafile}.jsonl --collection coding_variants_proteins
-  datafiles:
-    - s3://igvf-catalog-source-data/dbNSFP5.1a_grch38.gz # reference file IGVFFI3605PGCI
   source: dbNSFP 5.1a
 
 # Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key variants_coding_variants/chr1.jsonl --collection variants_coding_variants

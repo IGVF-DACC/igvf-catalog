@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
   "allOf": [
     {
@@ -15,16 +15,18 @@
           "enum": [
             "SNP",
             "deletion-insertion"
-          ]
+          ],
+          "enum_descriptions": {
+            "SNP": "A single-nucleotide substitution.",
+            "deletion-insertion": "Replacement of a reference sequence with an alternate sequence."
+          }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
         }

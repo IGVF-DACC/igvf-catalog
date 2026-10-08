@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.MPRAAdapter.json",
   "allOf": [
     {
@@ -15,20 +15,22 @@
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "strand": {
-          "type": "string",
-          "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",
+          "description": "Strand the tile was tested in..",
           "enum": [
             "+",
             "-",
             "."
-          ]
+          ],
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence.",
+            ".": "Strand is not recorded or is not applicable."
+          }
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "MPRA"
           ]
@@ -39,20 +41,16 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF",
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF769REH/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

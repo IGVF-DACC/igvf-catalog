@@ -55,7 +55,7 @@ def test_gencc_process_file_writes_edge(mock_gene_map, mock_file_fileset):
     assert doc['name'] == 'associated_with'
     assert doc['inverse_name'] == 'associated_with'
     assert doc['hgnc'] == 'HGNC:10896'
-    assert doc['gene_symbol'] == 'SKI'
+    assert doc['gene_name'] == 'SKI'
     assert doc['term_name'] == 'Shprintzen-Goldberg syndrome'
     assert doc['classification'] == 'Definitive'
     assert doc['moi_id'] == 'HP:0000006'

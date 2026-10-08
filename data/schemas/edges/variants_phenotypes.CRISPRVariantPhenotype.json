@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_phenotypes.CRISPRVariantPhenotype.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, phenotype ontology term and source file accession joined by underscores.",
           "example": "NC_000001.11:25253603:G:A_NTR_0001118_IGVFFI2014OOZP"
         },
@@ -28,18 +27,22 @@
           ]
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Estimated phenotype effect size (mu or mu_adj)"
         },
         "z_score": {
+          "title": "Z-Score",
           "type": "number",
           "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
         },
         "significant": {
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on the phenotype."
         },
         "num_guides": {
+          "title": "Number of Guides",
           "type": [
             "number",
             "null"
@@ -47,6 +50,7 @@
           "description": "Number of guides aggregated across the variant in the screen."
         },
         "edit_rate_mean": {
+          "title": "Mean Editing Rate",
           "type": [
             "number",
             "null"
@@ -54,97 +58,95 @@
           "description": "Mean effective prime-editing rate across the variant's guides: the fraction of cells edited, from 0 to 1."
         },
         "effect_size_ci95_lower": {
+          "title": "Effect Size 95% Confidence Interval Lower Bound",
           "type": [
             "number",
             "null"
           ],
-          "description": "Lower bound of the 95% confidence interval for effect size."
+          "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
         },
         "effect_size_ci95_upper": {
+          "title": "Effect Size 95% Confidence Interval Upper Bound",
           "type": [
             "number",
             "null"
           ],
-          "description": "Upper bound of the 95% confidence interval for effect size."
+          "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
+        },
+        "p_value_adj": {
+          "title": "Adjusted P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source."
+        },
+        "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative log10 of the multiple-testing-adjusted p-value when reported by the source."
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
         },
         "crispr_modality": {
-          "type": "string",
-          "description": "The CRISPR modality from the associated files_filesets record",
+          "$ref": "../mixins.json#/crispr_modality",
           "enum": [
-            "prime editing"
+            "prime editing",
+            "interference",
+            "base editing"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on phenotype"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI2014OOZP/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI2014OOZP",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "example": "human HCT116 cell line from donor(s) IGVFDO0384OZRW"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/EFO_0002824",
-          "pattern": "^ontology_terms/"
-        },
-        "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation."
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/EFO_0002824"
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "associated with"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "associated with"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
         }
       },
       "required": [
-        "_key",
         "effect_size",
         "z_score",
         "significant",
@@ -152,6 +154,8 @@
         "edit_rate_mean",
         "effect_size_ci95_lower",
         "effect_size_ci95_upper",
+        "p_value_adj",
+        "neg_log10_pvalue_adj",
         "files_filesets",
         "crispr_modality",
         "biological_context",
@@ -161,8 +165,8 @@
     }
   ],
   "accessible_via": {
-    "filter_by_range": "effect_size, z_score",
-    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper"
+    "filter_by_range": "effect_size, z_score, p_value_adj, neg_log10_pvalue_adj",
+    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
   },
   "db_collection_name": "variants_phenotypes"
 }

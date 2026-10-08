@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
@@ -27,97 +26,97 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI6224HZMG",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "mutational effect"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "altered due to mutation"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI6224HZMG",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "example": "HEK293 cell line, female, Homo sapiens"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/EFO_0001182"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "DUAL-IPA"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "protein variant effect"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "avg_gfp": {
+          "title": "Average GFP",
           "type": "number",
           "description": "Single cell mean GFP fluorescence value per well"
         },
         "avg_mcherry": {
+          "title": "Average mCherry",
           "type": "number",
           "description": "Single cell mean mCherry fluorescence value per well"
         },
         "avg_GFP_mCherry_ratio": {
+          "title": "Average GFP to mCherry Ratio",
           "type": "number",
           "description": "Ratio of avg_gfp to avg_mcherry for the well, the abundance readout for the variant allele."
         },
         "wt_GFP_mCherry_ratio": {
+          "title": "Wild-Type GFP to mCherry Ratio",
           "type": "number",
-          "description": "Ratio of avg_gfp/avg_mcherry of related wild-type measurement"
+          "description": "GFP-to-mCherry fluorescence ratio of the matched wild-type (WT) reference. WT reference selection, replicate aggregation and quality-control criteria are dataset-specific."
         },
         "allele_wt_ratio": {
+          "title": "Allele to Wild-Type Ratio",
           "type": "number",
-          "description": "Ratio of avg_GFP_mCherry_ratio/wt_GFP_mCherry_ratio"
+          "description": "Variant-to-WT fluorescence ratio, calculated as avg_GFP_mCherry_ratio / wt_GFP_mCherry_ratio. Values below 1 indicate lower protein abundance than the matched WT reference; values above 1 indicate higher abundance."
         },
         "dualipa_abun_score": {
+          "title": "DUAL-IPA Abundance Score",
           "type": "number",
-          "description": "Abundance score for the variant: the log2 Z-score of allele_wt_ratio against the wild-type distribution, computed as (log2(allele_wt_ratio) - log2(wt_mean)) / log2(wt_std)."
+          "description": "Z-score of the log2 variant-to-WT fluorescence ratio, calculated as (log2(allele_wt_ratio) - mu_wt) / sigma_wt. mu_wt and sigma_wt are the mean and standard deviation of log2-transformed WT:WT reference ratios; their values and calibration scope are dataset-specific. Lower scores indicate lower protein abundance; higher scores indicate higher abundance. A variant-to-WT ratio of 1 corresponds to -mu_wt / sigma_wt, not necessarily zero, so score sign alone does not determine direction relative to WT."
         },
         "dualipa_abun_change": {
+          "title": "DUAL-IPA Abundance Change",
           "type": "string",
-          "enum": ["Y", "N", "Uncertain"],
-          "description": "Whether the variant shows a significant change in abundance, judged against thresholds derived by the log-likelihood-ratio method."
+          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds.",
+          "enum": [
+            "Y",
+            "N",
+            "Uncertain"
+          ],
+          "enum_descriptions": {
+            "Y": "Meets the calibrated criteria for an abundance change in either direction. Use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value to determine direction.",
+            "N": "Falls within the calibrated no-change range.",
+            "Uncertain": "Falls between the calibrated change and no-change ranges."
+          }
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "_key",
         "files_filesets",
         "biological_context",
         "biosample_term",

@@ -1,3 +1,5 @@
+export {}
+
 describe('env.ts', () => {
   const OLD_ENV = process.env
 

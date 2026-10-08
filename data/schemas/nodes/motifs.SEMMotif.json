@@ -12,53 +12,44 @@
       "type": "object",
       "properties": {
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
           "pattern": "^https://data.igvf.org/model-files/"
         },
-        "baseline": {
+        "SEMpl_baseline": {
+          "title": "SEMpl Baseline",
           "type": "number",
           "description": "log2 of the average transcription factor binding signal across randomly scrambled endogenous kmers.",
           "example": -0.671761
         },
         "class": {
-          "type": "string",
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
+          "$ref": "../mixins.json#/class",
           "enum": [
             "observed data"
           ]
         },
         "method": {
-          "type": "string",
-          "description": "Name of the experimental class or prediction model that produced this result.",
+          "$ref": "../mixins.json#/method",
           "enum": [
             "SEMpl"
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI5279OTVZ",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "baseline",
+        "SEMpl_baseline",
         "class",
         "method",
         "files_filesets"
       ],
       "accessible_via": {
-        "return": "_id, name, tf_name, source, source_url, pwm, length, baseline, class, method, files_filesets"
+        "return": "_id, name, tf_name, source, source_url, pwm, length, SEMpl_baseline, class, method, files_filesets"
       }
     }
   ],

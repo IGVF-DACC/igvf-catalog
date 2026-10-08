@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genes_structure.GencodeStructure.json",
   "allOf": [
     {
@@ -11,31 +12,39 @@
           "example": "ENST00000456328_ENSE00002234944_exon"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "DDX11L2-202_exon_1_exon"
         },
         "chr": {
+          "title": "Chromosome",
           "type": "string",
           "description": "Chromosome the feature lies on, prefixed with 'chr'. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
         "start": {
+          "title": "Start",
           "type": "number",
           "description": "Start of the feature, 0-based and inclusive."
         },
         "end": {
+          "title": "End",
           "type": "number",
           "description": "End of the feature, 0-based and exclusive."
         },
         "strand": {
+          "title": "Strand",
           "type": "string",
-          "description": "Strand of the transcript the feature belongs to: '+' for the forward strand, '-' for the reverse strand.",
+          "description": "Strand of the transcript the feature belongs to..",
           "enum": [
             "+",
             "-"
-          ]
+          ],
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence."
+          }
         },
         "type": {
+          "title": "Type",
           "type": "string",
           "description": "Kind of sub-transcript feature. Exons and their CDS, UTR, start_codon, and stop_codon sub-features are taken from the GENCODE annotation, and the sub-features share the exon_id of the exon they fall in. Introns are not annotated by GENCODE and are derived from the gaps between consecutive exons of a transcript.",
           "enum": [
@@ -45,45 +54,59 @@
             "intron",
             "start_codon",
             "stop_codon"
-          ]
+          ],
+          "enum_descriptions": {
+            "CDS": "Coding sequence translated into protein.",
+            "UTR": "Untranslated region of a transcript.",
+            "exon": "A segment retained in the mature transcript.",
+            "intron": "An intervening segment removed during RNA splicing.",
+            "start_codon": "The codon at which translation begins.",
+            "stop_codon": "The codon at which translation terminates."
+          }
         },
         "gene_id": {
+          "title": "Gene ID",
           "type": "string",
           "description": "Ensembl gene ID",
           "example": "ENSG00000290825"
         },
         "gene_name": {
+          "title": "Gene Name",
           "type": "string",
           "description": "HGNC gene symbol.",
           "example": "DDX11L2"
         },
         "transcript_id": {
+          "title": "Transcript ID",
           "type": "string",
           "description": "ENSEMBL transcript ID, without version number.",
           "example": "ENST00000456328"
         },
         "transcript_name": {
+          "title": "Transcript Name",
           "type": "string",
           "description": "GENCODE transcript name, which is the gene symbol followed by a transcript index.",
           "example": "DDX11L2-202"
         },
         "exon_number": {
+          "title": "Exon Number",
           "type": "string",
           "description": "1-based index of the exon within its transcript. An intron is numbered by the two exons it separates, joined by an underscore.",
           "example": "1"
         },
         "exon_id": {
+          "title": "Exon ID",
           "type": "string",
-          "description": "Ensembl exon ID, including its version suffix.",
+          "description": "Ensembl exon ID, including its version suffix. Present for exons and their CDS, UTR, start_codon, and stop_codon sub-features. Absent for synthesized introns, which have no Ensembl exon ID.",
           "example": "ENSE00002234944.1"
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "GENCODE"
           ]
         },
         "version": {
+          "title": "Version",
           "type": "string",
           "description": "GENCODE release the annotation was taken from.",
           "enum": [
@@ -91,14 +114,12 @@
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "enum": [
             "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz"
           ]
         },
         "organism": {
-          "type": "string",
-          "description": "Species this annotation describes.",
+          "$ref": "../mixins.json#/organism",
           "enum": [
             "Homo sapiens"
           ]
@@ -115,7 +136,6 @@
         "transcript_id",
         "transcript_name",
         "exon_number",
-        "exon_id",
         "version",
         "organism"
       ]

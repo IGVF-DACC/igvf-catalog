@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.CRISPRElementPhenotype.json",
   "allOf": [
     {
@@ -15,30 +15,30 @@
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS"
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
-            "enhancer"
-          ]
+            "candidate enhancer"
+          ],
+          "enum_descriptions": {
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter."
+          }
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI5135QZCS/",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
@@ -48,10 +48,7 @@
           ]
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI5135QZCS",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

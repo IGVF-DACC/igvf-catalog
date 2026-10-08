@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS pathways (
 	name_aliases Array(String),
 	organism String,
 	disease_ontology_terms Array(String),
-	go_biological_process String,
+	biological_process String,
 	is_top_level_pathway boolean,
 	source String,
 	source_url String,
@@ -440,20 +440,6 @@ CREATE TABLE IF NOT EXISTS variants_proteins (
 )
 ENGINE = ReplacingMergeTree(id_hash)
 ORDER BY (id_hash);
-
-CREATE TABLE IF NOT EXISTS variants_proteins_terms (
-	es_mean_ref Float64,
-	es_mean_alt Float64,
-	fdrp_bh_ref Float64,
-	fdrp_bh_alt Float64,
-	biological_context String,
-	source_url String,
-	name String,
-	inverse_name String,
-	id String PRIMARY KEY,
-	variants_proteins_id String,
-	ontology_terms_id String
-);
 
 CREATE TABLE IF NOT EXISTS variants_genes (
 	chr String,

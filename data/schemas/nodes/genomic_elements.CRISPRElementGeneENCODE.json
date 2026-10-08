@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.CRISPRElementGeneENCODE.json",
   "allOf": [
     {
@@ -15,27 +15,28 @@
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "name": {
-          "description": "Human readable display name for the entity",
           "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL"
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Annotation of the element, usually enhancer, promoter, distal or accessible element.",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
-            "enhancer",
+            "candidate enhancer",
             "negative control"
-          ]
-        },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/ENCFF968BZL"
+          ],
+          "enum_descriptions": {
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter.",
+            "negative control": "An element selected as a control without the regulatory activity being tested."
+          }
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "CRISPR screen"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

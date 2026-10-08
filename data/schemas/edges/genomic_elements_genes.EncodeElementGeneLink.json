@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Genomic element key, Ensembl gene ID and source file accession joined by underscores.",
           "example": "intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC"
         },
@@ -28,80 +27,63 @@
           ]
         },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "ENCODE-rE2G"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "predicted regulatory element effect on gene expression"
           ]
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "prediction"
           ]
         },
         "score": {
+          "title": "Score",
           "type": "number",
           "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene."
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "ENCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/ENCFF003BKC",
-          "pattern": "^files_filesets/"
-        },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "example": "head of caudate nucleus from ENCDO948PMW"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/UBERON_0002626",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/UBERON_0002626"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "UniProtKB:P05112"
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "regulates"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "regulated by"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "_key",
         "score",
         "files_filesets",
         "biological_context",
@@ -113,7 +95,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "score",
-    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, score"
+    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, score"
   },
   "db_collection_name": "genomic_elements_genes"
 }

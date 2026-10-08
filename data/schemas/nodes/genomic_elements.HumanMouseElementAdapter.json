@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
   "allOf": [
     {
@@ -12,7 +12,6 @@
       "type": "object",
       "properties": {
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
             "integrative"
           ]
@@ -23,13 +22,11 @@
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "FUNCODE"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "pattern": "^https://data.igvf.org/reference-files/"
         }
       },

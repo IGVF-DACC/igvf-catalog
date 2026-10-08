@@ -1,3 +1,4 @@
+import logging
 import requests
 import json
 from jsonschema import Draft202012Validator, ValidationError
@@ -104,6 +105,7 @@ class FileFileSet:
         self.writer = writer
         self.accessions = accessions
         self.validate = validate
+        self.logger = logging.getLogger(self.__class__.__name__)
         if self.validate:
             if self.label in ['encode_donor', 'igvf_donor']:
                 self.schema = get_schema(
@@ -187,6 +189,14 @@ class FileFileSet:
             id_type='accession',
             api_url=self.api_url
         )
+        returned_accessions = {
+            file_object['accession'] for file_object in file_objects
+        }
+        for accession in self.accessions:
+            if accession not in returned_accessions:
+                self.logger.warning(
+                    f'Skipping {accession}: not returned by public API search.'
+                )
         for file_object in file_objects:
             print(f'Processing {file_object["accession"]}')
 
@@ -731,7 +741,7 @@ class FileFileSet:
                 f'Catalog collections are required for file_fileset {file_object["accession"]}.'))
 
         software = FileFileSet.get_software_igvf(file_object)
-        if not software and not is_external_curated_set:
+        if not software and fileset_object_type != 'CuratedSet':
             print(
                 f'Warning: no software found for file_fileset {file_object["accession"]}.')
 
@@ -771,6 +781,7 @@ class FileFileSet:
                 'Parse Perturb-seq',
                 'scCRISPR screen',
                 'Multiome Perturb-seq',
+                'in vivo Perturb-seq',
             }):
                 method = 'Perturb-seq'
             elif set(preferred_assay_titles).issubset({
@@ -778,6 +789,7 @@ class FileFileSet:
                 'CRISPR FlowFISH screen',
                 'Migration CRISPR screen',
                 'Proliferation CRISPR screen',
+                'Variant-EFFECTS',
             }):
                 method = 'CRISPR screen'
         if file_object['accession'] == 'IGVFFI8753TTYC':

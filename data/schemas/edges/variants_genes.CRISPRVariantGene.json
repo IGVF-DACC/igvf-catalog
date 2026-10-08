@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/variants_genes.CRISPRVariantGene.json",
   "allOf": [
     {
@@ -9,7 +9,6 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
           "description": "Variant key, Ensembl gene ID and source file accession joined by underscores."
         },
         "_from": {
@@ -27,10 +26,12 @@
           ]
         },
         "effect_size": {
+          "title": "Effect Size",
           "type": "number",
           "description": "Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
         },
         "log2FC": {
+          "title": "Log2 Fold Change",
           "type": [
             "number",
             "null"
@@ -38,6 +39,7 @@
           "description": "log2 fold-change in gene expression for the effect allele relative to the other allele."
         },
         "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -45,6 +47,7 @@
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
         "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
           "type": [
             "number",
             "null"
@@ -52,6 +55,7 @@
           "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "power": {
+          "title": "Power",
           "type": [
             "number",
             "null"
@@ -59,6 +63,7 @@
           "description": "Power to detect an effect of the size observed, from 0 to 1."
         },
         "posterior_inclusion_probability": {
+          "title": "Posterior Inclusion Probability",
           "type": [
             "number",
             "null"
@@ -66,6 +71,7 @@
           "description": "Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
         },
         "coefficient_stddev": {
+          "title": "Coefficient Standard Deviation",
           "type": [
             "number",
             "null"
@@ -73,93 +79,69 @@
           "description": "Standard deviation of the effect size estimate."
         },
         "significant": {
+          "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on gene expression."
         },
         "class": {
-          "description": "The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.",
           "enum": [
             "observed data"
           ]
         },
         "label": {
-          "description": "Non-method specific human readable label for the node or edge",
           "enum": [
             "variant effect on gene expression"
           ]
         },
         "name": {
-          "description": "Directional human readable label for the relationship, _from to _to.",
           "enum": [
             "modulates expression of"
           ]
         },
         "inverse_name": {
-          "description": "Reversed directional human readable label for the relationship, _to to _from.",
           "enum": [
             "expression modulated by"
           ]
         },
         "source": {
-          "description": "The database, dataset or organization that is a source for these data.",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "The URL for the source.",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0524YUIL/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Reference to the File and Metadata",
-          "example": "files_filesets/IGVFFI0332UGDD",
-          "pattern": "^files_filesets/"
-        },
         "method": {
-          "description": "Name of the experimental class or prediction model that produced this result.",
           "enum": [
-            "Variant-EFFECTS",
             "CRISPR screen"
           ]
         },
         "crispr_modality": {
-          "type": [
-            "string"
-          ],
-          "description": "The CRISPR modality from the associated files_filesets record",
+          "$ref": "../mixins.json#/crispr_modality",
           "enum": [
             "prime editing",
             "base editing"
           ]
         },
         "biological_context": {
-          "type": "string",
-          "description": "Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.",
+          "$ref": "../mixins.json#/biological_context",
           "items": {
             "type": "string"
           },
           "example": "THP-1"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Ontology term for the experimental sample, or the sample the prediction is valid for",
-          "example": "ontology_terms/EFO_0002067",
-          "pattern": "^ontology_terms/"
+          "$ref": "../mixins.json#/biosample_term",
+          "example": "ontology_terms/EFO_0002067"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "../mixins.json#/treatments_term_ids"
         }
       },
       "required": [
-        "_key",
         "effect_size",
         "log2FC",
         "neg_log10_pvalue",
