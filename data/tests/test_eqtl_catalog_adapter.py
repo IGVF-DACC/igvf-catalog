@@ -34,10 +34,22 @@ def mock_file_fileset_splice_qtl():
         yield mock_get
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.eqtl_catalog_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 @patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl):
+def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl, mock_bulk_check_variants):
     mock_portal_aliases(mock_request)
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
@@ -93,7 +105,7 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo, mock_re
 @patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl):
+def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl, mock_bulk_check_variants):
     mock_portal_aliases(mock_request)
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = False
@@ -138,7 +150,7 @@ def test_eqtl_catalog_adapter_initialization():
 
 def test_eqtl_catalog_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: qtl, study'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: qtl, study, variants'):
         EQTLCatalog(filepath='dummy.tsv.gz',
                     label='invalid_label',
                     writer=writer)
@@ -202,7 +214,7 @@ def test_eqtl_catalog_adapter_study_label():
 @patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl):
+def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl, mock_bulk_check_variants):
     mock_portal_aliases(mock_request)
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
@@ -237,7 +249,7 @@ def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo,
 @patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_splice_qtl):
+def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_splice_qtl, mock_bulk_check_variants):
     mock_portal_aliases(mock_request)
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
@@ -285,6 +297,95 @@ def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock
     finally:
         os.unlink(temp_file_path)
         os.unlink(temp_metadata_path)
+
+
+@patch('adapters.eqtl_catalog_adapter.requests.get')
+@patch('adapters.helpers.get_seqrepo')
+@patch('adapters.eqtl_catalog_adapter.GeneValidator')
+def test_eqtl_catalog_adapter_skips_edge_when_variant_not_loaded(mock_gene_validator, mock_get_seqrepo, mock_request, mock_file_fileset_eqtl, mock_bulk_check_variants):
+    """A variant that isn't already in the variants collection must be
+    skipped, not turned into a dangling edge."""
+    mock_portal_aliases(mock_request)
+    mock_validator_instance = MagicMock()
+    mock_validator_instance.validate.return_value = True
+    mock_gene_validator.return_value = mock_validator_instance
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+
+    writer = SpyWriter()
+
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
+        with gzip.open(temp_file.name, 'wt') as f:
+            f.write(
+                'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')
+            f.write('ENSG00000230489\tENSG00000230489\tENSG00000230489_L1\tchr1_108004887_G_T\trs1936009\t53\t0.0197781278649429\t7.46541e-09\t0.767387\t0.116543\t7.19210214446939\t0.945192225726688\tchr1:106964443-108964443\n')
+        temp_file_path = temp_file.name
+
+    try:
+        adapter = EQTLCatalog(filepath=temp_file_path,
+                              label='qtl',
+                              writer=writer,
+                              validate=True)
+        adapter.process_file()
+
+        assert len(writer.contents) == 0
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_eqtl_catalog_adapter_variants_label_creates_missing_variant(mocker):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection."""
+    # build_variant_id() calls get_seqrepo() unconditionally, even for simple SNVs that
+    # don't end up needing it - without this mock, environments without a real SeqRepo
+    # install (e.g. CI) raise there, which process_variant_chunk silently catches and
+    # treats as "skip this row", making the test fail with an empty writer instead of
+    # erroring loudly.
+    mock_seqrepo = MagicMock()
+    mocker.patch('adapters.helpers.get_seqrepo', return_value=mock_seqrepo)
+    mock_bulk_check_variants = mocker.patch(
+        'adapters.eqtl_catalog_adapter.bulk_check_variants_in_arangodb')
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant = mocker.patch(
+        'adapters.eqtl_catalog_adapter.load_variant')
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000001.11:108004886:G:T',
+        'name': 'NC_000001.11:108004886:G:T',
+        'chr': 'chr1',
+        'pos': 108004886,
+        'ref': 'G',
+        'alt': 'T',
+        'variation_type': 'SNP',
+        'spdi': 'NC_000001.11:108004886:G:T',
+        'hgvs': 'fake_hgvs',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    writer = SpyWriter()
+
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
+        with gzip.open(temp_file.name, 'wt') as f:
+            f.write(
+                'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')
+            f.write('ENSG00000230489\tENSG00000230489\tENSG00000230489_L1\tchr1_108004887_G_T\trs1936009\t53\t0.0197781278649429\t7.46541e-09\t0.767387\t0.116543\t7.19210214446939\t0.945192225726688\tchr1:106964443-108964443\n')
+        temp_file_path = temp_file.name
+
+    try:
+        adapter = EQTLCatalog(filepath=temp_file_path,
+                              label='variants',
+                              writer=writer,
+                              validate=True)
+        adapter.process_file()
+
+        non_empty_contents = [
+            content for content in writer.contents if content.strip()]
+        assert len(non_empty_contents) == 1
+        item = json.loads(non_empty_contents[0])
+        assert item['_key'] == 'NC_000001.11:108004886:G:T'
+        assert item['source'] == 'EBI'
+        assert item['source_url'] == EQTLCatalog.VARIANTS_SOURCE_URL
+    finally:
+        os.unlink(temp_file_path)
 
 
 @patch('adapters.eqtl_catalog_adapter.requests.get')

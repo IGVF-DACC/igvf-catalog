@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/variants.DbNSFP.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "dbNSFP 5.1a"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "http://database.liulab.science/dbNSFP"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

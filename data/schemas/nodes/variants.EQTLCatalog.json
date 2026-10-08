@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/variants.EQTLCatalog.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "EBI"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://www.ebi.ac.uk/eqtl/"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

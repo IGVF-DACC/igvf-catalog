@@ -48,8 +48,20 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI8105TNNO'
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.ESM_coding_variants_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
-def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_file_fileset):
+def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_file_fileset, mock_bulk_check_variants):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
         SAMPLE_FILEPATH, label='variants_coding_variants', writer=writer, validate=True)
@@ -71,6 +83,23 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_fi
     assert first_item['label'] == 'codes for'
     assert first_item['name'] == 'codes for'
     assert first_item['inverse_name'] == 'encoded by'
+
+
+@patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
+def test_variants_coding_variants_skips_edge_when_variant_not_loaded(mock_gzip_open, mock_file_fileset, mock_bulk_check_variants):
+    """A variant that isn't already in the variants collection must be
+    skipped, not turned into a dangling edge."""
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    writer = SpyWriter()
+    adapter = ESM1vCodingVariantsScores(
+        SAMPLE_FILEPATH, label='variants_coding_variants', writer=writer, validate=True)
+    adapter.file_fileset = mock_file_fileset.return_value
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
