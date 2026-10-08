@@ -62,8 +62,7 @@
         "postProbEffect": {
           "title": "Posterior Probability of Effect",
           "type": "number",
-          "description": "Posterior probability that the variant has a regulatory effect.",
-          "threshold": "Significant when postProbEffect > 0.9."
+          "description": "Posterior probability that the variant has a regulatory effect."
         },
         "significant": {
           "title": "Significant?",
