@@ -24,7 +24,8 @@ class DbNSFP(BaseAdapter):
     # over its already-loaded edges found no variants missing from the variants collection
     # (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have
     # missing variants and need label=variants run as part of their regular load).
-    ALLOWED_LABELS = ['coding_variants', 'variants_coding_variants', 'variants']
+    ALLOWED_LABELS = ['coding_variants',
+                      'variants_coding_variants', 'variants']
     CHUNK_SIZE = 6500
     SOURCE = 'dbNSFP 5.1a'
     SOURCE_URL = 'http://database.liulab.science/dbNSFP'

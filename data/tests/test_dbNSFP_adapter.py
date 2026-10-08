@@ -109,6 +109,8 @@ def test_dbNSFP_adapter_variants_label_creates_missing_variant(mock_bulk_check_v
     assert item['_key'] == 'fake_variant_id'
     assert item['source'] == DbNSFP.SOURCE
     assert item['source_url'] == DbNSFP.SOURCE_URL
+
+
 def test_dbNSFP_adapter_multiple_records():
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample')
     data_line = ['Y', '2786989', 'C', 'A', 'X', 'Y', '.', 'Y', '2655030', 'Y', '2715030', '205;206', 'SRY;SRY',
