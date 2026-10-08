@@ -107,6 +107,10 @@ or annotate unrelated fields merely to say they are not used in that decision.
 When a schema has `significant`, document its significance rule only on
 `significant.threshold`; do not repeat it on the contributing statistic fields.
 Keep separate selection rules on the fields they filter.
+Use "Source row retained when..." for rules that determine row inclusion.
+For rules that filter entries within a row, name the retained item instead
+(for example, "Mechanism retained when..."). Do not use row-retention wording
+for significance or classification rules that only label a row.
 Omit `threshold` on alternate representations and supporting fields when the
 cutoff is applied to another field.
 

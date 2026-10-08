@@ -105,7 +105,7 @@
             "binding_created": "Only the alternate allele has a binding score above the binding threshold.",
             "binding_ablated": "Only the reference allele has a binding score above the binding threshold."
           },
-          "threshold": "Retained when binding_ablated, binding_decreased, binding_created, or binding_increased."
+          "threshold": "Source row retained when SEMpl_annotation is binding_ablated, binding_decreased, binding_created, or binding_increased."
         },
         "SEMpl_baseline": {
           "title": "SEMpl Baseline",
