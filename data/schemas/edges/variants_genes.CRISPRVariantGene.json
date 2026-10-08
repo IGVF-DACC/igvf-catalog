@@ -53,7 +53,7 @@
             "null"
           ],
           "description": "Adjusted negative log 10 p-value of the measurement or prediction",
-          "threshold": "Used for Variant-EFFECTS only: 10^(-neg_log10_pvalue_adj) < 0.05 (neg_log10_pvalue_adj > approximately 1.30103)."
+          "threshold": "Variant-EFFECTS: significant when 10^(-neg_log10_pvalue_adj) < 0.05."
         },
         "power": {
           "title": "Power",
@@ -70,7 +70,7 @@
             "null"
           ],
           "description": "Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1.",
-          "threshold": "Used for CRISPR-Millipede only: posterior_inclusion_probability > 0.1."
+          "threshold": "CRISPR-Millipede: significant when posterior_inclusion_probability > 0.1."
         },
         "coefficient_stddev": {
           "title": "Coefficient Standard Deviation",
@@ -84,7 +84,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on gene expression.",
-          "threshold": "For Variant-EFFECTS files, significant is true when neg_log10_pvalue_adj is available and 10^(-neg_log10_pvalue_adj) < 0.05. For CRISPR-Millipede files, significant is true when posterior_inclusion_probability is available and > 0.1. A missing/null statistic for the applicable file format gives false; there is no fallback to the other format or to unadjusted p-values. Nonsignificant rows are retained."
+          "threshold": "Variant-EFFECTS: 10^(-neg_log10_pvalue_adj) < 0.05. CRISPR-Millipede: posterior_inclusion_probability > 0.1. False if the format-specific statistic is missing/null."
         },
         "class": {
           "enum": [

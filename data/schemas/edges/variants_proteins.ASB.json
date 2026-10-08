@@ -68,7 +68,7 @@
           "type": "string",
           "description": "Whether the allelic read imbalance agrees with the motif fold-change.",
           "example": "Concordant",
-          "threshold": "The source motif-concordance classification is assessed at 25% FDR; this is separate from the adapter’s strict 5% FDR criterion for the directional score."
+          "threshold": "Source classification uses 25% FDR."
         },
         "motif": {
           "title": "Motif",
@@ -94,14 +94,14 @@
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for reference-allele ASB.",
           "example": 0.0171981040581793,
-          "threshold": "Used to derive the directional score: this allele is significant when p_value_adj_ref < 0.05. See score.threshold for how the two allele-specific calls are combined."
+          "threshold": "Reference allele significant when p_value_adj_ref < 0.05."
         },
         "p_value_adj_alt": {
           "title": "Adjusted P-Value for Alternate Allele",
           "type": "number",
           "description": "Benjamini–Hochberg FDR of the logit-aggregated p-value for alternate-allele ASB.",
           "example": 1.0,
-          "threshold": "Used to derive the directional score: this allele is significant when p_value_adj_alt < 0.05. See score.threshold for how the two allele-specific calls are combined."
+          "threshold": "Alternate allele significant when p_value_adj_alt < 0.05."
         },
         "score": {
           "type": [
@@ -110,7 +110,7 @@
           ],
           "description": "Directional ASB significance score: the signed FDR-adjusted p-value for the uniquely significant allele, negative for reference and positive for alternate; null when no single direction can be assigned.",
           "example": -0.0171981040581793,
-          "threshold": "For the directional score, the adapter tests p_value_adj_ref < 0.05 and p_value_adj_alt < 0.05 separately. Exactly one allele must pass: score is -p_value_adj_ref for reference-only significance and +p_value_adj_alt for alternate-only significance; both or neither passing gives null. A p-value equal to 0.05 does not pass. This determines the score and does not filter rows."
+          "threshold": "Requires exactly one allele with adjusted p-value < 0.05: negative for reference, positive for alternate; null if both or neither pass."
         },
         "neg_log10_pvalue_adj_ref": {
           "title": "Adjusted Negative Log10 P-Value for Reference Allele",

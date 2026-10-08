@@ -46,7 +46,7 @@
           "type": "number",
           "description": "scE2G score: Probability that the element has a regulatory effect on the target gene",
           "example": 0.95,
-          "threshold": "Upstream thresholded predictions use the source file ScoreThreshold. IGVFFI5648GWQX and IGVFFI0793NWFM declare scE2G v1.2.0 and ScoreThreshold 0.177; IGVFFI5648GWQX also identifies multiome_powerlaw_v3. The verified model directories specify multiome_powerlaw_v3 0.177, multiome_megamap_v3 0.173, scATAC_powerlaw_v3 0.174, and scATAC_megamap_v3 0.187. Match the file header and model version; do not substitute a cutoff from a different model. See ../threshold-evidence.md for source/version evidence and the remaining historical boundary verification."
+          "threshold": "Selected upstream using the source file ScoreThreshold: 0.177 for IGVFFI5648GWQX and IGVFFI0793NWFM (scE2G v1.2.0). Other models and versions vary; see ../threshold-evidence.md."
         },
         "transcription_start_site": {
           "title": "Transcription Start Site",
