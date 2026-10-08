@@ -96,11 +96,13 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "max_value": 240
         },
         "neg_log10_pvalue_adj": {
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "max_value": 240
         },
         "log2FC": {
           "type": [

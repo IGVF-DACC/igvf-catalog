@@ -60,7 +60,8 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "max_value": 240
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -68,7 +69,8 @@
             "number",
             "null"
           ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "max_value": 240
         },
         "significant": {
           "title": "Significant?",

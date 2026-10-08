@@ -132,6 +132,20 @@ Annotations remain separate from adapter constants and do not change loading
 behavior. Consult the source-specific schema; a merged collection schema cannot
 represent all adapters' cutoffs as one shared rule.
 
+## Log10 p-value maxima
+
+Use a numeric `max_value` annotation on negative-log10 p-value fields with a
+defined finite replacement for zero p-values, for example `"max_value": 240`.
+Keep it separate from `threshold` and from the field's description. Omit it
+where no replacement value is established; an observed sample maximum alone
+does not establish this value.
+
+`max_value` is documentation metadata, not JSON Schema's `maximum` constraint
+or a stored document field. It records the finite zero-p-value replacement,
+not a guarantee that every value is clipped to that bound. Positive p-values
+may yield larger values, and source-provided log scores may be preserved.
+Record source-specific behavior in `threshold-evidence.md`.
+
 ## Base schemas
 
 - `nodes/node.base.json` provides common node identity and provenance fields.

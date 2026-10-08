@@ -116,13 +116,15 @@
           "title": "Adjusted Negative Log10 P-Value for Reference Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for reference-allele ASB. Larger values mean stronger evidence.",
-          "example": 1.7645194276538037
+          "example": 1.7645194276538037,
+          "max_value": 400
         },
         "neg_log10_pvalue_adj_alt": {
           "title": "Adjusted Negative Log10 P-Value for Alternate Allele",
           "type": "number",
           "description": "Negative log10 of the FDR-adjusted p-value for alternate-allele ASB. Larger values mean stronger evidence.",
-          "example": 0
+          "example": 0,
+          "max_value": 400
         },
         "biological_context": {
           "$ref": "../mixins.json#/biological_context",

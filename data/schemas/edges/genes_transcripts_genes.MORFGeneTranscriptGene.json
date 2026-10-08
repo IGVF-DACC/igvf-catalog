@@ -64,7 +64,8 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of p_value."
+          "description": "Negative log10 of p_value.",
+          "max_value": 240
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -72,7 +73,8 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of p_value_adj."
+          "description": "Negative log10 of p_value_adj.",
+          "max_value": 240
         },
         "significant": {
           "title": "Significant?",
