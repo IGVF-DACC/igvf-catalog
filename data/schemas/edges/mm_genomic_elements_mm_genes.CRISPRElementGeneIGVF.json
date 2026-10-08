@@ -82,16 +82,14 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay.",
-          "threshold": "Significant when p_value < 0.05, used only if p_value_adj is missing/null."
+          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
         },
         "p_value_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value when reported by the source.",
-          "threshold": "Significant when p_value_adj < 0.05; takes precedence when available."
+          "description": "Multiple-testing-adjusted p-value when reported by the source."
         },
         "neg_log10_pvalue": {
           "type": [
@@ -178,8 +176,7 @@
         },
         "z_score": {
           "type": "number",
-          "description": "Phenotype or effect z-score for the element-gene association when reported by the source.",
-          "threshold": "Significant when abs(z_score) >= 1.959963984540054, used only if both p-values are missing/null."
+          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
         },
         "t_score": {
           "type": "number",

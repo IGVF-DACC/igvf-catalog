@@ -69,8 +69,7 @@
             "number",
             "null"
           ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
-          "threshold": "Significant when neg_log10_pvalue_adj >= 1 (adjusted p-value <= 0.1)."
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
         },
         "significant": {
           "title": "Significant?",

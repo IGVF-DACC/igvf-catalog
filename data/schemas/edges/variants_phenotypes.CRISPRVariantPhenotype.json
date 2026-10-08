@@ -64,8 +64,7 @@
             "number",
             "null"
           ],
-          "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation.",
-          "threshold": "Significant when both bounds are available and (lower > 0 or upper < 0)."
+          "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
         },
         "effect_size_ci95_upper": {
           "title": "Effect Size 95% Confidence Interval Upper Bound",
@@ -73,8 +72,7 @@
             "number",
             "null"
           ],
-          "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation.",
-          "threshold": "Significant when both bounds are available and (lower > 0 or upper < 0)."
+          "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
