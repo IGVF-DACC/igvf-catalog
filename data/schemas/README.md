@@ -96,7 +96,9 @@ thresholded. Do not use "none" or "not applicable". Node schemas, including
 their fields, do not track `threshold`.
 
 Keep the field's meaning in `description`; put the cutoff in `threshold` beside
-it. When a significance call uses multiple fields, document which source formats
+it. Keep threshold phrases brief: state the rule and any necessary conditions.
+Keep source citations, research history, and detailed evidence in
+`threshold-evidence.md`. When a significance call uses multiple fields, document which source formats
 use each field, their precedence, strict/inclusive boundaries, and missing-value
 behavior on the decision field. Do not add schema-level `threshold` annotations
 or annotate unrelated fields merely to say they are not used in that decision.

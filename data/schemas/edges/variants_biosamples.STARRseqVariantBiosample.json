@@ -63,13 +63,13 @@
           "title": "Posterior Probability of Effect",
           "type": "number",
           "description": "Posterior probability that the variant has a regulatory effect.",
-          "threshold": "The adapter sets significant to true for postProbEffect > 0.9; a value equal to 0.9 is false. Confidence intervals and log2FC are not used for this call. Nonsignificant rows are retained."
+          "threshold": "Significant when postProbEffect > 0.9."
         },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on reporter activity.",
-          "threshold": "The adapter sets significant to true for postProbEffect > 0.9; a value equal to 0.9 is false. Confidence intervals and log2FC are not used for this call. Nonsignificant rows are retained."
+          "threshold": "True when postProbEffect > 0.9; otherwise false."
         },
         "CI_lower_95": {
           "title": "95% Confidence Interval Lower Bound",

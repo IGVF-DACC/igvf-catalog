@@ -79,13 +79,13 @@
           "title": "Reference Score",
           "type": "number",
           "description": "Predicted binding score at the reference allele: the transcription factor's affinity for the reference sequence, relative to its average binding affinity.",
-          "threshold": "Upstream binding criterion: score > 2^SEMpl_baseline for the corresponding motif. The adapter retains source binding-change annotations rather than recalculating them."
+          "threshold": "Binding called upstream when ref_score > 2^SEMpl_baseline for the motif."
         },
         "alt_score": {
           "title": "Alternate Score",
           "type": "number",
           "description": "Predicted binding score at the alternate allele, on the same scale as ref_score.",
-          "threshold": "Upstream binding criterion: score > 2^SEMpl_baseline for the corresponding motif. The adapter retains source binding-change annotations rather than recalculating them."
+          "threshold": "Binding called upstream when alt_score > 2^SEMpl_baseline for the motif."
         },
         "variant_effect_score": {
           "title": "Variant Effect Score",
@@ -105,7 +105,7 @@
             "binding_created": "Only the alternate allele has a binding score above the binding threshold.",
             "binding_ablated": "Only the reference allele has a binding score above the binding threshold."
           },
-          "threshold": "Binding is called upstream when an allele binding score is > 2^SEMpl_baseline, using the baseline for that motif rather than a universal cutoff. The adapter filters on the supplied SEMpl_annotation, retaining only binding_ablated, binding_decreased, binding_created, and binding_increased; it does not recompute these classifications or apply a p-value cutoff."
+          "threshold": "Retained when binding_ablated, binding_decreased, binding_created, or binding_increased."
         },
         "SEMpl_baseline": {
           "title": "SEMpl Baseline",

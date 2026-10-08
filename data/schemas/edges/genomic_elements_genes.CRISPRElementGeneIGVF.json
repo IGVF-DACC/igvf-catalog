@@ -83,7 +83,7 @@
             "null"
           ],
           "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay.",
-          "threshold": "Used only when p_value_adj is missing/null: significant is true for p_value < 0.05."
+          "threshold": "Significant when p_value < 0.05, used only if p_value_adj is missing/null."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -92,7 +92,7 @@
             "null"
           ],
           "description": "Multiple-testing-adjusted p-value when reported by the source.",
-          "threshold": "Used first when available: significant is true for p_value_adj < 0.05."
+          "threshold": "Significant when p_value_adj < 0.05; takes precedence when available."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -139,7 +139,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the perturbation effect.",
-          "threshold": "The adapter sets significant using the first available statistic: p_value_adj < 0.05; otherwise p_value < 0.05; otherwise abs(z_score) >= 1.959963984540054 (approximately 1.96). A present p-value takes precedence even when it is not significant. If all three are missing/null, significant is false. This labels significance and does not filter out nonsignificant rows."
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "effect_size": {
           "title": "Effect Size",
@@ -200,7 +200,7 @@
           "title": "Z-Score",
           "type": "number",
           "description": "Phenotype or effect z-score for the element-gene association when reported by the source.",
-          "threshold": "Used only when both p_value_adj and p_value are missing/null: significant is true for abs(z_score) >= 1.959963984540054 (approximately 1.96)."
+          "threshold": "Significant when abs(z_score) >= 1.959963984540054, used only if both p-values are missing/null."
         },
         "t_score": {
           "title": "T-Score",

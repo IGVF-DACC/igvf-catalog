@@ -30,7 +30,7 @@
           "title": "Score",
           "type": "number",
           "description": "cV2F score: prediction value for the variant, a continuous score between 0 and 1 for how likely the variant is to be functional.",
-          "threshold": "Source files IGVFFI1931RMNE (sample-agnostic) and IGVFFI4594QVDO (K562) declare PredictionValue threshold 0.75 in their headers but contain scores below 0.75. The catalog adapter applies the selection: score >= 0.75. This is a classifier-score cutoff; these source files are not prefiltered to that cutoff."
+          "threshold": "Retained by the adapter when score >= 0.75."
         },
         "source": {
           "enum": [

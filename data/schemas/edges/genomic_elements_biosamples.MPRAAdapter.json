@@ -70,13 +70,13 @@
             "null"
           ],
           "description": "Adjusted negative log 10 p-value of the measurement or prediction",
-          "threshold": "Used for significant when available: >= 1, equivalent to adjusted p-value/q-value <= 0.1."
+          "threshold": "Significant when neg_log10_pvalue_adj >= 1 (adjusted p-value <= 0.1)."
         },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's activity.",
-          "threshold": "The adapter sets significant to true when neg_log10_pvalue_adj is available and >= 1 (adjusted p-value/q-value <= 0.1); otherwise false. The unadjusted neg_log10_pvalue is not a fallback. This labels significance and does not filter out nonsignificant rows."
+          "threshold": "True when neg_log10_pvalue_adj is available and >= 1; otherwise false."
         },
         "label": {
           "enum": [

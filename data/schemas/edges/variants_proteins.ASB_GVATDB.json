@@ -31,7 +31,7 @@
           "title": "P-Value",
           "type": "number",
           "description": "Monte-Carlo p-value of the preferential binding score.",
-          "threshold": "The SNP-SELEX study defines significant preferential binding by PBS p_value < 0.01 together with OBS oligo_pval < 0.05. These are upstream significance criteria, not additional catalog load filters; p_value_adj is not part of this rule. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC9367673/."
+          "threshold": "Significant upstream when PBS p_value < 0.01 and OBS oligo_pval < 0.05."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -64,7 +64,7 @@
           "title": "Oligo P-Value",
           "type": "number",
           "description": "P-value of the oligo binding score.",
-          "threshold": "The SNP-SELEX study defines significant preferential binding by PBS p_value < 0.01 together with OBS oligo_pval < 0.05. These are upstream significance criteria, not additional catalog load filters; p_value_adj is not part of this rule. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC9367673/."
+          "threshold": "Significant upstream when PBS p_value < 0.01 and OBS oligo_pval < 0.05."
         },
         "ref_auc": {
           "title": "Reference Area Under the Curve",

@@ -40,7 +40,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on the phenotype.",
-          "threshold": "The adapter sets significant to true when both effect_size_ci95_lower and effect_size_ci95_upper are available and the 95% interval excludes zero: lower > 0 or upper < 0. It uses the source interval when both bounds are present; otherwise it derives effect_size +/- 1.96 times the configured source standard deviation (mu_sd_adj) when available. Missing bounds without that fallback give false. z_score, p_value_adj, and neg_log10_pvalue_adj do not determine significant. Nonsignificant rows are retained."
+          "threshold": "True when both 95% interval bounds are available and (lower > 0 or upper < 0); otherwise false. Missing source intervals use effect_size +/- 1.96 * mu_sd_adj when available."
         },
         "num_guides": {
           "title": "Number of Guides",
@@ -65,7 +65,7 @@
             "null"
           ],
           "description": "Lower bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation.",
-          "threshold": "Both interval bounds must be available; significant is true if effect_size_ci95_lower > 0 or effect_size_ci95_upper < 0. An interval touching zero is not significant."
+          "threshold": "Significant when both bounds are available and (lower > 0 or upper < 0)."
         },
         "effect_size_ci95_upper": {
           "title": "Effect Size 95% Confidence Interval Upper Bound",
@@ -74,7 +74,7 @@
             "null"
           ],
           "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation.",
-          "threshold": "Both interval bounds must be available; significant is true if effect_size_ci95_lower > 0 or effect_size_ci95_upper < 0. An interval touching zero is not significant."
+          "threshold": "Significant when both bounds are available and (lower > 0 or upper < 0)."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",

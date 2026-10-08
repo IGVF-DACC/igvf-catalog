@@ -42,7 +42,7 @@
           "title": "Log2 Fold Change",
           "type": "number",
           "description": "log2 fold change in STARR-seq reporter activity.",
-          "threshold": "Upstream selection for BlueSTARR v0.1.1 K562 predictions (IGVFFI5288RAAV): abs(log2FC) > 0.1. The IGVF file description explicitly specifies |effect| > 0.1 and filtered = true. This effect-size cutoff is applied before catalog loading."
+          "threshold": "Retained upstream when abs(log2FC) > 0.1 for BlueSTARR v0.1.1 K562 file IGVFFI5288RAAV."
         },
         "class": {
           "enum": [

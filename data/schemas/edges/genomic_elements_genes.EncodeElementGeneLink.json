@@ -45,7 +45,7 @@
           "title": "Score",
           "type": "number",
           "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene.",
-          "threshold": "Upstream ENCODE-rE2G thresholded element-gene links use model-specific score cutoffs calibrated to 70% recall. The inspected filtering code retains score >= the model threshold. Verified model thresholds: dhs_megamap 0.201, dhs_h3k27ac_megamap 0.217, dhs_intact_hic 0.243, dhs_h3k27ac_intact_hic 0.298, atac_megamap 0.179, atac_h3k27ac_megamap 0.203, atac_intact_hic 0.232, atac_h3k27ac_intact_hic 0.259, and extended 0.336. ENCFF003BKC is explicitly a thresholded element-gene file; match each input file to its model/version before choosing a cutoff. See ../threshold-evidence.md for the inspected code revision and remaining file-to-model verification."
+          "threshold": "Retained upstream when score >= the model-specific cutoff, calibrated to 70% recall. Match the input model and version to the cutoffs in ../threshold-evidence.md."
         },
         "source": {
           "enum": [

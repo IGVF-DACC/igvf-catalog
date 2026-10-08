@@ -57,7 +57,7 @@
             "null"
           ],
           "description": "DESeq2 Benjamini-Hochberg adjusted p-value.",
-          "threshold": "Used for significant when available: p_value_adj < 0.05."
+          "threshold": "Significant when p_value_adj < 0.05."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -79,7 +79,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the transcript perturbation effect on gene expression.",
-          "threshold": "The adapter sets significant to true when p_value_adj is available and < 0.05; otherwise false. It does not fall back to p_value. Nonsignificant rows are retained."
+          "threshold": "True when p_value_adj is available and < 0.05; otherwise false."
         },
         "morf_id": {
           "title": "MORF ID",
