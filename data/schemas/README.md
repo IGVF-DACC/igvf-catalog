@@ -88,11 +88,12 @@ meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work
 
 ## Threshold and significance documentation
 
-Use an optional field-level `threshold` string only when an actual selection or
-significance rule is established for an edge field. Omit the property entirely
-when no cutoff applies or the cutoff has not yet been established. Do not use
-placeholder values such as "none", "unknown", or "not applicable". Node schemas,
-including their fields, do not track `threshold`.
+Use an optional field-level `threshold` string for selection, significance, or
+score-based classification rules on edge fields. Use `"threshold": "unknown"`
+when such a rule is identified but its cutoff still needs investigation. Omit
+the property when no cutoff applies or there is no evidence that the field is
+thresholded. Do not use "none" or "not applicable". Node schemas, including
+their fields, do not track `threshold`.
 
 Keep the field's meaning in `description`; put the cutoff in `threshold` beside
 it. When a significance call uses multiple fields, document which source formats
@@ -115,8 +116,8 @@ threshold documentation.
 Record supporting sources, file accessions, model versions, the scope of data
 checks, and unresolved questions in [threshold-evidence.md](threshold-evidence.md).
 Omission of `threshold` must not be interpreted as proof that no upstream filter
-exists. Keep unresolved investigation notes in that evidence document rather
-than in placeholder schema annotations.
+exists. Keep detailed investigation notes in that evidence document; use the
+concise `"unknown"` marker on fields with unresolved rules.
 
 `threshold` is documentation metadata, not a stored document field, JSON Schema
 validation constraint, or executable adapter setting. Do not add a data property

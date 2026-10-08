@@ -160,7 +160,8 @@
             "functionally_normal": "The variant is classified as having normal function under the assay thresholds.",
             "indeterminate": "The assay does not confidently classify the variant as functionally normal or abnormal.",
             "functionally_abnormal": "The variant is classified as having abnormal function under the assay thresholds."
-          }
+          },
+          "threshold": "unknown"
         },
         "functional_consequence_zscore": {
           "title": "Functional Consequence Z-Score",
@@ -168,7 +169,8 @@
             "number",
             "null"
           ],
-          "description": "Z-score of the variant's score against the distribution of expected neutral variant scores."
+          "description": "Z-score of the variant's score against the distribution of expected neutral variant scores.",
+          "threshold": "unknown"
         },
         "variant_qc_flag": {
           "title": "Variant QC Flag",
