@@ -33,7 +33,7 @@
           "type": "number",
           "description": "COXPRESdb coexpression z-score: 3 is a false-positive rate of 0.1%, 0 for no value.",
           "example": 3.2,
-          "threshold": "Pairs retained when abs(z_score) >= 3."
+          "threshold": "Source row retained when abs(z_score) >= 3."
         },
         "associated_process": {
           "title": "Associated Process",

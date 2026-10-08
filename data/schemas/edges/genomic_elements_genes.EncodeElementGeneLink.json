@@ -45,7 +45,7 @@
           "title": "Score",
           "type": "number",
           "description": "ENCODE-rE2G score: Probability that the element has a regulatory effect on the target gene.",
-          "threshold": "Retained when score >= the model-specific cutoff, calibrated to 70% recall. Match the input model and version to the cutoffs in ../threshold-evidence.md."
+          "threshold": "Source row retained when score >= the model-specific cutoff, calibrated to 70% recall. Match the input model and version to the cutoffs in ../threshold-evidence.md."
         },
         "source": {
           "enum": [
