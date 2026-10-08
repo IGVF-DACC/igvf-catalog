@@ -79,13 +79,13 @@
           "title": "Reference Score",
           "type": "number",
           "description": "Predicted binding score at the reference allele: the transcription factor's affinity for the reference sequence, relative to its average binding affinity.",
-          "threshold": "Binding called upstream when ref_score > 2^SEMpl_baseline for the motif."
+          "threshold": "Binding called when ref_score > 2^SEMpl_baseline for the motif."
         },
         "alt_score": {
           "title": "Alternate Score",
           "type": "number",
           "description": "Predicted binding score at the alternate allele, on the same scale as ref_score.",
-          "threshold": "Binding called upstream when alt_score > 2^SEMpl_baseline for the motif."
+          "threshold": "Binding called when alt_score > 2^SEMpl_baseline for the motif."
         },
         "variant_effect_score": {
           "title": "Variant Effect Score",
