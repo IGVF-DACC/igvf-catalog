@@ -36,7 +36,7 @@ it('combines node overlap and promoter-gene filters before pagination', async ()
 
 it('returns accessibility metrics and verbose promoter gene links', async () => {
   const element = { _id: 'genomic_elements/promoter', name: 'promoter', chr: 'chr14', start: 1, end: 2, promoter_of: { _id: 'genes/ENSG00000100811', name: 'YY1', chr: 'chr14', start: 1, end: 2, gene_type: 'protein_coding', source: 'GENCODE', version: 'v43', source_url: 'https://www.gencodegenes.org/' } }
-  const record = { source_genomic_element: element, target_genomic_element: 'genomic_elements/peak', name: 'modulates accessibility of', inverse_name: 'accessibility modulated by', label: 'regulatory element effect on chromatin accessibility', class: 'observed data', method: 'Multiome Perturb-seq', source: 'IGVF', source_url: 'https://data.igvf.org/tabular-files/IGVFFI2419ZSGC/', files_filesets: 'files_filesets/IGVFFI2419ZSGC', p_value_adj: 0.07, log2FC: -1.3, significant: false }
+  const record = { perturbed_genomic_element: element, accessible_genomic_element: 'genomic_elements/peak', name: 'modulates accessibility of', inverse_name: 'accessibility modulated by', label: 'regulatory element effect on chromatin accessibility', class: 'observed data', method: 'Multiome Perturb-seq', source: 'IGVF', source_url: 'https://data.igvf.org/tabular-files/IGVFFI2419ZSGC/', files_filesets: 'files_filesets/IGVFFI2419ZSGC', p_value_adj: 0.07, log2FC: -1.3, significant: false }
   jest.spyOn(db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue([record]) } as any)
   expect(await call({ files_fileset: 'IGVFFI2419ZSGC', verbose: 'true' })).toEqual([record])
 })

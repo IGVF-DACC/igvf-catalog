@@ -45,8 +45,8 @@ const elementFormat = z.object({
   promoter_of: z.string().or(geneFormat).nullish()
 })
 const outputFormat = z.array(z.object({
-  source_genomic_element: z.string().or(elementFormat),
-  target_genomic_element: z.string().or(elementFormat),
+  perturbed_genomic_element: z.string().or(elementFormat),
+  accessible_genomic_element: z.string().or(elementFormat),
   name: z.string(),
   inverse_name: z.string(),
   label: z.string(),
@@ -129,7 +129,7 @@ const genomicElementsFromGenomicElements = publicProcedure
     const expanded = (endpoint: string): string => input.verbose === 'true'
       ? `MERGE(KEEP(DOCUMENT(record.${endpoint}), '_id', 'name', 'chr', 'start', 'end', 'type', 'source_annotation'), { promoter_of: DOCUMENT(record.${endpoint}).promoter_of == null ? null : DOCUMENT(DOCUMENT(record.${endpoint}).promoter_of) })`
       : `record.${endpoint}`
-    const fields = Object.keys(outputFormat.element.shape).filter(field => !['source_genomic_element', 'target_genomic_element'].includes(field))
+    const fields = Object.keys(outputFormat.element.shape).filter(field => !['perturbed_genomic_element', 'accessible_genomic_element'].includes(field))
     const cursor = await db.query(`
       ${nodeQueries.join('\n')}
       FOR record IN ${collection}
@@ -137,8 +137,8 @@ const genomicElementsFromGenomicElements = publicProcedure
         SORT record._key
         LIMIT @offset, @limit
         RETURN {
-          source_genomic_element: ${expanded('_from')},
-          target_genomic_element: ${expanded('_to')},
+          perturbed_genomic_element: ${expanded('_from')},
+          accessible_genomic_element: ${expanded('_to')},
           ${fields.map(field => `${field}: record.${field}`).join(',\n')}
         }
     `, bindVars)
