@@ -3,7 +3,7 @@
 api:
   default-environment: Production
   environments:
-    Production: https://api.catalog.igvf.org/api
-    Development: https://api-dev.catalog.igvf.org/api
+    Production: https://api.catalogkg.igvf.org/api
+    Development: https://api-dev.catalogkg.igvf.org/api
   specs:
     - openapi: openapi.json
