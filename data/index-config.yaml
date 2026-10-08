@@ -336,8 +336,10 @@ genomic_elements_genomic_elements:
     fields:
       - files_filesets
       - method
-      - neg_log10_pvalue_adj
       - significant
+  zkd:
+    fields:
+      - neg_log10_pvalue_adj
       - log2FC
   inverted:
     fields: biological_context
