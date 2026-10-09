@@ -714,8 +714,9 @@ def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
         assert 'GRCm39' in json.loads(writer.contents[0])['_key']
 
 
+@pytest.mark.parametrize('design_accession', ['IGVFFI4261NSQZ', 'IGVFFI1789LDNT'])
 @pytest.mark.parametrize('strand', ['+', '-'])
-def test_mouse_satmut_maps_changed_bases_to_named_reference_tile(tmp_path, mock_file_fileset, strand):
+def test_mouse_satmut_maps_changed_bases_to_named_reference_tile(tmp_path, mock_file_fileset, strand, design_accession):
     design = tmp_path / 'design.tsv'
     # ALT precedes WT and covers only the changed base, not the full tile.
     design.write_text(
@@ -731,7 +732,7 @@ def test_mouse_satmut_maps_changed_bases_to_named_reference_tile(tmp_path, mock_
         filepath=str(effects), label='genomic_element_biosample', writer=writer, validate=True,
         source_url='https://data.igvf.org/tabular-files/IGVFFI0975AQKF/',
         reference_filepath=str(design),
-        reference_source_url='https://data.igvf.org/tabular-files/IGVFFI4261NSQZ/',
+        reference_source_url=f'https://data.igvf.org/tabular-files/{design_accession}/',
     )
     assert adapter.variant_to_element['NC_000067.7:11:A:C'] == {
         ('chr1', '10', '20', strand)}

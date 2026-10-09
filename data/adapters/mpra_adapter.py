@@ -100,6 +100,8 @@ class MPRAAdapter(BaseAdapter):
         'variant_biosample'
     ]
 
+    SATMUT_DESIGN_ACCESSIONS = frozenset({'IGVFFI4261NSQZ', 'IGVFFI1789LDNT'})
+
     THRESHOLD = 1
     CHUNK_SIZE = 6500
     IGVFFI1436TRIH_EXCLUSION_LIST = (
@@ -346,7 +348,7 @@ class MPRAAdapter(BaseAdapter):
                     self.design_elements.add(key)
                     if row.get('name') is not None and str(row.get('name')).strip():
                         self.coords_to_element_name[key] = row.get('name')
-                        if self.reference_file_accession == 'IGVFFI4261NSQZ' and '::WT_' in row['name']:
+                        if self.reference_file_accession in self.SATMUT_DESIGN_ACCESSIONS and '::WT_' in row['name']:
                             reference_tiles_by_name[row['name'].split('::')[
                                 0]] = key
 
@@ -585,7 +587,7 @@ class MPRAAdapter(BaseAdapter):
                         effect_class = self.design_name_class.get(
                             normalized_effect_name, '')
                         if 'control' in effect_class and not (
-                                self.reference_file_accession == 'IGVFFI4261NSQZ'
+                                self.reference_file_accession in self.SATMUT_DESIGN_ACCESSIONS
                                 and 'ref' in self.design_name_alleles.get(normalized_effect_name, set())):
                             # Controls normally do not produce activity edges. The
                             # SatMut WT controls are its five reference test tiles.
