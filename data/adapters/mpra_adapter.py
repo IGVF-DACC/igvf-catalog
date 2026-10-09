@@ -9,6 +9,7 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
     name.
 
 **Labels (``self.label``)**
+  Prefix any label below with ``mm_`` for mouse (GRCm39); unprefixed labels use human (GRCh38).
   * ``genomic_element`` / ``genomic_element_biosample`` — element-level activity. Designs are required
   for IGVF to attribute the element to design file for joining with variant edges.
   * ``variant`` / ``variant_biosample`` / ``genomic_element_from_variant`` — IGVF variant activity.
@@ -97,7 +98,12 @@ class MPRAAdapter(BaseAdapter):
         'genomic_element_biosample',
         'variant',
         'genomic_element_from_variant',
-        'variant_biosample'
+        'variant_biosample',
+        'mm_genomic_element',
+        'mm_genomic_element_biosample',
+        'mm_variant',
+        'mm_genomic_element_from_variant',
+        'mm_variant_biosample'
     ]
 
     SATMUT_DESIGN_ACCESSIONS = frozenset({'IGVFFI4261NSQZ', 'IGVFFI1789LDNT'})
@@ -119,23 +125,27 @@ class MPRAAdapter(BaseAdapter):
         reference_filepath: Optional[str] = None,
         reference_source_url: Optional[str] = None,
         validate=False,
-        organism=None,
         **kwargs
     ):
+        if label not in self.ALLOWED_LABELS:
+            raise ValueError(
+                f'Invalid label: {label}. Allowed values: {self.ALLOWED_LABELS}')
+        self.effect_label = label.removeprefix('mm_')
         # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
-        if reference_filepath is None and label in ('variant', 'genomic_element_from_variant', 'variant_biosample'):
+        if reference_filepath is None and self.effect_label in ('variant', 'genomic_element_from_variant', 'variant_biosample'):
             if 'encodeproject.org' in (source_url or ''):
                 raise ValueError(
                     'ENCODE MPRA files do not have MPRA sequence designs. '
                     'Use label genomic_element or genomic_element_biosample only.'
                 )
 
-        self.assembly = self._read_design_assembly(reference_filepath)
-        expected_organism = 'MOUSE' if self.assembly == 'GRCm39' else 'HUMAN'
-        if organism is not None and organism != expected_organism:
-            raise ValueError(
-                f'Organism must be {expected_organism} for MPRA design assembly {self.assembly}; got {organism!r}')
-        prefix = 'mm_' if self.assembly == 'GRCm39' else ''
+        prefix = 'mm_' if label.startswith('mm_') else ''
+        self.assembly = 'GRCm39' if prefix else 'GRCh38'
+        if reference_filepath is not None:
+            design_assembly = self._read_design_assembly(reference_filepath)
+            if design_assembly != self.assembly:
+                raise ValueError(
+                    f'Label {label} requires {self.assembly}, but the MPRA design uses {design_assembly}')
         self.element_collection = f'{prefix}genomic_elements'
         self.variant_collection = f'{prefix}variants'
         super().__init__(filepath, label, writer, validate)
@@ -220,18 +230,18 @@ class MPRAAdapter(BaseAdapter):
         return open(self.filepath, 'r')
 
     def _get_schema_type(self):
-        if self.label in ['genomic_element_biosample', 'variant_biosample']:
+        if self.effect_label in ['genomic_element_biosample', 'variant_biosample']:
             return 'edges'
         return 'nodes'
 
     def _get_collection_name(self):
-        if self.label == 'variant':
+        if self.effect_label == 'variant':
             return self.variant_collection
-        if self.label == 'variant_biosample':
+        if self.effect_label == 'variant_biosample':
             return f'{self.variant_collection}_biosamples'
-        if self.label in ['genomic_element', 'genomic_element_from_variant']:
+        if self.effect_label in ['genomic_element', 'genomic_element_from_variant']:
             return self.element_collection
-        if self.label == 'genomic_element_biosample':
+        if self.effect_label == 'genomic_element_biosample':
             return f'{self.element_collection}_biosamples'
         return None
 
@@ -484,7 +494,7 @@ class MPRAAdapter(BaseAdapter):
         self.treatments_term_ids = self.file_fileset.get(
             'treatments_term_ids')
 
-        if self.label in ('genomic_element', 'genomic_element_biosample'):
+        if self.effect_label in ('genomic_element', 'genomic_element_biosample'):
             self._process_element_effects_file()
             return
 
@@ -537,7 +547,7 @@ class MPRAAdapter(BaseAdapter):
                 if self.normalize_design_name(row[3]) in self.excluded_assembly_design_names:
                     continue
 
-                if self.label == 'genomic_element':
+                if self.effect_label == 'genomic_element':
                     if self.has_sequence_designs and element_key not in self.design_elements:
                         self.logger.warning(
                             f'Skipping genomic element {(chr_, start, end, strand)} from {self.file_accession}: '
@@ -577,7 +587,7 @@ class MPRAAdapter(BaseAdapter):
                         self.validate_doc(props)
                     self.writer.write(json.dumps(props) + '\n')
 
-                elif self.label == 'genomic_element_biosample':
+                elif self.effect_label == 'genomic_element_biosample':
                     if self.has_sequence_designs:
                         normalized_effect_name = self.normalize_design_name(
                             row[3])
@@ -649,11 +659,11 @@ class MPRAAdapter(BaseAdapter):
                 )
 
     def _process_chunk_igvf(self, chunk):
-        if self.label == 'variant':
+        if self.effect_label == 'variant':
             self._process_variant_chunk(chunk)
-        elif self.label == 'variant_biosample':
+        elif self.effect_label == 'variant_biosample':
             self._process_variant_biosample_chunk(chunk)
-        elif self.label == 'genomic_element_from_variant':
+        elif self.effect_label == 'genomic_element_from_variant':
             self._process_genomic_element_chunk(chunk)
 
     def _process_variant_chunk(self, chunk):

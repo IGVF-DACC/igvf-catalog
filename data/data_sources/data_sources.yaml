@@ -1753,12 +1753,11 @@ mouse genomic element igvf mpra:
   command: >
     python3 data_parser.py
     --adapter mpra
-    --organism MOUSE
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label genomic_element
+    --label mm_genomic_element
     --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
@@ -1781,12 +1780,11 @@ mouse genomic element to biosample igvf mpra:
   command: >
     python3 data_parser.py
     --adapter mpra
-    --organism MOUSE
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label genomic_element_biosample
+    --label mm_genomic_element_biosample
     --output-bucket-key mm_genomic_elements_biosamples/mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
@@ -1807,11 +1805,11 @@ mouse genomic element from variants igvf mpra:
   params:
     - label
   command: >
-    python3 data_parser.py --adapter mpra --organism MOUSE
+    python3 data_parser.py --adapter mpra
     --source-url {source_url} --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label genomic_element_from_variant
+    --label mm_genomic_element_from_variant
     --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
@@ -1824,11 +1822,11 @@ mouse variant igvf mpra:
   params:
     - label
   command: >
-    python3 data_parser.py --adapter mpra --organism MOUSE
+    python3 data_parser.py --adapter mpra
     --source-url {source_url} --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label variant
+    --label mm_variant
     --output-bucket-key mm_variants/mpra_variants_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
@@ -1841,11 +1839,11 @@ mouse variant to biosample igvf mpra:
   params:
     - label
   command: >
-    python3 data_parser.py --adapter mpra --organism MOUSE
+    python3 data_parser.py --adapter mpra
     --source-url {source_url} --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label variant_biosample
+    --label mm_variant_biosample
     --output-bucket-key mm_variants_biosamples/mpra_variants_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
