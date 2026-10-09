@@ -105,7 +105,8 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/files-filesets', tag: 'Utility Endpoints' },
   { path: '/llm-query', tag: 'Utility Endpoints' },
   { path: '/autocomplete', tag: 'Utility Endpoints' },
-  { path: '/health', tag: 'Utility Endpoints' }
+  { path: '/health', tag: 'Utility Endpoints' },
+  { path: '/collection-endpoints', tag: 'Utility Endpoints' }
 ]
 
 export const PATH_TO_TAG: Readonly<Record<string, OpenApiTag>> = Object.fromEntries(
