@@ -14,10 +14,10 @@ Testing against our development environment is also available by running the sam
 
 ```
 $ tests/response_times> cd tests/response_times; python3 response_times.py
-Fetching: https://api.catalog.igvf.org/api/variants?spdi=NC_000020.11%3A3658947%3AA%3AG&organism=Homo%20sapiens&page=0
-Fetching: https://api.catalog.igvf.org/api/variants?hgvs=NC_000020.11%3Ag.3658948A%3EG&organism=Homo%20sapiens&page=0
-Fetching: https://api.catalog.igvf.org/api/variants?region=chr1%3A1157520-1158189&organism=Homo%20sapiens&page=0
-Fetching: https://api.catalog.igvf.org/api/variants?mouse_strain=A_J&organism=Mus%20musculus&page=0
+Fetching: https://api.catalogkg.igvf.org/api/variants?spdi=NC_000020.11%3A3658947%3AA%3AG&organism=Homo%20sapiens&page=0
+Fetching: https://api.catalogkg.igvf.org/api/variants?hgvs=NC_000020.11%3Ag.3658948A%3EG&organism=Homo%20sapiens&page=0
+Fetching: https://api.catalogkg.igvf.org/api/variants?region=chr1%3A1157520-1158189&organism=Homo%20sapiens&page=0
+Fetching: https://api.catalogkg.igvf.org/api/variants?mouse_strain=A_J&organism=Mus%20musculus&page=0
 ...
 
 Saved responses in 'responses/', average times in 'average_response_time.csv', and differences in 'differences.txt' if any.

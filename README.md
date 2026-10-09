@@ -93,6 +93,6 @@ pre-commit install
 
 ## Live demo
 
-Visit our beta Swagger page at:  <https://api.catalog.igvf.org>.
+Visit our beta Swagger page at:  <https://api.catalogkg.igvf.org>.
 
 For any feature requests and bug reports please open a ticket at: <https://github.com/IGVF-DACC/igvfd/issues>.
