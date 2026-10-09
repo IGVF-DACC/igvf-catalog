@@ -101,7 +101,7 @@ def split_spdi(spdi):
 
 def get_exon_coordinates(transcript_id):
     transcript_id = transcript_id.split('.')[0]
-    query_url = f'https://api-dev.catalog.igvf.org/api/genes-structure?transcript_id={transcript_id}&organism=Homo%20sapiens&limit=1000'
+    query_url = f'https://catalog-api-dev.demo.igvf.org/api/genes-structure?transcript_id={transcript_id}&organism=Homo%20sapiens&limit=1000'
     exons_coordinates = []
     chrom = None
     chrom_refseq = None
@@ -132,7 +132,7 @@ def get_exon_coordinates(transcript_id):
 
 def query_transcript_id_from_protein(protein_id):
     protein_id = protein_id.split('.')[0]
-    query_url = f'https://api-dev.catalog.igvf.org/api/proteins/transcripts?protein_id={protein_id}&organism=Homo%20sapiens'
+    query_url = f'https://catalog-api-dev.demo.igvf.org/api/proteins/transcripts?protein_id={protein_id}&organism=Homo%20sapiens'
     try:
         responses = requests.get(query_url).json()
         transcript_str = responses[0].get('transcript')
@@ -145,7 +145,7 @@ def query_transcript_id_from_protein(protein_id):
 
 def query_gene_from_protein(protein_id):
     protein_id = protein_id.split('.')[0]
-    query_url = f'https://api-dev.catalog.igvf.org/api/proteins/genes?protein_id={protein_id}&organism=Homo%20sapiens&verbose=true'
+    query_url = f'https://catalog-api-dev.demo.igvf.org/api/proteins/genes?protein_id={protein_id}&organism=Homo%20sapiens&verbose=true'
     try:
         responses = requests.get(query_url).json()
         gene_info = responses[0].get('gene')
@@ -158,7 +158,7 @@ def query_gene_from_protein(protein_id):
 
 def query_protein_name(protein_id):
     protein_id = protein_id.split('.')[0]
-    query_url = f'https://api-dev.catalog.igvf.org/api/proteins?protein_id={protein_id}&organism=Homo%20sapiens'
+    query_url = f'https://catalog-api-dev.demo.igvf.org/api/proteins?protein_id={protein_id}&organism=Homo%20sapiens'
     try:
         responses = requests.get(query_url).json()
         protein_name = responses.get('names')[0]

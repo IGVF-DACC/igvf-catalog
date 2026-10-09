@@ -141,7 +141,7 @@ let openApiConfig = {
   title: 'IGVF Catalog - Development',
   description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
   version: '2.0 - DEV',
-  docsUrl: 'https://api-dev.catalog.igvf.org/openapi',
+  docsUrl: 'https://catalog-api-dev.demo.igvf.org/openapi',
   baseUrl,
   tags: [...OPENAPI_TAG_ORDER]
 }
