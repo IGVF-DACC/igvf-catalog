@@ -612,6 +612,7 @@ igvf_file_accessions:
       - IGVFFI7181XJAK
       - IGVFFI3916WDKO
     reporter genomic variant effects:
+      - IGVFFI5939ZOZQ
       - IGVFFI1323RCIE
       - IGVFFI4134MFLL
       - IGVFFI7899LTDI
@@ -622,6 +623,7 @@ igvf_file_accessions:
       - IGVFFI4328UUGV
       - IGVFFI2950PCZI
     MPRA sequence designs:
+      - IGVFFI1789LDNT
       - IGVFFI1204BCKQ
       - IGVFFI4103SCUB
       - IGVFFI4914OUJH

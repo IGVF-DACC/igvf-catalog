@@ -1802,6 +1802,57 @@ mouse genomic element to biosample igvf mpra:
   label: regulatory reference element activity
 
 
+mouse genomic element from variants igvf mpra:
+  collection: mm_genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter mpra --organism MOUSE
+    --source-url {source_url} --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element_from_variant
+    --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI5939ZOZQ/@@download/IGVFFI5939ZOZQ.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1789LDNT/@@download/IGVFFI1789LDNT.tsv.gz
+  source: IGVF
+
+mouse variant igvf mpra:
+  collection: mm_variants
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter mpra --organism MOUSE
+    --source-url {source_url} --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label variant
+    --output-bucket-key mm_variants/mpra_variants_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI5939ZOZQ/@@download/IGVFFI5939ZOZQ.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1789LDNT/@@download/IGVFFI1789LDNT.tsv.gz
+  source: IGVF
+
+mouse variant to biosample igvf mpra:
+  collection: mm_variants_biosamples
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter mpra --organism MOUSE
+    --source-url {source_url} --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label variant_biosample
+    --output-bucket-key mm_variants_biosamples/mpra_variants_biosamples_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI5939ZOZQ/@@download/IGVFFI5939ZOZQ.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1789LDNT/@@download/IGVFFI1789LDNT.tsv.gz
+  source: IGVF
+
 # Three files under IGVFDS8793NHEL (unified MPRA adapter; no reference file for ENCODE)
 # Examples:
 # python3 data_parser.py --adapter mpra --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/'
