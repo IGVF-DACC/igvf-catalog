@@ -11,7 +11,7 @@ def query_intron_to_gene(intron_region):
     Returns:
         gene_ids (list): list of gene ids
     '''
-    data_service_url = 'https://api.catalog.igvf.org/api'
+    data_service_url = 'https://api.catalogkg.igvf.org/api'
     endpoint = 'genes'
     intron_chr = 'chr' + intron_region.split(':')[0]
     query_string = 'region=' + intron_chr + '%3A' + \

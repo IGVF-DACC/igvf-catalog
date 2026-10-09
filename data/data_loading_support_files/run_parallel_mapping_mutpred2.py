@@ -195,7 +195,7 @@ def init_worker(two_bit_path):
 
 def get_protein_id_name(transcript_id):
     transcript_id = transcript_id.split('.')[0]
-    query_url = f'https://api-dev.catalog.igvf.org/api/transcripts/proteins?transcript_id={transcript_id}&organism=Homo%20sapiens&verbose=true'
+    query_url = f'https://catalog-api-dev.demo.igvf.org/api/transcripts/proteins?transcript_id={transcript_id}&organism=Homo%20sapiens&verbose=true'
     protein_id = ''
     protein_name = ''
     try:
@@ -226,7 +226,7 @@ def get_protein_id_name(transcript_id):
 def get_exon_coordinates(transcript_id):
     """Fetch exon coordinates with retries and error handling."""
     transcript_id = transcript_id.split('.')[0]
-    query_url = f'https://api-dev.catalog.igvf.org/api/genes-structure?transcript_id={transcript_id}&organism=Homo%20sapiens&limit=1000'
+    query_url = f'https://catalog-api-dev.demo.igvf.org/api/genes-structure?transcript_id={transcript_id}&organism=Homo%20sapiens&limit=1000'
 
     exons_coordinates = []
     chrom = None

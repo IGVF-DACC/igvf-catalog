@@ -291,7 +291,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
 def main():
     # upload to s3
     seq_reader = py2bit.open('hg38.2bit')
-    query_url = 'https://api-dev.catalog.igvf.org/api/genes-structure?transcript_id=' + \
+    query_url = 'https://catalog-api-dev.demo.igvf.org/api/genes-structure?transcript_id=' + \
         transcript_id + '&organism=Homo%20sapiens&limit=1000'
     responses = requests.get(query_url).json()
 

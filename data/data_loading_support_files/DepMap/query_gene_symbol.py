@@ -11,7 +11,7 @@ def query_gene_symbol(gene_symbol, gene_json=None, chrom_filter=True):
     chrom_list = ['chr' + str(i) for i in range(1, 23)] + ['chrX', 'chrY']
     gene_ids = []
     if gene_json is None:
-        data_service_url = 'https://api.catalog.igvf.org/api'
+        data_service_url = 'https://api.catalogkg.igvf.org/api'
         endpoint = 'genes'
         query_string = 'gene_name=' + gene_symbol
         url = data_service_url + '/' + endpoint + '?' + query_string
