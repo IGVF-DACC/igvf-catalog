@@ -15,7 +15,8 @@
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "name": {
-          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
+          "description": "Original element name from the source file. Retained for provenance and cross-referencing the source data.",
+          "example": "HepG2_DNasePeakNoPromoter1"
         },
         "strand": {
           "description": "Strand the tile was tested in..",

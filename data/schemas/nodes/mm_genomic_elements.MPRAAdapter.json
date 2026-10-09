@@ -15,7 +15,8 @@
           "example": "MPRA_chr1_10410_10610_GRCm39_ENCFF769REH"
         },
         "name": {
-          "example": "MPRA_chr1_10410_10610_GRCm39_ENCFF769REH"
+          "description": "Original element label from the IGVF MPRA sequence-design name column or the ENCODE effect BED fourth column. Retained for provenance and cross-referencing the source experiment; it is not a biological annotation or the catalog element identifier.",
+          "example": "Bend5_chr4_8201::WT_NA_NA_NA"
         },
         "strand": {
           "description": "Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.",

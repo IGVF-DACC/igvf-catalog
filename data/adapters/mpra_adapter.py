@@ -315,7 +315,7 @@ class MPRAAdapter(BaseAdapter):
         # IGVF designs TSV: per-row `allele` / `SPDI` / `variant_pos` drive the maps in the
         # class docstring. Alt-only rows only contribute to allele *sets*, not to catalog keys.
         pending_alt_spdi_mappings = []
-        reference_tiles_by_name = {}
+        reference_tiles = set()
         opener = gzip.open if str(mpra_design_file).endswith('.gz') else open
         with opener(mpra_design_file, 'rt') as f:
             reader = csv.DictReader(f, delimiter='\t')
@@ -348,9 +348,8 @@ class MPRAAdapter(BaseAdapter):
                     self.design_elements.add(key)
                     if row.get('name') is not None and str(row.get('name')).strip():
                         self.coords_to_element_name[key] = row.get('name')
-                        if self.reference_file_accession in self.SATMUT_DESIGN_ACCESSIONS and '::WT_' in row['name']:
-                            reference_tiles_by_name[row['name'].split('::')[
-                                0]] = key
+                    if name_role == 'ref':
+                        reference_tiles.add(key)
 
                 normalized_name = self.normalize_design_name(row.get('name'))
                 if normalized_name:
@@ -397,8 +396,7 @@ class MPRAAdapter(BaseAdapter):
                     # Some IGVF design files provide SPDI/variant_pos only on ALT rows.
                     # Defer until we know whether this coordinate key has a ref/none tile.
                     pending_alt_spdi_mappings.append(
-                        (key, spdi_list, variant_pos_list,
-                         row.get('name', '').split('::')[0])
+                        (key, spdi_list, variant_pos_list)
                     )
                     continue
                 else:
@@ -414,18 +412,22 @@ class MPRAAdapter(BaseAdapter):
                             self.variant_pos_to_element[(
                                 spdi, pos)].add(target_key)
 
-        for key, spdi_list, variant_pos_list, parent_name in pending_alt_spdi_mappings:
+        for key, spdi_list, variant_pos_list in pending_alt_spdi_mappings:
             if key not in self.design_elements:
-                # This saturation-mutagenesis design records the changed bases
-                # on ALT rows, and the complete reference tile on a named WT row.
-                parent = reference_tiles_by_name.get(parent_name)
-                if parent is None:
+                if self.reference_file_accession not in self.SATMUT_DESIGN_ACCESSIONS:
                     continue
-                if not (key[0] == parent[0] and key[3] == parent[3]
-                        and int(parent[1]) <= int(key[1]) <= int(key[2]) <= int(parent[2])):
+                # ALT rows describe changed bases; identify the containing ref
+                # tile by coordinates and strand, never by its provenance name.
+                candidates = {
+                    tile for tile in reference_tiles
+                    if key[0] == tile[0] and key[3] == tile[3]
+                    and int(tile[1]) <= int(key[1]) <= int(key[2]) <= int(tile[2])
+                }
+                if len(candidates) != 1:
                     raise ValueError(
-                        f'Variant design {key} is outside reference tile {parent}')
-                key = parent
+                        f'Expected one reference tile containing variant design {key}; '
+                        f'found {len(candidates)} in {self.reference_file_accession}')
+                key = candidates.pop()
             for spdi in spdi_list:
                 self.variant_to_element[spdi].add(key)
             if variant_pos_list is not None:
