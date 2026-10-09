@@ -716,17 +716,17 @@ def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
 
 @pytest.mark.parametrize('design_accession', ['IGVFFI4261NSQZ', 'IGVFFI1789LDNT'])
 @pytest.mark.parametrize('strand', ['+', '-'])
-def test_mouse_satmut_maps_changed_bases_to_named_reference_tile(tmp_path, mock_file_fileset, strand, design_accession):
+def test_mouse_satmut_maps_changed_bases_by_coordinates(tmp_path, mock_file_fileset, strand, design_accession):
     design = tmp_path / 'design.tsv'
     # ALT precedes WT and covers only the changed base, not the full tile.
     design.write_text(
         'name\tref\tclass\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
-        f'tile::2_Mismatch_C_1\tGRCm39\ttest\tchr1\t11\t12\t{strand}\t["alt"]\t["NC_000067.7:11:A:C"]\t[1]\n'
-        f'tile::WT_NA_NA_NA\tGRCm39\telement active control\tchr1\t10\t20\t{strand}\t["ref"]\tNA\tNA\n'
+        f'arbitrary_variant_name\tGRCm39\ttest\tchr1\t11\t12\t{strand}\t["alt"]\t["NC_000067.7:11:A:C"]\t[1]\n'
+        f'unrelated_reference_name\tGRCm39\telement active control\tchr1\t10\t20\t{strand}\t["ref"]\tNA\tNA\n'
     )
     effects = tmp_path / 'effects.bed'
     effects.write_text(
-        f'chr1\t10\t20\ttile::WT_NA_NA_NA\t100\t{strand}\t1\t2\t3\t4\t5\n')
+        f'chr1\t10\t20\tunrelated_reference_name\t100\t{strand}\t1\t2\t3\t4\t5\n')
     writer = SpyWriter()
     adapter = MPRAAdapter(
         filepath=str(effects), label='genomic_element_biosample', writer=writer, validate=True,
@@ -754,3 +754,21 @@ def test_mouse_mpra_rejects_inconsistent_organism(tmp_path, organism):
             source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
             reference_filepath=str(design), organism=organism,
         )
+
+
+@pytest.mark.parametrize('reference_rows', ['',
+                                            'ref_a\tGRCm39\tchr1\t10\t20\t+\t["ref"]\tNA\n'
+                                            'ref_b\tGRCm39\tchr1\t9\t21\t+\t["ref"]\tNA\n'])
+def test_mouse_satmut_requires_unique_containing_reference(tmp_path, mock_file_fileset, reference_rows):
+    design = tmp_path / 'design.tsv'
+    design.write_text(
+        'name\tref\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+        'variant\tGRCm39\tchr1\t11\t12\t+\t["alt"]\t["NC_000067.7:11:A:C"]\n'
+        + reference_rows)
+    with pytest.raises(ValueError, match='Expected one reference tile'):
+        MPRAAdapter(
+            filepath='unused.bed', label='variant', writer=SpyWriter(),
+            source_url='https://data.igvf.org/tabular-files/IGVFFI5939ZOZQ/',
+            reference_filepath=str(design),
+            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1789LDNT/',
+            organism='MOUSE')
