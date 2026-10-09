@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://schema.buildwithfern.dev/docs-yml.json
+instances:
+  - url: igvf-catalog-api.docs.buildwithfern.com
+
+title: IGVF Catalog
+
+navigation:
+  - section: Guides
+    contents:
+      - page: Adapters and Collections
+        path: ../docs/adapters_and_collections.md
+        slug: adapters-and-collections
+      - page: Collection Keys
+        path: ../docs/collection_key_definition.md
+        slug: collection-keys
+  - section: Internal / maintainer docs
+    slug: internal
+    contents:
+      - page: Rules for Naming Catalog Nodes and Edges
+        path: ../docs/collection_node_edge_nomenclature.md
+        slug: collection-node-edge-nomenclature
+      - page: Connecting to the IGVF Datastore (ClickHouse)
+        path: ../docs/how_to_connect_to_the_datastore.md
+        slug: connect-to-the-datastore
+      - page: Loading Data into the Catalog
+        path: ../docs/how_to_load_data_into_the_catalog.md
+        slug: load-data-into-the-catalog
+      - page: Restarting the ArangoDB Server
+        path: ../docs/how_to_restart_arangodb_server.md
+        slug: restart-arangodb-server
+      - page: Using biocommons.seqrepo
+        path: ../docs/how_to_use_biocommons_seqrepo.md
+        slug: use-biocommons-seqrepo
+      - page: Response Time Testing
+        path: ../docs/response_time_testing.md
+        slug: response-time-testing
+  - api: API Reference

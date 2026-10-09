@@ -1,0 +1,44 @@
+name: Publish Docs
+
+on:
+  push:
+    branches:
+      - DSERV-1636-fern-docs
+
+concurrency:
+  group: publish-docs
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate OpenAPI spec
+        run: npm run openapi:generate
+
+      - name: Setup Fern CLI
+        uses: fern-api/setup-fern-cli@v1
+
+      - name: Validate Fern project
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+        run: fern check
+
+      - name: Publish docs
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+        run: fern generate --docs --no-prompt
