@@ -656,7 +656,7 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, labe
                return_value={spdi} if label == 'variant_biosample' else set()) as check, \
             patch('adapters.mpra_adapter.load_variant', return_value=(variant, None)) as load:
         adapter = MPRAAdapter(
-            filepath=str(effects), label=label, writer=writer, validate=True, organism='MOUSE',
+            filepath=str(effects), label=f'mm_{label}', writer=writer, validate=True,
             source_url='https://data.igvf.org/tabular-files/IGVFFI2111LQGF/',
             reference_filepath=str(design),
             reference_source_url='https://data.igvf.org/tabular-files/IGVFFI4261NSQZ/',
@@ -703,7 +703,7 @@ def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
     for label in ('genomic_element', 'genomic_element_biosample'):
         writer = SpyWriter()
         adapter = MPRAAdapter(
-            filepath=str(effects), label=label, writer=writer, validate=True,
+            filepath=str(effects), label=f'mm_{label}', writer=writer, validate=True,
             source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
             reference_filepath=str(design),
             reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1204BCKQ/',
@@ -729,7 +729,7 @@ def test_mouse_satmut_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
         f'chr1\t10\t20\tunrelated_reference_name\t100\t{strand}\t1\t2\t3\t4\t5\n')
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath=str(effects), label='genomic_element_biosample', writer=writer, validate=True,
+        filepath=str(effects), label='mm_genomic_element_biosample', writer=writer, validate=True,
         source_url='https://data.igvf.org/tabular-files/IGVFFI0975AQKF/',
         reference_filepath=str(design),
         reference_source_url=f'https://data.igvf.org/tabular-files/{design_accession}/',
@@ -744,16 +744,18 @@ def test_mouse_satmut_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
         'mm_genomic_elements/MPRA_chr1_10_20_GRCm39_')
 
 
-@pytest.mark.parametrize('organism', ['HUMAN', 'mouse', 'mm_'])
-def test_mouse_mpra_rejects_inconsistent_organism(tmp_path, organism):
+@pytest.mark.parametrize('label,assembly', [
+    ('genomic_element', 'GRCm39'),
+    ('mm_genomic_element', 'GRCh38'),
+])
+def test_mpra_rejects_label_assembly_mismatch(tmp_path, label, assembly):
     design = tmp_path / 'design.tsv'
-    design.write_text('ref\nGRCm39\n')
-    with pytest.raises(ValueError, match='Organism must be MOUSE'):
+    design.write_text(f'ref\n{assembly}\n')
+    with pytest.raises(ValueError, match='requires'):
         MPRAAdapter(
-            filepath='unused.bed', label='genomic_element',
+            filepath='unused.bed', label=label,
             source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
-            reference_filepath=str(design), organism=organism,
-        )
+            reference_filepath=str(design))
 
 
 @pytest.mark.parametrize('reference_rows', ['',
@@ -767,8 +769,7 @@ def test_mouse_satmut_requires_unique_containing_reference(tmp_path, mock_file_f
         + reference_rows)
     with pytest.raises(ValueError, match='Expected one reference tile'):
         MPRAAdapter(
-            filepath='unused.bed', label='variant', writer=SpyWriter(),
+            filepath='unused.bed', label='mm_variant', writer=SpyWriter(),
             source_url='https://data.igvf.org/tabular-files/IGVFFI5939ZOZQ/',
             reference_filepath=str(design),
-            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1789LDNT/',
-            organism='MOUSE')
+            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1789LDNT/')
