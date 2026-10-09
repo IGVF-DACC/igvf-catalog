@@ -1761,6 +1761,8 @@ mouse genomic element igvf mpra:
     --output-bucket-key mm_genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0975AQKF/@@download/IGVFFI0975AQKF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1789LDNT/@@download/IGVFFI1789LDNT.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7479MPBY/@@download/IGVFFI7479MPBY.bed.gz
@@ -1788,6 +1790,8 @@ mouse genomic element to biosample igvf mpra:
     --output-bucket-key mm_genomic_elements_biosamples/mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0975AQKF/@@download/IGVFFI0975AQKF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1789LDNT/@@download/IGVFFI1789LDNT.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7479MPBY/@@download/IGVFFI7479MPBY.bed.gz
