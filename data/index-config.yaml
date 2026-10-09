@@ -407,6 +407,7 @@ variants_biosamples:
       - files_filesets, _key
       - source, files_filesets, method
       - source, class, files_filesets, method
+      - _to, method, _key
 
 variants_coding_variants:
   persistent:
