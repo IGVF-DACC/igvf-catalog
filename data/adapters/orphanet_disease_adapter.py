@@ -6,6 +6,7 @@ from typing import Optional
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # The xml file was download from https://www.orphadata.com/genes/
@@ -41,6 +42,7 @@ class Disease(BaseAdapter):
 
     def __init__(self, filepath, label='disease_gene', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
+        self.ontology_term_validator = OntologyTermValidator()
 
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
@@ -52,6 +54,14 @@ class Disease(BaseAdapter):
     def _get_collection_name(self):
         """Get collection name."""
         return 'diseases_genes'
+
+    @staticmethod
+    def get_ontology_term_key(elem):
+        orpha_code = elem.find('OrphaCode')
+        ontology_id = orpha_code.text if orpha_code is not None else None
+        if not ontology_id:
+            return None
+        return 'Orphanet_' + ontology_id
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
@@ -67,8 +77,18 @@ class Disease(BaseAdapter):
         # or could return an iterator with ET.iterparse(xmlfile)
         disease_gene_tree = ET.parse(self.filepath)
         root = disease_gene_tree.getroot()
-        for elem in root.findall('./DisorderList/Disorder'):
-            ontology_id = elem.find('OrphaCode').text
+        disorders = root.findall('./DisorderList/Disorder')
+
+        ontology_term_keys = set()
+        for elem in disorders:
+            ontology_term_key = self.get_ontology_term_key(elem)
+            ontology_term_keys.add(ontology_term_key)
+        self.ontology_term_validator.preload(ontology_term_keys)
+
+        for elem in disorders:
+            ontology_term_key = self.get_ontology_term_key(elem)
+            if not self.ontology_term_validator.validate(ontology_term_key):
+                continue
             term_name = elem.find('Name').text
             for assoc in elem.findall('./DisorderGeneAssociationList/DisorderGeneAssociation'):
                 source = assoc.find('SourceOfValidation').text
@@ -98,11 +118,11 @@ class Disease(BaseAdapter):
                 assoc_status = assoc.find('DisorderGeneAssociationStatus')
                 assoc_status_name = assoc_status.find('Name').text
 
-                _key = 'Orphanet_' + ontology_id + '_' + gene_id
+                _key = ontology_term_key + '_' + gene_id
 
                 props = {
                     '_key': _key,
-                    '_from': 'ontology_terms/Orphanet_' + ontology_id,
+                    '_from': 'ontology_terms/' + ontology_term_key,
                     '_to': 'genes/' + gene_id,
                     'name': 'associated_with',
                     'inverse_name': 'associated_with',
@@ -126,3 +146,4 @@ class Disease(BaseAdapter):
                 self.writer.write('\n')
 
         self.gene_validator.log()
+        self.ontology_term_validator.log()

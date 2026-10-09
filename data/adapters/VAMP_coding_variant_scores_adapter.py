@@ -7,6 +7,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Example line from file from CYP2C19 VAMP-seq (IGVFFI0629IIQU.tsv.gz):
@@ -33,6 +34,7 @@ class VAMPAdapter(BaseAdapter):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.phenotype_term = phenotype_term
+        self.ontology_term_validator = OntologyTermValidator()
 
         super().__init__(filepath, label, writer, validate)
 
@@ -109,6 +111,11 @@ class VAMPAdapter(BaseAdapter):
         pattern_Met1 = re.compile(r'p\.Met1[A-Za-z]{3}')
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
+
+        if not self.ontology_term_validator.ensure(self.phenotype_term):
+            self.ontology_term_validator.log()
+            return
+
         with gzip.open(self.filepath, 'rt') as vamp_file:
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)

@@ -26,14 +26,18 @@ def mock_file_fileset():
 
 
 def test_process_file(sample_filepath, spy_writer, mock_file_fileset):
-    with patch('adapters.orphanet_disease_adapter.GeneValidator') as MockGeneValidator:
-        mock_validator_instance = MockGeneValidator.return_value
-        mock_validator_instance.validate.return_value = True
+    with patch('adapters.orphanet_disease_adapter.GeneValidator') as MockGeneValidator, \
+            patch('adapters.orphanet_disease_adapter.OntologyTermValidator') as MockOntologyTermValidator:
+        mock_gene_validator = MockGeneValidator.return_value
+        mock_gene_validator.validate.return_value = True
+        mock_ontology_term_validator = MockOntologyTermValidator.return_value
+        mock_ontology_term_validator.validate.return_value = True
         disease = Disease(sample_filepath, writer=spy_writer, validate=True)
         disease.file_accession = 'IGVFFI4540ZCXZ'
         disease.process_file()
 
         mock_file_fileset.assert_called_once_with('IGVFFI4540ZCXZ')
+        mock_ontology_term_validator.preload.assert_called_once()
         assert len(spy_writer.contents) > 0
         data = json.loads(spy_writer.contents[0])
         assert '_key' in data
@@ -60,9 +64,12 @@ def test_process_file(sample_filepath, spy_writer, mock_file_fileset):
 
 
 def test_validate_doc_invalid(sample_filepath, spy_writer):
-    with patch('adapters.orphanet_disease_adapter.GeneValidator') as MockGeneValidator:
-        mock_validator_instance = MockGeneValidator.return_value
-        mock_validator_instance.validate.return_value = True
+    with patch('adapters.orphanet_disease_adapter.GeneValidator') as MockGeneValidator, \
+            patch('adapters.orphanet_disease_adapter.OntologyTermValidator') as MockOntologyTermValidator:
+        mock_gene_validator = MockGeneValidator.return_value
+        mock_gene_validator.validate.return_value = True
+        mock_ontology_term_validator = MockOntologyTermValidator.return_value
+        mock_ontology_term_validator.validate.return_value = True
         disease = Disease(sample_filepath, writer=spy_writer, validate=True)
         invalid_doc = {
             'invalid_field': 'invalid_value',

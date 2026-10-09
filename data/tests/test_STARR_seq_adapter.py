@@ -1,6 +1,7 @@
 import json
 import pytest
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open
 
@@ -67,6 +68,17 @@ def mock_seqrepo_and_translator():
         yield
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.STARR_seq_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 @patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value=set())
 def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator, mocker):
     writer = SpyWriter()
@@ -90,7 +102,9 @@ def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_vari
 
 
 @patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
-def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator, mocker):
+def test_process_file_variant_biosample(
+        mock_bulk_check, mock_file_fileset, mock_load_variant,
+        mock_seqrepo_and_translator, mocker, mock_ontology_term_validator):
 
     writer = SpyWriter()
 
@@ -128,7 +142,8 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock
 
 @patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
 def test_process_file_variant_biosample_significant_true(
-    mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator
+    mock_bulk_check, mock_file_fileset, mock_load_variant,
+    mock_seqrepo_and_translator, mock_ontology_term_validator
 ):
     """Edges set significant=True when postProbEffect is strictly greater than THRESHOLD."""
     writer = SpyWriter()

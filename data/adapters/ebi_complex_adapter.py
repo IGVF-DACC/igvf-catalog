@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.protein_map import ProteinMap
 from adapters.writer import Writer
 
@@ -35,6 +36,7 @@ class EBIComplex(BaseAdapter):
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
 
     def __init__(self, filepath, label='complex', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -67,6 +69,9 @@ class EBIComplex(BaseAdapter):
         if self.label == 'complex_protein':
             self.protein_map = ProteinMap(organism='Homo sapiens')
             self.load_linked_features_dict()
+        if self.label == 'complex_term':
+            self.ontology_term_validator.preload(
+                self._collect_complex_term_keys())
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
@@ -193,6 +198,8 @@ class EBIComplex(BaseAdapter):
                 elif self.label == 'complex_term':  # parse cross-references & go annotations
                     for go_term in go_terms:
                         go_term_id = go_term.split('(')[0].replace(':', '_')
+                        if not self.ontology_term_validator.validate(go_term_id):
+                            continue
                         go_term_name = go_term.split('(')[1].replace(')', '')
 
                         _key = complex_ac + '_' + go_term_id
@@ -246,6 +253,9 @@ class EBIComplex(BaseAdapter):
                                 xref_term_id = xref_term_id.replace(
                                     '\ufeff', '')
 
+                                if not self.ontology_term_validator.validate(xref_term_id):
+                                    continue
+
                                 _key = complex_ac + '_' + xref_term_id
                                 _from = 'complexes/' + complex_ac
                                 _to = 'ontology_terms/' + xref_term_id
@@ -282,6 +292,32 @@ class EBIComplex(BaseAdapter):
 
             if self.label == 'complex_protein':
                 self.protein_map.log(self.logger)
+            elif self.label == 'complex_term':
+                self.ontology_term_validator.log()
+
+    def _collect_complex_term_keys(self):
+        """Collect GO and xref ontology term keys for preload (complex_term only)."""
+        term_keys = set()
+        with open(self.filepath, 'r') as complex_file:
+            complex_tsv = csv.reader(complex_file, delimiter='\t')
+            next(complex_tsv)
+            for complex_row in complex_tsv:
+                molecules = complex_row[4].split('|')
+                if any(m.startswith('CHEBI:') or m.startswith('URS') for m in molecules):
+                    continue
+                for go_term in complex_row[7].split('|'):
+                    term_keys.add(go_term.split('(')[0].replace(':', '_'))
+                for xref in complex_row[8].split('|'):
+                    for source in EBIComplex.XREF_SOURCES:
+                        if xref.startswith(source):
+                            if xref.startswith('pubmed'):
+                                xref_term_id = xref.split(
+                                    '(')[0].replace(':', '_')
+                            else:
+                                xref_term_id = xref.split('(')[0].replace(
+                                    source + ':', '').replace(':', '_')
+                            term_keys.add(xref_term_id.replace('\ufeff', ''))
+        return term_keys
 
     def get_chain_id(self, protein):
         if len(protein.split('-')) > 1:

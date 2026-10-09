@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from adapters.gencc_diseases_genes_adapter import GenccDiseasesGenes
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
@@ -33,7 +34,20 @@ def mock_file_fileset():
         yield mock_get
 
 
-def test_gencc_process_file_writes_edge(mock_gene_map, mock_file_fileset):
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.gencc_diseases_genes_adapter.OntologyTermValidator') as MockValidator:
+        # Keep real normalization so _from keys stay correct under the mock.
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
+def test_gencc_process_file_writes_edge(
+        mock_gene_map, mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GenccDiseasesGenes(
         filepath=SAMPLE_TSV,
@@ -44,6 +58,7 @@ def test_gencc_process_file_writes_edge(mock_gene_map, mock_file_fileset):
     adapter.process_file()
 
     mock_file_fileset.assert_called_once_with('IGVFFI8022JGUK')
+    mock_ontology_term_validator.preload.assert_called_once()
     docs = _parsed_docs(writer)
     assert len(docs) == 2
     doc = next(d for d in docs if d['_to'] == 'genes/ENSG00000123456')
@@ -70,7 +85,8 @@ def test_gencc_process_file_writes_edge(mock_gene_map, mock_file_fileset):
     assert doc['files_filesets'] == 'files_filesets/IGVFFI8022JGUK'
 
 
-def test_gencc_process_file_one_row_per_gene_ensembl(mock_gene_map, mock_file_fileset):
+def test_gencc_process_file_one_row_per_gene_ensembl(
+        mock_gene_map, mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GenccDiseasesGenes(
         filepath=SAMPLE_TSV,
@@ -93,7 +109,8 @@ def test_gencc_process_file_one_row_per_gene_ensembl(mock_gene_map, mock_file_fi
     }
 
 
-def test_gencc_skips_row_when_hgnc_not_in_gene_map(mock_gene_map, mock_file_fileset):
+def test_gencc_skips_row_when_hgnc_not_in_gene_map(
+        mock_gene_map, mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GenccDiseasesGenes(
         filepath=SAMPLE_TSV,

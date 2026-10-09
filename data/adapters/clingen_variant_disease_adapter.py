@@ -7,6 +7,7 @@ from typing import Optional
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.helpers import (
     CHR_MAP,
     bulk_query_variant_keys_by_identifier,
@@ -36,6 +37,7 @@ class ClinGen(BaseAdapter):
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -125,6 +127,13 @@ class ClinGen(BaseAdapter):
 
         self.load_variant_id_maps(rows)
 
+        if self.label == 'variant_disease':
+            mondo_ids = {
+                (row.get('Mondo Id') or '').replace(':', '_')
+                for row in rows
+            }
+            self.ontology_term_validator.preload(mondo_ids)
+
         unmatched = 0
         pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
 
@@ -140,6 +149,9 @@ class ClinGen(BaseAdapter):
                 continue
 
             disease_id = (row.get('Mondo Id') or '').replace(':', '_')
+            if self.label == 'variant_disease':
+                if not self.ontology_term_validator.validate(disease_id):
+                    continue
             assertion = row.get('Assertion')
             inheritance_mode = row.get('Mode of Inheritance')
             pmids_raw = row.get('PubMed Articles') or ''
@@ -203,3 +215,5 @@ class ClinGen(BaseAdapter):
                 f'{unmatched} ClinGen rows skipped (no catalog variant match via hgvs/ca_id)')
 
         self.gene_validator.log()
+        if self.label == 'variant_disease':
+            self.ontology_term_validator.log()

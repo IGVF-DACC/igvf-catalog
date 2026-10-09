@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Element-level CRISPR element-to-phenotype screens (Gersbach lab).
@@ -62,6 +63,7 @@ class CRISPRElementPhenotype(BaseAdapter):
         )
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
+        self.ontology_term_validator = OntologyTermValidator()
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -123,6 +125,12 @@ class CRISPRElementPhenotype(BaseAdapter):
         fileset_accession = self.file_fileset.get('file_set_id')
         if fileset_accession:
             self.writer.add_tag('portal_accessions', fileset_accession)
+
+        if self.label == 'genomic_element_phenotype':
+            if not self.ontology_term_validator.ensure(self.phenotype_term):
+                self.ontology_term_validator.log()
+                return
+
         with self._open_file(self.filepath) as f:
             reader = csv.DictReader(f, delimiter='\t')
             if self.label == 'genomic_element':

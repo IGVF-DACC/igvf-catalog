@@ -2,6 +2,7 @@ from unittest.mock import patch
 from adapters.writer import SpyWriter
 import json
 from adapters.cV2F_variant_phenotype_adapter import cV2F
+from adapters.ontology_term_validator import OntologyTermValidator
 import pytest
 
 
@@ -17,6 +18,17 @@ def mock_file_fileset():
             'samples': ['ontology_terms/EFO_0002067']
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.cV2F_variant_phenotype_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:10203:T:G'})
@@ -109,7 +121,9 @@ def test_cV2F_adapter_invalid_label(mock_file_fileset):
 
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('adapters.cV2F_variant_phenotype_adapter.load_variant', return_value=(None, None))
-def test_cV2F_adapter_process_file(mock_load_variant, mock_bulk_check, mock_file_fileset):
+def test_cV2F_adapter_process_file(
+        mock_load_variant, mock_bulk_check, mock_file_fileset,
+        mock_ontology_term_validator):
     writer = SpyWriter()
 
     # Create a temporary test file

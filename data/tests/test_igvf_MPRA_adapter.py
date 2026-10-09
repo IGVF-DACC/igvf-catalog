@@ -1,6 +1,7 @@
 import json
 import pytest
 from adapters.mpra_adapter import MPRAAdapter
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 from unittest.mock import patch
 
@@ -20,6 +21,17 @@ def mock_file_fileset():
             'treatments_term_ids': None
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.mpra_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set())
@@ -202,7 +214,9 @@ def test_elements_from_variant_file_no_duplicates_across_chunks(mock_file_filese
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000009.12:136248440:T:C'})
 @patch('adapters.mpra_adapter.load_variant')
-def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
+def test_variant_biosample(
+        mock_load_variant, mock_check, mock_file_fileset,
+        mock_ontology_term_validator):
 
     mock_load_variant.return_value = ({
         '_key': 'NC_000009.12:136248440:T:C',
@@ -263,7 +277,9 @@ def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:25:A:C'})
 @patch('adapters.mpra_adapter.load_variant')
-def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
+def test_variant_biosample_uses_variant_pos_for_overlapping_elements(
+        mock_load_variant, mock_check, mock_file_fileset, tmp_path,
+        mock_ontology_term_validator):
     mock_load_variant.return_value = ({
         '_key': 'NC_000001.11:25:A:C',
     }, None)
@@ -306,7 +322,9 @@ def test_variant_biosample_uses_variant_pos_for_overlapping_elements(mock_load_v
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347485:CGCGC:TTGGG'})
 @patch('adapters.mpra_adapter.load_variant')
-def test_variant_biosample_maps_alt_spdi_when_ref_row_has_no_spdi(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
+def test_variant_biosample_maps_alt_spdi_when_ref_row_has_no_spdi(
+        mock_load_variant, mock_check, mock_file_fileset, tmp_path,
+        mock_ontology_term_validator):
     mock_load_variant.return_value = ({
         '_key': 'NC_000010.11:79347485:CGCGC:TTGGG',
     }, None)
@@ -342,7 +360,9 @@ def test_variant_biosample_maps_alt_spdi_when_ref_row_has_no_spdi(mock_load_vari
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000006.12:52763752:A:G'})
 @patch('adapters.mpra_adapter.load_variant')
-def test_variant_biosample_uses_strand_for_reverse_complement_designs(mock_load_variant, mock_check, mock_file_fileset, tmp_path):
+def test_variant_biosample_uses_strand_for_reverse_complement_designs(
+        mock_load_variant, mock_check, mock_file_fileset, tmp_path,
+        mock_ontology_term_validator):
     mock_load_variant.return_value = ({
         '_key': 'NC_000006.12:52763752:A:G',
     }, None)
@@ -383,7 +403,7 @@ def test_variant_biosample_uses_strand_for_reverse_complement_designs(mock_load_
     assert by_score[368]['strand'] == '-'
 
 
-def test_genomic_element_biosample(mock_file_fileset):
+def test_genomic_element_biosample(mock_file_fileset, mock_ontology_term_validator):
 
     writer = SpyWriter()
     adapter = MPRAAdapter(
@@ -401,7 +421,8 @@ def test_genomic_element_biosample(mock_file_fileset):
                and p['_to'].startswith('ontology_terms/') for p in parsed)
 
 
-def test_genomic_element_biosample_ref_allele_only_writes(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_ref_allele_only_writes(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\n'
@@ -426,7 +447,8 @@ def test_genomic_element_biosample_ref_allele_only_writes(tmp_path, mock_file_fi
     assert len(writer.contents) == 1
 
 
-def test_genomic_element_biosample_mixed_ref_alt_writes_ref_element_effect(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_mixed_ref_alt_writes_ref_element_effect(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator):
     """Design row with both ref and alt is valid; biosample edge loads (ref is present)."""
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
@@ -452,7 +474,8 @@ def test_genomic_element_biosample_mixed_ref_alt_writes_ref_element_effect(tmp_p
     assert len(writer.contents) == 1
 
 
-def test_genomic_element_biosample_missing_allele_writes(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_missing_allele_writes(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\n'
@@ -477,7 +500,8 @@ def test_genomic_element_biosample_missing_allele_writes(tmp_path, mock_file_fil
     assert len(writer.contents) == 1
 
 
-def test_genomic_element_biosample_missing_allele_multi_effect_is_flagged(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_missing_allele_multi_effect_is_flagged(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\n'
@@ -504,7 +528,8 @@ def test_genomic_element_biosample_missing_allele_multi_effect_is_flagged(tmp_pa
         adapter.process_file()
 
 
-def test_genomic_element_biosample_control_ignored_and_ref_loaded(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_control_ignored_and_ref_loaded(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\tclass\n'
@@ -533,7 +558,8 @@ def test_genomic_element_biosample_control_ignored_and_ref_loaded(tmp_path, mock
     assert len(writer.contents) == 1
 
 
-def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids(tmp_path, mock_file_fileset):
+def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
@@ -564,7 +590,8 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
 
 
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample'])
-def test_igvffi1436trih_exclusion_list_is_applied(tmp_path, mock_file_fileset, label):
+def test_igvffi1436trih_exclusion_list_is_applied(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, label):
     excluded_name = (
         'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|'
         'EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|'

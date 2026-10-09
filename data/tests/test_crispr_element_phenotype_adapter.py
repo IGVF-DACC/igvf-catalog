@@ -2,6 +2,7 @@ import json
 import pytest
 from unittest.mock import patch
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
@@ -17,6 +18,17 @@ def mock_file_fileset():
             'treatments_term_ids': None,
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.CRISPR_element_phenotype_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
@@ -44,7 +56,8 @@ def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI5135QZCS'
 
 
-def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_phenotype_migration(
+        mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
         filepath='./samples/crispr_element_phenotype_migration.example.tsv',
@@ -75,7 +88,8 @@ def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_
     assert first_item['biosample_term'] == 'ontology_terms/CLO_0003730'
 
 
-def test_crispr_element_phenotype_genomic_element_phenotype_growth(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_phenotype_growth(
+        mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
         filepath='./samples/crispr_element_phenotype_growth.example.tsv',
@@ -141,7 +155,8 @@ def test_parse_element_coords_raises_on_unrecognized():
         CRISPRElementPhenotype._parse_element_coords('NA:something_else')
 
 
-def test_crispr_element_phenotype_skips_na_coordinate_rows(mock_file_fileset, tmp_path):
+def test_crispr_element_phenotype_skips_na_coordinate_rows(
+        mock_file_fileset, mock_ontology_term_validator, tmp_path):
     sample = tmp_path / 'mixed.tsv'
     sample.write_text(
         'dhs\tdhs_coords\tdhs_count\tavg_migration_pZ\thit_gRNA_count_mig\t'

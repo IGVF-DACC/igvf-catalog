@@ -2,6 +2,7 @@ import json
 import pytest
 from unittest.mock import patch
 from adapters.gwas_adapter import GWAS
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
@@ -28,6 +29,17 @@ def mock_variant_validation():
 
 
 @pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.gwas_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
+@pytest.fixture
 def gwas_files():
     return {
         'variants_to_ontology': './samples/gwas_v2d_igvf_sample.tsv'
@@ -39,7 +51,8 @@ def spy_writer():
     return SpyWriter()
 
 
-def test_variants_phenotypes_collection(gwas_files, spy_writer, mocker):
+def test_variants_phenotypes_collection(
+        gwas_files, spy_writer, mocker, mock_ontology_term_validator):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
@@ -142,7 +155,9 @@ def test_gwas_variants_label_writes_missing_variant(gwas_files, spy_writer, mock
     assert gwas.invalid_variant_ids == set()
 
 
-def test_gwas_skips_edge_for_invalid_variant(gwas_files, spy_writer, mocker, mock_variant_validation):
+def test_gwas_skips_edge_for_invalid_variant(
+        gwas_files, spy_writer, mocker, mock_variant_validation,
+        mock_ontology_term_validator):
     """process_variants_phenotypes should skip edges whose variant load_variant() rejects,
     rather than writing an edge with a _from that will never resolve to a real document."""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
@@ -159,7 +174,9 @@ def test_gwas_skips_edge_for_invalid_variant(gwas_files, spy_writer, mocker, moc
     assert len(spy_writer.contents) == 0
 
 
-def test_gwas_writes_edge_for_missing_but_valid_variant(gwas_files, spy_writer, mocker, mock_variant_validation):
+def test_gwas_writes_edge_for_missing_but_valid_variant(
+        gwas_files, spy_writer, mocker, mock_variant_validation,
+        mock_ontology_term_validator):
     """A variant that's merely missing (not invalid) must not be treated as invalid - the edge
     should still be written normally, relying on a prior label='variants' pass to load it."""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
@@ -188,7 +205,9 @@ def test_gwas_writes_edge_for_missing_but_valid_variant(gwas_files, spy_writer, 
     assert len(spy_writer.contents) > 0
 
 
-def test_gwas_skips_row_when_build_variant_id_raises(gwas_files, spy_writer, mocker, mock_variant_validation):
+def test_gwas_skips_row_when_build_variant_id_raises(
+        gwas_files, spy_writer, mocker, mock_variant_validation,
+        mock_ontology_term_validator):
     """build_variant_id() can raise directly (e.g. a bare insertion/deletion with no anchor
     base, which used to blow up translator.translate_from) rather than returning a value for
     validate_variants()/process_variants_phenotypes() to check against invalid_variant_ids.
@@ -223,7 +242,7 @@ def test_gwas_invalid_doc(gwas_files, spy_writer, mocker):
         gwas.validate_doc(invalid_doc)
 
 
-def test_gwas_pvalue_zero_handling(gwas_files, mocker):
+def test_gwas_pvalue_zero_handling(gwas_files, mocker, mock_ontology_term_validator):
     """Test handling of pvalue = 0 case (line 137)"""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
@@ -276,7 +295,8 @@ def test_gwas_empty_ontology_term_handling(gwas_files, mocker):
     assert result is None
 
 
-def test_gwas_broken_line_handling_in_process_file(gwas_files, spy_writer, mocker):
+def test_gwas_broken_line_handling_in_process_file(
+        gwas_files, spy_writer, mocker, mock_ontology_term_validator):
     """Test broken line handling in process_file (lines 227-228, 233-234)"""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')

@@ -7,6 +7,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Example rows from SGE file (IGVFFI9974PZRX.tsv.gz)
@@ -31,6 +32,7 @@ class SGE(BaseAdapter):
     FIELD_NAME_OVERRIDES = {'hgvs_p': 'hgvsp'}
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
@@ -152,6 +154,9 @@ class SGE(BaseAdapter):
         if self.label == 'variants':
             return
         else:
+            if not self.ontology_term_validator.ensure(self.PHENOTYPE_TERM):
+                self.ontology_term_validator.log()
+                return
             protein_id = self.get_protein_id()
             if protein_id is None:
                 self.logger.error(

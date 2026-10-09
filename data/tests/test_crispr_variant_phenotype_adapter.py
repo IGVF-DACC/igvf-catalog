@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 MOCK_VARIANT = {
@@ -34,6 +35,17 @@ def mock_file_fileset():
             'treatments_term_ids': None,
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.CRISPR_variant_phenotype_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 def _mock_load_variant(variant_id, **kwargs):
@@ -131,7 +143,8 @@ def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
+def test_variant_phenotype_sherwood_prime(
+        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
     mock_file_fileset.return_value['crispr_modality'] = 'prime editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
@@ -244,7 +257,8 @@ def test_variant_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
+def test_variant_phenotype_sherwood_crispri(
+        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
     mock_file_fileset.return_value['crispr_modality'] = 'interference'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
@@ -309,7 +323,8 @@ def test_variant_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
+def test_variant_phenotype_sherwood_abe(
+        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
     mock_file_fileset.return_value['crispr_modality'] = 'base editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(

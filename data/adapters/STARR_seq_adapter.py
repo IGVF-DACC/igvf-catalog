@@ -10,6 +10,7 @@ from ga4gh.vrs.extras.translator import AlleleTranslator
 
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Example rows from Reddy's STARR-seq data
@@ -50,6 +51,7 @@ class STARRseqVariantBiosample(BaseAdapter):
         # Optional list of file accessions whose previously-loaded variants should
         # NOT be considered "already loaded" for this run.
         self.excluded_file_accessions = excluded_file_accessions or []
+        self.ontology_term_validator = OntologyTermValidator()
 
         super().__init__(filepath, label, writer, validate)
 
@@ -79,6 +81,11 @@ class STARRseqVariantBiosample(BaseAdapter):
         self.treatments_term_ids = self.file_fileset['treatments_term_ids']
         self.method = self.file_fileset['method']
         self.collection_class = self.file_fileset['class']
+
+        if self.label == 'variant_biosample':
+            if not self.ontology_term_validator.ensure(self.biosample_term[0]):
+                self.ontology_term_validator.log()
+                return
 
         open_file = gzip.open(self.filepath, 'rt') if self.filepath.endswith(
             '.gz') else open(self.filepath, 'r')

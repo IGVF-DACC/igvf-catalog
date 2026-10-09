@@ -5,6 +5,7 @@ import gzip
 import os
 from unittest.mock import patch, MagicMock
 from adapters.mpra_adapter import MPRAAdapter
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
@@ -31,6 +32,17 @@ def mock_file_fileset():
             'samples': ['ontology_terms/EFO_0002067']
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.mpra_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 def test_encode_mpra_adapter_regulatory_region(mock_file_fileset, mock_igvf_api):
@@ -63,7 +75,8 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset, mock_igvf_api)
         os.unlink(temp_file_path)
 
 
-def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset, mock_igvf_api):
+def test_encode_mpra_adapter_regulatory_region_biosample(
+        mock_file_fileset, mock_igvf_api, mock_ontology_term_validator):
     writer = SpyWriter()
 
     # Create a small temporary test file

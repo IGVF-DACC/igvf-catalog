@@ -1,6 +1,7 @@
 import json
 import pytest
 from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosample
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open
 
@@ -55,6 +56,17 @@ def mock_build_variant_id():
         yield mock_build
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.BlueSTARR_variants_biosamples_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 @patch('adapters.BlueSTARR_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value=set())
 def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_variant):
     writer = SpyWriter()
@@ -75,7 +87,9 @@ def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_vari
 
 
 @patch('adapters.BlueSTARR_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:100005302:A:C'})
-def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock_build_variant_id):
+def test_process_file_variant_biosample(
+        mock_bulk_check, mock_file_fileset, mock_build_variant_id,
+        mock_ontology_term_validator):
     # regression test: process_edge_chunk used to call self.biosample_term.replaceAll(...),
     # which doesn't exist on Python str (that's the JS method) and raised AttributeError on
     # the very first edge, so no BlueSTARR variant-biosample edges were ever written.

@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # load 1 sample-agnostic cV2F file + 9 sample-specific cV2F files, each file has the same input variants
@@ -32,6 +33,7 @@ class cV2F(BaseAdapter):
     COLLECTION_LABEL = 'predicted variant effect on phenotype'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -109,6 +111,11 @@ class cV2F(BaseAdapter):
             self.writer.write('\n')
 
     def parse(self):
+        if self.label == 'variants_phenotypes':
+            if not self.ontology_term_validator.ensure(self.PHENOTYPE_TERM):
+                self.ontology_term_validator.log()
+                return
+
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             self.writer.add_tag('portal_accessions', self.file_accession)

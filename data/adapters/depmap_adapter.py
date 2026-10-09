@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -42,6 +43,7 @@ class DepMap(BaseAdapter):
     }
 
     def __init__(self, filepath, label='depmap', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -80,6 +82,13 @@ class DepMap(BaseAdapter):
                     self.logger.warning(
                         'Cell ontology unavailable for model id ' + model_id)
 
+            cell_ontology_ids = {
+                self.cell_ontology_id_mapping[model_id].get('cell_ontology_id')
+                for model_id in model_ids
+                if self.cell_ontology_id_mapping[model_id].get('cell_ontology_id')
+            }
+            self.ontology_term_validator.preload(cell_ontology_ids)
+
             for line in depmap_file:
                 gene, *values = line.strip().split(',')
                 gene_symbol = gene.split(' ')[0]
@@ -97,6 +106,8 @@ class DepMap(BaseAdapter):
                         cell_ontology_id = self.cell_ontology_id_mapping[gene_model_id].get(
                             'cell_ontology_id')
                         if not cell_ontology_id:  # no CVCL id provided for this model
+                            continue
+                        if not self.ontology_term_validator.validate(cell_ontology_id):
                             continue
 
                         for gene_id in gene_ids:
@@ -128,6 +139,8 @@ class DepMap(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
+
+        self.ontology_term_validator.log()
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
