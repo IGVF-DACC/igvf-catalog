@@ -15,8 +15,7 @@
     "build": "tsc",
     "test:integration": "jest --config jest.integration.config.js",
     "test": "jest",
-    "openapi:generate": "ENV=production IGVF_CATALOG_OPEN_API_CONFIG_TYPE=production IGVF_CATALOG_PROTOCOL=https IGVF_CATALOG_HOSTNAME=api.catalogkg.igvf.org tsx src/scripts/generateOpenapi.ts",
-    "openapi:generate:dev": "tsx src/scripts/generateOpenapi.ts"
+    "openapi:generate": "ENV=production IGVF_CATALOG_OPEN_API_CONFIG_TYPE=production IGVF_CATALOG_PROTOCOL=https IGVF_CATALOG_HOSTNAME=api.catalogkg.igvf.org tsx src/scripts/generateOpenapi.ts"
   },
   "repository": {
     "type": "git",
