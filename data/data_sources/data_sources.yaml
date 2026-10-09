@@ -1763,10 +1763,10 @@ mouse genomic element igvf mpra:
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4607JYJD/@@download/IGVFFI4607JYJD.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7479MPBY/@@download/IGVFFI7479MPBY.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0802WDXY/@@download/IGVFFI0802WDXY.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4845SDZI/@@download/IGVFFI4845SDZI.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0802WDXY/@@download/IGVFFI0802WDXY.tsv.gz
 
   source: IGVF
   threshold: 1
@@ -1790,10 +1790,10 @@ mouse genomic element to biosample igvf mpra:
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3406MEAD/@@download/IGVFFI3406MEAD.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1204BCKQ/@@download/IGVFFI1204BCKQ.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4607JYJD/@@download/IGVFFI4607JYJD.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7479MPBY/@@download/IGVFFI7479MPBY.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0802WDXY/@@download/IGVFFI0802WDXY.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4845SDZI/@@download/IGVFFI4845SDZI.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4103SCUB/@@download/IGVFFI4103SCUB.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0802WDXY/@@download/IGVFFI0802WDXY.tsv.gz
 
   source: IGVF
   threshold: 1
