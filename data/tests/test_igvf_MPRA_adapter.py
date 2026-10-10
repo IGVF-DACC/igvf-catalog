@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 import json
 import pytest
 from adapters.mpra_adapter import MPRAAdapter
@@ -692,15 +693,15 @@ def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
         assert 'GRCm39' in json.loads(writer.contents[0])['_key']
 
 
-@pytest.mark.parametrize('design_accession', ['IGVFFI4261NSQZ', 'IGVFFI1789LDNT'])
+@pytest.mark.parametrize('design_accession', ['IGVFFI4261NSQZ', 'IGVFFI1789LDNT', 'IGVFFI0000TEST'])
 @pytest.mark.parametrize('strand', ['+', '-'])
-def test_mouse_satmut_maps_changed_bases_by_coordinates(tmp_path, mock_file_fileset, strand, design_accession):
+def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_fileset, strand, design_accession):
     design = tmp_path / 'design.tsv'
     # ALT precedes WT and covers only the changed base, not the full tile.
     design.write_text(
         'name\tref\tclass\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
         f'arbitrary_variant_name\tGRCm39\ttest\tchr1\t11\t12\t{strand}\t["alt"]\t["NC_000067.7:11:A:C"]\t[1]\n'
-        f'unrelated_reference_name\tGRCm39\telement active control\tchr1\t10\t20\t{strand}\t["ref"]\tNA\tNA\n'
+        f'unrelated_reference_name\tGRCm39\ttest\tchr1\t10\t20\t{strand}\t["ref"]\tNA\tNA\n'
     )
     effects = tmp_path / 'effects.bed'
     effects.write_text(
@@ -725,15 +726,19 @@ def test_mouse_satmut_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
 @pytest.mark.parametrize('reference_rows', ['',
                                             'ref_a\tGRCm39\tchr1\t10\t20\t+\t["ref"]\tNA\n'
                                             'ref_b\tGRCm39\tchr1\t9\t21\t+\t["ref"]\tNA\n'])
-def test_mouse_satmut_requires_unique_containing_reference(tmp_path, mock_file_fileset, reference_rows):
+def test_mouse_design_requires_unique_containing_reference(tmp_path, mock_file_fileset, reference_rows):
     design = tmp_path / 'design.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
         'variant\tGRCm39\tchr1\t11\t12\t+\t["alt"]\t["NC_000067.7:11:A:C"]\n'
         + reference_rows)
-    with pytest.raises(ValueError, match='Expected one reference tile'):
-        MPRAAdapter(
+    with pytest.raises(ValueError, match='Expected one reference tile') if reference_rows else nullcontext():
+        adapter = MPRAAdapter(
             filepath='unused.bed', label='mm_variant', writer=SpyWriter(),
             source_url='https://data.igvf.org/tabular-files/IGVFFI5939ZOZQ/',
             reference_filepath=str(design),
-            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1789LDNT/')
+            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI0000TEST/')
+
+    if not reference_rows:
+        assert not adapter.variant_to_element
+        assert not adapter.variant_pos_to_element

@@ -414,15 +414,20 @@ class MPRAAdapter(BaseAdapter):
 
         for key, spdi_list, variant_pos_list in pending_alt_spdi_mappings:
             if key not in self.design_elements:
-                if self.reference_file_accession not in self.SATMUT_DESIGN_ACCESSIONS:
-                    continue
-                # ALT rows describe changed bases; identify the containing ref
-                # tile by coordinates and strand, never by its provenance name.
+                # ALT coordinates may describe only the changed bases rather
+                # than the full reference tile. When there is no exact tile
+                # match, require a unique reference tile containing that interval
+                # on the same chromosome and strand. This mapping uses reference
+                # coordinates, not sequence identity or provenance names, and
+                # applies to every design dataset.
                 candidates = {
                     tile for tile in reference_tiles
                     if key[0] == tile[0] and key[3] == tile[3]
                     and int(tile[1]) <= int(key[1]) <= int(key[2]) <= int(tile[2])
                 }
+                if not candidates:
+                    # ALT-only designs have no reference element to link to.
+                    continue
                 if len(candidates) != 1:
                     raise ValueError(
                         f'Expected one reference tile containing variant design {key}; '
