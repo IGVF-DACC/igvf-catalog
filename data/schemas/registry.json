@@ -80,6 +80,7 @@
         },
         "variants": {
             "Favor": "schemas/nodes/variants.Favor.json",
+            "TopLD": "schemas/nodes/variants.TopLD.json",
             "ASB": "schemas/nodes/variants.ASB.json",
             "AFGRCAQtl": "schemas/nodes/variants.AFGRCAQtl.json",
             "AFGREQtl": "schemas/nodes/variants.AFGREQtl.json",

@@ -3,7 +3,7 @@
   "$id": "schemas/edges/variants_variants.TopLD.json",
   "accessible_via": {
     "filter_by_range": "r2, d_prime",
-    "return": "chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid, source, source_url"
+    "return": "chr, ancestry, d_prime, label, r2, positive_corr, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid, source, source_url"
   },
   "db_collection_name": "variants_variants",
   "allOf": [
@@ -39,10 +39,9 @@
           "description": "Chromosome the pair of variants lies on. Scaffolds and patch regions use UCSC-style names.",
           "example": "chr1"
         },
-        "negated": {
-          "title": "Positive Correlation?",
+        "positive_corr": {
           "type": "boolean",
-          "description": "Sign of the Pearson correlation between the two reference alleles, as written by the adapter: true when TopLD reports +, false when it reports -.",
+          "description": "Sign of the Pearson correlation between the two reference alleles: true when TopLD reports +, false when it reports -.",
           "example": false
         },
         "variant_1_base_pair": {
@@ -137,7 +136,7 @@
         "_from",
         "_to",
         "chr",
-        "negated",
+        "positive_corr",
         "variant_1_base_pair",
         "variant_2_base_pair",
         "variant_1_rsid",

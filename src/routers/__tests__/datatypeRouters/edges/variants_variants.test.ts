@@ -37,6 +37,7 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
         ancestry: 'EUR',
         d_prime: 0.9,
         r2: 0.95,
+        positive_corr: true,
         'sequence variant': {
           _id: 'NC_000001.11:70000:A:G',
           chr: 'chr1',
@@ -120,6 +121,7 @@ describe('variantsVariantsRouters.variantsFromVariantID', () => {
         ancestry: 'EUR',
         d_prime: 0.9,
         r2: 0.95,
+        positive_corr: true,
         label: 'linkage disequilibrium',
         variant_1_base_pair: 'G:A',
         variant_1_rsid: 'rs1',

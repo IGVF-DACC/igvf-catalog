@@ -5,7 +5,7 @@ USE igvf;
 CREATE TABLE IF NOT EXISTS variants_variants (
 	chr String,
 	ancestry String,
-	negated boolean,
+	positive_corr boolean,
 	variant_1_base_pair String,
 	variant_2_base_pair String,
 	variant_1_rsid String,
