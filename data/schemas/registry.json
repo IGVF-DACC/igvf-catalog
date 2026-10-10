@@ -171,11 +171,17 @@
         "mm_genomic_elements_mm_genes": {
             "CRISPRElementGeneIGVF": "schemas/edges/mm_genomic_elements_mm_genes.CRISPRElementGeneIGVF.json"
         },
+        "mm_genomic_elements_biosamples": {
+            "MPRAAdapter": "schemas/edges/mm_genomic_elements_biosamples.MPRAAdapter.json"
+        },
         "mm_genes_mm_genes": {
             "GeneGeneBiogrid": "schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json"
         },
         "mm_transcripts_mm_genes_structure": {
             "GencodeStructure": "schemas/edges/mm_transcripts_mm_genes_structure.GencodeStructure.json"
+        },
+        "mm_variants_biosamples": {
+            "MPRAAdapter": "schemas/edges/mm_variants_biosamples.MPRAAdapter.json"
         },
         "motifs_proteins": {
             "Motif": "schemas/edges/motifs_proteins.Motif.json",
@@ -244,12 +250,6 @@
         },
         "variants_variants": {
             "TopLD": "schemas/edges/variants_variants.TopLD.json"
-        },
-        "mm_genomic_elements_biosamples": {
-            "MPRAAdapter": "schemas/edges/mm_genomic_elements_biosamples.MPRAAdapter.json"
-        },
-        "mm_variants_biosamples": {
-            "MPRAAdapter": "schemas/edges/mm_variants_biosamples.MPRAAdapter.json"
         }
     }
 }
