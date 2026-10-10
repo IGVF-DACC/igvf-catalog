@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/genomic_elements.CRISPRElementElement.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
+          "title": "Key"
+        },
+        "name": {
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI3069QCRA",
+          "title": "Name"
+        },
+        "promoter_of": {
+          "type": "string",
+          "description": "The gene this element is the presumed promoter of.",
+          "example": "genes/ENSG00000123685",
+          "title": "Promoter Of"
+        },
+        "method": {
+          "enum": [
+            "Multiome Perturb-seq"
+          ],
+          "title": "Method",
+          "enum_descriptions": {
+            "Multiome Perturb-seq": "CRISPR perturbation with paired single-cell gene expression and chromatin accessibility measurements."
+          }
+        },
+        "source_annotation": {
+          "type": "string",
+          "description": "Annotation of the element supplied by the source.",
+          "example": "promoter",
+          "enum": [
+            "promoter"
+          ],
+          "title": "Source Annotation",
+          "enum_descriptions": {
+            "promoter": "Promoter of the gene targeted by the perturbation."
+          }
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ],
+          "title": "Source",
+          "enum_descriptions": {
+            "IGVF": "Impact of Genomic Variation on Function Consortium."
+          }
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI3069QCRA/",
+          "title": "Source URL"
+        },
+        "type": {
+          "enum": [
+            "tested elements",
+            "accessible dna elements"
+          ],
+          "title": "Type",
+          "enum_descriptions": {
+            "tested elements": "Genomic elements targeted by the CRISPR perturbation.",
+            "accessible dna elements": "Accessible DNA peaks measured as the readout of the perturbation."
+          }
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets",
+          "title": "Files and Filesets"
+        }
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements",
+  "accessible_via": {
+    "filter_by_range": "start, end"
+  }
+}

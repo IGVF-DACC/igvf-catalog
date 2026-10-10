@@ -168,20 +168,20 @@ node	genomic_elements.CCRE	source	The database, dataset or organization that is 
 node	genomic_elements.CCRE	source_url	The URL for the source.
 node	genomic_elements.CCRE	files_filesets	Reference to the File and Metadata
 node	genomic_elements.CRISPRElementGeneENCODE	name	Human readable display name for the entity
-node	genomic_elements.CRISPRElementGeneENCODE	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
+node	genomic_elements.CRISPRElementGeneENCODE	source_annotation	Annotation of the genomic element from the source file.
 node	genomic_elements.CRISPRElementGeneENCODE	files_filesets	Reference to the File and Metadata
 node	genomic_elements.CRISPRElementGeneENCODE	method	Name of the experimental class or prediction model that produced this result.
 node	genomic_elements.CRISPRElementGeneIGVF	name	Human readable display name for the entity
 node	genomic_elements.CRISPRElementGeneIGVF	promoter_of	The gene this element is the presumed promoter of.
 node	genomic_elements.CRISPRElementGeneIGVF	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.CRISPRElementGeneIGVF	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
+node	genomic_elements.CRISPRElementGeneIGVF	source_annotation	Annotation of the genomic element from the source file.
 node	genomic_elements.CRISPRElementGeneIGVF	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.CRISPRElementGeneIGVF	source_url	The URL for the source.
 node	genomic_elements.CRISPRElementGeneIGVF	type
 node	genomic_elements.CRISPRElementGeneIGVF	files_filesets	Reference to the File and Metadata
 node	genomic_elements.CRISPRElementPhenotype	name	Human readable display name for the entity
 node	genomic_elements.CRISPRElementPhenotype	method	Name of the experimental class or prediction model that produced this result.
-node	genomic_elements.CRISPRElementPhenotype	source_annotation	Annotation of the element, usually enhancer, promoter, distal or accessible element.
+node	genomic_elements.CRISPRElementPhenotype	source_annotation	Annotation of the genomic element from the source file.
 node	genomic_elements.CRISPRElementPhenotype	source	The database, dataset or organization that is a source for these data.
 node	genomic_elements.CRISPRElementPhenotype	source_url	The URL for the source.
 node	genomic_elements.CRISPRElementPhenotype	type

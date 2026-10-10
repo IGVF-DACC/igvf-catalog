@@ -53,7 +53,7 @@
           "example": "jesse-engreitz"
         },
         "preferred_assay_titles": {
-          "title": "Preferred Assay Titles",
+           "title": "Preferred Assay Titles",
           "type": [
             "array",
             "null"
@@ -128,6 +128,7 @@
             "Homology",
             "MPRA",
             "MORF screen",
+            "Multiome Perturb-seq",
             "MutPred2",
             "Orphanet",
             "Perturb-seq",
@@ -218,7 +219,8 @@
               "SGE Pipeline",
               "Snakemake",
               "statsmodels",
-              "Straw"
+              "Straw",
+              "snapATAC2"
             ]
           }
         },
