@@ -109,6 +109,23 @@ def test_get_batch_objects():
         )
 
 
+def test_get_batch_objects_dbxrefs():
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response([])) as mock_get:
+        FileFileSet.get_batch_objects(
+            ids=['ENCODE:ENCFF003BKC', 'ENCODE:ENCFF968BZL'],
+            fields=['accession'],
+            id_type='dbxrefs',
+            api_url='https://api.data.igvf.org/',
+            object_type='File'
+        )
+    assert mock_get.call_count == 1
+    query = parse_qsl(urlparse(mock_get.call_args[0][0]).query)
+    assert ('type', 'File') in query
+    assert ('dbxrefs', 'ENCODE:ENCFF003BKC') in query
+    assert ('dbxrefs', 'ENCODE:ENCFF968BZL') in query
+    assert ('field', 'accession') in query
+
+
 def test_software_titles_from_analysis_step_version_igvf():
     analysis_step_version = {'summary': '4b52b7fa-e00e-4fc8-b653-ab0ca32174ba', 'software_versions': [
         {'summary': 'scATAC-seq processing v1.0.0', '@id': '/software-versions/scATAC-processing-v1.0.0/'}], '@id': '/analysis-step-versions/4b52b7fa-e00e-4fc8-b653-ab0ca32174ba/'}
@@ -415,16 +432,20 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
 
 
 @pytest.mark.parametrize('assay_title', ['Multiome Perturb-seq', 'in vivo Perturb-seq'])
-def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_perturb_seq(assay_title):
+@pytest.mark.parametrize('accession, expected_method', [
+    ('IGVFFI0000MULT', 'Perturb-seq'),
+    ('IGVFFI2419ZSGC', 'Multiome Perturb-seq'),
+])
+def test_query_fileset_files_props_igvf_multiome_method_override(assay_title, accession, expected_method):
     file_object = {
-        '@id': '/tabular-files/IGVFFI0000MULT/',
-        'accession': 'IGVFFI0000MULT',
+        '@id': f'/tabular-files/{accession}/',
+        'accession': accession,
         'catalog_class': 'observed data',
         'catalog_collections': ['genomic_elements'],
         'file_set': {
             '@id': '/analysis-sets/IGVFDS0000MULT/'
         },
-        'href': '/tabular-files/IGVFFI0000MULT/@@download/IGVFFI0000MULT.tsv.gz'
+        'href': f'/tabular-files/{accession}/@@download/{accession}.tsv.gz'
     }
     fileset_object = {
         'accession': 'IGVFDS0000MULT',
@@ -457,7 +478,7 @@ def test_query_fileset_files_props_igvf_multiome_perturb_seq_maps_method_to_pert
                         props, _, _ = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
     assert props['preferred_assay_titles'] == [assay_title]
-    assert props['method'] == 'Perturb-seq'
+    assert props['method'] == expected_method
     assert props['software'] == ['SciPy']
 
 
@@ -855,17 +876,75 @@ def test_parse_sample_donor_treatment_encode():
     assert treatment_ids == {'CHEBI:67890'}
 
 
+def test_get_igvf_dbxrefs_encode():
+    igvf_file_objects = [
+        {
+            'accession': 'IGVFFI1193PGVX',
+            'dbxrefs': ['ENCODE:ENCFF003BKC'],
+            'file_set': {'accession': 'IGVFDS1047BFMY'}
+        },
+        {
+            'accession': 'IGVFFI2331IRGH',
+            'dbxrefs': ['GEO:GSM0000000', 'ENCODE:ENCFF968BZL'],
+            'file_set': {'accession': 'IGVFDS5514HTXN'}
+        }
+    ]
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=igvf_file_objects) as mock_batch:
+        igvf_dbxrefs = FileFileSet.get_igvf_dbxrefs_encode(
+            ['ENCFF003BKC', 'ENCFF968BZL'])
+    assert igvf_dbxrefs == {
+        'ENCFF003BKC': {'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'},
+        'ENCFF968BZL': {'dbxref_name': 'IGVFFI2331IRGH', 'dbxref_fileset_id': 'IGVFDS5514HTXN'}
+    }
+    assert mock_batch.call_args.args[0] == [
+        'ENCODE:ENCFF003BKC', 'ENCODE:ENCFF968BZL']
+    assert mock_batch.call_args.kwargs['id_type'] == 'dbxrefs'
+    assert mock_batch.call_args.kwargs['object_type'] == 'File'
+
+
+def test_get_igvf_dbxrefs_encode_no_match_raises():
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=[]):
+        with pytest.raises(ValueError, match='ENCODE:ENCFF003BKC, found 0'):
+            FileFileSet.get_igvf_dbxrefs_encode(['ENCFF003BKC'])
+
+
+def test_get_igvf_dbxrefs_encode_multiple_matches_raises():
+    igvf_file_objects = [
+        {
+            'accession': 'IGVFFI1193PGVX',
+            'dbxrefs': ['ENCODE:ENCFF003BKC'],
+            'file_set': {'accession': 'IGVFDS1047BFMY'}
+        },
+        {
+            'accession': 'IGVFFI0000DUPL',
+            'dbxrefs': ['ENCODE:ENCFF003BKC'],
+            'file_set': {'accession': 'IGVFDS0000DUPL'}
+        }
+    ]
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=igvf_file_objects):
+        with pytest.raises(ValueError, match="found 2: \\['IGVFFI0000DUPL', 'IGVFFI1193PGVX'\\]"):
+            FileFileSet.get_igvf_dbxrefs_encode(['ENCFF003BKC'])
+
+
 def test_query_fileset_files_props_encode():
     file_object = {'@id': '/files/ENCFF003BKC/', '@type': ['File', 'Item'], 'accession': 'ENCFF003BKC', 'analysis_step_version': {'schema_version': '4', 'aliases': ['encode:encode-re2g_enhancer_gene_predictions_step_v2_version'], 'software_versions': [{'schema_version': '4', 'aliases': ['encode:rE2g_v2'], 'software': {'aliases': ['encode:re2g_model'], 'references': [], 'date_created': '2023-06-27T19:00:41.613175+00:00', '@type': ['Software', 'Item'], 'submitted_by': '/users/8c832fff-23ec-4589-81c9-49a1c0020e46/', 'description': 'Train ENCODE-rE2G models on CRISPR enhancer screen data and apply to generate genome-wide predictions of enhancer-gene regulatory connections.', 'lab': '/labs/jesse-engreitz/', 'title': 'Distal regulation ENCODE-rE2G', 'used_by': ['ENCODE'], 'uuid': '11d1fe31-2784-449a-a3d8-e1fd41116a1d', 'source_url': 'https://github.com/EngreitzLab/ENCODE_rE2G', 'schema_version': '10', 'award': '/awards/UM1HG009436/', 'versions': ['/software-versions/db685a75-a35c-4052-bc9b-dc1f9da977e3/', '/software-versions/5b51197d-5cb0-4f54-afe6-d270665c9fbe/'], 'name': 'distal-regulation-encode_re2g', '@id': '/software/distal-regulation-encode_re2g/', 'status': 'released'}, 'date_created': '2024-05-28T04:29:01.090382+00:00', '@type': ['SoftwareVersion', 'Item'], 'submitted_by': '/users/6667a92a-d202-493a-8c7d-7a56d1380356/', '@id': '/software-versions/5b51197d-5cb0-4f54-afe6-d270665c9fbe/', 'downloaded_url': 'https://github.com/EngreitzLab/ENCODE_rE2G/releases/tag/v1.0.0', 'version': '1.0.0', 'uuid': '5b51197d-5cb0-4f54-afe6-d270665c9fbe', 'status': 'released'}], 'date_created': '2024-05-28T21:36:34.996156+00:00', 'analysis_step': {'aliases': ['encode:encode-re2g_enhancer_gene_predictions_step_v2'], 'analysis_step_types': ['element gene link prediction'], 'documents': [], 'date_created': '2024-05-28T05:30:31.599940+00:00', '@type': ['AnalysisStep', 'Item'], 'input_file_types': ['element gene links'], 'submitted_by': '/users/6667a92a-d202-493a-8c7d-7a56d1380356/', 'current_version':
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           '/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/', 'title': 'encode-e2g-enhancer-gene-predictions-step', 'step_label': 'encode-e2g-enhancer-gene-predictions-step', 'uuid': '689ef7b2-0553-48c5-a4ac-73a58ec4e3aa', 'schema_version': '17', 'output_file_types': ['element gene links', 'thresholded element gene links', 'thresholded links'], 'major_version': 2, 'pipelines': [{'analysis_steps': ['/analysis-steps/abc-element-gene-link-prediction-step-v-2/', '/analysis-steps/encode-e2g-enhancer-gene-predictions-step-v-2/'], 'aliases': ['encode:encode_rE2G_pipeline'], 'references': [], 'documents': [], 'assay_term_names': ['DNase-seq', 'ChIP-seq', 'CAGE', 'HiC'], 'date_created': '2024-05-28T04:23:49.891641+00:00', '@type': ['Pipeline', 'Item'], 'submitted_by': '/users/6667a92a-d202-493a-8c7d-7a56d1380356/', 'description': 'Applies ENCODE_rE2G models on chromatin accessibility assays to predict genome-wide enhancer-gene regulatory connection', 'accession': 'ENCPL835OUC', 'lab': '/labs/jesse-engreitz/', 'title': 'ENCODE_rE2G Pipeline', 'uuid': 'b3a1519f-6190-4316-ac39-8caffbf9691c', 'schema_version': '14', 'award': '/awards/UM1HG009436/', 'alternate_accessions': [], '@id': '/pipelines/ENCPL835OUC/', 'status': 'released'}], 'versions': ['/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/'], 'name': 'encode-e2g-enhancer-gene-predictions-step-v-2', '@id': '/analysis-steps/encode-e2g-enhancer-gene-predictions-step-v-2/', 'status': 'released', 'parents': ['/analysis-steps/abc-element-gene-link-prediction-step-v-2/']}, '@type': ['AnalysisStepVersion', 'Item'], 'name': 'encode-e2g-enhancer-gene-predictions-step-v-2-0', 'submitted_by': '/users/6667a92a-d202-493a-8c7d-7a56d1380356/', '@id': '/analysis-step-versions/encode-e2g-enhancer-gene-predictions-step-v-2-0/', 'uuid': '4e1fd6ec-7796-40e1-af89-58dc729aff6b', 'status': 'released', 'minor_version': 0}, 'dataset': '/annotations/ENCSR297HTV/', 'derived_from': ['/files/ENCFF632XQP/'], 'href': '/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz'}
+    igvf_dbxref = {'dbxref_name': 'IGVFFI1193PGVX',
+                   'dbxref_fileset_id': 'IGVFDS1047BFMY'}
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect):
         props, donor_ids, sample_types, disease_ids = FileFileSet.query_fileset_files_props_encode(
-            file_object)
+            file_object, igvf_dbxref)
     assert props == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None, 'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'}
     assert donor_ids == {'ENCDO948PMW'}
     assert sample_types == ['/biosample-types/tissue_UBERON_0002626/']
     assert disease_ids == []
+
+    with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect):
+        props, _, _, _ = FileFileSet.query_fileset_files_props_encode(
+            file_object)
+    assert 'dbxref_name' not in props
+    assert 'dbxref_fileset_id' not in props
 
 
 def test_adapter_init_validate():
@@ -901,7 +980,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None, 'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'}
 
     writer = SpyWriter()
     adapter = FileFileSet(accessions=[
@@ -964,3 +1043,23 @@ def test_process_file_warns_when_accession_skipped(caplog):
         for record in caplog.records
     )
     assert len(writer.contents) == 1
+
+
+def test_process_file_encode_dbxref_mismatch_raises():
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF003BKC'],
+        label='encode_file_fileset',
+        writer=writer,
+        validate=False,
+    )
+
+    def batch_side_effect(ids, fields=None, id_type='accession', api_url=None, object_type=None):
+        if id_type == 'dbxrefs':
+            return []
+        return [{'accession': 'ENCFF003BKC', '@id': '/files/ENCFF003BKC/'}]
+
+    with patch.object(FileFileSet, 'get_batch_objects', side_effect=batch_side_effect):
+        with pytest.raises(ValueError, match='Expected exactly one IGVF file with dbxref ENCODE:ENCFF003BKC'):
+            adapter.process_file()
+    assert writer.contents == []

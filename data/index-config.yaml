@@ -331,6 +331,21 @@ genomic_elements_genes:
     analyzers:
       - text_en_no_stem
 
+genomic_elements_genomic_elements:
+  persistent:
+    fields:
+      - files_filesets
+      - method
+      - significant
+  zkd:
+    fields:
+      - neg_log10_pvalue_adj
+      - log2FC
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
 mm_genomic_elements_mm_genes:
   # IGVFFI9159XDOS: 257,900 edges, 19 promoters, 14,690 response genes.
   # One dataset: method/source/fileset/context indexes add little selectivity.
@@ -407,6 +422,7 @@ variants_biosamples:
       - files_filesets, _key
       - source, files_filesets, method
       - source, class, files_filesets, method
+      - _to, method, _key
 
 variants_coding_variants:
   persistent:
