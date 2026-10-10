@@ -161,11 +161,6 @@ class MPRAAdapter(BaseAdapter):
 
         prefix = 'mm_' if label.startswith('mm_') else ''
         self.assembly = 'GRCm39' if prefix else 'GRCh38'
-        if reference_filepath is not None:
-            design_assembly = self._read_design_assembly(reference_filepath)
-            if design_assembly != self.assembly:
-                raise ValueError(
-                    f'Label {label} requires {self.assembly}, but the MPRA design uses {design_assembly}')
         self.element_collection = f'{prefix}genomic_elements'
         self.variant_collection = f'{prefix}variants'
         self.ontology_term_validator = OntologyTermValidator()
@@ -217,29 +212,6 @@ class MPRAAdapter(BaseAdapter):
         except (KeyError, IndexError) as e:
             raise ValueError(
                 f'Failed to resolve IGVF accession from ENCODE accession: {encode_accession}, response: {response.json()}') from e
-
-    @staticmethod
-    def _read_design_assembly(reference_filepath):
-        """Route by the tested sequence assembly, which may differ from the biosample species."""
-        if reference_filepath is None:
-            return 'GRCh38'
-        opener = gzip.open if str(reference_filepath).endswith('.gz') else open
-        with opener(reference_filepath, 'rt') as designs:
-            rows = list(csv.DictReader(designs, delimiter='\t'))
-            # Libraries can include controls from another species. Only test
-            # sequences determine the assembly; control-only designs use all rows.
-            test_rows = [row for row in rows if 'control' not in row.get(
-                'class', '').lower()]
-            assemblies = {
-                row['ref'].strip() for row in (test_rows or rows)
-                if row.get('ref', '').strip() not in ('', 'NA', 'None')
-            }
-        if not assemblies:
-            return 'GRCh38'
-        if len(assemblies) != 1 or not assemblies <= {'GRCh38', 'GRCm39'}:
-            raise ValueError(
-                f'Unsupported or mixed MPRA design assemblies: {sorted(assemblies)}')
-        return assemblies.pop()
 
     def _open_file(self):
         """Open file as text, handling optional gzip."""

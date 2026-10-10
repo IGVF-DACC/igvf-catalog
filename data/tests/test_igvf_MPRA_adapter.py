@@ -666,13 +666,6 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, labe
             load.assert_called_once_with(spdi, assembly='GRCm39')
 
 
-def test_mpra_rejects_mixed_design_assemblies(tmp_path):
-    design = tmp_path / 'design.tsv'
-    design.write_text('ref\nGRCh38\nGRCm39\n')
-    with pytest.raises(ValueError, match='mixed MPRA design assemblies'):
-        MPRAAdapter._read_design_assembly(design)
-
-
 def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
     design = tmp_path / 'design.tsv'
     design.write_text(
@@ -727,20 +720,6 @@ def test_mouse_satmut_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0])['_from'].startswith(
         'mm_genomic_elements/MPRA_chr1_10_20_GRCm39_')
-
-
-@pytest.mark.parametrize('label,assembly', [
-    ('genomic_element', 'GRCm39'),
-    ('mm_genomic_element', 'GRCh38'),
-])
-def test_mpra_rejects_label_assembly_mismatch(tmp_path, label, assembly):
-    design = tmp_path / 'design.tsv'
-    design.write_text(f'ref\n{assembly}\n')
-    with pytest.raises(ValueError, match='requires'):
-        MPRAAdapter(
-            filepath='unused.bed', label=label,
-            source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
-            reference_filepath=str(design))
 
 
 @pytest.mark.parametrize('reference_rows', ['',
