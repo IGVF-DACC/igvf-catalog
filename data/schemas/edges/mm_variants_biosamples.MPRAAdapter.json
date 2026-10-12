@@ -119,8 +119,7 @@
         },
         "source": {
           "enum": [
-            "IGVF",
-            "ENCODE"
+            "IGVF"
           ]
         },
         "source_url": {
