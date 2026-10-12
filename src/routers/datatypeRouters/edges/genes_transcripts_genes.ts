@@ -24,6 +24,7 @@ const inputFormat = z.object({
   morf_id: identifier,
   files_fileset: identifier,
   method: z.enum(methods).optional(),
+  perturbation: z.enum(['ORF overexpression']).optional(),
   significant: z.enum(['true']).optional(),
   biological_context: identifier,
   biosample_term: identifier,
@@ -54,6 +55,7 @@ const outputFormat = z.object({
   label: z.string(),
   class: z.string(),
   method: z.string(),
+  perturbation: z.string(),
   source: z.string(),
   source_url: z.string(),
   files_filesets: z.string(),
@@ -63,7 +65,7 @@ const outputFormat = z.object({
 })
 
 async function findEffects (input: paramsFormatType): Promise<any[]> {
-  const required = ['gene_id', 'gene_name', 'transcript_id', 'readout_gene_id', 'readout_gene_name', 'morf_id', 'files_fileset', 'method']
+  const required = ['gene_id', 'gene_name', 'transcript_id', 'readout_gene_id', 'readout_gene_name', 'morf_id', 'files_fileset', 'method', 'perturbation']
   if (!required.some(key => input[key] !== undefined)) {
     throw new TRPCError({ code: 'BAD_REQUEST', message: `Define at least one of: ${required.join(', ')}.` })
   }
@@ -89,7 +91,7 @@ async function findEffects (input: paramsFormatType): Promise<any[]> {
       bindVars[key] = input[key]
     }
   }
-  for (const key of ['morf_id', 'method', 'biological_context', 'biosample_term']) {
+  for (const key of ['morf_id', 'method', 'perturbation', 'biological_context', 'biosample_term']) {
     if (input[key] !== undefined) {
       filters.push(`record.${key} == @${key}`)
       bindVars[key] = input[key]

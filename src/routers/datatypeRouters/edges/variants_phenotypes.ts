@@ -80,7 +80,7 @@ const igvfVariantPhenotypeFormat = z.object({
   effect_size_ci95_upper: z.number().nullish(),
   p_value_adj: z.number().nullish(),
   neg_log10_pvalue_adj: z.number().nullish(),
-  crispr_modality: z.string().nullish(),
+  perturbation: z.string().nullish(),
   // SGE-specific
   protein_id: z.string().nullish(),
   exon: z.string().nullish(),

@@ -78,14 +78,14 @@
             "Multiome Perturb-seq": "CRISPR perturbation with paired single-cell gene expression and chromatin accessibility measurements."
           }
         },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality",
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
           "enum": [
-            "interference"
+            "CRISPR interference"
           ],
           "title": "CRISPR Modality",
           "enum_descriptions": {
-            "interference": "CRISPR interference that represses the targeted locus."
+            "CRISPR interference": "CRISPR interference that represses the targeted locus."
           }
         },
         "class": {
@@ -161,7 +161,7 @@
       "required": [
         "_key",
         "files_filesets",
-        "crispr_modality",
+        "perturbation",
         "biosample_term",
         "biological_context",
         "treatments_term_ids",

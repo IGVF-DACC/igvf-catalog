@@ -19,6 +19,23 @@ class FileFileSet:
     SOURCE_IGVF = 'IGVF'
     SOURCE_COMMUNITY = 'Community'
 
+    @staticmethod
+    def get_perturbation(modality, method):
+        if method == 'MORF screen':
+            return 'ORF overexpression'
+        if modality is None:
+            return None
+        modalities = {
+            'interference': 'CRISPR interference',
+            'activation': 'CRISPR activation',
+            'base editing': 'CRISPR base editing',
+            'prime editing': 'CRISPR prime editing',
+            'cutting': 'CRISPR cutting',
+            # Older metadata called nuclease cutting "knockout".
+            'knockout': 'CRISPR cutting',
+        }
+        return modalities[modality]
+
     ENCODE_disease_id_mapping = {
         'DOID:0080832': 'HP:0100543',
         'DOID:2377': 'MONDO:0005301',
@@ -516,9 +533,8 @@ class FileFileSet:
         if len(crispr_modalities) > 1:
             raise ValueError(
                 'Loading analysis sets with multiple CRISPR modalities is unsupported.')
-        crispr_modality = next(iter(crispr_modalities)
-                               ) if crispr_modalities else None
-        return sample_accessions, donor_accessions, sample_term_ids, simple_sample_summaries, treatment_term_ids, crispr_modality
+        modality = next(iter(crispr_modalities), None)
+        return sample_accessions, donor_accessions, sample_term_ids, simple_sample_summaries, treatment_term_ids, modality
 
     @staticmethod
     def decompose_analysis_set_to_measurement_set_igvf(analysis_set_id, measurement_sets_accession=None):
@@ -678,10 +694,10 @@ class FileFileSet:
             ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
         all_sample_types = list(sample_term_to_sample_type.values())
         # manually set the method and modality for file ENCFF968BZL
-        crispr_modality = None
+        perturbation = None
         if file_object['accession'] == 'ENCFF968BZL':
             method = 'CRISPR screen'
-            crispr_modality = 'interference'
+            perturbation = 'interference'
 
         if file_object['accession'] == 'ENCFF420VPZ':
             catalog_collections = ['genomic_elements']
@@ -733,7 +749,7 @@ class FileFileSet:
             'cell_annotation': None,
             'cell_annotation_term': None,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': crispr_modality,
+            'perturbation': FileFileSet.get_perturbation(perturbation, method),
             'browser_index_file': None
         }
         if igvf_dbxref:
@@ -890,7 +906,7 @@ class FileFileSet:
             'cell_annotation': cell_annotation,
             'cell_annotation_term': cell_annotation_term,
             'genome_browser_link': genome_browser_link,
-            'crispr_modality': modality,
+            'perturbation': FileFileSet.get_perturbation(modality, method),
             'browser_index_file': browser_index_file
         }
         return props, donor_ids, sample_term_ids

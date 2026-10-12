@@ -81,10 +81,10 @@
             "CRISPR screen"
           ]
         },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality",
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
           "enum": [
-            "interference"
+            "CRISPR interference"
           ]
         },
         "class": {
@@ -149,7 +149,7 @@
         "neg_log10_pvalue_adj",
         "significant",
         "files_filesets",
-        "crispr_modality",
+        "perturbation",
         "biological_context",
         "biosample_term"
       ],
@@ -158,7 +158,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "effect_size, log2FC",
-    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, log2FC, p_value"
+    "return": "class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, effect_size, log2FC, p_value"
   },
   "db_collection_name": "genomic_elements_genes"
 }

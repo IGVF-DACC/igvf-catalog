@@ -6,7 +6,7 @@ jest.mock('../../../../database')
 
 describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   it('returns genomic elements for a gene, resolving the gene through geneSearch first', async () => {
@@ -24,7 +24,7 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
         cell_annotation: null,
         cell_annotation_term: null,
         files_filesets: 'files_filesets/ENCFF968BZL',
-        crispr_modality: null,
+        perturbation: null,
         score: null,
         transcription_start_site: null,
         rna_pseudobulk_tpm: null,
@@ -76,7 +76,7 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
 
 describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   it('returns genes for a genomic element filtered by method', async () => {
@@ -93,7 +93,7 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
         cell_annotation: null,
         cell_annotation_term: null,
         files_filesets: 'files_filesets/IGVFFI3069QCRA',
-        crispr_modality: 'interference',
+        perturbation: 'CRISPR interference',
         score: null,
         transcription_start_site: null,
         rna_pseudobulk_tpm: null,
@@ -144,7 +144,7 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
         cell_annotation: null,
         cell_annotation_term: null,
         files_filesets: 'files_filesets/ENCFF968BZL',
-        crispr_modality: null,
+        perturbation: null,
         score: null,
         transcription_start_site: null,
         rna_pseudobulk_tpm: null,
@@ -196,7 +196,7 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
 
 describe('genomicElementsGenesRouters.grn', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   it('returns the gene regulatory network for a response gene', async () => {
@@ -204,7 +204,7 @@ describe('genomicElementsGenesRouters.grn', () => {
       {
         response_gene: 'CALML6',
         genomic_element: { chr: 'chr1', start: 1850597, end: 1858437, regulator_gene: 'SAMD11' },
-        crispr_modality: 'interference',
+        perturbation: 'CRISPR interference',
         class: 'observed data',
         method: 'CRISPR screen',
         source: 'IGVF',
@@ -253,7 +253,7 @@ describe('genomicElementsGenesRouters.grn', () => {
 })
 
 describe('mouse element-gene routing', () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => jest.resetAllMocks())
 
   it.each(['genomicElementsFromGenes', 'genesFromGenomicElements'] as const)(
     '%s keeps exact and fallback queries in mouse collections', async (endpoint) => {
@@ -302,7 +302,7 @@ describe('mouse element-gene routing', () => {
 })
 
 describe('GRN organism routing', () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => jest.resetAllMocks())
 
   it.each([
     { regulator_gene_id: 'ENSMUSG00000032440' },
@@ -335,7 +335,7 @@ describe('GRN organism routing', () => {
 
 describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   it('returns grouped min/max summaries for a known gene', async () => {
@@ -348,7 +348,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
         biological_context: 'head of caudate nucleus',
         cell_annotation: null,
         cell_annotation_term: null,
-        crispr_modality: null,
+        perturbation: null,
         min: 0.20425818,
         max: 0.99998393,
         edge_count: 5,
@@ -392,7 +392,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
     })
     expect(query.mock.calls[1][1]).toMatchObject({ page: 0, limit: 25 })
 
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     const query2 = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
@@ -497,5 +497,79 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
       })
     ).rejects.toThrow(TRPCError)
     expect(query).not.toHaveBeenCalled()
+  })
+})
+
+describe('MORF gene regulatory network', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+  })
+
+  it.each([
+    { regulator_gene_id: 'ENSG00000275700' },
+    { response_gene_id: 'ENSG00000198846' },
+    { regulator_gene_name: 'AATF', response_gene_name: 'TOX' }
+  ])('joins MORF genes and transcripts for %j', async (genes) => {
+    const input = { ...genes, method: 'MORF screen', perturbation: 'ORF overexpression', files_fileset: 'IGVFFI6734IWRB', significant: 'true', neg_log10_pvalue_adj: 'gte:2', page: 1, limit: 10 }
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    const aql = String((dbModule.db.query as jest.Mock).mock.calls[0][0])
+    const morf = aql.slice(aql.indexOf('LET morf ='))
+    expect(morf).toContain('FOR record IN genes_transcripts_genes')
+    expect(morf).toContain('DOCUMENT(record._from)')
+    expect(morf).toContain('DOCUMENT(relationship._from)')
+    expect(morf).toContain('transcript: relationship._to')
+    expect(morf).toContain("record.method IN ['MORF screen']")
+    expect(morf).toContain("record.perturbation == 'ORF overexpression'")
+    expect(morf).toContain("record.files_filesets == 'files_filesets/IGVFFI6734IWRB'")
+    expect(morf).toContain('record.significant == true')
+    expect(morf).toContain("record['neg_log10_pvalue_adj'] >= 2")
+    if ('regulator_gene_id' in genes) expect(morf).toContain("regulator_gene._key == 'ENSG00000275700'")
+    if ('response_gene_id' in genes) expect(morf).toContain("response_gene._key == 'ENSG00000198846'")
+    if ('regulator_gene_name' in genes) {
+      expect(morf).toContain("regulator_gene.name == 'AATF'")
+      expect(morf).toContain("response_gene.name == 'TOX'")
+    }
+    const efficiency = morf.slice(morf.indexOf('LET perturbationEfficiencyEdge'), morf.indexOf('RETURN {'))
+    expect(efficiency).toContain("se.morf_id == 'TOX_1'")
+    expect(efficiency).toContain('se.files_filesets == record.files_filesets')
+    expect(efficiency).toContain('se._to == record._to')
+    expect(efficiency).not.toContain('se.significant')
+    expect(efficiency).not.toContain('se._from == record._from')
+    expect(aql).toContain('FOR result IN UNION(crispr, morf)')
+    expect(aql.match(/LIMIT 10, 10/g)).toHaveLength(1)
+    expect(aql.indexOf('LIMIT 10, 10')).toBeGreaterThan(aql.indexOf('UNION(crispr, morf)'))
+  })
+
+  it('preserves each MORF transcript and nullable efficiency in the response', async () => {
+    const records = ['ENST00000450518', 'ENST00000392662'].map(transcript => ({
+      response_gene: 'TOX',
+      regulator_gene: 'ACTL6A',
+      genomic_element: null,
+      transcript: `transcripts/${transcript}`,
+      perturbation: 'ORF overexpression',
+      method: 'MORF screen',
+      class: 'observed data',
+      source: 'IGVF',
+      biological_context: 'T cell',
+      files_filesets: 'files_filesets/IGVFFI6734IWRB',
+      log2FC: 0.5,
+      neg_log10_pvalue: 3,
+      neg_log10_pvalue_adj: 2,
+      significant: true,
+      perturbation_efficiency_log2FC: null,
+      perturbation_efficiency_neg_log10_pvalue: null,
+      perturbation_efficiency_neg_log10_pvalue_adj: null,
+      perturbation_efficiency_significant: null
+    }))
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(records) } as any)
+    const input = { response_gene_name: 'TOX' }
+    expect(await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })).toEqual(records)
+  })
+
+  it('does not join human MORF data for mouse requests', async () => {
+    const input = { regulator_gene_id: 'ENSMUSG00000027018', organism: 'Mus musculus' }
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    expect(String((dbModule.db.query as jest.Mock).mock.calls[0][0])).not.toContain('genes_transcripts_genes')
   })
 })

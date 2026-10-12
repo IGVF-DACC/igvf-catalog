@@ -75,7 +75,7 @@ export const completeQtlsFormat = z.object({
   z_score: z.number().nullish(),
   credible_set_min_r2: z.number().nullish(),
   method: z.string().nullish(),
-  crispr_modality: z.string().nullish(),
+  perturbation: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
   label: z.string(),
@@ -111,7 +111,7 @@ const CRISPR_SCREEN_LABEL = 'variant effect on gene expression'
 // Only IGVF currently produces CRISPR screen variant-gene edges - the file's general SOURCES
 // constant also includes AFGR/EBI (QTL-only sources), which could never match here.
 const CRISPR_SCREEN_SOURCES = ['IGVF'] as const
-const CRISPR_PERTURBATIONS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'crispr_modality')
+const CRISPR_PERTURBATIONS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'perturbation')
 // The only fields on CRISPRVariantGene that represent an effect/association strength, as
 // opposed to identifiers, provenance, or the boolean `significant` flag.
 const CRISPR_SCORE_FIELDS = ['effect_size', 'log2FC', 'neg_log10_pvalue', 'neg_log10_pvalue_adj', 'power', 'posterior_inclusion_probability', 'coefficient_stddev'] as const
@@ -792,11 +792,6 @@ async function findGeneVariantScoreSummary (input: paramsFormatType): Promise<an
   if (input.biosample_term !== undefined) {
     input.biosample_term = `ontology_terms/${input.biosample_term as string}`
   }
-  // perturbation is the public name for the stored crispr_modality field.
-  if (input.perturbation !== undefined) {
-    input.crispr_modality = input.perturbation
-    delete input.perturbation
-  }
 
   const optionalFilters = getFilterStatements(variantsGenesCRISPRVariantGene, input)
   const filters = [
@@ -827,7 +822,7 @@ async function findGeneVariantScoreSummary (input: paramsFormatType): Promise<an
           files_filesets = record.files_filesets,
           biosample_term = record.biosample_term,
           biological_context = record.biological_context,
-          perturbation = record.crispr_modality
+          perturbation = record.perturbation
         AGGREGATE
           edge_count = SUM(1),
           numeric_count = SUM(isNumeric ? 1 : 0),
