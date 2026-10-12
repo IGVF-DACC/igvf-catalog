@@ -611,7 +611,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         file_accession: str,
         file_fileset: dict,
         method: str,
-        crispr_modality: str,
+        perturbation: str,
         metrics: dict,
         gene_collection: str = 'genes',
     ) -> dict:
@@ -628,7 +628,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             'name': 'modulates expression of',
             'inverse_name': 'expression modulated by',
             'method': method,
-            'crispr_modality': crispr_modality,
+            'perturbation': perturbation,
             'biological_context': file_fileset['simple_sample_summaries'][0],
             'biosample_term': file_fileset['samples'][0],
             'treatments_term_ids': file_fileset['treatments_term_ids'],
@@ -887,7 +887,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         method = self.file_fileset['method']
-        crispr_modality = self.file_fileset.get('crispr_modality')
+        perturbation = self.file_fileset.get('perturbation')
         layout_name = self.file_config.get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
@@ -1007,7 +1007,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         file_accession=self.file_accession,
                         file_fileset=self.file_fileset,
                         method=method,
-                        crispr_modality=crispr_modality,
+                        perturbation=perturbation,
                         metrics=metrics,
                         gene_collection=self.gene_collection,
                     )

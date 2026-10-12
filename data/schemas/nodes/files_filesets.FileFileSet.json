@@ -365,21 +365,22 @@
           "description": "Download link for the genome browser index file (.tbi).",
           "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
         },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality",
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
           "type": [
             "string",
             "null"
           ],
           "enum": [
             null,
-            "interference",
-            "activation",
-            "base editing",
-            "prime editing",
-            "knockout"
+            "CRISPR interference",
+            "CRISPR activation",
+            "CRISPR base editing",
+            "CRISPR prime editing",
+            "CRISPR cutting",
+            "ORF overexpression"
           ],
-          "example": "interference"
+          "example": "CRISPR interference"
         },
         "version": {
           "title": "Version",
@@ -419,13 +420,13 @@
         "cell_annotation",
         "cell_annotation_term",
         "browser_index_file",
-        "crispr_modality"
+        "perturbation"
       ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, cell_annotation_term, genome_browser_link, browser_index_file, crispr_modality"
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, collections, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source, source_url, download_link, cell_annotation, cell_annotation_term, genome_browser_link, browser_index_file, perturbation"
   },
   "db_collection_name": "files_filesets"
 }

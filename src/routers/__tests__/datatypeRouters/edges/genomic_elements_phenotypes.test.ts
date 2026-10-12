@@ -17,7 +17,7 @@ const buildEdgeRecord = (overrides: Record<string, unknown> = {}): Record<string
   biological_context: 'human HFF-1 cell line',
   biosample_term: 'ontology_terms/CLO_0003730',
   files_filesets: 'files_filesets/IGVFFI5135QZCS',
-  crispr_modality: 'interference',
+  perturbation: 'CRISPR interference',
   z_score: 1.5,
   p_value: 0.01,
   neg_log10_pvalue: 2,

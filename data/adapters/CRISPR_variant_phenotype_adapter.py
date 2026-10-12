@@ -118,7 +118,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
             self.biosample_term = self.file_fileset['samples'][0]
             self.treatments_term_ids = self.file_fileset.get(
                 'treatments_term_ids')
-            self.crispr_modality = self.file_fileset.get('crispr_modality')
+            self.perturbation = self.file_fileset.get('perturbation')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -347,7 +347,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
                     'neg_log10_pvalue_adj': self._optional_float(
                         row, config.get('neg_log10_pvalue_adj_col')),
                     'method': self.method,
-                    'crispr_modality': self.crispr_modality,
+                    'perturbation': self.perturbation,
                     'class': self.collection_class,
                     'label': self.COLLECTION_LABEL,
                     'name': 'associated with',

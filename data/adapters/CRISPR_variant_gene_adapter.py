@@ -54,7 +54,7 @@ class CRISPRVariantGene(BaseAdapter):
         self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
         self.biosample_term = self.file_fileset['samples'][0]
         self.treatments_term_ids = self.file_fileset['treatments_term_ids']
-        self.crispr_modality = self.file_fileset.get('crispr_modality')
+        self.perturbation = self.file_fileset.get('perturbation')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -282,7 +282,7 @@ class CRISPRVariantGene(BaseAdapter):
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
                         'method': self.method,
-                        'crispr_modality': self.crispr_modality,
+                        'perturbation': self.perturbation,
                         'biological_context': self.simple_sample_summaries[0],
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,
@@ -320,7 +320,7 @@ class CRISPRVariantGene(BaseAdapter):
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
                         'method': self.method,
-                        'crispr_modality': self.crispr_modality,
+                        'perturbation': self.perturbation,
                         'biological_context': self.simple_sample_summaries[0],
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,

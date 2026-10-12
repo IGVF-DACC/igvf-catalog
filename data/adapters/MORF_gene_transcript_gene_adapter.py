@@ -444,6 +444,7 @@ class MORFGeneTranscriptGene(BaseAdapter):
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
                         'method': self.method,
+                        'perturbation': 'ORF overexpression',
                         'biological_context': self.simple_sample_summaries[0],
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,

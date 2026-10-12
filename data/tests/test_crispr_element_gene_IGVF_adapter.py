@@ -18,7 +18,7 @@ def mock_file_fileset_perturb_seq():
         mock_get_file_fileset.return_value = {
             'method': 'Perturb-seq',
             'class': 'observed data',
-            'crispr_modality': 'interference',
+            'perturbation': 'CRISPR interference',
             'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
             'samples': ['ontology_terms/CL_0000909'],
             'treatments_term_ids': None
@@ -33,7 +33,7 @@ def mock_file_fileset_facs_screen():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'activation',
+            'perturbation': 'CRISPR activation',
             'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
             'samples': ['ontology_terms/CL_0000909'],
             'treatments_term_ids': None
@@ -87,7 +87,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_genomic_elements_genes(moc
         assert first_item['significant'] is True
         assert first_item['neg_log10_pvalue'] == CRISPRElementGeneIGVF.MAX_LOG10_PVALUE
         assert first_item['method'] == 'Perturb-seq'
-        assert first_item['crispr_modality'] == 'interference'
+        assert first_item['perturbation'] == 'CRISPR interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None
@@ -462,7 +462,7 @@ def test_crispr_element_gene_igvf_adapter_facs_screen_genomic_elements_genes(moc
             -math.log10(0.9994257067617868))
         assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
-        assert first_item['crispr_modality'] == 'activation'
+        assert first_item['perturbation'] == 'CRISPR activation'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None

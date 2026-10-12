@@ -61,7 +61,7 @@ describe('variantsPhenotypesRouters', () => {
         class: 'observed data',
         method: 'CRISPR screen',
         label: 'variant effect on phenotype',
-        crispr_modality: 'prime editing',
+        perturbation: 'CRISPR prime editing',
         biological_context: 'human HCT116 cell line',
         biosample_term: 'ontology_terms/EFO_0002824',
         files_filesets: 'files_filesets/IGVFFI2014OOZP',

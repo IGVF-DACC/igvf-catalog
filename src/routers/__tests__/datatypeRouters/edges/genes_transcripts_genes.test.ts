@@ -31,7 +31,7 @@ it('uses bind parameters for construct strings, numeric filters and pagination',
 })
 
 it('expands all three nodes in verbose mode and exposes the source edge ID', async () => {
-  await call({ method: 'MORF screen', verbose: 'true', page: 0 })
+  await call({ method: 'MORF screen', perturbation: 'ORF overexpression', verbose: 'true', page: 0 })
   const query = (db.query as jest.Mock).mock.calls[0][0]
   expect(query).toContain('DOCUMENT(relationship._from)')
   expect(query).toContain('DOCUMENT(relationship._to)')
@@ -55,6 +55,7 @@ it('returns the relationship ID and all three node handles', async () => {
     label: 'gene overexpression effect on gene expression',
     class: 'observed data',
     method: 'MORF screen',
+    perturbation: 'ORF overexpression',
     source: 'IGVF',
     source_url: 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/',
     files_filesets: 'files_filesets/IGVFFI6734IWRB',
@@ -68,7 +69,7 @@ it('returns the relationship ID and all three node handles', async () => {
 it('rejects missing selectors and malformed numeric filters', async () => {
   await expect(call({ page: 0 })).rejects.toThrow('Define at least one')
   for (const log2FC of ['gt:NaN', 'wrong:2', '1:2:3', 'Infinity']) {
-    await expect(call({ method: 'MORF screen', log2FC, page: 0 })).rejects.toThrow('must be a number')
+    await expect(call({ method: 'MORF screen', perturbation: 'ORF overexpression', log2FC, page: 0 })).rejects.toThrow('must be a number')
   }
   expect(db.query).not.toHaveBeenCalled()
 })
