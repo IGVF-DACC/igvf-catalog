@@ -31,8 +31,7 @@ class FileFileSet:
             'base editing': 'CRISPR base editing',
             'prime editing': 'CRISPR prime editing',
             'cutting': 'CRISPR cutting',
-            # Older metadata called nuclease cutting "knockout".
-            'knockout': 'CRISPR cutting',
+            'knockout': 'CRISPR knockout',
         }
         return modalities[modality]
 

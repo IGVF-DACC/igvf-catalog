@@ -75,6 +75,7 @@
       "CRISPR activation": "Increases target gene expression using a CRISPR-directed regulatory effector.",
       "CRISPR base editing": "Introduces targeted nucleotide substitutions using a base editor.",
       "CRISPR prime editing": "Introduces targeted substitutions, insertions, or deletions using a prime editor and a template-bearing guide RNA.",
+      "CRISPR knockout": "Disrupts a target gene to eliminate its function.",
       "CRISPR cutting": "Cuts target DNA using a CRISPR-directed nuclease.",
       "ORF overexpression": "Increases expression using an open reading frame construct.",
       "null": "No perturbation is recorded or applicable."
