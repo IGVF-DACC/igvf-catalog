@@ -67,7 +67,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicating the significance of the variant effect, based on the posterior probability."
+          "description": "Boolean indicator of the significance of the variant effect on reporter activity.",
+          "threshold": "True when postProbEffect > 0.9; otherwise false."
         },
         "CI_lower_95": {
           "title": "95% Confidence Interval Lower Bound",

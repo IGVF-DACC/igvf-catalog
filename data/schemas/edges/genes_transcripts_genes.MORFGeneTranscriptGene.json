@@ -64,7 +64,8 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of p_value."
+          "description": "Negative log10 of p_value.",
+          "max_value": 240
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -72,12 +73,14 @@
             "number",
             "null"
           ],
-          "description": "Negative log10 of p_value_adj."
+          "description": "Negative log10 of p_value_adj.",
+          "max_value": 240
         },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Whether the adjusted p-value is below 0.05."
+          "description": "Boolean indicator of the significance of the transcript perturbation effect on gene expression.",
+          "threshold": "True when p_value_adj is available and < 0.05; otherwise false."
         },
         "morf_id": {
           "title": "MORF ID",

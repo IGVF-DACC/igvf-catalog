@@ -86,6 +86,70 @@ treatment definition without importing a file-reference property.
 Fields such as `score`, `log2FC`, and `significant` retain adapter-specific
 meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work.
 
+## Threshold and significance documentation
+
+Use an optional field-level `threshold` string for selection, significance, or
+score-based classification rules on edge fields. Use `"threshold": "unknown"`
+when such a rule is identified but its cutoff still needs investigation. Omit
+the property when no cutoff applies or there is no evidence that the field is
+thresholded. Do not use "none" or "not applicable". Node schemas, including
+their fields, do not track `threshold`.
+
+Keep the field's meaning in `description`; put the cutoff in `threshold` beside
+it. Keep threshold phrases brief: state the rule and any necessary conditions.
+Describe the data rule without implementation references such as "by the
+adapter" or "upstream"; record where the rule is applied in the evidence notes.
+Keep source citations, research history, and detailed evidence in
+`threshold-evidence.md`. When a significance call uses multiple fields, document which source formats
+use each field, their precedence, strict/inclusive boundaries, and missing-value
+behavior on the decision field. Do not add schema-level `threshold` annotations
+or annotate unrelated fields merely to say they are not used in that decision.
+When a schema has `significant`, document its significance rule only on
+`significant.threshold`; do not repeat it on the contributing statistic fields.
+Keep separate selection rules on the fields they filter.
+Use "Source row retained when..." for rules that determine row inclusion.
+For rules that filter entries within a row, name the retained item instead
+(for example, "Mechanism retained when..."). Do not use row-retention wording
+for significance or classification rules that only label a row.
+Omit `threshold` on alternate representations and supporting fields when the
+cutoff is applied to another field.
+
+A missing adapter filter does not establish that a dataset is unthresholded.
+Predictive files may already be selected upstream. Investigate source-file
+headers, portal metadata, format specifications, and the versioned generating
+workflow before recording a cutoff. Distinguish upstream file selection,
+catalog preparation/load filters, and significance calls that retain all rows.
+A score range or observed sample minimum alone does not establish a threshold.
+The supplied method-score review is a set of research leads, not authoritative
+threshold documentation.
+
+Record supporting sources, file accessions, model versions, the scope of data
+checks, and unresolved questions in [threshold-evidence.md](threshold-evidence.md).
+Omission of `threshold` must not be interpreted as proof that no upstream filter
+exists. Keep detailed investigation notes in that evidence document; use the
+concise `"unknown"` marker on fields with unresolved rules.
+
+`threshold` is documentation metadata, not a stored document field, JSON Schema
+validation constraint, or executable adapter setting. Do not add a data property
+named `threshold` to `properties`, `required`, or `accessible_via.return`.
+Annotations remain separate from adapter constants and do not change loading
+behavior. Consult the source-specific schema; a merged collection schema cannot
+represent all adapters' cutoffs as one shared rule.
+
+## Log10 p-value maxima
+
+Use a numeric `max_value` annotation on negative-log10 p-value fields with a
+defined finite replacement for zero p-values, for example `"max_value": 240`.
+Keep it separate from `threshold` and from the field's description. Omit it
+where no replacement value is established; an observed sample maximum alone
+does not establish this value.
+
+`max_value` is documentation metadata, not JSON Schema's `maximum` constraint
+or a stored document field. It records the finite zero-p-value replacement,
+not a guarantee that every value is clipped to that bound. Positive p-values
+may yield larger values, and source-provided log scores may be preserved.
+Record source-specific behavior in `threshold-evidence.md`.
+
 ## Base schemas
 
 - `nodes/node.base.json` provides common node identity and provenance fields.
