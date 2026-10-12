@@ -1071,7 +1071,7 @@ def test_process_file_encode_dbxref_mismatch_raises():
     ('base editing', 'CRISPR base editing'),
     ('prime editing', 'CRISPR prime editing'),
     ('cutting', 'CRISPR cutting'),
-    ('knockout', 'CRISPR cutting'),
+    ('knockout', 'CRISPR knockout'),
     (None, None),
 ])
 def test_perturbation_vocabulary(modality, expected):

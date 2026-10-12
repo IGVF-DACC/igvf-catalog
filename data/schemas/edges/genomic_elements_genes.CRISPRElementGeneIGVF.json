@@ -60,6 +60,7 @@
           "enum": [
             "CRISPR interference",
             "CRISPR activation",
+            "CRISPR knockout",
             "CRISPR cutting"
           ]
         },
