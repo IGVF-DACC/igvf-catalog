@@ -34,6 +34,8 @@ igvf_file_accessions:
     - IGVFFI5288RAAV
     - IGVFFI0818FMCC
     - IGVFFI3351LASN
+  Candidate Cis-Regulatory Elements:
+    - IGVFFI8753TTYC
   CRISPR element gene:
     - IGVFFI3069QCRA
     - IGVFFI5749WPVK
@@ -47,6 +49,8 @@ igvf_file_accessions:
     - IGVFFI9246AJEK
     - IGVFFI3434YAPX
     - IGVFFI1168JUYR
+    - IGVFFI4773CPYN
+    - IGVFFI0957PYTA
     - IGVFFI5903QAWP
     - IGVFFI7280ZZFA
     - IGVFFI5288BRAZ
@@ -76,12 +80,18 @@ igvf_file_accessions:
     - IGVFFI7368COWA
     - IGVFFI9322VVTR
     - IGVFFI4081AUXT
+    - IGVFFI2104BKIF
+    - IGVFFI0192YMEY
+  CRISPR element element:
+    - IGVFFI2419ZSGC
   CRISPR element phenotype:
     - IGVFFI5135QZCS
     - IGVFFI9584UDAS
   CRISPR variant phenotype:
     - IGVFFI2014OOZP
     - IGVFFI6803HZJG
+    - IGVFFI9726GFTC
+    - IGVFFI1678CDBR
   CRISPR variant gene:
     - IGVFFI9602ILPC
     - IGVFFI4333XLOF
@@ -98,6 +108,10 @@ igvf_file_accessions:
     - IGVFFI2440ESUS
     - IGVFFI4769NVJT
     - IGVFFI8101RHSC
+  MORF screen:
+    - IGVFFI6734IWRB
+    - IGVFFI6032GREJ
+    - IGVFFI2373SYJW
   SEM prediction:
     - IGVFFI2943RVII
     - IGVFFI3116SMJK
@@ -323,6 +337,7 @@ igvf_file_accessions:
     - IGVFFI0218RAAG
     - IGVFFI1255MQGI
   SEM motif:
+    - IGVFFI4892QCRR
     - IGVFFI5615JDRZ
     - IGVFFI8706ANLY
     - IGVFFI2972JEVI
@@ -711,6 +726,7 @@ igvf_file_accessions:
     - IGVFFI9779WEGD
     - IGVFFI9815VYTN
   community reference files:
+    - IGVFFI9074FIDG
     - IGVFFI7449PKMJ
     - IGVFFI4637FWQJ
     - IGVFFI2960JTMH
@@ -826,6 +842,7 @@ igvf_file_accessions:
     - IGVFFI3624EMSN
     - IGVFFI2284ZDWV
     - IGVFFI7217ZMJZ
+    - IGVFFI9820RGXX # GENCODE v43 RefSeq mapping
     - IGVFFI0314GYGG
     - IGVFFI2080RTXB
     - IGVFFI8525TBYT
@@ -859,7 +876,6 @@ igvf_file_accessions:
     - IGVFFI7019IZDF
     - IGVFFI3693WSFI
     - IGVFFI3237WUWL
-
     - IGVFFI9678CVIS
     - IGVFFI8431OEKU
     - IGVFFI0865ANAN
@@ -1255,6 +1271,7 @@ igvf_file_accessions:
     - IGVFFI6726JWOJ
     - IGVFFI0416NIIE
     - IGVFFI6667HMZF
+    - IGVFFI4975UFZM
 # Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:
   collection: file_fileset
@@ -2755,7 +2772,6 @@ encode_file_accessions:
     - ENCFF103XRK
     - ENCFF776CZZ
   candidate Cis-Regulatory Elements:
-    - ENCFF167FJQ
     - ENCFF420VPZ
   CRISPR enhancer perturbation screen:
     - ENCFF968BZL

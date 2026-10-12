@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/files_filesets.FileFileSet.json",
+  "$id": "schemas/nodes/files_filesets.FileFileSet.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -15,13 +15,15 @@
           "example": "ENCFF004PFU"
         },
         "file_set_id": {
+          "title": "File Set ID",
           "type": "string",
-          "description": "The file set id of the file set",
-          "example": "ENCFF004PFU"
+          "description": "Accession of the file set that contains this file: the unique identifier used to reference that file set on the source portal.",
+          "example": "ENCSR359DFW"
         },
         "lab": {
+          "title": "Laboratory",
           "type": "string",
-          "description": "The lab of the file set",
+          "description": "Lab associated with the submission.",
           "enum": [
             "alan-boyle",
             "bill-majoros",
@@ -29,6 +31,7 @@
             "community",
             "danwei-huangfu",
             "doug-fowler",
+            "encode",
             "gary-hon",
             "j-michael-cherry",
             "jay-shendure",
@@ -44,15 +47,18 @@
             "richard-sherwood",
             "thomas-quertermous",
             "tim-reddy",
+            "tom-norman",
             "zhiping-weng"
-          ]
+          ],
+          "example": "jesse-engreitz"
         },
         "preferred_assay_titles": {
+           "title": "Preferred Assay Titles",
           "type": [
             "array",
             "null"
           ],
-          "description": "The preferred assay titles of the file set",
+          "description": "Preferred assay title from the IGVF Portal.",
           "items": {
             "type": "string",
             "enum": [
@@ -63,7 +69,10 @@
               "electroporated MPRA",
               "lentiMPRA",
               "Migration CRISPR screen",
+              "MORF screen",
               "MPRA",
+              "Multiome Perturb-seq",
+              "in vivo Perturb-seq",
               "Perturb-seq",
               "Parse Perturb-seq",
               "Proliferation CRISPR screen",
@@ -77,14 +86,18 @@
               "Variant painting via fluorescence",
               "Variant-EFFECTS"
             ]
-          }
+          },
+          "example": [
+            "lentiMPRA"
+          ]
         },
         "assay_term_ids": {
+          "title": "Assay Term IDs",
           "type": [
             "array",
             "null"
           ],
-          "description": "The assay term ids of the file set",
+          "description": "Ontology term identifiers for the assays used to produce the data.",
           "example": [
             "OBI:0002440"
           ],
@@ -93,11 +106,11 @@
           }
         },
         "method": {
+          "$ref": "../mixins.json#/method",
           "type": [
             "string",
             "null"
           ],
-          "description": "The method of the file set",
           "enum": [
             "ADASTRA",
             "BlueSTARR",
@@ -114,6 +127,8 @@
             "HOCOMOCO",
             "Homology",
             "MPRA",
+            "MORF screen",
+            "Multiome Perturb-seq",
             "MutPred2",
             "Orphanet",
             "Perturb-seq",
@@ -123,15 +138,16 @@
             "SGE",
             "STARR-seq",
             "TopLD",
+            "training data for predictive models",
             "VAMP-seq",
             "VAMP-seq (MultiSTEP)",
             "Variant painting via fluorescence",
-            "Variant-EFFECTS",
             "cV2F",
             "caQTL",
             "candidate Cis-Regulatory Elements",
             "eQTL",
             "elements",
+            "genes",
             "pQTL",
             "scATAC-seq",
             "scE2G",
@@ -141,8 +157,7 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the file set",
+          "$ref": "../mixins.json#/class",
           "enum": [
             "biological relationship",
             "observed data",
@@ -150,11 +165,12 @@
           ]
         },
         "software": {
+          "title": "Software",
           "type": [
             "array",
             "null"
           ],
-          "description": "The software of the file set",
+          "description": "Name of the software packages used to produce the file.",
           "items": {
             "type": "string",
             "enum": [
@@ -203,16 +219,18 @@
               "SGE Pipeline",
               "Snakemake",
               "statsmodels",
-              "Straw"
+              "Straw",
+              "snapATAC2"
             ]
           }
         },
         "samples": {
+          "title": "Samples",
           "type": [
             "array",
             "null"
           ],
-          "description": "The samples of the file set",
+          "description": "Ontology terms identifying the biosamples the data was produced from.",
           "example": [
             "ontology_terms/UBERON_0002048"
           ],
@@ -222,11 +240,12 @@
           }
         },
         "sample_ids": {
+          "title": "Sample IDs",
           "type": [
             "array",
             "null"
           ],
-          "description": "The sample ids of the file set",
+          "description": "ENCODE or IGVF Accessions of the samples the data was produced from.",
           "example": [
             "ENCBS160ZPI",
             "ENCBS659PKW",
@@ -237,21 +256,23 @@
           }
         },
         "simple_sample_summaries": {
+          "title": "Biosample Summaries",
           "type": [
             "array",
             "null"
           ],
-          "description": "The simple sample summaries of the file set",
+          "description": "Short readable summary of each sample.",
           "example": [
             "GM12878"
           ]
         },
         "donors": {
+          "title": "Donors",
           "type": [
             "array",
             "null"
           ],
-          "description": "The donors of the file set",
+          "description": "ENCODE or IGVF Donors the samples were derived from.",
           "example": [
             "donors/ENCDO000AAK"
           ],
@@ -261,30 +282,28 @@
           }
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "The treatments term ids of the file set",
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "CHEBI:15367"
           ]
         },
         "publication": {
+          "title": "Publication",
           "type": [
             "string",
             "null"
           ],
-          "description": "The publication of the file set",
+          "description": "Publication identifier associated with the file set.",
           "example": "PMID:34017130"
         },
         "collections": {
+          "title": "Collections",
           "type": "array",
           "items": {
             "type": "string",
             "minItems": 1
           },
-          "description": "The collections of the file set",
+          "description": "The collections in the IGVF catalog that contain the data in this file.",
           "example": [
             "genomic_elements"
           ]
@@ -304,49 +323,54 @@
           ]
         },
         "download_link": {
+          "title": "Download Link",
           "type": "string",
-          "description": "The download link of the file",
+          "description": "The download path to obtain the file from the source portal.",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "cell_annotation": {
+          "title": "Cell Annotation",
           "type": [
             "string",
             "null"
           ],
-          "description": "The cell annotation of the file set",
+          "description": "The cell annotation of the file set, with optional qualifier, for single-cell derived results.",
           "example": "pluripotent epiblast cell derived from mouse embryonic stem cell"
         },
         "cell_annotation_term": {
+          "title": "Cell Annotation Term",
           "type": [
             "string",
             "null"
           ],
-          "description": "Ontology term id for the cell annotation (from fileset cell_type.term_id)",
+          "description": "Base ontology term describing the cell type of a single-cell derived result.",
           "example": "ontology_terms/CL_0000352",
           "pattern": "^ontology_terms/[A-Z0-9_]+$"
         },
         "genome_browser_link": {
+          "title": "Genome Browser Link",
           "type": [
             "string",
             "null"
           ],
-          "description": "The genome browser link of the file set",
+          "description": "Link to a file that can be rendered in a genome browser: the file set's bigInteract, bigBed, bigWig, or bedpe file where one exists, or the file itself for a pseudobulk set.",
           "example": "https://api.data.igvf.org/signal-files/IGVFFI8400FXRX/@@download/IGVFFI8400FXRX.bigWig"
         },
         "browser_index_file": {
+          "title": "Browser Index File",
           "type": [
             "string",
             "null"
           ],
-          "description": "Download link for the genome browser index file (.tbi). Null for ENCODE files; for IGVF files, the tabix index file when present in the file set.",
+          "description": "Download link for the genome browser index file (.tbi).",
           "example": "https://api.data.igvf.org/index-files/IGVFFI3262ZXDO/@@download/IGVFFI3262ZXDO.tbi"
         },
         "crispr_modality": {
+          "$ref": "../mixins.json#/crispr_modality",
           "type": [
             "string",
             "null"
           ],
-          "description": "The CRISPR modality of the file set",
           "enum": [
             null,
             "interference",
@@ -354,15 +378,27 @@
             "base editing",
             "prime editing",
             "knockout"
-          ]
+          ],
+          "example": "interference"
         },
         "version": {
+          "title": "Version",
           "type": [
             "string",
             "null"
           ],
-          "description": "The version string of the external data source",
+          "description": "Version of the external data source",
           "example": "File generated on 2023-10-10"
+        },
+        "dbxref_name": {
+          "type": "string",
+          "description": "Accession of the IGVF Portal file mirroring this ENCODE file.",
+          "example": "IGVFFI2331IRGH"
+        },
+        "dbxref_fileset_id": {
+          "type": "string",
+          "description": "Accession of the IGVF Portal file set containing the mirrored file.",
+          "example": "IGVFDS5514HTXN"
         }
       },
       "required": [

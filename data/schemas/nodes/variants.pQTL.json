@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/variants.pQTL.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "UKB"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://metabolomips.org/ukbbpgwas/"
+          ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

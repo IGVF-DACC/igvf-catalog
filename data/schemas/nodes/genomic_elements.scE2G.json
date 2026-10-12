@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.scE2G.json",
   "allOf": [
     {
@@ -28,14 +28,21 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
             "genic",
             "intergenic",
             "promoter",
             "enhancer"
-          ]
+          ],
+          "enum_descriptions": {
+            "genic": "An element within a gene body.",
+            "intergenic": "An element between annotated genes.",
+            "promoter": "An element associated with transcription initiation at a gene.",
+            "enhancer": "An element annotated as potentially regulating transcription from a promoter."
+          }
         },
         "source": {
           "enum": [
@@ -47,10 +54,7 @@
           "pattern": "^https://data\\.igvf\\.org/tabular-files/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "example": "files_filesets/IGVFFI5648GWQX",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

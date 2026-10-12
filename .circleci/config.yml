@@ -16,6 +16,9 @@ workflows:
       - trpc:
           requires:
             - lint
+      - trpc-integration:
+          requires:
+            - trpc
 
 jobs:
   lint:
@@ -42,6 +45,26 @@ jobs:
           token: COVERALLS_REPO_TOKEN
           coverage_file: coverage/lcov.info
           fail_on_error: false
+  trpc-integration:
+    docker:
+      - image: cimg/node:20.20.2
+    working_directory: ~/igvf-catalog
+    # ENV=production only selects src/env.ts's env-var-override code path here - it has
+    # nothing to do with a real prod deploy. The actual db-dev connection details come from
+    # CircleCI project Environment Variables (Project Settings > Environment Variables), never
+    # committed to config/development.json: IGVF_CATALOG_ARANGODB_URI, _DBNAME, _USERNAME,
+    # _PASSWORD.
+    environment:
+      ENV: production
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          # Hits the real shared dev ArangoDB (db-dev.catalog.igvf.org).
+          name: Run integration tests against db-dev
+          command: npm run test:integration
   data:
     docker:
       - image: cimg/python:3.11

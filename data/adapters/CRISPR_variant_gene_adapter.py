@@ -45,13 +45,13 @@ class CRISPRVariantGene(BaseAdapter):
         self.is_crispr_millipede = self.file_accession in CRISPR_MILLIPEDE_FILE_ACCESSIONS
         self.gene_validator = GeneValidator()
 
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.method = file_fileset['method']
-        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
-        self.biosample_term = file_fileset['samples'][0]
-        self.treatments_term_ids = file_fileset['treatments_term_ids']
-        self.crispr_modality = file_fileset.get('crispr_modality')
+        self.method = self.file_fileset['method']
+        self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
+        self.biosample_term = self.file_fileset['samples'][0]
+        self.treatments_term_ids = self.file_fileset['treatments_term_ids']
+        self.crispr_modality = self.file_fileset.get('crispr_modality')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -120,6 +120,9 @@ class CRISPRVariantGene(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         if self.is_crispr_millipede:
             self._parse_crispr_millipede()
         else:

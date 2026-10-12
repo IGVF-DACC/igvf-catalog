@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/variants.PharmGKB.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "pharmGKB"
+          ]
+        },
+        "source_url": {
+          "description": "pharmgkb_drug_adapter.py's own --label variants path builds this as .../variant/<rsid> from the raw source TSV. The S3-backup remediation script (find_and_create_missing_variants.py) doesn't have the rsid available (not carried onto the variants_drugs edge), so it falls back to the edge's own .../variantAnnotation/<id> URL instead - still a real, traceable pharmgkb.org page, just not the variant-specific one. Pattern is intentionally broadened to the whole domain to accept both forms.",
+          "example": "https://www.pharmgkb.org/variant/rs5031016",
+          "pattern": "^https://www\\.pharmgkb\\.org/"
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        }
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

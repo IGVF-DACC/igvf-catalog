@@ -12,7 +12,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const genesPathwaysFormat = z.object({
+export const genesPathwaysFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   orgnism: z.string().optional(),
@@ -34,7 +34,7 @@ const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.jso
 const pathwayCollectionName = pathwaySchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym', 'region'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -43,7 +43,7 @@ function validateGeneInput (input: paramsFormatType): void {
   }
 }
 function validatePathwayInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['pathway_id', 'pathway_name', 'name_aliases', 'disease_ontology_terms', 'go_biological_process'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['pathway_id', 'pathway_name', 'name_aliases', 'disease_ontology_terms', 'biological_process'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -60,12 +60,13 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, region, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, region, organism, page: 0 }
 
   delete input.hgnc_id
   delete input.gene_name
   delete input.synonym
+  delete input.region
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
@@ -103,13 +104,13 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
-  const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
+  const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, biological_process } = input
+  const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, biological_process, organism: 'Homo sapiens', page: 0 }
   delete input.pathway_id
   delete input.pathway_name
   delete input.name_aliases
   delete input.disease_ontology_terms
-  delete input.go_biological_process
+  delete input.biological_process
   delete input.organism
   const pathways = await pathwaySearchPersistent(pathwayInput)
   const pathwayIDs = pathways.map(pathway => `${pathwayCollectionName}/${pathway._id as string}`)

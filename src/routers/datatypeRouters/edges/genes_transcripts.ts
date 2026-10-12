@@ -13,7 +13,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const genesTranscriptsFormat = z.object({
+export const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   version: z.string().optional(),
@@ -21,7 +21,7 @@ const genesTranscriptsFormat = z.object({
   transcript: z.string().or(transcriptFormat).optional(),
   name: z.string()
 })
-const genesProteinsFormat = z.object({
+export const genesProteinsFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
   protein: z.string().or(proteinFormat).optional()
 })
@@ -37,7 +37,7 @@ const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json
 const proteinCollectionName = proteinSchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym', 'region'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -91,6 +91,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
   delete input.uniprot_name
   delete input.uniprot_full_name
   delete input.protein_name
+  delete input.organism
 
   const filters = getFilterStatements(proteinSchema, preProcessRegionParam(input))
   if (filters === '') {
@@ -142,11 +143,12 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, region, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, region, organism, page: 0 }
   delete input.hgnc_id
   delete input.gene_name
   delete input.synonym
+  delete input.region
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
@@ -195,11 +197,12 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, synonym, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, region, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, region, organism, page: 0 }
   delete input.hgnc_id
   delete input.gene_name
   delete input.synonym
+  delete input.region
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)

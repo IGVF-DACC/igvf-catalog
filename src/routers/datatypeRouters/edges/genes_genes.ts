@@ -5,9 +5,9 @@ import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withHgncPrefix } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
-import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
+import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -16,6 +16,11 @@ const MousegenesGenesSchema = getSchema('data/schemas/edges/mm_genes_mm_genes.Ge
 const CoXPresdbSchema = getSchema('data/schemas/edges/genes_genes.Coxpresdb.json') // human coexpredb
 const HumangenesSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const MousegenesSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
+// genes_genes holds both BioGRID (fake z_score = 0) and COXPRESdb (real z_score) edges.
+// Filtering must see the union so a real z_score range filter isn't built from a schema
+// that doesn't know about it.
+const HumangenesGenesFilterSchema = getMergedCollectionSchema('edges', 'genes_genes')
+const MousegenesGenesFilterSchema = getMergedCollectionSchema('edges', 'mm_genes_mm_genes')
 
 const interactionTypes = z.enum([
   'dosage growth defect (sensu BioGRID)',
@@ -56,11 +61,11 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   })
 ).merge(commonEdgeParamsFormat)
 
-const genesGenesRelativeFormat = z.object({
+export const genesGenesRelativeFormat = z.object({
   _id: z.string(),
   gene_1: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   gene_2: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
-  z_score: z.number().optional(),
+  z_score: z.number().nullish(),
   associated_process: z.string().nullish(),
   detection_method: z.string().optional(),
   detection_method_code: z.string().optional(),
@@ -110,9 +115,11 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let genesSchema = HumangenesSchema
   let genesGenesSchema = HumangenesGenesSchema
+  let genesGenesFilterSchema = HumangenesGenesFilterSchema
   if (input.organism === 'Mus musculus') {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
+    genesGenesFilterSchema = MousegenesGenesFilterSchema
   }
   delete input.organism
 
@@ -126,7 +133,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, synonym } = input
-  const geneInput: paramsFormatType = { _key: gene_id, hgnc_id, name, synonyms: synonym, page: 0 }
+  const geneInput: paramsFormatType = { _key: gene_id, hgnc: hgnc_id !== undefined ? withHgncPrefix(hgnc_id as string) : undefined, name, synonyms: synonym, page: 0 }
   delete input.gene_id
   delete input.hgnc_id
   delete input.gene_name
@@ -134,7 +141,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   const associatedGeneInput: paramsFormatType = {
     _key: input.associated_gene_id,
-    hgnc_id: input.associated_hgnc_id,
+    hgnc: input.associated_hgnc_id !== undefined ? withHgncPrefix(input.associated_hgnc_id as string) : undefined,
     name: input.associated_gene_name,
     synonyms: input.associated_synonym,
     page: 0
@@ -144,10 +151,21 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   delete input.associated_gene_name
   delete input.associated_synonym
 
+  // z_score only exists on COXPRESdb edges (BioGRID doesn't write this field at all), so
+  // it must be filtered using CoXPresdbSchema, not the BioGRID-derived genesGenesSchema
+  // (which no longer declares z_score as a property). BioGRID edges simply lack the
+  // attribute, so a plain range comparison already excludes them without needing an
+  // explicit source guard.
+  let zScoreFilter = ''
+  if (input.z_score !== undefined) {
+    zScoreFilter = getFilterStatements(CoXPresdbSchema, { z_score: input.z_score })
+    delete input.z_score
+  }
+
   const filters = []
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
   const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
-  const edgeFilters = getFilterStatements(genesGenesSchema, input)
+  const edgeFilters = getFilterStatements(genesGenesFilterSchema, input)
 
   if (gene) {
     filters.push('(record._from == gene._id OR record._to == gene._id)')
@@ -159,6 +177,10 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   if (edgeFilters) {
     filters.push(edgeFilters)
+  }
+
+  if (zScoreFilter) {
+    filters.push(zScoreFilter)
   }
 
   const combinedFilter = filters.filter((filter) => filter !== '').join(' AND ')

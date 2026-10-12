@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from arango import ArangoClient
-from jsonschema import ValidationError, validate
+from jsonschema import Draft202012Validator, ValidationError
 
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
@@ -31,6 +31,7 @@ translator = AlleleTranslator(data_proxy=dp)
 
 with open(SCHEMA_PATH) as f:
     schema = json.load(f)
+validator = Draft202012Validator(schema)
 
 
 def build_variant_doc(variant_key: str, edge: dict) -> dict:
@@ -102,7 +103,7 @@ with open(OUTPUT_PATH, 'w') as out_file:
             doc = build_variant_doc(variant_key, edge)
 
             try:
-                validate(instance=doc, schema=schema)
+                validator.validate(doc)
             except ValidationError as exc:
                 print('Schema validation failed for %s: %s' %
                       (variant_key, exc.message))

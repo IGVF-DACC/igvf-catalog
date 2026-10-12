@@ -55,10 +55,13 @@ class DepMap(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         self.load_cell_ontology_id_mapping()
         self.load_gene_id_mapping()
@@ -105,11 +108,11 @@ class DepMap(BaseAdapter):
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
-                                'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
+                                'biological_context': self.cell_ontology_id_mapping[gene_model_id]['biological_context'],
                                 'model_id': gene_model_id,
                                 'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
-                                # oncotree code can be mapped to NCIT ids
-                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
+                                # Match Oncotree _key ( '/' is illegal in ArangoDB keys)
+                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'].replace('/', '_'),
                                 'gene_dependency': float(value),
                                 'source': DepMap.SOURCE,
                                 'source_url': DepMap.SOURCE_URL,
@@ -131,7 +134,7 @@ class DepMap(BaseAdapter):
         # need to take care of comma inside double quotes, e.g. ACH-000082,PT-noCCE4,"G-292, clone A141B1",...
         self.cell_ontology_id_mapping = defaultdict(dict)
         column_index_mapping = {
-            'biology_context': 2,
+            'biological_context': 2,
             'cell_ontology_id': 7,
             'model_type': 8,
             'oncotree_code': 26

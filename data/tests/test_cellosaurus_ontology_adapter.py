@@ -87,6 +87,22 @@ def test_cellosaurus_adapter_initialization():
     assert adapter.species_filter == True
 
 
+def test_cellosaurus_adapter_relationship_edges_are_validated(mock_file_fileset):
+    # regression test: the relationship branch (derived_from,
+    # originate_from_same_individual_as) used to call save_props without ever calling
+    # validate_doc, so validate=True silently let through edges the schema didn't allow.
+    writer = SpyWriter()
+    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+                          label='ontology_relationship', species_filter=False,
+                          writer=writer, validate=True)
+    adapter.process_file()
+
+    names = {json.loads(c)['name']
+             for c in writer.contents if c.strip().startswith('{')}
+    assert 'derived from' in names
+    assert 'originate from same individual as' in names
+
+
 def test_cellosaurus_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',

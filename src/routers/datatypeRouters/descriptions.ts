@@ -110,6 +110,7 @@ export const descriptions = {
   Example: region = chr20:9537369-9839076, <br> \
   transcript_type = protein_coding, <br> \
   transcript_id = ENST00000443707 (Ensembl ids), <br> \
+  refseq_transcript_id = NM_177990.4, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -127,10 +128,11 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
     Example: gene_name = ATF3, <br> \
     hgnc_id = HGNC:28208, <br> \
     synonym = CKLF, <br> \
+    region = chr3:193593143-193697811, <br> \
     organism = Homo sapiens, <br> \
     gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -149,9 +151,10 @@ export const descriptions = {
 
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
   Example: gene_name = ATF3, <br> \
   synonym = CKLF, <br> \
+  region = chr3:193593143-193697811, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc_id = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -208,9 +211,34 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
+  genes_transcripts_genes: 'Retrieve MORF gene overexpression effects through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; readout_gene_id identifies the readout gene. Filter by a source gene, transcript, readout gene, morf_id, files_fileset, or method. Set verbose=true to expand gene and transcript nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+    {
+      id: 'morf-screen',
+      label: 'MORF screen',
+      examples: [
+        {
+          label: 'AATF transcript overexpression effect on TOX',
+          items: [
+            'gene_id = ENSG00000275700',
+            'transcript_id = ENST00000619387',
+            'readout_gene_id = ENSG00000198846',
+            'files_fileset = IGVFFI6734IWRB'
+          ]
+        },
+        {
+          label: 'All MORF effects on TOX',
+          items: [
+            'readout_gene_id = ENSG00000198846',
+            'method = MORF screen'
+          ]
+        }
+      ]
+    }
+  ]),
+
   genes_genes:
     'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
-    The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on z_score: gt (>), gte (>=), lt (<), lte (<=). z_score only exists on CoXPresdb edges; BioGRID edges do not have this field at all.<br> \
     At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -281,7 +309,9 @@ export const descriptions = {
    Example: variant_id = NC_000020.11:3658947:A:G, <br> \
    spdi = NC_000020.11:3658947:A:G, <br> \
    hgvs = NC_000020.11:g.3658948A>G. <br> \
-   ca_id = CA739473472',
+   ca_id = CA739473472. <br> \
+   The response includes an "annotations" field summarizing everything known about the variant across genes, drugs, proteins, diseases, phenotypes, biosamples and genomic elements: for each data type, a total edge count and a breakdown of counts by method and biological context (when available). <br> \
+   Set igvf_only = true to restrict the "annotations" counts to records sourced from IGVF only.',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
    Example: region = chr1:1157520-1158520 (maximum length: 10kb).<br> \
@@ -317,7 +347,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by variants.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens from IGVF, by variants.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     posterior_inclusion_probability and log2FC also accept plain numbers (exact match) or the same gt/gte/lt/lte range syntax. significant only accepts true (omit the parameter to not filter on it).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
@@ -376,14 +406,14 @@ export const descriptions = {
             items: [
               'spdi = NC_000010.11:79347741:AGGT:TCAG',
               'effect_size = lt:-0.6',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
               'region = chr10:79347740-79347749 (maximum length: 10kb)',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -421,7 +451,7 @@ export const descriptions = {
     ]),
 
   genes_variants:
-    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screen and Variant-EFFECTS from IGVF, by Ensembl gene ids.<br> \
+    'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR and eQTL Catalogue, and CRISPR screens from IGVF, by Ensembl gene ids.<br> \
     The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, synonym, method, or files_fileset. <br> \
@@ -481,14 +511,14 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000108179',
               'neg_log10_pvalue = gt:13.1',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           },
           {
             label: 'Group results',
             items: [
               'synonym = PPIF',
-              'method = Variant-EFFECTS'
+              'method = CRISPR screen'
             ]
           }
         ]
@@ -712,7 +742,7 @@ export const descriptions = {
 
   phenotypes_variants:
     'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by phenotypes.<br> \
-    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=). neg_log10_pvalue is only populated for GWAS records; it does not filter out SGE, cV2F, or CRISPR screen edges, which have no p-value field.<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: phenotype_id, phenotype_name, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -806,7 +836,7 @@ export const descriptions = {
   variants_phenotypes:
     'Retrieve variant-trait pairs from GWAS, SGE, cV2F, and CRISPR screens by variants.<br> \
     Filters on phenotype ontology id can be used together.<br> \
-    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=). neg_log10_pvalue is only populated for GWAS records; it does not filter out SGE, cV2F, or CRISPR screen edges, which have no p-value field.<br> \
     Set verbose = true to retrieve full info on the studies.<br> \
     At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -1356,17 +1386,18 @@ export const descriptions = {
   name_aliases = 2-LTR circle formation, <br> \
   is_top_level_pathway = true. <br> \
   disease_ontology_terms = DOID_526, <br> \
-  go_biological_process = GO_0006015. <br> \
+  biological_process = GO_0006015. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
-  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+  At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, region. <br> \
   Example: gene_id = ENSG00000183840, <br> \
   hgnc_id = HGNC:4496, <br> \
   gene_name = GPR39, <br> \
-  synonym = ZnR. <br> \
+  synonym = ZnR, <br> \
+  region = chr16:30114104-30123506. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -1377,7 +1408,7 @@ export const descriptions = {
   pathway_name = 2-LTR circle formation, <br> \
   name_aliases = 2-LTR circle formation, <br> \
   disease_ontology_terms = DOID_526, <br> \
-  go_biological_process = GO_0006015. <br> \
+  biological_process = GO_0006015. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -1388,7 +1419,7 @@ export const descriptions = {
   pathway_name = 2-LTR circle formation, <br> \
   name_aliases = 2-LTR circle formation, <br> \
   disease_ontology_terms = DOID_526, <br> \
-  go_biological_process = GO_0006015. <br> \
+  biological_process = GO_0006015. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -1884,6 +1915,7 @@ export const descriptions = {
 
   grn:
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
     crispr_modality accepts knockout, interference, or activation.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -1936,6 +1968,7 @@ export const descriptions = {
 
   genes_genomic_elements:
     'Retrieve genomic elements and gene pairs by querying genes.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     One of these fields is required: gene_id, hgnc_id, gene_name, synonym, method, or files_fileset. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -2029,11 +2062,12 @@ export const descriptions = {
 
   genomic_elements_phenotypes:
     'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
-    At least one of these properties must be defined: region, files_fileset, phenotype_id, or phenotype_name. <br> \
+    At least one of these properties must be defined: region, files_fileset, phenotype_id, phenotype_name, or method. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
     Example: phenotype_id = GO_0016477, <br> \
     phenotype_name = cell migration, <br> \
+    method = CRISPR screen, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI5135QZCS, <br> \
     region = chr1:101174581-101175330 (maximum length: 10kb). <br> \
@@ -2042,18 +2076,57 @@ export const descriptions = {
 
   phenotypes_genomic_elements:
     'Retrieve genomic elements associated with phenotypes.<br> \
-    At least one of these properties must be defined: phenotype_id, phenotype_name, or files_fileset. <br> \
+    At least one of these properties must be defined: phenotype_id, phenotype_name, files_fileset, or method. <br> \
     Set significant = true to return only significant associations.<br> \
     Set verbose = true to retrieve full info on the genomic element.<br> \
     Example: phenotype_id = GO_0008283, <br> \
     phenotype_name = cell population proliferation, <br> \
+    method = CRISPR screen, <br> \
     significant = true, <br> \
     files_fileset = IGVFFI9584UDAS. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
+  genomic_elements_genomic_elements:
+    'Retrieve promoter perturbation effects on chromatin accessibility at target peaks.<br> \
+    Source elements identify perturbed promoters; target elements identify readout peaks. \
+    Filter by perturbed_region (promoter) or accessible_region (readout peak), using chr:start-end, promoter_gene_name or promoter_gene_id, files_fileset, or method. \
+    Set verbose=true to expand both genomic elements and the linked promoter gene record. \
+    Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+      {
+        id: 'perturb-seq',
+        label: 'Multiome Perturb-seq',
+        examples: [
+          {
+            label: 'Query by perturbed gene',
+            items: [
+              'promoter_gene_name = YY1',
+              'method = Multiome Perturb-seq',
+              'files_fileset = IGVFFI2419ZSGC'
+            ]
+          },
+          {
+            label: 'Query by readout peak region',
+            items: [
+              'accessible_region = chr1:3586345-3586846',
+              'method = Multiome Perturb-seq'
+            ]
+          },
+          {
+            label: 'Accessibility decreases with adjusted p-value below 0.1',
+            items: [
+              'method = Multiome Perturb-seq',
+              'log2FC = lt:0',
+              'p_value_adj = lt:0.1'
+            ]
+          }
+        ]
+      }
+    ]),
+
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+    Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     At least one of these properties must be defined: region, files_fileset, or method. <br> \
     Set verbose = true to retrieve full info on the genes and genomic element.<br> \
     The limit parameter controls the page size and can not exceed 500. <br> \

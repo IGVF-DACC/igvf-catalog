@@ -52,10 +52,13 @@ class GeneGeneBiogrid(BaseAdapter):
             return 'mm_genes_mm_genes'
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_fileset['class']
+        self.collection_class = self.file_fileset['class']
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
@@ -110,8 +113,6 @@ class GeneGeneBiogrid(BaseAdapter):
                             # should be BioGRID for all edges loaded
                             'source': row[-1],
                             'pmids': [pmid_url + pmid for pmid in pmids],
-                            # assign a fake value here to get around with the indexing issue on logit_score from gene-gene coexpressdb,
-                            'z_score': 0,
                             'name': 'interacts with',
                             'inverse_name': 'interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515',

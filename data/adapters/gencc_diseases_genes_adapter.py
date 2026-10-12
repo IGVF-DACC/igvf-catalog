@@ -24,10 +24,13 @@ class GenccDiseasesGenes(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.gene_map = get_gene_map_from_arangodb('hgnc')
         # read the tsv file
         with open(self.filepath, 'r', encoding='utf-8', newline='') as f:
@@ -41,7 +44,7 @@ class GenccDiseasesGenes(BaseAdapter):
                 if gene_ids is None:
                     print(f'No gene id found for {hgnc_id}')
                     continue
-                gene_symbol = row[3]
+                gene_name = row[3]
                 # need to replace ":" with "_" in the ontology_term_id
                 ontology_term_id = row[4].replace(':', '_')
                 _from = f'ontology_terms/{ontology_term_id}'
@@ -65,7 +68,7 @@ class GenccDiseasesGenes(BaseAdapter):
                         'name': 'associated_with',
                         'inverse_name': 'associated_with',
                         'hgnc': hgnc_id,
-                        'gene_symbol': gene_symbol,
+                        'gene_name': gene_name,
                         'term_name': term_name,
                         'classification': classification,
                         'moi_id': moi_id,

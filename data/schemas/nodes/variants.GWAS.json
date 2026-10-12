@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/variants.GWAS.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "description": "The database, dataset or organization that is a source for these data.",
+          "enum": [
+            "OpenTargets"
+          ]
+        },
+        "source_url": {
+          "description": "The URL for the source.",
+          "example": "https://data.igvf.org/reference-files/IGVFFI1309WDQG",
+          "pattern": "^https://data.igvf.org/reference-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Reference to the File and Metadata",
+          "example": "files_filesets/IGVFFI1309WDQG",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

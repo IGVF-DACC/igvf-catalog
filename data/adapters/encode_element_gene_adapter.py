@@ -85,7 +85,8 @@ class EncodeElementGeneLink(BaseAdapter):
         self.source_url = source_url
         # Handle URLs ending with '/' by using -2 index instead of -1
         self.file_accession = source_url.rstrip('/').split('/')[-1]
-
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         if label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
 
@@ -106,9 +107,10 @@ class EncodeElementGeneLink(BaseAdapter):
             return 'genomic_elements_genes'
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
-
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             for row in reader:
@@ -138,16 +140,16 @@ class EncodeElementGeneLink(BaseAdapter):
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'method': file_fileset['method'],
+                        'method': self.file_fileset['method'],
                         'label': self.COLLECTION_LABEL,
-                        'class': file_fileset['class'],
+                        'class': self.file_fileset['class'],
                         'score': float(score),
                         'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'biological_context': file_fileset['simple_sample_summaries'][0],
-                        'biosample_term': file_fileset['samples'][0],
-                        'treatments_term_ids': file_fileset.get('treatments_term_ids'),
+                        'biological_context': self.file_fileset['simple_sample_summaries'][0],
+                        'biosample_term': self.file_fileset['samples'][0],
+                        'treatments_term_ids': self.file_fileset.get('treatments_term_ids'),
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
@@ -166,14 +168,14 @@ class EncodeElementGeneLink(BaseAdapter):
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': file_fileset['method'],
+                        'method': self.file_fileset['method'],
                         'type': self.TYPE,
                         'source_annotation': class_name,
                         'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'simple_sample_summaries': file_fileset['simple_sample_summaries'],
-                        'treatments_term_ids': file_fileset.get('treatments_term_ids')
+                        'simple_sample_summaries': self.file_fileset['simple_sample_summaries'],
+                        'treatments_term_ids': self.file_fileset.get('treatments_term_ids')
                     }
 
                     if self.validate:

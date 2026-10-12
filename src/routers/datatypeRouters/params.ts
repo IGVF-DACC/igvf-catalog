@@ -14,7 +14,8 @@ export const genesCommonQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   hgnc_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
-  synonym: z.string().trim().optional()
+  synonym: z.string().trim().optional(),
+  region: z.string().trim().optional()
 })
 
 const TRANSCRIPT_TYPES = getCollectionEnumValuesOrThrow('nodes', 'transcripts', 'transcript_type')
@@ -82,7 +83,7 @@ export const commonPathwayQueryFormat = z.object({
   pathway_name: z.string().trim().optional(),
   name_aliases: z.string().trim().optional(),
   disease_ontology_terms: z.string().trim().optional(),
-  go_biological_process: z.string().trim().optional()
+  biological_process: z.string().trim().optional()
 })
 
 export const commonHumanEdgeParamsFormat = z.object({

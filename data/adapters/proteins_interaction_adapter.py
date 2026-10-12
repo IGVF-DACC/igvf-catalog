@@ -1,6 +1,5 @@
 import csv
 import json
-import pickle
 import hashlib
 from typing import Optional
 import os
@@ -9,6 +8,7 @@ import obonet
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.protein_map import ProteinMap
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
@@ -18,8 +18,6 @@ from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 class ProteinsInteraction(BaseAdapter):
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
-    HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
-    MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
     ALLOWED_LABELS = ['protein_protein_human', 'protein_protein_mouse']
 
     def __init__(self, filepath, label='protein_protein_human', writer: Optional[Writer] = None, validate=False, **kwargs):
@@ -27,12 +25,8 @@ class ProteinsInteraction(BaseAdapter):
         self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
         if label == 'protein_protein_mouse':
             self.organism = 'Mus musculus'
-            self.ensembls = pickle.load(
-                open(self.MOUSE_ENSEMBL_MAPPING, 'rb'))
         else:
             self.organism = 'Homo sapiens'
-            self.ensembls = pickle.load(
-                open(self.HUMAN_ENSEMBL_MAPPING, 'rb'))
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -51,13 +45,16 @@ class ProteinsInteraction(BaseAdapter):
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
     def parse(self):
-        file_fileset = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_fileset['class']
+        self.collection_class = self.file_fileset['class']
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
-        ensembl_unmatched = 0
+        self.protein_map = ProteinMap(organism=self.organism)
 
         with open(self.filepath, 'r') as interaction_file:
             interaction_csv = csv.reader(interaction_file)
@@ -70,13 +67,10 @@ class ProteinsInteraction(BaseAdapter):
                 protein_from = row[0]
                 protein_to = row[1]
 
-                ensembl_ids_from = self.ensembls.get(
-                    protein_from) or self.ensembls.get(protein_from.split('-')[0])
-                ensembl_ids_to = self.ensembls.get(
-                    protein_to) or self.ensembls.get(protein_to.split('-')[0])
+                ensembl_ids_from = self.protein_map.get(protein_from)
+                ensembl_ids_to = self.protein_map.get(protein_to)
 
                 if ensembl_ids_from is None or ensembl_ids_to is None:
-                    ensembl_unmatched += 1
                     continue
 
                 for protein_from_ensembl in ensembl_ids_from:
@@ -126,6 +120,4 @@ class ProteinsInteraction(BaseAdapter):
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
 
-        if ensembl_unmatched != 0:
-            self.logger.warning(
-                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+        self.protein_map.log(self.logger)

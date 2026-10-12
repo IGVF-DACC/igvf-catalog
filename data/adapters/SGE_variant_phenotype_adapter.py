@@ -26,11 +26,16 @@ class SGE(BaseAdapter):
     CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
     CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL = 'protein variant effect'
+    # the source file's header spells this column "hgvs_p", but every other coding-variant
+    # collection (DbNSFP, ESM-1v, MutPred2) uses "hgvsp" - rename on load so the KG is consistent.
+    FIELD_NAME_OVERRIDES = {'hgvs_p': 'hgvsp'}
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -119,6 +124,9 @@ class SGE(BaseAdapter):
     def parse(self):
         # check if all variants in file is already loaded
         self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         skipped_spdis = self.validate_variants()
         invalid_variants = []
         for spdi in skipped_spdis:
@@ -149,8 +157,6 @@ class SGE(BaseAdapter):
                 self.logger.error(
                     f'Error: unable to get protein id from the file.')
                 return
-            file_fileset = get_file_fileset_by_accession_in_arangodb(
-                self.file_accession)
             with gzip.open(self.filepath, 'rt') as sge_file:
                 reader = csv.reader(sge_file, delimiter='\t')
                 headers = next(reader)
@@ -170,11 +176,11 @@ class SGE(BaseAdapter):
                                 'source': self.SOURCE,
                                 'source_url': self.source_url,
                                 'files_filesets': 'files_filesets/' + self.file_accession,
-                                'method': file_fileset.get('method'),
-                                'class': file_fileset.get('class'),
+                                'method': self.file_fileset.get('method'),
+                                'class': self.file_fileset.get('class'),
                                 'label': self.COLLECTION_LABEL,
-                                'biosample_term': file_fileset.get('samples')[0] if file_fileset.get('samples') else None,
-                                'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
+                                'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
+                                'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
                                 'name': self.VARIANTS_PHENOTYPES_COLLECTION_NAME,
                                 'inverse_name': self.VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME
                             }
@@ -183,16 +189,18 @@ class SGE(BaseAdapter):
                                 # don't need first 4 columns
                                 if column_index > 3:
                                     prop = {}
+                                    key = self.FIELD_NAME_OVERRIDES.get(
+                                        field, field)
                                     value = row[column_index]
                                     if field in self.FLOAT_FIELDS:
-                                        prop[field] = float(
+                                        prop[key] = float(
                                             value) if value != '' else None
                                     # starting from column 17 are integers
                                     elif column_index > 15:
-                                        prop[field] = int(
+                                        prop[key] = int(
                                             value) if value != '' else None
                                     else:
-                                        prop[field] = value if value != '' and value != '---' else None
+                                        prop[key] = value if value != '' and value != '---' else None
 
                                     _props.update(prop)
 
@@ -226,10 +234,10 @@ class SGE(BaseAdapter):
                                     'source': self.SOURCE,
                                     'source_url': self.source_url,
                                     'files_filesets': 'files_filesets/' + self.file_accession,
-                                    'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
-                                    'biosample_term': file_fileset['samples'][0] if file_fileset.get('samples') else None,
-                                    'method': file_fileset.get('method'),
-                                    'class': file_fileset.get('class'),
+                                    'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
+                                    'biosample_term': self.file_fileset['samples'][0] if self.file_fileset.get('samples') else None,
+                                    'method': self.file_fileset.get('method'),
+                                    'class': self.file_fileset.get('class'),
                                     'label': self.COLLECTION_LABEL,
                                     'name': self.CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME,
                                     'inverse_name': self.CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME,
@@ -240,16 +248,18 @@ class SGE(BaseAdapter):
                                     # don't need first 4 columns
                                     if column_index > 3:
                                         prop = {}
+                                        key = self.FIELD_NAME_OVERRIDES.get(
+                                            field, field)
                                         value = row[column_index]
                                         if field in self.FLOAT_FIELDS:
-                                            prop[field] = float(
+                                            prop[key] = float(
                                                 value) if value != '' else None
                                         # starting from column 17 are integers
                                         elif column_index > 15:
-                                            prop[field] = int(
+                                            prop[key] = int(
                                                 value) if value != '' else None
                                         else:
-                                            prop[field] = value if value != '' and value != '---' else None
+                                            prop[key] = value if value != '' and value != '---' else None
 
                                         _props.update(prop)
 

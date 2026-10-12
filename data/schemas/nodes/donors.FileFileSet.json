@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/donors.FileFileSet.json",
+  "$id": "schemas/nodes/donors.FileFileSet.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -15,11 +15,12 @@
           "example": "ENCDO374BBL"
         },
         "sex": {
+          "title": "Sex",
           "type": [
             "string",
             "null"
           ],
-          "description": "The sex of the donor",
+          "description": "Sex of the donor: female, male, mixed, unknown, or unspecified.",
           "enum": [
             "female",
             "male",
@@ -29,19 +30,21 @@
           ]
         },
         "age": {
+          "title": "Age",
           "type": [
             "string",
             "null"
           ],
-          "description": "The age of the donor",
+          "description": "Age of the donor, in the units given by age_units. Stored as a string, since the portal records open-ended values as well as exact ages.",
           "example": "35"
         },
         "age_units": {
+          "title": "Age Units",
           "type": [
             "string",
             "null"
           ],
-          "description": "The age units of the donor",
+          "description": "Unit the age value is expressed in: day, week, month, or year.",
           "enum": [
             "day",
             "month",
@@ -51,21 +54,23 @@
           ]
         },
         "ethnicities": {
+          "title": "Ethnicities",
           "type": [
             "array",
             "null"
           ],
-          "description": "The ethnicities of the donor",
+          "description": "Ethnicity of the donor.",
           "example": [
             "African American"
           ]
         },
         "phenotypic_features": {
+          "title": "Phenotypes",
           "type": [
             "array",
             "null"
           ],
-          "description": "The phenotypic features of the donor",
+          "description": "Phenotypic features observed for the donor, with DOID identifiers mapped onto MONDO or HP.",
           "example": [
             "ontology_terms/DOID_3308"
           ]

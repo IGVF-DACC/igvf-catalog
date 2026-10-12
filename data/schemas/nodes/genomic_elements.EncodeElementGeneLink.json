@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
   "allOf": [
     {
@@ -28,13 +28,19 @@
           ]
         },
         "source_annotation": {
+          "title": "Source Annotation",
           "type": "string",
-          "description": "Source annotation for the genomic element",
+          "description": "Annotation of the element supplied by the source.",
           "enum": [
             "genic",
             "intergenic",
             "promoter"
-          ]
+          ],
+          "enum_descriptions": {
+            "genic": "An element within a gene body.",
+            "intergenic": "An element between annotated genes.",
+            "promoter": "An element associated with transcription initiation at a gene."
+          }
         },
         "source": {
           "enum": [
@@ -45,31 +51,25 @@
           "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
           "pattern": "^https://www.encodeproject.org/files/"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "example": "files_filesets/ENCFF003BKC",
-          "pattern": "^files_filesets/"
-        },
         "simple_sample_summaries": {
+          "title": "Biosample Summaries",
           "type": [
             "array",
             "null"
           ],
-          "description": "Simple sample summaries for the genomic element",
+          "description": "Short readable summary of each sample.",
           "example": [
             "head of caudate nucleus from ENCDO948PMW"
           ]
         },
         "treatments_term_ids": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "Treatments term ids for the genomic element",
+          "$ref": "../mixins.json#/treatments_term_ids",
           "example": [
             "UniProtKB:P05112"
           ]
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

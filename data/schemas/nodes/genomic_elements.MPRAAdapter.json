@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.MPRAAdapter.json",
   "allOf": [
     {
@@ -18,13 +18,17 @@
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
         "strand": {
-          "type": "string",
-          "description": "Strand of the MPRA element tile",
+          "description": "Strand the tile was tested in..",
           "enum": [
             "+",
             "-",
             "."
-          ]
+          ],
+          "enum_descriptions": {
+            "+": "Forward strand of the reference sequence.",
+            "-": "Reverse strand of the reference sequence.",
+            ".": "Strand is not recorded or is not applicable."
+          }
         },
         "method": {
           "enum": [
@@ -46,9 +50,7 @@
           "example": "https://www.encodeproject.org/files/ENCFF769REH/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filesets for the genomic element",
-          "pattern": "^files_filesets/"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

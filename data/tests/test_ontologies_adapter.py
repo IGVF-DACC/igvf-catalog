@@ -122,6 +122,34 @@ def test_predicate_name_returns_expected_strings():
     assert ont.predicate_name('unknown') == ''
 
 
+def test_type_uri_enum_covers_all_predicates():
+    # regression test: type_uri's enum in ontology_terms_ontology_terms.Ontology.json used to
+    # only list SUBCLASS/DB_XREF, so every restriction-predicate edge (HAS_PART, PART_OF,
+    # DERIVES_FROM) failed schema validation with validate=True.
+    from jsonschema import Draft202012Validator
+    from schemas.registry import get_schema
+
+    schema = get_schema('edges', 'ontology_terms_ontology_terms', 'Ontology')
+    validator = Draft202012Validator(schema)
+
+    base_doc = {
+        '_key': 'CL_0000001_predicate_CL_0000002',
+        '_from': 'ontology_terms/CL_0000001',
+        '_to': 'ontology_terms/CL_0000002',
+        'inverse_name': 'part of',
+        'source': 'CL',
+        'source_url': 'https://obophenotype.github.io/cell-ontology/',
+        'class': 'biological relationship',
+        'method': None,
+        'files_filesets': 'files_filesets/IGVFFI0402TNDW'
+    }
+
+    for predicate in Ontology.PREDICATES + Ontology.RESTRICTION_PREDICATES:
+        doc = {**base_doc, 'type_uri': str(predicate),
+               'name': Ontology('dummy.owl', 'cl', None, None, None, None).predicate_name(predicate)}
+        validator.validate(doc)
+
+
 def test_to_key_handles_various_cases():
     assert Ontology.to_key(URIRef(
         'http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123')) == 'CLO_0027762.subclass_id_123'

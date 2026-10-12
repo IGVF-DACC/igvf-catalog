@@ -14,6 +14,7 @@ describe('transcriptsRouters.transcripts', () => {
   it('returns transcript by transcript_id (human)', async () => {
     const mockRecord = [{
       _id: 'T1',
+      refseq_transcript_ids: ['NM_001317238.2', 'NM_031921.6'],
       transcript_type: 'protein_coding',
       chr: 'chr1',
       start: 100,

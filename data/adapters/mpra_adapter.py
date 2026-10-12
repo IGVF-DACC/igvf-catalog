@@ -144,7 +144,7 @@ class MPRAAdapter(BaseAdapter):
 
         self.has_sequence_designs = reference_filepath is not None
 
-        self.files_filesets = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
 
         self.variant_to_element = defaultdict(set)
@@ -408,20 +408,24 @@ class MPRAAdapter(BaseAdapter):
 
     def parse(self):
         # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = (
             'regulatory reference element activity')
-        self.collection_class = self.files_filesets.get('class')
-        self.method = self.files_filesets.get('method')
-        samples = self.files_filesets.get('samples') or []
+        self.collection_class = self.file_fileset.get('class')
+        self.method = self.file_fileset.get('method')
+        samples = self.file_fileset.get('samples') or []
         raw = samples[0] if samples else None
         # Normalize to full document ID (fileset may give "EFO_0002067" or "ontology_terms/EFO_0002067")
         self.biosample_term = (raw if (raw or '').startswith(
             'ontology_terms/') else f'ontology_terms/{raw}') if raw else None
-        self.simple_sample_summaries = self.files_filesets.get(
+        self.simple_sample_summaries = self.file_fileset.get(
             'simple_sample_summaries')
-        self.treatments_term_ids = self.files_filesets.get(
+        self.treatments_term_ids = self.file_fileset.get(
             'treatments_term_ids')
 
         if self.label in ('genomic_element', 'genomic_element_biosample'):

@@ -98,13 +98,22 @@ genes:
       - start, end
 
 genes_genes:
-  zkd:
+  zkd_sparse:
     fields:
       - z_score
   persistent:
     fields:
       - interaction_type[*], source
       - source
+
+genes_transcripts_genes:
+  persistent:
+    fields:
+      - method, files_filesets
+      - morf_id
+  zkd_sparse:
+    fields:
+      - log2FC, neg_log10_pvalue_adj
 
 genes_structure:
   persistent:
@@ -159,6 +168,7 @@ mm_genes_structure:
 mm_genomic_elements:
   persistent:
     fields:
+      - promoter_of
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
@@ -230,7 +240,7 @@ pathways:
   persistent:
     fields:
       - name
-      - go_biological_process
+      - biological_process
       - is_top_level_pathway, is_in_disease, species
       - is_in_disease, species
       - species
@@ -281,6 +291,11 @@ genomic_elements:
       - source
       - method, _key
       - promoter_of
+      - source, files_filesets
+  mdi_prefixed:
+    fields:
+      - fields: start, end
+        prefixFields: chr
 
 genomic_elements_biosamples:
   persistent:
@@ -289,6 +304,7 @@ genomic_elements_biosamples:
       - source, source_url, files_filesets
       - source_url, files_filesets
       - files_filesets
+      - method, _key
   zkd:
     fields:
       - log2FC
@@ -308,7 +324,38 @@ genomic_elements_genes:
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
       - method, source, _key
+      - _from, _to, files_filesets
 
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
+genomic_elements_genomic_elements:
+  persistent:
+    fields:
+      - files_filesets
+      - method
+      - significant
+  zkd:
+    fields:
+      - neg_log10_pvalue_adj
+      - log2FC
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
+mm_genomic_elements_mm_genes:
+  # IGVFFI9159XDOS: 257,900 edges, 19 promoters, 14,690 response genes.
+  # One dataset: method/source/fileset/context indexes add little selectivity.
+  # Endpoint indexes support filtering and _key pagination in either direction.
+  persistent:
+    fields:
+      - _from, _key
+      - _to, _key
+
+  # Required by the API's biological-context search fallback queries.
   inverted:
     fields: biological_context
     analyzers:
@@ -333,6 +380,7 @@ studies:
 transcripts:
   persistent:
     fields:
+      - refseq_transcript_ids[*]
       - chr, gene_name, name, transcript_type
       - gene_name, name, transcript_type
       - name, transcript_type
@@ -356,6 +404,13 @@ variants:
     fields:
       - pos
 
+variants_IGVF:
+  persistent:
+    fields:
+      - gwas_results
+      - gwas_results[*].neg_log10_pvalue
+      - gwas_results[*].phenotype_term
+
 variants_biosamples:
   persistent:
     fields:
@@ -365,12 +420,15 @@ variants_biosamples:
       - files_filesets
       - method, _key
       - files_filesets, _key
+      - source, files_filesets, method
+      - source, class, files_filesets, method
+      - _to, method, _key
 
 variants_coding_variants:
   persistent:
     fields:
       - source
-
+      - source, source_url
 
 variants_diseases:
   persistent:
@@ -400,7 +458,6 @@ variants_drugs_genes:
 variants_genes:
   zkd_sparse:
     fields:
-      - slope, neg_log10_pvalue, effect_size
       - neg_log10_pvalue, effect_size
       - intron_start, intron_end
   persistent:
@@ -413,6 +470,8 @@ variants_genes:
       - files_filesets
       - effect_size
       - method
+      - source, files_filesets, method
+      - source, class, files_filesets, method
       - method, _key
   inverted:
     fields: biological_context
@@ -423,7 +482,6 @@ variants_genes:
 variants_genomic_elements:
   persistent:
     fields:
-      fields:
       - biosample_term, biological_context, source, method, files_filesets
       - biological_context, source, method, files_filesets
       - source, method, files_filesets
@@ -449,6 +507,8 @@ variants_phenotypes:
       - files_filesets, _key
       - _to, _key
       - source, files_filesets
+      - source, files_filesets, method
+      - source, class, files_filesets, method
 
 variants_phenotypes_coding_variants:
   persistent:
@@ -461,7 +521,7 @@ variants_phenotypes_coding_variants:
 variants_proteins:
   zkd_sparse:
     fields:
-      - log10pvalue
+      - neg_log10_pvalue
   persistent:
     fields:
       - files_filesets, _key, source, label
@@ -477,7 +537,9 @@ variants_proteins:
       - files_filesets
       - method
       - gene, method, source, biological_context, _key
+      - source, files_filesets, method
       - gene, method, _key
+      - source, class, files_filesets, method
 
 variants_variants:
   persistent:

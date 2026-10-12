@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/variants.IGVFMPRAAdapter.json",
   "allOf": [
     {
@@ -21,13 +21,7 @@
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "files_filesets": {
-          "type": "string",
-          "description": "Filesets of the variant",
-          "example": "files_filesets/IGVFFI1323RCIE",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

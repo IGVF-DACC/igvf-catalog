@@ -156,6 +156,21 @@ class ArangoDB:
                 data['name'] = name
 
             collection_db._add_index(data)
+        elif index_type == 'mdi-prefixed':
+            data = {
+                'type': 'mdi-prefixed',
+                'fields': fields,
+                'prefixFields': opts['prefixFields'],
+                'inBackground': True,
+                'fieldValueTypes': 'double'
+            }
+            if sparse:
+                data['sparse'] = True
+
+            if name:
+                data['name'] = name
+
+            collection_db._add_index(data)
         elif index_type == 'inverted':
             if self.index_exists(collection_db, name):
                 return

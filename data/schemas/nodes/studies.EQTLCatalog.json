@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/studies.EQTLCatalog.json",
+  "$id": "schemas/nodes/studies.EQTLCatalog.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -15,27 +15,31 @@
           "example": "OneK1K"
         },
         "pmid": {
+          "title": "PubMed ID",
           "type": "string",
-          "description": "The PMID of the study",
+          "description": "PubMed identifier.",
           "example": "35389779"
         },
         "study_type": {
+          "title": "Study Type",
           "type": "string",
-          "description": "The type of the study",
+          "description": "Resolution at which gene expression was measured.",
           "enum": [
             "single-cell",
             "bulk"
-          ]
+          ],
+          "enum_descriptions": {
+            "single-cell": "Expression is measured in individual cells.",
+            "bulk": "Expression is measured across a population of cells."
+          }
         },
         "source": {
           "enum": [
             "EBI"
           ]
         },
-        "source_url": {},
         "files_filesets": {
-          "type": "string",
-          "description": "The filesets of the study"
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [

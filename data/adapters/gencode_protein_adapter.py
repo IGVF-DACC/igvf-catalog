@@ -95,7 +95,6 @@ class GencodeProtein(BaseAdapter):
                             'name': database_name,
                             'id': id
                         })
-            # Ensembl cross references pregenerated in pkl file, skip it here
             elif database_name in ['RefSeq', 'MANE-Select']:
                 for item in cross_reference[1:]:
                     if item != '-':

@@ -14,7 +14,7 @@ const MAX_PAGE_SIZE = 1000
 
 const METHODS = getCollectionEnumValuesOrThrow('edges', 'motifs_proteins', 'method')
 
-const motifsToProteinsFormat = z.object({
+export const motifsToProteinsFormat = z.object({
   source: z.string().optional(),
   protein: z.string().or(proteinFormat).optional(),
   complex: z.string().or(complexFormat).optional(),

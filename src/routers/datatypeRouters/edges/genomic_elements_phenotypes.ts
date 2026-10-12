@@ -6,7 +6,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
-import { getSchema } from '../schema'
+import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const PHENOTYPE_NAMES = ['cell population proliferation', 'cell migration'] as const
@@ -16,11 +16,13 @@ const genomicElementToPhenotypeCollectionName = 'genomic_elements_phenotypes'
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
 const ontologyCollectionName = 'ontology_terms'
+const METHODS = getCollectionEnumValuesOrThrow('edges', 'genomic_elements_phenotypes', 'method')
 
 const edgeQueryFormat = z.object({
   files_fileset: z.string().optional(),
   phenotype_id: z.string().trim().optional(),
   phenotype_name: z.enum(PHENOTYPE_NAMES).optional(),
+  method: z.enum(METHODS).optional(),
   // Omit or set to true: true returns only significant associations.
   significant: z.enum(['true']).optional()
 })
@@ -37,7 +39,8 @@ const elementOutputFormat = z.object({
   chr: z.string().nullish(),
   start: z.number().nullish(),
   end: z.number().nullish(),
-  name: z.string()
+  name: z.string(),
+  source_annotation: z.string().nullish()
 })
 
 const phenotypeOutputFormat = z.object({
@@ -45,7 +48,7 @@ const phenotypeOutputFormat = z.object({
   phenotype_name: z.string().nullish()
 })
 
-const outputFormat = z.array(z.object({
+export const outputFormat = z.array(z.object({
   name: z.string(),
   label: z.string(),
   method: z.string(),
@@ -199,7 +202,7 @@ async function executePhenotypesQuery (
 }
 
 async function findPhenotypesFromGenomicElements (input: paramsFormatType): Promise<any[]> {
-  validateQuery(input, ['region', 'files_fileset', 'phenotype_id', 'phenotype_name'])
+  validateQuery(input, ['region', 'files_fileset', 'phenotype_id', 'phenotype_name', 'method'])
   delete input.organism
   const limit = applyLimit(input)
   const page = input.page as number
@@ -236,7 +239,7 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
 }
 
 async function findGenomicElementsFromPhenotypes (input: paramsFormatType): Promise<any[]> {
-  validateQuery(input, ['phenotype_id', 'phenotype_name', 'files_fileset'])
+  validateQuery(input, ['phenotype_id', 'phenotype_name', 'files_fileset', 'method'])
   delete input.organism
   const limit = applyLimit(input)
   const page = input.page as number

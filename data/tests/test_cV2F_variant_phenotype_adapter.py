@@ -21,7 +21,7 @@ def mock_file_fileset():
 
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:10203:T:G'})
 @patch('adapters.cV2F_variant_phenotype_adapter.load_variant')
-def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mocker):
+def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mock_file_fileset, mocker):
     # Create a complete mock variant that satisfies the schema requirements
     mock_variant = {
         '_key': 'NC_000001.11:10202:C:A',

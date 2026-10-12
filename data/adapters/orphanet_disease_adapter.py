@@ -55,10 +55,13 @@ class Disease(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
 
         # the xml file is relatively small, just parse at once here
         # or could return an iterator with ET.iterparse(xmlfile)
@@ -76,7 +79,7 @@ class Disease(BaseAdapter):
                              for pmid in source.split('_')]
 
                 gene = assoc.find('Gene')
-                gene_symbol = gene.find('Symbol').text
+                gene_name = gene.find('Symbol').text
                 gene_id = None
                 for exter_ref in gene.findall('./ExternalReferenceList/ExternalReference'):
                     exter_source = exter_ref.find('Source').text
@@ -105,7 +108,7 @@ class Disease(BaseAdapter):
                     'inverse_name': 'associated_with',
                     'pmids': pmids,
                     'term_name': term_name,
-                    'gene_symbol': gene_symbol,
+                    'gene_name': gene_name,
                     'association_type': assoc_type_name,
                     'association_status': assoc_status_name,
                     'source': Disease.SOURCE,

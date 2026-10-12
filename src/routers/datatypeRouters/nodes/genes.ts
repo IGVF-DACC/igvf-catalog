@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat } from '../params'
@@ -12,7 +12,6 @@ const MAX_PAGE_SIZE = 500
 
 const humanGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const mouseGeneSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
-const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 
 const GENE_TYPES = getCollectionEnumValuesOrThrow('nodes', 'genes', 'gene_type')
 const GENE_COLLECTIONS = getCollectionEnumValuesOrThrow('nodes', 'genes', 'collections')
@@ -65,7 +64,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
 
   const inRegionQuery = `
     FOR record in genes
-    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam(input))}
+    FILTER ${getFilterStatements(humanGeneSchema, preProcessRegionParam(input))}
     RETURN {${getDBReturnStatements(humanGeneSchema)}}
   `
 
@@ -191,10 +190,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.hgnc_id !== undefined) {
-    input.hgnc = input.hgnc_id
-    if (!(input.hgnc.toString().startsWith('HGNC'))) {
-      input.hgnc = `HGNC:${input.hgnc as string}`
-    }
+    input.hgnc = withHgncPrefix(input.hgnc_id as string)
     delete input.hgnc_id
   }
 

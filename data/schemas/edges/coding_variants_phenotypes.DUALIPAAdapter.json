@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/coding_variants_phenotypes.DUALIPAAdapter.json",
   "allOf": [
     {
@@ -9,8 +9,7 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores."
         },
         "_from": {
           "example": "coding_variants/ACSF3_ENST00000317447_p.Ala17Pro_c.49G-C",
@@ -45,23 +44,12 @@
             "altered due to mutation"
           ]
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "File and fileset reference for this edge",
-          "example": "files_filesets/IGVFFI6224HZMG",
-          "pattern": "^files_filesets/",
-          "collections": [
-            "files_filesets"
-          ]
-        },
         "biological_context": {
-          "type": "string",
-          "description": "Biological context of the measurement",
+          "$ref": "../mixins.json#/biological_context",
           "example": "HEK293 cell line, female, Homo sapiens"
         },
         "biosample_term": {
-          "type": "string",
-          "description": "Biosample ontology term reference",
+          "$ref": "../mixins.json#/biosample_term",
           "example": "ontology_terms/EFO_0001182"
         },
         "method": {
@@ -80,37 +68,55 @@
           ]
         },
         "avg_gfp": {
+          "title": "Average GFP",
           "type": "number",
-          "description": "Single cells mean GFP fluorescence value per well"
+          "description": "Single cell mean GFP fluorescence value per well"
         },
         "avg_mcherry": {
+          "title": "Average mCherry",
           "type": "number",
-          "description": "Single cells mean mCherry fluorescence value per well"
+          "description": "Single cell mean mCherry fluorescence value per well"
         },
         "avg_GFP_mCherry_ratio": {
+          "title": "Average GFP to mCherry Ratio",
           "type": "number",
-          "description": "Ratio of avg_gfp/avg_mcherry"
+          "description": "Ratio of avg_gfp to avg_mcherry for the well, the abundance readout for the variant allele."
         },
         "wt_GFP_mCherry_ratio": {
+          "title": "Wild-Type GFP to mCherry Ratio",
           "type": "number",
-          "description": "Ratio of avg_gfp/avg_mcherry of related wild-type measurement"
+          "description": "GFP-to-mCherry fluorescence ratio of the matched wild-type (WT) reference. WT reference selection, replicate aggregation and quality-control criteria are dataset-specific."
         },
         "allele_wt_ratio": {
+          "title": "Allele to Wild-Type Ratio",
           "type": "number",
-          "description": "Ratio of avg_GFP_mCherry_ratio/wt_GFP_mCherry_ratio"
+          "description": "Variant-to-WT fluorescence ratio, calculated as avg_GFP_mCherry_ratio / wt_GFP_mCherry_ratio. Values below 1 indicate lower protein abundance than the matched WT reference; values above 1 indicate higher abundance."
         },
         "dualipa_abun_score": {
+          "title": "DUAL-IPA Abundance Score",
           "type": "number",
-          "description": "Log2 Z-score of allele_wt_ratio"
+          "description": "Z-score of the log2 variant-to-WT fluorescence ratio, calculated as (log2(allele_wt_ratio) - mu_wt) / sigma_wt. mu_wt and sigma_wt are the mean and standard deviation of log2-transformed WT:WT reference ratios; their values and calibration scope are dataset-specific. Lower scores indicate lower protein abundance; higher scores indicate higher abundance. A variant-to-WT ratio of 1 corresponds to -mu_wt / sigma_wt, not necessarily zero, so score sign alone does not determine direction relative to WT."
         },
         "dualipa_abun_change": {
+          "title": "DUAL-IPA Abundance Change",
           "type": "string",
-          "enum": ["Y", "N", "Uncertain"],
-          "description": "Significant change of abundance determined by thresholds derived from the log likelihood ratio method"
+          "description": "Abundance-change classification based on dataset-specific log-likelihood-ratio-calibrated score thresholds.",
+          "enum": [
+            "Y",
+            "N",
+            "Uncertain"
+          ],
+          "enum_descriptions": {
+            "Y": "Meets the calibrated criteria for an abundance change in either direction. Use allele_wt_ratio or compare dualipa_abun_score with its WT-equivalent value to determine direction.",
+            "N": "Falls within the calibrated no-change range.",
+            "Uncertain": "Falls between the calibrated change and no-change ranges."
+          }
+        },
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
         }
       },
       "required": [
-        "_key",
         "files_filesets",
         "biological_context",
         "biosample_term",

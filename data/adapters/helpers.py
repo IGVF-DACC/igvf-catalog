@@ -233,6 +233,20 @@ def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
 
 
 def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', validate_SNV=False, correct_ref_allele=True):
+    # A bare insertion/deletion with no anchor base (ref or alt == '') can't be expressed as
+    # gnomad-style "chr-pos-ref-alt" notation - translator.translate_from raises trying to parse
+    # it. Handle it directly against the reference sequence instead, same as load_variant() does
+    # for spdi-formatted input.
+    if ref == '' or alt == '':
+        chr_ref = CHR_MAP[assembly][chr]
+        pos_spdi = int(pos) - 1
+        if ref:
+            ref_genome = seq_repo[chr_ref][pos_spdi:pos_spdi + len(ref)]
+            if ref != ref_genome:
+                raise ValueError(
+                    f'Ref allele mismatch: expected {ref_genome} but got {ref} at {chr_ref}:{pos_spdi}')
+        return f'{chr_ref}:{pos_spdi}:{ref}:{alt}'
+
     # Only use translator if the ref or alt is more than one base, or validate_SNV is True
     if len(ref) == 1 and len(alt) == 1 and validate_SNV != True:
         chr_ref = CHR_MAP[assembly][chr]
@@ -794,7 +808,12 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if len(variant_id.split(':')) == 4:
         format = 'spdi'
         chr_spdi = variant_id.split(':')[0]
-        chr, pos_start, ref, alt = split_spdi(variant_id)
+        split_result = split_spdi(variant_id)
+        if split_result is None:
+            skipped_message = {'variant_id': variant_id,
+                               'reason': 'Unable to parse this variant id'}
+            return variant_json, skipped_message
+        chr, pos_start, ref, alt = split_result
     elif len(variant_id.split('-')) == 4:
         format = 'vcf'
         chr, pos_start, ref, alt = variant_id.split('-')

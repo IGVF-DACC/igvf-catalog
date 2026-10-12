@@ -91,6 +91,10 @@ class Ontology:
     DESCRIPTION = URIRef(
         'http://purl.obolibrary.org/obo/IAO_0000115')
 
+    # PREDICATES + RESTRICTION_PREDICATES together are the closed set of URIs ever written to
+    # an edge's `type_uri` (see process_edges below). Keep this in sync with the `type_uri`
+    # enum in data/schemas/edges/ontology_terms_ontology_terms.Ontology.json -- adding a
+    # predicate here without updating that enum will fail schema validation.
     PREDICATES = [SUBCLASS, DB_XREF]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF, DERIVES_FROM]
 
@@ -179,14 +183,18 @@ class Ontology:
             self.process_ontology()
 
     def process_ontology(self):
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        file_set_accession = self.file_fileset.get(
+            'file_set_id') if self.file_fileset else None
         for writer in (self.node_primary_writer, self.node_secondary_writer,
                        self.edge_primary_writer, self.edge_secondary_writer):
             writer.add_tag('portal_accessions', self.file_accession)
+            if file_set_accession:
+                writer.add_tag('portal_accessions', file_set_accession)
 
-        file_metadata = get_file_fileset_by_accession_in_arangodb(
-            self.file_accession)
-        self.collection_class = file_metadata['class']
-        self.method = file_metadata['method']
+        self.collection_class = self.file_fileset['class']
+        self.method = self.file_fileset['method']
 
         converted_path = self._convert_functional_syntax_if_needed(
             self.filepath)

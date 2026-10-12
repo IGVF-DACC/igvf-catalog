@@ -33,10 +33,10 @@ describe('verboseItems', () => {
 
     expect(mockDbQuery).toHaveBeenCalledWith(`
     FOR record in genes_pathways
-    FILTER record._id in ['id1','id2']
+    FILTER record._id in @ids
     RETURN {
       'source': record['source'], 'source_url': record['source_url'], 'organism': record['organism'], 'class': record['class'], 'method': record['method'], 'label': record['label'], 'files_filesets': record['files_filesets']
-    }`)
+    }`, { ids: ['id1', 'id2'] })
     expect(result).toEqual({
       id1: { _id: 'id1', name: 'Item 1' },
       id2: { _id: 'id2', name: 'Item 2' }
@@ -122,6 +122,26 @@ describe('getFilterStatements', () => {
 
   it('should reject a non-numeric bound in a "range:" filter', () => {
     expect(() => getFilterStatements(GENES_SCHEMA, { start: 'range:100-abc' })).toThrow(TRPCError)
+  })
+
+  it('should escape a single quote in a string equality filter instead of breaking out of the AQL literal', () => {
+    // Regression test: a raw `'` used to close the AQL string literal early, letting the
+    // rest of the value (or a follow-up clause) be parsed as AQL instead of data.
+    const result = getFilterStatements(GENES_SCHEMA, { name: "O'Brien" })
+
+    expect(result).toEqual("record.name == 'O\\'Brien'")
+  })
+
+  it('should escape a single quote in an array-membership filter', () => {
+    const result = getFilterStatements(GENES_PATHWAYS_SCHEMA, { dbxrefs: "O'Brien" })
+
+    expect(result).toEqual("'O\\'Brien' in record.dbxrefs[*].id")
+  })
+
+  it('should reject an intersect filter whose field names are not on the schema', () => {
+    // Regression test: fieldOperands are interpolated as bare (unescapable) AQL property
+    // names, so they must be validated against the schema rather than trusted blindly.
+    expect(() => getFilterStatements(GENES_SCHEMA, { intersect: 'bogus-alsoBogus:100-200' })).toThrow(TRPCError)
   })
 })
 

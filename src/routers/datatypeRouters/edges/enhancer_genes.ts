@@ -46,7 +46,7 @@ const geneOutputFormat = z.object({
   chr: z.string()
 })
 
-const genesGenomicElementsOutputFormat = z.array(z.object({
+export const genesGenomicElementsOutputFormat = z.array(z.object({
   gene: geneOutputFormat,
   elements: z.array(elementOutputFormat).or(elementOutputFormat)
 }))
@@ -117,7 +117,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
 
     COLLECT gene = DOCUMENT(record._to) INTO rows = {
       id: record._from,
-      cell_type: record.biological_context,
+      cell_type: record.cell_annotation != null ? record.cell_annotation : record.biological_context,
       score: record.score,
       model: record.source,
       files_filesets: record.files_filesets,

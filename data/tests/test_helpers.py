@@ -1,6 +1,6 @@
 import pytest
 import hashlib
-from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1
+from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1, build_spdi
 from unittest.mock import patch, MagicMock
 from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 
@@ -8,6 +8,44 @@ from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_b
 def test_build_variant_id_fails_for_unsupported_assembly():
     with pytest.raises(ValueError, match='Assembly not supported'):
         build_variant_id(None, None, None, None, 'hg19')
+
+
+class _FakeChromosomeSeq:
+    """Returns a fixed sequence for any slice - only the returned bases matter for these tests."""
+
+    def __init__(self, bases):
+        self.bases = bases
+
+    def __getitem__(self, _slice):
+        return self.bases
+
+
+def test_build_spdi_empty_alt_matching_ref_skips_translator():
+    # A bare deletion with no anchor base (alt == '') can't be expressed as gnomad-style
+    # "chr-pos-ref-alt" notation, so this must be handled without ever calling the translator.
+    seq_repo = {'NC_000009.12': _FakeChromosomeSeq(
+        'AAACATCACACAGAATTACCGTACGAGGCCGGGCGC')}
+    translator = MagicMock()
+    spdi = build_spdi('9', 133276164, 'AAACATCACACAGAATTACCGTACGAGGCCGGGCGC', '',
+                      translator, seq_repo)
+    assert spdi == 'NC_000009.12:133276163:AAACATCACACAGAATTACCGTACGAGGCCGGGCGC:'
+    translator.translate_from.assert_not_called()
+
+
+def test_build_spdi_empty_ref_skips_translator():
+    seq_repo = {'NC_000010.11': _FakeChromosomeSeq('')}
+    translator = MagicMock()
+    spdi = build_spdi('10', 79347445, '', 'CCTCCTCAGG', translator, seq_repo)
+    assert spdi == 'NC_000010.11:79347444::CCTCCTCAGG'
+    translator.translate_from.assert_not_called()
+
+
+def test_build_spdi_raises_on_empty_alt_ref_mismatch():
+    seq_repo = {'NC_000009.12': _FakeChromosomeSeq('G' * 36)}
+    translator = MagicMock()
+    with pytest.raises(ValueError, match='Ref allele mismatch'):
+        build_spdi('9', 133276164, 'AAACATCACACAGAATTACCGTACGAGGCCGGGCGC', '',
+                   translator, seq_repo)
 
 
 def test_build_regulatory_region_id_creates_id_string():
@@ -228,6 +266,19 @@ def test_valid_spdi_input(mock_hgvs, mock_build, mock_translator, mock_proxy, mo
 
 def test_unable_to_parse_variant():
     variant_id = 'BAD_FORMAT'
+    result, skipped = load_variant(variant_id)
+    assert result == {}
+    assert skipped == {'variant_id': variant_id,
+                       'reason': 'Unable to parse this variant id'}
+
+
+def test_spdi_shaped_id_with_unsupported_accession():
+    # 4 colon-separated parts looks parseable as spdi format, but split_spdi() only
+    # recognizes NC_ accessions and returns None for anything else (e.g. an NW_ scaffold/alt
+    # contig accession). Regression test for a bug where load_variant() unpacked that None
+    # return value directly (`chr, pos_start, ref, alt = split_spdi(variant_id)`) and crashed
+    # with TypeError instead of skipping, the same way it already does for other unparseable ids.
+    variant_id = 'NW_009646208.1:1000:A:T'
     result, skipped = load_variant(variant_id)
     assert result == {}
     assert skipped == {'variant_id': variant_id,

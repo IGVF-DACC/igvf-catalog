@@ -37,7 +37,7 @@ def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     assert first_item['start'] == 101174581
     assert first_item['end'] == 101175330
     assert first_item['type'] == 'tested elements'
-    assert first_item['source_annotation'] == 'enhancer'
+    assert first_item['source_annotation'] == 'candidate enhancer'
     assert first_item['method'] == 'CRISPR screen'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI5135QZCS/'
