@@ -60,20 +60,20 @@
         },
         "beta": {
           "title": "Beta",
-          "type": "number",
-          "description": "Effect size of the alternate allele on the trait.",
+          "type": ["number", "null"],
+          "description": "Effect size of the alternate allele on the trait. Null when the study did not report a beta (e.g. it reported an odds_ratio instead).",
           "example": 0.01
         },
         "beta_ci_lower": {
           "title": "Beta Confidence Interval Lower Bound",
-          "type": "number",
-          "description": "Lower bound of the confidence interval on beta.",
+          "type": ["number", "null"],
+          "description": "Lower bound of the confidence interval on beta. Null when the study did not report a beta.",
           "example": 0.005
         },
         "beta_ci_upper": {
           "title": "Beta Confidence Interval Upper Bound",
-          "type": "number",
-          "description": "Upper bound of the confidence interval on beta.",
+          "type": ["number", "null"],
+          "description": "Upper bound of the confidence interval on beta. Null when the study did not report a beta.",
           "example": 0.015
         },
         "odds_ratio": {

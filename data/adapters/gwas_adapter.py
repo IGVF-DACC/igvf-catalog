@@ -185,9 +185,12 @@ class GWAS(BaseAdapter):
             'lead_alt': row[7],
             'phenotype_term': phenotype_term,
             'direction': row[8],
-            'beta': float(row[9] or 0),
-            'beta_ci_lower': float(row[10] or 0),
-            'beta_ci_upper': float(row[11] or 0),
+            # An empty field means the study didn't report a beta (e.g. it reported an
+            # odds_ratio instead) - that must stay null, not become a measured effect of 0.
+            # A row that does report '0' is a real zero and is preserved as 0.0.
+            'beta': float(row[9]) if row[9] else None,
+            'beta_ci_lower': float(row[10]) if row[10] else None,
+            'beta_ci_upper': float(row[11]) if row[11] else None,
             'odds_ratio': float(row[12] or 0),
             'oddsr_ci_lower': float(row[13] or 0),
             'oddsr_ci_upper': float(row[14] or 0),
