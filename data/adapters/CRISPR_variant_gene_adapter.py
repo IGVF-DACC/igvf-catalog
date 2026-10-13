@@ -237,6 +237,14 @@ class CRISPRVariantGene(BaseAdapter):
         if self.label == 'variant':
             self._write_variants(spdi_to_variant, loaded_variants)
         elif self.label == 'variant_gene':
+            missing_spdis = set(spdi_to_row) - set(loaded_variants)
+            if missing_spdis:
+                self.logger.error(
+                    f'{self.file_accession}: skipping variant-gene edges for '
+                    f'{len(missing_spdis)} unique variants in this chunk because their '
+                    'nodes are missing from variants in ArangoDB. '
+                    'Output will be incomplete. Load the variant nodes into ArangoDB '
+                    'and rerun edge generation; uploading node files to S3 is not sufficient.')
             if self.is_crispr_millipede:
                 self._write_crispr_millipede_edges(
                     spdi_to_row, loaded_variants)

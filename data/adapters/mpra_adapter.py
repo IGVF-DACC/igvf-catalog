@@ -732,6 +732,14 @@ class MPRAAdapter(BaseAdapter):
         """IGVF variant×biosample BED: SPDI in col 3, optional ``variant_pos`` in col 16 for disambiguation of the same variant on different strands."""
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[3] for row in chunk], collection=self.variant_collection)
+        missing_spdis = {row[3] for row in chunk} - set(loaded_spdis)
+        if missing_spdis:
+            self.logger.error(
+                f'{self.file_accession}: skipping variant-biosample edges for '
+                f'{len(missing_spdis)} unique variants in this chunk because their '
+                f'nodes are missing from {self.variant_collection} in ArangoDB. '
+                'Output will be incomplete. Load the variant nodes into ArangoDB '
+                'and rerun edge generation; uploading node files to S3 is not sufficient.')
         for row in chunk:
             spdi = row[3]
             if spdi not in loaded_spdis:
