@@ -40,8 +40,10 @@ from adapters.file_fileset_adapter import FileFileSet
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
-    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', label='gencode_transcript'),
+    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', label='gencode_transcript', reference_filepath='./samples/gencode_refseq_sample.tsv'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
+    'mm_gencode_transcripts': Gencode(filepath='./samples/gencode_mouse_sample.gtf', label='mm_gencode_transcript'),
+    'mm_transcribed_to': Gencode(filepath='./samples/gencode_mouse_sample.gtf', label='mm_transcribed_to'),
     'gencode_gene_structures': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='gene_structure'),
     'transcript_contains_gene_structure': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='transcript_contains_gene_structure'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),

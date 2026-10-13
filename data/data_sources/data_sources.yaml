@@ -418,33 +418,28 @@ gene:
     - https://api.data.igvf.org/reference-files/IGVFFI7344CFHT/@@download/IGVFFI7344CFHT.tsv.gz # gene alias support file: Homo_sapiens.gene_info.gz
   source: GENCODE
 
-# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts/transcripts_IGVFFI7217ZMJZ.jsonl --label gencode_transcript --organism HUMAN --reference-filepath ~/dataset/IGVFFI9820RGXX.tsv.gz
+# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts/transcripts_IGVFFI7217ZMJZ.jsonl --label gencode_transcript --reference-filepath ~/dataset/IGVFFI9820RGXX.tsv.gz
 transcript:
   collection: transcripts
   params:
     - label
-    - organism
     - reference_filepath
-  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts/transcripts_{datafile}.jsonl --label gencode_transcript --organism {organism} --reference-filepath {reference_filepath}
+  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts/transcripts_{datafile}.jsonl --label gencode_transcript --reference-filepath {reference_filepath}
   pypy3: false
   file_mappings:
     - datafile: https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
       reference_filepath: https://api.data.igvf.org/reference-files/IGVFFI9820RGXX/@@download/IGVFFI9820RGXX.tsv.gz # GENCODE v43 RefSeq mapping
   source: GENCODE
 
-# Example:
-# python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl --label transcribed_to --organism HUMAN
-# python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key genes_transcripts/mm_genes_transcripts_IGVFFI5842FWGQ.vcf.jsonl --label transcribed_to --organism MOUSE
+# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl --label transcribed_to
 transcribed to:
   collection: genes_transcripts
   params:
     - label
-    - organism
-  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts/transcripts_{datafile}.jsonl --label gencode_transcript --organism {organism}
+  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_transcripts/genes_transcripts_{datafile}.jsonl --label transcribed_to
   pypy3: false
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
-    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
 
 # Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label gene_structure
@@ -550,17 +545,16 @@ ontology relationship:
 
 # Examples:
 ## Note we switched loading from uniprot dat files to gencode gtf files
-# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --label gencode_protein --organism HUMAN --uniprot-sprot-file-path ~/dataset/IGVFFI4731NANO.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI8551EYSR.dat.gz
-# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl --label gencode_protein --organism MOUSE --uniprot-sprot-file-path ~/dataset/IGVFFI3157HIUW.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI6972ORPG.dat.gz
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --label gencode_protein --uniprot-sprot-file-path ~/dataset/IGVFFI4731NANO.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI8551EYSR.dat.gz
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl --label mm_gencode_protein --uniprot-sprot-file-path ~/dataset/IGVFFI3157HIUW.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI6972ORPG.dat.gz
 protein:
   collection: proteins
   params:
-    - organism
     - label
   pypy3: true
   command:
-    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {human gencode datafile} --output-bucket-key proteins/human.jsonl --organism HUMAN --label gencode_protein --uniprot-sprot-file-path {human_uniprot_sprot_file} --uniprot-trembl-file-path {human_uniprot_trembl_file}
-    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {mouse gencode datafile} --output-bucket-key proteins/mouse.jsonl --organism MOUSE --label gencode_protein --uniprot-sprot-file-path {rodent_uniprot_sprot_file} --uniprot-trembl-file-path {rodent_uniprot_trembl_file}
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {human gencode datafile} --output-bucket-key proteins/human.jsonl --label gencode_protein --uniprot-sprot-file-path {human_uniprot_sprot_file} --uniprot-trembl-file-path {human_uniprot_trembl_file}
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {mouse gencode datafile} --output-bucket-key proteins/mouse.jsonl --label mm_gencode_protein --uniprot-sprot-file-path {rodent_uniprot_sprot_file} --uniprot-trembl-file-path {rodent_uniprot_trembl_file}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43
     - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
@@ -572,17 +566,16 @@ protein:
 
 # Example:
 ## Note we switched loading from uniprot dat files to gencode gtf files
-# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcrits_proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --organism HUMAN --label gencode_translates_to
-# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key transcrits_proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl --organism MOUSE --label gencode_translates_to
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts_proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --label gencode_translates_to
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key transcripts_proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl --label mm_gencode_translates_to
 translates to:
   collection: transcripts_proteins
   params:
     - label
-    - organism
   pypy3: true
   command:
-    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {human gencode datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To
-    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {mouse gencode datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {human gencode datafile} --output-bucket-key transcripts_proteins/gencode_translates_to.jsonl --label gencode_translates_to
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {mouse gencode datafile} --output-bucket-key transcripts_proteins/mm_gencode_translates_to.jsonl --label mm_gencode_translates_to
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43
     - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # Mouse GENCODE vM36
@@ -2276,14 +2269,25 @@ gene mouse:
   source: GENCODE
   version: vM36
 
-# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI5842FWGQ.jsonl --label mm_gencode_transcript --organism MOUSE
+# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI5842FWGQ.jsonl --label mm_gencode_transcript
 transcript mouse:
   collection: mm_transcripts
   params:
     - label
-    - organism
   pypy3: false
-  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI5842FWGQ.jsonl --label mm_gencode_transcript --organism {organism}
+  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI5842FWGQ.jsonl --label mm_gencode_transcript
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
+  source: GENCODE
+  version: vM36
+
+# Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key genes_transcripts/mm_genes_transcripts_IGVFFI5842FWGQ.vcf.jsonl --label mm_transcribed_to
+transcribed to mouse:
+  collection: genes_transcripts
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_transcripts/mm_genes_transcripts_IGVFFI5842FWGQ.jsonl --label mm_transcribed_to
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz
   source: GENCODE
