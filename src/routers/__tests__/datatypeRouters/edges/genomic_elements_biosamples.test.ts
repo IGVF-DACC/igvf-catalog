@@ -136,3 +136,28 @@ describe('genomicElementsBiosamplesRouters.genomicElementsFromBiosamples', () =>
     ).rejects.toThrow(TRPCError)
   })
 })
+
+describe('MPRA element routing by organism', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it.each(['Homo sapiens', 'Mus musculus'])('routes both directions and verbose lookups for %s', async (organism) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const prefix = organism === 'Mus musculus' ? 'mm_' : ''
+    const input = { organism, region: 'chr1:10-20', verbose: 'true', page: 0 }
+    await genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+    expect(query.mock.calls[0][0]).toContain(`FOR record in ${prefix}genomic_elements`)
+    expect(query.mock.calls[0][0]).toContain(`FOR record IN ${prefix}genomic_elements_biosamples`)
+    expect(query.mock.calls[0][0]).toContain(`FOR otherRecord IN ${prefix}genomic_elements`)
+
+    const reverseInput = { organism, biosample_name: 'PYS-2 cell', verbose: 'true', page: 0 }
+    await genomicElementsBiosamplesRouters.genomicElementsFromBiosamples({
+      input: reverseInput, ctx: {}, type: 'query', path: '', rawInput: reverseInput
+    })
+    expect(query.mock.calls[1][0]).toContain(`FOR record IN ${prefix}genomic_elements_biosamples`)
+    expect(query.mock.calls[1][0]).toContain(`FOR otherRecord IN ${prefix}genomic_elements`)
+    expect(query.mock.calls[1][0]).toContain('FOR record IN ontology_terms')
+  })
+})
