@@ -4,6 +4,7 @@ import json
 import requests
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -76,15 +77,16 @@ class EncodeElementGeneLink(BaseAdapter):
     TYPE = 'accessible dna elements'
     COLLECTION_LABEL = 'predicted regulatory element effect on gene expression'
 
-    def __init__(self, filepath, label, source, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label, source, writer: Optional[Writer] = None, validate=False, **kwargs):
         if source not in self.ALLOWED_SOURCES:
             raise ValueError('Invalid source. Allowed values: ' +
                              ','.join(self.ALLOWED_SOURCES))
 
         self.source = source
-        self.source_url = source_url
-        # Handle URLs ending with '/' by using -2 index instead of -1
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
+        self.file_accession = get_file_accession(filepath)
+        self.source_url = (
+            f'https://www.encodeproject.org/files/{self.file_accession}/'
+        )
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         if label == 'genomic_element_gene':

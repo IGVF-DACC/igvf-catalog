@@ -4,6 +4,9 @@ from unittest.mock import patch
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.writer import SpyWriter
 
+MIGRATION_PATH = './samples/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
+GROWTH_PATH = './samples/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
+
 
 @pytest.fixture
 def mock_file_fileset():
@@ -22,9 +25,8 @@ def mock_file_fileset():
 def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
-        filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+        filepath=MIGRATION_PATH,
         label='genomic_element',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
         validate=True,
     )
@@ -47,9 +49,8 @@ def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
 def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_fileset):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
-        filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+        filepath=MIGRATION_PATH,
         label='genomic_element_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
         validate=True,
     )
@@ -78,9 +79,8 @@ def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_
 def test_crispr_element_phenotype_genomic_element_phenotype_growth(mock_file_fileset):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
-        filepath='./samples/crispr_element_phenotype_growth.example.tsv',
+        filepath=GROWTH_PATH,
         label='genomic_element_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/',
         writer=writer,
         validate=True,
     )
@@ -101,20 +101,20 @@ def test_crispr_element_phenotype_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label'):
         CRISPRElementPhenotype(
-            filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+            filepath=MIGRATION_PATH,
             label='invalid_label',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
             writer=writer,
         )
 
 
-def test_crispr_element_phenotype_unsupported_accession(mock_file_fileset):
+def test_crispr_element_phenotype_unsupported_accession(mock_file_fileset, tmp_path):
+    sample = tmp_path / 'IGVFFI0000AAAA_unsupported.tsv'
+    sample.write_text('dhs\tdhs_coords\n')
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Unsupported file accession'):
         CRISPRElementPhenotype(
-            filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+            filepath=str(sample),
             label='genomic_element',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
         )
 
@@ -142,7 +142,7 @@ def test_parse_element_coords_raises_on_unrecognized():
 
 
 def test_crispr_element_phenotype_skips_na_coordinate_rows(mock_file_fileset, tmp_path):
-    sample = tmp_path / 'mixed.tsv'
+    sample = tmp_path / 'IGVFFI5135QZCS_mixed.tsv'
     sample.write_text(
         'dhs\tdhs_coords\tdhs_count\tavg_migration_pZ\thit_gRNA_count_mig\t'
         'nonhit_gRNA_count_mig\tfraction_hit_mig\tmigration_pval\tmig_significant\n'
@@ -154,7 +154,6 @@ def test_crispr_element_phenotype_skips_na_coordinate_rows(mock_file_fileset, tm
     adapter = CRISPRElementPhenotype(
         filepath=str(sample),
         label='genomic_element_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
         validate=True,
     )

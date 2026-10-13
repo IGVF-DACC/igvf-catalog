@@ -5,8 +5,8 @@ import math
 import re
 from pathlib import Path
 from typing import Optional
-from urllib.parse import urlparse
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.gene_validator import GeneValidator
 from adapters.helpers import (
@@ -60,14 +60,12 @@ class MORFGeneTranscriptGene(BaseAdapter):
         self,
         filepath,
         label,
-        source_url,
         writer: Optional[Writer] = None,
         validate=False,
         reference_filepath: Optional[str] = None,
-        reference_source_url: Optional[str] = None,
         **kwargs
     ):
-        self.file_accession = self._file_accession(source_url, 'source_url')
+        self.file_accession = get_file_accession(filepath)
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '
@@ -81,10 +79,11 @@ class MORFGeneTranscriptGene(BaseAdapter):
         self.source_url = (
             f'https://data.igvf.org/tabular-files/{self.file_accession}/'
         )
-        self.reference_accession = self._file_accession(
-            reference_source_url, 'reference_source_url')
+        self.reference_accession = get_file_accession(reference_filepath)
         self.reference_filepath = reference_filepath
-        self.reference_source_url = reference_source_url
+        self.reference_source_url = (
+            f'https://data.igvf.org/tabular-files/{self.reference_accession}/'
+        )
         self.readout_gene = self.FILE_CONFIG[self.file_accession]['readout_gene']
         self.gene_validator = GeneValidator()
 
@@ -108,16 +107,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
 
     def _get_collection_name(self):
         return 'genes_transcripts_genes'
-
-    @staticmethod
-    def _file_accession(source_url: Optional[str], field: str) -> str:
-        parsed = urlparse(source_url or '')
-        parts = parsed.path.strip('/').split('/')
-        if (parsed.scheme not in {'http', 'https'} or not parsed.netloc
-                or len(parts) != 2 or parts[0] != 'tabular-files'
-                or not re.fullmatch(r'IGVFFI[0-9A-Z]{8}', parts[-1])):
-            raise ValueError(f'{field} must be an IGVF tabular-file URL.')
-        return parts[-1]
 
     @staticmethod
     def _open_file(filepath):
