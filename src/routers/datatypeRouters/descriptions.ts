@@ -2087,6 +2087,43 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
+  genomic_elements_genomic_elements:
+    'Retrieve promoter perturbation effects on chromatin accessibility at target peaks.<br> \
+    Source elements identify perturbed promoters; target elements identify readout peaks. \
+    Filter by perturbed_region (promoter) or accessible_region (readout peak), using chr:start-end, promoter_gene_name or promoter_gene_id, files_fileset, or method. \
+    Set verbose=true to expand both genomic elements and the linked promoter gene record. \
+    Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+      {
+        id: 'perturb-seq',
+        label: 'Multiome Perturb-seq',
+        examples: [
+          {
+            label: 'Query by perturbed gene',
+            items: [
+              'promoter_gene_name = YY1',
+              'method = Multiome Perturb-seq',
+              'files_fileset = IGVFFI2419ZSGC'
+            ]
+          },
+          {
+            label: 'Query by readout peak region',
+            items: [
+              'accessible_region = chr1:3586345-3586846',
+              'method = Multiome Perturb-seq'
+            ]
+          },
+          {
+            label: 'Accessibility decreases with adjusted p-value below 0.1',
+            items: [
+              'method = Multiome Perturb-seq',
+              'log2FC = lt:0',
+              'p_value_adj = lt:0.1'
+            ]
+          }
+        ]
+      }
+    ]),
+
   genomic_elements_genes:
     'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
     Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \

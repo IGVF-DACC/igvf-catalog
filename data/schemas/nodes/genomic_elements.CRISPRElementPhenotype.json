@@ -30,7 +30,7 @@
             "candidate enhancer"
           ],
           "enum_descriptions": {
-            "enhancer": "An element annotated as potentially regulating transcription from a promoter."
+            "candidate enhancer": "An element annotated as potentially regulating transcription from a promoter."
           }
         },
         "source": {

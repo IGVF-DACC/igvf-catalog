@@ -53,7 +53,7 @@
           "example": "jesse-engreitz"
         },
         "preferred_assay_titles": {
-          "title": "Preferred Assay Titles",
+           "title": "Preferred Assay Titles",
           "type": [
             "array",
             "null"
@@ -128,6 +128,7 @@
             "Homology",
             "MPRA",
             "MORF screen",
+            "Multiome Perturb-seq",
             "MutPred2",
             "Orphanet",
             "Perturb-seq",
@@ -218,7 +219,8 @@
               "SGE Pipeline",
               "Snakemake",
               "statsmodels",
-              "Straw"
+              "Straw",
+              "snapATAC2"
             ]
           }
         },
@@ -387,6 +389,16 @@
           ],
           "description": "Version of the external data source",
           "example": "File generated on 2023-10-10"
+        },
+        "dbxref_name": {
+          "type": "string",
+          "description": "Accession of the IGVF Portal file mirroring this ENCODE file.",
+          "example": "IGVFFI2331IRGH"
+        },
+        "dbxref_fileset_id": {
+          "type": "string",
+          "description": "Accession of the IGVF Portal file set containing the mirrored file.",
+          "example": "IGVFDS5514HTXN"
         }
       },
       "required": [

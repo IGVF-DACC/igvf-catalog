@@ -51,6 +51,18 @@ def spy_writer():
     return SpyWriter()
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.pharmgkb_drug_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 def test_drug_label(drug_filepath, spy_writer, mocker, mock_file_fileset):
     mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
                  return_value='fake_variant_id')
@@ -77,7 +89,7 @@ def test_drug_label(drug_filepath, spy_writer, mocker, mock_file_fileset):
     assert first_item['files_filesets'] == f'files_filesets/{DRUG_FILE_ACCESSION}'
 
 
-def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker, mock_file_fileset):
+def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker, mock_file_fileset, mock_bulk_check_variants):
     mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
                  return_value='fake_variant_id')
     pharmgkb = PharmGKB(filepath=filepath, label='variant_drug',
@@ -101,6 +113,63 @@ def test_variant_drug_label(filepath, reference_kwargs, spy_writer, mocker, mock
     assert first_item['class'] == 'observed data'
     assert first_item['method'] == 'PharmGKB'
     assert first_item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
+
+
+def test_variant_drug_label_skips_edge_when_variant_not_loaded(filepath, reference_kwargs, spy_writer, mocker, mock_file_fileset, mock_bulk_check_variants):
+    """A variant that isn't already in the variants collection must be
+    skipped, not turned into a dangling edge."""
+    mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
+                 return_value='fake_variant_id')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    pharmgkb = PharmGKB(filepath=filepath, label='variant_drug',
+                        writer=spy_writer, validate=True, **reference_kwargs)
+    pharmgkb.process_file()
+
+    non_empty_contents = [
+        content for content in spy_writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+
+
+def test_variants_label_creates_missing_variant(filepath, reference_kwargs, spy_writer, mocker, mock_file_fileset, mock_bulk_check_variants):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection."""
+    mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
+                 return_value='NC_000019.10:9435653:C:A')
+    mock_load_variant = mocker.patch(
+        'adapters.pharmgkb_drug_adapter.load_variant')
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000019.10:9435653:C:A',
+        'name': 'NC_000019.10:9435653:C:A',
+        'chr': 'chr19',
+        'pos': 9435653,
+        'ref': 'C',
+        'alt': 'A',
+        'variation_type': 'SNP',
+        'spdi': 'NC_000019.10:9435653:C:A',
+        'hgvs': 'fake_hgvs',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    pharmgkb = PharmGKB(filepath=filepath, label='variants', writer=spy_writer, validate=True,
+                        variant_reference_filepath=reference_kwargs['variant_reference_filepath'])
+    pharmgkb.process_file()
+
+    non_empty_contents = [
+        content for content in spy_writer.contents if content.strip()]
+    assert len(non_empty_contents) >= 1
+    item = json.loads(non_empty_contents[0])
+    assert item['_key'] == 'NC_000019.10:9435653:C:A'
+    assert item['source'] == 'pharmGKB'
+    assert item['source_url'].startswith('https://www.pharmgkb.org/variant/')
+    assert item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
+
+
+def test_variants_label_requires_variant_reference_filepath(filepath, spy_writer):
+    with pytest.raises(ValueError, match='variant_reference_filepath'):
+        PharmGKB(filepath=filepath, label='variants', writer=spy_writer)
 
 
 def test_variant_drug_gene_label(filepath, reference_kwargs, spy_writer, mocker, mock_file_fileset):

@@ -272,6 +272,19 @@ def test_unable_to_parse_variant():
                        'reason': 'Unable to parse this variant id'}
 
 
+def test_spdi_shaped_id_with_unsupported_accession():
+    # 4 colon-separated parts looks parseable as spdi format, but split_spdi() only
+    # recognizes NC_ accessions and returns None for anything else (e.g. an NW_ scaffold/alt
+    # contig accession). Regression test for a bug where load_variant() unpacked that None
+    # return value directly (`chr, pos_start, ref, alt = split_spdi(variant_id)`) and crashed
+    # with TypeError instead of skipping, the same way it already does for other unparseable ids.
+    variant_id = 'NW_009646208.1:1000:A:T'
+    result, skipped = load_variant(variant_id)
+    assert result == {}
+    assert skipped == {'variant_id': variant_id,
+                       'reason': 'Unable to parse this variant id'}
+
+
 @patch('adapters.helpers.get_ref_seq_by_spdi', return_value='A')
 def test_empty_alt(mock_ref_seq):
     variant_id = 'NC_000001.11:12345:A:'

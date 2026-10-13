@@ -9,7 +9,9 @@ import requests
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
+    bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
+    load_variant,
     to_float,
 )
 from adapters.writer import Writer
@@ -49,9 +51,11 @@ class EQTLCatalog(BaseAdapter):
     # Used by qtl to resolve dataset_id -> biosample/study/source_url, and by study
     # to select which study_ids to emit (quant_method ge/leafcutter + condition naive).
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
-    ALLOWED_LABELS = ['qtl', 'study']
+    ALLOWED_LABELS = ['qtl', 'study', 'variants']
+    CHUNK_SIZE = 6500
     MAX_LOG10_PVALUE = 400
     STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
+    VARIANTS_SOURCE_URL = 'https://www.ebi.ac.uk/eqtl/'
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     @staticmethod
@@ -70,6 +74,7 @@ class EQTLCatalog(BaseAdapter):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source = 'EBI'
         self.gene_validator = GeneValidator()
+        self.written_variant_keys = set()
 
         super().__init__(filepath, label, writer, validate)
 
@@ -84,6 +89,8 @@ class EQTLCatalog(BaseAdapter):
         """Get collection based on label."""
         if self.label == 'qtl':
             return 'variants_genes'
+        elif self.label == 'variants':
+            return 'variants'
         else:
             return 'studies'
 
@@ -93,6 +100,8 @@ class EQTLCatalog(BaseAdapter):
             self.process_qtl()
         elif self.label == 'study':
             self.process_study()
+        elif self.label == 'variants':
+            self.process_variants()
 
     def process_qtl(self):
         # class/method come from catalog files_filesets (same pattern as other adapters)
@@ -135,71 +144,168 @@ class EQTLCatalog(BaseAdapter):
         if not found_dataset:
             raise ValueError(f'No metadata found for dataset {dataset_id}')
 
+        def write_edge(variant_id, row):
+            gene_id = row[1]
+            is_valid_gene_id = self.gene_validator.validate(
+                gene_id)
+            if not is_valid_gene_id:
+                return
+            # this edge id is too long, needs to be hashed
+            variants_genes_id = hashlib.sha256(
+                (variant_id + '_' + gene_id + '_' + dataset_id).encode()).hexdigest()
+            variant_vcf_format = row[3]
+            p_value = to_float(row[7])
+            if p_value == 0:
+                self.logger.warning(
+                    f'p_value is 0 for {variant_vcf_format} {gene_id} {dataset_id}')
+                log_pvalue = self.MAX_LOG10_PVALUE  # Max value based on data
+            else:
+                log_pvalue = -1 * log10(p_value)
+            _props = {
+                '_key': variants_genes_id,
+                '_from': f'variants/{variant_id}',
+                '_to': f'genes/{gene_id}',
+                'biosample_term': biosample_term,
+                'biological_process': biological_process,
+                'study': study,
+                'biological_context': biological_context,
+                'label': label,
+                'class': self.collection_class,
+                'method': self.method,
+                'source': self.source,
+                'source_url': source_url,
+                'name': name,
+                'inverse_name': inverse_name,
+                'molecular_trait_id': row[0],
+                'gene_id': gene_id,
+                'credible_set_id': row[2],
+                'variant_chromosome_position_ref_alt': variant_vcf_format,
+                'rsid': row[4],
+                'credible_set_size': int(row[5]),
+                'posterior_inclusion_probability': float(row[6]),
+                'p_value': p_value,
+                'neg_log10_pvalue': log_pvalue,
+                'effect_size': to_float(row[8]),
+                'standard_error': float(row[9]),
+                'z_score': float(row[10]),
+                'credible_set_min_r2': float(row[11]),
+                'region': row[12],
+                'files_filesets': 'files_filesets/' + self.file_accession,
+            }
+            if label == 'spliceQTL':
+                molecular_trait_id_list = row[0].split(':')
+                _props['intron_chr'] = molecular_trait_id_list[0]
+                _props['intron_start'] = int(molecular_trait_id_list[1])
+                _props['intron_end'] = int(molecular_trait_id_list[2])
+            if self.validate:
+                self.validate_doc(_props)
+            self.writer.write(json.dumps(_props) + '\n')
+
+        def process_chunk(chunk):
+            rows_by_variant_id = []
+            for row in chunk:
+                variant_vcf_format = row[3]
+                chr, pos, ref_seq, alt_seq = variant_vcf_format.split('_')
+                try:
+                    variant_id = build_variant_id(
+                        chr, pos, ref_seq, alt_seq, 'GRCh38'
+                    )
+                except Exception as e:
+                    self.logger.warning(
+                        f'Skipping row - unable to build variant id (chr={chr}, pos={pos}, ref={ref_seq}, alt={alt_seq}): {e}')
+                    continue
+                rows_by_variant_id.append((variant_id, row))
+
+            if not rows_by_variant_id:
+                return
+
+            loaded_variants = bulk_check_variants_in_arangodb(
+                list({variant_id for variant_id, _ in rows_by_variant_id}),
+                check_by='_key',
+            )
+
+            skipped_missing = 0
+            for variant_id, row in rows_by_variant_id:
+                if variant_id not in loaded_variants:
+                    skipped_missing += 1
+                    continue
+                write_edge(variant_id, row)
+
+            if skipped_missing:
+                self.logger.warning(
+                    f'Skipped {skipped_missing} row(s) - variant not found in variants collection')
+
         with gzip.open(self.filepath, 'rt') as f:
             qtl_reader = csv.reader(f, delimiter='\t')
             next(qtl_reader)
+            chunk = []
             for row in qtl_reader:
-                variant_vcf_format = row[3]
-                chr, pos, ref_seq, alt_seq = variant_vcf_format.split('_')
+                chunk.append(row)
+                if len(chunk) >= EQTLCatalog.CHUNK_SIZE:
+                    process_chunk(chunk)
+                    chunk = []
+            if chunk:
+                process_chunk(chunk)
+
+            self.gene_validator.log()
+
+    def process_variants(self):
+        with gzip.open(self.filepath, 'rt') as f:
+            qtl_reader = csv.reader(f, delimiter='\t')
+            next(qtl_reader)
+            chunk = []
+            for row in qtl_reader:
+                chunk.append(row)
+                if len(chunk) >= EQTLCatalog.CHUNK_SIZE:
+                    self.process_variant_chunk(chunk)
+                    chunk = []
+            if chunk:
+                self.process_variant_chunk(chunk)
+
+    def process_variant_chunk(self, chunk):
+        rows_by_variant_id = []
+        for row in chunk:
+            variant_vcf_format = row[3]
+            chr, pos, ref_seq, alt_seq = variant_vcf_format.split('_')
+            try:
                 variant_id = build_variant_id(
                     chr, pos, ref_seq, alt_seq, 'GRCh38'
                 )
-                gene_id = row[1]
-                is_valid_gene_id = self.gene_validator.validate(
-                    gene_id)
-                if not is_valid_gene_id:
-                    continue
-                # this edge id is too long, needs to be hashed
-                variants_genes_id = hashlib.sha256(
-                    (variant_id + '_' + gene_id + '_' + dataset_id).encode()).hexdigest()
-                p_value = to_float(row[7])
-                if p_value == 0:
-                    self.logger.warning(
-                        f'p_value is 0 for {variant_vcf_format} {gene_id} {dataset_id}')
-                    log_pvalue = self.MAX_LOG10_PVALUE  # Max value based on data
-                else:
-                    log_pvalue = -1 * log10(p_value)
-                _props = {
-                    '_key': variants_genes_id,
-                    '_from': f'variants/{variant_id}',
-                    '_to': f'genes/{gene_id}',
-                    'biosample_term': biosample_term,
-                    'biological_process': biological_process,
-                    'study': study,
-                    'biological_context': biological_context,
-                    'label': label,
-                    'class': self.collection_class,
-                    'method': self.method,
-                    'source': self.source,
-                    'source_url': source_url,
-                    'name': name,
-                    'inverse_name': inverse_name,
-                    'molecular_trait_id': row[0],
-                    'gene_id': gene_id,
-                    'credible_set_id': row[2],
-                    'variant_chromosome_position_ref_alt': variant_vcf_format,
-                    'rsid': row[4],
-                    'credible_set_size': int(row[5]),
-                    'posterior_inclusion_probability': float(row[6]),
-                    'p_value': p_value,
-                    'neg_log10_pvalue': log_pvalue,
-                    'effect_size': to_float(row[8]),
-                    'standard_error': float(row[9]),
-                    'z_score': float(row[10]),
-                    'credible_set_min_r2': float(row[11]),
-                    'region': row[12],
-                    'files_filesets': 'files_filesets/' + self.file_accession,
-                }
-                if label == 'spliceQTL':
-                    molecular_trait_id_list = row[0].split(':')
-                    _props['intron_chr'] = molecular_trait_id_list[0]
-                    _props['intron_start'] = int(molecular_trait_id_list[1])
-                    _props['intron_end'] = int(molecular_trait_id_list[2])
-                if self.validate:
-                    self.validate_doc(_props)
-                self.writer.write(json.dumps(_props) + '\n')
+            except Exception as e:
+                self.logger.warning(
+                    f'Skipping row - unable to build variant id (chr={chr}, pos={pos}, ref={ref_seq}, alt={alt_seq}): {e}')
+                continue
+            rows_by_variant_id.append((variant_id, row))
 
-            self.gene_validator.log()
+        if not rows_by_variant_id:
+            return
+
+        loaded_variants = bulk_check_variants_in_arangodb(
+            list({variant_id for variant_id, _ in rows_by_variant_id}),
+            check_by='_key',
+        )
+        self.write_missing_variants(rows_by_variant_id, loaded_variants)
+
+    def write_missing_variants(self, rows_by_variant_id, loaded_variants):
+        for variant_id, row in rows_by_variant_id:
+            if variant_id in loaded_variants or variant_id in self.written_variant_keys:
+                continue
+            self.written_variant_keys.add(variant_id)
+
+            chr, pos, ref_seq, alt_seq = row[3].split('_')
+            variant_props, skipped = load_variant(
+                f'{chr}-{pos}-{ref_seq}-{alt_seq}')
+            if variant_props:
+                variant_props.update({
+                    'source': self.source,
+                    'source_url': EQTLCatalog.VARIANTS_SOURCE_URL,
+                })
+                if self.validate:
+                    self.validate_doc(variant_props)
+                self.writer.write(json.dumps(variant_props) + '\n')
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
 
     def process_study(self):
         study_list = []

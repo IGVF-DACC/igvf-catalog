@@ -125,9 +125,9 @@ https://api.catalogkg.igvf.org/api/genomic-elements/variants?method=caQTL
 https://api.catalogkg.igvf.org/api/genomic-elements/biosamples?method=MPRA
 https://api.catalogkg.igvf.org/api/phenotypes/variants?method=cV2F
 https://api.catalogkg.igvf.org/api/phenotypes/coding-variants?method=VAMP-seq
-https://api.catalogkg.igvf.org/api/files-filesets?method=Variant-EFFECTS
+https://api.catalogkg.igvf.org/api/files-filesets?method=DepMap
 https://api.catalogkg.igvf.org/api/files-filesets?method=CRISPR%20screen
-https://api.catalogkg.igvf.org/api/biosamples/variants?method=STARR-seq
+https://api.catalogkg.igvf.org/api/biosamples/variants?biosample_id=EFO_0001182&method=MPRA
 https://api.catalogkg.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000186092&page=0&limit=8&method=MutPred2
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?neg_log10_pvalue_adj=gte%3A1&regulator_gene_id=ENSG00000152284&page=0
 https://api.catalogkg.igvf.org/api/gene-regulatory-network?response_gene_id=ENSG00000152284&page=0
@@ -238,7 +238,7 @@ https://api.catalogkg.igvf.org/api/files-filesets?source=Community&limit=5
 https://api.catalogkg.igvf.org/api/variants/genes?variant_id=NC_000016.10%3A28930707%3AT%3AC&method=CRISPR+screen&organism=Homo+sapiens&page=0
 https://api.catalogkg.igvf.org/api/variants/genes?variant_id=NC_000017.11%3A76710350%3AG%3AA&method=eQTL&organism=Homo+sapiens&page=0
 https://api.catalogkg.igvf.org/api/genes/variants?gene_id=ENSG00000177455&method=CRISPR+screen&organism=Homo+sapiens&page=0
-https://api.catalogkg.igvf.org/api/genes/variants?gene_id=ENSG00000134460&method=Variant-EFFECTS&organism=Homo+sapiens&page=0
+https://api.catalogkg.igvf.org/api/genes/variants?gene_id=ENSG00000134460&method=eQTL&organism=Homo+sapiens&page=0
 https://api.catalogkg.igvf.org/api/biosamples/variants?biosample_id=EFO_0001086&method=BlueSTARR&organism=Homo+sapiens&page=0
 https://api.catalogkg.igvf.org/api/variants/biosamples?variant_id=NC_000001.11%3A100003003%3AA%3AG&method=BlueSTARR&organism=Homo+sapiens&page=0
 https://api.catalogkg.igvf.org/api/variants/biosamples?variant_id=NC_000020.11%3A63182006%3AGCCAGAAAGCAGGACCCTCCCTCACGGGCACCGCCAGAAAGCAGGACCCTCCCTCACGGGCACCGCCAGAAAGCAGGACCCTCCCTCAC%3AGCCAGAAAGCAGGACCCTCCCTCACGGGCACCGCCAGAAAGCAGGACCCTCCCTCAC&method=MPRA&organism=Homo+sapiens&page=0

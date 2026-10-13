@@ -6911,5 +6911,34 @@
       },
       "href": "/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz"
     }
+  ],
+  "https://api.data.igvf.org/search/?type=File&dbxrefs=ENCODE:ENCFF003BKC&field=accession&field=file_set&field=dbxrefs&format=json&limit=all": [
+    {
+      "@id": "/reference-files/IGVFFI1193PGVX/",
+      "@type": [
+        "ReferenceFile",
+        "File",
+        "Item"
+      ],
+      "accession": "IGVFFI1193PGVX",
+      "dbxrefs": [
+        "ENCODE:ENCFF003BKC"
+      ],
+      "file_set": {
+        "summary": "Homo sapiens GRCh38 functional effect",
+        "file_set_type": "functional effect",
+        "@type": [
+          "CuratedSet",
+          "FileSet",
+          "Item"
+        ],
+        "accession": "IGVFDS1047BFMY",
+        "@id": "/curated-sets/IGVFDS1047BFMY/",
+        "lab": {
+          "@id": "/labs/encode/",
+          "title": "ENCODE Project, NHGRI"
+        }
+      }
+    }
   ]
 }

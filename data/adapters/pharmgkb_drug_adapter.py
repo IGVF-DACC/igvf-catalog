@@ -9,7 +9,12 @@ from adapters.archive_utils import (
     get_files_from_folder,
 )
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id_from_hgvs, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import (
+    build_variant_id_from_hgvs,
+    bulk_check_variants_in_arangodb,
+    get_file_fileset_by_accession_in_arangodb,
+    load_variant,
+)
 from adapters.writer import Writer
 
 # Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
@@ -60,7 +65,9 @@ class PharmGKB(BaseAdapter):
         'drug',
         'variant_drug',
         'variant_drug_gene',
+        'variants',
     ]
+    CHUNK_SIZE = 6500
 
     def __init__(
         self,
@@ -82,15 +89,17 @@ class PharmGKB(BaseAdapter):
         self.gene_reference_filepath = gene_reference_filepath
 
         self.file_accession = get_file_accession(filepath)
+        self.written_variant_keys = set()
 
-        if self.label in ('variant_drug', 'variant_drug_gene'):
+        if self.label in ('variant_drug', 'variant_drug_gene', 'variants'):
             missing = []
-            if not self.drug_reference_filepath:
-                missing.append('drug_reference_filepath')
+            if self.label in ('variant_drug', 'variant_drug_gene'):
+                if not self.drug_reference_filepath:
+                    missing.append('drug_reference_filepath')
+                if not self.study_reference_filepath:
+                    missing.append('study_reference_filepath')
             if not self.variant_reference_filepath:
                 missing.append('variant_reference_filepath')
-            if not self.study_reference_filepath:
-                missing.append('study_reference_filepath')
             if self.label == 'variant_drug_gene' and not self.gene_reference_filepath:
                 missing.append('gene_reference_filepath')
             if missing:
@@ -101,7 +110,7 @@ class PharmGKB(BaseAdapter):
 
     def _get_schema_type(self):
         """Return schema type based on label."""
-        if self.label == 'drug':
+        if self.label in ('drug', 'variants'):
             return 'nodes'
         else:
             return 'edges'
@@ -114,6 +123,16 @@ class PharmGKB(BaseAdapter):
             return 'variants_drugs'
         elif self.label == 'variant_drug_gene':
             return 'variants_drugs_genes'
+        elif self.label == 'variants':
+            return 'variants'
+
+    def _bulk_check_variants_batched(self, variant_ids):
+        loaded = set()
+        unique_ids = list(set(variant_ids))
+        for i in range(0, len(unique_ids), PharmGKB.CHUNK_SIZE):
+            batch = unique_ids[i:i + PharmGKB.CHUNK_SIZE]
+            loaded |= bulk_check_variants_in_arangodb(batch, check_by='_key')
+        return loaded
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
@@ -163,13 +182,18 @@ class PharmGKB(BaseAdapter):
                     self.save_props(props)
 
         else:
-            self.load_drug_id_mapping()
+            if self.label in ('variant_drug', 'variant_drug_gene'):
+                self.load_drug_id_mapping()
+                self.load_study_paramters_mapping()
             self.load_variant_id_mapping()
-            self.load_study_paramters_mapping()
             if self.label == 'variant_drug_gene':
                 self.load_gene_id_mapping()
             # one variant can be in multiple rows, save those converted variant ids to speed up
             variant_hgvs_id_converted = {}
+            # deferred until all files are read, so the existence check can be
+            # batched instead of hitting ArangoDB once per row
+            pending_variant_drug_edges = []
+            pending_variants = []
             for input_filepath in get_files_from_folder(self.filepath):
                 filename = input_filepath.name
                 if filename.startswith('var_'):
@@ -187,12 +211,13 @@ class PharmGKB(BaseAdapter):
                             # variant info
                             variant_anno_id = variant_drug_row[0]
                             # study info
-                            study_info = self.study_paramters_mapping.get(
-                                variant_anno_id)
-                            if study_info is None:
-                                self.logger.warning(variant_anno_id +
-                                                    ' has no matched study info.')
-                                continue
+                            if self.label in ('variant_drug', 'variant_drug_gene'):
+                                study_info = self.study_paramters_mapping.get(
+                                    variant_anno_id)
+                                if study_info is None:
+                                    self.logger.warning(variant_anno_id +
+                                                        ' has no matched study info.')
+                                    continue
 
                             variant_hgvs_ids = self.variant_id_mapping.get(
                                 variant_name)
@@ -226,6 +251,11 @@ class PharmGKB(BaseAdapter):
                                     self.logger.warning(variant_name +
                                                         ' failed converting hgvs id.')
                                     continue
+
+                            if self.label == 'variants':
+                                pending_variants.append(
+                                    (variant_id, variant_name))
+                                continue
 
                             # gene info
                             # can be multiple genes split by ', ', or empty str for NA cases
@@ -309,9 +339,8 @@ class PharmGKB(BaseAdapter):
                                             'method': self.method,
                                             'files_filesets': 'files_filesets/' + self.file_accession
                                         }
-                                        if self.validate:
-                                            self.validate_doc(props)
-                                        self.save_props(props)
+                                        pending_variant_drug_edges.append(
+                                            (variant_id, props))
 
                                     elif self.label == 'variant_drug_gene':
 
@@ -347,6 +376,45 @@ class PharmGKB(BaseAdapter):
                                                         self.validate_doc(
                                                             props)
                                                     self.save_props(props)
+
+            if self.label == 'variant_drug':
+                loaded_variants = self._bulk_check_variants_batched(
+                    [variant_id for variant_id, _ in pending_variant_drug_edges])
+                skipped_missing = 0
+                for variant_id, props in pending_variant_drug_edges:
+                    if variant_id not in loaded_variants:
+                        skipped_missing += 1
+                        continue
+                    if self.validate:
+                        self.validate_doc(props)
+                    self.save_props(props)
+                if skipped_missing:
+                    self.logger.warning(
+                        f'Skipped {skipped_missing} row(s) - variant not found in variants collection')
+            elif self.label == 'variants':
+                loaded_variants = self._bulk_check_variants_batched(
+                    [variant_id for variant_id, _ in pending_variants])
+                self.write_missing_variants(pending_variants, loaded_variants)
+
+    def write_missing_variants(self, pending_variants, loaded_variants):
+        for variant_id, variant_name in pending_variants:
+            if variant_id in loaded_variants or variant_id in self.written_variant_keys:
+                continue
+            self.written_variant_keys.add(variant_id)
+
+            variant_props, skipped = load_variant(variant_id)
+            if variant_props:
+                variant_props.update({
+                    'source': PharmGKB.SOURCE,
+                    'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variant/' + variant_name,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                })
+                if self.validate:
+                    self.validate_doc(variant_props)
+                self.save_props(variant_props)
+            elif skipped:
+                self.logger.warning(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
 
     def load_drug_id_mapping(self):
         # e.g. key: '17-alpha-dihydroequilenin sulfate', value: 'PA166238901'
