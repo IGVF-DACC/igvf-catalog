@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.gene_validator import GeneValidator
@@ -830,9 +831,11 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             )
         seen_element_gene_ids.add(element_gene_id)
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
+        self.source_url = (
+            f'https://data.igvf.org/tabular-files/{self.file_accession}'
+        )
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
         self.assembly = self.file_config.get('assembly', 'GRCh38')
         self.gene_collection = 'mm_genes' if self.assembly == 'GRCm39' else 'genes'

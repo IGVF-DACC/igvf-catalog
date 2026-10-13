@@ -4,6 +4,7 @@ import gzip
 import json
 import math
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.CRISPR_element_gene_IGVF_adapter import CRISPRElementGeneIGVF
 from adapters.gene_validator import GeneValidator
@@ -36,9 +37,11 @@ class CRISPRElementElement(BaseAdapter):
         'intended_target_start', 'intended_target_end',
     }
 
-    def __init__(self, filepath, label, source_url, writer=None, validate=False, **kwargs):
-        self.source_url = source_url
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
+    def __init__(self, filepath, label, writer=None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
+        self.source_url = (
+            f'https://data.igvf.org/tabular-files/{self.file_accession}'
+        )
         self.gene_validator = GeneValidator()
         super().__init__(filepath, label, writer, validate)
 
