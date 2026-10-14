@@ -4,6 +4,7 @@ import json
 from math import log10
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -50,8 +51,8 @@ class CRISPRElementPhenotype(BaseAdapter):
         },
     }
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '

@@ -5,7 +5,8 @@ from adapters.CRISPR_variant_gene_adapter import CRISPRVariantGene
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
-SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI9602ILPC/'
+ACCESSION = 'IGVFFI9602ILPC'
+SAMPLE = f'./samples/{ACCESSION}_crispr_variant_gene.example.tsv'
 
 
 @pytest.mark.parametrize('effect_size, log2_fold_change', [
@@ -85,8 +86,7 @@ mock_tsv_data = (
 def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
     adapter = CRISPRVariantGene(
-        filepath='./samples/crispr_variant_gene.example.tsv',
-        source_url=SOURCE_URL,
+        filepath=SAMPLE,
         writer=writer,
         label='variant',
         validate=True
@@ -140,8 +140,7 @@ def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_vali
 def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
     adapter = CRISPRVariantGene(
-        filepath='./samples/crispr_variant_gene.example.tsv',
-        source_url=SOURCE_URL,
+        filepath=SAMPLE,
         writer=writer,
         label='variant_gene',
         validate=True
@@ -203,8 +202,7 @@ def test_variant_pass_re_emits_when_only_loaded_from_same_fileset(
     mock_bulk_check.return_value = set()
     writer = SpyWriter()
     adapter = CRISPRVariantGene(
-        filepath='./samples/crispr_variant_gene.example.tsv',
-        source_url=SOURCE_URL,
+        filepath=SAMPLE,
         writer=writer,
         label='variant',
         validate=True,
@@ -223,14 +221,14 @@ def test_variant_pass_re_emits_when_only_loaded_from_same_fileset(
 def test_invalid_label(mock_file_fileset):
     with pytest.raises(ValueError, match='Invalid label: invalid. Allowed values: variant, variant_gene'):
         CRISPRVariantGene(
-            filepath='./samples/crispr_variant_gene.example.tsv',
-            source_url=SOURCE_URL,
+            filepath=SAMPLE,
             writer=SpyWriter(),
             label='invalid'
         )
 
 
-CRISPR_MILLIPEDE_SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI8101RHSC/'
+CRISPR_MILLIPEDE_ACCESSION = 'IGVFFI8101RHSC'
+CRISPR_MILLIPEDE_SAMPLE = f'./samples/{CRISPR_MILLIPEDE_ACCESSION}_crispr_variant_gene_millipede.example.csv'
 mock_crispr_millipede_data = (
     'variants,PIP,Betas,Coefficient StdDev\n'
     'NC_000016.10:28930710:G:A,0.0284163262526425,-0.0116633875205405,0.0699744682130392\n'
@@ -281,8 +279,7 @@ def test_crispr_millipede_file_uses_hardcoded_cd19_gene(
 ):
     writer = SpyWriter()
     adapter = CRISPRVariantGene(
-        filepath='./samples/crispr_variant_gene_millipede.example.csv',
-        source_url=CRISPR_MILLIPEDE_SOURCE_URL,
+        filepath=CRISPR_MILLIPEDE_SAMPLE,
         writer=writer,
         label='variant_gene',
         validate=True

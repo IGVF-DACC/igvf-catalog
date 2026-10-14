@@ -21,7 +21,7 @@ def mock_file_fileset():
 def test_caqtl_adapter_regulatory_region(mock_file_fileset):
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='genomic_element', writer=writer, validate=True)
+                    label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -50,7 +50,7 @@ def test_caqtl_adapter_encode_caqtl(mocker, mock_file_fileset, mock_bulk_check_v
                  return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='encode_caqtl', writer=writer, validate=True)
+                    label='encode_caqtl', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -74,7 +74,7 @@ def test_caqtl_adapter_skips_edge_when_variant_not_loaded(mocker, mock_file_file
     mock_bulk_check_variants.return_value = set()
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='encode_caqtl', writer=writer, validate=True)
+                    label='encode_caqtl', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) == 0
 
@@ -103,7 +103,7 @@ def test_caqtl_adapter_variants_label_creates_missing_variant(mocker, mock_file_
     }, None)
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='variants', writer=writer, validate=True)
+                    label='variants', writer=writer, validate=True)
     adapter.process_file()
 
     non_empty_contents = [
@@ -121,17 +121,16 @@ def test_caqtl_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, encode_caqtl, variants'):
         CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-              source='PMID:34017130', label='invalid_label', writer=writer)
+              label='invalid_label', writer=writer)
 
 
 def test_caqtl_adapter_initialization(mock_file_fileset):
     writer = SpyWriter()
     for label in CAQtl.ALLOWED_LABELS:
         adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                        source='PMID:34017130', label=label, writer=writer)
+                        label=label, writer=writer)
         assert adapter.filepath == './samples/ENCFF103XRK.sample.bed'
         assert adapter.label == label
-        assert adapter.source == 'PMID:34017130'
         assert adapter.writer == writer
         assert adapter.file_accession == 'ENCFF103XRK'
 
@@ -139,7 +138,7 @@ def test_caqtl_adapter_initialization(mock_file_fileset):
 def test_caqtl_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='encode_caqtl', writer=writer, validate=True)
+                    label='encode_caqtl', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

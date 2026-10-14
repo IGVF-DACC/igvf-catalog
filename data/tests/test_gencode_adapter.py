@@ -3,7 +3,7 @@ import json
 import pytest
 import tempfile
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from adapters.gencode_adapter import Gencode
 from adapters.writer import SpyWriter
 
@@ -34,43 +34,56 @@ def test_gencode_adapter_transcript():
     assert first_item['refseq_transcript_ids'] == ['NM_177990.4']
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
+    assert first_item['organism'] == 'Homo sapiens'
     assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
 
 
 def test_gencode_adapter_transcribed_to():
     writer = SpyWriter()
-    adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
-                      filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
                       label='transcribed_to', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
+    assert first_item['_from'].startswith('genes/')
+    assert first_item['_to'].startswith('transcripts/')
     assert first_item['name'] == 'transcribes'
     assert first_item['inverse_name'] == 'transcribed by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0010467'
+    assert first_item['organism'] == 'Homo sapiens'
 
 
-def test_gencode_adapter_mouse():
+def test_gencode_adapter_mouse_transcript():
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
-                      label='mm_gencode_transcript', organism='MOUSE', writer=writer, validate=True)
+                      label='mm_gencode_transcript', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
     assert first_item['source'] == 'GENCODE'
+    assert first_item['organism'] == 'Mus musculus'
     assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
+    assert first_item['version'] == 'vM36'
+
+
+def test_gencode_adapter_mm_transcribed_to():
+    writer = SpyWriter()
+    adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
+                      label='mm_transcribed_to', writer=writer, validate=True)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item['_from'].startswith('mm_genes/')
+    assert first_item['_to'].startswith('mm_transcripts/')
+    assert first_item['organism'] == 'Mus musculus'
     assert first_item['version'] == 'vM36'
 
 
 def test_gencode_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to'):
-        Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
-                filepath='./samples/gencode_sample.gtf',
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to, mm_transcribed_to'):
+        Gencode(filepath='./samples/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
 
 
@@ -96,14 +109,15 @@ def test_refseq_mapping_preserves_versions_and_par_y(tmp_path, compressed):
     assert all(doc['refseq_transcript_ids'] == [] for doc in docs[1:])
 
 
-@pytest.mark.parametrize('label,organism,filepath', [
-    ('transcribed_to', 'HUMAN', './samples/gencode_sample.gtf'),
-    ('mm_gencode_transcript', 'MOUSE', './samples/gencode_mouse_sample.gtf'),
+@pytest.mark.parametrize('label,filepath', [
+    ('transcribed_to', './samples/gencode_sample.gtf'),
+    ('mm_gencode_transcript', './samples/gencode_mouse_sample.gtf'),
+    ('mm_transcribed_to', './samples/gencode_mouse_sample.gtf'),
 ])
-def test_refseq_mapping_only_loaded_for_human_nodes(label, organism, filepath):
+def test_refseq_mapping_only_loaded_for_human_nodes(label, filepath):
     writer = SpyWriter()
     with patch.object(Gencode, 'load_refseq_mapping') as load_mapping:
-        Gencode(filepath=filepath, label=label, organism=organism,
+        Gencode(filepath=filepath, label=label,
                 writer=writer, validate=True).process_file()
     load_mapping.assert_not_called()
     assert all('refseq_transcript_ids' not in json.loads(line)
@@ -113,18 +127,23 @@ def test_refseq_mapping_only_loaded_for_human_nodes(label, organism, filepath):
 def test_gencode_adapter_initialization():
     writer = SpyWriter()
     for label in Gencode.ALLOWED_LABELS:
-        adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
-                          filepath='./samples/gencode_sample.gtf',
-                          label=label, writer=writer)
-        assert adapter.filepath == './samples/gencode_sample.gtf'
+        filepath = (
+            './samples/gencode_mouse_sample.gtf'
+            if label in Gencode.MOUSE_LABELS
+            else './samples/gencode_sample.gtf'
+        )
+        adapter = Gencode(filepath=filepath, label=label, writer=writer)
+        assert adapter.filepath == filepath
         assert adapter.label == label
         assert adapter.writer == writer
-        assert adapter.organism in ['HUMAN', 'MOUSE']
+        if label in Gencode.MOUSE_LABELS:
+            assert adapter.organism == 'Mus musculus'
+        else:
+            assert adapter.organism == 'Homo sapiens'
 
 
 def test_gencode_adapter_parse_info_metadata():
-    adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
-                      filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
                       label='gencode_transcript')
     info = ['gene_id', '"ENSG00000223972.5";', 'transcript_id', '"ENST00000456328.2";', 'gene_type', '"transcribed_unprocessed_pseudogene";',
             'gene_name', '"DDX11L1";', 'transcript_type', '"processed_transcript";', 'transcript_name', '"DDX11L1-202";']

@@ -12,8 +12,8 @@
         "_from": {
           "type": "string",
           "description": "Document handle of the transcript.",
-          "example": "transcripts/ENST00000456328 or transcripts/ENSMUST00000456328",
-          "pattern": "^transcripts/ENST[0-9]{11}(?:_PAR_Y)?$|transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
+          "example": "transcripts/ENST00000456328 or mm_transcripts/ENSMUST00000456328",
+          "pattern": "^transcripts/ENST[0-9]{11}(?:_PAR_Y)?$|^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "transcripts",
             "mm_transcripts"

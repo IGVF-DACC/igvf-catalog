@@ -53,9 +53,8 @@ class CAQtl(BaseAdapter):
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
     EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
-    def __init__(self, filepath, source, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
-        self.source = source
         self.collection_label = 'caQTL'
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
