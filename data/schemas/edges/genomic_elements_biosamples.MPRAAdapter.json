@@ -34,6 +34,11 @@
           "title": "Strand",
           "type": "string",
           "description": "Strand the tile was tested in..",
+          "enum": [
+            "+",
+            "-",
+            "."
+          ],
           "enum_descriptions": {
             "+": "Forward strand of the reference sequence.",
             "-": "Reverse strand of the reference sequence.",
