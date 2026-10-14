@@ -20,32 +20,25 @@ from adapters.writer import Writer
 
 class GencodeProtein(BaseAdapter):
 
-    ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
-    ALLOWED_LABELS = ['gencode_protein', 'gencode_translates_to']
+    ALLOWED_LABELS = [
+        'gencode_protein',
+        'mm_gencode_protein',
+        'gencode_translates_to',
+        'mm_gencode_translates_to',
+    ]
+    MOUSE_LABELS = frozenset(
+        {'mm_gencode_protein', 'mm_gencode_translates_to'})
+    PROTEIN_LABELS = frozenset({'gencode_protein', 'mm_gencode_protein'})
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name', 'protein_id']
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
-
-        if organism not in GencodeProtein.ALLOWED_ORGANISMS:
-            raise ValueError('Invalid organism. Allowed values: ' +
-                             ','.join(GencodeProtein.ALLOWED_ORGANISMS))
-
+    def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
 
-        if organism == 'HUMAN':
-            self.version = 'v43'
-            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
-            self.ensembl_to_sprot_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_sprot_human.pkl'
-            self.ensembl_to_trembl_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_trembl_human.pkl'
-            self.organism = 'Homo sapiens'
-            self.taxonomy_id = '9606'
-            self.transcript_endpoint = 'transcripts/'
-            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
-        else:
+        if label in self.MOUSE_LABELS:
             self.version = 'vM36'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.ensembl_to_sprot_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_sprot_mouse.pkl'
@@ -54,6 +47,15 @@ class GencodeProtein(BaseAdapter):
             self.organism = 'Mus musculus'
             self.transcript_endpoint = 'mm_transcripts/'
             self.taxonomy_id = '10090'
+        else:
+            self.version = 'v43'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
+            self.ensembl_to_sprot_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_sprot_human.pkl'
+            self.ensembl_to_trembl_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_trembl_human.pkl'
+            self.organism = 'Homo sapiens'
+            self.taxonomy_id = '9606'
+            self.transcript_endpoint = 'transcripts/'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
 
         self.load_chr_name_mapping()
 
@@ -61,14 +63,14 @@ class GencodeProtein(BaseAdapter):
 
     def _get_schema_type(self):
         """Return schema type based on label."""
-        if self.label == 'gencode_protein':
+        if self.label in self.PROTEIN_LABELS:
             return 'nodes'
         else:
             return 'edges'
 
     def _get_collection_name(self):
         """Get collection based on label."""
-        if self.label == 'gencode_protein':
+        if self.label in self.PROTEIN_LABELS:
             return 'proteins'
         else:
             return 'transcripts_proteins'
@@ -153,7 +155,7 @@ class GencodeProtein(BaseAdapter):
 
     def parse(self):
         # first get ENSP -> uniprot id mapping pregenerated from uniprot dat files
-        if self.label == 'gencode_protein':
+        if self.label in self.PROTEIN_LABELS:
             ensp_to_sprot_mapping = {}
             ensp_to_trembl_mapping = {}
             with open(self.ensembl_to_sprot_mapping_path, 'rb') as sprot_mapping_file:
@@ -192,7 +194,7 @@ class GencodeProtein(BaseAdapter):
                                 chr + ' has illegal mapped chromosome name.')
                             continue
 
-                    if self.label == 'gencode_protein':
+                    if self.label in self.PROTEIN_LABELS:
                         to_json = {
                             '_key': id,
                             'name': info['gene_name'],

@@ -26,7 +26,6 @@ igvf donor:
     --accessions {igvf_file_accessions}
     --output-bucket-key files_filesets/igvf_files_filesets_donors.jsonl
     --label igvf_donor
-    --replace
 
 igvf_file_accessions:
   BlueSTARR:
@@ -1287,14 +1286,13 @@ encode file to file_set:
     --output-bucket-key files_filesets/encode_files_filesets.jsonl
     --label encode_file_fileset
 
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset --replace
+# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode donor:
   collection: donor
   pypy3: false
   params:
     - label
     - accessions
-    - replace
   command: >
     python3 data_parser.py
     --adapter file_fileset
@@ -1302,7 +1300,6 @@ encode donor:
     --accessions {encode_file_accessions}
     --output-bucket-key files_filesets/encode_files_filesets_donors.jsonl
     --label encode_donor
-    --replace
 
 encode_file_accessions:
   Distal regulation ENCODE-rE2G:

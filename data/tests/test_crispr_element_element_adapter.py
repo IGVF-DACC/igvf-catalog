@@ -7,7 +7,8 @@ from adapters.CRISPR_element_element_adapter import CRISPRElementElement
 from adapters.writer import SpyWriter
 
 MODULE = 'adapters.CRISPR_element_element_adapter'
-SAMPLE = './samples/crispr_element_element.example.tsv.gz'
+SAMPLE = './samples/IGVFFI2419ZSGC_crispr_element_element.example.tsv.gz'
+ACCESSION = 'IGVFFI2419ZSGC'
 
 
 def parse(label, filepath=SAMPLE):
@@ -22,7 +23,7 @@ def parse(label, filepath=SAMPLE):
             'treatments_term_ids': None, 'file_set_id': 'IGVFDS1890GPOK',
         }
         CRISPRElementElement(
-            filepath, label, 'https://api.data.igvf.org/tabular-files/IGVFFI2419ZSGC/', writer, validate=True).process_file()
+            filepath, label, writer, validate=True).process_file()
     return [json.loads(item) for item in writer.contents if item.strip()]
 
 
@@ -37,6 +38,8 @@ def test_nodes_and_edges():
     assert len(promoters) == 1
     assert promoters[0]['type'] == 'tested elements'
     assert promoters[0]['source_annotation'] == 'promoter'
+    assert promoters[0][
+        'source_url'] == f'https://data.igvf.org/tabular-files/{ACCESSION}'
     peaks = [node for node in nodes if 'promoter_of' not in node]
     assert len(peaks) == 3
     assert all(node['type'] == 'accessible dna elements' for node in peaks)
@@ -50,6 +53,7 @@ def test_nodes_and_edges():
     assert edges[2]['p_value_adj'] > 0.05
     assert edges[0]['significant'] is True
     assert edges[2]['significant'] is False
+    assert edges[0]['source_url'] == f'https://data.igvf.org/tabular-files/{ACCESSION}'
 
 
 @pytest.mark.parametrize('change,match', [('duplicate', 'Duplicate promoter-peak'), ('gene', 'Invalid promoter gene'), ('interval', 'Invalid genomic interval'), ('nan', 'Non-finite'), ('pvalue', 'P-values must'), ('header', 'missing columns')])
@@ -66,7 +70,7 @@ def test_invalid_input(tmp_path, change, match):
             5, '-1'), 'nan': (0, 'nan'), 'pvalue': (2, '1.1')}[change]
         row[index] = value
         lines[1] = '\t'.join(row) + '\n'
-    path = tmp_path / 'input.tsv.gz'
+    path = tmp_path / f'{ACCESSION}_input.tsv.gz'
     with gzip.open(path, 'wt') as stream:
         stream.writelines(lines)
     with pytest.raises(ValueError, match=match):

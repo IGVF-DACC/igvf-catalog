@@ -8,6 +8,7 @@ from biocommons.seqrepo import SeqRepo
 from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from ga4gh.vrs.extras.translator import AlleleTranslator
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -37,14 +38,15 @@ class STARRseqVariantBiosample(BaseAdapter):
         self,
         filepath,
         label,
-        source_url,
         writer: Optional[Writer] = None,
         validate=False,
         excluded_file_accessions=None,
         **kwargs
     ):
-        self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+        self.file_accession = get_file_accession(filepath)
+        self.source_url = (
+            f'https://data.igvf.org/tabular-files/{self.file_accession}'
+        )
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
         self.collection_label = 'variant effect on regulatory element activity'

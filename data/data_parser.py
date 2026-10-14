@@ -31,16 +31,8 @@ parser.add_argument('--chr', help='The chr of the adapter to load.')
 parser.add_argument('--label', help='The label of the adapter to load.')
 parser.add_argument('--ancestry', type=str, help='Ancestry for TopLD.')
 parser.add_argument('--source', type=str)
-parser.add_argument('--source-url', type=str)
-parser.add_argument('--organism', type=str, default='HUMAN')
-parser.add_argument('--biological-context', type=str,
-                    help='Biological context for EncodeElementGeneLink.')
 parser.add_argument('--favor-on-disk-deduplication', action='store_true', default=False,
                     help='Use on-disk deduplication for Favor.')
-parser.add_argument('--variants-to-genes', type=str,
-                    help='Location of variants to genes TSV for GWAS.')
-parser.add_argument('--taxonomy-id', type=str,
-                    choices=['9606', '10090'], help='Taxonomy ID for Uniprot Protein/')
 parser.add_argument('--mode', type=str, default='catalog',
                     choices=['igvfd', 'catalog'], help='mode for gencode gene')
 parser.add_argument('--ontology', type=str, help='Ontology name.')
@@ -62,8 +54,6 @@ parser.add_argument('--filepath', type=str,
                     help='The path to the input file or archive.')
 parser.add_argument('--reference-filepath', type=str,
                     help='The path to a related reference input file that has reference data for adapting the data file. e.g. MPRA sequence designs')
-parser.add_argument('--reference-source-url', type=str,
-                    help='The source url for the related input reference file.')
 parser.add_argument('--drug-reference-filepath', type=str,
                     help='PharmGKB chemicals TSV for drug name→ID mapping (IGVFFI2997DUKO). Required for variant_drug and variant_drug_gene.')
 parser.add_argument('--variant-reference-filepath', type=str,
@@ -80,8 +70,6 @@ parser.add_argument(
     type=str,
     help='Optional. One or more IGVF file accessions whose entries, for example variants, (if previously loaded) should be ignored for "already loaded" checks. '
 )
-parser.add_argument('--replace', action='store_true', default=None,
-                    help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
 parser.add_argument('--validate', action=argparse.BooleanOptionalAction, default=None,
                     help='Enable schema validation for parsed records. Defaults to enabled, '
                          'except for the variant-loading adapters (favor, mouse_variant), which '

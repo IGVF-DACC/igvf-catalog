@@ -83,8 +83,8 @@ def mock_ontology_term_validator():
 def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator, mocker):
     writer = SpyWriter()
 
-    adapter = STARRseqVariantBiosample(filepath='./samples/starr_seq.example.tsv', writer=writer,
-                                       label='variant', source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/', validate=True)
+    adapter = STARRseqVariantBiosample(filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv', writer=writer,
+                                       label='variant', validate=True)
 
     # Use a more precise mock that only affects opening the data file.
     with patch('builtins.open', mock_open(read_data=mock_bed_data)) as mock_file_open:
@@ -96,7 +96,7 @@ def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_vari
     assert first_item['spdi'] == 'NC_000001.11:13833:C:T'
     assert first_item['hgvs'] == 'NC_000001.11:g.13834C>T'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7664HHXI/'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7664HHXI'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
     assert 'significant' not in first_item
 
@@ -109,7 +109,7 @@ def test_process_file_variant_biosample(
     writer = SpyWriter()
 
     adapter = STARRseqVariantBiosample(
-        filepath='./samples/starr_seq.example.tsv', writer=writer, label='variant_biosample', source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/', validate=True)
+        filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv', writer=writer, label='variant_biosample', validate=True)
 
     # Use a more precise mock that only affects opening the data file.
     with patch('builtins.open', mock_open(read_data=mock_bed_data)) as mock_file_open:
@@ -133,7 +133,7 @@ def test_process_file_variant_biosample(
     assert first_item['method'] == 'STARR-seq'
     assert first_item['class'] == 'observed data'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7664HHXI/'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7664HHXI'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
     assert first_item['biological_context'] == 'K562'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
@@ -148,10 +148,9 @@ def test_process_file_variant_biosample_significant_true(
     """Edges set significant=True when postProbEffect is strictly greater than THRESHOLD."""
     writer = SpyWriter()
     adapter = STARRseqVariantBiosample(
-        filepath='./samples/starr_seq.example.tsv',
+        filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv',
         writer=writer,
         label='variant_biosample',
-        source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/',
         validate=True,
     )
     with patch('builtins.open', mock_open(read_data=mock_bed_data_significant)):
@@ -165,9 +164,8 @@ def test_invalid_label(mock_file_fileset, mock_load_variant, mock_seqrepo_and_tr
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_biosample'):
         STARRseqVariantBiosample(
-            filepath='./samples/starr_seq.example.tsv',
+            filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv',
             label='invalid_label',
-            source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/',
             writer=writer,
             validate=True
         )
@@ -176,9 +174,8 @@ def test_invalid_label(mock_file_fileset, mock_load_variant, mock_seqrepo_and_tr
 def test_validate_doc_invalid(mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator):
     writer = SpyWriter()
     adapter = STARRseqVariantBiosample(
-        filepath='./samples/starr_seq.example.tsv',
+        filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv',
         label='variant',
-        source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/',
         writer=writer,
         validate=True
     )

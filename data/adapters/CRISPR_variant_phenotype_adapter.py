@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 import requests
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     bulk_check_variants_in_arangodb,
@@ -94,8 +95,8 @@ class CRISPRVariantPhenotype(BaseAdapter):
         },
     }
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '

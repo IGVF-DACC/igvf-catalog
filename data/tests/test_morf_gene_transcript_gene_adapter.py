@@ -6,10 +6,9 @@ from unittest.mock import MagicMock, patch
 from adapters.MORF_gene_transcript_gene_adapter import MORFGeneTranscriptGene
 from adapters.writer import SpyWriter
 
-DESEQ_PATH = './samples/morf_transcript_gene_deseq2.example.tsv'
-ORF_PATH = './samples/morf_orf_transcripts.example.tsv'
-SOURCE_URL = 'https://api.data.igvf.org/tabular-files/IGVFFI6734IWRB/'
-REFERENCE_SOURCE_URL = 'https://api.data.igvf.org/tabular-files/IGVFFI2373SYJW/'
+DESEQ_PATH = './samples/IGVFFI6734IWRB_morf_transcript_gene_deseq2.example.tsv'
+ORF_PATH = './samples/IGVFFI2373SYJW_morf_orf_transcripts.example.tsv'
+CHRONIC_DESEQ_PATH = './samples/IGVFFI6032GREJ_morf_transcript_gene_deseq2.example.tsv'
 
 
 @pytest.fixture
@@ -40,12 +39,9 @@ def _build_adapter(writer, **kwargs):
     return MORFGeneTranscriptGene(
         filepath=kwargs.get('filepath', DESEQ_PATH),
         label=kwargs.get('label', 'gene_transcript_gene'),
-        source_url=kwargs.get('source_url', SOURCE_URL),
         writer=writer,
         validate=kwargs.get('validate', True),
         reference_filepath=kwargs.get('reference_filepath', ORF_PATH),
-        reference_source_url=kwargs.get(
-            'reference_source_url', REFERENCE_SOURCE_URL),
     )
 
 
@@ -141,10 +137,7 @@ def test_unlisted_missing_statistics_fail(mock_file_fileset, mock_gene_validator
 
 def test_morf_gene_transcript_gene_chronic_accession(mock_file_fileset, mock_gene_validator):
     writer = SpyWriter()
-    adapter = _build_adapter(
-        writer,
-        source_url='https://data.igvf.org/tabular-files/IGVFFI6032GREJ/',
-    )
+    adapter = _build_adapter(writer, filepath=CHRONIC_DESEQ_PATH)
     adapter.process_file()
 
     first = _parsed_docs(writer)[0]
@@ -158,16 +151,16 @@ def test_morf_gene_transcript_gene_invalid_label(mock_file_fileset, mock_gene_va
         _build_adapter(writer, label='invalid_label')
 
 
-def test_morf_gene_transcript_gene_unsupported_accession(mock_file_fileset):
+def test_morf_gene_transcript_gene_unsupported_accession(mock_file_fileset, tmp_path):
+    sample = tmp_path / 'IGVFFI0000AAAA_deseq2.tsv'
+    sample.write_text('rowID\n')
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Unsupported file accession'):
         MORFGeneTranscriptGene(
-            filepath=DESEQ_PATH,
+            filepath=str(sample),
             label='gene_transcript_gene',
-            source_url='https://data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
             reference_filepath=ORF_PATH,
-            reference_source_url=REFERENCE_SOURCE_URL,
         )
 
 
@@ -177,7 +170,6 @@ def test_morf_gene_transcript_gene_requires_reference_filepath(mock_file_fileset
         MORFGeneTranscriptGene(
             filepath=DESEQ_PATH,
             label='gene_transcript_gene',
-            source_url=SOURCE_URL,
             writer=writer,
         )
 
@@ -191,11 +183,9 @@ def test_morf_gene_transcript_gene_invalid_readout_gene(mock_file_fileset):
         adapter = MORFGeneTranscriptGene(
             filepath=DESEQ_PATH,
             label='gene_transcript_gene',
-            source_url=SOURCE_URL,
             writer=writer,
             validate=False,
             reference_filepath=ORF_PATH,
-            reference_source_url=REFERENCE_SOURCE_URL,
         )
         with pytest.raises(ValueError, match='ENSG00000198846 is not a valid gene'):
             adapter.process_file()
@@ -242,11 +232,13 @@ def test_ambiguous_gene_requires_consistent_transcripts(mock_gene_maps, parents,
     assert orf['orf_gene'] == expected
 
 
-def test_reference_provenance_uses_input(mock_file_fileset, mock_gene_validator):
+def test_reference_provenance_uses_filepath(mock_file_fileset, mock_gene_validator, tmp_path):
+    import shutil
+    alt_reference = tmp_path / 'IGVFFI0000AAAA_morf_orf_transcripts.example.tsv'
+    shutil.copy(ORF_PATH, alt_reference)
     writer = SpyWriter()
     writer.add_tag = MagicMock()
-    adapter = _build_adapter(
-        writer, reference_source_url='https://data.igvf.org/tabular-files/IGVFFI0000AAAA/?format=json')
+    adapter = _build_adapter(writer, reference_filepath=str(alt_reference))
     adapter.process_file()
     assert adapter.reference_accession == 'IGVFFI0000AAAA'
     tags = [call.args[1] for call in writer.add_tag.call_args_list]
@@ -254,10 +246,11 @@ def test_reference_provenance_uses_input(mock_file_fileset, mock_gene_validator)
     assert 'IGVFFI2373SYJW' not in tags
 
 
-@pytest.mark.parametrize('url', [None, '', 'IGVFFI2373SYJW', 'https://data.igvf.org/tabular-files/bad/'])
-def test_reference_url_required(mock_file_fileset, mock_gene_validator, url):
-    with pytest.raises(ValueError, match='reference_source_url'):
-        _build_adapter(SpyWriter(), reference_source_url=url)
+def test_reference_filepath_requires_accession(mock_file_fileset, mock_gene_validator, tmp_path):
+    bad_reference = tmp_path / 'orf_without_accession.tsv'
+    bad_reference.write_text('Name\tMORF_id\n')
+    with pytest.raises(ValueError, match='Could not derive the file accession'):
+        _build_adapter(SpyWriter(), reference_filepath=str(bad_reference))
 
 
 def test_transcript_parser_rejects_partial_ids():
@@ -277,7 +270,7 @@ def test_invalid_statistics_have_row_context(tmp_path, mock_file_fileset, mock_g
         columns = reader.fieldnames
         row = next(reader)
     row[field] = value
-    path = tmp_path / 'bad.tsv'
+    path = tmp_path / 'IGVFFI6734IWRB_bad.tsv'
     with path.open('w') as f:
         writer = csv.DictWriter(f, fieldnames=columns, delimiter='\t')
         writer.writeheader()
@@ -288,7 +281,7 @@ def test_invalid_statistics_have_row_context(tmp_path, mock_file_fileset, mock_g
 
 
 def test_missing_columns_fail(tmp_path, mock_file_fileset, mock_gene_validator):
-    path = tmp_path / 'bad.tsv'
+    path = tmp_path / 'IGVFFI6734IWRB_bad.tsv'
     path.write_text('rowID\nAATF_1\n')
     adapter = _build_adapter(SpyWriter(), filepath=str(path))
     with pytest.raises(ValueError, match='missing required columns'):
@@ -297,7 +290,7 @@ def test_missing_columns_fail(tmp_path, mock_file_fileset, mock_gene_validator):
 
 def test_duplicate_screen_rows_fail(tmp_path, mock_file_fileset, mock_gene_validator):
     lines = open(DESEQ_PATH).readlines()
-    path = tmp_path / 'duplicate.tsv'
+    path = tmp_path / 'IGVFFI6734IWRB_duplicate.tsv'
     path.write_text(''.join([lines[0], lines[1], lines[1]]))
     adapter = _build_adapter(SpyWriter(), filepath=str(path))
     with pytest.raises(ValueError, match='duplicate rowID'):
@@ -305,7 +298,7 @@ def test_duplicate_screen_rows_fail(tmp_path, mock_file_fileset, mock_gene_valid
 
 
 def test_null_pvalues_are_preserved(tmp_path, mock_file_fileset, mock_gene_validator):
-    path = tmp_path / 'null.tsv'
+    path = tmp_path / 'IGVFFI6734IWRB_null.tsv'
     path.write_text(
         'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tpvalue\tpadj\nAATF_1\t1\t2\t0.1\tNA\tNA\n')
     writer = SpyWriter()
@@ -456,7 +449,7 @@ def test_multiple_source_edges_are_rejected(mock_file_fileset, mock_gene_validat
 
 
 def test_unlisted_missing_reference_fails(tmp_path, mock_file_fileset, mock_gene_validator):
-    path = tmp_path / 'unknown.tsv'
+    path = tmp_path / 'IGVFFI6734IWRB_unknown.tsv'
     path.write_text(
         'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tpvalue\tpadj\nUNKNOWN_1\t1\t1\t1\t0.5\t0.5\n')
     with pytest.raises(ValueError, match='UNKNOWN_1.*no matching MORF_id'):

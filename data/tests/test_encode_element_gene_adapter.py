@@ -1,8 +1,20 @@
+import gzip
 import json
+import os
+import tempfile
 import pytest
 from unittest.mock import patch, MagicMock
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.writer import SpyWriter
+
+SAMPLE_PATH = './samples/epiraction_ENCFF712SUP.bed.gz'
+
+
+def _write_bed_gz(path, rows):
+    with gzip.open(path, 'wt') as f:
+        f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
+        for row in rows:
+            f.write(row)
 
 
 # mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
@@ -29,21 +41,17 @@ def test_encode_element_gene_adapter_genomic_element_gene(mock_file_fileset):
 
         writer = SpyWriter()
 
-        # Create a small temporary test file
-        import tempfile
-        import gzip
-        with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
-            with gzip.open(temp_file.name, 'wt') as f:
-                f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
-                f.write('chr1\t827140\t827667\te:chr1:827140-827667\tpromoter\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
-            temp_file_path = temp_file.name
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file_path = os.path.join(temp_dir, 'ENCFF712SUP.bed.gz')
+            _write_bed_gz(
+                temp_file_path,
+                ['chr1\t827140\t827667\te:chr1:827140-827667\tpromoter\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n'],
+            )
 
-        try:
             adapter = EncodeElementGeneLink(
                 filepath=temp_file_path,
                 label='genomic_element_gene',
                 source='ENCODE-E2G-DNaseOnly',
-                source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
                 writer=writer,
                 validate=True
             )
@@ -67,29 +75,22 @@ def test_encode_element_gene_adapter_genomic_element_gene(mock_file_fileset):
             assert first_item['label'] == 'predicted regulatory element effect on gene expression'
             assert first_item['class'] == 'prediction'
             assert first_item['method'] == 'ENCODE-rE2G'
-        finally:
-            import os
-            os.unlink(temp_file_path)
 
 
 def test_encode_element_gene_adapter_genomic_element(mock_file_fileset):
     writer = SpyWriter()
 
-    # Create a small temporary test file
-    import tempfile
-    import gzip
-    with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
-        with gzip.open(temp_file.name, 'wt') as f:
-            f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
-            f.write('chr1\t827140\t827667\te:chr1:827140-827667\tpromoter\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
-        temp_file_path = temp_file.name
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file_path = os.path.join(temp_dir, 'ENCFF712SUP.bed.gz')
+        _write_bed_gz(
+            temp_file_path,
+            ['chr1\t827140\t827667\te:chr1:827140-827667\tpromoter\tNOC2L\tENSG00000188976\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n'],
+        )
 
-    try:
         adapter = EncodeElementGeneLink(
             filepath=temp_file_path,
             label='genomic_element',
             source='ENCODE-E2G-DNaseOnly',
-            source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
             writer=writer,
             validate=True
         )
@@ -112,22 +113,19 @@ def test_encode_element_gene_adapter_genomic_element(mock_file_fileset):
         assert 'treatments_term_ids' in first_item
         assert first_item['type'] == 'accessible dna elements'
         assert first_item['source'] == 'ENCODE'
-    finally:
-        import os
-        os.unlink(temp_file_path)
+        assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF712SUP/'
 
 
 def test_encode_element_gene_adapter_initialization(mock_file_fileset):
     writer = SpyWriter()
     for label in EncodeElementGeneLink.ALLOWED_LABELS:
         adapter = EncodeElementGeneLink(
-            filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
+            filepath=SAMPLE_PATH,
             label=label,
             source='ENCODE-E2G-DNaseOnly',
-            source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
             writer=writer
         )
-        assert adapter.filepath == './samples/epiraction_ENCFF712SUP.bed.gz'
+        assert adapter.filepath == SAMPLE_PATH
         assert adapter.label == label
         assert adapter.writer == writer
         assert adapter.source == 'ENCODE-E2G-DNaseOnly'
@@ -138,10 +136,9 @@ def test_encode_element_gene_adapter_initialization(mock_file_fileset):
 def test_encode_element_gene_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = EncodeElementGeneLink(
-        filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
+        filepath=SAMPLE_PATH,
         label='genomic_element_gene',
         source='ENCODE-E2G-DNaseOnly',
-        source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
         writer=writer,
         validate=True
     )
@@ -159,10 +156,9 @@ def test_encode_element_gene_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element_gene, genomic_element'):
         EncodeElementGeneLink(
-            filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
+            filepath=SAMPLE_PATH,
             label='invalid_label',
             source='ENCODE-E2G-DNaseOnly',
-            source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
             writer=writer,
             validate=True
         )
@@ -172,10 +168,9 @@ def test_encode_element_gene_adapter_invalid_source(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid source. Allowed values: ENCODE-E2G-DNaseOnly'):
         EncodeElementGeneLink(
-            filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
+            filepath=SAMPLE_PATH,
             label='genomic_element_gene',
             source='INVALID_SOURCE',
-            source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
             writer=writer,
             validate=True
         )
@@ -190,21 +185,17 @@ def test_encode_element_gene_adapter_skips_na_gene_id(mock_file_fileset):
 
         writer = SpyWriter()
 
-        # Create a small temporary test file with NA gene ID
-        import tempfile
-        import gzip
-        with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
-            with gzip.open(temp_file.name, 'wt') as f:
-                f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
-                f.write('chr1\t827140\t827667\te:chr1:827140-827667\tenhancer\tNA\tNA\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
-            temp_file_path = temp_file.name
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file_path = os.path.join(temp_dir, 'ENCFF712SUP.bed.gz')
+            _write_bed_gz(
+                temp_file_path,
+                ['chr1\t827140\t827667\te:chr1:827140-827667\tenhancer\tNA\tNA\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n'],
+            )
 
-        try:
             adapter = EncodeElementGeneLink(
                 filepath=temp_file_path,
                 label='genomic_element_gene',
                 source='ENCODE-E2G-DNaseOnly',
-                source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
                 writer=writer,
                 validate=True
             )
@@ -212,9 +203,6 @@ def test_encode_element_gene_adapter_skips_na_gene_id(mock_file_fileset):
 
             # Should skip the row with NA gene ID
             assert len(writer.contents) == 0
-        finally:
-            import os
-            os.unlink(temp_file_path)
 
 
 def test_encode_element_gene_adapter_skips_invalid_gene_id(mock_file_fileset):
@@ -226,21 +214,17 @@ def test_encode_element_gene_adapter_skips_invalid_gene_id(mock_file_fileset):
 
         writer = SpyWriter()
 
-        # Create a small temporary test file with invalid gene ID
-        import tempfile
-        import gzip
-        with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
-            with gzip.open(temp_file.name, 'wt') as f:
-                f.write('#chr\tstart\tend\tname\tclass\tTargetGene\tTargetGeneEnsemblID\tTargetGeneTSS\tCellType\tScore\tDistanceToTSS\tH3K27ac\tOpen\tCofactor\tActivity\tHiC_contacts\tHiC_foldchange\n')
-                f.write('chr1\t827140\t827667\te:chr1:827140-827667\tenhancer\tINVALID_GENE\tINVALID_GENE\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n')
-            temp_file_path = temp_file.name
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file_path = os.path.join(temp_dir, 'ENCFF712SUP.bed.gz')
+            _write_bed_gz(
+                temp_file_path,
+                ['chr1\t827140\t827667\te:chr1:827140-827667\tenhancer\tINVALID_GENE\tINVALID_GENE\t959156\tBlood.Myeloid.Erythroblast\t0.1094868\t131089\t29.0349\t15.5104\t8.8905\t60.5940863\t0.13094\t9.70500\n'],
+            )
 
-        try:
             adapter = EncodeElementGeneLink(
                 filepath=temp_file_path,
                 label='genomic_element_gene',
                 source='ENCODE-E2G-DNaseOnly',
-                source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
                 writer=writer,
                 validate=True
             )
@@ -248,6 +232,3 @@ def test_encode_element_gene_adapter_skips_invalid_gene_id(mock_file_fileset):
 
             # Should skip the row with invalid gene ID
             assert len(writer.contents) == 0
-        finally:
-            import os
-            os.unlink(temp_file_path)
