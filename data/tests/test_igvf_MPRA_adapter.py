@@ -742,3 +742,19 @@ def test_mouse_design_requires_unique_containing_reference(tmp_path, mock_file_f
     if not reference_rows:
         assert not adapter.variant_to_element
         assert not adapter.variant_pos_to_element
+
+
+@pytest.mark.parametrize('value', ['NaN', 'Infinity', '-Infinity'])
+def test_omit_nonfinite_metrics_preserves_record(value):
+    record = {
+        '_key': 'test-edge',
+        'log2FC': MPRAAdapter.safe_float(value),
+        'RNA_count': MPRAAdapter.safe_float('0'),
+        'DNA_count': MPRAAdapter.safe_float('12.5'),
+        'optional': None,
+    }
+    cleaned = MPRAAdapter._drop_nonfinite_metrics(record)
+    assert cleaned == {'_key': 'test-edge', 'RNA_count': 0.0,
+                       'DNA_count': 12.5, 'optional': None}
+    json.dumps(cleaned, allow_nan=False)
+    assert MPRAAdapter.safe_int(value) is None
