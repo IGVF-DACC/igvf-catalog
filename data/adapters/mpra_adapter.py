@@ -53,6 +53,7 @@ import csv
 import gzip
 import json
 import hashlib
+import math
 from typing import Optional
 from collections import defaultdict
 import ast
@@ -221,14 +222,20 @@ class MPRAAdapter(BaseAdapter):
     def safe_float(value):
         try:
             parsed = float(value)
-            return None if parsed != parsed else parsed
+            return parsed
         except (TypeError, ValueError):
             return None
+
+    @staticmethod
+    def _drop_nonfinite_metrics(props):
+        """Preserve records while omitting NaN and infinite numeric fields."""
+        return {key: value for key, value in props.items()
+                if not (isinstance(value, float) and not math.isfinite(value))}
 
     @classmethod
     def safe_int(cls, value):
         parsed = cls.safe_float(value)
-        if parsed is None:
+        if parsed is None or not math.isfinite(parsed):
             return None
         return int(parsed) if parsed.is_integer() else None
 
@@ -562,7 +569,8 @@ class MPRAAdapter(BaseAdapter):
                     }
                     if self.validate:
                         self.validate_doc(props)
-                    self.writer.write(json.dumps(props) + '\n')
+                    self.writer.write(json.dumps(
+                        props, allow_nan=False) + '\n')
 
                 elif self.effect_label == 'genomic_element_biosample':
                     if self.has_sequence_designs:
@@ -625,9 +633,11 @@ class MPRAAdapter(BaseAdapter):
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
                     }
+                    props = self._drop_nonfinite_metrics(props)
                     if self.validate:
                         self.validate_doc(props)
-                    self.writer.write(json.dumps(props) + '\n')
+                    self.writer.write(json.dumps(
+                        props, allow_nan=False) + '\n')
 
             if missing_allele_multi_effect:
                 raise ValueError(
@@ -703,7 +713,7 @@ class MPRAAdapter(BaseAdapter):
             }
             if self.validate:
                 self.validate_doc(props)
-            self.writer.write(json.dumps(props) + '\n')
+            self.writer.write(json.dumps(props, allow_nan=False) + '\n')
 
     def _process_variant_biosample_chunk(self, chunk):
         """IGVF variant×biosample BED: SPDI in col 3, optional ``variant_pos`` in col 16 for disambiguation of the same variant on different strands."""
@@ -798,6 +808,8 @@ class MPRAAdapter(BaseAdapter):
                     'treatments_term_ids': self.treatments_term_ids or None,
                 }
 
+                edge_props = self._drop_nonfinite_metrics(edge_props)
                 if self.validate:
                     self.validate_doc(edge_props)
-                self.writer.write(json.dumps(edge_props) + '\n')
+                self.writer.write(json.dumps(
+                    edge_props, allow_nan=False) + '\n')
