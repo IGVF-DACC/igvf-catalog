@@ -67,6 +67,7 @@ from adapters.helpers import (
     load_variant,
     get_file_fileset_by_accession_in_arangodb
 )
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 
@@ -146,6 +147,7 @@ class MPRAAdapter(BaseAdapter):
                 'Use label genomic_element or genomic_element_biosample only.'
             )
 
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
 
         if self.source == 'ENCODE':
@@ -443,6 +445,11 @@ class MPRAAdapter(BaseAdapter):
             'simple_sample_summaries')
         self.treatments_term_ids = self.file_fileset.get(
             'treatments_term_ids')
+
+        if self.label in ('genomic_element_biosample', 'variant_biosample'):
+            if not self.ontology_term_validator.ensure(self.biosample_term):
+                self.ontology_term_validator.log()
+                return
 
         if self.label in ('genomic_element', 'genomic_element_biosample'):
             self._process_element_effects_file()

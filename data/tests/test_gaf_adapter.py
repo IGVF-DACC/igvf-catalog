@@ -2,6 +2,7 @@ import json
 import pytest
 from unittest.mock import patch
 from adapters.gaf_adapter import GAF
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
@@ -25,7 +26,18 @@ def mock_protein_map():
         yield mock_get
 
 
-def test_gaf_adapter_human(mock_file_fileset, mock_protein_map):
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.gaf_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
+def test_gaf_adapter_human(mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
                   label='human', writer=writer, validate=True)
@@ -50,7 +62,7 @@ def test_gaf_adapter_human(mock_file_fileset, mock_protein_map):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI1490WZCV'
 
 
-def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map):
+def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/mgi_sample.gaf.gz',
                   label='mouse', writer=writer, validate=True)
@@ -75,7 +87,7 @@ def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI9807JOKT'
 
 
-def test_gaf_adapter_rna(mock_file_fileset):
+def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
                   label='rna', writer=writer, validate=True)

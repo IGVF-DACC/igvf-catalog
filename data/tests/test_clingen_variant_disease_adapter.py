@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from adapters.clingen_variant_disease_adapter import ClinGen
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 SAMPLE_PATH = './samples/clinGen_variant_pathogenicity_example.csv'
@@ -54,7 +55,19 @@ def mock_variant_lookup():
         yield mock_bulk
 
 
-def test_clingen_adapter_variant_disease(mock_file_fileset, mock_variant_lookup):
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.clingen_variant_disease_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
+def test_clingen_adapter_variant_disease(
+        mock_file_fileset, mock_variant_lookup, mock_ontology_term_validator):
     writer = SpyWriter()
     with patch('adapters.clingen_variant_disease_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
@@ -140,7 +153,8 @@ def test_clingen_adapter_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
-def test_clingen_adapter_invalid_gene_id(mock_file_fileset, mock_variant_lookup):
+def test_clingen_adapter_invalid_gene_id(
+        mock_file_fileset, mock_variant_lookup, mock_ontology_term_validator):
     writer = SpyWriter()
 
     with patch('adapters.clingen_variant_disease_adapter.GeneValidator') as MockGeneValidator:
@@ -154,7 +168,8 @@ def test_clingen_adapter_invalid_gene_id(mock_file_fileset, mock_variant_lookup)
         assert len(writer.contents) == 0
 
 
-def test_clingen_adapter_skips_unmatched_variants(mock_file_fileset):
+def test_clingen_adapter_skips_unmatched_variants(
+        mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
 
     def _no_matches(identifiers, check_by='ca_id', chunk_size=500):

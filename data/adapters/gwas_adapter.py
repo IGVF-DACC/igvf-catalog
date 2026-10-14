@@ -7,6 +7,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb, load_variant, bulk_check_variants_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 
@@ -41,6 +42,7 @@ class GWAS(BaseAdapter):
         # load_variant() rejects (e.g. ref allele mismatch), so process_variants_phenotypes
         # can skip them instead of emitting an edge with a dangling _from reference.
         self.invalid_variant_ids = set()
+        self.ontology_term_validator = OntologyTermValidator()
 
         super().__init__(filepath, label, writer, validate)
 
@@ -154,6 +156,9 @@ class GWAS(BaseAdapter):
                     equivalent_term_id = efo_id
             else:
                 ontology_term_id = efo_id
+
+        if not self.ontology_term_validator.validate(ontology_term_id):
+            return None
 
         study_id = row[3]
         studies_variants_key = self.generate_studies_variants_key(
@@ -297,6 +302,8 @@ class GWAS(BaseAdapter):
 
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()
+            ontology_term_ids = self.collect_ontology_term_ids()
+            self.ontology_term_validator.preload(ontology_term_ids)
 
         header = None
         trying_to_complete_line = None
@@ -337,6 +344,9 @@ class GWAS(BaseAdapter):
                 self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
+
+        if self.label == 'variants_phenotypes':
+            self.ontology_term_validator.log()
 
     def get_tagged_variants(self):
         header = None
@@ -403,3 +413,53 @@ class GWAS(BaseAdapter):
         self.ontology_name_mapping = {}
         with open(GWAS.ONTOLOGY_MAPPING_PATH, 'rb') as mapfile:
             self.ontology_name_mapping = pickle.load(mapfile)
+
+    @staticmethod
+    def get_candidate_ontology_term_id(row):
+        """Preferred ontology term id for a row (same special cases as process_variants_phenotypes)."""
+        mondo_id = None
+        efo_id = None
+        if row[1] and row[1] != 'NA':
+            mondo_id = row[1]
+            efo_id = row[2] if row[2] and row[2] != 'NA' else None
+        else:
+            efo_id = row[2] if row[2] and row[2] != 'NA' else None
+
+        if efo_id == 'EFO_10019866':
+            mondo_id = 'MONDO_0003900'
+            efo_id = 'EFO_1001986'
+        if mondo_id == 'MONDO_0001524':
+            mondo_id = 'MONDO_0005328'
+
+        if mondo_id:
+            return mondo_id
+        if efo_id:
+            return efo_id
+        return None
+
+    def collect_ontology_term_ids(self):
+        header = None
+        trying_to_complete_line = None
+        ontology_term_ids = set()
+
+        for record in open(self.filepath, 'r'):
+            if header is None:
+                header = record.strip().split('\t')
+                continue
+
+            if trying_to_complete_line:
+                record = trying_to_complete_line + record
+                trying_to_complete_line = None
+
+            row = record.strip().split('\t')
+
+            if self.line_appears_broken(row):
+                trying_to_complete_line = record
+                continue
+
+            row = row + [None] * (len(header) - len(row))
+            ontology_term_id = self.get_candidate_ontology_term_id(row)
+            if ontology_term_id:
+                ontology_term_ids.add(ontology_term_id)
+
+        return ontology_term_ids

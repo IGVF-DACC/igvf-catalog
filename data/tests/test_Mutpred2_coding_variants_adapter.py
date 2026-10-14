@@ -4,6 +4,7 @@ from io import StringIO
 import gzip
 import json
 from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
+from adapters.ontology_term_validator import OntologyTermValidator
 import pytest
 
 mechanisms_json = json.dumps([{
@@ -32,6 +33,17 @@ def mock_file_fileset():
             'simple_sample_summaries': None
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.Mutpred2_coding_variants_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
@@ -102,7 +114,8 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
-def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_file_fileset):
+def test_process_file_coding_variants_phenotypes(
+        mock_gzip_open, mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
         SAMPLE_FILEPATH,

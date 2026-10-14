@@ -14,6 +14,7 @@ from adapters.helpers import (
     convert_aa_letter_code_and_Met1,
     get_file_fileset_by_accession_in_arangodb,
 )
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # works in similar way to mutpred2 adapter
@@ -52,6 +53,7 @@ class ESM1vCodingVariantsScores(BaseAdapter):
         self.file_accession = self.FILE_ACCESSION_PATTERN.search(
             os.path.basename(filepath)).group(0)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -76,6 +78,9 @@ class ESM1vCodingVariantsScores(BaseAdapter):
         if self.label == 'coding_variants_phenotypes':
             self.file_fileset = get_file_fileset_by_accession_in_arangodb(
                 self.file_accession)
+            if not self.ontology_term_validator.ensure(self.PHENOTYPE_TERM):
+                self.ontology_term_validator.log()
+                return
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)

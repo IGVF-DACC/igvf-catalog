@@ -9,6 +9,7 @@ from Bio.UniProt.GOA import gafiterator
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.protein_map import ProteinMap
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
@@ -57,6 +58,7 @@ class GAF(BaseAdapter):
     ALLOWED_LABELS = list(SOURCES.keys())
 
     def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -97,10 +99,18 @@ class GAF(BaseAdapter):
         else:
             self.protein_map = ProteinMap(organism=self.organism)
 
+        go_term_keys = set()
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
-                _to = 'ontology_terms/' + \
-                    annotation['GO_ID'].replace(':', '_')
+                go_term_keys.add(annotation['GO_ID'].replace(':', '_'))
+        self.ontology_term_validator.preload(go_term_keys)
+
+        with gzip.open(self.filepath, 'rt') as input_file:
+            for annotation in gafiterator(input_file):
+                go_term_key = annotation['GO_ID'].replace(':', '_')
+                if not self.ontology_term_validator.validate(go_term_key):
+                    continue
+                _to = 'ontology_terms/' + go_term_key
 
                 if self.label == 'rna':
                     transcript_id = self.rnacentral_mapping.get(
@@ -171,3 +181,4 @@ class GAF(BaseAdapter):
                     f'{unmatched_transcripts} unmatched ids for label: {self.label}')
         else:
             self.protein_map.log(self.logger)
+        self.ontology_term_validator.log()

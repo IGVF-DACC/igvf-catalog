@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_query_coding_variants_from_spdi_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Example line from DUAL-IPA score file (IGVFFI6224HZMG.tsv.gz):
@@ -27,6 +28,7 @@ class DUALIPAAdapter(BaseAdapter):
     CHUNK_SIZE = 100
 
     def __init__(self, filepath, label='coding_variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
 
@@ -102,6 +104,11 @@ class DUALIPAAdapter(BaseAdapter):
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
+
+        if self.label == 'coding_variants_phenotypes':
+            if not self.ontology_term_validator.ensure(self.PHENOTYPE_TERM):
+                self.ontology_term_validator.log()
+                return
 
         with gzip.open(self.filepath, 'rt') as dual_ipa_file:
             self.writer.add_tag('portal_accessions', self.file_accession)

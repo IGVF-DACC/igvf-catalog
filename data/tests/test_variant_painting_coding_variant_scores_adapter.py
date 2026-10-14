@@ -2,6 +2,7 @@ import json
 from unittest.mock import patch, mock_open
 from adapters.writer import SpyWriter
 from adapters.variant_painting_coding_variant_scores_adapter import VariantPaintingAdapter
+from adapters.ontology_term_validator import OntologyTermValidator
 import pytest
 
 
@@ -27,10 +28,23 @@ MOCKED_FILE_FILESET = {
 }
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.variant_painting_coding_variant_scores_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 @patch('adapters.variant_painting_coding_variant_scores_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_FILE_FILESET)
 @patch('adapters.variant_painting_coding_variant_scores_adapter.bulk_query_coding_variants_from_spdi_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query, mock_file_fileset):
+def test_process_file_coding_variants_phenotypes(
+        mock_gzip_open, mock_bulk_query, mock_file_fileset,
+        mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = VariantPaintingAdapter(
         'IGVFFI9499PJFU.tsv.gz',
@@ -67,7 +81,9 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
 @patch('adapters.variant_painting_coding_variant_scores_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_FILE_FILESET)
 @patch('adapters.variant_painting_coding_variant_scores_adapter.bulk_query_coding_variants_from_spdi_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_missing_variant_is_skipped(mock_gzip_open, mock_bulk_query, mock_file_fileset):
+def test_missing_variant_is_skipped(
+        mock_gzip_open, mock_bulk_query, mock_file_fileset,
+        mock_ontology_term_validator):
     writer = SpyWriter()
     mock_bulk_query.return_value = {}
     adapter = VariantPaintingAdapter(
