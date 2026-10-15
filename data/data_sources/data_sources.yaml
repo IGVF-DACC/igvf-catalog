@@ -1417,8 +1417,8 @@ genomic element IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/@@download/IGVFFI7368COWA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9322VVTR/@@download/IGVFFI9322VVTR.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/@@download/IGVFFI4081AUXT.csv.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2104BKIF/@@download/IGVFFI2104BKIF.tsv.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0192YMEY/@@download/IGVFFI0192YMEY.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7203AWIC/@@download/IGVFFI7203AWIC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6853MYBE/@@download/IGVFFI6853MYBE.tsv.gz
   source: IGVF
   type: tested elements
 
@@ -1472,8 +1472,8 @@ genomic element to gene IGVF CRISPR E2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI7368COWA/@@download/IGVFFI7368COWA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9322VVTR/@@download/IGVFFI9322VVTR.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4081AUXT/@@download/IGVFFI4081AUXT.csv.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2104BKIF/@@download/IGVFFI2104BKIF.tsv.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0192YMEY/@@download/IGVFFI0192YMEY.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7203AWIC/@@download/IGVFFI7203AWIC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6853MYBE/@@download/IGVFFI6853MYBE.tsv.gz
   source: IGVF
   label: str # element effect on gene expression of {readout_gene}
 
@@ -2627,3 +2627,41 @@ genomic_element_genomic_element IGVF CRISPR accessibility:
   command: python3 data_parser.py --adapter crispr_element_element --filepath {datafile} --label genomic_element_genomic_element --output-bucket-key genomic_elements_genomic_elements/crispr_element_element_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2419ZSGC/@@download/IGVFFI2419ZSGC.tsv.gz
+
+genomic_elements CDH5 MAGeCK screens:
+  collection: genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter crispr_element_gene_igvf
+    --source-url {source_url} --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI9629WVUU/
+    --label genomic_element
+    --output-bucket-key genomic_elements/crispr_element_gene_igvf_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9001HIYI/@@download/IGVFFI9001HIYI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9629WVUU/@@download/IGVFFI9629WVUU.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3975KRIX/@@download/IGVFFI3975KRIX.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9629WVUU/@@download/IGVFFI9629WVUU.tsv.gz
+  source: IGVF
+
+genomic_elements_genes CDH5 MAGeCK screens:
+  collection: genomic_elements_genes
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter crispr_element_gene_igvf
+    --source-url {source_url} --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI9629WVUU/
+    --label genomic_element_gene
+    --output-bucket-key genomic_elements_genes/crispr_element_gene_igvf_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9001HIYI/@@download/IGVFFI9001HIYI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9629WVUU/@@download/IGVFFI9629WVUU.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3975KRIX/@@download/IGVFFI3975KRIX.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9629WVUU/@@download/IGVFFI9629WVUU.tsv.gz
+  source: IGVF

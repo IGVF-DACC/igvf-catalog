@@ -2,6 +2,7 @@ import json
 import gzip
 import logging
 import math
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -1477,19 +1478,19 @@ def test_igvf_e2g_ccr_perturb_seq_drops_failing_qc_and_labels_mixed_types(
 
 def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
         mock_file_fileset_perturb_seq, tmp_path):
-    """IGVFFI2104BKIF: promoter TF Perturb-seq; effect_score is z_score, not log2FC."""
+    """IGVFFI7203AWIC: promoter TF Perturb-seq; effect_score and log2_fold_change remain distinct."""
     writer = SpyWriter()
     test_file = tmp_path / 'IGVFFI2104BKIF_crispr_element_gene_igvf_hs27_tf_perturb_seq.tsv.gz'
     header = (
         'effect_score\tp_val\tp_val_adj\tguide_id\ttarget_gene\t'
         'intended_target_name\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\n'
+        'intended_target_start\tintended_target_end\tlog2_fold_change\n'
     )
     rows = (
         '1.85\t1.2e-8\t3.4e-6\tFOXL1-3\tENSG00000139618\t'
-        'ENSG00000176678\tchr16\t86611420\t86612920\n'
+        'ENSG00000176678\tchr16\t86611420\t86612920\t-0.75\n'
         '0.12\t0.41\t0.88\tFOXL1-3\tENSG00000157764\t'
-        'ENSG00000176678\tchr16\t86611420\t86612920\n'
+        'ENSG00000176678\tchr16\t86611420\t86612920\t-0.75\n'
     )
     with gzip.open(test_file, 'wt') as out:
         out.write(header)
@@ -1515,7 +1516,7 @@ def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
     assert hit['p_value'] == pytest.approx(1.2e-8)
     assert hit['p_value_adj'] == pytest.approx(3.4e-6)
     assert hit['significant'] is True
-    assert 'log2FC' not in hit
+    assert hit['log2FC'] == pytest.approx(-0.75)
 
     assert miss['z_score'] == pytest.approx(0.12)
     assert miss['significant'] is False
@@ -1692,3 +1693,172 @@ def test_flowfish_promoter_override_retains_nodes_and_edges(
     assert edge['log2FC'] == -1.768807043
     assert edge['p_value'] == 1.64e-17
     assert edge['p_value_adj'] == 1.72e-16
+
+
+@pytest.mark.parametrize('accession,log2fc,z_score', [
+    ('IGVFFI6853MYBE', -0.8168859481811523, -0.1270749744073581),
+    ('IGVFFI7203AWIC', -0.10302283993428271, 0.19537870585918427),
+])
+def test_norman_replacements_preserve_log2fc_and_nonsignificant_pairs(
+        accession, log2fc, z_score, mock_file_fileset_perturb_seq, tmp_path):
+    from pathlib import Path
+    source = Path(f'samples/crispr_{accession}.example.tsv').read_text()
+    path = tmp_path / 'norman.tsv.gz'
+    with gzip.open(path, 'wt') as output:
+        output.write(source)
+    writer = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as validator:
+        validator.return_value.validate.return_value = True
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(path), label='genomic_element_gene',
+            source_url=f'https://data.igvf.org/tabular-files/{accession}/',
+            writer=writer, validate=True)
+        adapter.process_file()
+    records = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(records) == 3
+    assert records[0]['log2FC'] == pytest.approx(log2fc)
+    assert records[0]['z_score'] == pytest.approx(z_score)
+    assert records[0]['significant'] is False
+    assert records[0]['files_filesets'] == f'files_filesets/{accession}'
+
+
+@pytest.mark.parametrize('accession,count', [('IGVFFI9001HIYI', 5), ('IGVFFI3975KRIX', 5)])
+@pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_gene'])
+def test_cdh5_mageck_screens(accession, count, label, mock_file_fileset_facs_screen, tmp_path):
+    from pathlib import Path
+    path = tmp_path / 'mageck.tsv.gz'
+    with gzip.open(path, 'wt') as output:
+        output.write(
+            Path(f'samples/crispr_{accession}.example.tsv').read_text())
+    writer = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as validator:
+        validator.return_value.validate.return_value = True
+        CRISPRElementGeneIGVF(
+            filepath=str(path), label=label,
+            source_url=f'https://data.igvf.org/tabular-files/{accession}/',
+            reference_filepath='samples/crispr_IGVFFI9629WVUU.example.tsv',
+            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI9629WVUU/',
+            writer=writer, validate=True).process_file()
+    records = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(records) == count
+    assert len({r['_key'] for r in records}) == count
+    if label == 'genomic_element_gene':
+        assert all(r['_to'] == 'genes/ENSG00000179776' for r in records)
+        assert records[0]['significant'] is True
+        assert records[0]['log2FC'] < 0
+        assert records[0]['p_value_adj'] == pytest.approx(
+            0.000068 if accession == 'IGVFFI9001HIYI' else 0.000114)
+        if accession == 'IGVFFI3975KRIX':
+            notch = [r for r in records if 'NOTCH1' in r['_key']]
+            assert len(notch) == 2
+            assert notch[0]['log2FC'] == notch[1]['log2FC']
+            assert all(r['num_guides'] == 6 for r in notch)
+    else:
+        assert all(r['source_annotation'] == 'promoter' for r in records)
+        assert all(r['promoter_of'].startswith('genes/ENSG') for r in records)
+
+
+def _normalize_mageck_test_rows(header, rows, config, reference_filepath, logger):
+    adapter = CRISPRElementGeneIGVF.__new__(CRISPRElementGeneIGVF)
+    adapter.file_config = config
+    adapter.reference_filepath = reference_filepath
+    adapter.logger = logger
+    return adapter._normalize_mageck_rows(header, rows)
+
+
+MAGECK_HEADER = ['id', 'num', 'neg|lfc', 'neg|p-value', 'neg|fdr',
+                 'pos|lfc', 'pos|p-value', 'pos|fdr', 'ensembl_gene_id',
+                 'element_chr', 'element_start', 'element_end', 'element_guide_count']
+MAGECK_ROW = ['TEST', '12', '-0.2', '0.4', '0.8', '0.3', '0.002', '0.01',
+              'ENSG00000179776', 'chr16', '100', '200', '6']
+MAGECK_LOGGER = logging.getLogger(__name__)
+
+
+def test_selects_matched_statistics_from_lower_fdr_direction():
+    header, rows = _normalize_mageck_test_rows(
+        MAGECK_HEADER, [MAGECK_ROW], {}, None, MAGECK_LOGGER)
+    normalized_row = next(rows)
+    assert header == MAGECK_HEADER
+    assert normalized_row == MAGECK_ROW
+    record = _mageck_test_metrics(header, normalized_row)
+    assert float(record['log2FC']) == 0.3
+    assert float(record['p_value']) == 0.002
+    assert float(record['p_value_adj']) == 0.01
+    # element-specific, not native test's 12
+    assert int(record['num_guides']) == 6
+
+
+def test_negative_direction_wins_ties():
+    row = MAGECK_ROW.copy()
+    row[4] = row[7]
+    header, rows = _normalize_mageck_test_rows(
+        MAGECK_HEADER, [row], {}, None, MAGECK_LOGGER)
+    record = _mageck_test_metrics(header, next(rows))
+    assert float(record['log2FC']) == -0.2
+    assert float(record['p_value']) == 0.4
+
+
+@pytest.mark.parametrize('field,value', [('neg|fdr', '1.5'), ('pos|lfc', 'nan'), ('pos|p-value', '-0.1')])
+def test_rejects_invalid_statistics(field, value):
+    row = MAGECK_ROW.copy()
+    row[MAGECK_HEADER.index(field)] = value
+    _, rows = _normalize_mageck_test_rows(
+        MAGECK_HEADER, [row], {}, None, MAGECK_LOGGER)
+    with pytest.raises(ValueError, match='Invalid MAGeCK statistics'):
+        list(rows)
+
+
+def test_rejects_duplicate_native_ids():
+    _, rows = _normalize_mageck_test_rows(
+        MAGECK_HEADER, [MAGECK_ROW, MAGECK_ROW], {}, None, MAGECK_LOGGER)
+    with pytest.raises(ValueError, match='duplicate MAGeCK element ID'):
+        list(rows)
+
+
+def test_requires_reference_for_genome_wide_screen():
+    with pytest.raises(ValueError, match='requires reference_filepath'):
+        _normalize_mageck_test_rows(MAGECK_HEADER, [], {
+                                    'reference_accession': 'IGVFFI9629WVUU'}, None, MAGECK_LOGGER)
+
+
+def test_unknown_native_ids_require_explicit_curation():
+    _, rows = _normalize_mageck_test_rows(
+        MAGECK_HEADER, [MAGECK_ROW], {'reference_accession': 'IGVFFI9629WVUU'},
+        'samples/crispr_IGVFFI9629WVUU.example.tsv', MAGECK_LOGGER)
+    with pytest.raises(ValueError, match='No guide reference'):
+        list(rows)
+
+
+def test_conflicting_guide_annotations_are_rejected(tmp_path):
+    reference = tmp_path / 'guides.tsv'
+    lines = Path(
+        'samples/crispr_IGVFFI9629WVUU.example.tsv').read_text().splitlines()
+    fields = lines[1].split('\t')
+    fields[lines[0].split('\t').index('intended_target_start')] = '12345'
+    reference.write_text(
+        '\n'.join([lines[0], lines[1], '\t'.join(fields)]) + '\n')
+    with pytest.raises(ValueError, match='Conflicting guide annotations'):
+        _normalize_mageck_test_rows(MAGECK_HEADER, [], {
+                                    'reference_accession': 'IGVFFI9629WVUU'}, reference, MAGECK_LOGGER)
+
+
+def _mageck_test_metrics(header, row, layout='macs_validation'):
+    adapter = CRISPRElementGeneIGVF.__new__(CRISPRElementGeneIGVF)
+    adapter.layout = CRISPR_E2G_LAYOUTS[layout]
+    return adapter._mageck_metrics_from_row(row, {name: idx for idx, name in enumerate(header)})
+
+
+def test_macs_metric_mappings_reference_actual_source_columns():
+    for layout, accession in [('macs_validation', 'IGVFFI3975KRIX'),
+                              ('macs_genome_wide', 'IGVFFI9001HIYI')]:
+        header = Path(
+            f'samples/crispr_{accession}.example.tsv').read_text().splitlines()[0].split('\t')
+        for sources in CRISPR_E2G_LAYOUTS[layout]['semantic_columns']['metrics'].values():
+            sources = [sources] if isinstance(sources, str) else sources
+            assert set(sources) <= set(header)
+
+
+def test_genome_wide_guide_count_uses_native_num():
+    metrics = _mageck_test_metrics(
+        MAGECK_HEADER, MAGECK_ROW, 'macs_genome_wide')
+    assert metrics['num_guides'] == 12
