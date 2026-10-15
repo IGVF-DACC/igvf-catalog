@@ -93,8 +93,13 @@
         "SEMpl_annotation": {
           "title": "SEMpl Annotation",
           "type": "string",
-          "description": "Predicted effect of the variant on binding, assigned by comparing reference and alternate scores against 2 raised to SEMpl_baseline.",
-          "example": "binding_created",
+          "description": "Predicted effect of the variant on binding, assigned by comparing reference and alternate scores against 2 raised to SEMpl_baseline. Source values no_binding and binding_unchanged are filtered out and not loaded.",
+          "enum": [
+            "binding_ablated",
+            "binding_decreased",
+            "binding_created",
+            "binding_increased"
+          ],
           "enum_descriptions": {
             "no_binding": "Neither allele has a binding score above the binding threshold.",
             "binding_unchanged": "Binding is retained without a change in the predicted binding classification.",

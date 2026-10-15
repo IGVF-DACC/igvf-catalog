@@ -35,6 +35,11 @@
             "CRISPR screen"
           ]
         },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
         }
