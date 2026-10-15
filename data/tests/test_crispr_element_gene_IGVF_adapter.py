@@ -1544,8 +1544,6 @@ def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
     assert element['promoter_of'] == 'genes/ENSG00000176678'
 
 
-
-
 @pytest.mark.parametrize('label,collection', [
     ('genomic_element', 'mm_genomic_elements'),
     ('genomic_element_gene', 'mm_genomic_elements_mm_genes'),
