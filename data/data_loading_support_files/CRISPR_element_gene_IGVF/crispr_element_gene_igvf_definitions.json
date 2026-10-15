@@ -1220,7 +1220,7 @@
       "element_id_column": "id",
       "format_specification": "/documents/c97c6fab-e907-4bc8-bf4b-77321e48b875/",
       "reference_accession": "IGVFFI9629WVUU",
-      "element_mapping_curation": "cdh5_mageck_element_mapping.tsv"
+      "element_mapping_curation": "IGVFFI9001HIYI_exclusion_list.tsv"
     },
     "IGVFFI3975KRIX": {
       "layout": "macs_validation",
