@@ -30,12 +30,8 @@ describe('filesFilesetsRouters.filesFilesets (integration)', () => {
   })
 
   // Confirmed against the live dev DB (see probe script used while authoring this test) that
-  // every one of these real enum values has at least one matching document, except
-  // 'scATAC-seq' - no files_filesets record currently carries that exact method value (the
-  // closest real data is 'snATAC-seq'), so it's excluded here rather than asserting a
-  // guaranteed-empty result.
+  // every one of these real enum values has at least one matching document.
   const methods = getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'method')
-    .filter((method) => method !== 'scATAC-seq')
 
   it.each(methods.map((method) => ({ method })))('returns schema-valid records for method=$method', async (testCase) => {
     const input = { method: testCase.method, limit: 5 }

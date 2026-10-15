@@ -149,7 +149,6 @@
             "elements",
             "genes",
             "pQTL",
-            "scATAC-seq",
             "scE2G",
             "snATAC-seq",
             "spliceQTL",
