@@ -64,6 +64,7 @@
             "enum": [
               "CRISPR FACS screen",
               "CRISPR FlowFISH screen",
+              "CRISPR MACS screen",
               "DNase-seq",
               "DUAL-IPA",
               "electroporated MPRA",
@@ -196,6 +197,7 @@
               "ESM-1v",
               "FRACTEL",
               "Irreproducible Discovery Rate",
+              "MAGeCK",
               "matplotlib",
               "MPRAflow tsv-to-bed",
               "mpralm",

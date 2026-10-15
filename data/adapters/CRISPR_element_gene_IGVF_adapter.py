@@ -831,12 +831,137 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             )
         seen_element_gene_ids.add(element_gene_id)
 
+    def _load_mageck_reference(self):
+        filepath = self.reference_filepath
+        reference_fields = (
+            'intended_target_name', 'intended_target_chr',
+            'intended_target_start', 'intended_target_end',
+        )
+        if not filepath:
+            raise ValueError(
+                'IGVFFI9001HIYI requires reference_filepath for IGVFFI9629WVUU.')
+        elements = {}
+        opener = gzip.open if str(filepath).endswith('.gz') else open
+        with opener(filepath, 'rt') as handle:
+            reader = csv.DictReader(handle, delimiter='\t')
+            missing = set(reference_fields + ('description',)) - \
+                set(reader.fieldnames or [])
+            if missing:
+                raise ValueError(
+                    f'MAGeCK guide reference missing columns: {sorted(missing)}')
+            for row in reader:
+                match = re.search(
+                    r'legacy promoter target ([^;]+);', row['description'])
+                if not match:
+                    continue
+                element_id = match.group(1)
+                annotation = tuple(row[field] for field in reference_fields)
+                if element_id in elements and elements[element_id] != annotation:
+                    raise ValueError(
+                        f'Conflicting guide annotations for {element_id}')
+                elements[element_id] = annotation
+        return elements
+
+    def _mageck_metrics_from_row(self, row, name_to_idx):
+        """Select one direction, then map its native columns to edge metrics."""
+        direction = min(
+            ('neg', 'pos'),
+            key=lambda value: float(row[name_to_idx[f'{value}|fdr']]),
+        )
+        other_direction = 'pos' if direction == 'neg' else 'neg'
+        selected_columns = {
+            name: idx for name, idx in name_to_idx.items()
+            if not name.startswith(f'{other_direction}|')
+        }
+        return self._metrics_from_row(row, self._columns_from_layout(selected_columns))
+
+    def _normalize_mageck_rows(self, header, rows):
+        """Join guide annotations and validate native MAGeCK rows.
+
+        Only explicitly curated exclusions are omitted. New unresolved IDs fail the
+        load; aliases never merge rows or their measurements.
+        """
+        config = self.file_config
+        element_fields = ('ensembl_gene_id', 'element_chr',
+                          'element_start', 'element_end')
+        required = {'id', 'num'} | {f'{direction}|{metric}' for direction in ('neg', 'pos')
+                                    for metric in ('lfc', 'p-value', 'fdr')}
+        if not config.get('reference_accession'):
+            required.update(element_fields + ('element_guide_count',))
+        missing = required - set(header)
+        if missing:
+            raise ValueError(
+                f'MAGeCK results missing columns: {sorted(missing)}')
+        elements = self._load_mageck_reference() if config.get(
+            'reference_accession') else None
+        if elements is not None:
+            element_fields = ('intended_target_name', 'intended_target_chr',
+                              'intended_target_start', 'intended_target_end')
+        curation = {}
+        if config.get('element_mapping_curation'):
+            with (_CRISPR_E2G_DEFINITIONS_PATH.parent / config['element_mapping_curation']).open() as handle:
+                for row in csv.DictReader(handle, delimiter='\t'):
+                    if row['element_id'] in curation:
+                        raise ValueError(
+                            f'Duplicate curated element: {row["element_id"]}')
+                    curation[row['element_id']] = row['reference_id']
+        controls = {row['id']
+                    for row in config.get('skip_rows', []) if 'id' in row}
+        output_header = list(
+            header) + [field for field in element_fields if field not in header]
+
+        def normalized():
+            skipped = 0
+            seen = set()
+            for values in rows:
+                if not values:
+                    continue
+                if len(values) != len(header):
+                    raise ValueError(
+                        'MAGeCK row does not match the header length')
+                row = dict(zip(header, values))
+                element_id = row['id']
+                if not element_id or element_id in seen:
+                    raise ValueError(
+                        f'Missing or duplicate MAGeCK element ID: {element_id!r}')
+                seen.add(element_id)
+                if element_id in controls or curation.get(element_id) == '':
+                    skipped += 1
+                    continue
+                if elements is not None:
+                    reference_id = curation.get(element_id, element_id)
+                    if reference_id not in elements:
+                        raise ValueError(
+                            f'No guide reference for MAGeCK element {element_id!r}; curate explicitly.')
+                    annotation = elements[reference_id]
+                    if not all(annotation):
+                        raise ValueError(
+                            f'Incomplete promoter annotation for {element_id!r}; curate explicitly.')
+                    row.update(zip(element_fields, annotation))
+                for direction in ('neg', 'pos'):
+                    lfc, pvalue, fdr = (
+                        float(row[f'{direction}|{field}']) for field in ('lfc', 'p-value', 'fdr'))
+                    if not all(math.isfinite(value) for value in (lfc, pvalue, fdr)) or not (0 <= pvalue <= 1 and 0 <= fdr <= 1):
+                        raise ValueError(
+                            f'Invalid MAGeCK statistics for {element_id!r}')
+                yield [row[field] for field in output_header]
+            if skipped:
+                self.logger.warning(
+                    'Omitted %d explicitly curated MAGeCK controls/unmapped elements.', skipped)
+
+        return output_header, normalized()
+
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = get_file_accession(filepath)
         self.source_url = (
             f'https://data.igvf.org/tabular-files/{self.file_accession}'
         )
+        self.reference_filepath = reference_filepath
+        self.reference_source_url = reference_source_url
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
+        reference_accession = self.file_config.get('reference_accession')
+        if reference_accession and reference_source_url and reference_source_url.rstrip('/').split('/')[-1] != reference_accession:
+            raise ValueError(f'Expected guide reference {reference_accession}')
         self.assembly = self.file_config.get('assembly', 'GRCh38')
         self.gene_collection = 'mm_genes' if self.assembly == 'GRCm39' else 'genes'
         self.element_collection = 'mm_genomic_elements' if self.assembly == 'GRCm39' else 'genomic_elements'
@@ -883,6 +1008,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.writer.add_tag('portal_accessions', self.file_accession)
+        if self.file_config.get('reference_accession'):
+            self.writer.add_tag('portal_accessions',
+                                self.file_config['reference_accession'])
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
@@ -901,6 +1029,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             reader = csv.reader(
                 data_file, delimiter=self.layout.get('delimiter', '\t'))
             header = next(reader)
+            if layout_name in ('macs_genome_wide', 'macs_validation'):
+                header, reader = self._normalize_mageck_rows(header, reader)
             name_to_idx = {h.strip(): i for i, h in enumerate(header)}
 
             if not self.layout:
@@ -976,6 +1106,10 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     promoter_gene,
                     source_annotation,
                 )
+                native_element_id = None
+                if self.file_config.get('element_id_column'):
+                    native_element_id = row[name_to_idx[self.file_config['element_id_column']]]
+                    element_coordinates += (native_element_id,)
                 if element_coordinates not in genomic_coordinates_to_element_id:
                     element_id = build_regulatory_region_id(
                         intended_target_chr,
@@ -984,12 +1118,17 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         'CRISPR',
                         assembly=self.assembly,
                     )
+                    if native_element_id is not None:
+                        element_id += '_' + native_element_id
                     genomic_coordinates_to_element_id[element_coordinates] = element_id
                 else:
                     element_id = genomic_coordinates_to_element_id[
                         element_coordinates]
 
-                metrics = self._metrics_from_row(row, colmap)
+                if layout_name in ('macs_genome_wide', 'macs_validation'):
+                    metrics = self._mageck_metrics_from_row(row, name_to_idx)
+                else:
+                    metrics = self._metrics_from_row(row, colmap)
                 metrics = self._apply_adapter_calculated_fields(
                     row, colmap, metrics)
 
