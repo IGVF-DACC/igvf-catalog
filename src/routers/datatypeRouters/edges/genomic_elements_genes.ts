@@ -681,13 +681,18 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     perturbationFilter = `AND record.perturbation == '${input.perturbation as string}'`
   }
 
+  // Filter stored edges before MERGE so ArangoDB can use its edge indexes.
+  const rawFilesFilesetFilter = filesFilesetFilter.replaceAll('record.', 'rawRecord.')
+  const rawPerturbationFilter = perturbationFilter.replaceAll('record.', 'rawRecord.')
+
   const responseQuery = `
     FOR gene IN ${routing.geneCollection}
         FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
         FOR rawRecord in ${routing.edgeCollection}
+          FILTER rawRecord._to == gene._id AND rawRecord.method IN ${methodFilter} ${rawFilesFilesetFilter} ${rawPerturbationFilter}
           LET record = ${grnRecord('rawRecord')}
-          FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
+          ${significantFilter === '' ? '' : `FILTER record.significant == ${input.significant as string}`}
           ${pvalueFilter}
           LET ge = DOCUMENT(record._from)
           // Not every genomic element has a presumed promoter gene (promoter_of is
@@ -737,8 +742,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           FILTER ge.promoter_of == gene._id
 
           FOR rawRecord in ${routing.edgeCollection}
+          FILTER rawRecord._from == ge._id AND rawRecord.method IN ${methodFilter} ${rawFilesFilesetFilter} ${rawPerturbationFilter}
           LET record = ${grnRecord('rawRecord')}
-            FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
+          ${significantFilter === '' ? '' : `FILTER record.significant == ${input.significant as string}`}
             ${pvalueFilter}
 
             SORT record._id
@@ -781,8 +787,9 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
             FOR rawRecord in ${routing.edgeCollection}
+          FILTER rawRecord._to == response_gene._id AND rawRecord.method IN ${methodFilter} ${rawFilesFilesetFilter} ${rawPerturbationFilter}
           LET record = ${grnRecord('rawRecord')}
-              FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
+          ${significantFilter === '' ? '' : `FILTER record.significant == ${input.significant as string}`}
               ${pvalueFilter}
 
               FOR ge IN ${routing.elementCollection}
