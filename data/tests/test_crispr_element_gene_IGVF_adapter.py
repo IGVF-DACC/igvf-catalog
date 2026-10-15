@@ -1650,7 +1650,8 @@ def test_norman_replacements_preserve_log2fc_and_nonsignificant_pairs(
 
 @pytest.mark.parametrize('accession,count', [('IGVFFI9001HIYI', 5), ('IGVFFI3975KRIX', 5)])
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_gene'])
-def test_cdh5_macs_screens(accession, count, label, mock_file_fileset_facs_screen, tmp_path):
+@pytest.mark.parametrize('provide_reference_url', [True, False])
+def test_cdh5_macs_screens(accession, count, label, provide_reference_url, mock_file_fileset_facs_screen, tmp_path):
     from pathlib import Path
     path = tmp_path / f'{accession}.tsv.gz'
     with gzip.open(path, 'wt') as output:
@@ -1662,13 +1663,21 @@ def test_cdh5_macs_screens(accession, count, label, mock_file_fileset_facs_scree
         CRISPRElementGeneIGVF(
             filepath=str(path), label=label,
             **({'reference_filepath': 'samples/crispr_IGVFFI9629WVUU.example.tsv',
-                'reference_source_url': 'https://data.igvf.org/tabular-files/IGVFFI9629WVUU/'}
+                'reference_source_url': 'https://data.igvf.org/tabular-files/IGVFFI9629WVUU/' if provide_reference_url else None}
                if accession == 'IGVFFI9001HIYI' else {}),
             writer=writer, validate=True).process_file()
     records = [json.loads(line) for line in writer.contents if line.strip()]
     assert len(records) == count
     assert len({r['_key'] for r in records}) == count
+    element_accession = 'IGVFFI9629WVUU' if accession == 'IGVFFI9001HIYI' else accession
     if label == 'genomic_element_gene':
+        assert all(r['_from'].endswith('_' + element_accession)
+                   for r in records)
+        assert all(r['_key'].endswith('_' + accession) for r in records)
+        assert all(r['files_filesets'] ==
+                   f'files_filesets/{accession}' for r in records)
+        assert all(r['source_url'].rstrip('/').endswith('/' + accession)
+                   for r in records)
         assert all(r['_to'] == 'genes/ENSG00000179776' for r in records)
         assert records[0]['negative_selection_significant'] is True
         assert records[0]['negative_selection_log2FC'] < 0
@@ -1680,6 +1689,12 @@ def test_cdh5_macs_screens(accession, count, label, mock_file_fileset_facs_scree
             assert notch[0]['negative_selection_log2FC'] == notch[1]['negative_selection_log2FC']
             assert all(r['num_guides'] == 6 for r in notch)
     else:
+        assert all(r['_key'].endswith('_' + element_accession)
+                   for r in records)
+        assert all(r['files_filesets'] ==
+                   f'files_filesets/{element_accession}' for r in records)
+        assert all(r['source_url'].rstrip(
+            '/').endswith('/' + element_accession) for r in records)
         assert all(r['source_annotation'] == 'promoter' for r in records)
         assert all(r['promoter_of'].startswith('genes/ENSG') for r in records)
 
