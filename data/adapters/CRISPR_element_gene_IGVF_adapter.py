@@ -61,19 +61,6 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     # CRISPR_element_gene_ENCODE_adapter; max log10pvalue from file is 235
     MAX_LOG10_PVALUE = 240
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
-        'negative_selection_log2FC',
-        'negative_selection_p_value',
-        'negative_selection_p_value_adj',
-        'negative_selection_neg_log10_pvalue',
-        'negative_selection_neg_log10_pvalue_adj',
-        'negative_selection_significant',
-        'positive_selection_log2FC',
-        'positive_selection_p_value',
-        'positive_selection_p_value_adj',
-        'positive_selection_neg_log10_pvalue',
-        'positive_selection_neg_log10_pvalue_adj',
-        'positive_selection_significant',
-
         'p_value',
         'p_value_adj',
         'neg_log10_pvalue_adj',
@@ -95,6 +82,18 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         'z_score',
         't_score',
         'idr',
+        'negative_selection_log2FC',
+        'negative_selection_p_value',
+        'negative_selection_p_value_adj',
+        'negative_selection_neg_log10_pvalue',
+        'negative_selection_neg_log10_pvalue_adj',
+        'negative_selection_significant',
+        'positive_selection_log2FC',
+        'positive_selection_p_value',
+        'positive_selection_p_value_adj',
+        'positive_selection_neg_log10_pvalue',
+        'positive_selection_neg_log10_pvalue_adj',
+        'positive_selection_significant'
     })
 
     @staticmethod

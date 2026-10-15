@@ -35,14 +35,6 @@ class FileFileSet:
         }
         return modalities[modality]
 
-    # Released replacement/new E2G files awaiting portal Catalog annotations.
-    CRISPR_E2G_METHODS = {
-        'IGVFFI6853MYBE': 'Perturb-seq',
-        'IGVFFI7203AWIC': 'Perturb-seq',
-        'IGVFFI9001HIYI': 'CRISPR screen',
-        'IGVFFI3975KRIX': 'CRISPR screen',
-    }
-
     ENCODE_disease_id_mapping = {
         'DOID:0080832': 'HP:0100543',
         'DOID:2377': 'MONDO:0005301',
@@ -769,10 +761,7 @@ class FileFileSet:
         source_url = urljoin(FileFileSet.IGVF_SOURCE_URL, file_object['@id'])
         href = file_object.get('href')
         download_link = urljoin(FileFileSet.IGVF_API, href)
-        e2g_method = FileFileSet.CRISPR_E2G_METHODS.get(
-            file_object['accession'])
-        class_type = file_object.get('catalog_class') or (
-            'observed data' if e2g_method else None)
+        class_type = file_object.get('catalog_class')
         genome_browser_link = None
         browser_index_file = None
         fileset_object = requests.get(
@@ -781,8 +770,7 @@ class FileFileSet:
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
         is_external_curated_set = fileset_object_type == 'CuratedSet' and lab == 'community'
-        catalog_collections = file_object.get('catalog_collections') or (
-            ['genomic_elements', 'genomic_elements_genes'] if e2g_method else [])
+        catalog_collections = file_object.get('catalog_collections', [])
         cell_annotation = None
         cell_annotation_term = None
         if fileset_object_type == 'PseudobulkSet':
@@ -868,9 +856,6 @@ class FileFileSet:
             method = 'Multiome Perturb-seq'
         if file_object['accession'] == 'IGVFFI8753TTYC':
             method = 'candidate Cis-Regulatory Elements'
-
-        if e2g_method:
-            method = e2g_method
 
         publication_id = FileFileSet.get_publication_igvf(fileset_object)
 

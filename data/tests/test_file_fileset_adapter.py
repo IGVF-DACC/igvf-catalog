@@ -1087,11 +1087,13 @@ def test_morf_perturbation_without_crispr_modification():
     ('IGVFFI6853MYBE', 'Perturb-seq'), ('IGVFFI7203AWIC', 'Perturb-seq'),
     ('IGVFFI9001HIYI', 'CRISPR screen'), ('IGVFFI3975KRIX', 'CRISPR screen'),
 ])
-def test_new_crispr_e2g_metadata_without_portal_catalog_annotations(accession, expected_method):
+def test_crispr_e2g_metadata_uses_portal_catalog_annotations(accession, expected_method):
     file_object = {
         '@id': f'/tabular-files/{accession}/', 'accession': accession,
         'href': f'/tabular-files/{accession}/@@download/{accession}.tsv.gz',
         'file_set': {'@id': '/analysis-sets/IGVFDS0000TEST/'},
+        'catalog_class': 'observed data',
+        'catalog_collections': ['genomic_elements', 'genomic_elements_genes'],
     }
     fileset = {
         'accession': 'IGVFDS0000TEST', '@type': ['AnalysisSet', 'FileSet', 'Item'],
@@ -1100,7 +1102,7 @@ def test_new_crispr_e2g_metadata_without_portal_catalog_annotations(accession, e
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset)), \
             patch.object(FileFileSet, 'get_software_igvf', return_value={'MAGeCK'}), \
-            patch.object(FileFileSet, 'parse_analysis_set_igvf', return_value=({'CRISPR MACS screen'}, {'OBI:0003659'})), \
+            patch.object(FileFileSet, 'parse_analysis_set_igvf', return_value=({'CRISPR MACS screen' if expected_method == 'CRISPR screen' else 'Perturb-seq'}, {'OBI:0003659'})), \
             patch.object(FileFileSet, 'get_publication_igvf', return_value=None), \
             patch.object(FileFileSet, 'parse_sample_donor_treatment_igvf', return_value=(set(), set(), {'CL:0000115'}, {'endothelial cells'}, set(), 'interference')):
         props, _, _ = FileFileSet.query_fileset_files_props_igvf(file_object)

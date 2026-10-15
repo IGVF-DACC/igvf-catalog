@@ -1994,7 +1994,7 @@ export const descriptions = {
     Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
     perturbation accepts CRISPR interference, CRISPR activation, CRISPR knockout, CRISPR cutting, CRISPR base editing, CRISPR prime editing, or ORF overexpression.<br> \
-    MORF screen results return regulator_gene and the specific transcript from genes_transcripts; genomic_element is null. Perturbation efficiency uses the same screen’s TOX_1 log2FC, p-values, and significance. Missing TOX_1 results yield null efficiency fields.<br> \
+    MORF screen results return regulator_gene and the specific transcript from genes_transcripts; genomic_element is null.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -2037,6 +2037,29 @@ export const descriptions = {
             items: [
               'response_gene_name = TSPAN6',
               'method = Perturb-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'morf-screen',
+        label: 'MORF screen',
+        examples: [
+          {
+            label: 'AATF overexpression effect on TOX',
+            items: [
+              'regulator_gene_id = ENSG00000275700',
+              'response_gene_id = ENSG00000198846',
+              'method = MORF screen',
+              'perturbation = ORF overexpression',
+              'files_fileset = IGVFFI6734IWRB'
+            ]
+          },
+          {
+            label: 'All MORF effects on TOX',
+            items: [
+              'response_gene_name = TOX',
+              'method = MORF screen'
             ]
           }
         ]
