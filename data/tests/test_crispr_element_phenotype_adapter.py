@@ -186,7 +186,7 @@ def test_crispr_element_phenotype_skips_na_coordinate_rows(
     (0.051, 'TRUE', False),
 ])
 def test_significance_uses_adapter_threshold(
-        mock_file_fileset, tmp_path, accession, p_value, source_flag, expected):
+        mock_file_fileset, mock_ontology_term_validator, tmp_path, accession, p_value, source_flag, expected):
     config = CRISPRElementPhenotype.FILE_CONFIG[accession]
     row = {
         'dhs_coords': 'chr1:100-200_1', 'dhs_count': 2,
@@ -197,13 +197,12 @@ def test_significance_uses_adapter_threshold(
         config['fraction_guides_hit_col']: 0,
         'mig_significant': source_flag, 'growth_significant': source_flag,
     }
-    sample = tmp_path / 'threshold.tsv'
+    sample = tmp_path / f'{accession}_threshold.tsv'
     sample.write_text('\t'.join(row) + '\n' +
                       '\t'.join(map(str, row.values())) + '\n')
     writer = SpyWriter()
     CRISPRElementPhenotype(
         filepath=str(sample), label='genomic_element_phenotype',
-        source_url=f'https://api.data.igvf.org/tabular-files/{accession}/',
         writer=writer, validate=True,
     ).process_file()
     assert json.loads(writer.contents[0])['significant'] is expected
