@@ -573,3 +573,24 @@ describe('MORF gene regulatory network', () => {
     expect(String((dbModule.db.query as jest.Mock).mock.calls[0][0])).not.toContain('genes_transcripts_genes')
   })
 })
+
+describe('GRN directional screen statistics', () => {
+  it.each([
+    { response_gene_id: 'ENSG00000179776' },
+    { regulator_gene_id: 'ENSG00000179776' },
+    { regulator_gene_id: 'ENSG00000179776', response_gene_id: 'ENSG00000179776' }
+  ])('maps negative-selection statistics before filtering: %j', async (genes) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+    const input = { ...genes, significant: 'true', neg_log10_pvalue_adj: 'gte:2', page: 0, limit: 10 }
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    const aql = String(query.mock.calls[query.mock.calls.length - 1][0])
+    expect(aql).toContain('log2FC: rawRecord.negative_selection_log2FC')
+    expect(aql).toContain('p_value: rawRecord.negative_selection_p_value')
+    expect(aql).toContain('p_value_adj: rawRecord.negative_selection_p_value_adj')
+    expect(aql).toContain('significant: rawRecord.negative_selection_significant')
+    expect(aql).toContain('log2FC: se.negative_selection_log2FC')
+    expect(aql.indexOf('LET record =')).toBeLessThan(aql.indexOf('AND record.significant == true'))
+    expect(aql).not.toContain('positive_selection')
+  })
+})

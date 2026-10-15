@@ -723,22 +723,16 @@
       ],
       "perturbed_gene": "ensembl_gene_id",
       "metrics": {
-        "log2FC": [
-          "neg|lfc",
-          "pos|lfc"
-        ],
-        "p_value": [
-          "neg|p-value",
-          "pos|p-value"
-        ],
-        "p_value_adj": [
-          "neg|fdr",
-          "pos|fdr"
-        ],
+        "negative_selection_log2FC": "neg|lfc",
+        "negative_selection_p_value": "neg|p-value",
+        "negative_selection_p_value_adj": "neg|fdr",
+        "positive_selection_log2FC": "pos|lfc",
+        "positive_selection_p_value": "pos|p-value",
+        "positive_selection_p_value_adj": "pos|fdr",
         "num_guides": "element_guide_count"
       }
     },
-    "notes": "One edge per native promoter element to CDH5. Select the lower-FDR MAGeCK direction (negative on ties), keeping its p-value and log2FC together. Catalog significance uses adjusted p-value < 0.05. Coordinates are copied from the corrected guide metadata without conversion. Preserve native element IDs in keys to avoid merging distinct tests at shared coordinates."
+    "notes": "Preserve both one-sided selection results. Negative selection measures depletion in CDH5+ versus CDH5- cells; positive selection measures enrichment. Directional significance requires FDR < 0.05 and matching log2FC sign (negative for depletion, positive for enrichment). The gene regulatory network endpoint reports negative-selection statistics. Preserve native element IDs and guide-reference coordinates."
   },
   "macs_genome_wide": {
     "uuid": "c97c6fab-e907-4bc8-bf4b-77321e48b875",
@@ -768,22 +762,16 @@
       ],
       "perturbed_gene": "intended_target_name",
       "metrics": {
-        "log2FC": [
-          "neg|lfc",
-          "pos|lfc"
-        ],
-        "p_value": [
-          "neg|p-value",
-          "pos|p-value"
-        ],
-        "p_value_adj": [
-          "neg|fdr",
-          "pos|fdr"
-        ],
+        "negative_selection_log2FC": "neg|lfc",
+        "negative_selection_p_value": "neg|p-value",
+        "negative_selection_p_value_adj": "neg|fdr",
+        "positive_selection_log2FC": "pos|lfc",
+        "positive_selection_p_value": "pos|p-value",
+        "positive_selection_p_value_adj": "pos|fdr",
         "num_guides": "num"
       }
     },
-    "notes": "One edge per native promoter element to CDH5. Select the lower-FDR MAGeCK direction (negative on ties), keeping its p-value and log2FC together. Catalog significance uses adjusted p-value < 0.05. Coordinates are copied from the corrected guide metadata without conversion. Preserve native element IDs in keys to avoid merging distinct tests at shared coordinates."
+    "notes": "Preserve both one-sided selection results. Negative selection measures depletion in CDH5+ versus CDH5- cells; positive selection measures enrichment. Directional significance requires FDR < 0.05 and matching log2FC sign (negative for depletion, positive for enrichment). The gene regulatory network endpoint reports negative-selection statistics. Preserve native element IDs and guide-reference coordinates."
   },
   "files": {
     "IGVFFI9159XDOS": {
@@ -1217,10 +1205,8 @@
         "promoter"
       ],
       "readout_gene": "ENSG00000179776",
-      "element_id_column": "id",
-      "format_specification": "/documents/c97c6fab-e907-4bc8-bf4b-77321e48b875/",
       "reference_accession": "IGVFFI9629WVUU",
-      "element_mapping_curation": "IGVFFI9001HIYI_exclusion_list.tsv"
+      "skip_rows": "IGVFFI9001HIYI_exclusion_list.tsv"
     },
     "IGVFFI3975KRIX": {
       "layout": "macs_validation",
@@ -1228,8 +1214,6 @@
         "promoter"
       ],
       "readout_gene": "ENSG00000179776",
-      "element_id_column": "id",
-      "format_specification": "/documents/babab92f-024f-4734-8a59-55134d3d86b7/",
       "skip_rows": [
         {
           "id": "NON-TARGETING",

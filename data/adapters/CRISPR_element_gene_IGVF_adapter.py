@@ -61,6 +61,19 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     # CRISPR_element_gene_ENCODE_adapter; max log10pvalue from file is 235
     MAX_LOG10_PVALUE = 240
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
+        'negative_selection_log2FC',
+        'negative_selection_p_value',
+        'negative_selection_p_value_adj',
+        'negative_selection_neg_log10_pvalue',
+        'negative_selection_neg_log10_pvalue_adj',
+        'negative_selection_significant',
+        'positive_selection_log2FC',
+        'positive_selection_p_value',
+        'positive_selection_p_value_adj',
+        'positive_selection_neg_log10_pvalue',
+        'positive_selection_neg_log10_pvalue_adj',
+        'positive_selection_significant',
+
         'p_value',
         'p_value_adj',
         'neg_log10_pvalue_adj',
@@ -206,12 +219,35 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 return False
         return True
 
+    def _configured_row_exceptions(self):
+        """Read inline skip rules or a dataset's exclusion/alias TSV once."""
+        configured = self.file_config.get('skip_rows', [])
+        if not isinstance(configured, str):
+            return configured
+        if not hasattr(self, '_row_exceptions'):
+            with (_CRISPR_E2G_DEFINITIONS_PATH.parent / configured).open() as handle:
+                reader = csv.DictReader(handle, delimiter='\t')
+                if not {'element_id', 'reference_id', 'reason'} <= set(reader.fieldnames or []):
+                    raise ValueError(
+                        f'Invalid exclusion list columns: {configured}')
+                self._row_exceptions = list(reader)
+            ids = [entry['element_id'] for entry in self._row_exceptions]
+            if any(not element_id for element_id in ids) or len(set(ids)) != len(ids):
+                raise ValueError(
+                    f'Missing or duplicate element ID in exclusion list: {configured}')
+        return self._row_exceptions
+
     def _is_explicitly_skipped_row(
         self,
         row: list,
         name_to_idx: Dict[str, int],
     ) -> bool:
-        for skip_spec in self.file_config.get('skip_rows', []):
+        for skip_spec in self._configured_row_exceptions():
+            if 'reference_id' in skip_spec:
+                if skip_spec['reference_id']:
+                    # An alias supplies annotation; it does not exclude the row.
+                    continue
+                skip_spec = {'id': skip_spec['element_id']}
             if self._matches_configured_skip_row(row, name_to_idx, skip_spec):
                 return True
         return False
@@ -552,8 +588,19 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     f'File {self.file_accession} uses unknown adapter calculated '
                     f'field rule: {rule_type!r}'
                 )
-        self._apply_standard_neg_log10_fields(metrics)
-        self._apply_standard_significant_field(metrics)
+        if 'negative_selection_p_value_adj' in metrics:
+            for prefix, sign in (('negative_selection', -1), ('positive_selection', 1)):
+                metrics[f'{prefix}_neg_log10_pvalue'] = self._neg_log10_pvalue(
+                    metrics[f'{prefix}_p_value'])
+                metrics[f'{prefix}_neg_log10_pvalue_adj'] = self._neg_log10_pvalue(
+                    metrics[f'{prefix}_p_value_adj'])
+                metrics[f'{prefix}_significant'] = (
+                    metrics[f'{prefix}_p_value_adj'] < self.SIGNIFICANCE_THRESHOLD
+                    and sign * metrics[f'{prefix}_log2FC'] > 0
+                )
+        else:
+            self._apply_standard_neg_log10_fields(metrics)
+            self._apply_standard_significant_field(metrics)
         return self._drop_nonfinite_metrics(metrics)
 
     @staticmethod
@@ -633,7 +680,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             'biosample_term': file_fileset['samples'][0],
             'treatments_term_ids': file_fileset['treatments_term_ids'],
         }
-        edge['significant'] = metrics['significant']
+        if 'significant' in metrics:
+            edge['significant'] = metrics['significant']
         if 'neg_log10_pvalue' in metrics:
             edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
         if 'log2FC' in metrics:
@@ -862,19 +910,6 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 elements[element_id] = annotation
         return elements
 
-    def _macs_screens_metrics_from_row(self, row, name_to_idx):
-        """Select one direction, then map its native columns to edge metrics."""
-        direction = min(
-            ('neg', 'pos'),
-            key=lambda value: float(row[name_to_idx[f'{value}|fdr']]),
-        )
-        other_direction = 'pos' if direction == 'neg' else 'neg'
-        selected_columns = {
-            name: idx for name, idx in name_to_idx.items()
-            if not name.startswith(f'{other_direction}|')
-        }
-        return self._metrics_from_row(row, self._columns_from_layout(selected_columns))
-
     def _normalize_macs_screens_rows(self, header, rows):
         """Join guide annotations and validate native MACS screen rows.
 
@@ -897,16 +932,12 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         if elements is not None:
             element_fields = ('intended_target_name', 'intended_target_chr',
                               'intended_target_start', 'intended_target_end')
-        curation = {}
-        if config.get('element_mapping_curation'):
-            with (_CRISPR_E2G_DEFINITIONS_PATH.parent / config['element_mapping_curation']).open() as handle:
-                for row in csv.DictReader(handle, delimiter='\t'):
-                    if row['element_id'] in curation:
-                        raise ValueError(
-                            f'Duplicate curated element: {row["element_id"]}')
-                    curation[row['element_id']] = row['reference_id']
-        controls = {row['id']
-                    for row in config.get('skip_rows', []) if 'id' in row}
+        curation = {
+            entry['element_id']: entry['reference_id']
+            for entry in self._configured_row_exceptions()
+            if entry.get('reference_id')
+        }
+        name_to_idx = {name: idx for idx, name in enumerate(header)}
         output_header = list(
             header) + [field for field in element_fields if field not in header]
 
@@ -925,7 +956,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     raise ValueError(
                         f'Missing or duplicate MACS screen element ID: {element_id!r}')
                 seen.add(element_id)
-                if element_id in controls or curation.get(element_id) == '':
+                if self._is_explicitly_skipped_row(values, name_to_idx):
                     skipped += 1
                     continue
                 if elements is not None:
@@ -951,7 +982,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
 
         return output_header, normalized()
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, reference_filepath=None, reference_source_url=None, **kwargs):
         self.file_accession = get_file_accession(filepath)
         self.source_url = (
             f'https://data.igvf.org/tabular-files/{self.file_accession}'
@@ -1108,8 +1139,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     source_annotation,
                 )
                 native_element_id = None
-                if self.file_config.get('element_id_column'):
-                    native_element_id = row[name_to_idx[self.file_config['element_id_column']]]
+                if layout_name in ('macs_genome_wide', 'macs_validation'):
+                    # Distinct native tests may share coordinates; preserve their IDs.
+                    native_element_id = row[name_to_idx['id']]
                     element_coordinates += (native_element_id,)
                 if element_coordinates not in genomic_coordinates_to_element_id:
                     element_id = build_regulatory_region_id(
@@ -1126,11 +1158,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     element_id = genomic_coordinates_to_element_id[
                         element_coordinates]
 
-                if layout_name in ('macs_genome_wide', 'macs_validation'):
-                    metrics = self._macs_screens_metrics_from_row(
-                        row, name_to_idx)
-                else:
-                    metrics = self._metrics_from_row(row, colmap)
+                metrics = self._metrics_from_row(row, colmap)
                 metrics = self._apply_adapter_calculated_fields(
                     row, colmap, metrics)
 
