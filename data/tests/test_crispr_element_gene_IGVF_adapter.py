@@ -1753,13 +1753,13 @@ def test_rejects_duplicate_native_ids():
 def test_requires_reference_for_genome_wide_screen():
     with pytest.raises(ValueError, match='requires reference_filepath'):
         _normalize_macs_screens_test_rows(MACS_SCREENS_HEADER, [], {
-            'reference_accession': 'IGVFFI9629WVUU'}, None, MACS_SCREENS_LOGGER)
+            'layout': 'macs_genome_wide'}, None, MACS_SCREENS_LOGGER)
 
 
 def test_unknown_native_ids_require_explicit_curation():
     _, rows = _normalize_macs_screens_test_rows(
         MACS_SCREENS_HEADER, [MACS_SCREENS_ROW], {
-            'reference_accession': 'IGVFFI9629WVUU'},
+            'layout': 'macs_genome_wide'},
         'samples/crispr_IGVFFI9629WVUU.example.tsv', MACS_SCREENS_LOGGER)
     with pytest.raises(ValueError, match='No guide reference'):
         list(rows)
@@ -1775,7 +1775,7 @@ def test_conflicting_guide_annotations_are_rejected(tmp_path):
         '\n'.join([lines[0], lines[1], '\t'.join(fields)]) + '\n')
     with pytest.raises(ValueError, match='Conflicting guide annotations'):
         _normalize_macs_screens_test_rows(MACS_SCREENS_HEADER, [], {
-            'reference_accession': 'IGVFFI9629WVUU'}, reference, MACS_SCREENS_LOGGER)
+            'layout': 'macs_genome_wide'}, reference, MACS_SCREENS_LOGGER)
 
 
 def _macs_screens_test_metrics(header, row, layout='macs_validation'):
