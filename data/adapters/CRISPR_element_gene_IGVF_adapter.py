@@ -921,14 +921,14 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                           'element_start', 'element_end')
         required = {'id', 'num'} | {f'{direction}|{metric}' for direction in ('neg', 'pos')
                                     for metric in ('lfc', 'p-value', 'fdr')}
-        if not config.get('reference_accession'):
+        requires_reference = config.get('layout') == 'macs_genome_wide'
+        if not requires_reference:
             required.update(element_fields + ('element_guide_count',))
         missing = required - set(header)
         if missing:
             raise ValueError(
                 f'MACS screen results missing columns: {sorted(missing)}')
-        elements = self._load_macs_screens_reference() if config.get(
-            'reference_accession') else None
+        elements = self._load_macs_screens_reference() if requires_reference else None
         if elements is not None:
             element_fields = ('intended_target_name', 'intended_target_chr',
                               'intended_target_start', 'intended_target_end')
@@ -990,9 +990,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.reference_filepath = reference_filepath
         self.reference_source_url = reference_source_url
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
-        reference_accession = self.file_config.get('reference_accession')
-        if reference_accession and reference_source_url and reference_source_url.rstrip('/').split('/')[-1] != reference_accession:
-            raise ValueError(f'Expected guide reference {reference_accession}')
+        if self.file_config.get('layout') == 'macs_genome_wide' and reference_source_url:
+            if reference_source_url.rstrip('/').split('/')[-1] != 'IGVFFI9629WVUU':
+                raise ValueError('Expected guide reference IGVFFI9629WVUU')
         self.assembly = self.file_config.get('assembly', 'GRCh38')
         self.gene_collection = 'mm_genes' if self.assembly == 'GRCm39' else 'genes'
         self.element_collection = 'mm_genomic_elements' if self.assembly == 'GRCm39' else 'genomic_elements'
@@ -1039,9 +1039,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.writer.add_tag('portal_accessions', self.file_accession)
-        if self.file_config.get('reference_accession'):
+        if self.reference_source_url:
             self.writer.add_tag('portal_accessions',
-                                self.file_config['reference_accession'])
+                                self.reference_source_url.rstrip('/').split('/')[-1])
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)

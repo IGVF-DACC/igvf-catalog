@@ -1205,7 +1205,6 @@
         "promoter"
       ],
       "readout_gene": "ENSG00000179776",
-      "reference_accession": "IGVFFI9629WVUU",
       "skip_rows": "IGVFFI9001HIYI_exclusion_list.tsv"
     },
     "IGVFFI3975KRIX": {
