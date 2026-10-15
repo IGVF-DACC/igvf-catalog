@@ -77,7 +77,10 @@ export const outputFormat = z.object({
   alt_score: z.number().nullish(),
   ref_score: z.number().nullish(),
   relative_binding_affinity: z.number().nullish(),
-  effect_on_binding: z.string().nullish()
+  effect_on_binding: z.string().nullish(),
+  pbs: z.number().nullish(),
+  ref_auc: z.number().nullish(),
+  alt_auc: z.number().nullish()
 })
 
 const MOTIF_LOG2FC_RETURN = "'motif_log2FC': record.motif_fc"

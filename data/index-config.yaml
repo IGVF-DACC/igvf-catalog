@@ -535,7 +535,7 @@ variants_proteins:
       - files_filesets, name
       - name
       - files_filesets
-      - method
+      - method, _key
       - gene, method, source, biological_context, _key
       - source, files_filesets, method
       - gene, method, _key

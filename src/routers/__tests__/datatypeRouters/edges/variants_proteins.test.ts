@@ -41,6 +41,39 @@ describe('variantsProteinsRouters.variantsFromProteins', () => {
     expect(dbModule.db.query).toHaveBeenCalledTimes(1)
   })
 
+  it('returns pbs/ref_auc/alt_auc for GVATdb allele-specific binding records', async () => {
+    const mockResult = [
+      {
+        sequence_variant: 'variants/NC_000010.11:112626979:C:T',
+        protein_complex: 'proteins/ENSP00000368332',
+        name: 'modulates binding of',
+        is_complex: false,
+        method: 'GVATdb',
+        source: 'GVATdb',
+        p_value: 0.31704,
+        neg_log10_pvalue: 0.4989882375639998,
+        pbs: 2.72179,
+        ref_auc: 1.44024,
+        alt_auc: -1.28154
+      }
+    ]
+
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { method: 'GVATdb', page: 0 }
+    const result = await variantsProteinsRouters.variantsFromProteins({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual(mockResult)
+  })
+
   it('resolves protein/complex IDs first when protein_id is given (two sequential db calls)', async () => {
     const proteinComplexIDs = [['proteins/ENSP00000281043']]
     const mockResult = [
