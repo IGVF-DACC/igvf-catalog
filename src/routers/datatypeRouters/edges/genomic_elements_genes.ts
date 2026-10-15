@@ -121,6 +121,18 @@ export const outputFormat = z.array(z.object({
   score: z.number().nullish(),
   transcription_start_site: z.number().nullish(),
   rna_pseudobulk_tpm: z.number().nullish(),
+  negative_selection_log2FC: z.number().nullish(),
+  negative_selection_p_value: z.number().nullish(),
+  negative_selection_p_value_adj: z.number().nullish(),
+  negative_selection_neg_log10_pvalue: z.number().nullish(),
+  negative_selection_neg_log10_pvalue_adj: z.number().nullish(),
+  negative_selection_significant: z.boolean().nullish(),
+  positive_selection_log2FC: z.number().nullish(),
+  positive_selection_p_value: z.number().nullish(),
+  positive_selection_p_value_adj: z.number().nullish(),
+  positive_selection_neg_log10_pvalue: z.number().nullish(),
+  positive_selection_neg_log10_pvalue_adj: z.number().nullish(),
+  positive_selection_significant: z.boolean().nullish(),
   log2FC: z.number().nullish(),
   log2FC_ci95_lower: z.number().nullish(),
   log2FC_ci95_upper: z.number().nullish(),
@@ -169,6 +181,8 @@ export const grnOutputFormat = z.object({
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
   significant: z.boolean().nullish(),
+  p_value: z.number().or(z.string()).nullish(),
+  p_value_adj: z.number().or(z.string()).nullish(),
   perturbation_efficiency_log2FC: z.number().nullish(),
   perturbation_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
   perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
@@ -262,6 +276,18 @@ function buildQuery (params: {
         'score': record.score,
         'transcription_start_site': record.transcription_start_site,
         'rna_pseudobulk_tpm': record.rna_pseudobulk_tpm,
+        'negative_selection_log2FC': record.negative_selection_log2FC,
+        'negative_selection_p_value': record.negative_selection_p_value,
+        'negative_selection_p_value_adj': record.negative_selection_p_value_adj,
+        'negative_selection_neg_log10_pvalue': record.negative_selection_neg_log10_pvalue,
+        'negative_selection_neg_log10_pvalue_adj': record.negative_selection_neg_log10_pvalue_adj,
+        'negative_selection_significant': record.negative_selection_significant,
+        'positive_selection_log2FC': record.positive_selection_log2FC,
+        'positive_selection_p_value': record.positive_selection_p_value,
+        'positive_selection_p_value_adj': record.positive_selection_p_value_adj,
+        'positive_selection_neg_log10_pvalue': record.positive_selection_neg_log10_pvalue,
+        'positive_selection_neg_log10_pvalue_adj': record.positive_selection_neg_log10_pvalue_adj,
+        'positive_selection_significant': record.positive_selection_significant,
         'log2FC': record.log2FC,
         'log2FC_ci95_lower': record.log2FC_ci95_lower,
         'log2FC_ci95_upper': record.log2FC_ci95_upper,
@@ -550,6 +576,18 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   })
 }
 
+// Directional screen results remain separate in storage; GRN reports depletion.
+const grnRecord = (variable: string): string => `(
+  HAS(${variable}, 'negative_selection_p_value_adj') ? MERGE(${variable}, {
+    log2FC: ${variable}.negative_selection_log2FC,
+    p_value: ${variable}.negative_selection_p_value,
+    p_value_adj: ${variable}.negative_selection_p_value_adj,
+    neg_log10_pvalue: ${variable}.negative_selection_neg_log10_pvalue,
+    neg_log10_pvalue_adj: ${variable}.negative_selection_neg_log10_pvalue_adj,
+    significant: ${variable}.negative_selection_significant
+  }) : ${variable}
+)`
+
 async function grnSearch (input: paramsFormatType): Promise<any> {
   const organism = input.organism ?? 'Homo sapiens'
   const routing = getRouting(organism)
@@ -599,7 +637,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     FOR gene IN ${routing.geneCollection}
         FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
-        FOR record in ${routing.edgeCollection}
+        FOR rawRecord in ${routing.edgeCollection}
+          LET record = ${grnRecord('rawRecord')}
           FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
           ${pvalueFilter}
           LET ge = DOCUMENT(record._from)
@@ -616,7 +655,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             FOR se IN ${routing.edgeCollection}
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
               LIMIT 1
-              RETURN se
+              RETURN ${grnRecord('se')}
           )
 
           RETURN {
@@ -630,6 +669,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'files_filesets': record.files_filesets,
           'biological_context': record.biological_context,
           'log2FC': record.log2FC,
+          'p_value': record.p_value,
+          'p_value_adj': record.p_value_adj,
           'neg_log10_pvalue': record.neg_log10_pvalue,
           'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
           'significant': record.significant,
@@ -647,7 +688,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FOR ge in ${routing.elementCollection}
           FILTER ge.promoter_of == gene._id
 
-          FOR record in ${routing.edgeCollection}
+          FOR rawRecord in ${routing.edgeCollection}
+          LET record = ${grnRecord('rawRecord')}
             FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
             ${pvalueFilter}
 
@@ -657,7 +699,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
               FOR se IN ${routing.edgeCollection}
                 FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
                 LIMIT 1
-                RETURN se
+                RETURN ${grnRecord('se')}
             )
 
             RETURN {
@@ -671,6 +713,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'files_filesets': record.files_filesets,
             'biological_context': record.biological_context,
             'log2FC': record.log2FC,
+          'p_value': record.p_value,
+          'p_value_adj': record.p_value_adj,
             'neg_log10_pvalue': record.neg_log10_pvalue,
             'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
             'significant': record.significant,
@@ -688,7 +732,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FOR response_gene IN ${routing.geneCollection}
             FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
-            FOR record in ${routing.edgeCollection}
+            FOR rawRecord in ${routing.edgeCollection}
+          LET record = ${grnRecord('rawRecord')}
               FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
               ${pvalueFilter}
 
@@ -701,7 +746,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   FOR se IN ${routing.edgeCollection}
                     FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
                     LIMIT 1
-                    RETURN se
+                    RETURN ${grnRecord('se')}
                 )
 
                 RETURN {
@@ -715,6 +760,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'files_filesets': record.files_filesets,
                   'biological_context': record.biological_context,
                   'log2FC': record.log2FC,
+          'p_value': record.p_value,
+          'p_value_adj': record.p_value_adj,
                   'neg_log10_pvalue': record.neg_log10_pvalue,
                   'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
                   'significant': record.significant,
@@ -758,7 +805,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
               AND se._to == record._to AND se.morf_id == 'TOX_1'
             SORT se._key
             LIMIT 1
-            RETURN se
+            RETURN ${grnRecord('se')}
         )
         RETURN {
           _sort_id: record._id,
@@ -773,6 +820,8 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           files_filesets: record.files_filesets,
           biological_context: record.biological_context,
           log2FC: record.log2FC,
+          p_value: record.p_value,
+          p_value_adj: record.p_value_adj,
           neg_log10_pvalue: record.neg_log10_pvalue,
           neg_log10_pvalue_adj: record.neg_log10_pvalue_adj,
           significant: record.significant,
