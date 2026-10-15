@@ -831,7 +831,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             )
         seen_element_gene_ids.add(element_gene_id)
 
-    def _load_mageck_reference(self):
+    def _load_macs_screens_reference(self):
         filepath = self.reference_filepath
         reference_fields = (
             'intended_target_name', 'intended_target_chr',
@@ -848,7 +848,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 set(reader.fieldnames or [])
             if missing:
                 raise ValueError(
-                    f'MAGeCK guide reference missing columns: {sorted(missing)}')
+                    f'MACS screen guide reference missing columns: {sorted(missing)}')
             for row in reader:
                 match = re.search(
                     r'legacy promoter target ([^;]+);', row['description'])
@@ -862,7 +862,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 elements[element_id] = annotation
         return elements
 
-    def _mageck_metrics_from_row(self, row, name_to_idx):
+    def _macs_screens_metrics_from_row(self, row, name_to_idx):
         """Select one direction, then map its native columns to edge metrics."""
         direction = min(
             ('neg', 'pos'),
@@ -875,8 +875,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         }
         return self._metrics_from_row(row, self._columns_from_layout(selected_columns))
 
-    def _normalize_mageck_rows(self, header, rows):
-        """Join guide annotations and validate native MAGeCK rows.
+    def _normalize_macs_screens_rows(self, header, rows):
+        """Join guide annotations and validate native MACS screen rows.
 
         Only explicitly curated exclusions are omitted. New unresolved IDs fail the
         load; aliases never merge rows or their measurements.
@@ -891,8 +891,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         missing = required - set(header)
         if missing:
             raise ValueError(
-                f'MAGeCK results missing columns: {sorted(missing)}')
-        elements = self._load_mageck_reference() if config.get(
+                f'MACS screen results missing columns: {sorted(missing)}')
+        elements = self._load_macs_screens_reference() if config.get(
             'reference_accession') else None
         if elements is not None:
             element_fields = ('intended_target_name', 'intended_target_chr',
@@ -918,12 +918,12 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     continue
                 if len(values) != len(header):
                     raise ValueError(
-                        'MAGeCK row does not match the header length')
+                        'MACS screen row does not match the header length')
                 row = dict(zip(header, values))
                 element_id = row['id']
                 if not element_id or element_id in seen:
                     raise ValueError(
-                        f'Missing or duplicate MAGeCK element ID: {element_id!r}')
+                        f'Missing or duplicate MACS screen element ID: {element_id!r}')
                 seen.add(element_id)
                 if element_id in controls or curation.get(element_id) == '':
                     skipped += 1
@@ -932,7 +932,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     reference_id = curation.get(element_id, element_id)
                     if reference_id not in elements:
                         raise ValueError(
-                            f'No guide reference for MAGeCK element {element_id!r}; curate explicitly.')
+                            f'No guide reference for MACS screen element {element_id!r}; curate explicitly.')
                     annotation = elements[reference_id]
                     if not all(annotation):
                         raise ValueError(
@@ -943,11 +943,11 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         float(row[f'{direction}|{field}']) for field in ('lfc', 'p-value', 'fdr'))
                     if not all(math.isfinite(value) for value in (lfc, pvalue, fdr)) or not (0 <= pvalue <= 1 and 0 <= fdr <= 1):
                         raise ValueError(
-                            f'Invalid MAGeCK statistics for {element_id!r}')
+                            f'Invalid MACS screen statistics for {element_id!r}')
                 yield [row[field] for field in output_header]
             if skipped:
                 self.logger.warning(
-                    'Omitted %d explicitly curated MAGeCK controls/unmapped elements.', skipped)
+                    'Omitted %d explicitly curated MACS screen controls/unmapped elements.', skipped)
 
         return output_header, normalized()
 
@@ -1030,7 +1030,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 data_file, delimiter=self.layout.get('delimiter', '\t'))
             header = next(reader)
             if layout_name in ('macs_genome_wide', 'macs_validation'):
-                header, reader = self._normalize_mageck_rows(header, reader)
+                header, reader = self._normalize_macs_screens_rows(
+                    header, reader)
             name_to_idx = {h.strip(): i for i, h in enumerate(header)}
 
             if not self.layout:
@@ -1126,7 +1127,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         element_coordinates]
 
                 if layout_name in ('macs_genome_wide', 'macs_validation'):
-                    metrics = self._mageck_metrics_from_row(row, name_to_idx)
+                    metrics = self._macs_screens_metrics_from_row(
+                        row, name_to_idx)
                 else:
                     metrics = self._metrics_from_row(row, colmap)
                 metrics = self._apply_adapter_calculated_fields(

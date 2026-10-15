@@ -1724,9 +1724,9 @@ def test_norman_replacements_preserve_log2fc_and_nonsignificant_pairs(
 
 @pytest.mark.parametrize('accession,count', [('IGVFFI9001HIYI', 5), ('IGVFFI3975KRIX', 5)])
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_gene'])
-def test_cdh5_mageck_screens(accession, count, label, mock_file_fileset_facs_screen, tmp_path):
+def test_cdh5_macs_screens(accession, count, label, mock_file_fileset_facs_screen, tmp_path):
     from pathlib import Path
-    path = tmp_path / 'mageck.tsv.gz'
+    path = tmp_path / 'macs_screens.tsv.gz'
     with gzip.open(path, 'wt') as output:
         output.write(
             Path(f'samples/crispr_{accession}.example.tsv').read_text())
@@ -1758,29 +1758,29 @@ def test_cdh5_mageck_screens(accession, count, label, mock_file_fileset_facs_scr
         assert all(r['promoter_of'].startswith('genes/ENSG') for r in records)
 
 
-def _normalize_mageck_test_rows(header, rows, config, reference_filepath, logger):
+def _normalize_macs_screens_test_rows(header, rows, config, reference_filepath, logger):
     adapter = CRISPRElementGeneIGVF.__new__(CRISPRElementGeneIGVF)
     adapter.file_config = config
     adapter.reference_filepath = reference_filepath
     adapter.logger = logger
-    return adapter._normalize_mageck_rows(header, rows)
+    return adapter._normalize_macs_screens_rows(header, rows)
 
 
-MAGECK_HEADER = ['id', 'num', 'neg|lfc', 'neg|p-value', 'neg|fdr',
-                 'pos|lfc', 'pos|p-value', 'pos|fdr', 'ensembl_gene_id',
-                 'element_chr', 'element_start', 'element_end', 'element_guide_count']
-MAGECK_ROW = ['TEST', '12', '-0.2', '0.4', '0.8', '0.3', '0.002', '0.01',
-              'ENSG00000179776', 'chr16', '100', '200', '6']
-MAGECK_LOGGER = logging.getLogger(__name__)
+MACS_SCREENS_HEADER = ['id', 'num', 'neg|lfc', 'neg|p-value', 'neg|fdr',
+                       'pos|lfc', 'pos|p-value', 'pos|fdr', 'ensembl_gene_id',
+                       'element_chr', 'element_start', 'element_end', 'element_guide_count']
+MACS_SCREENS_ROW = ['TEST', '12', '-0.2', '0.4', '0.8', '0.3', '0.002', '0.01',
+                    'ENSG00000179776', 'chr16', '100', '200', '6']
+MACS_SCREENS_LOGGER = logging.getLogger(__name__)
 
 
 def test_selects_matched_statistics_from_lower_fdr_direction():
-    header, rows = _normalize_mageck_test_rows(
-        MAGECK_HEADER, [MAGECK_ROW], {}, None, MAGECK_LOGGER)
+    header, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [MACS_SCREENS_ROW], {}, None, MACS_SCREENS_LOGGER)
     normalized_row = next(rows)
-    assert header == MAGECK_HEADER
-    assert normalized_row == MAGECK_ROW
-    record = _mageck_test_metrics(header, normalized_row)
+    assert header == MACS_SCREENS_HEADER
+    assert normalized_row == MACS_SCREENS_ROW
+    record = _macs_screens_test_metrics(header, normalized_row)
     assert float(record['log2FC']) == 0.3
     assert float(record['p_value']) == 0.002
     assert float(record['p_value_adj']) == 0.01
@@ -1789,42 +1789,43 @@ def test_selects_matched_statistics_from_lower_fdr_direction():
 
 
 def test_negative_direction_wins_ties():
-    row = MAGECK_ROW.copy()
+    row = MACS_SCREENS_ROW.copy()
     row[4] = row[7]
-    header, rows = _normalize_mageck_test_rows(
-        MAGECK_HEADER, [row], {}, None, MAGECK_LOGGER)
-    record = _mageck_test_metrics(header, next(rows))
+    header, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [row], {}, None, MACS_SCREENS_LOGGER)
+    record = _macs_screens_test_metrics(header, next(rows))
     assert float(record['log2FC']) == -0.2
     assert float(record['p_value']) == 0.4
 
 
 @pytest.mark.parametrize('field,value', [('neg|fdr', '1.5'), ('pos|lfc', 'nan'), ('pos|p-value', '-0.1')])
 def test_rejects_invalid_statistics(field, value):
-    row = MAGECK_ROW.copy()
-    row[MAGECK_HEADER.index(field)] = value
-    _, rows = _normalize_mageck_test_rows(
-        MAGECK_HEADER, [row], {}, None, MAGECK_LOGGER)
-    with pytest.raises(ValueError, match='Invalid MAGeCK statistics'):
+    row = MACS_SCREENS_ROW.copy()
+    row[MACS_SCREENS_HEADER.index(field)] = value
+    _, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [row], {}, None, MACS_SCREENS_LOGGER)
+    with pytest.raises(ValueError, match='Invalid MACS screen statistics'):
         list(rows)
 
 
 def test_rejects_duplicate_native_ids():
-    _, rows = _normalize_mageck_test_rows(
-        MAGECK_HEADER, [MAGECK_ROW, MAGECK_ROW], {}, None, MAGECK_LOGGER)
-    with pytest.raises(ValueError, match='duplicate MAGeCK element ID'):
+    _, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [MACS_SCREENS_ROW, MACS_SCREENS_ROW], {}, None, MACS_SCREENS_LOGGER)
+    with pytest.raises(ValueError, match='duplicate MACS screen element ID'):
         list(rows)
 
 
 def test_requires_reference_for_genome_wide_screen():
     with pytest.raises(ValueError, match='requires reference_filepath'):
-        _normalize_mageck_test_rows(MAGECK_HEADER, [], {
-                                    'reference_accession': 'IGVFFI9629WVUU'}, None, MAGECK_LOGGER)
+        _normalize_macs_screens_test_rows(MACS_SCREENS_HEADER, [], {
+            'reference_accession': 'IGVFFI9629WVUU'}, None, MACS_SCREENS_LOGGER)
 
 
 def test_unknown_native_ids_require_explicit_curation():
-    _, rows = _normalize_mageck_test_rows(
-        MAGECK_HEADER, [MAGECK_ROW], {'reference_accession': 'IGVFFI9629WVUU'},
-        'samples/crispr_IGVFFI9629WVUU.example.tsv', MAGECK_LOGGER)
+    _, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [MACS_SCREENS_ROW], {
+            'reference_accession': 'IGVFFI9629WVUU'},
+        'samples/crispr_IGVFFI9629WVUU.example.tsv', MACS_SCREENS_LOGGER)
     with pytest.raises(ValueError, match='No guide reference'):
         list(rows)
 
@@ -1838,14 +1839,14 @@ def test_conflicting_guide_annotations_are_rejected(tmp_path):
     reference.write_text(
         '\n'.join([lines[0], lines[1], '\t'.join(fields)]) + '\n')
     with pytest.raises(ValueError, match='Conflicting guide annotations'):
-        _normalize_mageck_test_rows(MAGECK_HEADER, [], {
-                                    'reference_accession': 'IGVFFI9629WVUU'}, reference, MAGECK_LOGGER)
+        _normalize_macs_screens_test_rows(MACS_SCREENS_HEADER, [], {
+            'reference_accession': 'IGVFFI9629WVUU'}, reference, MACS_SCREENS_LOGGER)
 
 
-def _mageck_test_metrics(header, row, layout='macs_validation'):
+def _macs_screens_test_metrics(header, row, layout='macs_validation'):
     adapter = CRISPRElementGeneIGVF.__new__(CRISPRElementGeneIGVF)
     adapter.layout = CRISPR_E2G_LAYOUTS[layout]
-    return adapter._mageck_metrics_from_row(row, {name: idx for idx, name in enumerate(header)})
+    return adapter._macs_screens_metrics_from_row(row, {name: idx for idx, name in enumerate(header)})
 
 
 def test_macs_metric_mappings_reference_actual_source_columns():
@@ -1859,6 +1860,6 @@ def test_macs_metric_mappings_reference_actual_source_columns():
 
 
 def test_genome_wide_guide_count_uses_native_num():
-    metrics = _mageck_test_metrics(
-        MAGECK_HEADER, MAGECK_ROW, 'macs_genome_wide')
+    metrics = _macs_screens_test_metrics(
+        MACS_SCREENS_HEADER, MACS_SCREENS_ROW, 'macs_genome_wide')
     assert metrics['num_guides'] == 12
