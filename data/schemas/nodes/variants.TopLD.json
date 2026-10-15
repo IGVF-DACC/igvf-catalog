@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/variants.TopLD.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "TopLD"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "http://topld.genetics.unc.edu/"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
+}

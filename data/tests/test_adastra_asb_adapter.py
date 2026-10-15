@@ -42,6 +42,18 @@ def mock_protein_map():
         yield mock_get
 
 
+@pytest.fixture
+def mock_bulk_check_variants():
+    """Mock bulk_check_variants_in_arangodb. Defaults to treating every
+    computed variant id as already loaded, so tests that aren't specifically
+    exercising the existence check still see edges emitted; override
+    .side_effect/.return_value in a test to exercise the skip path."""
+    with patch('adapters.adastra_asb_adapter.bulk_check_variants_in_arangodb') as mock_check:
+        mock_check.side_effect = lambda variant_ids, **kwargs: set(
+            variant_ids)
+        yield mock_check
+
+
 def test_adastra_asb_adapter_invalid_label(sample_archive):
     """Test invalid label handling"""
     with pytest.raises(ValueError, match='Invalid label'):
@@ -49,7 +61,7 @@ def test_adastra_asb_adapter_invalid_label(sample_archive):
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, sample_archive):
     """Test processing file with asb label"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -117,7 +129,140 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_file_f
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, sample_archive):
+def test_adastra_asb_adapter_skips_edge_when_variant_not_loaded(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, sample_archive, caplog):
+    """ADASTRA never creates variant nodes itself, so a variant that isn't
+    already in the variants collection must be skipped, not turned into a
+    dangling edge."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+
+    adapter = ASB(filepath=sample_archive,
+                  label='asb', writer=SpyWriter(), validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+    assert 'variant not found in variants collection' in caplog.text
+
+
+ASB_HEADER = (
+    '#chr\tpos\tID\tref\talt\trepeat_type\tmean_BAD\tmean_SNP_per_segment\t'
+    'total_cover\tn_aggregated\tes_mean_ref\tes_mean_alt\tlogitp_ref\t'
+    'fdrp_bh_ref\tlogitp_alt\tfdrp_bh_alt\tmotif_log_pref\tmotif_log_palt\t'
+    'motif_fc\tmotif_pos\tmotif_orient\tmotif_conc\tnovel'
+)
+
+
+@pytest.fixture
+def zero_fdrp_archive(tmp_path):
+    """Archive with a single row whose fdrp_bh_ref/alt are 0 (the -log10 edge case)."""
+    # fdrp_bh_ref (col 13) and fdrp_bh_alt (col 15) are both 0.
+    row = (
+        'chr19\t9435653.0\trs1433060\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.4349511461894011\t-1.104751195642913\t4.221586590047205e-05\t0\t'
+        '0.9967883068007664\t0\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse'
+    )
+    tsv_path = tmp_path / 'ATF1_HUMAN@HepG2__hepatoblastoma_.tsv'
+    tsv_path.write_text(f'{ASB_HEADER}\n{row}\n')
+
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(str(tsv_path),
+                    arcname='ATF1_HUMAN@HepG2__hepatoblastoma_.tsv')
+    return str(archive_filepath)
+
+
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_caps_zero_fdrp_instead_of_infinity(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, zero_fdrp_archive):
+    """When fdrp_bh is 0, neg_log10_pvalue_adj must be capped, not float('inf')."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+
+    adapter = ASB(filepath=zero_fdrp_archive,
+                  label='asb', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) > 0
+
+    for content in non_empty_contents:
+        item = json.loads(content)
+        assert item['neg_log10_pvalue_adj_ref'] == ASB.MAX_LOG10_PVALUE
+        assert item['neg_log10_pvalue_adj_alt'] == ASB.MAX_LOG10_PVALUE
+        # allow_nan=False raises on Infinity/NaN, guaranteeing valid JSON output.
+        json.dumps(item, allow_nan=False)
+
+
+@pytest.fixture
+def directional_score_archive(tmp_path):
+    """Archive with rows covering every branch of ASB._compute_score:
+    ref-only significant, alt-only significant, both significant, neither."""
+    rows = [
+        # fdrp_bh_ref=0.01 (col 13), fdrp_bh_alt=0.5 (col 15) -> ref-only significant
+        'chr19\t9435653.0\trs1\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.01\t'
+        '0.9967883068007664\t0.5\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+        # fdrp_bh_ref=0.5, fdrp_bh_alt=0.02 -> alt-only significant
+        'chr19\t9435654.0\trs2\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.5\t'
+        '0.9967883068007664\t0.02\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+        # fdrp_bh_ref=0.01, fdrp_bh_alt=0.01 -> both significant
+        'chr19\t9435655.0\trs3\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.01\t'
+        '0.9967883068007664\t0.01\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+        # fdrp_bh_ref=0.5, fdrp_bh_alt=0.5 -> neither significant
+        'chr19\t9435656.0\trs4\tC\tA\t\t1.25\t263.5\t73.0\t2.0\t'
+        '1.0\t-1.0\t4.221586590047205e-05\t0.5\t'
+        '0.9967883068007664\t0.5\t2.003495359068703\t1.968913183373999\t'
+        '-0.1148795010225674\t10\t-\tNo Hit\tFalse',
+    ]
+    tsv_path = tmp_path / 'ATF1_HUMAN@HepG2__hepatoblastoma_.tsv'
+    tsv_path.write_text(f'{ASB_HEADER}\n' + '\n'.join(rows) + '\n')
+
+    archive_filepath = tmp_path / f'{FILE_ACCESSION}.tar.gz'
+    with tarfile.open(archive_filepath, 'w:gz') as archive:
+        archive.add(str(tsv_path),
+                    arcname='ATF1_HUMAN@HepG2__hepatoblastoma_.tsv')
+    return str(archive_filepath)
+
+
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_computes_directional_score(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, directional_score_archive):
+    """score should be the negative ref p-value, the positive alt p-value, or
+    None when both or neither allele is significant - computed at load time
+    rather than by the API router."""
+    mock_build_variant_id.side_effect = [
+        'NC_000019.10:9435653:C:A',
+        'NC_000019.10:9435654:C:A',
+        'NC_000019.10:9435655:C:A',
+        'NC_000019.10:9435656:C:A',
+    ]
+
+    adapter = ASB(filepath=directional_score_archive,
+                  label='asb', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    items_by_from = {
+        json.loads(content)['_from']: json.loads(content)
+        for content in non_empty_contents
+    }
+
+    assert items_by_from['variants/NC_000019.10:9435653:C:A']['score'] == -0.01
+    assert items_by_from['variants/NC_000019.10:9435654:C:A']['score'] == 0.02
+    assert items_by_from['variants/NC_000019.10:9435655:C:A']['score'] is None
+    assert items_by_from['variants/NC_000019.10:9435656:C:A']['score'] is None
+
+
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_file_fileset, mock_protein_map, mock_bulk_check_variants, sample_archive):
     """Test process_file method with mocked protein mapping"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -181,6 +326,86 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
 
     # Verify no output was generated since the TF was skipped
     assert len(adapter.writer.contents) == 0
+
+
+@patch('adapters.adastra_asb_adapter.load_variant')
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_variants_label_creates_missing_variant(mock_build_variant_id, mock_load_variant, mock_file_fileset, mock_bulk_check_variants, sample_archive):
+    """label='variants' should create a variant node for a valid variant
+    that isn't already in the variants collection, tagged with ADASTRA's
+    source and the per-cell GTRD source_url."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({
+        '_key': 'NC_000019.10:9435653:C:A',
+        'name': 'NC_000019.10:9435653:C:A',
+        'chr': 'chr19',
+        'pos': 9435653,
+        'ref': 'C',
+        'alt': 'A',
+        'variation_type': 'SNP',
+        'spdi': 'NC_000019.10:9435653:C:A',
+        'hgvs': 'NC_000019.10:g.9435654C>A',
+        'organism': 'Homo sapiens',
+    }, None)
+
+    adapter = ASB(filepath=sample_archive,
+                  label='variants', writer=SpyWriter(), validate=True)
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    # Same mocked variant id is produced for every row across both sample
+    # files - written_variant_keys must dedupe it down to a single node.
+    assert len(non_empty_contents) == 1
+
+    item = json.loads(non_empty_contents[0])
+    assert item['_key'] == 'NC_000019.10:9435653:C:A'
+    assert item['source'] == ASB.SOURCE
+    assert item['source_url'].startswith(
+        'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=')
+    assert item['files_filesets'] == f'files_filesets/{FILE_ACCESSION}'
+
+
+@patch('adapters.adastra_asb_adapter.load_variant')
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_variants_label_skips_already_loaded(mock_build_variant_id, mock_load_variant, mock_file_fileset, mock_bulk_check_variants, sample_archive):
+    """A variant that's already in the collection shouldn't be re-emitted as
+    a node."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+
+    adapter = ASB(filepath=sample_archive,
+                  label='variants', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+    mock_load_variant.assert_not_called()
+
+
+@patch('adapters.adastra_asb_adapter.load_variant')
+@patch('adapters.adastra_asb_adapter.build_variant_id')
+def test_adastra_asb_adapter_variants_label_skips_invalid_variant(mock_build_variant_id, mock_load_variant, mock_file_fileset, mock_bulk_check_variants, sample_archive, caplog):
+    """A variant that load_variant() rejects (e.g. ref allele mismatch)
+    should be logged and skipped, not written as a node."""
+    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
+    mock_bulk_check_variants.side_effect = None
+    mock_bulk_check_variants.return_value = set()
+    mock_load_variant.return_value = ({}, {
+        'variant_id': 'NC_000019-9435653-C-A',
+        'reason': 'Ref allele mismatch',
+    })
+
+    adapter = ASB(filepath=sample_archive,
+                  label='variants', writer=SpyWriter())
+    adapter.process_file()
+
+    non_empty_contents = [
+        content for content in adapter.writer.contents if content.strip()]
+    assert len(non_empty_contents) == 0
+    assert 'Ref allele mismatch' in caplog.text
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')

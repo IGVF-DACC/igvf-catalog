@@ -24,7 +24,7 @@ const QueryFormat = z.object({
   type: z.enum(STRUCTURE_TYPES).optional()
 }).merge(commonNodesParamsFormat)
 
-const GeneStructureFormat = z.object({
+export const GeneStructureFormat = z.object({
   _id: z.string(),
   name: z.string(),
   chr: z.string(),

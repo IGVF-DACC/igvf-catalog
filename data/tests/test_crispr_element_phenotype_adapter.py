@@ -2,7 +2,11 @@ import json
 import pytest
 from unittest.mock import patch
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
+
+MIGRATION_PATH = './samples/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
+GROWTH_PATH = './samples/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
 
 
 @pytest.fixture
@@ -19,12 +23,22 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.CRISPR_element_phenotype_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
-        filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+        filepath=MIGRATION_PATH,
         label='genomic_element',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
         validate=True,
     )
@@ -37,19 +51,19 @@ def test_crispr_element_phenotype_genomic_element_migration(mock_file_fileset):
     assert first_item['start'] == 101174581
     assert first_item['end'] == 101175330
     assert first_item['type'] == 'tested elements'
-    assert first_item['source_annotation'] == 'enhancer'
+    assert first_item['source_annotation'] == 'candidate enhancer'
     assert first_item['method'] == 'CRISPR screen'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI5135QZCS/'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI5135QZCS'
 
 
-def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_phenotype_migration(
+        mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
-        filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+        filepath=MIGRATION_PATH,
         label='genomic_element_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
         validate=True,
     )
@@ -75,12 +89,12 @@ def test_crispr_element_phenotype_genomic_element_phenotype_migration(mock_file_
     assert first_item['biosample_term'] == 'ontology_terms/CLO_0003730'
 
 
-def test_crispr_element_phenotype_genomic_element_phenotype_growth(mock_file_fileset):
+def test_crispr_element_phenotype_genomic_element_phenotype_growth(
+        mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = CRISPRElementPhenotype(
-        filepath='./samples/crispr_element_phenotype_growth.example.tsv',
+        filepath=GROWTH_PATH,
         label='genomic_element_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/',
         writer=writer,
         validate=True,
     )
@@ -101,20 +115,20 @@ def test_crispr_element_phenotype_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label'):
         CRISPRElementPhenotype(
-            filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+            filepath=MIGRATION_PATH,
             label='invalid_label',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
             writer=writer,
         )
 
 
-def test_crispr_element_phenotype_unsupported_accession(mock_file_fileset):
+def test_crispr_element_phenotype_unsupported_accession(mock_file_fileset, tmp_path):
+    sample = tmp_path / 'IGVFFI0000AAAA_unsupported.tsv'
+    sample.write_text('dhs\tdhs_coords\n')
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Unsupported file accession'):
         CRISPRElementPhenotype(
-            filepath='./samples/crispr_element_phenotype_migration.example.tsv',
+            filepath=str(sample),
             label='genomic_element',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
         )
 
@@ -141,8 +155,9 @@ def test_parse_element_coords_raises_on_unrecognized():
         CRISPRElementPhenotype._parse_element_coords('NA:something_else')
 
 
-def test_crispr_element_phenotype_skips_na_coordinate_rows(mock_file_fileset, tmp_path):
-    sample = tmp_path / 'mixed.tsv'
+def test_crispr_element_phenotype_skips_na_coordinate_rows(
+        mock_file_fileset, mock_ontology_term_validator, tmp_path):
+    sample = tmp_path / 'IGVFFI5135QZCS_mixed.tsv'
     sample.write_text(
         'dhs\tdhs_coords\tdhs_count\tavg_migration_pZ\thit_gRNA_count_mig\t'
         'nonhit_gRNA_count_mig\tfraction_hit_mig\tmigration_pval\tmig_significant\n'
@@ -154,7 +169,6 @@ def test_crispr_element_phenotype_skips_na_coordinate_rows(mock_file_fileset, tm
     adapter = CRISPRElementPhenotype(
         filepath=str(sample),
         label='genomic_element_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/',
         writer=writer,
         validate=True,
     )

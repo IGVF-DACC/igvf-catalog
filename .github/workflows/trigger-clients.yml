@@ -1,0 +1,37 @@
+name: Trigger client generation
+
+# Asks IGVF-DACC/igvf-catalog-client-openapi-spec to regenerate the catalog
+# clients (python, asyncio, R) and the MCP server from this repo's OpenAPI spec:
+#   push to dev          -> dev builds on the client repos' dev branches
+#   published release    -> released clients (GitHub + PyPI) versioned by the tag
+# Needs the catalog client builder GitHub App: repo variable
+# CATALOG_CLIENT_BUILDER_APP_ID and secret CATALOG_CLIENT_BUILDER_PRIVATE_KEY.
+on:
+  push:
+    branches: [dev]
+  release:
+    types: [published]
+
+jobs:
+  dispatch:
+    if: github.event_name == 'push' || !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    steps:
+      - id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.CATALOG_CLIENT_BUILDER_APP_ID }}
+          private-key: ${{ secrets.CATALOG_CLIENT_BUILDER_PRIVATE_KEY }}
+          owner: IGVF-DACC
+          repositories: igvf-catalog-client-openapi-spec
+      - name: Dispatch to igvf-catalog-client-openapi-spec
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          EVENT: ${{ github.event_name == 'release' && 'catalog-release' || 'catalog-dev' }}
+          REF: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+          TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+        run: |
+          jq -n --arg e "$EVENT" --arg r "$REF" --arg t "$TAG" --arg s "$GITHUB_SHA" \
+            '{event_type: $e, client_payload: {ref: $r, tag: $t, sha: $s}}' \
+          | gh api repos/IGVF-DACC/igvf-catalog-client-openapi-spec/dispatches --input -
+          echo "Sent $EVENT for $REF"

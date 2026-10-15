@@ -1,10 +1,8 @@
 import pytest
-import pickle
 from unittest.mock import MagicMock, patch, mock_open
 from adapters.gencode_protein_adapter import GencodeProtein
 from adapters.writer import SpyWriter
 import json
-from jsonschema import ValidationError
 
 SAMPLE_DATA = "# header\nchr1\tHAVANA\ttranscript\t65419\t71585\t.\t+\t.\tgene_id \"ENSG00000186092.7\"; transcript_id \"ENST00000641515.2\"; gene_type \"protein_coding\"; gene_name \"OR4F5\"; transcript_type \"protein_coding\"; transcript_name \"OR4F5-201\"; level 2; protein_id \"ENSP00000493376.2\"; hgnc_id \"HGNC:14825\"; tag \"MANE_Select\";\n"
 
@@ -20,7 +18,6 @@ def gencode_protein_human(mock_writer):
         yield GencodeProtein(
             filepath='dummy.gtf',
             label='gencode_protein',
-            organism='HUMAN',
             writer=mock_writer,
             uniprot_sprot_file_path='dummy_sprot.gz',
             uniprot_trembl_file_path='dummy_trembl.gz',
@@ -28,16 +25,10 @@ def gencode_protein_human(mock_writer):
         )
 
 
-def test_init_invalid_organism(mock_writer):
-    with pytest.raises(ValueError):
-        GencodeProtein(filepath='dummy.gtf', label='gencode_protein',
-                       organism='INVALID', writer=mock_writer)
-
-
 def test_init_invalid_label(mock_writer):
     with pytest.raises(ValueError):
         GencodeProtein(filepath='dummy.gtf', label='invalid_label',
-                       organism='HUMAN', writer=mock_writer)
+                       writer=mock_writer)
 
 
 def test_parse_info_metadata_extracts_keys(gencode_protein_human):
@@ -100,7 +91,6 @@ def test_process_file_writes_json(mock_get_uniprot, mock_writer):
         gencode = GencodeProtein(
             filepath='dummy.gtf',
             label='gencode_protein',
-            organism='HUMAN',
             writer=mock_writer,
             uniprot_sprot_file_path='dummy_sprot.gz',
             uniprot_trembl_file_path='dummy_trembl.gz',
@@ -145,47 +135,63 @@ def test_process_file_writes_json(mock_get_uniprot, mock_writer):
             gencode.validate_doc(invalid_doc)
 
 
-def test_init_mouse_organism(mock_writer):
-    """Test initialization with MOUSE organism"""
-    with patch('pickle.load', return_value={}):
+def test_init_mouse_label(mock_writer):
+    """Mouse organism is derived from mm_* labels."""
+    with patch('adapters.gencode_protein_adapter.open', mock_open(read_data='#\n')):
         gencode = GencodeProtein(
             filepath='dummy.gtf',
-            label='gencode_protein',
-            organism='MOUSE',
+            label='mm_gencode_protein',
             writer=mock_writer,
             uniprot_sprot_file_path='dummy_sprot.gz',
             uniprot_trembl_file_path='dummy_trembl.gz'
         )
-        assert gencode.organism == 'Mus musculus'
-        assert gencode.version == 'vM36'
-        assert gencode.transcript_endpoint == 'mm_transcripts/'
-        assert gencode.taxonomy_id == '10090'
-        assert 'mouse' in gencode.source_url.lower()
+    assert gencode.organism == 'Mus musculus'
+    assert gencode.version == 'vM36'
+    assert gencode.transcript_endpoint == 'mm_transcripts/'
+    assert gencode.taxonomy_id == '10090'
+    assert 'mouse' in gencode.source_url.lower()
 
 
 def test_process_file_edge_translates_to(mock_writer):
     """Test process_file with gencode_translates_to label"""
-    with patch('pickle.load', return_value={}):
+    with patch('adapters.gencode_protein_adapter.open', mock_open(read_data='#\n')):
         gencode = GencodeProtein(
             filepath='dummy.gtf',
             label='gencode_translates_to',
-            organism='HUMAN',
             writer=mock_writer,
-            uniprot_sprot_file_path='dummy_sprot.gz',
-            uniprot_trembl_file_path='dummy_trembl.gz',
             validate=True
         )
-        # Patch the file opening for process_file
-        with patch('adapters.gencode_protein_adapter.open', mock_open(read_data=SAMPLE_DATA)):
-            gencode.process_file()
+    with patch('adapters.gencode_protein_adapter.open', mock_open(read_data=SAMPLE_DATA)):
+        gencode.process_file()
 
-        # Parse the output
-        first_item = json.loads(mock_writer.contents[0])
-        assert '_from' in first_item
-        assert '_to' in first_item
-        assert first_item['_from'].startswith('transcripts/')
-        assert first_item['_to'].startswith('proteins/')
-        assert first_item['source'] == 'GENCODE'
-        assert first_item['name'] == 'translates to'
-        assert first_item['inverse_name'] == 'translated from'
-        assert first_item['biological_process'] == 'ontology_terms/GO_0006412'
+    first_item = json.loads(mock_writer.contents[0])
+    assert '_from' in first_item
+    assert '_to' in first_item
+    assert first_item['_from'].startswith('transcripts/')
+    assert first_item['_to'].startswith('proteins/')
+    assert first_item['source'] == 'GENCODE'
+    assert first_item['name'] == 'translates to'
+    assert first_item['inverse_name'] == 'translated from'
+    assert first_item['biological_process'] == 'ontology_terms/GO_0006412'
+    assert first_item['organism'] == 'Homo sapiens'
+
+
+MOUSE_SAMPLE_DATA = "# header\nchr1\tHAVANA\ttranscript\t65419\t71585\t.\t+\t.\tgene_id \"ENSMUSG00000000001.1\"; transcript_id \"ENSMUST00000000001.1\"; gene_type \"protein_coding\"; gene_name \"Gnai3\"; transcript_type \"protein_coding\"; transcript_name \"Gnai3-201\"; level 2; protein_id \"ENSP00000493376.2\";\n"
+
+
+def test_process_file_edge_mm_translates_to(mock_writer):
+    with patch('adapters.gencode_protein_adapter.open', mock_open(read_data='#\n')):
+        gencode = GencodeProtein(
+            filepath='dummy.gtf',
+            label='mm_gencode_translates_to',
+            writer=mock_writer,
+            validate=True
+        )
+    with patch('adapters.gencode_protein_adapter.open', mock_open(read_data=MOUSE_SAMPLE_DATA)):
+        gencode.process_file()
+
+    first_item = json.loads(mock_writer.contents[0])
+    assert first_item['_from'] == 'mm_transcripts/ENSMUST00000000001'
+    assert first_item['_to'].startswith('proteins/')
+    assert first_item['organism'] == 'Mus musculus'
+    assert first_item['version'] == 'vM36'

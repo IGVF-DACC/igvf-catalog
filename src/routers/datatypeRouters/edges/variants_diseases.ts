@@ -25,7 +25,7 @@ export const variantReturnFormat = z.object({
   ca_id: z.string().nullish()
 })
 
-const variantDiseaseFormat = z.object({
+export const variantDiseaseFormat = z.object({
   sequence_variant: z.string().or((variantReturnFormat)).optional(),
   disease: z.string().or(ontologyFormat).optional(),
   gene_id: z.string().optional(),

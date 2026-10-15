@@ -2,6 +2,7 @@ import json
 import pytest
 from unittest.mock import patch
 from adapters.ebi_complex_adapter import EBIComplex
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.protein_map import ProteinMap
 from adapters.writer import SpyWriter
 
@@ -35,6 +36,17 @@ def mock_protein_map():
         yield mock_get
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.ebi_complex_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 def test_ebi_complex_initialization():
     sample_filepath = './samples/EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
@@ -53,7 +65,8 @@ def test_ebi_complex_invalid_label():
         EBIComplex(sample_filepath, label='invalid_label', writer=writer)
 
 
-def test_ebi_complex_process_file(mock_file_fileset, mock_protein_map):
+def test_ebi_complex_process_file(
+        mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
     sample_filepath = './samples/EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()

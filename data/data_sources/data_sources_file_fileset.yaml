@@ -26,7 +26,6 @@ igvf donor:
     --accessions {igvf_file_accessions}
     --output-bucket-key files_filesets/igvf_files_filesets_donors.jsonl
     --label igvf_donor
-    --replace
 
 igvf_file_accessions:
   BlueSTARR:
@@ -82,6 +81,8 @@ igvf_file_accessions:
     - IGVFFI4081AUXT
     - IGVFFI2104BKIF
     - IGVFFI0192YMEY
+  CRISPR element element:
+    - IGVFFI2419ZSGC
   CRISPR element phenotype:
     - IGVFFI5135QZCS
     - IGVFFI9584UDAS
@@ -106,6 +107,10 @@ igvf_file_accessions:
     - IGVFFI2440ESUS
     - IGVFFI4769NVJT
     - IGVFFI8101RHSC
+  MORF screen:
+    - IGVFFI6734IWRB
+    - IGVFFI6032GREJ
+    - IGVFFI2373SYJW
   SEM prediction:
     - IGVFFI2943RVII
     - IGVFFI3116SMJK
@@ -331,6 +336,7 @@ igvf_file_accessions:
     - IGVFFI0218RAAG
     - IGVFFI1255MQGI
   SEM motif:
+    - IGVFFI4892QCRR
     - IGVFFI5615JDRZ
     - IGVFFI8706ANLY
     - IGVFFI2972JEVI
@@ -719,6 +725,7 @@ igvf_file_accessions:
     - IGVFFI9779WEGD
     - IGVFFI9815VYTN
   community reference files:
+    - IGVFFI9074FIDG
     - IGVFFI7449PKMJ
     - IGVFFI4637FWQJ
     - IGVFFI2960JTMH
@@ -834,6 +841,7 @@ igvf_file_accessions:
     - IGVFFI3624EMSN
     - IGVFFI2284ZDWV
     - IGVFFI7217ZMJZ
+    - IGVFFI9820RGXX # GENCODE v43 RefSeq mapping
     - IGVFFI0314GYGG
     - IGVFFI2080RTXB
     - IGVFFI8525TBYT
@@ -867,7 +875,6 @@ igvf_file_accessions:
     - IGVFFI7019IZDF
     - IGVFFI3693WSFI
     - IGVFFI3237WUWL
-
     - IGVFFI9678CVIS
     - IGVFFI8431OEKU
     - IGVFFI0865ANAN
@@ -1279,14 +1286,13 @@ encode file to file_set:
     --output-bucket-key files_filesets/encode_files_filesets.jsonl
     --label encode_file_fileset
 
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset --replace
+# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode donor:
   collection: donor
   pypy3: false
   params:
     - label
     - accessions
-    - replace
   command: >
     python3 data_parser.py
     --adapter file_fileset
@@ -1294,7 +1300,6 @@ encode donor:
     --accessions {encode_file_accessions}
     --output-bucket-key files_filesets/encode_files_filesets_donors.jsonl
     --label encode_donor
-    --replace
 
 encode_file_accessions:
   Distal regulation ENCODE-rE2G:

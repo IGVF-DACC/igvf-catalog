@@ -2,6 +2,7 @@ from unittest.mock import patch, mock_open
 from adapters.writer import SpyWriter
 import json
 from adapters.SGE_variant_phenotype_adapter import SGE
+from adapters.ontology_term_validator import OntologyTermValidator
 import pytest
 
 
@@ -17,6 +18,17 @@ def mock_file_fileset():
             'samples': ['ontology_terms/EFO_0007598']
         }
         yield mock_get_file_fileset
+
+
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.SGE_variant_phenotype_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 SAMPLE_TSV = (
@@ -64,7 +76,9 @@ def test_process_file_variants(mock_gzip_open, mock_bulk_check, mock_load_varian
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=(COMPLETE_VARIANT, None))
 @patch('adapters.SGE_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=[])
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_variants_phenotypes(mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset):
+def test_process_file_variants_phenotypes(
+        mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset,
+        mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = SGE('dummy_accession.tsv.gz',
                   label='variants_phenotypes', writer=writer, validate=True)
@@ -82,7 +96,9 @@ def test_process_file_variants_phenotypes(mock_gzip_open, mock_bulk_check, mock_
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=(COMPLETE_VARIANT, None))
 @patch('adapters.SGE_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=[])
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset, mocker):
+def test_process_file_coding_variants_phenotypes(
+        mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset,
+        mocker, mock_ontology_term_validator):
     mocker.patch.object(
         SGE,
         'validate_coding_variant',

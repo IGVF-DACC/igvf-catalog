@@ -1,3 +1,4 @@
+import gzip
 import json
 from typing import Optional
 
@@ -16,29 +17,35 @@ from adapters.writer import Writer
 
 
 class Gencode(BaseAdapter):
-    ALLOWED_LABELS = ['gencode_transcript',
-                      'mm_gencode_transcript',
-                      'transcribed_to']
+    ALLOWED_LABELS = [
+        'gencode_transcript',
+        'mm_gencode_transcript',
+        'transcribed_to',
+        'mm_transcribed_to',
+    ]
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name']
-    ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
+    MOUSE_LABELS = frozenset({'mm_gencode_transcript', 'mm_transcribed_to'})
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
              'coord_end': 4, 'strand': 6, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.organism = organism
-        self.transcript_endpoint = 'transcripts/'
-        self.gene_endpoint = 'genes/'
-        self.version = 'v43'
-        self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
-        self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
-        if self.organism == 'MOUSE' or label == 'mm_gencode_transcript':
+    def __init__(self, filepath=None, label='gencode_transcript', writer: Optional[Writer] = None, validate=False, reference_filepath=None, **kwargs):
+        self.reference_filepath = reference_filepath
+        if label in self.MOUSE_LABELS:
             self.transcript_endpoint = 'mm_transcripts/'
             self.gene_endpoint = 'mm_genes/'
             self.version = 'vM36'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
+            self.organism = 'Mus musculus'
+        else:
+            self.transcript_endpoint = 'transcripts/'
+            self.gene_endpoint = 'genes/'
+            self.version = 'v43'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
+            self.organism = 'Homo sapiens'
 
         self.load_chr_name_mapping()
 
@@ -57,7 +64,7 @@ class Gencode(BaseAdapter):
             return 'transcripts'
         elif self.label == 'mm_gencode_transcript':
             return 'mm_transcripts'
-        elif self.label == 'transcribed_to':
+        elif self.label in ('transcribed_to', 'mm_transcribed_to'):
             return 'genes_transcripts'
 
     def parse_info_metadata(self, info):
@@ -80,7 +87,26 @@ class Gencode(BaseAdapter):
                 mapping_line = row.strip().split('\t')
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
+    def load_refseq_mapping(self):
+        mapping = {}
+        if not self.reference_filepath:
+            raise ValueError(
+                'reference_filepath is required for human transcripts '
+                '(GENCODE RefSeq mapping, IGVFFI9820RGXX).')
+        opener = gzip.open if str(
+            self.reference_filepath).endswith('.gz') else open
+        with opener(self.reference_filepath, 'rt') as metadata:
+            for line in metadata:
+                transcript_id, refseq_id, *_ = line.rstrip().split('\t')
+                # The optional third column contains a RefSeq protein accession.
+                mapping.setdefault(transcript_id, set()).add(refseq_id)
+        return {transcript: sorted(refseq_ids)
+                for transcript, refseq_ids in mapping.items()}
+
     def parse(self):
+        refseq_mapping = (self.load_refseq_mapping()
+                          if self.label == 'gencode_transcript'
+                          else {})
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -126,16 +152,18 @@ class Gencode(BaseAdapter):
                     'source': 'GENCODE',
                     'version': self.version,
                     'source_url': self.source_url,
-                    'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
+                    'organism': self.organism,
                 }
                 if self.label == 'gencode_transcript':
                     props['MANE_Select'] = info['MANE_Select']
+                    props['refseq_transcript_ids'] = refseq_mapping.get(
+                        info['transcript_id'], [])
                 if self.validate:
                     self.validate_doc(props)
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
 
-            elif self.label == 'transcribed_to':
+            elif self.label in ('transcribed_to', 'mm_transcribed_to'):
                 _id = gene_key + '_' + transcript_key
                 _source = self.gene_endpoint + gene_key
                 _target = self.transcript_endpoint + transcript_key
@@ -148,7 +176,7 @@ class Gencode(BaseAdapter):
                     'source_url': self.source_url,
                     'name': 'transcribes',
                     'inverse_name': 'transcribed by',
-                    'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus',
+                    'organism': self.organism,
                     'biological_process': 'ontology_terms/GO_0010467'
                 }
                 if self.validate:

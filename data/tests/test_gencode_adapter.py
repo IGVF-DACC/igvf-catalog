@@ -1,8 +1,9 @@
+import gzip
 import json
 import pytest
 import tempfile
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from adapters.gencode_adapter import Gencode
 from adapters.writer import SpyWriter
 
@@ -15,7 +16,8 @@ except ImportError:
 
 def test_gencode_adapter_transcript():
     writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
+                      filepath='./samples/gencode_sample.gtf',
                       label='gencode_transcript', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -29,8 +31,10 @@ def test_gencode_adapter_transcript():
     assert 'end' in first_item
     assert 'gene_name' in first_item
     assert 'MANE_Select' in first_item
+    assert first_item['refseq_transcript_ids'] == ['NM_177990.4']
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
+    assert first_item['organism'] == 'Homo sapiens'
     assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
 
 
@@ -42,42 +46,100 @@ def test_gencode_adapter_transcribed_to():
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
+    assert first_item['_from'].startswith('genes/')
+    assert first_item['_to'].startswith('transcripts/')
     assert first_item['name'] == 'transcribes'
     assert first_item['inverse_name'] == 'transcribed by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0010467'
+    assert first_item['organism'] == 'Homo sapiens'
 
 
-def test_gencode_adapter_mouse():
+def test_gencode_adapter_mouse_transcript():
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
-                      label='mm_gencode_transcript', organism='MOUSE', writer=writer, validate=True)
+                      label='mm_gencode_transcript', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
     assert first_item['source'] == 'GENCODE'
+    assert first_item['organism'] == 'Mus musculus'
     assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
+    assert first_item['version'] == 'vM36'
+
+
+def test_gencode_adapter_mm_transcribed_to():
+    writer = SpyWriter()
+    adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
+                      label='mm_transcribed_to', writer=writer, validate=True)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item['_from'].startswith('mm_genes/')
+    assert first_item['_to'].startswith('mm_transcripts/')
+    assert first_item['organism'] == 'Mus musculus'
     assert first_item['version'] == 'vM36'
 
 
 def test_gencode_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to, mm_transcribed_to'):
         Gencode(filepath='./samples/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
+
+
+@pytest.mark.parametrize('compressed', [True, False])
+def test_refseq_mapping_preserves_versions_and_par_y(tmp_path, compressed):
+    mapping = tmp_path / ('refseq.gz' if compressed else 'refseq.tsv')
+    opener = gzip.open if compressed else open
+    with opener(mapping, 'wt') as handle:
+        handle.write('ENST00000353224.10\tNM_123.1\tNP_123.1\n'
+                     'ENST00000353224.10\tNR_456.2\n'
+                     'ENST00000353224.10\tNM_123.1\tNP_123.1\n'
+                     'ENST00000353224.10_PAR_Y\tNM_789.3\n'
+                     'ENST00000353224.9\tNM_999.1\n')
+    writer = SpyWriter()
+    adapter = Gencode(reference_filepath=mapping,
+                      filepath='./samples/gencode_sample.gtf', writer=writer,
+                      validate=True)
+    assert adapter.load_refseq_mapping()['ENST00000353224.10_PAR_Y'] == [
+        'NM_789.3']
+    adapter.process_file()
+    docs = [json.loads(line) for line in writer.contents if line.strip()]
+    assert docs[0]['refseq_transcript_ids'] == ['NM_123.1', 'NR_456.2']
+    assert all(doc['refseq_transcript_ids'] == [] for doc in docs[1:])
+
+
+@pytest.mark.parametrize('label,filepath', [
+    ('transcribed_to', './samples/gencode_sample.gtf'),
+    ('mm_gencode_transcript', './samples/gencode_mouse_sample.gtf'),
+    ('mm_transcribed_to', './samples/gencode_mouse_sample.gtf'),
+])
+def test_refseq_mapping_only_loaded_for_human_nodes(label, filepath):
+    writer = SpyWriter()
+    with patch.object(Gencode, 'load_refseq_mapping') as load_mapping:
+        Gencode(filepath=filepath, label=label,
+                writer=writer, validate=True).process_file()
+    load_mapping.assert_not_called()
+    assert all('refseq_transcript_ids' not in json.loads(line)
+               for line in writer.contents if line.strip())
 
 
 def test_gencode_adapter_initialization():
     writer = SpyWriter()
     for label in Gencode.ALLOWED_LABELS:
-        adapter = Gencode(filepath='./samples/gencode_sample.gtf',
-                          label=label, writer=writer)
-        assert adapter.filepath == './samples/gencode_sample.gtf'
+        filepath = (
+            './samples/gencode_mouse_sample.gtf'
+            if label in Gencode.MOUSE_LABELS
+            else './samples/gencode_sample.gtf'
+        )
+        adapter = Gencode(filepath=filepath, label=label, writer=writer)
+        assert adapter.filepath == filepath
         assert adapter.label == label
         assert adapter.writer == writer
-        assert adapter.organism in ['HUMAN', 'MOUSE']
+        if label in Gencode.MOUSE_LABELS:
+            assert adapter.organism == 'Mus musculus'
+        else:
+            assert adapter.organism == 'Homo sapiens'
 
 
 def test_gencode_adapter_parse_info_metadata():
@@ -98,7 +160,8 @@ def test_gencode_adapter_parse_info_metadata():
 def test_gencode_adapter_validate_doc_invalid():
     """Test that ValidationError is properly caught and converted to ValueError"""
     writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
+                      filepath='./samples/gencode_sample.gtf',
                       label='gencode_transcript', writer=writer, validate=True)
 
     # Create an invalid document that will fail validation
@@ -130,7 +193,8 @@ NA_CHR	HAVANA	gene	1	100	.	+	.	gene_id "ENSG00000101351.1"; gene_name "TEST_GENE
 
     try:
         # Create adapter - it will automatically use the correct mapping file
-        adapter = Gencode(filepath=gtf_file_path,
+        adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
+                          filepath=gtf_file_path,
                           label='gencode_transcript', writer=writer, validate=False)
 
         # Process the file - this should trigger the chromosome mapping logic
@@ -151,3 +215,10 @@ NA_CHR	HAVANA	gene	1	100	.	+	.	gene_id "ENSG00000101351.1"; gene_name "TEST_GENE
     finally:
         # Clean up temporary file
         os.unlink(gtf_file_path)
+
+
+def test_human_transcripts_require_refseq_mapping():
+    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
+                      writer=SpyWriter())
+    with pytest.raises(ValueError, match='reference_filepath is required'):
+        adapter.process_file()

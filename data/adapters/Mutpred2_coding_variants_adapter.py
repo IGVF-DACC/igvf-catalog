@@ -7,6 +7,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.helpers import convert_aa_letter_code_and_Met1, convert_aa_to_three_letter, split_spdi, build_variant_coding_variant_key, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # The mapping from a given amino acid change to all possible genetic variants is done via scripts under data/data_loading_support_files/
@@ -43,6 +44,7 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
         self.file_accession = self.FILE_ACCESSION_PATTERN.search(
             os.path.basename(filepath)).group(0)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -74,6 +76,9 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
             file_set_accession = self.file_fileset.get('file_set_id')
             if file_set_accession:
                 self.writer.add_tag('portal_accessions', file_set_accession)
+            if not self.ontology_term_validator.ensure(self.PHENOTYPE_TERM):
+                self.ontology_term_validator.log()
+                return
         with gzip.open(self.filepath, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)

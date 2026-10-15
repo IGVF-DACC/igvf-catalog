@@ -8,8 +8,10 @@ from biocommons.seqrepo import SeqRepo
 from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from ga4gh.vrs.extras.translator import AlleleTranslator
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Example rows from Reddy's STARR-seq data
@@ -36,20 +38,22 @@ class STARRseqVariantBiosample(BaseAdapter):
         self,
         filepath,
         label,
-        source_url,
         writer: Optional[Writer] = None,
         validate=False,
         excluded_file_accessions=None,
         **kwargs
     ):
-        self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+        self.file_accession = get_file_accession(filepath)
+        self.source_url = (
+            f'https://data.igvf.org/tabular-files/{self.file_accession}'
+        )
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
         self.collection_label = 'variant effect on regulatory element activity'
         # Optional list of file accessions whose previously-loaded variants should
         # NOT be considered "already loaded" for this run.
         self.excluded_file_accessions = excluded_file_accessions or []
+        self.ontology_term_validator = OntologyTermValidator()
 
         super().__init__(filepath, label, writer, validate)
 
@@ -79,6 +83,11 @@ class STARRseqVariantBiosample(BaseAdapter):
         self.treatments_term_ids = self.file_fileset['treatments_term_ids']
         self.method = self.file_fileset['method']
         self.collection_class = self.file_fileset['class']
+
+        if self.label == 'variant_biosample':
+            if not self.ontology_term_validator.ensure(self.biosample_term[0]):
+                self.ontology_term_validator.log()
+                return
 
         open_file = gzip.open(self.filepath, 'rt') if self.filepath.endswith(
             '.gz') else open(self.filepath, 'r')

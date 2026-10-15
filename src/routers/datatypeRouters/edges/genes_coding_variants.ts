@@ -25,7 +25,9 @@ const allVariantsQueryFormat = z.object({
   limit: z.number().optional()
 })
 
-const codingVariantsScoresFormat = z.object({
+export const allCodingVariantsScoresFormat = z.array(z.number().optional())
+
+export const codingVariantsScoresFormat = z.object({
   protein_change: z.object({
     protein_id: z.string().nullish(),
     protein_name: z.string().nullish(),
@@ -336,7 +338,7 @@ const codingVariantsFromGenes = publicProcedure
 const allCodingVariantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants_all_scores } })
   .input(allVariantsQueryFormat)
-  .output(z.array(z.number().optional()))
+  .output(allCodingVariantsScoresFormat)
   .query(async ({ input }) => await findAllCodingVariantsFromGenes(input))
 
 export const genesCodingVariantsRouters = {

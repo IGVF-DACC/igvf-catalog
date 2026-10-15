@@ -808,7 +808,12 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     if len(variant_id.split(':')) == 4:
         format = 'spdi'
         chr_spdi = variant_id.split(':')[0]
-        chr, pos_start, ref, alt = split_spdi(variant_id)
+        split_result = split_spdi(variant_id)
+        if split_result is None:
+            skipped_message = {'variant_id': variant_id,
+                               'reason': 'Unable to parse this variant id'}
+            return variant_json, skipped_message
+        chr, pos_start, ref, alt = split_result
     elif len(variant_id.split('-')) == 4:
         format = 'vcf'
         chr, pos_start, ref, alt = variant_id.split('-')

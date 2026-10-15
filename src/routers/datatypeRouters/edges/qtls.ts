@@ -19,7 +19,7 @@ const variantReturnFormat = z.object({
   ca_id: z.string().nullish()
 })
 
-const outputFormat = z.object({
+export const outputFormat = z.object({
   variant: variantReturnFormat,
   gene: z.object({
     name: z.string(),

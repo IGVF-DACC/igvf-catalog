@@ -12,7 +12,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const proteinTranscriptFormat = z.object({
+export const proteinTranscriptFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),

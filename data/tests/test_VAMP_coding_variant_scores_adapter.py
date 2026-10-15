@@ -2,6 +2,7 @@ import json
 from unittest.mock import patch, mock_open
 from adapters.writer import SpyWriter
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
+from adapters.ontology_term_validator import OntologyTermValidator
 import pytest
 
 
@@ -29,12 +30,25 @@ MOCKED_GET_FILES_FILESET_ARANGO_RETURN = {
 }
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.VAMP_coding_variant_scores_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 @patch('adapters.VAMP_coding_variant_scores_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_GET_FILES_FILESET_ARANGO_RETURN)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_from_hgvsc_in_arangodb', return_value=MOCKED_CODING_VARIANTS_hgvsc)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_Met1_in_arangodb', return_value={})
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_open, mock_bulk_query, mock_bulk_query_hgvsc, mock_bulk_query_Met1):
+def test_process_file_coding_variants_phenotypes(
+        mock_file_fileset, mock_gzip_open, mock_bulk_query, mock_bulk_query_hgvsc,
+        mock_bulk_query_Met1, mock_ontology_term_validator):
     writer = SpyWriter()
     phenotype_term = 'test_phenotype'
     adapter = VAMPAdapter(

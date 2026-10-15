@@ -59,6 +59,7 @@ from pathlib import Path
 
 import requests
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_regulatory_region_id,
@@ -66,6 +67,7 @@ from adapters.helpers import (
     load_variant,
     get_file_fileset_by_accession_in_arangodb
 )
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 
@@ -112,35 +114,48 @@ class MPRAAdapter(BaseAdapter):
         self,
         filepath,
         label,
-        source_url,
         writer: Optional[Writer] = None,
         reference_filepath: Optional[str] = None,
-        reference_source_url: Optional[str] = None,
         validate=False,
         **kwargs
     ):
-        # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
-        if reference_filepath is None and label in ('variant', 'genomic_element_from_variant', 'variant_biosample'):
-            if 'encodeproject.org' in (source_url or ''):
-                raise ValueError(
-                    'ENCODE MPRA files do not have MPRA sequence designs. '
-                    'Use label genomic_element or genomic_element_biosample only.'
-                )
-
-        super().__init__(filepath, label, writer, validate)
-        self.source_url = source_url
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
-
-        if 'encodeproject.org' in source_url:
+        self.file_accession = get_file_accession(filepath)
+        if self.file_accession.startswith('ENCFF'):
             self.source = 'ENCODE'
+            self.source_url = (
+                f'https://www.encodeproject.org/files/{self.file_accession}/'
+            )
+        elif self.file_accession.startswith('IGVFFI'):
+            self.source = 'IGVF'
+            self.source_url = (
+                f'https://data.igvf.org/tabular-files/{self.file_accession}'
+            )
+        else:
+            raise ValueError(
+                f'Unsupported file accession prefix: {self.file_accession}. '
+                'Expected ENCFF (ENCODE) or IGVFFI (IGVF).'
+            )
+
+        # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
+        if (
+            reference_filepath is None
+            and label in ('variant', 'genomic_element_from_variant', 'variant_biosample')
+            and self.source == 'ENCODE'
+        ):
+            raise ValueError(
+                'ENCODE MPRA files do not have MPRA sequence designs. '
+                'Use label genomic_element or genomic_element_biosample only.'
+            )
+
+        self.ontology_term_validator = OntologyTermValidator()
+        super().__init__(filepath, label, writer, validate)
+
+        if self.source == 'ENCODE':
             self.igvf_accession = self._resolve_igvf_accession_from_encode_accession(
                 self.file_accession)
             self.writer.add_tag('portal_accessions', self.igvf_accession)
-        elif 'data.igvf.org' in source_url:
-            self.source = 'IGVF'
-            self.writer.add_tag('portal_accessions', self.file_accession)
         else:
-            raise ValueError(f'Invalid source URL: {source_url}')
+            self.writer.add_tag('portal_accessions', self.file_accession)
 
         self.has_sequence_designs = reference_filepath is not None
 
@@ -156,9 +171,12 @@ class MPRAAdapter(BaseAdapter):
         self.design_name_class = {}
         if self.has_sequence_designs:
             self.mpra_design_file = reference_filepath
-            self.reference_source_url = reference_source_url or ''
-            self.reference_file_accession = (
-                reference_source_url or '').rstrip('/').split('/')[-1]
+            self.reference_file_accession = get_file_accession(
+                reference_filepath)
+            self.reference_source_url = (
+                f'https://data.igvf.org/tabular-files/'
+                f'{self.reference_file_accession}'
+            )
             self.writer.add_tag('portal_accessions',
                                 self.reference_file_accession)
             self.load_mpra_design_mapping(self.mpra_design_file)
@@ -427,6 +445,11 @@ class MPRAAdapter(BaseAdapter):
             'simple_sample_summaries')
         self.treatments_term_ids = self.file_fileset.get(
             'treatments_term_ids')
+
+        if self.label in ('genomic_element_biosample', 'variant_biosample'):
+            if not self.ontology_term_validator.ensure(self.biosample_term):
+                self.ontology_term_validator.log()
+                return
 
         if self.label in ('genomic_element', 'genomic_element_biosample'):
             self._process_element_effects_file()

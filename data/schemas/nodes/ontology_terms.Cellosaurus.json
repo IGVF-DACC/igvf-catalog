@@ -22,6 +22,7 @@
           "example": "CW70177"
         },
         "synonyms": {
+          "title": "Synonyms",
           "type": [
             "array",
             "null"
@@ -42,6 +43,7 @@
           ]
         },
         "subset": {
+          "title": "Subset",
           "type": [
             "array",
             "null"

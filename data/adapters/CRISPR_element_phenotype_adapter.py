@@ -4,8 +4,10 @@ import json
 from math import log10
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
 # Element-level CRISPR element-to-phenotype screens (Gersbach lab).
@@ -50,8 +52,8 @@ class CRISPRElementPhenotype(BaseAdapter):
         },
     }
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = source_url.rstrip('/').split('/')[-1]
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = get_file_accession(filepath)
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
                 f'Unsupported file accession {self.file_accession}. '
@@ -62,6 +64,7 @@ class CRISPRElementPhenotype(BaseAdapter):
         )
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
+        self.ontology_term_validator = OntologyTermValidator()
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -123,6 +126,12 @@ class CRISPRElementPhenotype(BaseAdapter):
         fileset_accession = self.file_fileset.get('file_set_id')
         if fileset_accession:
             self.writer.add_tag('portal_accessions', fileset_accession)
+
+        if self.label == 'genomic_element_phenotype':
+            if not self.ontology_term_validator.ensure(self.phenotype_term):
+                self.ontology_term_validator.log()
+                return
+
         with self._open_file(self.filepath) as f:
             reader = csv.DictReader(f, delimiter='\t')
             if self.label == 'genomic_element':
@@ -153,7 +162,7 @@ class CRISPRElementPhenotype(BaseAdapter):
                 'end': end,
                 'method': self.method,
                 'type': 'tested elements',
-                'source_annotation': 'enhancer',
+                'source_annotation': 'candidate enhancer',
                 'source': self.SOURCE,
                 'source_url': self.source_url,
                 'files_filesets': f'files_filesets/{self.file_accession}',

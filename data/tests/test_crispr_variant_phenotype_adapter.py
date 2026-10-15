@@ -4,7 +4,12 @@ from unittest.mock import patch
 import pytest
 
 from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
+
+PRIME_PATH = './samples/IGVFFI2014OOZP_crispr_variant_phenotype_sherwood_prime.example.csv'
+CRISPRI_PATH = './samples/IGVFFI9726GFTC_crispr_variant_phenotype_sherwood_crispri.example.csv'
+ABE_PATH = './samples/IGVFFI1678CDBR_crispr_variant_phenotype_sherwood_abe.example.csv'
 
 MOCK_VARIANT = {
     '_key': 'NC_000001.11:25253603:G:A',
@@ -36,6 +41,17 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.CRISPR_variant_phenotype_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 def _mock_load_variant(variant_id, **kwargs):
     if variant_id.startswith('NC_') and len(variant_id.split(':')) == 4:
         _chr, pos, ref, alt = variant_id.split(':')
@@ -58,25 +74,27 @@ def _mock_load_variant(variant_id, **kwargs):
     return variant, None
 
 
-def test_unsupported_accession(mock_file_fileset):
+def test_unsupported_accession(mock_file_fileset, tmp_path):
+    sample = tmp_path / 'IGVFFI0000AAAA_unsupported.csv'
+    sample.write_text('variant_id\n')
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Unsupported file accession'):
         CRISPRVariantPhenotype(
-            filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
+            filepath=str(sample),
             label='variant',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI0000AAAA/',
             writer=writer,
         )
 
 
-def test_dropped_accessions(mock_file_fileset):
+def test_dropped_accessions(mock_file_fileset, tmp_path):
     writer = SpyWriter()
     for accession in ('IGVFFI7160EKDK', 'IGVFFI7659OTOX', 'IGVFFI7206JILF'):
+        sample = tmp_path / f'{accession}_dropped.csv'
+        sample.write_text('variant_id\n')
         with pytest.raises(ValueError, match='Unsupported file accession'):
             CRISPRVariantPhenotype(
-                filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
+                filepath=str(sample),
                 label='variant',
-                source_url=f'https://api.data.igvf.org/tabular-files/{accession}/',
                 writer=writer,
             )
 
@@ -85,9 +103,8 @@ def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label'):
         CRISPRVariantPhenotype(
-            filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
+            filepath=PRIME_PATH,
             label='invalid_label',
-            source_url='https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/',
             writer=writer,
         )
 
@@ -104,9 +121,8 @@ def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
     mock_file_fileset.return_value['crispr_modality'] = 'prime editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
+        filepath=PRIME_PATH,
         label='variant',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/',
         writer=writer,
         validate=True,
     )
@@ -131,13 +147,13 @@ def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
+def test_variant_phenotype_sherwood_prime(
+        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
     mock_file_fileset.return_value['crispr_modality'] = 'prime editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
+        filepath=PRIME_PATH,
         label='variant_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/',
         writer=writer,
         validate=True,
     )
@@ -170,9 +186,8 @@ def test_ontology_term_ntr(mock_get, mock_file_fileset):
 
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_prime.example.csv',
+        filepath=PRIME_PATH,
         label='ontology_term',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI2014OOZP/',
         writer=writer,
         validate=True,
     )
@@ -189,6 +204,7 @@ def test_ontology_term_ntr(mock_get, mock_file_fileset):
     assert term['method'] == 'CRISPR screen'
     # NTR phenotype terms are shared vocabulary, not tied to a single dataset. See DSERV-1466.
     assert term['files_filesets'] is None
+    mock_get.assert_called_once()
 
 
 def test_to_loadable_variant_id_converts_hg38_ids():
@@ -215,9 +231,8 @@ def test_variant_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
     mock_file_fileset.return_value['crispr_modality'] = 'interference'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_crispri.example.csv',
+        filepath=CRISPRI_PATH,
         label='variant',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/',
         writer=writer,
         validate=True,
     )
@@ -244,13 +259,13 @@ def test_variant_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
+def test_variant_phenotype_sherwood_crispri(
+        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
     mock_file_fileset.return_value['crispr_modality'] = 'interference'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_crispri.example.csv',
+        filepath=CRISPRI_PATH,
         label='variant_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/',
         writer=writer,
         validate=True,
     )
@@ -282,9 +297,8 @@ def test_variant_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
     mock_file_fileset.return_value['crispr_modality'] = 'base editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_abe.example.csv',
+        filepath=ABE_PATH,
         label='variant',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/',
         writer=writer,
         validate=True,
     )
@@ -309,13 +323,13 @@ def test_variant_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
+def test_variant_phenotype_sherwood_abe(
+        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
     mock_file_fileset.return_value['crispr_modality'] = 'base editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='./samples/crispr_variant_phenotype_sherwood_abe.example.csv',
+        filepath=ABE_PATH,
         label='variant_phenotype',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI1678CDBR/',
         writer=writer,
         validate=True,
     )
@@ -351,9 +365,8 @@ def test_embedded_id_preserves_hg38_coordinates(
 ):
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath='unused.csv',
+        filepath=CRISPRI_PATH,
         label='variant',
-        source_url='https://api.data.igvf.org/tabular-files/IGVFFI9726GFTC/',
         writer=writer,
     )
     monkeypatch.chdir(tmp_path)

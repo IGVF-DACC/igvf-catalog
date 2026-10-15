@@ -1,6 +1,7 @@
 import json
 from unittest.mock import patch
 from adapters.depmap_adapter import DepMap
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 import pytest
 
@@ -29,6 +30,17 @@ def mock_file_fileset():
             'method': 'DepMap'
         }
         yield mock_get
+
+
+@pytest.fixture(autouse=True)
+def mock_ontology_term_validator():
+    with patch('adapters.depmap_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
 
 
 def test_depmap_adapter_process_file(mock_file_fileset):

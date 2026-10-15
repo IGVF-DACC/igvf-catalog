@@ -4,6 +4,7 @@ import os
 from typing import Optional
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_accession_in_arangodb
 
 
@@ -13,6 +14,7 @@ class GenccDiseasesGenes(BaseAdapter):
     SOURCE_URL = 'https://thegencc.org/'
 
     def __init__(self, filepath, label='disease_gene', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
 
@@ -21,6 +23,12 @@ class GenccDiseasesGenes(BaseAdapter):
 
     def _get_collection_name(self):
         return 'diseases_genes'
+
+    @staticmethod
+    def get_ontology_term_key(row):
+        if len(row) <= 4:
+            return None
+        return OntologyTermValidator.normalize_term_key(row[4])
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
@@ -34,55 +42,66 @@ class GenccDiseasesGenes(BaseAdapter):
         self.gene_map = get_gene_map_from_arangodb('hgnc')
         # read the tsv file
         with open(self.filepath, 'r', encoding='utf-8', newline='') as f:
-            reader = csv.reader(f, delimiter='\t')
-            next(reader)
-            for row in reader:
-                _key = row[0]
-                sgc_id = f'{row[0]}.{row[1]}'
-                hgnc_id = row[2]
-                gene_ids = self.gene_map.get(hgnc_id)
-                if gene_ids is None:
-                    print(f'No gene id found for {hgnc_id}')
-                    continue
-                gene_name = row[3]
-                # need to replace ":" with "_" in the ontology_term_id
-                ontology_term_id = row[4].replace(':', '_')
-                _from = f'ontology_terms/{ontology_term_id}'
-                term_name = row[5]
-                classification = row[9]
-                moi_id = row[10]
-                moi_name = row[11]
-                submitter = row[13]
-                pmids = []
-                if row[27]:
-                    pmids = [pmid.strip()
-                             for pmid in row[27].split(',') if pmid.strip()]
+            rows = list(csv.reader(f, delimiter='\t'))[1:]
 
-                for gene_id in gene_ids:
-                    _to = f'genes/{gene_id}'
-                    props = {
-                        '_key': f'{_key}_{gene_id}',
-                        '_from': _from,
-                        '_to': _to,
-                        'sgc_id': sgc_id,
-                        'name': 'associated_with',
-                        'inverse_name': 'associated_with',
-                        'hgnc': hgnc_id,
-                        'gene_name': gene_name,
-                        'term_name': term_name,
-                        'classification': classification,
-                        'moi_id': moi_id,
-                        'moi_name': moi_name,
-                        'submitter': submitter,
-                        'pmids': pmids,
-                        'source': self.SOURCE,
-                        'source_url': f'https://thegencc.org/submissions/{sgc_id}',
-                        'class': self.collection_class,
-                        'method': self.method,
-                        'label': self.method,
-                        'files_filesets': 'files_filesets/' + self.file_accession,
-                    }
-                    if self.validate:
-                        self.validate_doc(props)
-                    self.writer.write(json.dumps(props, ensure_ascii=False))
-                    self.writer.write('\n')
+        ontology_term_keys = {
+            key for key in (
+                self.get_ontology_term_key(row) for row in rows
+            )
+            if key
+        }
+        self.ontology_term_validator.preload(ontology_term_keys)
+
+        for row in rows:
+            _key = row[0]
+            sgc_id = f'{row[0]}.{row[1]}'
+            hgnc_id = row[2]
+            gene_ids = self.gene_map.get(hgnc_id)
+            if gene_ids is None:
+                print(f'No gene id found for {hgnc_id}')
+                continue
+            gene_name = row[3]
+            ontology_term_key = self.get_ontology_term_key(row)
+            if not self.ontology_term_validator.validate(ontology_term_key):
+                continue
+            _from = f'ontology_terms/{ontology_term_key}'
+            term_name = row[5]
+            classification = row[9]
+            moi_id = row[10]
+            moi_name = row[11]
+            submitter = row[13]
+            pmids = []
+            if row[27]:
+                pmids = [pmid.strip()
+                         for pmid in row[27].split(',') if pmid.strip()]
+
+            for gene_id in gene_ids:
+                _to = f'genes/{gene_id}'
+                props = {
+                    '_key': f'{_key}_{gene_id}',
+                    '_from': _from,
+                    '_to': _to,
+                    'sgc_id': sgc_id,
+                    'name': 'associated_with',
+                    'inverse_name': 'associated_with',
+                    'hgnc': hgnc_id,
+                    'gene_name': gene_name,
+                    'term_name': term_name,
+                    'classification': classification,
+                    'moi_id': moi_id,
+                    'moi_name': moi_name,
+                    'submitter': submitter,
+                    'pmids': pmids,
+                    'source': self.SOURCE,
+                    'source_url': f'https://thegencc.org/submissions/{sgc_id}',
+                    'class': self.collection_class,
+                    'method': self.method,
+                    'label': self.method,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
+                }
+                if self.validate:
+                    self.validate_doc(props)
+                self.writer.write(json.dumps(props, ensure_ascii=False))
+                self.writer.write('\n')
+
+        self.ontology_term_validator.log()

@@ -155,7 +155,7 @@ class CRISPRElementGeneENCODE(BaseAdapter):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
         # one regulatory region can be tested in multiple rows, i.e. with multiple genes
         # type will all be 'tested elements'
-        # assign source_annotation = 'enhancer' if the genomic element has significant = 'TRUE' with any tested gene, else assign source_annotation = 'negative control'
+        # assign source_annotation = 'candidate enhancer' if the genomic element has significant = 'TRUE' with any tested gene, else assign source_annotation = 'negative control'
         # store those info in a dictionary here and output all nodes info at the end, since the file is not big (3,962 unique regions tested)
         self.genomic_element_nodes = {}
 
@@ -171,7 +171,7 @@ class CRISPRElementGeneENCODE(BaseAdapter):
                     self.genomic_element_nodes[genomic_element_coordinate] = 'negative control'
 
                 if significant == 'TRUE':
-                    self.genomic_element_nodes[genomic_element_coordinate] = 'enhancer'
+                    self.genomic_element_nodes[genomic_element_coordinate] = 'candidate enhancer'
 
     def load_gene_id_mapping(self):
         # key: gene symbol; value: list of gene Ensembl ids

@@ -2,6 +2,7 @@ import csv
 import json
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, load_variant, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.ontology_term_validator import OntologyTermValidator
 from typing import Optional
 from adapters.writer import Writer
 
@@ -38,7 +39,7 @@ class BlueSTARRVariantBiosample(BaseAdapter):
         validate=False,
         **kwargs
     ):
-        # Initialize base adapter first
+        self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = self.filepath.split('/')[-1].split('.')[-2]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession + '/'
@@ -67,6 +68,11 @@ class BlueSTARRVariantBiosample(BaseAdapter):
         self.collection_class = self.file_fileset['class']
         self.biosample_term = self.file_fileset['samples'][0]
         self.biological_context = self.file_fileset['simple_sample_summaries'][0]
+
+        if self.label == 'variant_biosample':
+            if not self.ontology_term_validator.ensure(self.biosample_term):
+                self.ontology_term_validator.log()
+                return
 
         with open(self.filepath, 'r') as bluestarr_tsv:
             reader = csv.reader(bluestarr_tsv, delimiter='\t')

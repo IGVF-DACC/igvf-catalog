@@ -5,6 +5,7 @@ import gzip
 import os
 from unittest.mock import patch, MagicMock
 from adapters.mpra_adapter import MPRAAdapter
+from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
@@ -33,11 +34,22 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
+@pytest.fixture
+def mock_ontology_term_validator():
+    with patch('adapters.mpra_adapter.OntologyTermValidator') as MockValidator:
+        MockValidator.normalize_term_key = staticmethod(
+            OntologyTermValidator.normalize_term_key)
+        mock_validator = MockValidator.return_value
+        mock_validator.validate.return_value = True
+        mock_validator.ensure.return_value = True
+        yield mock_validator
+
+
 def test_encode_mpra_adapter_regulatory_region(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
 
     # Create a small temporary test file
-    with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='ENCFF802FUV_', suffix='.bed.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'chr1\t10410\t10610\tHepG2_DNasePeakNoPromoter1\t212\t+\t-0.843\t0.307\t0.171\t-1\t-1\n')
@@ -46,7 +58,6 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset, mock_igvf_api)
     try:
         adapter = MPRAAdapter(filepath=temp_file_path,
                               label='genomic_element',
-                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                               writer=writer,
                               validate=True)
         adapter.process_file()
@@ -63,11 +74,12 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset, mock_igvf_api)
         os.unlink(temp_file_path)
 
 
-def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset, mock_igvf_api):
+def test_encode_mpra_adapter_regulatory_region_biosample(
+        mock_file_fileset, mock_igvf_api, mock_ontology_term_validator):
     writer = SpyWriter()
 
     # Create a small temporary test file
-    with tempfile.NamedTemporaryFile(suffix='.bed.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='ENCFF802FUV_', suffix='.bed.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'chr1\t10410\t10610\tHepG2_DNasePeakNoPromoter1\t212\t+\t-0.843\t0.307\t0.171\t-1\t-1\n')
@@ -76,7 +88,6 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset, mock
     try:
         adapter = MPRAAdapter(filepath=temp_file_path,
                               label='genomic_element_biosample',
-                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                               writer=writer,
                               validate=True)
         adapter.process_file()
@@ -104,9 +115,8 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset, mock
 def test_encode_mpra_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label:'):
-        MPRAAdapter(filepath='dummy.bed.gz',
+        MPRAAdapter(filepath='ENCFF802FUV_dummy.bed.gz',
                     label='invalid_label',
-                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                     writer=writer)
 
 
@@ -114,20 +124,18 @@ def test_encode_mpra_adapter_no_sequence_design_variant_label(mock_file_fileset)
     """Without reference_filepath, variant label is not allowed (ENCODE has no sequence designs)."""
     writer = SpyWriter()
     with pytest.raises(ValueError, match='ENCODE MPRA files do not have MPRA sequence designs'):
-        MPRAAdapter(filepath='dummy.bed.gz',
+        MPRAAdapter(filepath='ENCFF802FUV_dummy.bed.gz',
                     label='variant',
-                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                     writer=writer)
 
 
 def test_encode_mpra_adapter_initialization(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
     for label in ['genomic_element', 'genomic_element_biosample']:
-        adapter = MPRAAdapter(filepath='dummy.bed.gz',
+        adapter = MPRAAdapter(filepath='ENCFF802FUV_dummy.bed.gz',
                               label=label,
-                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                               writer=writer)
-        assert adapter.filepath == 'dummy.bed.gz'
+        assert adapter.filepath == 'ENCFF802FUV_dummy.bed.gz'
         assert adapter.label == label
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF802FUV/'
         assert adapter.file_accession == 'ENCFF802FUV'
@@ -136,9 +144,8 @@ def test_encode_mpra_adapter_initialization(mock_file_fileset, mock_igvf_api):
 
 def test_encode_mpra_adapter_validate_doc_invalid(mock_file_fileset, mock_igvf_api):
     writer = SpyWriter()
-    adapter = MPRAAdapter(filepath='dummy.bed.gz',
+    adapter = MPRAAdapter(filepath='ENCFF802FUV_dummy.bed.gz',
                           label='genomic_element',
-                          source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                           writer=writer,
                           validate=True)
 

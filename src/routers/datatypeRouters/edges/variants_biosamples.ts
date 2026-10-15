@@ -36,7 +36,7 @@ const genomicElementFormat = z.object({
   source_annotation: z.string().nullish()
 })
 
-const returnFormat = z.object({
+export const returnFormat = z.object({
   variant: z.string().or(variantFormat).optional(),
   biosample: z.string().or(ontologyFormat).optional(),
   genomic_element: z.string().or(genomicElementFormat).nullish(),
