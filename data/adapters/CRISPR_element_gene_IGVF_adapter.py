@@ -989,6 +989,16 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.reference_filepath = reference_filepath
         self.reference_source_url = reference_source_url
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
+        self.element_file_accession = self.file_accession
+        self.element_source_url = self.source_url
+        if self.file_config.get('layout') == 'macs_genome_wide' and reference_filepath:
+            self.element_file_accession = get_file_accession(
+                reference_filepath)
+            if self.element_file_accession != 'IGVFFI9629WVUU':
+                raise ValueError('Expected guide reference IGVFFI9629WVUU')
+            self.element_source_url = (
+                f'https://data.igvf.org/tabular-files/{self.element_file_accession}/'
+            )
         if self.file_config.get('layout') == 'macs_genome_wide' and reference_source_url:
             if reference_source_url.rstrip('/').split('/')[-1] != 'IGVFFI9629WVUU':
                 raise ValueError('Expected guide reference IGVFFI9629WVUU')
@@ -1038,9 +1048,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.writer.add_tag('portal_accessions', self.file_accession)
-        if self.reference_source_url:
+        if self.element_file_accession != self.file_accession:
             self.writer.add_tag('portal_accessions',
-                                self.reference_source_url.rstrip('/').split('/')[-1])
+                                self.element_file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
@@ -1168,7 +1178,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         _key=_id,
                         _from=(
                             self.element_collection + '/' + element_id + '_'
-                            + self.file_accession
+                            + self.element_file_accession
                         ),
                         readout_gene=readout_gene,
                         source_url=self.source_url,
@@ -1218,7 +1228,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 for genomic_element, element_id in genomic_coordinates_to_element_id.items():
                     source_annotation = genomic_element[4]
                     promoter_gene = genomic_element[3]
-                    _id = element_id + '_' + self.file_accession
+                    _id = element_id + '_' + self.element_file_accession
                     _props = {
                         '_key': _id,
                         'name': _id,
@@ -1228,9 +1238,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         'method': method,
                         'source_annotation': source_annotation,
                         'source': CRISPRElementGeneIGVF.SOURCE,
-                        'source_url': self.source_url,
+                        'source_url': self.element_source_url,
                         'type': 'tested elements',
-                        'files_filesets': 'files_filesets/' + self.file_accession
+                        'files_filesets': 'files_filesets/' + self.element_file_accession
                     }
                     if source_annotation == 'promoter':
                         if not promoter_gene:
