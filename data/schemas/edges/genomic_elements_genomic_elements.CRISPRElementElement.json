@@ -46,56 +46,37 @@
           "enum": [
             "regulatory element effect on chromatin accessibility"
           ],
-          "title": "Label",
-          "enum_descriptions": {
-            "regulatory element effect on chromatin accessibility": "Effect of perturbing a regulatory element on accessibility at a readout peak."
-          }
+          "title": "Label"
         },
         "name": {
           "enum": [
             "modulates accessibility of"
           ],
-          "title": "Name",
-          "enum_descriptions": {
-            "modulates accessibility of": "The perturbed element affects accessibility of the target peak."
-          }
+          "title": "Name"
         },
         "inverse_name": {
           "enum": [
             "accessibility modulated by"
           ],
-          "title": "Inverse Name",
-          "enum_descriptions": {
-            "accessibility modulated by": "Accessibility of the peak is affected by perturbation of the source element."
-          }
+          "title": "Inverse Name"
         },
         "method": {
           "enum": [
             "Multiome Perturb-seq"
           ],
-          "title": "Method",
-          "enum_descriptions": {
-            "Multiome Perturb-seq": "CRISPR perturbation with paired single-cell gene expression and chromatin accessibility measurements."
-          }
+          "title": "Method"
         },
         "perturbation": {
           "$ref": "../mixins.json#/perturbation",
           "enum": [
             "CRISPR interference"
-          ],
-          "title": "CRISPR Modality",
-          "enum_descriptions": {
-            "CRISPR interference": "CRISPR interference that represses the targeted locus."
-          }
+          ]
         },
         "class": {
           "enum": [
             "observed data"
           ],
-          "title": "Class",
-          "enum_descriptions": {
-            "observed data": "Data derived from experimental measurements."
-          }
+          "title": "Class"
         },
         "biosample_term": {
           "$ref": "../mixins.json#/biosample_term",
