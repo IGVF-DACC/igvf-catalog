@@ -36,7 +36,6 @@ igvf_file_accessions:
   Candidate Cis-Regulatory Elements:
     - IGVFFI8753TTYC
   CRISPR element gene:
-    - IGVFFI9159XDOS
     - IGVFFI3069QCRA
     - IGVFFI5749WPVK
     - IGVFFI6376HTIF
@@ -80,9 +79,11 @@ igvf_file_accessions:
     - IGVFFI7368COWA
     - IGVFFI9322VVTR
     - IGVFFI4081AUXT
+    - IGVFFI9159XDOS
     - IGVFFI7203AWIC
     - IGVFFI6853MYBE
     - IGVFFI9001HIYI
+    - IGVFFI9629WVUU # Guide reference for IGVFFI9001HIYI
     - IGVFFI3975KRIX
   CRISPR element element:
     - IGVFFI2419ZSGC
