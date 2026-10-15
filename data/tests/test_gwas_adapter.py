@@ -276,6 +276,72 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker, mock_ontology_term_valida
     assert result['neg_log10_pvalue'] == gwas.MAX_LOG10_PVALUE
 
 
+def test_gwas_empty_beta_is_null_not_zero(gwas_files, mocker):
+    """An empty beta/beta_ci field means the study didn't report one (e.g. it reported an
+    odds_ratio instead) - that must load as null, not get coerced into a measured effect of 0."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants_phenotypes')
+    gwas.load_ontology_name_mapping()
+    gwas.file_fileset = {'method': 'GWAS', 'class': 'observed data'}
+
+    mock_row = [''] * 18
+    mock_row[1] = 'NA'
+    mock_row[2] = 'EFO_0007010'
+    mock_row[3] = 'test_study_id'
+    mock_row[4] = '1'
+    mock_row[5] = '100'
+    mock_row[6] = 'A'
+    mock_row[7] = 'T'
+    mock_row[15] = '1'
+    mock_row[16] = '-3'
+    mock_row[17] = '1e-8'
+    # beta/beta_ci_lower/beta_ci_upper (indexes 9-11) left as '' - not reported
+
+    studies_variants_key = gwas.generate_studies_variants_key(mock_row)
+    result = gwas.process_variants_phenotypes(
+        mock_row, {studies_variants_key: []})
+
+    assert result['beta'] is None
+    assert result['beta_ci_lower'] is None
+    assert result['beta_ci_upper'] is None
+
+
+def test_gwas_real_zero_beta_is_preserved(gwas_files, mocker):
+    """A row that explicitly reports '0' has a real measured effect of zero - it must stay
+    0.0, not be swept into null along with genuinely missing betas."""
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
+    gwas = GWAS(gwas_files['variants_to_ontology'],
+                label='variants_phenotypes')
+    gwas.load_ontology_name_mapping()
+    gwas.file_fileset = {'method': 'GWAS', 'class': 'observed data'}
+
+    mock_row = [''] * 18
+    mock_row[1] = 'NA'
+    mock_row[2] = 'EFO_0007010'
+    mock_row[3] = 'test_study_id'
+    mock_row[4] = '1'
+    mock_row[5] = '100'
+    mock_row[6] = 'A'
+    mock_row[7] = 'T'
+    mock_row[9] = '0'
+    mock_row[10] = '0'
+    mock_row[11] = '0'
+    mock_row[15] = '1'
+    mock_row[16] = '-3'
+    mock_row[17] = '1e-8'
+
+    studies_variants_key = gwas.generate_studies_variants_key(mock_row)
+    result = gwas.process_variants_phenotypes(
+        mock_row, {studies_variants_key: []})
+
+    assert result['beta'] == 0.0
+    assert result['beta_ci_lower'] == 0.0
+    assert result['beta_ci_upper'] == 0.0
+
+
 def test_gwas_empty_ontology_term_handling(gwas_files, mocker):
     """Test handling of empty ontology term (line 183)"""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
