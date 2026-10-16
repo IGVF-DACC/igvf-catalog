@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, probeThenFetchPage } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
 import { getSchema } from '../schema'
@@ -59,134 +59,142 @@ async function findProteinByID (proteinId: string): Promise<any[]> {
   return (await (await db.query(query)).all())
 }
 
+function exactMatchFilterClause (input: paramsFormatType): string {
+  const workingInput = { ...input }
+  const filters = []
+  if (workingInput.name !== undefined) {
+    const proteinName = workingInput.name as string
+    delete workingInput.name
+    filters.push(`"${decodeURIComponent(proteinName.toUpperCase())}" == record.name`)
+  }
+  if (workingInput.uniprot_name !== undefined) {
+    const uniprotName = workingInput.uniprot_name as string
+    delete workingInput.uniprot_name
+    filters.push(`"${decodeURIComponent(uniprotName.toUpperCase())}" in record.uniprot_names`)
+  }
+  if (workingInput.uniprot_full_name !== undefined) {
+    const fullName = workingInput.uniprot_full_name as string
+    delete workingInput.uniprot_full_name
+    filters.push(`"${decodeURIComponent(fullName)}" in record.uniprot_full_names`)
+  }
+  const additionalFilters = getFilterStatements(proteinSchema, workingInput)
+  if (additionalFilters !== '') {
+    filters.push(additionalFilters)
+  }
+  return filters.length > 0 ? `FILTER ${filters.join(' AND ')}` : ''
+}
+
+function exactMatchQueryBody (input: paramsFormatType, limitClause: string): string {
+  return `
+    FOR record IN ${proteinCollectionName}
+    ${exactMatchFilterClause(input)}
+    SORT record.chr
+    ${limitClause}
+    RETURN { ${getDBReturnStatements(proteinSchema)} }
+  `
+}
+
 async function findProteins (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
-  const filters = []
-  if (input.name !== undefined) {
-    const proteinName = input.name as string
-    delete input.name
-    filters.push(`"${decodeURIComponent(proteinName.toUpperCase())}" == record.name`)
-  }
-  if (input.uniprot_name !== undefined) {
-    const uniprotName = input.uniprot_name as string
-    delete input.uniprot_name
-    filters.push(`"${decodeURIComponent(uniprotName.toUpperCase())}" in record.uniprot_names`)
-  }
-
-  if (input.uniprot_full_name !== undefined) {
-    const fullName = input.uniprot_full_name as string
-    delete input.uniprot_full_name
-    filters.push(`"${decodeURIComponent(fullName)}" in record.uniprot_full_names`)
-  }
-
-  const additionalFilters = getFilterStatements(proteinSchema, input)
-  if (additionalFilters !== '') {
-    filters.push(additionalFilters)
-  }
-
-  const filterBy = filters.length > 0 ? `FILTER ${filters.join(' AND ')}` : ''
-
-  const query = `
-    FOR record IN ${proteinCollectionName}
-    ${filterBy}
-    SORT record.chr
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(proteinSchema)} }
-  `
-  const results = await (await db.query(query)).all()
-  return results
+  const page = input.page as number
+  const query = exactMatchQueryBody(input, `LIMIT ${page * limit}, ${limit}`)
+  return await (await db.query(query)).all()
 }
 
-async function findProteinsByPrefixSearch (name: string, uniprotName: string, uniprotFullName: string, dbxrefs: string, filters: string, page: number, limit: number): Promise<any[]> {
-  const fields: Record<string, string | undefined> = { name, uniprot_names: uniprotName, uniprot_full_names: uniprotFullName, 'dbxrefs.id': dbxrefs }
+function searchViewQueryBody (
+  buildMatch: (field: string, value: string) => string,
+  fields: Record<string, string | undefined>,
+  filters: string,
+  limitClause: string
+): string {
   const searchFilters = []
   for (const field in fields) {
     if (fields[field] !== undefined) {
-      searchFilters.push(`STARTS_WITH(record.${field}, TOKENS("${decodeURIComponent(fields[field] as string)}", 'text_en_no_stem'))`)
+      searchFilters.push(buildMatch(field, fields[field] as string))
     }
   }
 
-  const query = `
+  return `
     FOR record IN ${SEARCH_ALIAS}
     SEARCH ${searchFilters.join(' AND ')}
     ${filters}
     SORT BM25(record) DESC
-    LIMIT ${page * limit}, ${limit}
+    ${limitClause}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
-
-  return await (await db.query(query)).all()
 }
 
-async function findProteinsByFuzzySearch (name: string, uniprotName: string, uniprotFullName: string, dbxrefs: string, filters: string, page: number, limit: number): Promise<any[]> {
-  const fields: Record<string, string | undefined> = { name, uniprot_names: uniprotName, uniprot_full_names: uniprotFullName, 'dbxrefs.id': dbxrefs }
-  const searchFilters = []
-  for (const field in fields) {
-    if (fields[field] !== undefined) {
-      searchFilters.push(`LEVENSHTEIN_MATCH(record.${field}, "${decodeURIComponent(fields[field] as string)}", 3, true)`)
-    }
-  }
-
-  const query = `
-    FOR record IN ${SEARCH_ALIAS}
-    SEARCH ${searchFilters.join(' AND ')}
-    ${filters}
-    SORT BM25(record) DESC
-    LIMIT ${page * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(proteinSchema)} }
-  `
-  return await (await db.query(query)).all()
-}
-
+// Each stage's applicability is decided by probeThenFetchPage via a page-independent
+// existence probe (not "is page N empty"), so the same stage - and therefore a stable,
+// non-overlapping result set - is used across every page of the same query. Previously,
+// findProteins() also re-derived/deleted input.limit itself, which meant the exact-match
+// stage silently ignored the caller-resolved limit (always falling back to QUERY_LIMIT)
+// whenever it was reached from this text-search path.
 async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]> {
-  const uniprotName = input.uniprot_name as string
-  const fullName = input.uniprot_full_name as string
-  const dbxrefs = input.dbxrefs as string
-  const name = input.name as string
+  const uniprotName = input.uniprot_name as string | undefined
+  const fullName = input.uniprot_full_name as string | undefined
+  const dbxrefs = input.dbxrefs as string | undefined
+  const name = input.name as string | undefined
 
-  let nameOnlySearch = false
-  if ((name !== undefined || uniprotName !== undefined) && fullName === undefined && dbxrefs === undefined) {
-    nameOnlySearch = true
-  }
+  const nameOnlySearch = (name !== undefined || uniprotName !== undefined) && fullName === undefined && dbxrefs === undefined
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  const page = input.page as number
 
-  // try exact match
-  const exactObjects = await findProteins(input)
-  if (exactObjects.length !== 0) {
-    return exactObjects
+  const exactResults = await probeThenFetchPage((limitClause) => exactMatchQueryBody({ ...input }, limitClause), page, limit)
+  if (exactResults !== null) {
+    return exactResults
   }
 
-  delete input.uniprot_name
-  delete input.uniprot_full_name
-  delete input.dbxrefs
-
-  let remainingFilters = getFilterStatements(proteinSchema, input)
+  const remainingInput = { ...input }
+  delete remainingInput.name
+  delete remainingInput.uniprot_name
+  delete remainingInput.uniprot_full_name
+  delete remainingInput.dbxrefs
+  let remainingFilters = getFilterStatements(proteinSchema, remainingInput)
   if (remainingFilters) {
     remainingFilters = `FILTER ${remainingFilters}`
   }
 
-  // try prefix match
-  const prefixObjects = await findProteinsByPrefixSearch(name, uniprotName, fullName, dbxrefs, remainingFilters, input.page as number, limit)
-  if (prefixObjects.length !== 0) {
-    return prefixObjects
+  const searchFields = { name, uniprot_names: uniprotName, uniprot_full_names: fullName, 'dbxrefs.id': dbxrefs }
+
+  const prefixResults = await probeThenFetchPage(
+    (limitClause) => searchViewQueryBody(
+      (field, value) => `STARTS_WITH(record.${field}, TOKENS("${decodeURIComponent(value)}", 'text_en_no_stem'))`,
+      searchFields,
+      remainingFilters,
+      limitClause
+    ),
+    page,
+    limit
+  )
+  if (prefixResults !== null) {
+    return prefixResults
   }
 
   if (nameOnlySearch) {
     return []
   }
 
-  // try fuzzy match
-  return await findProteinsByFuzzySearch(name, uniprotName, fullName, dbxrefs, remainingFilters, input.page as number, limit)
+  const fuzzyResults = await probeThenFetchPage(
+    (limitClause) => searchViewQueryBody(
+      (field, value) => `LEVENSHTEIN_MATCH(record.${field}, "${decodeURIComponent(value)}", 3, true)`,
+      searchFields,
+      remainingFilters,
+      limitClause
+    ),
+    page,
+    limit
+  )
+  return fuzzyResults ?? []
 }
 
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
