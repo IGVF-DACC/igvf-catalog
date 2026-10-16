@@ -121,6 +121,38 @@ export async function verboseItems (ids: string[], schema: configType): Promise<
   }
 }
 
+// For a multi-stage fallback search (exact match -> prefix -> token -> fuzzy, etc.) where each
+// stage's own query has its own total result count: deciding whether to fall through to the
+// next stage by checking "is the page-N result empty" breaks pagination, because a stage can be
+// legitimately exhausted at a high page (e.g. page 2 of a 27-row prefix match) without meaning
+// "this stage has zero matches overall" - the old code treated those as the same thing, which
+// is what let later pages silently jump to token/fuzzy search while earlier pages were served
+// from prefix search, mixing and repeating rows across pages.
+//
+// This runs `buildQuery(limitClause)` first with 'LIMIT 1' as a cheap, index-backed existence
+// probe (terminates at the first match, unlike skipping to a high offset) and only commits to
+// this stage - re-running with the real page/limit - if that probe found something. Returns
+// null when the probe is empty (the caller should try the next stage); otherwise returns the
+// real page's rows, which may legitimately be an empty array if the requested page is beyond
+// this stage's total results (the correct "no more results" signal, not a cue to fall through).
+export async function probeThenFetchPage (
+  buildQuery: (limitClause: string) => string,
+  page: number,
+  limit: number,
+  bindVars?: Record<string, unknown>
+): Promise<any[] | null> {
+  const probeQuery = buildQuery('LIMIT 1')
+  const probeCursor = bindVars !== undefined ? await db.query(probeQuery, bindVars) : await db.query(probeQuery)
+  const probeResult = await probeCursor.all()
+  if (probeResult.length === 0) {
+    return null
+  }
+
+  const pageQuery = buildQuery(`LIMIT ${page * limit}, ${limit}`)
+  const pageCursor = bindVars !== undefined ? await db.query(pageQuery, bindVars) : await db.query(pageQuery)
+  return await pageCursor.all()
+}
+
 // Generates aql RETURN statement, for the `return` list in a schema
 // Example:
 // for return statement based on schema: "return: _id, pos, name"

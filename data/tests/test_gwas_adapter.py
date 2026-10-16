@@ -276,7 +276,7 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker, mock_ontology_term_valida
     assert result['neg_log10_pvalue'] == gwas.MAX_LOG10_PVALUE
 
 
-def test_gwas_empty_beta_is_null_not_zero(gwas_files, mocker):
+def test_gwas_empty_beta_is_null_not_zero(gwas_files, mocker, mock_ontology_term_validator):
     """An empty beta/beta_ci field means the study didn't report one (e.g. it reported an
     odds_ratio instead) - that must load as null, not get coerced into a measured effect of 0."""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
@@ -308,7 +308,7 @@ def test_gwas_empty_beta_is_null_not_zero(gwas_files, mocker):
     assert result['beta_ci_upper'] is None
 
 
-def test_gwas_real_zero_beta_is_preserved(gwas_files, mocker):
+def test_gwas_real_zero_beta_is_preserved(gwas_files, mocker, mock_ontology_term_validator):
     """A row that explicitly reports '0' has a real measured effect of zero - it must stay
     0.0, not be swept into null along with genuinely missing betas."""
     mocker.patch('adapters.gwas_adapter.build_variant_id',
