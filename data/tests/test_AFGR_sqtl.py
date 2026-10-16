@@ -25,8 +25,35 @@ def mock_bulk_check_variants():
         yield mock_check
 
 
+# Replicates the mapping the old AFGR_sQTL_intron_genes.pkl held for the sample file's
+# introns, so get_genes_for_intron()'s direct DB query can be mocked instead of hitting Arango.
+SAMPLE_INTRON_GENES = {
+    ('chr1', 944800, 945042): [('ENSG00000188976', 'protein_coding')],
+    ('chr1', 944800, 945057): [('ENSG00000188976', 'protein_coding')],
+    ('chr1', 1062808, 1063061): [
+        ('ENSG00000273443', 'protein_coding'),
+        ('ENSG00000291156', 'protein_coding'),
+    ],
+    ('chr1', 1092103, 1095077): [('ENSG00000131591', 'protein_coding')],
+}
+
+
+@pytest.fixture
+def mock_intron_gene_lookup():
+    """Mock the direct ArangoDB gene-overlap query used by get_genes_for_intron()."""
+    def execute(query, bind_vars=None, **kwargs):
+        genes = SAMPLE_INTRON_GENES.get(
+            (bind_vars['chr'], bind_vars['start'], bind_vars['end']), [])
+        return iter([{'_key': key, 'gene_type': gene_type}
+                     for key, gene_type in genes])
+
+    with patch('adapters.AFGR_sqtl_adapter.ArangoDB') as MockArangoDB:
+        MockArangoDB.return_value.get_igvf_connection.return_value.aql.execute.side_effect = execute
+        yield MockArangoDB
+
+
 @patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mock_bulk_check_variants, mocker):
+def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mock_bulk_check_variants, mock_intron_gene_lookup, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
@@ -78,7 +105,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_term_validate_doc_invalid(mock_request, moc
 
 
 @patch('adapters.AFGR_sqtl_adapter.get_file_fileset_by_accession_in_arangodb')
-def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mock_bulk_check_variants, mocker):
+def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mock_bulk_check_variants, mock_intron_gene_lookup, mocker):
     mock_igvf_metadata(mock_request)
     mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
