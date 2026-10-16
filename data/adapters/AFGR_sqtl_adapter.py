@@ -2,7 +2,6 @@ import csv
 import gzip
 import hashlib
 import json
-import pickle
 from math import log10
 from typing import Optional
 import os
@@ -15,6 +14,7 @@ from adapters.helpers import (
 )
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from db.arango_db import ArangoDB
 
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
@@ -27,7 +27,6 @@ class AFGRSQtl(BaseAdapter):
     CHUNK_SIZE = 6500
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
-    INTRON_GENE_MAPPING_PATH = './data_loading_support_files/AFGR/AFGR_sQTL_intron_genes.pkl'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
@@ -40,6 +39,9 @@ class AFGRSQtl(BaseAdapter):
         self.gene_validator = GeneValidator()
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.written_variant_keys = set()
+        # key: intron_id (e.g. 1:187577:187755:clu_2352); value: list of overlapping gene ids.
+        # Populated lazily per intron via get_genes_for_intron().
+        self.intron_gene_mapping = {}
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -56,7 +58,6 @@ class AFGRSQtl(BaseAdapter):
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
-        self.load_intron_gene_mapping()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
@@ -117,8 +118,8 @@ class AFGRSQtl(BaseAdapter):
     def write_edges(self, variant_id, row):
         chr, _pos, _ref, _alt = row[4].split('_')
         intron_id = row[5]
-        gene_ids = self.intron_gene_mapping.get(intron_id)
-        if gene_ids is None:
+        gene_ids = self.get_genes_for_intron(intron_id)
+        if not gene_ids:
             self.logger.warning(f'no gene mapping for {intron_id}')
             return
 
@@ -190,8 +191,35 @@ class AFGRSQtl(BaseAdapter):
                 self.logger.warning(
                     f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
 
-    def load_intron_gene_mapping(self):
-        # key: intron_id (e.g. 1:187577:187755:clu_2352); value: gene ensembl id
-        self.intron_gene_mapping = {}
-        with open(AFGRSQtl.INTRON_GENE_MAPPING_PATH, 'rb') as mapfile:
-            self.intron_gene_mapping = pickle.load(mapfile)
+    def get_genes_for_intron(self, intron_id):
+        if intron_id in self.intron_gene_mapping:
+            return self.intron_gene_mapping[intron_id]
+
+        gene_ids = []
+        parts = intron_id.split(':')
+        if len(parts) >= 3:
+            try:
+                chr, start, end = 'chr' + \
+                    parts[0], int(parts[1]), int(parts[2])
+            except ValueError:
+                chr = None
+
+            if chr is not None:
+                db = ArangoDB().get_igvf_connection()
+                genes = list(db.aql.execute(
+                    '''
+                    FOR gene IN genes
+                    FILTER gene.chr == @chr AND gene.start < @end AND gene.end > @start
+                    RETURN { _key: gene._key, gene_type: gene.gene_type }
+                    ''',
+                    bind_vars={'chr': chr, 'start': start, 'end': end}
+                ))
+                if len(genes) > 1:
+                    # filter out pseudogene cases for multiple mapping cases
+                    gene_ids = [gene['_key']
+                                for gene in genes if gene['gene_type'] != 'processed_pseudogene']
+                elif len(genes) == 1:
+                    gene_ids = [genes[0]['_key']]
+
+        self.intron_gene_mapping[intron_id] = gene_ids
+        return gene_ids
