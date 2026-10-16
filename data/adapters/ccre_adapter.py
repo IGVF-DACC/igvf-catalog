@@ -40,11 +40,11 @@ class CCRE(BaseAdapter):
     }
 
     def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filename = filepath.split('/')[-1].split('.')[0]
+        self.accession = filepath.split('/')[-1].split('.')[0]
         if label == 'mm_genomic_element':
-            self.source_url = f'https://data.igvf.org/reference-files/{self.filename}/'
+            self.source_url = f'https://data.igvf.org/reference-files/{self.accession}/'
         else:
-            self.source_url = 'https://www.encodeproject.org/files/' + self.filename
+            self.source_url = f'https://www.encodeproject.org/files/{self.accession}'
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -60,7 +60,19 @@ class CCRE(BaseAdapter):
 
     def parse(self):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.filename)
+            self.accession)
+        # in case of encode file/fileset igvf accession/fileset accession are in dbxref_name/dbxref_fileset_id
+        if self.label == 'mm_genomic_element':
+            self.fileset_accession = self.file_fileset.get('dbxref_fileset_id')
+            self.writer.add_tag('portal_accessions', self.accession)
+            self.writer.add_tag('portal_accessions', self.fileset_accession)
+        else:
+            self.igvf_accession = self.file_fileset.get('dbxref_name')
+            self.igvf_fileset_accession = self.file_fileset.get(
+                'dbxref_fileset_id')
+            self.writer.add_tag('portal_accessions', self.igvf_accession)
+            self.writer.add_tag('portal_accessions',
+                                self.igvf_fileset_accession)
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
 
@@ -70,7 +82,7 @@ class CCRE(BaseAdapter):
                 _props = {
                     '_key': build_regulatory_region_id(
                         row[0], row[1], row[2], 'candidate_cis_regulatory_element', assembly
-                    ) + '_' + self.filename,
+                    ) + '_' + self.accession,
                     'name': row[3],
                     'chr': row[0],
                     'start': int(row[1]),
@@ -80,7 +92,7 @@ class CCRE(BaseAdapter):
                     'type': 'candidate cis regulatory element',
                     'source': 'ENCODE',
                     'source_url': self.source_url,
-                    'files_filesets': f'files_filesets/{self.filename}'
+                    'files_filesets': f'files_filesets/{self.accession}'
                 }
                 if self.validate:
                     self.validate_doc(_props)
