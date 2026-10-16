@@ -191,6 +191,50 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
+  genes_variants_score_summary:
+    'Observed min/max and counts for a score field across every IGVF CRISPR screen ' +
+    'variant-to-gene edge for one gene - without paginating through the edges themselves. Always ' +
+    'restricted to method = "CRISPR screen" and label = "variant effect on gene expression", so ' +
+    'QTL records sharing the variants_genes collection (AFGR eQTL/spliceQTL, EBI eQTL Catalog) ' +
+    'are excluded.<br> \
+    Optional filters are \
+    combined with and matched exactly. Perturbation filters the stored crispr_modality field.<br> \
+    Results are grouped by every distinct combination of those fields, so measurements from \
+    incompatible sources are never pooled. \
+    Groups with no numeric scores are omitted, and total_edge_count only counts edges with a \
+    numeric score.<br> \
+    Default page size is 25, maximum 500; pagination is \
+    0-based.<br><br>' + examples([
+      {
+        id: 'prime-editing',
+        label: 'Prime editing',
+        examples: [
+          {
+            label: 'Effect size distribution for a prime-edited gene',
+            items: [
+              'gene_id = ENSG00000108179',
+              'score_field = effect_size',
+              'perturbation = prime editing'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'base-editing',
+        label: 'Base editing',
+        examples: [
+          {
+            label: 'Effect size distribution for a base-edited gene',
+            items: [
+              'gene_id = ENSG00000177455',
+              'score_field = effect_size',
+              'perturbation = base editing'
+            ]
+          }
+        ]
+      }
+    ], 'Examples by perturbation', 'These examples are grouped by CRISPR perturbation type; use the <code>perturbation</code> filter to return data from a specific modality.'),
+
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
     Example: <br> \
     variant_id = NC_000001.11:40242002:G:A,<br> \
@@ -1960,6 +2004,73 @@ export const descriptions = {
             items: [
               'response_gene_name = TSPAN6',
               'method = Perturb-seq'
+            ]
+          }
+        ]
+      }
+    ]),
+
+  genes_genomic_elements_score_summary:
+    'Observed min/max and counts for a score field across every genomic-element-to-gene edge for ' +
+    'one gene - without paginating through the edges themselves.<br> \
+    Optional filters are combined with and matched exactly.<br> \
+    Results are grouped by every distinct combination of those fields plus crispr_modality, so \
+    measurements from incompatible sources are never pooled. Groups with no numeric scores are omitted, and total_edge_count \
+    only counts edges with a numeric score.<br> \
+    Default page size is 25, maximum 500; pagination is \
+    0-based.<br><br>' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Element effect sizes on a CRISPR screen target gene',
+            items: [
+              'gene_id = ENSG00000102145',
+              'score_field = effect_size',
+              'method = CRISPR screen'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Perturb-seq significance distribution for a gene',
+            items: [
+              'gene_id = ENSG00000108179',
+              'score_field = neg_log10_pvalue',
+              'method = Perturb-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'encode-re2g',
+        label: 'ENCODE-rE2G',
+        examples: [
+          {
+            label: 'ENCODE-rE2G prediction scores for a gene',
+            items: [
+              'gene_id = ENSG00000108179',
+              'score_field = score',
+              'method = ENCODE-rE2G'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'sce2g',
+        label: 'scE2G',
+        examples: [
+          {
+            label: 'scE2G prediction scores for a gene',
+            items: [
+              'gene_id = ENSG00000108179',
+              'score_field = score',
+              'method = scE2G'
             ]
           }
         ]

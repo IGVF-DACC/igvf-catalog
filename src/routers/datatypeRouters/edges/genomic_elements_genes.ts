@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
-import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withHgncPrefix } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
@@ -85,6 +85,54 @@ const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
 }).merge(edgeQueryFormat)
   .merge(commonEdgeParamsFormat)
+
+// The only fields on this collection that represent an effect/association strength, as
+// opposed to identifiers, provenance, or significance machinery (p-values aren't included -
+// they measure confidence, not effect magnitude, and already have their own distribution
+// quirks like exact zeros from underflow that would be misleading to summarize the same way).
+const SCORE_FIELDS = ['score', 'log2FC', 'effect_size', 'z_score', 't_score', 'idr', 'neg_log10_pvalue', 'neg_log10_pvalue_adj'] as const
+
+const geneScoreSummaryQueryFormat = z.object({
+  gene_id: z.string().trim(),
+  score_field: z.enum(SCORE_FIELDS),
+  method: z.enum(METHODS).optional(),
+  files_fileset: z.string().optional(),
+  source: z.enum(SOURCES).optional(),
+  biosample_term: z.string().optional(),
+  biological_context: z.string().optional(),
+  cell_annotation: z.string().optional(),
+  cell_annotation_term: z.string().optional(),
+  // Paginates the groups list itself, not the underlying edges - the aggregation still runs
+  // over every matching edge regardless of page/limit (total_edge_count always reflects the
+  // full match set), since a gene can have thousands of distinct provenance combinations.
+  page: z.number().default(0),
+  limit: z.number().optional()
+})
+
+const geneScoreSummaryGroupFormat = z.object({
+  method: z.string().nullable(),
+  source: z.string().nullable(),
+  files_filesets: z.string().nullable(),
+  biosample_term: z.string().nullable(),
+  biological_context: z.string().nullable(),
+  cell_annotation: z.string().nullable(),
+  cell_annotation_term: z.string().nullable(),
+  crispr_modality: z.string().nullable(),
+  min: z.number().nullable(),
+  max: z.number().nullable(),
+  edge_count: z.number(),
+  numeric_count: z.number(),
+  missing_count: z.number(),
+  invalid_count: z.number(),
+  zero_count: z.number()
+})
+
+const geneScoreSummaryFormat = z.object({
+  gene_id: z.string(),
+  score_field: z.enum(SCORE_FIELDS),
+  total_edge_count: z.number(),
+  groups: z.array(geneScoreSummaryGroupFormat)
+})
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -834,6 +882,93 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   })
 }
 
+async function findGeneScoreSummary (input: paramsFormatType): Promise<any> {
+  const geneId = input.gene_id as string
+  const scoreField = input.score_field as string
+  delete input.gene_id
+  delete input.score_field
+
+  const limit = resolveValidatedLimit(input, QUERY_LIMIT, MAX_PAGE_SIZE)
+  const page = input.page as number
+
+  const routing = humanRouting
+
+  const geneDocs = await (await db.query(
+    `FOR g IN ${routing.geneCollection} FILTER g._key == @geneId LIMIT 1 RETURN g._id`,
+    { geneId }
+  )).all()
+
+  if (geneDocs.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Gene not found: ${geneId}`
+    })
+  }
+
+  const biologicalContext = input.biological_context as string | undefined
+  delete input.biological_context
+
+  const edgeFilter = buildEdgeFilter(input, routing)
+  let combinedFilter = buildCombinedFilter('record._to == @geneFullId', edgeFilter)
+  const bindVars: Record<string, unknown> = { geneFullId: geneDocs[0], scoreField, page, limit }
+  if (biologicalContext !== undefined) {
+    combinedFilter = buildCombinedFilter(combinedFilter, 'record.biological_context == @biologicalContext')
+    bindVars.biologicalContext = biologicalContext
+  }
+
+  const query = `
+    LET allGroups = (
+      FOR record IN ${routing.edgeCollection}
+        FILTER ${combinedFilter}
+        LET rawScore = record[@scoreField]
+        LET isNumeric = IS_NUMBER(rawScore)
+        COLLECT
+          method = record.method,
+          source = record.source,
+          files_filesets = record.files_filesets,
+          biosample_term = record.biosample_term,
+          biological_context = record.biological_context,
+          cell_annotation = record.cell_annotation,
+          cell_annotation_term = record.cell_annotation_term,
+          crispr_modality = record.crispr_modality
+        AGGREGATE
+          edge_count = SUM(1),
+          numeric_count = SUM(isNumeric ? 1 : 0),
+          missing_count = SUM(rawScore == null ? 1 : 0),
+          invalid_count = SUM((rawScore != null && !isNumeric) ? 1 : 0),
+          zero_count = SUM((isNumeric && rawScore == 0) ? 1 : 0),
+          minScore = MIN(isNumeric ? rawScore : null),
+          maxScore = MAX(isNumeric ? rawScore : null)
+        SORT method, source, files_filesets, biosample_term, biological_context, cell_annotation, cell_annotation_term, crispr_modality
+        RETURN {
+          method, source, files_filesets, biosample_term, biological_context, cell_annotation, cell_annotation_term, crispr_modality,
+          'min': minScore,
+          'max': maxScore,
+          edge_count, numeric_count, missing_count, invalid_count, zero_count
+        }
+    )
+    LET scoredGroups = (
+      FOR g IN allGroups
+        FILTER g.numeric_count > 0
+        RETURN g
+    )
+    RETURN {
+      total_edge_count: SUM(scoredGroups[*].numeric_count),
+      groups: SLICE(scoredGroups, @page * @limit, @limit)
+    }
+  `
+
+  const results = await (await db.query(query, bindVars)).all()
+  const summary = results[0]
+
+  return {
+    gene_id: geneId,
+    score_field: scoreField,
+    total_edge_count: summary.total_edge_count,
+    groups: summary.groups
+  }
+}
+
 const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_genomic_elements } })
   .input(geneQueryFormat)
@@ -852,8 +987,15 @@ const grn = publicProcedure
   .output(z.array(grnOutputFormat))
   .query(async ({ input }) => await grnSearch(input))
 
+const genesGenomicElementsScoreSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements/score-summary', description: descriptions.genes_genomic_elements_score_summary } })
+  .input(geneScoreSummaryQueryFormat)
+  .output(geneScoreSummaryFormat)
+  .query(async ({ input }) => await findGeneScoreSummary(input))
+
 export const genomicElementsGenesRouters = {
   genomicElementsFromGenes,
   genesFromGenomicElements,
-  grn
+  grn,
+  genesGenomicElementsScoreSummary
 }
