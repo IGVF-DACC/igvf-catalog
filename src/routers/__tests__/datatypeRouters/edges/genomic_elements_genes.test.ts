@@ -449,4 +449,53 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
     expect(String(aql)).toContain('record.biological_context == @biologicalContext')
     expect(bindVars).toMatchObject({ biologicalContext: 'HCASMC-hTERT' })
   })
+
+  it('excludes groups with no numeric scores before pagination and counts only scored edges', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'score' }
+    await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    const aql = String(query.mock.calls[1][0])
+    expect(aql).toContain('FILTER g.numeric_count > 0')
+    expect(aql).toContain('total_edge_count: SUM(scoredGroups[*].numeric_count)')
+    expect(aql).toContain('groups: SLICE(scoredGroups, @page * @limit, @limit)')
+  })
+
+  it.each([
+    [{ page: -1 }],
+    [{ page: 1.5 }]
+  ])('throws BAD_REQUEST for an invalid page %j', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'score', ...overrides }
+    await expect(
+      genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+        input, ctx: {}, type: 'query', path: '', rawInput: input
+      })
+    ).rejects.toThrow(TRPCError)
+    expect(query).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ limit: -1 }],
+    [{ limit: 0 }],
+    [{ limit: 1.5 }]
+  ])('throws BAD_REQUEST for an invalid limit %j instead of silently bypassing the page size cap', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'score', ...overrides }
+    await expect(
+      genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+        input, ctx: {}, type: 'query', path: '', rawInput: input
+      })
+    ).rejects.toThrow(TRPCError)
+    expect(query).not.toHaveBeenCalled()
+  })
 })

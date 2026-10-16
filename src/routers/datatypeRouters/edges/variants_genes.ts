@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, validRegion } from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -765,7 +765,7 @@ async function findGeneVariantScoreSummary (input: paramsFormatType): Promise<an
   const scoreField = input.score_field as string
   delete input.gene_id
   delete input.score_field
-  const limit = getQueryLimit(input)
+  const limit = resolveValidatedLimit(input, QUERY_LIMIT, MAX_PAGE_SIZE)
   const page = input.page as number
 
   const geneDocs = await (await db.query(
@@ -844,9 +844,14 @@ async function findGeneVariantScoreSummary (input: paramsFormatType): Promise<an
           edge_count, numeric_count, missing_count, invalid_count, zero_count
         }
     )
+    LET scoredGroups = (
+      FOR g IN allGroups
+        FILTER g.numeric_count > 0
+        RETURN g
+    )
     RETURN {
-      total_edge_count: SUM(allGroups[*].edge_count),
-      groups: SLICE(allGroups, @page * @limit, @limit)
+      total_edge_count: SUM(scoredGroups[*].numeric_count),
+      groups: SLICE(scoredGroups, @page * @limit, @limit)
     }
   `
 

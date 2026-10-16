@@ -322,4 +322,43 @@ describe('variantsGenesRouters.genesVariantsScoreSummary', () => {
     await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input2)
     expect(query2.mock.calls[1][1]).toMatchObject({ page: 2, limit: 500 })
   })
+
+  it('excludes groups with no numeric scores before pagination and counts only scored edges', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size' }
+    await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
+
+    const aql = String(query.mock.calls[1][0])
+    expect(aql).toContain('FILTER g.numeric_count > 0')
+    expect(aql).toContain('total_edge_count: SUM(scoredGroups[*].numeric_count)')
+    expect(aql).toContain('groups: SLICE(scoredGroups, @page * @limit, @limit)')
+  })
+
+  it.each([
+    [{ page: -1 }],
+    [{ page: 1.5 }]
+  ])('throws BAD_REQUEST for an invalid page %j', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size', ...overrides }
+    await expect(callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)).rejects.toThrow(TRPCError)
+    expect(query).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ limit: -1 }],
+    [{ limit: 0 }],
+    [{ limit: 1.5 }]
+  ])('throws BAD_REQUEST for an invalid limit %j instead of silently bypassing the page size cap', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size', ...overrides }
+    await expect(callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)).rejects.toThrow(TRPCError)
+    expect(query).not.toHaveBeenCalled()
+  })
 })
