@@ -191,6 +191,36 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
+  genes_variants_score_summary:
+    'Retrieve the observed min/max bounds of a score field (and related counts) across every ' +
+    'IGVF CRISPR screen variant-to-gene edge for one gene, without paginating through the edges ' +
+    'themselves. Restricted to method = "CRISPR screen" and label = "variant effect on gene ' +
+    'expression" - QTL records sharing the variants_genes collection (AFGR eQTL/spliceQTL, EBI ' +
+    'eQTL Catalog) are always excluded.<br> \
+    gene_id (exact gene ID) and score_field are required. score_field must be one of: effect_size, \
+    log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, power, posterior_inclusion_probability, \
+    coefficient_stddev.<br> \
+    Optional filters (files_fileset, source, biosample_term, biological_context, perturbation) are \
+    combined with AND and matched exactly - including biological_context, which has no prefix/fuzzy \
+    fallback here unlike /genes/variants. perturbation filters the stored crispr_modality field \
+    (currently "prime editing" or "base editing").<br> \
+    Results are grouped by every distinct combination of method, source, files_fileset, \
+    biosample_term, biological_context and perturbation, so measurements from incompatible sources \
+    are never pooled together. Each group reports min/max over finite numeric values (null if none \
+    exist), plus edge_count, numeric_count, missing_count (absent or null), invalid_count (present \
+    but non-numeric or non-finite - numeric-looking strings and booleans are never coerced into \
+    scores) and zero_count. Groups with zero numeric scores are still returned. Counts stored edges, \
+    so the same variant associated with the gene via multiple files contributes multiple \
+    observations.<br> \
+    page/limit paginate the groups list itself (default page size 25, maximum 500) - \
+    total_edge_count always reflects every matching edge regardless of which page is requested. \
+    Pagination is 0-based.<br> \
+    These are observed data ranges, not theoretical bounds or normalized scores - grouping preserves \
+    provenance but does not guarantee scientific comparability across groups.<br> \
+    Returns 404 for an unknown gene_id, and an empty groups list with total_edge_count = 0 for a \
+    known gene with no matching edges.<br> \
+    Example: gene_id = ENSG00000108179, score_field = effect_size, perturbation = prime editing.',
+
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
     Example: <br> \
     variant_id = NC_000001.11:40242002:G:A,<br> \
@@ -1965,6 +1995,30 @@ export const descriptions = {
         ]
       }
     ]),
+
+  genes_genomic_elements_score_summary:
+    'Retrieve the observed min/max bounds of a score field (and related counts) across every ' +
+    'genomic-element-to-gene edge for one gene, without paginating through the edges themselves.<br> \
+    gene_id (exact gene ID) and score_field are required. score_field must be one of: score, log2FC, \
+    effect_size, z_score, t_score, idr, neg_log10_pvalue, neg_log10_pvalue_adj.<br> \
+    Optional filters (method, files_fileset, source, biosample_term, biological_context, \
+    cell_annotation, cell_annotation_term) are combined with AND and matched exactly - including \
+    biological_context, which has no prefix/fuzzy fallback here unlike /genes/genomic-elements.<br> \
+    Results are grouped by every distinct combination of method, source, files_fileset, \
+    biosample_term, biological_context, cell_annotation, cell_annotation_term and crispr_modality, \
+    so measurements from incompatible sources are never pooled together. Each group reports min/max \
+    over finite numeric values (null if none exist), plus edge_count, numeric_count, missing_count \
+    (absent or null), invalid_count (present but non-numeric) and zero_count. Groups with zero \
+    numeric scores are still returned.<br> \
+    page/limit paginate the groups list itself (default page size 25, maximum 500) - a gene can \
+    have thousands of distinct provenance combinations. total_edge_count always reflects every \
+    matching edge regardless of which page is requested; only the groups array is paginated. \
+    Pagination is 0-based.<br> \
+    These are observed data ranges, not theoretical bounds or normalized scores - grouping preserves \
+    provenance but does not guarantee scientific comparability across groups.<br> \
+    Returns 404 for an unknown gene_id, and an empty groups list for a known gene with no matching \
+    edges.<br> \
+    Example: gene_id = ENSG00000116198, score_field = score, method = CRISPR screen.',
 
   genes_genomic_elements:
     'Retrieve genomic elements and gene pairs by querying genes.<br> \

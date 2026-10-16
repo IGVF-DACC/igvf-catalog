@@ -332,3 +332,121 @@ describe('GRN organism routing', () => {
     expect(String(query.mock.calls[0][0])).toContain('FOR se IN genomic_elements_genes')
   })
 })
+
+describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('returns grouped min/max summaries for a known gene', async () => {
+    const mockGroups = [
+      {
+        method: 'ENCODE-rE2G',
+        source: 'ENCODE',
+        files_filesets: 'files_filesets/ENCFF003BKC',
+        biosample_term: 'ontology_terms/UBERON_0002626',
+        biological_context: 'head of caudate nucleus',
+        cell_annotation: null,
+        cell_annotation_term: null,
+        crispr_modality: null,
+        min: 0.20425818,
+        max: 0.99998393,
+        edge_count: 5,
+        numeric_count: 5,
+        missing_count: 0,
+        invalid_count: 0,
+        zero_count: 0
+      }
+    ]
+
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 5, groups: mockGroups }]) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'score' }
+    const result = await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual({
+      gene_id: 'ENSG00000000003',
+      score_field: 'score',
+      total_edge_count: 5,
+      groups: mockGroups
+    })
+    expect(dbModule.db.query).toHaveBeenCalledTimes(2)
+  })
+
+  it('defaults to page 0 and a limit of 25, capping a larger requested limit at 500', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'score' }
+    await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+    expect(query.mock.calls[1][1]).toMatchObject({ page: 0, limit: 25 })
+
+    jest.clearAllMocks()
+    const query2 = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input2 = { gene_id: 'ENSG00000000003', score_field: 'score', page: 2, limit: 99999 }
+    await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+      input: input2, ctx: {}, type: 'query', path: '', rawInput: input2
+    })
+    expect(query2.mock.calls[1][1]).toMatchObject({ page: 2, limit: 500 })
+  })
+
+  it('throws NOT_FOUND for an unknown gene without ever running the aggregation query', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any)
+
+    const input = { gene_id: 'NOT_A_REAL_GENE', score_field: 'score' }
+    await expect(
+      genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+        input, ctx: {}, type: 'query', path: '', rawInput: input
+      })
+    ).rejects.toThrow(TRPCError)
+    expect(query).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns an empty group list for a known gene with no matching edges', async () => {
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'idr', files_fileset: 'NOTAREALFILESET' }
+    const result = await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(result).toEqual({
+      gene_id: 'ENSG00000000003',
+      score_field: 'idr',
+      total_edge_count: 0,
+      groups: []
+    })
+  })
+
+  it('filters biological_context as an exact match, not a fuzzy search', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000000003']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000000003', score_field: 'score', biological_context: 'HCASMC-hTERT' }
+    await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    const [aql, bindVars] = query.mock.calls[1]
+    expect(String(aql)).toContain('record.biological_context == @biologicalContext')
+    expect(bindVars).toMatchObject({ biologicalContext: 'HCASMC-hTERT' })
+  })
+})
