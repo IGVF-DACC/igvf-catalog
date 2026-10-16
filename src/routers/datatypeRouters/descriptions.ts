@@ -201,9 +201,8 @@ export const descriptions = {
     log2FC, neg_log10_pvalue, neg_log10_pvalue_adj, power, posterior_inclusion_probability, \
     coefficient_stddev.<br> \
     Optional filters (files_fileset, source, biosample_term, biological_context, perturbation) are \
-    combined with AND and matched exactly - including biological_context, which has no prefix/fuzzy \
-    fallback here unlike /genes/variants. perturbation filters the stored crispr_modality field \
-    (currently "prime editing" or "base editing").<br> \
+    combined with AND and matched exactly - including biological_context.<br />\
+    Perturbation filters the stored crispr_modality field (currently "prime editing" or "base editing").<br> \
     Results are grouped by every distinct combination of method, source, files_fileset, \
     biosample_term, biological_context and perturbation, so measurements from incompatible sources \
     are never pooled together. Each group reports min/max over finite numeric values (null if none \
@@ -2003,7 +2002,7 @@ export const descriptions = {
     effect_size, z_score, t_score, idr, neg_log10_pvalue, neg_log10_pvalue_adj.<br> \
     Optional filters (method, files_fileset, source, biosample_term, biological_context, \
     cell_annotation, cell_annotation_term) are combined with AND and matched exactly - including \
-    biological_context, which has no prefix/fuzzy fallback here unlike /genes/genomic-elements.<br> \
+    biological_context.<br> \
     Results are grouped by every distinct combination of method, source, files_fileset, \
     biosample_term, biological_context, cell_annotation, cell_annotation_term and crispr_modality, \
     so measurements from incompatible sources are never pooled together. Each group reports min/max \
