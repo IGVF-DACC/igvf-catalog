@@ -8,7 +8,7 @@ import pickle
 
 
 def query_gene_from_protein(uniprot_id, species='Homo sapiens'):
-    data_service_url = 'https://api-dev.catalog.igvf.org/api'
+    data_service_url = 'https://catalog-api-dev.demo.igvf.org/api'
     endpoint = 'proteins/genes'
     query_string = f'dbxrefs={uniprot_id}&organism={species}&verbose=true'
     url = data_service_url + '/' + endpoint + '?' + query_string
