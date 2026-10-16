@@ -72,12 +72,12 @@
         "CI_lower_95": {
           "title": "95% Confidence Interval Lower Bound",
           "type": "number",
-          "description": "Log2 lower bound of a 95% interval for the variant effect, on the same log2 fold-change scale as log2FC (no change = 0). The source reports this on the fold-change scale (no change = 1); it is log2-transformed on load."
+          "description": "Log2 lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
           "title": "95% Confidence Interval Upper Bound",
           "type": "number",
-          "description": "Log2 upper bound of a 95% interval for the variant effect, on the same log2 fold-change scale as log2FC (no change = 0). The source reports this on the fold-change scale (no change = 1); it is log2-transformed on load."
+          "description": "Log2 upper bound of a 95% interval for the variant effect."
         },
         "label": {
           "enum": [
