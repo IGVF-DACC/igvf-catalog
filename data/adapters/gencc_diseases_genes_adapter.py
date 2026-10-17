@@ -50,7 +50,8 @@ class GenccDiseasesGenes(BaseAdapter):
             )
             if key
         }
-        self.ontology_term_validator.preload(ontology_term_keys)
+        self.ontology_term_validator.preload(
+            ontology_term_keys, resolve_via_ols=True)
 
         for row in rows:
             _key = row[0]
@@ -62,9 +63,11 @@ class GenccDiseasesGenes(BaseAdapter):
                 continue
             gene_name = row[3]
             ontology_term_key = self.get_ontology_term_key(row)
-            if not self.ontology_term_validator.validate(ontology_term_key):
+            resolved_term_key = self.ontology_term_validator.resolve(
+                ontology_term_key)
+            if resolved_term_key is None:
                 continue
-            _from = f'ontology_terms/{ontology_term_key}'
+            _from = f'ontology_terms/{resolved_term_key}'
             term_name = row[5]
             classification = row[9]
             moi_id = row[10]
