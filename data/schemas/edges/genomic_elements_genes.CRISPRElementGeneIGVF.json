@@ -55,12 +55,13 @@
             "CRISPR screen"
           ]
         },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality",
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
           "enum": [
-            "interference",
-            "activation",
-            "knockout"
+            "CRISPR interference",
+            "CRISPR activation",
+            "CRISPR knockout",
+            "CRISPR cutting"
           ]
         },
         "class": {
@@ -213,22 +214,128 @@
         },
         "treatments_term_ids": {
           "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "negative_selection_log2FC": {
+          "title": "Negative Selection Log2 Fold Change",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative selection result: Log2 fold change of readout gene expression for the perturbation."
+        },
+        "negative_selection_p_value": {
+          "title": "Negative Selection P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative selection result: Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
+        },
+        "negative_selection_p_value_adj": {
+          "title": "Negative Selection Adjusted P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative selection result: Multiple-testing-adjusted p-value when reported by the source."
+        },
+        "negative_selection_neg_log10_pvalue": {
+          "title": "Negative Selection Negative Log10 P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction"
+        },
+        "negative_selection_neg_log10_pvalue_adj": {
+          "title": "Negative Selection Adjusted Negative Log10 P-Value",
+          "type": "number",
+          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+        },
+        "negative_selection_significant": {
+          "title": "Negative Selection Significant?",
+          "type": "boolean",
+          "description": "True when this direction has FDR < 0.05 and a matching log2FC sign (negative for negative selection, positive for positive selection)."
+        },
+        "positive_selection_log2FC": {
+          "title": "Positive Selection Log2 Fold Change",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Positive selection result: Log2 fold change of readout gene expression for the perturbation."
+        },
+        "positive_selection_p_value": {
+          "title": "Positive Selection P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Positive selection result: Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
+        },
+        "positive_selection_p_value_adj": {
+          "title": "Positive Selection Adjusted P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Positive selection result: Multiple-testing-adjusted p-value when reported by the source."
+        },
+        "positive_selection_neg_log10_pvalue": {
+          "title": "Positive Selection Negative Log10 P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction"
+        },
+        "positive_selection_neg_log10_pvalue_adj": {
+          "title": "Positive Selection Adjusted Negative Log10 P-Value",
+          "type": "number",
+          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+        },
+        "positive_selection_significant": {
+          "title": "Positive Selection Significant?",
+          "type": "boolean",
+          "description": "True when this direction has FDR < 0.05 and a matching log2FC sign (negative for negative selection, positive for positive selection)."
         }
       },
       "required": [
         "files_filesets",
-        "crispr_modality",
+        "perturbation",
         "biosample_term",
         "biological_context",
-        "treatments_term_ids",
-        "significant"
+        "treatments_term_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "significant"
+          ]
+        },
+        {
+          "required": [
+            "negative_selection_log2FC",
+            "negative_selection_p_value",
+            "negative_selection_p_value_adj",
+            "negative_selection_neg_log10_pvalue",
+            "negative_selection_neg_log10_pvalue_adj",
+            "negative_selection_significant",
+            "positive_selection_log2FC",
+            "positive_selection_p_value",
+            "positive_selection_p_value_adj",
+            "positive_selection_neg_log10_pvalue",
+            "positive_selection_neg_log10_pvalue_adj",
+            "positive_selection_significant"
+          ]
+        }
+      ]
     }
   ],
   "accessible_via": {
     "filter_by_range": "log2FC, effect_size, neg_log10_pvalue, neg_log10_pvalue_adj, z_score, idr",
-    "return": "class, label, name, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_ci95_lower, log2FC_ci95_upper, effect_size, effect_size_ci_95, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, pct_1, pct_2, num_guides, num_cells, fold_change, background_corrected_fold_change, z_score, t_score, idr, cpm_perturb, cpm_bg, gamma_approximation_ln_p_value, hypergeometric_ln_p_value"
+    "return": "class, label, name, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, log2FC_ci95_lower, log2FC_ci95_upper, effect_size, effect_size_ci_95, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, pct_1, pct_2, num_guides, num_cells, fold_change, background_corrected_fold_change, z_score, t_score, idr, cpm_perturb, cpm_bg, gamma_approximation_ln_p_value, hypergeometric_ln_p_value, negative_selection_log2FC, negative_selection_p_value, negative_selection_p_value_adj, negative_selection_neg_log10_pvalue, negative_selection_neg_log10_pvalue_adj, negative_selection_significant, positive_selection_log2FC, positive_selection_p_value, positive_selection_p_value_adj, positive_selection_neg_log10_pvalue, positive_selection_neg_log10_pvalue_adj, positive_selection_significant"
   },
   "db_collection_name": "genomic_elements_genes"
 }

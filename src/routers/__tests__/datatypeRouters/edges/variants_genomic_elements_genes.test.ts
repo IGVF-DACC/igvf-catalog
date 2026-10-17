@@ -69,7 +69,7 @@ describe('variantsGenomicElementsGenesRouters.variantsGenomicElementsGenes', () 
         files_filesets: 'files_filesets/FILESET1',
         biological_context: 'ontology_terms/CL_0000000',
         biosample_term: 'ontology_terms/CL_0000000',
-        crispr_modality: 'CRISPRi',
+        perturbation: 'CRISPR interference',
         log2FC: -1.2,
         neg_log10_pvalue: 5.5,
         neg_log10_pvalue_adj: 4.2,

@@ -1917,7 +1917,8 @@ export const descriptions = {
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
     Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
-    crispr_modality accepts knockout, interference, or activation.<br> \
+    perturbation accepts CRISPR interference, CRISPR activation, CRISPR knockout, CRISPR cutting, CRISPR base editing, CRISPR prime editing, or ORF overexpression.<br> \
+    MORF screen results return regulator_gene and the specific transcript from genes_transcripts; genomic_element is null.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -1931,7 +1932,7 @@ export const descriptions = {
               'regulator_gene_id = ENSG00000143190',
               'p_value = gte:0.9',
               'method = CRISPR screen',
-              'crispr_modality = interference',
+              'perturbation = CRISPR interference',
               'files_fileset = IGVFFI1336XWXJ'
             ]
           },
@@ -1960,6 +1961,29 @@ export const descriptions = {
             items: [
               'response_gene_name = TSPAN6',
               'method = Perturb-seq'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'morf-screen',
+        label: 'MORF screen',
+        examples: [
+          {
+            label: 'AATF overexpression effect on TOX',
+            items: [
+              'regulator_gene_id = ENSG00000275700',
+              'response_gene_id = ENSG00000198846',
+              'method = MORF screen',
+              'perturbation = ORF overexpression',
+              'files_fileset = IGVFFI6734IWRB'
+            ]
+          },
+          {
+            label: 'All MORF effects on TOX',
+            items: [
+              'response_gene_name = TOX',
+              'method = MORF screen'
             ]
           }
         ]

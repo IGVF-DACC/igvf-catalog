@@ -72,7 +72,7 @@ files_filesets:
       - lab
       - preferred_assay_titles[*]
       - method
-      - crispr_modality
+      - perturbation
       - donors[*]
       - samples[*]
       - simple_sample_summaries[*]
@@ -111,6 +111,7 @@ genes_transcripts_genes:
     fields:
       - method, files_filesets
       - morf_id
+      - files_filesets, morf_id, _to
   zkd_sparse:
     fields:
       - log2FC, neg_log10_pvalue_adj
