@@ -1142,6 +1142,15 @@ export const descriptions = {
   Example: term = TP53, <br> \
   Pagination is 0-based.',
 
+  collection_endpoints: 'Look up which API endpoint(s) serve a given ArangoDB node/edge collection name ' +
+    '(for example the names listed in a files_fileset\'s <code>collections</code> property, such as ' +
+    '<code>genomic_elements_genes</code>). Useful for scripts/notebooks that need to turn a raw collection ' +
+    'name into a matching API call instead of connecting to the database directly.<br><br>' +
+    'With no parameters, returns the entire mapping (every known node and edge collection). Filter by ' +
+    '<code>collection</code> (exact collection name) and/or <code>type</code> (<code>node</code> or ' +
+    '<code>edge</code>). A collection with an empty <code>endpoints</code> array currently has no dedicated ' +
+    'API endpoint.',
+
   complex: 'Retrieve complexes.<br> \
   Example: complex_id = CPX-11, <br> \
   name = SMAD2, <br> \
