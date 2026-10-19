@@ -23,6 +23,36 @@ export function distanceGeneVariant (geneStart: number, geneEnd: number, variant
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
 }
 
+// Validates page/limit and resolves the effective limit, mutating input by deleting
+// `limit` (matching the existing applyLimit/getQueryLimit contract). Negative or
+// fractional values are rejected outright rather than silently coerced - a negative
+// limit previously slipped past the "cap at maxPageSize" check entirely (-1 <= 500 is
+// true) and reached AQL's SLICE, whose negative-length semantics returned far more rows
+// than the documented maximum.
+export function resolveValidatedLimit (input: paramsFormatType, defaultLimit: number, maxPageSize: number): number {
+  const page = input.page as number
+  if (!Number.isInteger(page) || page < 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `page must be a non-negative integer. Received: ${String(page)}`
+    })
+  }
+
+  let limit = defaultLimit
+  if (input.limit !== undefined) {
+    const rawLimit = input.limit as number
+    if (!Number.isInteger(rawLimit) || rawLimit <= 0) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `limit must be a positive integer. Received: ${String(rawLimit)}`
+      })
+    }
+    limit = rawLimit <= maxPageSize ? rawLimit : maxPageSize
+    delete input.limit
+  }
+  return limit
+}
+
 // The gene schema's `hgnc` property stores IDs with an `HGNC:` prefix (e.g. `HGNC:4232`),
 // but the `hgnc_id` API param accepts the bare number. Any caller that filters on `hgnc`
 // directly (rather than delegating to geneSearch()) must apply this same prefixing or the

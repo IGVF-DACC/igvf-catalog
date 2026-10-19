@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, validRegion } from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -102,6 +102,57 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneCollectionName = geneSchema.db_collection_name as string
 const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
+
+// variants_genes is shared with AFGR/EBI eQTL and spliceQTL edges (see variantsGenesFilterSchema
+// above) - method/label are hard-restricted below to isolate just the IGVF CRISPR screen
+// variant-effect-on-gene-expression edges, so QTL records never leak into these summaries.
+const CRISPR_SCREEN_METHOD = 'CRISPR screen'
+const CRISPR_SCREEN_LABEL = 'variant effect on gene expression'
+// Only IGVF currently produces CRISPR screen variant-gene edges - the file's general SOURCES
+// constant also includes AFGR/EBI (QTL-only sources), which could never match here.
+const CRISPR_SCREEN_SOURCES = ['IGVF'] as const
+const CRISPR_PERTURBATIONS = getCollectionEnumValuesOrThrow('edges', 'variants_genes', 'crispr_modality')
+// The only fields on CRISPRVariantGene that represent an effect/association strength, as
+// opposed to identifiers, provenance, or the boolean `significant` flag.
+const CRISPR_SCORE_FIELDS = ['effect_size', 'log2FC', 'neg_log10_pvalue', 'neg_log10_pvalue_adj', 'power', 'posterior_inclusion_probability', 'coefficient_stddev'] as const
+
+const geneVariantScoreSummaryQueryFormat = z.object({
+  gene_id: z.string().trim(),
+  score_field: z.enum(CRISPR_SCORE_FIELDS),
+  files_fileset: z.string().optional(),
+  source: z.enum(CRISPR_SCREEN_SOURCES).optional(),
+  biosample_term: z.string().optional(),
+  biological_context: z.string().optional(),
+  perturbation: z.enum(CRISPR_PERTURBATIONS).optional(),
+  // Paginates the groups list itself, not the underlying edges - the aggregation still runs
+  // over every matching edge regardless of page/limit, matching the sibling
+  // /genes/genomic-elements/score-summary endpoint's pagination convention.
+  page: z.number().default(0),
+  limit: z.number().optional()
+})
+
+const geneVariantScoreSummaryGroupFormat = z.object({
+  method: z.string().nullable(),
+  source: z.string().nullable(),
+  files_filesets: z.string().nullable(),
+  biosample_term: z.string().nullable(),
+  biological_context: z.string().nullable(),
+  perturbation: z.string().nullable(),
+  min: z.number().nullable(),
+  max: z.number().nullable(),
+  edge_count: z.number(),
+  numeric_count: z.number(),
+  missing_count: z.number(),
+  invalid_count: z.number(),
+  zero_count: z.number()
+})
+
+const geneVariantScoreSummaryFormat = z.object({
+  gene_id: z.string(),
+  score_field: z.enum(CRISPR_SCORE_FIELDS),
+  total_edge_count: z.number(),
+  groups: z.array(geneVariantScoreSummaryGroupFormat)
+})
 
 function raiseInvalidParameters (param: string): void {
   throw new TRPCError({
@@ -703,6 +754,118 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
   return []
 }
 
+// Aggregates entirely in AQL (COLLECT ... AGGREGATE), same approach as the sibling
+// /genes/genomic-elements/score-summary endpoint - MIN/MAX already ignore `null` inputs, so
+// feeding them `isNumeric ? rawScore : null` for non-numeric/missing/boolean scores gives
+// exactly the "bounds among finite numeric values, null if none exist" semantics for free.
+// IS_NUMBER() returns false for both numeric-looking strings and booleans, so neither gets
+// miscounted as numeric - they fall into invalid_count instead, per spec.
+async function findGeneVariantScoreSummary (input: paramsFormatType): Promise<any> {
+  const geneId = input.gene_id as string
+  const scoreField = input.score_field as string
+  delete input.gene_id
+  delete input.score_field
+  const limit = resolveValidatedLimit(input, QUERY_LIMIT, MAX_PAGE_SIZE)
+  const page = input.page as number
+
+  const geneDocs = await (await db.query(
+    `FOR g IN ${geneCollectionName} FILTER g._key == @geneId LIMIT 1 RETURN g._id`,
+    { geneId }
+  )).all()
+
+  if (geneDocs.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Gene not found: ${geneId}`
+    })
+  }
+
+  // biological_context must be an exact match here - no prefix/token/Levenshtein fallback
+  // search, unlike getVariantFromGene/getGeneFromVariant above.
+  const biologicalContext = input.biological_context as string | undefined
+  delete input.biological_context
+
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
+  }
+  if (input.biosample_term !== undefined) {
+    input.biosample_term = `ontology_terms/${input.biosample_term as string}`
+  }
+  // perturbation is the public name for the stored crispr_modality field.
+  if (input.perturbation !== undefined) {
+    input.crispr_modality = input.perturbation
+    delete input.perturbation
+  }
+
+  const optionalFilters = getFilterStatements(variantsGenesCRISPRVariantGene, input)
+  const filters = [
+    'record._to == @geneFullId',
+    `record.method == '${CRISPR_SCREEN_METHOD}'`,
+    `record.label == '${CRISPR_SCREEN_LABEL}'`,
+    optionalFilters
+  ].filter((filter) => filter !== '')
+  const bindVars: Record<string, unknown> = { geneFullId: geneDocs[0], scoreField, page, limit }
+  if (biologicalContext !== undefined) {
+    filters.push('record.biological_context == @biologicalContext')
+    bindVars.biologicalContext = biologicalContext
+  }
+  const combinedFilter = filters.join(' AND ')
+
+  // Pagination applies to the groups list, not the underlying edges - total_edge_count is
+  // summed over every group before slicing, so it always reflects the full match set
+  // regardless of which page is requested. The SORT makes page boundaries deterministic.
+  const query = `
+    LET allGroups = (
+      FOR record IN variants_genes
+        FILTER ${combinedFilter}
+        LET rawScore = record[@scoreField]
+        LET isNumeric = IS_NUMBER(rawScore)
+        COLLECT
+          method = record.method,
+          source = record.source,
+          files_filesets = record.files_filesets,
+          biosample_term = record.biosample_term,
+          biological_context = record.biological_context,
+          perturbation = record.crispr_modality
+        AGGREGATE
+          edge_count = SUM(1),
+          numeric_count = SUM(isNumeric ? 1 : 0),
+          missing_count = SUM(rawScore == null ? 1 : 0),
+          invalid_count = SUM((rawScore != null && !isNumeric) ? 1 : 0),
+          zero_count = SUM((isNumeric && rawScore == 0) ? 1 : 0),
+          minScore = MIN(isNumeric ? rawScore : null),
+          maxScore = MAX(isNumeric ? rawScore : null)
+        SORT method, source, files_filesets, biosample_term, biological_context, perturbation
+        RETURN {
+          method, source, files_filesets, biosample_term, biological_context, perturbation,
+          'min': minScore,
+          'max': maxScore,
+          edge_count, numeric_count, missing_count, invalid_count, zero_count
+        }
+    )
+    LET scoredGroups = (
+      FOR g IN allGroups
+        FILTER g.numeric_count > 0
+        RETURN g
+    )
+    RETURN {
+      total_edge_count: SUM(scoredGroups[*].numeric_count),
+      groups: SLICE(scoredGroups, @page * @limit, @limit)
+    }
+  `
+
+  const results = await (await db.query(query, bindVars)).all()
+  const summary = results[0]
+
+  return {
+    gene_id: geneId,
+    score_field: scoreField,
+    total_edge_count: summary.total_edge_count,
+    groups: summary.groups
+  }
+}
+
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(variantsQueryFormat)
@@ -727,9 +890,16 @@ const qtlSummaryEndpoint = publicProcedure
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 
+const genesVariantsScoreSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genes/variants/score-summary', description: descriptions.genes_variants_score_summary } })
+  .input(geneVariantScoreSummaryQueryFormat)
+  .output(geneVariantScoreSummaryFormat)
+  .query(async ({ input }) => await findGeneVariantScoreSummary(input))
+
 export const variantsGenesRouters = {
   qtlSummaryEndpoint,
   genesFromVariants,
   variantsFromGenes,
-  nearestGenes
+  nearestGenes,
+  genesVariantsScoreSummary
 }

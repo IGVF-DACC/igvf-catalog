@@ -215,3 +215,150 @@ describe('variantsGenesRouters', () => {
     })
   })
 })
+
+describe('variantsGenesRouters.genesVariantsScoreSummary', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('returns grouped min/max summaries for a known gene, restricted to CRISPR screen edges', async () => {
+    const mockGroups = [
+      {
+        method: 'CRISPR screen',
+        source: 'IGVF',
+        files_filesets: 'files_filesets/IGVFFI0524YUIL',
+        biosample_term: 'ontology_terms/EFO_0001253',
+        biological_context: 'human THP-1 cell line',
+        perturbation: 'prime editing',
+        min: -0.727384492,
+        max: -0.1,
+        edge_count: 2,
+        numeric_count: 2,
+        missing_count: 0,
+        invalid_count: 0,
+        zero_count: 0
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 2, groups: mockGroups }]) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size' }
+    const result = await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
+
+    expect(result).toEqual({
+      gene_id: 'ENSG00000108179',
+      score_field: 'effect_size',
+      total_edge_count: 2,
+      groups: mockGroups
+    })
+
+    const aql = String(query.mock.calls[1][0])
+    expect(aql).toContain("record.method == 'CRISPR screen'")
+    expect(aql).toContain("record.label == 'variant effect on gene expression'")
+  })
+
+  it('throws NOT_FOUND for an unknown gene without running the aggregation query', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any)
+
+    const input = { gene_id: 'NOT_A_REAL_GENE', score_field: 'effect_size' }
+    await expect(callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)).rejects.toThrow(TRPCError)
+    expect(query).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns an empty group list and zero total for a known gene with no matching edges', async () => {
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size', files_fileset: 'NOTAREALFILESET' }
+    const result = await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
+
+    expect(result).toEqual({
+      gene_id: 'ENSG00000108179',
+      score_field: 'effect_size',
+      total_edge_count: 0,
+      groups: []
+    })
+  })
+
+  it('maps perturbation to the stored crispr_modality field and filters biological_context exactly', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = {
+      gene_id: 'ENSG00000108179',
+      score_field: 'effect_size',
+      perturbation: 'base editing',
+      biological_context: 'human THP-1 cell line'
+    }
+    await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
+
+    const [aql, bindVars] = query.mock.calls[1]
+    const aqlText = String(aql)
+    expect(aqlText).toContain("record.crispr_modality == 'base editing'")
+    expect(aqlText).toContain('record.biological_context == @biologicalContext')
+    expect(bindVars).toMatchObject({ biologicalContext: 'human THP-1 cell line' })
+  })
+
+  it('defaults to page 0 and a limit of 25, capping a larger requested limit at 500', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size' }
+    await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
+    expect(query.mock.calls[1][1]).toMatchObject({ page: 0, limit: 25 })
+
+    jest.clearAllMocks()
+    const query2 = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input2 = { gene_id: 'ENSG00000108179', score_field: 'effect_size', page: 2, limit: 99999 }
+    await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input2)
+    expect(query2.mock.calls[1][1]).toMatchObject({ page: 2, limit: 500 })
+  })
+
+  it('excludes groups with no numeric scores before pagination and counts only scored edges', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size' }
+    await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
+
+    const aql = String(query.mock.calls[1][0])
+    expect(aql).toContain('FILTER g.numeric_count > 0')
+    expect(aql).toContain('total_edge_count: SUM(scoredGroups[*].numeric_count)')
+    expect(aql).toContain('groups: SLICE(scoredGroups, @page * @limit, @limit)')
+  })
+
+  it.each([
+    [{ page: -1 }],
+    [{ page: 1.5 }]
+  ])('throws BAD_REQUEST for an invalid page %j', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size', ...overrides }
+    await expect(callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)).rejects.toThrow(TRPCError)
+    expect(query).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ limit: -1 }],
+    [{ limit: 0 }],
+    [{ limit: 1.5 }]
+  ])('throws BAD_REQUEST for an invalid limit %j instead of silently bypassing the page size cap', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
+
+    const input = { gene_id: 'ENSG00000108179', score_field: 'effect_size', ...overrides }
+    await expect(callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)).rejects.toThrow(TRPCError)
+    expect(query).not.toHaveBeenCalled()
+  })
+})

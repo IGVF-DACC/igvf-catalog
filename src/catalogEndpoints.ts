@@ -59,6 +59,8 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/variants/variant-ld/summary', tag: 'Bespoke Endpoints' },
   { path: '/variants/region-summary', tag: 'Bespoke Endpoints' },
   { path: '/variants/genes/summary', tag: 'Bespoke Endpoints' },
+  { path: '/genes/genomic-elements/score-summary', tag: 'Bespoke Endpoints' },
+  { path: '/genes/variants/score-summary', tag: 'Bespoke Endpoints' },
   { path: '/variants/predictions-count', tag: 'Bespoke Endpoints' },
   { path: '/variants/predictions', tag: 'Bespoke Endpoints' },
   { path: '/variants/phenotypes/score-summary', tag: 'Bespoke Endpoints' },
