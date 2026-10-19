@@ -1350,15 +1350,22 @@ export const descriptions = {
   files_fileset = ENCFF475FKV,<br> \
   method = MPRA,<br> \
   source = IGVF. <br> \
+  Mouse MPRA example: organism = Mus musculus, <br> \
+  region = chr11:55319627-55319927, <br> \
+  files_fileset = IGVFFI0975AQKF, <br> \
+  method = MPRA, verbose = true. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
-  biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
+  biosamples_genomic_elements: 'Retrieve MPRA experiments by querying cell ontology terms. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
   Example: biosample_name = hepg2, <br> \
   method = MPRA, <br> \
   source = IGVF, <br> \
   files_fileset = ENCFF475FKV. <br> \
+  Mouse MPRA example: organism = Mus musculus, <br> \
+  files_fileset = IGVFFI0975AQKF (mouse PYS-2 biosample), <br> \
+  method = MPRA, verbose = true. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -1851,6 +1858,16 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
+            label: 'mouse MPRA by variant identifier',
+            items: [
+              'organism = Mus musculus',
+              'spdi = NC_000077.7:55319687:T:C',
+              'files_fileset = IGVFFI5939ZOZQ',
+              'method = MPRA',
+              'verbose = true'
+            ]
+          },
+          {
             label: 'query by variant identifier',
             items: [
               'spdi = NC_000001.11:1000161:C:A',
@@ -1918,6 +1935,16 @@ export const descriptions = {
         id: 'mpra',
         label: 'MPRA',
         examples: [
+          {
+            label: 'mouse MPRA by biosample identifier',
+            items: [
+              'organism = Mus musculus',
+              'biosample_id = CLO_0008675',
+              'files_fileset = IGVFFI5939ZOZQ',
+              'method = MPRA',
+              'verbose = true'
+            ]
+          },
           {
             label: 'query by biosample identifier',
             items: [
