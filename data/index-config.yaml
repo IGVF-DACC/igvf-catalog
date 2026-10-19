@@ -196,11 +196,7 @@ mm_variants:
       - hgvs
       - chr, strain[*]
       - strain[*]
-  zkd:
-    fields:
-      - pos
-
-
+      - chr, pos
 
 motifs:
   persistent:
