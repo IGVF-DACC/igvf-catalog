@@ -1345,7 +1345,8 @@ export const descriptions = {
 
   genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
-  Example: region_type = tested elements, <br> \
+  Human MPRA example: organism = Homo sapiens, <br> \
+  region_type = tested elements, <br> \
   region = chr10:100038743-100038963. <br> \
   files_fileset = ENCFF475FKV,<br> \
   method = MPRA,<br> \
@@ -1359,7 +1360,8 @@ export const descriptions = {
 
   biosamples_genomic_elements: 'Retrieve MPRA experiments by querying cell ontology terms. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
-  Example: biosample_name = hepg2, <br> \
+  Human MPRA example: organism = Homo sapiens, <br> \
+  biosample_name = hepg2, <br> \
   method = MPRA, <br> \
   source = IGVF, <br> \
   files_fileset = ENCFF475FKV. <br> \
@@ -1868,15 +1870,17 @@ export const descriptions = {
             ]
           },
           {
-            label: 'query by variant identifier',
+            label: 'human MPRA by variant identifier',
             items: [
+              'organism = Homo sapiens',
               'spdi = NC_000001.11:1000161:C:A',
               'method = MPRA'
             ]
           },
           {
-            label: 'query by region',
+            label: 'human MPRA by region',
             items: [
+              'organism = Homo sapiens',
               'region = chr1:1000160-1000163 (maximum length: 10kb)',
               'method = MPRA'
             ]
@@ -1946,8 +1950,9 @@ export const descriptions = {
             ]
           },
           {
-            label: 'query by biosample identifier',
+            label: 'human MPRA by biosample identifier',
             items: [
+              'organism = Homo sapiens',
               'biosample_id = EFO_0001182',
               'method = MPRA',
               'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
