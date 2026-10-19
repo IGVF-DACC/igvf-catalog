@@ -1860,16 +1860,6 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
-            label: 'mouse MPRA by variant identifier',
-            items: [
-              'organism = Mus musculus',
-              'spdi = NC_000077.7:55319687:T:C',
-              'files_fileset = IGVFFI5939ZOZQ',
-              'method = MPRA',
-              'verbose = true'
-            ]
-          },
-          {
             label: 'human MPRA by variant identifier',
             items: [
               'organism = Homo sapiens',
@@ -1883,6 +1873,16 @@ export const descriptions = {
               'organism = Homo sapiens',
               'region = chr1:1000160-1000163 (maximum length: 10kb)',
               'method = MPRA'
+            ]
+          },
+          {
+            label: 'mouse MPRA by variant identifier',
+            items: [
+              'organism = Mus musculus',
+              'spdi = NC_000077.7:55319687:T:C',
+              'files_fileset = IGVFFI5939ZOZQ',
+              'method = MPRA',
+              'verbose = true'
             ]
           }
         ]
@@ -1940,16 +1940,6 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
-            label: 'mouse MPRA by biosample identifier',
-            items: [
-              'organism = Mus musculus',
-              'biosample_id = CLO_0008675',
-              'files_fileset = IGVFFI5939ZOZQ',
-              'method = MPRA',
-              'verbose = true'
-            ]
-          },
-          {
             label: 'human MPRA by biosample identifier',
             items: [
               'organism = Homo sapiens',
@@ -1957,6 +1947,16 @@ export const descriptions = {
               'method = MPRA',
               'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
               'significant = true'
+            ]
+          },
+          {
+            label: 'mouse MPRA by biosample identifier',
+            items: [
+              'organism = Mus musculus',
+              'biosample_id = CLO_0008675',
+              'files_fileset = IGVFFI5939ZOZQ',
+              'method = MPRA',
+              'verbose = true'
             ]
           }
         ]
