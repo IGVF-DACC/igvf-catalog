@@ -618,14 +618,14 @@ def test_validate_doc_invalid(mock_file_fileset):
     ('variant', 'mm_variants'),
     ('variant_biosample', 'mm_variants_biosamples'),
 ])
-def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, label, collection):
+def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, mock_ontology_term_validator, label, collection):
     spdi = 'NC_000067.7:11:A:C'
-    design = tmp_path / 'design.tsv'
+    design = tmp_path / 'IGVFFI4261NSQZ.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tSPDI\tallele\tvariant_pos\n'
         f'ref_tile\tGRCm39\tchr1\t10\t20\t+\t["{spdi}"]\t["ref"]\t[1]\n'
     )
-    effects = tmp_path / 'effects.bed'
+    effects = tmp_path / 'IGVFFI2111LQGF.bed'
     if label in ('genomic_element', 'genomic_element_biosample'):
         effects.write_text(
             'chr1\t10\t20\tref_tile\t100\t+\t0.25\t1\t2\t3\t1.5\n')
@@ -643,9 +643,7 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, labe
             patch('adapters.mpra_adapter.load_variant', return_value=(variant, None)) as load:
         adapter = MPRAAdapter(
             filepath=str(effects), label=f'mm_{label}', writer=writer, validate=True,
-            source_url='https://data.igvf.org/tabular-files/IGVFFI2111LQGF/',
             reference_filepath=str(design),
-            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI4261NSQZ/',
         )
         assert adapter._get_collection_name() == collection
         assert adapter.schema['db_collection_name'] == collection
@@ -667,14 +665,14 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, labe
             load.assert_called_once_with(spdi, assembly='GRCm39')
 
 
-def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
-    design = tmp_path / 'design.tsv'
+def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset, mock_ontology_term_validator):
+    design = tmp_path / 'IGVFFI1204BCKQ.tsv'
     design.write_text(
         'name\tref\tclass\tchr\tstart\tend\tstrand\tallele\n'
         'mouse_tile\tGRCm39\ttest\tchr1\t10\t20\t+\tNA\n'
         'human_control\tGRCh38\telement active control\tchr2\t30\t40\t+\tNA\n'
     )
-    effects = tmp_path / 'effects.bed'
+    effects = tmp_path / 'IGVFFI3406MEAD.bed'
     effects.write_text(
         'chr1\t10\t20\tmouse_tile\t100\t+\t1\t2\t3\t4\t5\n'
         'chr2\t30\t40\thuman_control\t100\t+\t1\t2\t3\t4\t5\n'
@@ -683,9 +681,7 @@ def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
         writer = SpyWriter()
         adapter = MPRAAdapter(
             filepath=str(effects), label=f'mm_{label}', writer=writer, validate=True,
-            source_url='https://data.igvf.org/tabular-files/IGVFFI3406MEAD/',
             reference_filepath=str(design),
-            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI1204BCKQ/',
         )
         adapter.process_file()
         assert adapter.assembly == 'GRCm39'
@@ -695,23 +691,21 @@ def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset):
 
 @pytest.mark.parametrize('design_accession', ['IGVFFI4261NSQZ', 'IGVFFI1789LDNT', 'IGVFFI0000TEST'])
 @pytest.mark.parametrize('strand', ['+', '-'])
-def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_fileset, strand, design_accession):
-    design = tmp_path / 'design.tsv'
+def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_fileset, mock_ontology_term_validator, strand, design_accession):
+    design = tmp_path / f'{design_accession}.tsv'
     # ALT precedes WT and covers only the changed base, not the full tile.
     design.write_text(
         'name\tref\tclass\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
         f'arbitrary_variant_name\tGRCm39\ttest\tchr1\t11\t12\t{strand}\t["alt"]\t["NC_000067.7:11:A:C"]\t[1]\n'
         f'unrelated_reference_name\tGRCm39\ttest\tchr1\t10\t20\t{strand}\t["ref"]\tNA\tNA\n'
     )
-    effects = tmp_path / 'effects.bed'
+    effects = tmp_path / 'IGVFFI0975AQKF.bed'
     effects.write_text(
         f'chr1\t10\t20\tunrelated_reference_name\t100\t{strand}\t1\t2\t3\t4\t5\n')
     writer = SpyWriter()
     adapter = MPRAAdapter(
         filepath=str(effects), label='mm_genomic_element_biosample', writer=writer, validate=True,
-        source_url='https://data.igvf.org/tabular-files/IGVFFI0975AQKF/',
         reference_filepath=str(design),
-        reference_source_url=f'https://data.igvf.org/tabular-files/{design_accession}/',
     )
     assert adapter.variant_to_element['NC_000067.7:11:A:C'] == {
         ('chr1', '10', '20', strand)}
@@ -727,17 +721,16 @@ def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
                                             'ref_a\tGRCm39\tchr1\t10\t20\t+\t["ref"]\tNA\n'
                                             'ref_b\tGRCm39\tchr1\t9\t21\t+\t["ref"]\tNA\n'])
 def test_mouse_design_requires_unique_containing_reference(tmp_path, mock_file_fileset, reference_rows):
-    design = tmp_path / 'design.tsv'
+    design = tmp_path / 'IGVFFI0000TEST.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
         'variant\tGRCm39\tchr1\t11\t12\t+\t["alt"]\t["NC_000067.7:11:A:C"]\n'
         + reference_rows)
     with pytest.raises(ValueError, match='Expected one reference tile') if reference_rows else nullcontext():
         adapter = MPRAAdapter(
-            filepath='unused.bed', label='mm_variant', writer=SpyWriter(),
-            source_url='https://data.igvf.org/tabular-files/IGVFFI5939ZOZQ/',
+            filepath='IGVFFI5939ZOZQ.bed', label='mm_variant', writer=SpyWriter(),
             reference_filepath=str(design),
-            reference_source_url='https://data.igvf.org/tabular-files/IGVFFI0000TEST/')
+        )
 
     if not reference_rows:
         assert not adapter.variant_to_element
