@@ -89,6 +89,7 @@ class HumanMouseElementAdapter(BaseAdapter):
             return 'genomic_elements_mm_genomic_elements'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             next(reader)
