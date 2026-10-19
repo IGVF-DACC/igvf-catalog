@@ -54,6 +54,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         'genomic_element_gene'
     ]
     SOURCE = 'IGVF'
+    MACS_GENOME_WIDE_REFERENCE_ACCESSION = 'IGVFFI9629WVUU'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
     # Two-tailed normal critical value for SIGNIFICANCE_THRESHOLD (≈ normsinv(0.975)).
@@ -886,7 +887,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         )
         if not filepath:
             raise ValueError(
-                'IGVFFI9001HIYI requires reference_filepath for IGVFFI9629WVUU.')
+                f'IGVFFI9001HIYI requires reference_filepath for {self.MACS_GENOME_WIDE_REFERENCE_ACCESSION}.')
         elements = {}
         opener = gzip.open if str(filepath).endswith('.gz') else open
         with opener(filepath, 'rt') as handle:
@@ -994,14 +995,16 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         if self.file_config.get('layout') == 'macs_genome_wide' and reference_filepath:
             self.element_file_accession = get_file_accession(
                 reference_filepath)
-            if self.element_file_accession != 'IGVFFI9629WVUU':
-                raise ValueError('Expected guide reference IGVFFI9629WVUU')
+            if self.element_file_accession != self.MACS_GENOME_WIDE_REFERENCE_ACCESSION:
+                raise ValueError(
+                    f'Expected guide reference {self.MACS_GENOME_WIDE_REFERENCE_ACCESSION}')
             self.element_source_url = (
                 f'https://data.igvf.org/tabular-files/{self.element_file_accession}/'
             )
         if self.file_config.get('layout') == 'macs_genome_wide' and reference_source_url:
-            if reference_source_url.rstrip('/').split('/')[-1] != 'IGVFFI9629WVUU':
-                raise ValueError('Expected guide reference IGVFFI9629WVUU')
+            if reference_source_url.rstrip('/').split('/')[-1] != self.MACS_GENOME_WIDE_REFERENCE_ACCESSION:
+                raise ValueError(
+                    f'Expected guide reference {self.MACS_GENOME_WIDE_REFERENCE_ACCESSION}')
         self.assembly = self.file_config.get('assembly', 'GRCh38')
         self.gene_collection = 'mm_genes' if self.assembly == 'GRCm39' else 'genes'
         self.element_collection = 'mm_genomic_elements' if self.assembly == 'GRCm39' else 'genomic_elements'

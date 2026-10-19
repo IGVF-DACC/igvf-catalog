@@ -19,21 +19,22 @@ class FileFileSet:
     SOURCE_IGVF = 'IGVF'
     SOURCE_COMMUNITY = 'Community'
 
+    CRISPR_PERTURBATION_MAPPING = {
+        'interference': 'CRISPR interference',
+        'activation': 'CRISPR activation',
+        'base editing': 'CRISPR base editing',
+        'prime editing': 'CRISPR prime editing',
+        'cutting': 'CRISPR cutting',
+        'knockout': 'CRISPR knockout',
+    }
+
     @staticmethod
     def get_perturbation(modality, method):
         if method == 'MORF screen':
             return 'ORF overexpression'
         if modality is None:
             return None
-        modalities = {
-            'interference': 'CRISPR interference',
-            'activation': 'CRISPR activation',
-            'base editing': 'CRISPR base editing',
-            'prime editing': 'CRISPR prime editing',
-            'cutting': 'CRISPR cutting',
-            'knockout': 'CRISPR knockout',
-        }
-        return modalities[modality]
+        return FileFileSet.CRISPR_PERTURBATION_MAPPING[modality]
 
     ENCODE_disease_id_mapping = {
         'DOID:0080832': 'HP:0100543',
