@@ -1850,7 +1850,7 @@ export const descriptions = {
   dataset = VAMP-seq',
 
   variants_biosamples:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, MPRA, and ColocBoost for a given variant. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1926,11 +1926,24 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'colocboost',
+        label: 'ColocBoost',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:155904168:A:G',
+              'method = ColocBoost'
+            ]
+          }
+        ]
       }
     ]),
 
   biosamples_variants:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, MPRA, and ColocBoost for a given biosample. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: biosample_id or biosample_name. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1983,6 +1996,19 @@ export const descriptions = {
             items: [
               'biosample_id = EFO_0002067',
               'method = BlueSTARR'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'colocboost',
+        label: 'ColocBoost',
+        examples: [
+          {
+            label: 'query by biosample identifier',
+            items: [
+              'biosample_id = UBERON_0001225',
+              'method = ColocBoost'
             ]
           }
         ]
