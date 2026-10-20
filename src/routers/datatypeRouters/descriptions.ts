@@ -1343,22 +1343,31 @@ export const descriptions = {
   The limit parameter controls the page size of related items and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
+  genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
-  Example: region_type = tested elements, <br> \
+  Human MPRA example: organism = Homo sapiens, <br> \
+  region_type = tested elements, <br> \
   region = chr10:100038743-100038963. <br> \
   files_fileset = ENCFF475FKV,<br> \
   method = MPRA,<br> \
   source = IGVF. <br> \
+  Mouse MPRA example: organism = Mus musculus, <br> \
+  region = chr11:55319627-55319927, <br> \
+  files_fileset = IGVFFI0975AQKF, <br> \
+  method = MPRA, verbose = true. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
-  biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
+  biosamples_genomic_elements: 'Retrieve MPRA experiments by querying cell ontology terms. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
-  Example: biosample_name = hepg2, <br> \
+  Human MPRA example: organism = Homo sapiens, <br> \
+  biosample_name = hepg2, <br> \
   method = MPRA, <br> \
   source = IGVF, <br> \
   files_fileset = ENCFF475FKV. <br> \
+  Mouse MPRA example: organism = Mus musculus, <br> \
+  files_fileset = IGVFFI0975AQKF (mouse PYS-2 biosample), <br> \
+  method = MPRA, verbose = true. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -1841,7 +1850,7 @@ export const descriptions = {
   dataset = VAMP-seq',
 
   variants_biosamples:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant.<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1851,17 +1860,29 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
-            label: 'query by variant identifier',
+            label: 'human MPRA by variant identifier',
             items: [
+              'organism = Homo sapiens',
               'spdi = NC_000001.11:1000161:C:A',
               'method = MPRA'
             ]
           },
           {
-            label: 'query by region',
+            label: 'human MPRA by region',
             items: [
+              'organism = Homo sapiens',
               'region = chr1:1000160-1000163 (maximum length: 10kb)',
               'method = MPRA'
+            ]
+          },
+          {
+            label: 'mouse MPRA by variant identifier',
+            items: [
+              'organism = Mus musculus',
+              'spdi = NC_000077.7:55319687:T:C',
+              'files_fileset = IGVFFI5939ZOZQ',
+              'method = MPRA',
+              'verbose = true'
             ]
           }
         ]
@@ -1909,7 +1930,7 @@ export const descriptions = {
     ]),
 
   biosamples_variants:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample.<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: biosample_id or biosample_name. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1919,12 +1940,23 @@ export const descriptions = {
         label: 'MPRA',
         examples: [
           {
-            label: 'query by biosample identifier',
+            label: 'human MPRA by biosample identifier',
             items: [
+              'organism = Homo sapiens',
               'biosample_id = EFO_0001182',
               'method = MPRA',
               'element_id = MPRA_chr1_1000079_1000279_GRCh38_plus_IGVFFI7321WGMD',
               'significant = true'
+            ]
+          },
+          {
+            label: 'mouse MPRA by biosample identifier',
+            items: [
+              'organism = Mus musculus',
+              'biosample_id = CLO_0008675',
+              'files_fileset = IGVFFI5939ZOZQ',
+              'method = MPRA',
+              'verbose = true'
             ]
           }
         ]

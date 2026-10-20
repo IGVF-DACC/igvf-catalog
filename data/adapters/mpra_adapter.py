@@ -9,6 +9,7 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
     name.
 
 **Labels (``self.label``)**
+  Prefix any label below with ``mm_`` for mouse (GRCm39); unprefixed labels use human (GRCh38).
   * ``genomic_element`` / ``genomic_element_biosample`` — element-level activity. Designs are required
   for IGVF to attribute the element to design file for joining with variant edges.
   * ``variant`` / ``variant_biosample`` / ``genomic_element_from_variant`` — IGVF variant activity.
@@ -52,6 +53,7 @@ import csv
 import gzip
 import json
 import hashlib
+import math
 from typing import Optional
 from collections import defaultdict
 import ast
@@ -99,8 +101,15 @@ class MPRAAdapter(BaseAdapter):
         'genomic_element_biosample',
         'variant',
         'genomic_element_from_variant',
-        'variant_biosample'
+        'variant_biosample',
+        'mm_genomic_element',
+        'mm_genomic_element_biosample',
+        'mm_variant',
+        'mm_genomic_element_from_variant',
+        'mm_variant_biosample'
     ]
+
+    SATMUT_DESIGN_ACCESSIONS = frozenset({'IGVFFI4261NSQZ', 'IGVFFI1789LDNT'})
 
     THRESHOLD = 1
     CHUNK_SIZE = 6500
@@ -119,6 +128,10 @@ class MPRAAdapter(BaseAdapter):
         validate=False,
         **kwargs
     ):
+        if label not in self.ALLOWED_LABELS:
+            raise ValueError(
+                f'Invalid label: {label}. Allowed values: {self.ALLOWED_LABELS}')
+        self.effect_label = label.removeprefix('mm_')
         self.file_accession = get_file_accession(filepath)
         if self.file_accession.startswith('ENCFF'):
             self.source = 'ENCODE'
@@ -139,7 +152,7 @@ class MPRAAdapter(BaseAdapter):
         # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
         if (
             reference_filepath is None
-            and label in ('variant', 'genomic_element_from_variant', 'variant_biosample')
+            and self.effect_label in ('variant', 'genomic_element_from_variant', 'variant_biosample')
             and self.source == 'ENCODE'
         ):
             raise ValueError(
@@ -147,6 +160,10 @@ class MPRAAdapter(BaseAdapter):
                 'Use label genomic_element or genomic_element_biosample only.'
             )
 
+        prefix = 'mm_' if label.startswith('mm_') else ''
+        self.assembly = 'GRCm39' if prefix else 'GRCh38'
+        self.element_collection = f'{prefix}genomic_elements'
+        self.variant_collection = f'{prefix}variants'
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
 
@@ -169,6 +186,7 @@ class MPRAAdapter(BaseAdapter):
         self.design_name_alleles = defaultdict(set)
         self.design_element_alleles = defaultdict(set)
         self.design_name_class = {}
+        self.excluded_assembly_design_names = set()
         if self.has_sequence_designs:
             self.mpra_design_file = reference_filepath
             self.reference_file_accession = get_file_accession(
@@ -203,33 +221,39 @@ class MPRAAdapter(BaseAdapter):
         return open(self.filepath, 'r')
 
     def _get_schema_type(self):
-        if self.label in ['genomic_element_biosample', 'variant_biosample']:
+        if self.effect_label in ['genomic_element_biosample', 'variant_biosample']:
             return 'edges'
         return 'nodes'
 
     def _get_collection_name(self):
-        if self.label == 'variant':
-            return 'variants'
-        if self.label == 'variant_biosample':
-            return 'variants_biosamples'
-        if self.label in ['genomic_element', 'genomic_element_from_variant']:
-            return 'genomic_elements'
-        if self.label == 'genomic_element_biosample':
-            return 'genomic_elements_biosamples'
+        if self.effect_label == 'variant':
+            return self.variant_collection
+        if self.effect_label == 'variant_biosample':
+            return f'{self.variant_collection}_biosamples'
+        if self.effect_label in ['genomic_element', 'genomic_element_from_variant']:
+            return self.element_collection
+        if self.effect_label == 'genomic_element_biosample':
+            return f'{self.element_collection}_biosamples'
         return None
 
     @staticmethod
     def safe_float(value):
         try:
             parsed = float(value)
-            return None if parsed != parsed else parsed
+            return parsed
         except (TypeError, ValueError):
             return None
+
+    @staticmethod
+    def _drop_nonfinite_metrics(props):
+        """Preserve records while omitting NaN and infinite numeric fields."""
+        return {key: value for key, value in props.items()
+                if not (isinstance(value, float) and not math.isfinite(value))}
 
     @classmethod
     def safe_int(cls, value):
         parsed = cls.safe_float(value)
-        if parsed is None:
+        if parsed is None or not math.isfinite(parsed):
             return None
         return int(parsed) if parsed.is_integer() else None
 
@@ -288,19 +312,25 @@ class MPRAAdapter(BaseAdapter):
         """
         return name_role in ('ref', 'none')
 
-    @classmethod
-    def build_mpra_element_node_id(cls, chr_, start, end, strand, suffix):
+    def build_mpra_element_node_id(self, chr_, start, end, strand, suffix):
         """Genomic element node _key: coordinates + strand token + suffix."""
-        region_id = build_regulatory_region_id(chr_, start, end, 'MPRA')
-        return f'{region_id}_{cls.strand_token(strand)}_{suffix}'
+        region_id = build_regulatory_region_id(
+            chr_, start, end, 'MPRA', assembly=self.assembly)
+        return f'{region_id}_{self.strand_token(strand)}_{suffix}'
 
     def load_mpra_design_mapping(self, mpra_design_file):
         # IGVF designs TSV: per-row `allele` / `SPDI` / `variant_pos` drive the maps in the
         # class docstring. Alt-only rows only contribute to allele *sets*, not to catalog keys.
         pending_alt_spdi_mappings = []
-        with open(mpra_design_file, 'r') as f:
+        reference_tiles = set()
+        opener = gzip.open if str(mpra_design_file).endswith('.gz') else open
+        with opener(mpra_design_file, 'rt') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
+                if row.get('ref', self.assembly) not in (self.assembly, '', 'NA'):
+                    self.excluded_assembly_design_names.add(
+                        self.normalize_design_name(row.get('name')))
+                    continue
                 try:
                     key = self.make_design_key(
                         row['chr'], row['start'], row['end'], row.get('strand'))
@@ -325,6 +355,8 @@ class MPRAAdapter(BaseAdapter):
                     self.design_elements.add(key)
                     if row.get('name') is not None and str(row.get('name')).strip():
                         self.coords_to_element_name[key] = row.get('name')
+                    if name_role == 'ref':
+                        reference_tiles.add(key)
 
                 normalized_name = self.normalize_design_name(row.get('name'))
                 if normalized_name:
@@ -389,7 +421,25 @@ class MPRAAdapter(BaseAdapter):
 
         for key, spdi_list, variant_pos_list in pending_alt_spdi_mappings:
             if key not in self.design_elements:
-                continue
+                # ALT coordinates may describe only the changed bases rather
+                # than the full reference tile. When there is no exact tile
+                # match, require a unique reference tile containing that interval
+                # on the same chromosome and strand. This mapping uses reference
+                # coordinates, not sequence identity or provenance names, and
+                # applies to every design dataset.
+                candidates = {
+                    tile for tile in reference_tiles
+                    if key[0] == tile[0] and key[3] == tile[3]
+                    and int(tile[1]) <= int(key[1]) <= int(key[2]) <= int(tile[2])
+                }
+                if not candidates:
+                    # ALT-only designs have no reference element to link to.
+                    continue
+                if len(candidates) != 1:
+                    raise ValueError(
+                        f'Expected one reference tile containing variant design {key}; '
+                        f'found {len(candidates)} in {self.reference_file_accession}')
+                key = candidates.pop()
             for spdi in spdi_list:
                 self.variant_to_element[spdi].add(key)
             if variant_pos_list is not None:
@@ -446,12 +496,12 @@ class MPRAAdapter(BaseAdapter):
         self.treatments_term_ids = self.file_fileset.get(
             'treatments_term_ids')
 
-        if self.label in ('genomic_element_biosample', 'variant_biosample'):
+        if self.effect_label in ('genomic_element_biosample', 'variant_biosample'):
             if not self.ontology_term_validator.ensure(self.biosample_term):
                 self.ontology_term_validator.log()
                 return
 
-        if self.label in ('genomic_element', 'genomic_element_biosample'):
+        if self.effect_label in ('genomic_element', 'genomic_element_biosample'):
             self._process_element_effects_file()
             return
 
@@ -497,12 +547,14 @@ class MPRAAdapter(BaseAdapter):
                     row) > 10 and row[10] != '-1' else None
                 significant = minus_q is not None and minus_q >= self.THRESHOLD
                 region_id = build_regulatory_region_id(
-                    chr_, start, end, 'MPRA')
+                    chr_, start, end, 'MPRA', assembly=self.assembly)
                 element_id = self.build_mpra_element_node_id(
                     chr_, start, end, strand, element_id_suffix)
                 element_key = self.make_design_key(chr_, start, end, strand)
+                if self.normalize_design_name(row[3]) in self.excluded_assembly_design_names:
+                    continue
 
-                if self.label == 'genomic_element':
+                if self.effect_label == 'genomic_element':
                     if self.has_sequence_designs and element_key not in self.design_elements:
                         self.logger.warning(
                             f'Skipping genomic element {(chr_, start, end, strand)} from {self.file_accession}: '
@@ -540,9 +592,10 @@ class MPRAAdapter(BaseAdapter):
                     }
                     if self.validate:
                         self.validate_doc(props)
-                    self.writer.write(json.dumps(props) + '\n')
+                    self.writer.write(json.dumps(
+                        props, allow_nan=False) + '\n')
 
-                elif self.label == 'genomic_element_biosample':
+                elif self.effect_label == 'genomic_element_biosample':
                     if self.has_sequence_designs:
                         normalized_effect_name = self.normalize_design_name(
                             row[3])
@@ -553,9 +606,11 @@ class MPRAAdapter(BaseAdapter):
                             continue
                         effect_class = self.design_name_class.get(
                             normalized_effect_name, '')
-                        if 'control' in effect_class:
-                            # Controls can be present without allele values and
-                            # should not produce genomic_element_biosample edges.
+                        if 'control' in effect_class and not (
+                                self.reference_file_accession in self.SATMUT_DESIGN_ACCESSIONS
+                                and 'ref' in self.design_name_alleles.get(normalized_effect_name, set())):
+                            # Controls normally do not produce activity edges. The
+                            # SatMut WT controls are its five reference test tiles.
                             continue
                         # Prefer design-name mapping when available; fallback to
                         # coordinate mapping for legacy files.
@@ -579,7 +634,7 @@ class MPRAAdapter(BaseAdapter):
                         row) > 10 and row[10] != '-1' else None
                     props = {
                         '_key': edge_id,
-                        '_from': 'genomic_elements/' + element_id,
+                        '_from': f'{self.element_collection}/{element_id}',
                         '_to': self.biosample_term,
                         'strand': strand,
                         'log2FC': self.safe_float(row[6]),
@@ -601,9 +656,11 @@ class MPRAAdapter(BaseAdapter):
                         'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
                     }
+                    props = self._drop_nonfinite_metrics(props)
                     if self.validate:
                         self.validate_doc(props)
-                    self.writer.write(json.dumps(props) + '\n')
+                    self.writer.write(json.dumps(
+                        props, allow_nan=False) + '\n')
 
             if missing_allele_multi_effect:
                 raise ValueError(
@@ -612,22 +669,24 @@ class MPRAAdapter(BaseAdapter):
                 )
 
     def _process_chunk_igvf(self, chunk):
-        if self.label == 'variant':
+        if self.effect_label == 'variant':
             self._process_variant_chunk(chunk)
-        elif self.label == 'variant_biosample':
+        elif self.effect_label == 'variant_biosample':
             self._process_variant_biosample_chunk(chunk)
-        elif self.label == 'genomic_element_from_variant':
+        elif self.effect_label == 'genomic_element_from_variant':
             self._process_genomic_element_chunk(chunk)
 
     def _process_variant_chunk(self, chunk):
         spdis = [row[3] for row in chunk]
         loaded_spdis = bulk_check_variants_in_arangodb(
-            spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}')
+            spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}',
+            collection=self.variant_collection)
         for row in chunk:
             spdi = row[3]
             if spdi in loaded_spdis:
                 continue
-            variant, skipped_message = load_variant(spdi)
+            variant, skipped_message = load_variant(
+                spdi, assembly=self.assembly)
             if variant:
                 variant.update({
                     'source': self.source,
@@ -677,12 +736,20 @@ class MPRAAdapter(BaseAdapter):
             }
             if self.validate:
                 self.validate_doc(props)
-            self.writer.write(json.dumps(props) + '\n')
+            self.writer.write(json.dumps(props, allow_nan=False) + '\n')
 
     def _process_variant_biosample_chunk(self, chunk):
         """IGVF variant×biosample BED: SPDI in col 3, optional ``variant_pos`` in col 16 for disambiguation of the same variant on different strands."""
         loaded_spdis = bulk_check_variants_in_arangodb(
-            [row[3] for row in chunk])
+            [row[3] for row in chunk], collection=self.variant_collection)
+        missing_spdis = {row[3] for row in chunk} - set(loaded_spdis)
+        if missing_spdis:
+            self.logger.error(
+                f'{self.file_accession}: skipping variant-biosample edges for '
+                f'{len(missing_spdis)} unique variants in this chunk because their '
+                f'nodes are missing from {self.variant_collection} in ArangoDB. '
+                'Output will be incomplete. Load the variant nodes into ArangoDB '
+                'and rerun edge generation; uploading node files to S3 is not sufficient.')
         for row in chunk:
             spdi = row[3]
             if spdi not in loaded_spdis:
@@ -693,7 +760,8 @@ class MPRAAdapter(BaseAdapter):
                     'Ensure all genomic element edges are mapped via the sequence design file.'
                 )
 
-            variant, skipped_message = load_variant(spdi)
+            variant, skipped_message = load_variant(
+                spdi, assembly=self.assembly)
             if not variant:
                 if skipped_message:
                     self.logger.warning(f'Skipped {spdi}: {skipped_message}')
@@ -734,9 +802,9 @@ class MPRAAdapter(BaseAdapter):
                 minus_q = self.safe_float(row[12])
                 edge_props = {
                     '_key': edge_key,
-                    '_from': f'variants/{variant_id}',
+                    '_from': f'{self.variant_collection}/{variant_id}',
                     '_to': self.biosample_term,
-                    'genomic_element': f'genomic_elements/{element_id}',
+                    'genomic_element': f'{self.element_collection}/{element_id}',
                     'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
                     'bed_score': self.safe_int(row[4]),
@@ -763,6 +831,8 @@ class MPRAAdapter(BaseAdapter):
                     'treatments_term_ids': self.treatments_term_ids or None,
                 }
 
+                edge_props = self._drop_nonfinite_metrics(edge_props)
                 if self.validate:
                     self.validate_doc(edge_props)
-                self.writer.write(json.dumps(edge_props) + '\n')
+                self.writer.write(json.dumps(
+                    edge_props, allow_nan=False) + '\n')
