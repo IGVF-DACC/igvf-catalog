@@ -303,11 +303,10 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     )
 
     FOR vws IN variantWithScores
-      COLLECT protein_change = vws.protein_change INTO grouped = vws
-      FILTER protein_change.aapos != -1
-      LET maxScore = MAX(grouped[*].maxScore)
+      COLLECT protein_change = vws.protein_change, alt = vws.cvDoc.alt INTO grouped = vws
       LET firstCvDoc = FIRST(grouped).cvDoc
-      SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC
+      FILTER firstCvDoc.aapos != -1
+      SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC, alt ASC
       LIMIT ${page as number * limit}, ${limit}
       RETURN {
         protein_change: {
@@ -317,7 +316,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
           hgvsp: protein_change,
           aapos: firstCvDoc.aapos,
           ref: firstCvDoc.ref,
-          alt: firstCvDoc.alt
+          alt: alt
         },
         variants: grouped[* RETURN {
           variant: CURRENT.variant,
