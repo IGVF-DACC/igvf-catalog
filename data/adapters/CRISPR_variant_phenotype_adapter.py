@@ -301,6 +301,14 @@ class CRISPRVariantPhenotype(BaseAdapter):
         elif self.label == 'variant_phenotype':
             loaded_variants = bulk_check_variants_in_arangodb(
                 list(spdi_to_variant.keys()))
+            missing_spdis = set(spdi_to_rows) - set(loaded_variants)
+            if missing_spdis:
+                self.logger.error(
+                    f'{self.file_accession}: skipping variant-phenotype edges for '
+                    f'{len(missing_spdis)} unique variants in this chunk because their '
+                    'nodes are missing from variants in ArangoDB. '
+                    'Output will be incomplete. Load the variant nodes into ArangoDB '
+                    'and rerun edge generation; uploading node files to S3 is not sufficient.')
             self._write_variant_phenotypes(spdi_to_rows, loaded_variants)
 
     def _write_variants(self, spdi_to_variant, loaded_variants):

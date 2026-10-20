@@ -732,7 +732,7 @@
         "num_guides": "element_guide_count"
       }
     },
-    "notes": "Preserve both one-sided selection results. Negative selection measures depletion in CDH5+ versus CDH5- cells; positive selection measures enrichment. Directional significance requires FDR < 0.05 and matching log2FC sign (negative for depletion, positive for enrichment). The gene regulatory network endpoint reports negative-selection statistics. Preserve native element IDs and guide-reference coordinates."
+    "notes": "Preserve both one-sided selection results. Negative selection measures depletion in CDH5+ versus CDH5- cells; positive selection measures enrichment. Directional significance requires FDR < 0.05 and matching log2FC sign (negative for depletion, positive for enrichment). The gene regulatory network endpoint reports negative-selection statistics. Preserve native element IDs and guide-reference coordinates. In IGVFFI3975KRIX, NOTCH1_-P1 and NOTCH1_-P2 intentionally retain identical statistics from the single gene-level NOTCH1 test, which aggregated 12 guides across both promoters. This submitter-provided duplication makes the shared signal discoverable when querying either promoter region; these rows are not independent promoter-level tests and must not be deduplicated away. num_guides reports the six guides assigned to each element, not the 12 guides in the shared statistical test. source_mageck_id and statistics_duplicated_across_elements remain available in the source file but are not currently emitted as catalog fields."
   },
   "macs_genome_wide": {
     "uuid": "c97c6fab-e907-4bc8-bf4b-77321e48b875",
