@@ -149,6 +149,7 @@
             "eQTL",
             "elements",
             "genes",
+            "guide RNAs",
             "pQTL",
             "scE2G",
             "snATAC-seq",
