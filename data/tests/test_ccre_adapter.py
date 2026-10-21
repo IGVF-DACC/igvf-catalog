@@ -36,7 +36,7 @@ def test_ccre_adapter_initialization():
     adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
                    label='genomic_element')
     assert adapter.label == 'genomic_element'
-    assert adapter.filename == 'ENCFF420VPZ'
+    assert adapter.accession == 'ENCFF420VPZ'
     assert adapter.source_url.startswith(
         'https://www.encodeproject.org/files/')
     assert adapter._get_collection_name() == 'genomic_elements'
@@ -47,7 +47,7 @@ def test_ccre_adapter_mm_genomic_element_collection_name():
     adapter = CCRE(filepath='./samples/IGVFFI8753TTYC.example.bed.gz',
                    label='mm_genomic_element')
     assert adapter.label == 'mm_genomic_element'
-    assert adapter.filename == 'IGVFFI8753TTYC'
+    assert adapter.accession == 'IGVFFI8753TTYC'
     assert adapter.source_url == 'https://data.igvf.org/reference-files/IGVFFI8753TTYC/'
     assert adapter._get_collection_name() == 'mm_genomic_elements'
 

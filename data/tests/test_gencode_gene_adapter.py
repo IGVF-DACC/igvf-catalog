@@ -25,7 +25,7 @@ def test_gencode_gene_adapter_human(mock_get):
     mock_get.return_value.json.return_value = mock_response
 
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./samples/IGVFFI7217ZMJZ_gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get(
                               'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
                           label='gencode_gene',
@@ -49,7 +49,7 @@ def test_gencode_gene_adapter_human(mock_get):
 def test_gencode_gene_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_gene, mm_gencode_gene'):
-        GencodeGene(filepath='./samples/gencode_sample.gtf',
+        GencodeGene(filepath='./samples/IGVFFI7217ZMJZ_gencode_sample.gtf',
                     gene_alias_file_path=os.environ.get(
                         'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
                     label='invalid_label',
@@ -57,7 +57,7 @@ def test_gencode_gene_adapter_invalid_label():
 
 
 def test_gencode_gene_adapter_parse_info_metadata():
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./samples/IGVFFI7217ZMJZ_gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get('TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'))
     info = ['gene_id', '"ENSG00000223972.5";', 'gene_type',
             '"transcribed_unprocessed_pseudogene";', 'gene_name', '"DDX11L1";']
@@ -69,7 +69,7 @@ def test_gencode_gene_adapter_parse_info_metadata():
 
 def test_gencode_gene_adapter_mouse():
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_mouse_sample.gtf',
+    adapter = GencodeGene(filepath='./samples/IGVFFI5842FWGQ_gencode_mouse_sample.gtf',
                           gene_alias_file_path='./samples/Mus_musculus.gene_info.gz',
                           label='mm_gencode_gene',
                           writer=writer,
@@ -92,7 +92,7 @@ def test_gencode_gene_adapter_mouse():
 
 def test_gencode_gene_adapter_not_catalog():
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./samples/IGVFFI7217ZMJZ_gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get(
                               'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
                           label='gencode_gene',
@@ -112,7 +112,7 @@ def test_gencode_gene_adapter_not_catalog():
 
 def test_gencode_gene_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./samples/IGVFFI7217ZMJZ_gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get(
                               'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
                           label='gencode_gene',
@@ -129,7 +129,7 @@ def test_gencode_gene_adapter_validate_doc_invalid():
 def test_gencode_gene_adapter_invalid_mode():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid mode. Allowed values: igvfd,catalog'):
-        GencodeGene(filepath='./samples/gencode_sample.gtf',
+        GencodeGene(filepath='./samples/IGVFFI7217ZMJZ_gencode_sample.gtf',
                     gene_alias_file_path=os.environ.get(
                         'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
                     label='gencode_gene',
@@ -141,7 +141,7 @@ def test_gencode_gene_adapter_chr_name_mapping():
     """Test chromosome name mapping logic - simplified test that focuses on the mapping logic"""
     writer = SpyWriter()
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.gtf', delete=False) as gtf_file:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI7217ZMJZ.', suffix='.gtf', delete=False) as gtf_file:
         gtf_file.write('''# Test GTF file
 GL000008.2	HAVANA	gene	1	100	.	+	.	gene_id "ENSG00000101349.1"; gene_name "TEST_GENE"; gene_type "protein_coding";
 ''')

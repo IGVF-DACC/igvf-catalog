@@ -3,10 +3,12 @@ import json
 import hashlib
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
     bulk_check_variants_in_arangodb,
+    get_file_fileset_by_accession_in_arangodb,
     load_variant,
 )
 from adapters.writer import Writer
@@ -34,6 +36,7 @@ class TopLD(BaseAdapter):
         self.chr = chr
         self.ancestry = ancestry
         self.written_variant_keys = set()
+        self.accession = get_file_accession(filepath)
 
         super().__init__(filepath, label, writer, validate)
 
@@ -65,6 +68,12 @@ class TopLD(BaseAdapter):
                 }
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.accession)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         if self.label == 'variants':
             self.process_variants()
             return

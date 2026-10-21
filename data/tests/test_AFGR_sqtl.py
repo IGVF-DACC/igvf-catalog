@@ -34,7 +34,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mock_bulk_check_variants, moc
     with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
-        adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+        adapter = AFGRSQtl(filepath='./samples/AFGR/IGVFFI4560RRRS_sorted.all.AFR.Meta.sQTL.example.txt.gz',
                            label='AFGR_sqtl', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
@@ -54,7 +54,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl(mock_request, mock_bulk_check_variants, moc
 def test_AFGR_sqtl_adapter_AFGR_sqtl_term_invalid_label(mocker):
     writer = SpyWriter()
     with pytest.raises(ValueError):
-        adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+        adapter = AFGRSQtl(filepath='./samples/AFGR/IGVFFI4560RRRS_sorted.all.AFR.Meta.sQTL.example.txt.gz',
                            label='invalid_label', writer=writer, validate=True)
 
 
@@ -67,7 +67,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_term_validate_doc_invalid(mock_request, moc
     with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
-        adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+        adapter = AFGRSQtl(filepath='./samples/AFGR/IGVFFI4560RRRS_sorted.all.AFR.Meta.sQTL.example.txt.gz',
                            label='AFGR_sqtl', writer=writer, validate=True)
         invalid_doc = {
             'invalid_field': 'invalid_value',
@@ -86,7 +86,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_invalid_gene_id(mock_request, mock_bulk_che
     with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = False
-        adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+        adapter = AFGRSQtl(filepath='./samples/AFGR/IGVFFI4560RRRS_sorted.all.AFR.Meta.sQTL.example.txt.gz',
                            label='AFGR_sqtl', writer=writer, validate=True)
         adapter.process_file()
         assert len(writer.contents) == 0
@@ -105,7 +105,7 @@ def test_AFGR_sqtl_adapter_skips_edge_when_variant_not_loaded(mock_request, mock
     with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
-        adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+        adapter = AFGRSQtl(filepath='./samples/AFGR/IGVFFI4560RRRS_sorted.all.AFR.Meta.sQTL.example.txt.gz',
                            label='AFGR_sqtl', writer=writer, validate=True)
         adapter.process_file()
         assert len(writer.contents) == 0
@@ -135,7 +135,7 @@ def test_AFGR_sqtl_adapter_variants_label_creates_missing_variant(mock_request, 
     }, None)
 
     writer = SpyWriter()
-    adapter = AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz',
+    adapter = AFGRSQtl(filepath='./samples/AFGR/IGVFFI4560RRRS_sorted.all.AFR.Meta.sQTL.example.txt.gz',
                        label='variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -159,7 +159,7 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_skip_alt_star(mock_request):
     # Create a temporary test file with a deletion variant
     import tempfile
     import gzip
-    with tempfile.NamedTemporaryFile(suffix='.txt.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI4560RRRS.', suffix='.txt.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'chr\tpos\tref\talt\tsnp\tfeature\tbeta\tse\tzstat\tp\t95pct_ci_lower\t95pct_ci_upper\tqstat\tdf\tp_het\n')
@@ -192,7 +192,7 @@ def test_AFGR_sqtl_adapter_no_gene_mapping(mock_request, mock_bulk_check_variant
     # Create a temporary test file with an intron that has no gene mapping
     import tempfile
     import gzip
-    with tempfile.NamedTemporaryFile(suffix='.txt.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI4560RRRS.', suffix='.txt.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'chr\tpos\tref\talt\tsnp\tfeature\tbeta\tse\tzstat\tp\t95pct_ci_lower\t95pct_ci_upper\tqstat\tdf\tp_het\n')

@@ -8,7 +8,7 @@ from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
-SAMPLE_TSV = './samples/gencc_submissions.example.tsv'
+SAMPLE_TSV = './samples/IGVFFI8022JGUK_gencc_submissions.example.tsv'
 MOCK_GENE_MAP = {'HGNC:10896': ['ENSG00000123456', 'ENSG00000654321']}
 
 
@@ -191,4 +191,4 @@ def test_gencc_initialization():
     adapter = GenccDiseasesGenes(filepath=SAMPLE_TSV, label='disease_gene')
     assert adapter.filepath == SAMPLE_TSV
     assert adapter.label == 'disease_gene'
-    assert adapter.file_accession == 'gencc_submissions'
+    assert adapter.file_accession == 'IGVFFI8022JGUK'

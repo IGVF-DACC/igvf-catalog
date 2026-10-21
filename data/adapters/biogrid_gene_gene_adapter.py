@@ -4,8 +4,8 @@ import hashlib
 import obonet
 import pickle
 from typing import Optional
-import os
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
@@ -26,7 +26,7 @@ class GeneGeneBiogrid(BaseAdapter):
     COLLECTION_LABEL = 'genetic interference'
 
     def __init__(self, filepath, label='human_gene_gene_biogrid', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         # Determine gene collection BEFORE calling super().__init__()
         # because _get_collection_name() needs it for schema loading
         if label == 'mouse_gene_gene_biogrid':

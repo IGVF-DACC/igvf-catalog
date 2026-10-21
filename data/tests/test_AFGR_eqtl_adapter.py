@@ -36,7 +36,7 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl(mock_request, mock_bulk_check_variants, moc
         mock_validator_instance.validate.return_value = True
 
         adapter = AFGREQtl(
-            filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+            filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
             label='AFGR_eqtl',
             writer=writer,
             validate=True
@@ -63,7 +63,7 @@ def test_AFGR_eqtl_adapter_key_includes_file_accession(mock_request, mock_bulk_c
 
         writer_a = SpyWriter()
         adapter_a = AFGREQtl(
-            filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+            filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
             label='AFGR_eqtl',
             writer=writer_a,
             validate=False
@@ -73,7 +73,7 @@ def test_AFGR_eqtl_adapter_key_includes_file_accession(mock_request, mock_bulk_c
 
         writer_b = SpyWriter()
         adapter_b = AFGREQtl(
-            filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+            filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
             label='AFGR_eqtl',
             writer=writer_b,
             validate=False
@@ -95,13 +95,13 @@ def test_AFGR_eqtl_adapter_key_includes_file_accession(mock_request, mock_bulk_c
 def test_AFGR_eqtl_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError):
-        adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+        adapter = AFGREQtl(filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
                            label='invalid_label', writer=writer, validate=True)
 
 
 def test_AFGR_eqtl_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+    adapter = AFGREQtl(filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
                        label='AFGR_eqtl', writer=writer, validate=True)
 
     invalid_doc = {
@@ -124,7 +124,7 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mock_request, mock_bulk_che
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = False
 
-        adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+        adapter = AFGREQtl(filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
                            label='AFGR_eqtl', writer=writer, validate=True)
         adapter.process_file()
         assert len(writer.contents) == 0
@@ -145,7 +145,7 @@ def test_AFGR_eqtl_adapter_skips_edge_when_variant_not_loaded(mock_request, mock
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
 
-        adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+        adapter = AFGREQtl(filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
                            label='AFGR_eqtl', writer=writer, validate=True)
         adapter.process_file()
         assert len(writer.contents) == 0
@@ -175,7 +175,7 @@ def test_AFGR_eqtl_adapter_variants_label_creates_missing_variant(mock_request, 
         'organism': 'Homo sapiens',
     }, None)
 
-    adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
+    adapter = AFGREQtl(filepath='./samples/AFGR/IGVFFI8011XYOB_sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
                        label='variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -199,7 +199,7 @@ def test_AFGR_eqtl_adapter_deletion_variant_skipped(mock_request):
     # Create a temporary test file with a deletion variant
     import tempfile
     import gzip
-    with tempfile.NamedTemporaryFile(suffix='.txt.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI8011XYOB.', suffix='.txt.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write('chr\tsnp_pos\tsnp_pos2\tref\talt\teffect_af_eqtl\tvariant\tfeature\tlog10p\tpvalue\tbeta\tseqstat\tdf\tp_het\tp_hwe\tdist_start\tdist_end\tgeneSymbol\tgeneType\n')
             f.write('1\t12345\t12345\tA\t*\t1.0\t1_12345_A_*\tENSG00000123456.1\t6.0\t1e-06\t1.0\t0.3\tNA\t1.0\tNA\t1.0\t-100\t-200\tTEST_GENE\tprotein_coding\n')

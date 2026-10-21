@@ -7,12 +7,12 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def filepath():
-    return './samples/reactome/Ensembl2Reactome_All_Levels_sample.txt'
+    return './samples/reactome/IGVFFI7082TATW_Ensembl2Reactome_All_Levels_sample.txt'
 
 
 @pytest.fixture
 def parent_pathway_of_filepath():
-    return './samples/reactome/ReactomePathwaysRelation_20240603.txt'
+    return './samples/reactome/IGVFFI8363VRKN_ReactomePathwaysRelation_20240603.txt'
 
 
 @pytest.fixture
