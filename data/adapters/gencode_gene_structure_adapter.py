@@ -1,9 +1,10 @@
 import json
+import os
 from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
-
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
 # ##provider: GENCODE
@@ -58,6 +59,7 @@ class GencodeStructure(BaseAdapter):
         self.load_chr_name_mapping()
 
         super().__init__(filepath, label, writer, validate)
+        self.accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -94,6 +96,12 @@ class GencodeStructure(BaseAdapter):
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.accession)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         UTR_keys = set()
         exon_transcript = None
         last_exon_end = 0
