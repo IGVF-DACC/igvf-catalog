@@ -5,7 +5,7 @@ import json
 import pickle
 from math import log10
 from typing import Optional
-import os
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
@@ -38,7 +38,7 @@ class AFGRSQtl(BaseAdapter):
 
         # Adapter-specific initialization
         self.gene_validator = GeneValidator()
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.written_variant_keys = set()
 
     def _get_schema_type(self):

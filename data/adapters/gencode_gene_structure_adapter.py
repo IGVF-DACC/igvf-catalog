@@ -1,7 +1,7 @@
 import json
-import os
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
@@ -59,7 +59,7 @@ class GencodeStructure(BaseAdapter):
         self.load_chr_name_mapping()
 
         super().__init__(filepath, label, writer, validate)
-        self.accession = os.path.basename(filepath).split('.')[0]
+        self.accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type based on label."""

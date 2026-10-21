@@ -1,10 +1,10 @@
 import csv
 import json
-import os
 import gzip
 import requests
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -33,7 +33,7 @@ class SGE(BaseAdapter):
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.ontology_term_validator = OntologyTermValidator()
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(

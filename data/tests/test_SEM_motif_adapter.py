@@ -6,7 +6,7 @@ from adapters.SEM_motif_adapter import SEMMotif
 from adapters.writer import SpyWriter
 
 
-FILE_ACCESSION = 'SEM_model_file'
+FILE_ACCESSION = 'IGVFFI5615JDRZ'
 
 # real uniprot -> ENSP mapping for P15923 (TCF3), used by the sample provenance file
 SAMPLE_PROTEIN_MAP = {
@@ -35,8 +35,8 @@ def mock_protein_map():
 
 def test_sem_motif_adapter_motif(mock_file_fileset, mock_protein_map):
     writer = SpyWriter()
-    adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+    adapter = SEMMotif(filepath='./samples/SEM/IGVFFI5615JDRZ_SEM_model_file.tsv.gz',
+                       sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
     adapter.process_file()
     # the 'motif' label never touches self.protein_map, so the protein map should not be fetched
     mock_protein_map.assert_not_called()
@@ -59,7 +59,7 @@ def test_sem_motif_adapter_motif_with_description_header(mock_file_fileset, mock
     # '#Description: ...' line before '#BASELINE:', which used to break
     # the naive two-line header parsing (see: ValueError could not convert
     # string to float when 'SEMpl_baseline' picked up the description text)
-    model_file = tmp_path / 'SEM_model_file_with_description.tsv.gz'
+    model_file = tmp_path / 'IGVFFI5615JDRZ_SEM_model_file_with_description.tsv.gz'
     with gzip.open(model_file, 'wt') as f:
         f.write(
             '#Description: Predictions of variant effects on transcription factor binding\n')
@@ -70,7 +70,7 @@ def test_sem_motif_adapter_motif_with_description_header(mock_file_fileset, mock
 
     writer = SpyWriter()
     adapter = SEMMotif(filepath=str(model_file),
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+                       sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item['tf_name'] == 'TCF3'
@@ -83,14 +83,14 @@ def test_sem_motif_adapter_raises_clear_error_for_non_model_file(mock_file_files
     # no '#BASELINE:' header at all) is mistakenly passed as the model file,
     # the adapter should fail with a clear message instead of a TypeError
     # from float(None) deep inside parse()
-    not_a_model_file = tmp_path / 'not_a_model_file.tsv.gz'
+    not_a_model_file = tmp_path / 'IGVFFI4892QCRR_not_a_model_file.tsv.gz'
     with gzip.open(not_a_model_file, 'wt') as f:
         f.write('transcription_factor\tensembl_id\tebi_complex_ac\tuniprot_ac\n')
         f.write('AHR\tENSG00000106546\t\tP35869\n')
 
     writer = SpyWriter()
     adapter = SEMMotif(filepath=str(not_a_model_file),
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+                       sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
     with pytest.raises(ValueError, match='does not look like a SEMpl motif model file'):
         adapter.process_file()
 
@@ -101,7 +101,7 @@ def test_sem_motif_adapter_complex_protein_without_sem_provenance_path(mock_prot
     # documented CLI usage for them omits --sem_provenance_path entirely.
     # The adapter must not require it.
     writer = SpyWriter()
-    adapter = SEMMotif(filepath='./samples/SEM/provenance_file.tsv.gz',
+    adapter = SEMMotif(filepath='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz',
                        label='complex_protein', writer=writer)
     adapter.process_file()
     assert adapter.sem_provenance_path is None
@@ -111,7 +111,7 @@ def test_sem_motif_adapter_complex_protein_without_sem_provenance_path(mock_prot
 
 def test_sem_motif_adapter_motif_protein_link(mock_file_fileset, mock_protein_map):
     writer = SpyWriter()
-    adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+    adapter = SEMMotif(filepath='./samples/SEM/IGVFFI5615JDRZ_SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz',
                        label='motif_protein', writer=writer, validate=True)
     adapter.process_file()
     mock_protein_map.assert_called_once_with(
@@ -141,13 +141,13 @@ def test_sem_motif_adapter_motif_protein_link(mock_file_fileset, mock_protein_ma
 def test_sem_motif_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: motif, motif_protein, complex, complex_protein'):
-        SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+        SEMMotif(filepath='./samples/SEM/IGVFFI5615JDRZ_SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz',
                  label='invalid_label', writer=writer)
 
 
 def test_sem_motif_adapter_load_tf_id_mapping():
-    adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz')
+    adapter = SEMMotif(filepath='./samples/SEM/IGVFFI5615JDRZ_SEM_model_file.tsv.gz',
+                       sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz')
     adapter.load_tf_id_mapping()
     assert hasattr(adapter, 'tf_id_mapping')
     assert isinstance(adapter.tf_id_mapping, dict)
@@ -155,8 +155,8 @@ def test_sem_motif_adapter_load_tf_id_mapping():
 
 
 def test_protein_map_is_fetched_only_once(mock_protein_map):
-    adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif_protein')
+    adapter = SEMMotif(filepath='./samples/SEM/IGVFFI5615JDRZ_SEM_model_file.tsv.gz',
+                       sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz', label='motif_protein')
     assert adapter.protein_map.get('P15923') == SAMPLE_PROTEIN_MAP['P15923']
     assert adapter.protein_map.get('P15923') == SAMPLE_PROTEIN_MAP['P15923']
     mock_protein_map.assert_called_once_with(
@@ -168,8 +168,8 @@ def test_protein_map_is_fetched_only_once(mock_protein_map):
 
 def test_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+    adapter = SEMMotif(filepath='./samples/SEM/IGVFFI5615JDRZ_SEM_model_file.tsv.gz',
+                       sem_provenance_path='./samples/SEM/IGVFFI4892QCRR_provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

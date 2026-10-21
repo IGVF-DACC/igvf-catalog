@@ -7,13 +7,13 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def filepath():
-    return './samples/reactome/ReactomePathways_20240603.txt'
+    return './samples/reactome/IGVFFI6981KOFP_ReactomePathways_20240603.txt'
 
 
 @pytest.fixture
 def mock_sample_file(tmp_path):
     """Create a mock sample file with known pathway IDs"""
-    sample_file = tmp_path / 'ReactomePathways_sample.txt'
+    sample_file = tmp_path / 'IGVFFI6981KOFP_ReactomePathways_sample.txt'
     sample_content = """R-HSA-164843	2-LTR circle formation	Homo sapiens
 R-HSA-1971475	A tetrasaccharide linker sequence is required for GAG synthesis	Homo sapiens
 R-BTA-73843	5-Phosphoribose 1-diphosphate biosynthesis	Bos taurus

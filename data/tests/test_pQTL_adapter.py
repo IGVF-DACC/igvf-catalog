@@ -61,7 +61,7 @@ def test_pQTL_adapter(mock_get_file_fileset, mock_get_protein_map, mock_bulk_che
     with patch('adapters.pQTL_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
-        adapter = pQTL(filepath='./samples/pQTL_UKB_example.csv',
+        adapter = pQTL(filepath='./samples/IGVFFI2053GDNI_pQTL_UKB_example.csv',
                        label='variant_protein', writer=writer, validate=True)
         adapter.file_accession = 'IGVFFI0000TEST'
         adapter.process_file()
@@ -102,7 +102,7 @@ def test_pQTL_adapter_skips_edge_when_variant_not_loaded(mock_get_file_fileset, 
     with patch('adapters.pQTL_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
-        adapter = pQTL(filepath='./samples/pQTL_UKB_example.csv',
+        adapter = pQTL(filepath='./samples/IGVFFI2053GDNI_pQTL_UKB_example.csv',
                        label='variant_protein', writer=writer, validate=True)
         adapter.file_accession = 'IGVFFI0000TEST'
         adapter.process_file()
@@ -137,7 +137,7 @@ def test_pQTL_adapter_variants_label_creates_missing_variant(mock_get_file_files
     }, None)
 
     writer = SpyWriter()
-    adapter = pQTL(filepath='./samples/pQTL_UKB_example.csv',
+    adapter = pQTL(filepath='./samples/IGVFFI2053GDNI_pQTL_UKB_example.csv',
                    label='variants', writer=writer, validate=True)
     adapter.file_accession = 'IGVFFI0000TEST'
     adapter.process_file()
@@ -157,7 +157,7 @@ def test_validate_doc_invalid(mocker):
     mocker.patch('adapters.pQTL_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
-    pqtl = pQTL(filepath='./samples/pQTL_UKB_example.csv',
+    pqtl = pQTL(filepath='./samples/IGVFFI2053GDNI_pQTL_UKB_example.csv',
                 label='variant_protein', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

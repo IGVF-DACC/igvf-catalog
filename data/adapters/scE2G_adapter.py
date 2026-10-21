@@ -3,6 +3,7 @@ import csv
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -49,7 +50,7 @@ class scE2G(BaseAdapter):
     }
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = filepath.split('/')[-1].split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
         if label == 'genomic_element_gene':

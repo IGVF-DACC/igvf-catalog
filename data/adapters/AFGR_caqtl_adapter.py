@@ -3,8 +3,8 @@ import gzip
 import json
 from math import log10
 from typing import Optional
-import os
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
@@ -36,7 +36,7 @@ class AFGRCAQtl(BaseAdapter):
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.written_variant_keys = set()
 
     def _get_schema_type(self):

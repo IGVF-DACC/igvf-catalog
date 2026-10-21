@@ -3,6 +3,7 @@ import csv
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
@@ -66,7 +67,7 @@ class HumanMouseElementAdapter(BaseAdapter):
     }
 
     def __init__(self, filepath, label='genomic_element_mm_genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = filepath.split('/')[-1].split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/reference-files/' + \
             self.file_accession
 

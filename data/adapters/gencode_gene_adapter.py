@@ -1,8 +1,8 @@
 import gzip
 import json
-import os
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -66,7 +66,7 @@ class GencodeGene(BaseAdapter):
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
 
         super().__init__(filepath, label, writer, validate)
-        self.accession = os.path.basename(filepath).split('.')[0]
+        self.accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type."""

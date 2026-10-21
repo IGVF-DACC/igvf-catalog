@@ -7,7 +7,7 @@ from adapters.protein_map import ProteinMap
 from adapters.writer import SpyWriter
 
 
-FILE_ACCESSION = 'EBI_complex_example'
+FILE_ACCESSION = 'IGVFFI1444TRQL'
 
 SAMPLE_PROTEIN_MAP = {
     'P84022': ['ENSP00000341551'],
@@ -48,7 +48,7 @@ def mock_ontology_term_validator():
 
 
 def test_ebi_complex_initialization():
-    sample_filepath = './samples/EBI_complex_example.tsv'
+    sample_filepath = './samples/IGVFFI1444TRQL_EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()
         adapter = EBIComplex(sample_filepath, label=label, writer=writer)
@@ -59,7 +59,7 @@ def test_ebi_complex_initialization():
 
 
 def test_ebi_complex_invalid_label():
-    sample_filepath = './samples/EBI_complex_example.tsv'
+    sample_filepath = './samples/IGVFFI1444TRQL_EBI_complex_example.tsv'
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: complex, complex_protein, complex_term'):
         EBIComplex(sample_filepath, label='invalid_label', writer=writer)
@@ -67,7 +67,7 @@ def test_ebi_complex_invalid_label():
 
 def test_ebi_complex_process_file(
         mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
-    sample_filepath = './samples/EBI_complex_example.tsv'
+    sample_filepath = './samples/IGVFFI1444TRQL_EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()
         adapter = EBIComplex(sample_filepath, label=label,
@@ -101,7 +101,8 @@ def test_ebi_complex_process_file(
 
 
 def test_ebi_complex_get_chain_id():
-    adapter = EBIComplex('./samples/EBI_complex_example.tsv', label='complex')
+    adapter = EBIComplex(
+        './samples/IGVFFI1444TRQL_EBI_complex_example.tsv', label='complex')
 
     assert adapter.get_chain_id('P12345') == None
     assert adapter.get_chain_id('P12345-1') == None
@@ -109,7 +110,8 @@ def test_ebi_complex_get_chain_id():
 
 
 def test_ebi_complex_get_isoform_id():
-    adapter = EBIComplex('./samples/EBI_complex_example.tsv', label='complex')
+    adapter = EBIComplex(
+        './samples/IGVFFI1444TRQL_EBI_complex_example.tsv', label='complex')
 
     assert adapter.get_isoform_id('P12345') == None
     assert adapter.get_isoform_id('P12345-1') == '1'
@@ -117,7 +119,7 @@ def test_ebi_complex_get_isoform_id():
 
 
 def test_ebi_complex_load_linked_features_dict(mock_protein_map):
-    sample_filepath = './samples/EBI_complex_example.tsv'
+    sample_filepath = './samples/IGVFFI1444TRQL_EBI_complex_example.tsv'
     writer = SpyWriter()
     adapter = EBIComplex(
         sample_filepath, label='complex_protein', writer=writer)
@@ -128,7 +130,7 @@ def test_ebi_complex_load_linked_features_dict(mock_protein_map):
 
 
 def test_ebi_complex_load_subontologies():
-    sample_filepath = './samples/EBI_complex_example.tsv'
+    sample_filepath = './samples/IGVFFI1444TRQL_EBI_complex_example.tsv'
     writer = SpyWriter()
     adapter = EBIComplex(sample_filepath, label='complex', writer=writer)
     adapter.load_subontologies()
@@ -137,7 +139,7 @@ def test_ebi_complex_load_subontologies():
 
 
 def test_ebi_complex_validate_doc_invalid():
-    sample_filepath = './samples/EBI_complex_example.tsv'
+    sample_filepath = './samples/IGVFFI1444TRQL_EBI_complex_example.tsv'
     writer = SpyWriter()
     adapter = EBIComplex(sample_filepath, label='complex',
                          writer=writer, validate=True)
