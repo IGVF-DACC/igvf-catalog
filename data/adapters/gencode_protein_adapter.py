@@ -37,9 +37,13 @@ class GencodeProtein(BaseAdapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
     def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.accession = get_file_accession(filepath)
+        self.file_accession = get_file_accession(filepath)
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
+        self.uniprot_sprot_file_accession = get_file_accession(
+            uniprot_sprot_file_path)
+        self.uniprot_trembl_file_accession = get_file_accession(
+            uniprot_trembl_file_path)
 
         if label in self.MOUSE_LABELS:
             self.version = 'vM36'
@@ -157,9 +161,13 @@ class GencodeProtein(BaseAdapter):
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
     def parse(self):
-        self.writer.add_tag('portal_accessions', self.accession)
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        self.writer.add_tag('portal_accessions',
+                            self.uniprot_sprot_file_accession)
+        self.writer.add_tag('portal_accessions',
+                            self.uniprot_trembl_file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.accession)
+            self.file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)

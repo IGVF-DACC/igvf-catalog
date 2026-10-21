@@ -64,7 +64,7 @@ class CCRE(BaseAdapter):
             self.accession)
         # in case of encode file/fileset igvf accession/fileset accession are in dbxref_name/dbxref_fileset_id
         if self.label == 'mm_genomic_element':
-            self.fileset_accession = self.file_fileset.get('dbxref_fileset_id')
+            self.fileset_accession = self.file_fileset.get('fileset_id')
             self.writer.add_tag('portal_accessions', self.accession)
             self.writer.add_tag('portal_accessions', self.fileset_accession)
         else:
