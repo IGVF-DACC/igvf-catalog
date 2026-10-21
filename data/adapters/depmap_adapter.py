@@ -9,25 +9,28 @@ from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_acc
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
-# CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
-# The original matrix in file is organized as ModelID (1,095 rows) X Gene (17,931 coloumns).
+# CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/
+# The original matrix in file is organized as ModelID (rows) X Gene (columns).
 # The transpose of the original matrix is loaded here for easier processing.
-
+#
+# Portal files (example):
+#   IGVFFI8832ZBCC — CRISPRGeneDependency_transposed.csv (dependency matrix)
+#   IGVFFI6415FDRI — Model.csv (cell-line metadata / RRID mapping)
+#
 # Example of part of the loading matrix:
 # Gene,ACH-000001,ACH-000004,ACH-000005,ACH-000007,ACH-000009,ACH-000011,ACH-000012,ACH-000013,ACH-000014
 # A1BG (1),0.0553211648540664,0.0234180490346237,0.0595523208289766,0.0238795185094775,0.0276524140275033,0.011752429730298,0.0543502827694051,0.0124079166941024,0.040318101157517
 # A1CF (29974),0.01403856306881,0.0487237248460492,0.0254784832528157,0.0350823083989964,0.0748604776571315,0.0185146565164343,0.0124800836750166,0.0565492355005334,0.060836485655342
-# A2M (2),0.014083962468692,0.0580835979659146,0.009988767666177,0.0065561956482438,0.0110209379651418,0.0060609112443749,0.0072958232853707,0.0179317372336054,0.0065760777739698
-# A2ML1 (144568),0.0338284534541587,0.0194828713741789,0.0087747320511599,0.0043219200079226,0.0091529955757067,0.0012808358556768,0.0047749277968025,0.0060950766332704,0.0044051485846711
-# A3GALT2 (127550),0.0495109597139512,0.0497933372469599,0.0993215225089184,0.0222002915981626,0.0216318159720975,0.0691636263860943,0.0171814961410507,0.0878640626935068,0.0289686576103241
-# A4GALT (53947),0.0049549043798291,0.0644720329570723,0.0995723644759633,0.0171211497280876,0.0677580998736281,0.1066244413858098,0.0842259302575638,0.0347167502889501,0.0467279313668812
-# A4GNT (51146),0.0269933824143704,0.0017749187371471,0.0075438544746256,0.0096048506255836,0.0135592402503593,0.0101073432171285,0.0021596303931416,0.0229722081510304,0.0652710662490125
-# AAAS (8086),0.131006482326207,0.0712890616055635,0.0496013615174664,0.1493775190934886,0.2167959119007355,0.0509210708384526,0.1354858251710864,0.1042089421935019,0.0645025243815082
-# AACS (65985),0.0031017110004655,0.0037316464915786,0.0475549666425148,0.052872923167593,0.0136603726345243,0.0079949689832072,0.0193872501805128,0.0305006545923165,0.0792603149045092
-
-# Other files needed for loading:
-# DepMap_model.csv is also downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set (Model.csv).
-# Gene symbol to gene ensembl id mapping is queried directly from the IGVF catalog genes collection.
+#
+# Example of part of Model.csv (columns used by the adapter; file has additional metadata columns):
+# ModelID,CellLineName,DepmapModelType,OncotreeCode,RRID,...
+# ACH-000001,NIH:OVCAR-3,HGSOC,HGSOC,CVCL_0465,...
+# ACH-000004,HEL,AMLNOS,AMLNOS,CVCL_0001,...
+# ACH-000005,HEL 92.1.7,AML,AML,CVCL_2481,...
+#
+# Gene rows are "SYMBOL (ENTREZ_ID)". Ensembl ids are resolved from the genes
+# collection in order: entrez (ENTREZ:{id}), then name for symbols still
+# unmapped, then synonyms for symbols still unmapped.
 
 
 class DepMap(BaseAdapter):
@@ -35,17 +38,30 @@ class DepMap(BaseAdapter):
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
-    CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
-    # gene symbols missing/unresolvable via the genes collection's name or synonyms fields
-    GENE_ID_MAPPING_OVERRIDES = {
-        'LOC118142757': ['ENSG00000290147'],
+    # Model.csv column headers -> edge property names
+    MODEL_COLUMN_HEADERS = {
+        'biological_context': 'CellLineName',
+        'cell_ontology_id': 'RRID',
+        'model_type': 'DepmapModelType',
+        'oncotree_code': 'OncotreeCode',
     }
 
-    def __init__(self, filepath, label='depmap', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        reference_filepath,
+        label='depmap',
+        writer: Optional[Writer] = None,
+        validate=False,
+        **kwargs
+    ):
         self.ontology_term_validator = OntologyTermValidator()
+        self.reference_filepath = reference_filepath
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.model_file_accession = os.path.basename(
+            self.reference_filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -57,6 +73,7 @@ class DepMap(BaseAdapter):
 
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
+        self.writer.add_tag('portal_accessions', self.model_file_accession)
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.collection_class = self.file_fileset['class']
@@ -73,26 +90,32 @@ class DepMap(BaseAdapter):
             model_ids = next(depmap_file).strip().split(',')[1:]
             # record the column index of each model ID (start from 2nd column)
             model_ids_column_mapping = {}
+            ontology_term_keys = set()
             for column_index, model_id in enumerate(model_ids):
                 model_ids_column_mapping[column_index] = model_id
-                # check CVCL id mapping for all models once first
-                cell_ontology_id = self.cell_ontology_id_mapping[model_id].get(
-                    'cell_ontology_id')
+                model_props = self.cell_ontology_id_mapping[model_id]
+                # check CVCL / Oncotree mapping for all models once first
+                cell_ontology_id = model_props.get('cell_ontology_id')
                 if not cell_ontology_id:
                     self.logger.warning(
                         'Cell ontology unavailable for model id ' + model_id)
+                else:
+                    ontology_term_keys.add(cell_ontology_id)
+                oncotree_code = model_props.get('oncotree_code')
+                if not oncotree_code:
+                    self.logger.warning(
+                        'Oncotree code unavailable for model id ' + model_id)
+                else:
+                    # Match Oncotree _key ('/' is illegal in ArangoDB keys)
+                    ontology_term_keys.add(
+                        'Oncotree_' + oncotree_code.replace('/', '_'))
 
-            cell_ontology_ids = {
-                self.cell_ontology_id_mapping[model_id].get('cell_ontology_id')
-                for model_id in model_ids
-                if self.cell_ontology_id_mapping[model_id].get('cell_ontology_id')
-            }
-            self.ontology_term_validator.preload(cell_ontology_ids)
+            self.ontology_term_validator.preload(
+                ontology_term_keys, resolve_via_ols=True)
 
             for line in depmap_file:
                 gene, *values = line.strip().split(',')
-                gene_symbol = gene.split(' ')[0]
-                gene_ids = self.gene_id_mapping.get(gene_symbol)
+                gene_ids = self._gene_ids_for_label(gene)
                 if gene_ids is None:
                     self.logger.warning('no gene id mapping for ' + gene)
                     continue
@@ -103,27 +126,37 @@ class DepMap(BaseAdapter):
                     # only load gene-cell pairs with values >= cutoff (0.5)
                     elif float(value) >= DepMap.CUTOFF:
                         gene_model_id = model_ids_column_mapping[value_index]
-                        cell_ontology_id = self.cell_ontology_id_mapping[gene_model_id].get(
-                            'cell_ontology_id')
+                        model_props = self.cell_ontology_id_mapping[gene_model_id]
+                        cell_ontology_id = model_props.get('cell_ontology_id')
                         if not cell_ontology_id:  # no CVCL id provided for this model
                             continue
-                        if not self.ontology_term_validator.validate(cell_ontology_id):
+                        oncotree_code = model_props.get('oncotree_code')
+                        if not oncotree_code:
+                            continue
+                        resolved_cell_ontology_id = self.ontology_term_validator.resolve(
+                            cell_ontology_id)
+                        if not resolved_cell_ontology_id:
+                            continue
+                        cancer_term_key = 'Oncotree_' + \
+                            oncotree_code.replace('/', '_')
+                        resolved_cancer_term = self.ontology_term_validator.resolve(
+                            cancer_term_key)
+                        if not resolved_cancer_term:
                             continue
 
                         for gene_id in gene_ids:
-                            _id = gene_id + '_' + cell_ontology_id
+                            _id = gene_id + '_' + resolved_cell_ontology_id
                             _source = 'genes/' + gene_id
-                            _target = 'ontology_terms/' + cell_ontology_id
+                            _target = 'ontology_terms/' + resolved_cell_ontology_id
 
                             _props = {
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
-                                'biological_context': self.cell_ontology_id_mapping[gene_model_id]['biological_context'],
+                                'biological_context': model_props['biological_context'],
                                 'model_id': gene_model_id,
-                                'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
-                                # Match Oncotree _key ( '/' is illegal in ArangoDB keys)
-                                'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'].replace('/', '_'),
+                                'model_type': model_props['model_type'],
+                                'cancer_term': 'ontology_terms/' + resolved_cancer_term,
                                 'gene_dependency': float(value),
                                 'source': DepMap.SOURCE,
                                 'source_url': DepMap.SOURCE_URL,
@@ -146,55 +179,74 @@ class DepMap(BaseAdapter):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
         # need to take care of comma inside double quotes, e.g. ACH-000082,PT-noCCE4,"G-292, clone A141B1",...
         self.cell_ontology_id_mapping = defaultdict(dict)
-        column_index_mapping = {
-            'biological_context': 2,
-            'cell_ontology_id': 7,
-            'model_type': 8,
-            'oncotree_code': 26
-        }
-        with open(DepMap.CELL_ONTOLOGY_ID_MAPPING_PATH, 'r') as cell_ontology_id_mapping_file:
+        with open(self.reference_filepath, 'r') as cell_ontology_id_mapping_file:
             cell_ontology_csv = csv.reader(cell_ontology_id_mapping_file)
-            next(cell_ontology_csv)
+            header = next(cell_ontology_csv)
+            header_index = {name: i for i, name in enumerate(header)}
+            column_index_mapping = {
+                prop: header_index[header_name]
+                for prop, header_name in self.MODEL_COLUMN_HEADERS.items()
+            }
             for cell_ontology_row in cell_ontology_csv:
-                model_id = cell_ontology_row[0]
+                model_id = cell_ontology_row[header_index['ModelID']]
                 for prop, column_index in column_index_mapping.items():
                     self.cell_ontology_id_mapping[model_id][prop] = cell_ontology_row[column_index]
 
-    def load_gene_id_mapping(self):
-        # key: gene symbol; value: list of gene ensembl ids
-        self.gene_id_mapping = {}
-        gene_map = get_gene_map_from_arangodb('name')
-        for gene_symbol, gene_keys in gene_map.items():
-            if len(gene_keys) > 1:
-                self.logger.warning(
-                    'multiple gene ids found for symbol ' + gene_symbol + ': ' + ', '.join(gene_keys))
-            self.gene_id_mapping[gene_symbol] = gene_keys
+    @staticmethod
+    def _parse_gene_label(gene_label):
+        """Return (symbol, ENTREZ:id or None) from a DepMap gene column.
 
-        self.gene_id_mapping.update(DepMap.GENE_ID_MAPPING_OVERRIDES)
+        Example: ``CFAP90 (134121)`` -> ``('CFAP90', 'ENTREZ:134121')``.
+        """
+        symbol = gene_label.split(' ', 1)[0]
+        entrez_id = None
+        if gene_label.endswith(')') and '(' in gene_label:
+            entrez_number = gene_label[gene_label.rfind('(') + 1:-1]
+            if entrez_number.isdigit() and entrez_number != '0':
+                entrez_id = 'ENTREZ:' + entrez_number
+        return symbol, entrez_id
 
-        unmatched_symbols = self._get_unmatched_gene_symbols()
-        if not unmatched_symbols:
-            return
-
-        # fall back to gene synonyms for symbols not found by name. Only run
-        # this (very expensive) query when there's actually something unmatched.
-        synonym_map = get_gene_map_from_arangodb('synonyms')
-        for gene_symbol, gene_keys in synonym_map.items():
-            if gene_symbol not in unmatched_symbols:
-                continue
-            if len(gene_keys) > 1:
-                self.logger.warning(
-                    'multiple gene ids found for synonym ' + gene_symbol + ': ' + ', '.join(gene_keys))
-            self.gene_id_mapping[gene_symbol] = gene_keys
-
-    def _get_unmatched_gene_symbols(self):
-        # scan just the gene column of the input file (cheap) to see whether
-        # the synonyms fallback is even needed
-        unmatched_symbols = set()
+    def _gene_labels_in_file(self):
+        """Return unique (symbol, ENTREZ:id or None) pairs from the gene column."""
+        gene_labels = set()
         with open(self.filepath, 'r') as depmap_file:
             next(depmap_file)  # skip header row of model ids
             for line in depmap_file:
-                gene_symbol = line.split(',', 1)[0].split(' ')[0]
-                if gene_symbol not in self.gene_id_mapping:
-                    unmatched_symbols.add(gene_symbol)
-        return unmatched_symbols
+                gene_label = line.split(',', 1)[0]
+                gene_labels.add(self._parse_gene_label(gene_label))
+        return gene_labels
+
+    def load_gene_id_mapping(self):
+        # One map. Entrez keys are ENTREZ:{id}; name and synonym keys are symbols.
+        # The gene column is read once. Name, then synonym, run only for symbols
+        # whose Entrez id was not in the previous map.
+        gene_labels = self._gene_labels_in_file()
+        self.gene_id_mapping = get_gene_map_from_arangodb('entrez')
+
+        unmatched_symbols = {
+            symbol for symbol, entrez_id in gene_labels
+            if not entrez_id or entrez_id not in self.gene_id_mapping
+        }
+        if unmatched_symbols:
+            name_map = get_gene_map_from_arangodb('name')
+            still_unmatched = set()
+            for symbol in unmatched_symbols:
+                gene_keys = name_map.get(symbol)
+                if gene_keys:
+                    self.gene_id_mapping[symbol] = gene_keys
+                else:
+                    still_unmatched.add(symbol)
+            unmatched_symbols = still_unmatched
+
+        if unmatched_symbols:
+            synonym_map = get_gene_map_from_arangodb('synonyms')
+            for symbol in unmatched_symbols:
+                gene_keys = synonym_map.get(symbol)
+                if gene_keys:
+                    self.gene_id_mapping[symbol] = gene_keys
+
+    def _gene_ids_for_label(self, gene_label):
+        symbol, entrez_id = self._parse_gene_label(gene_label)
+        if entrez_id and entrez_id in self.gene_id_mapping:
+            return self.gene_id_mapping[entrez_id]
+        return self.gene_id_mapping.get(symbol)

@@ -104,7 +104,11 @@ ADAPTERS = {
     'disease_gene': Disease(filepath='./samples/orphanet_example.xml'),
     'oncotree_terms': Oncotree(filepath='./samples/IGVFFI4975UFZM.example.tar.gz', label='node'),
     'oncotree_relationships': Oncotree(filepath='./samples/IGVFFI4975UFZM.example.tar.gz', label='edge'),
-    'gene_term': DepMap(filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', label='depmap'),
+    'gene_term': DepMap(
+        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        reference_filepath='./samples/DepMap/DepMap_model_example.csv',
+        label='depmap',
+    ),
     'complex': EBIComplex(filepath='./samples/EBI_complex_example.tsv', label='complex'),
     'complex_protein': EBIComplex(filepath='./samples/EBI_complex_example.tsv', label='complex_protein'),
     'complex_term': EBIComplex(filepath='./samples/EBI_complex_example.tsv', label='complex_term'),
