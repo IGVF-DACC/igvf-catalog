@@ -1,11 +1,11 @@
 import gzip
 import json
 from typing import Optional
-import os
 import pickle
 import pdb
 from Bio import SwissProt
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -37,7 +37,7 @@ class GencodeProtein(BaseAdapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
     def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.accession = os.path.basename(filepath).split('.')[0]
+        self.accession = get_file_accession(filepath)
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
 

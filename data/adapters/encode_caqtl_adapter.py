@@ -1,7 +1,7 @@
 import json
-import os
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
@@ -54,7 +54,7 @@ class CAQtl(BaseAdapter):
     EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.collection_label = 'caQTL'
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)

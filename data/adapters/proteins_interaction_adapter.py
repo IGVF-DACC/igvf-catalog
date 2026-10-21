@@ -2,9 +2,9 @@ import csv
 import json
 import hashlib
 from typing import Optional
-import os
 
 import obonet
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
@@ -21,7 +21,7 @@ class ProteinsInteraction(BaseAdapter):
     ALLOWED_LABELS = ['protein_protein_human', 'protein_protein_mouse']
 
     def __init__(self, filepath, label='protein_protein_human', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
         if label == 'protein_protein_mouse':
             self.organism = 'Mus musculus'

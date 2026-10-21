@@ -1,9 +1,9 @@
 import csv
 import json
-import os
 import gzip
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import (
@@ -43,10 +43,9 @@ class SEMPred(BaseAdapter):
 
     def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.sem_provenance_path = sem_provenance_path
-        # assumes that both sem_provenance_path and filepath have accession as prefix
-        self.sem_provenance_accession = os.path.basename(
-            sem_provenance_path).split('.')[0]
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.sem_provenance_accession = get_file_accession(
+            sem_provenance_path)
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.written_variant_keys = set()
 

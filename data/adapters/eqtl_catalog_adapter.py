@@ -4,8 +4,8 @@ import json
 import gzip
 from typing import Optional
 from math import log10
-import os
 import requests
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
@@ -71,7 +71,7 @@ class EQTLCatalog(BaseAdapter):
                 yield row
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source = 'EBI'
         self.gene_validator = GeneValidator()
         self.written_variant_keys = set()

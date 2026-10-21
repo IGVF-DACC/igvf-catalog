@@ -42,7 +42,7 @@ def mock_ontology_term_validator():
 @pytest.fixture
 def gwas_files():
     return {
-        'variants_to_ontology': './tests/fixtures/gwas_v2d_igvf_sample.tsv'
+        'variants_to_ontology': './tests/fixtures/IGVFFI1309WDQG_gwas_v2d_igvf_sample.tsv'
     }
 
 
@@ -151,7 +151,7 @@ def test_gwas_variants_label_writes_missing_variant(gwas_files, spy_writer, mock
     data = json.loads(spy_writer.contents[0])
     assert data['_key'] == 'fake_variant_id'
     assert data['source'] == 'OpenTargets'
-    assert data['files_filesets'] == 'files_filesets/gwas_v2d_igvf_sample'
+    assert data['files_filesets'] == 'files_filesets/IGVFFI1309WDQG'
     assert gwas.invalid_variant_ids == set()
 
 
@@ -371,7 +371,7 @@ def test_gwas_broken_line_handling_in_process_file(
     import tempfile
     import os
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI1309WDQG.', suffix='.tsv', delete=False) as f:
         # Write a header with enough columns for GWAS parsing
         header = [f'col_{i}' for i in range(47)]
         f.write('\t'.join(header) + '\n')

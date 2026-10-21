@@ -16,7 +16,7 @@ def mock_writer():
 def gencode_protein_human(mock_writer):
     with patch('adapters.gencode_protein_adapter.open', mock_open(read_data=SAMPLE_DATA)):
         yield GencodeProtein(
-            filepath='dummy.gtf',
+            filepath='IGVFFI7217ZMJZ.gtf',
             label='gencode_protein',
             writer=mock_writer,
             uniprot_sprot_file_path='dummy_sprot.gz',
@@ -27,7 +27,7 @@ def gencode_protein_human(mock_writer):
 
 def test_init_invalid_label(mock_writer):
     with pytest.raises(ValueError):
-        GencodeProtein(filepath='dummy.gtf', label='invalid_label',
+        GencodeProtein(filepath='IGVFFI7217ZMJZ.gtf', label='invalid_label',
                        writer=mock_writer)
 
 
@@ -89,7 +89,7 @@ def test_process_file_writes_json(mock_get_uniprot, mock_writer):
     # Patch pickle.load and mapping files
     with patch('pickle.load', return_value={'ENSP00000493376': ['P12345']}):
         gencode = GencodeProtein(
-            filepath='dummy.gtf',
+            filepath='IGVFFI7217ZMJZ.gtf',
             label='gencode_protein',
             writer=mock_writer,
             uniprot_sprot_file_path='dummy_sprot.gz',
@@ -139,7 +139,7 @@ def test_init_mouse_label(mock_writer):
     """Mouse organism is derived from mm_* labels."""
     with patch('adapters.gencode_protein_adapter.open', mock_open(read_data='#\n')):
         gencode = GencodeProtein(
-            filepath='dummy.gtf',
+            filepath='IGVFFI7217ZMJZ.gtf',
             label='mm_gencode_protein',
             writer=mock_writer,
             uniprot_sprot_file_path='dummy_sprot.gz',
@@ -156,7 +156,7 @@ def test_process_file_edge_translates_to(mock_writer):
     """Test process_file with gencode_translates_to label"""
     with patch('adapters.gencode_protein_adapter.open', mock_open(read_data='#\n')):
         gencode = GencodeProtein(
-            filepath='dummy.gtf',
+            filepath='IGVFFI7217ZMJZ.gtf',
             label='gencode_translates_to',
             writer=mock_writer,
             validate=True
@@ -182,7 +182,7 @@ MOUSE_SAMPLE_DATA = "# header\nchr1\tHAVANA\ttranscript\t65419\t71585\t.\t+\t.\t
 def test_process_file_edge_mm_translates_to(mock_writer):
     with patch('adapters.gencode_protein_adapter.open', mock_open(read_data='#\n')):
         gencode = GencodeProtein(
-            filepath='dummy.gtf',
+            filepath='IGVFFI7217ZMJZ.gtf',
             label='mm_gencode_translates_to',
             writer=mock_writer,
             validate=True
