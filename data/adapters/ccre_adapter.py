@@ -3,6 +3,7 @@ import csv
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
@@ -40,7 +41,7 @@ class CCRE(BaseAdapter):
     }
 
     def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.accession = filepath.split('/')[-1].split('.')[0]
+        self.accession = get_file_accession(filepath)
         if label == 'mm_genomic_element':
             self.source_url = f'https://data.igvf.org/reference-files/{self.accession}/'
         else:

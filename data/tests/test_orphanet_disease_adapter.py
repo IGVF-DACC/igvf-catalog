@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def sample_filepath():
-    return './tests/fixtures/orphanet_example.xml'
+    return './tests/fixtures/IGVFFI4540ZCXZ_orphanet_example.xml'
 
 
 @pytest.fixture

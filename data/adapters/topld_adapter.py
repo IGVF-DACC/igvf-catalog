@@ -3,6 +3,7 @@ import json
 import hashlib
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_id,
@@ -35,7 +36,7 @@ class TopLD(BaseAdapter):
         self.chr = chr
         self.ancestry = ancestry
         self.written_variant_keys = set()
-        self.accession = filepath.split('/')[-1].split('.')[0]
+        self.accession = get_file_accession(filepath)
 
         super().__init__(filepath, label, writer, validate)
 

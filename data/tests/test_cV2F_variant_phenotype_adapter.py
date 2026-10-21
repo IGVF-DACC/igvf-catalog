@@ -62,15 +62,15 @@ def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mock_file_fi
             'GO:0003674', 'AGNOSTIC', '', 'continuous score', '0.76']
     ]
 
-    adapter = cV2F('dummy_accession.tsv.gz', label='variants',
+    adapter = cV2F('IGVFFI1931RMNE.tsv.gz', label='variants',
                    writer=writer, validate=True)
     adapter.process_variants_chunk(chunk)
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_key'] == 'NC_000001.11:10202:C:A'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
-    assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI1931RMNE'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI1931RMNE'
 
 
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:10202:C:A'})
@@ -83,16 +83,16 @@ def test_process_variants_phenotypes_chunk(mock_load_variant, mock_bulk_check, m
         ['chr1', '10204', '10204', 'T', 'G', 'NC_000001.11:10203:T:G',
             'GO:0003674', 'AGNOSTIC', '', 'continuous score', '0.76']
     ]
-    adapter = cV2F('dummy_accession.tsv.gz',
+    adapter = cV2F('IGVFFI1931RMNE.tsv.gz',
                    label='variants_phenotypes', writer=writer, validate=True)
     adapter.process_variants_phenotypes_chunk(chunk)
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 1
     assert first_item['_key'] == 'NC_000001.11:10202:C:A_' + \
-        cV2F.PHENOTYPE_TERM + '_dummy_accession'
+        cV2F.PHENOTYPE_TERM + '_IGVFFI1931RMNE'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
-    assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI1931RMNE'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI1931RMNE'
     assert first_item['biological_context'] == 'lung'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
     assert first_item['method'] == 'cV2F'
@@ -102,7 +102,7 @@ def test_process_variants_phenotypes_chunk(mock_load_variant, mock_bulk_check, m
 
 def test_cV2F_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
-    adapter = cV2F('dummy_accession.tsv.gz',
+    adapter = cV2F('IGVFFI1931RMNE.tsv.gz',
                    label='variants_phenotypes', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
@@ -115,7 +115,7 @@ def test_cV2F_adapter_validate_doc_invalid(mock_file_fileset):
 def test_cV2F_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variants, variants_phenotypes'):
-        cV2F('dummy_accession.tsv.gz', label='invalid_label',
+        cV2F('IGVFFI1931RMNE.tsv.gz', label='invalid_label',
              writer=writer, validate=True)
 
 
@@ -129,7 +129,7 @@ def test_cV2F_adapter_process_file(
     # Create a temporary test file
     import tempfile
     import gzip
-    with tempfile.NamedTemporaryFile(suffix='.tsv.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI1931RMNE.', suffix='.tsv.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write('VariantChr\tVariantStart\tVariantEnd\tEffectAllele\tOtherAllele\tSPDI_ID\tGOOntology\tBiosampleTermName\tBiosampleTerm\tPredictionType\tPredictionValue\n')
             f.write('VariantChr\tVariantStart\tVariantEnd\tEffectAllele\tOtherAllele\tSPDI_ID\tGOOntology\tBiosampleTermName\tBiosampleTerm\tPredictionType\tPredictionValue\n')

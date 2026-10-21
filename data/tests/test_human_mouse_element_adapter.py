@@ -10,7 +10,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def human_mouse_files():
-    return './tests/fixtures/element_mapping_example.txt.gz'
+    return './tests/fixtures/IGVFFI0000TEST_element_mapping_example.txt.gz'
 
 
 @pytest.fixture
@@ -98,21 +98,21 @@ def test_human_mouse_element_adapter_initialization():
     writer = SpyWriter()
 
     # Test default initialization
-    adapter = HumanMouseElementAdapter('test_file.txt.gz', writer=writer)
-    assert adapter.filepath == 'test_file.txt.gz'
+    adapter = HumanMouseElementAdapter('IGVFFI0000TEST.txt.gz', writer=writer)
+    assert adapter.filepath == 'IGVFFI0000TEST.txt.gz'
     assert adapter.label == 'genomic_element_mm_genomic_element'
     assert adapter.SOURCE == 'FUNCODE'
-    assert adapter.file_accession == 'test_file'
-    assert adapter.source_url == 'https://data.igvf.org/reference-files/test_file'
+    assert adapter.file_accession == 'IGVFFI0000TEST'
+    assert adapter.source_url == 'https://data.igvf.org/reference-files/IGVFFI0000TEST'
 
     # Test genomic_element label
     adapter = HumanMouseElementAdapter(
-        'test_file.txt.gz', label='genomic_element', writer=writer)
+        'IGVFFI0000TEST.txt.gz', label='genomic_element', writer=writer)
     assert adapter.label == 'genomic_element'
 
     # Test mm_genomic_element label
     adapter = HumanMouseElementAdapter(
-        'test_file.txt.gz', label='mm_genomic_element', writer=writer)
+        'IGVFFI0000TEST.txt.gz', label='mm_genomic_element', writer=writer)
     assert adapter.label == 'mm_genomic_element'
 
 
@@ -122,13 +122,13 @@ def test_human_mouse_element_adapter_invalid_label():
 
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, mm_genomic_element, genomic_element_mm_genomic_element'):
         HumanMouseElementAdapter(
-            'test_file.txt.gz', label='invalid_label', writer=writer)
+            'IGVFFI0000TEST.txt.gz', label='invalid_label', writer=writer)
 
 
 def test_human_mouse_element_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = HumanMouseElementAdapter(
-        'test_file.txt.gz', label='genomic_element_mm_genomic_element', writer=writer, validate=True)
+        'IGVFFI0000TEST.txt.gz', label='genomic_element_mm_genomic_element', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

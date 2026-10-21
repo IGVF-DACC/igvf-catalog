@@ -1,10 +1,10 @@
 import json
 import hashlib
-import os
 import pickle
 from math import log10
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, get_file_fileset_by_accession_in_arangodb, load_variant, bulk_check_variants_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -36,7 +36,7 @@ class GWAS(BaseAdapter):
 
     def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/reference-files/' + self.file_accession
         # populated by validate_variants(); variant ids build_variant_id() produces that
         # load_variant() rejects (e.g. ref allele mismatch), so process_variants_phenotypes

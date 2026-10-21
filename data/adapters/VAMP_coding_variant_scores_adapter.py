@@ -1,10 +1,10 @@
 import csv
 import json
-import os
 import gzip
 import re
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -31,7 +31,7 @@ class VAMPAdapter(BaseAdapter):
     CHUNK_SIZE = 1000
 
     def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.phenotype_term = phenotype_term
         self.ontology_term_validator = OntologyTermValidator()

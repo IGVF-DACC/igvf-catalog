@@ -1,11 +1,11 @@
 import json
-import os
 from typing import Optional
 
 from ga4gh.vrs.extras.translator import AlleleTranslator as Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_mouse_variant_id,
@@ -51,7 +51,7 @@ class MouseGenomesProjectAdapter(BaseAdapter):
         self.organism = 'Mus musculus'
 
         super().__init__(filepath, label, writer, validate)
-        self.accession = os.path.basename(filepath).split('.')[0]
+        self.accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type."""

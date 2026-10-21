@@ -9,7 +9,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def sample_filepath():
-    return './tests/fixtures/mouse_variants/mouse_variant_snps_rsid_sample.vcf'
+    return './tests/fixtures/mouse_variants/IGVFFI4287QQKV_mouse_variant_snps_rsid_sample.vcf'
 
 
 @pytest.fixture
@@ -74,9 +74,9 @@ def test_mouse_genomes_project_adapter_process_file(mock_translator, mock_seqrep
 def test_mouse_genomes_project_adapter_initialization(mock_translator, mock_seqrepo, mock_dataproxy, mock_get_seqrepo, spy_writer):
     """Test adapter initialization"""
     adapter = MouseGenomesProjectAdapter(
-        'test_file.vcf', writer=spy_writer, validate=True)
+        'IGVFFI4287QQKV.vcf', writer=spy_writer, validate=True)
 
-    assert adapter.filepath == 'test_file.vcf'
+    assert adapter.filepath == 'IGVFFI4287QQKV.vcf'
     assert adapter.label == 'mouse_variant'
     assert adapter.organism == 'Mus musculus'
     assert adapter.validate == True
@@ -91,7 +91,7 @@ def test_mouse_genomes_project_adapter_initialization(mock_translator, mock_seqr
 def test_mouse_genomes_project_adapter_validate_doc_invalid(mock_translator, mock_seqrepo, mock_dataproxy, mock_get_seqrepo, spy_writer):
     """Test document validation with invalid data"""
     adapter = MouseGenomesProjectAdapter(
-        'test_file.vcf', writer=spy_writer, validate=True)
+        'IGVFFI4287QQKV.vcf', writer=spy_writer, validate=True)
 
     invalid_doc = {
         'invalid_field': 'invalid_value',

@@ -4,6 +4,7 @@ import json
 import os
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_gene_map_from_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -59,7 +60,7 @@ class DepMap(BaseAdapter):
         self.ontology_term_validator = OntologyTermValidator()
         self.reference_filepath = reference_filepath
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.model_file_accession = os.path.basename(
             self.reference_filepath).split('.')[0]
 

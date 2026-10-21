@@ -5,7 +5,7 @@ from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 import pytest
 
-CRISPR_SAMPLE = './tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv'
+CRISPR_SAMPLE = './tests/fixtures/DepMap/IGVFFI8863BMFF_CRISPRGeneDependency_transposed_example.csv'
 MODEL_SAMPLE = './tests/fixtures/DepMap/DepMap_model_example.csv'
 
 
@@ -110,7 +110,7 @@ def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
         header = sample_file.readline().strip().split(',')
 
     model_id = header[1]
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI8863BMFF.', suffix='.csv', delete=False) as f:
         f.write(','.join(header) + '\n')
         row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
         f.write(','.join(row) + '\n')
@@ -147,7 +147,7 @@ def test_depmap_adapter_initialization():
     assert adapter.reference_filepath == MODEL_SAMPLE
     assert adapter.label == 'depmap'
     assert adapter.writer is None, 'Writer should be None by default.'
-    assert adapter.file_accession == 'CRISPRGeneDependency_transposed_example'
+    assert adapter.file_accession == 'IGVFFI8863BMFF'
     assert adapter.model_file_accession == 'DepMap_model_example'
 
 
@@ -184,7 +184,7 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
     with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI8863BMFF.', suffix='.csv', delete=False) as f:
         f.write(','.join(header) + '\n')
         row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
         f.write(','.join(row) + '\n')
@@ -221,7 +221,7 @@ def test_depmap_adapter_synonym_fallback(mocker):
     with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI8863BMFF.', suffix='.csv', delete=False) as f:
         f.write(','.join(header) + '\n')
         row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
         f.write(','.join(row) + '\n')
@@ -307,7 +307,7 @@ def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
     with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI8863BMFF.', suffix='.csv', delete=False) as f:
         f.write(','.join(header) + '\n')
         row = ['FAKEGENE (0)'] + ['0.9'] + [''] * (len(header) - 2)
         f.write(','.join(row) + '\n')

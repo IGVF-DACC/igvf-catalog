@@ -1,9 +1,9 @@
 import csv
 import json
-import os
 import gzip
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import bulk_query_coding_variants_from_spdi_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -29,7 +29,7 @@ class DUALIPAAdapter(BaseAdapter):
 
     def __init__(self, filepath, label='coding_variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.ontology_term_validator = OntologyTermValidator()
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
 
         super().__init__(filepath, label, writer, validate)

@@ -1,7 +1,7 @@
 import json
-import os
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -42,7 +42,7 @@ class Reactome(BaseAdapter):
             self.gene_validator = GeneValidator()
 
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type."""

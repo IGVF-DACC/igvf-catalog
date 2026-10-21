@@ -1,5 +1,6 @@
 import csv
 import json
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, load_variant, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -41,7 +42,7 @@ class BlueSTARRVariantBiosample(BaseAdapter):
     ):
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = self.filepath.split('/')[-1].split('.')[-2]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession + '/'
         self.collection_label = 'predicted variant effect on gene expression'
 

@@ -1,5 +1,4 @@
 import json
-import os
 import time
 from typing import Optional
 
@@ -8,6 +7,7 @@ from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import RequestException
 from json import JSONDecodeError
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
@@ -35,7 +35,7 @@ class ReactomePathway(BaseAdapter):
 
     def __init__(self, filepath=None, label='pathway', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type."""

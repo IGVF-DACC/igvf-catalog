@@ -1,10 +1,10 @@
 import csv
 import json
-import os
 import gzip
 from functools import cached_property
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.protein_map import ProteinMap
@@ -39,10 +39,9 @@ class SEMMotif(BaseAdapter):
         # (see load_tf_id_mapping); 'complex'/'complex_protein' don't require it.
         self.sem_provenance_accession = None
         if sem_provenance_path is not None:
-            # assumes both sem_provenance_path and filepath have accession as prefix
-            self.sem_provenance_accession = os.path.basename(
-                sem_provenance_path).split('.')[0]
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+            self.sem_provenance_accession = get_file_accession(
+                sem_provenance_path)
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
 
         super().__init__(filepath, label, writer, validate)

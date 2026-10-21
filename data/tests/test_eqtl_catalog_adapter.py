@@ -138,10 +138,10 @@ def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_ge
 def test_eqtl_catalog_adapter_initialization():
     writer = SpyWriter()
     for label in EQTLCatalog.ALLOWED_LABELS:
-        adapter = EQTLCatalog(filepath='dummy.tsv.gz',
+        adapter = EQTLCatalog(filepath='IGVFFI0000TEST.tsv.gz',
                               label=label,
                               writer=writer)
-        assert adapter.filepath == 'dummy.tsv.gz'
+        assert adapter.filepath == 'IGVFFI0000TEST.tsv.gz'
         assert adapter.label == label
         assert adapter.writer == writer
         assert adapter.source == 'EBI'
@@ -151,14 +151,14 @@ def test_eqtl_catalog_adapter_initialization():
 def test_eqtl_catalog_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: qtl, study, variants'):
-        EQTLCatalog(filepath='dummy.tsv.gz',
+        EQTLCatalog(filepath='IGVFFI0000TEST.tsv.gz',
                     label='invalid_label',
                     writer=writer)
 
 
 def test_eqtl_catalog_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = EQTLCatalog(filepath='dummy.tsv.gz',
+    adapter = EQTLCatalog(filepath='IGVFFI0000TEST.tsv.gz',
                           label='qtl',
                           writer=writer,
                           validate=True)
@@ -176,7 +176,7 @@ def test_eqtl_catalog_adapter_study_label():
     """Test adapter with 'study' label"""
     writer = SpyWriter()
 
-    with tempfile.NamedTemporaryFile(mode='wb', suffix='.tsv.gz', delete=False) as temp_study:
+    with tempfile.NamedTemporaryFile(mode='wb', prefix='IGVFFI9074FIDG.', suffix='.tsv.gz', delete=False) as temp_study:
         with gzip.open(temp_study, 'wt') as gz:
             gz.write(
                 'study_id\tdataset_id\tstudy_label\tsample_group\ttissue_id\ttissue_label\tcondition_label\tsample_size\tquant_method\tpmid\tstudy_type\n')
