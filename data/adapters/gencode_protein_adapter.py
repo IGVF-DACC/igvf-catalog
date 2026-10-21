@@ -1,11 +1,13 @@
 import gzip
 import json
 from typing import Optional
+import os
 import pickle
 import pdb
 from Bio import SwissProt
 
 from adapters.base import BaseAdapter
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example genocde gtf input file row with protein_id
@@ -35,6 +37,7 @@ class GencodeProtein(BaseAdapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
     def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.accession = os.path.basename(filepath).split('.')[0]
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
 
@@ -154,6 +157,12 @@ class GencodeProtein(BaseAdapter):
                 self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.accession)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         # first get ENSP -> uniprot id mapping pregenerated from uniprot dat files
         if self.label in self.PROTEIN_LABELS:
             ensp_to_sprot_mapping = {}
