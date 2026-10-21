@@ -43,6 +43,9 @@ def mock_ontology_term_validator():
         mock_validator = MockValidator.return_value
         mock_validator.validate.return_value = True
         mock_validator.ensure.return_value = True
+        mock_validator.resolve.side_effect = (
+            lambda term_key: OntologyTermValidator.normalize_term_key(term_key)
+        )
         yield mock_validator
 
 
@@ -59,6 +62,8 @@ def test_gencc_process_file_writes_edge(
 
     mock_file_fileset.assert_called_once_with('IGVFFI8022JGUK')
     mock_ontology_term_validator.preload.assert_called_once()
+    _, kwargs = mock_ontology_term_validator.preload.call_args
+    assert kwargs.get('resolve_via_ols') is True
     docs = _parsed_docs(writer)
     assert len(docs) == 2
     doc = next(d for d in docs if d['_to'] == 'genes/ENSG00000123456')
@@ -107,6 +112,46 @@ def test_gencc_process_file_one_row_per_gene_ensembl(
         'genes/ENSG00000123456',
         'genes/ENSG00000654321',
     }
+
+
+def test_gencc_uses_remapped_ontology_term_for_from(
+        mock_gene_map, mock_file_fileset, mock_ontology_term_validator):
+    mock_ontology_term_validator.resolve.side_effect = (
+        lambda term_key: 'MONDO_0018894'
+        if OntologyTermValidator.normalize_term_key(term_key) == 'MONDO_0008426'
+        else None
+    )
+
+    writer = SpyWriter()
+    adapter = GenccDiseasesGenes(
+        filepath=SAMPLE_TSV,
+        writer=writer,
+        validate=False,
+    )
+    adapter.file_accession = 'IGVFFI8022JGUK'
+    adapter.process_file()
+
+    docs = _parsed_docs(writer)
+    assert len(docs) == 2
+    assert all(d['_from'] == 'ontology_terms/MONDO_0018894' for d in docs)
+    assert all(d['term_name'] == 'Shprintzen-Goldberg syndrome' for d in docs)
+
+
+def test_gencc_skips_row_when_ontology_term_unresolvable(
+        mock_gene_map, mock_file_fileset, mock_ontology_term_validator):
+    mock_ontology_term_validator.resolve.return_value = None
+    mock_ontology_term_validator.resolve.side_effect = None
+
+    writer = SpyWriter()
+    adapter = GenccDiseasesGenes(
+        filepath=SAMPLE_TSV,
+        writer=writer,
+        validate=False,
+    )
+    adapter.file_accession = 'IGVFFI8022JGUK'
+    adapter.process_file()
+
+    assert _parsed_docs(writer) == []
 
 
 def test_gencc_skips_row_when_hgnc_not_in_gene_map(
