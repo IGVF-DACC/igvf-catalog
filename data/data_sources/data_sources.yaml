@@ -2383,13 +2383,16 @@ complex to term:
     - https://api.data.igvf.org/reference-files/IGVFFI1444TRQL/@@download/IGVFFI1444TRQL.tsv.gz # EBI_complex_proteins_9606.tsv.gz
   source: EBI
 
-# Example: python3 data_parser.py --adapter gene_term --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8863BMFF.csv --output-bucket-key genes_biosamples/genes_biosamples_IGVFFI8863BMFF.jsonl
+# Example: python3 data_parser.py --adapter gene_term --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8832ZBCC.csv --reference-filepath ~/dataset/IGVFFI6415FDRI.csv --output-bucket-key genes_biosamples/genes_biosamples_IGVFFI8832ZBCC.jsonl
 gene to term:
   collection: genes_biosamples
-  command: python3 data_parser.py --adapter gene_term --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_biosamples/genes_biosamples_IGVFFI8863BMFF.jsonl
+  params:
+    - reference-filepath
+  command: python3 data_parser.py --adapter gene_term --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --reference-filepath {reference_filepath} --output-bucket-key genes_biosamples/genes_biosamples_IGVFFI8832ZBCC.jsonl
   pypy3: false
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI8863BMFF/@@download/IGVFFI8863BMFF.csv.gz # CRISPRGeneDependency_transposed.csv
+  file_mappings:
+    - datafile: https://api.data.igvf.org/reference-files/IGVFFI8832ZBCC/@@download/IGVFFI8832ZBCC.csv.gz # CRISPRGeneDependency_transposed.csv
+      reference_filepath: https://api.data.igvf.org/reference-files/IGVFFI6415FDRI/@@download/IGVFFI6415FDRI.csv.gz # Model.csv
   source: DepMap
   threshold: 0.5
 
