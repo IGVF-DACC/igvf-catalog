@@ -19,8 +19,8 @@ def gencode_protein_human(mock_writer):
             filepath='IGVFFI7217ZMJZ.gtf',
             label='gencode_protein',
             writer=mock_writer,
-            uniprot_sprot_file_path='dummy_sprot.gz',
-            uniprot_trembl_file_path='dummy_trembl.gz',
+            uniprot_sprot_file_path='IGVFFI4731NANO.dat.gz',
+            uniprot_trembl_file_path='IGVFFI8551EYSR.dat.gz',
             validate=True
         )
 
@@ -92,8 +92,8 @@ def test_process_file_writes_json(mock_get_uniprot, mock_writer):
             filepath='IGVFFI7217ZMJZ.gtf',
             label='gencode_protein',
             writer=mock_writer,
-            uniprot_sprot_file_path='dummy_sprot.gz',
-            uniprot_trembl_file_path='dummy_trembl.gz',
+            uniprot_sprot_file_path='IGVFFI4731NANO.dat.gz',
+            uniprot_trembl_file_path='IGVFFI8551EYSR.dat.gz',
             validate=True
         )
         # Patch the file opening only for process_file
@@ -142,8 +142,8 @@ def test_init_mouse_label(mock_writer):
             filepath='IGVFFI7217ZMJZ.gtf',
             label='mm_gencode_protein',
             writer=mock_writer,
-            uniprot_sprot_file_path='dummy_sprot.gz',
-            uniprot_trembl_file_path='dummy_trembl.gz'
+            uniprot_sprot_file_path='IGVFFI4731NANO.dat.gz',
+            uniprot_trembl_file_path='IGVFFI8551EYSR.dat.gz'
         )
     assert gencode.organism == 'Mus musculus'
     assert gencode.version == 'vM36'
