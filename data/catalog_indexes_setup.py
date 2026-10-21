@@ -9,13 +9,39 @@ collections_in_config = list(index_config.keys())
 
 parser = argparse.ArgumentParser(
     prog='IGVF Catalog DB Index Setup',
-    description='Creates indexes in the development.json IGVF Catalog ArangoDB collections'
+    description='Creates (or, with --drop, removes) indexes in the development.json IGVF Catalog ArangoDB collections'
 )
 
 parser.add_argument('-c', '--collection', nargs='*',
                     help='Creates collection indexes in the development.json DB', choices=collections_in_config)
+parser.add_argument('-d', '--drop', nargs='+', metavar='COLLECTION',
+                    help='Drops all non-system indexes (everything but the primary/edge index) from the given '
+                         'collection(s) in the development.json DB, instead of creating any. Not limited to '
+                         'collections present in index-config.yaml. Requires at least one collection name - '
+                         'there is no "drop from everything" shortcut.')
+parser.add_argument('-y', '--yes', action='store_true',
+                    help='Skip the confirmation prompt when using --drop.')
 
 args = parser.parse_args()
+
+if args.drop:
+    print('About to drop all non-system indexes from: {}'.format(', '.join(args.drop)))
+    if not args.yes:
+        confirmation = input('Type "yes" to continue: ')
+        if confirmation.strip().lower() != 'yes':
+            print('Aborted.')
+            exit(0)
+
+    for collection in args.drop:
+        print('{} - dropping indexes...'.format(collection))
+        try:
+            dropped = ArangoDB().drop_all_indexes(collection)
+            print('{} - dropped {} index(es).'.format(collection, len(dropped)))
+        except Exception as error:
+            print('{} - failed to drop indexes. {}'.format(collection, error))
+
+    exit(0)
+
 collections_to_index = args.collection or collections_in_config
 
 

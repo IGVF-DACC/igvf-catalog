@@ -116,6 +116,37 @@ class ArangoDB:
     def index_exists(self, collection_db, index_name):
         return (index_name in [i['name'] for i in collection_db.indexes()])
 
+    # 'primary' and 'edge' indexes are created automatically by ArangoDB and can't be
+    # dropped - attempting to do so raises an error, so they're always skipped.
+    SYSTEM_INDEX_TYPES = ('primary', 'edge')
+
+    def drop_all_indexes(self, collection):
+        db = ArangoDB.__connection.db(
+            self.dbName, username=self.username, password=self.password)
+
+        collection_db = db.collection(collection)
+        dropped = []
+
+        for index in collection_db.indexes():
+            if index['type'] in ArangoDB.SYSTEM_INDEX_TYPES:
+                continue
+
+            index_name = index.get('name', index['id'])
+            print('Dropping {} index \'{}\' on {} (fields: {})'.format(
+                index['type'], index_name, collection, index.get('fields')))
+
+            # Caught per-index (rather than letting one failure abort the rest) because an
+            # inverted index still referenced by a search-alias view may refuse deletion
+            # depending on ArangoDB version - better to drop everything droppable and report
+            # the exception than to leave later indexes untouched.
+            try:
+                collection_db.delete_index(index['id'], ignore_missing=True)
+                dropped.append(index_name)
+            except Exception as error:
+                print('  failed to drop \'{}\': {}'.format(index_name, error))
+
+        return dropped
+
     def view_exists(self, db, view_name):
         return (view_name in [v['name'] for v in db.views()])
 
