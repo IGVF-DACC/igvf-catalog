@@ -117,6 +117,21 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('groups protein_change by hgvsp and alt, so an ambiguous notation like p.Met1? splits by amino acid', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(undefined) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+
+    const input = { gene_id: 'GENE5', page: 0 }
+    await genesCodingVariantsRouters.codingVariantsFromGenes({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    const liveQuery = String(query.mock.calls[1][0])
+    expect(liveQuery).toContain('COLLECT protein_change = vws.protein_change, alt = vws.cvDoc.alt INTO grouped = vws')
+    expect(liveQuery).toContain('FILTER firstCvDoc.aapos != -1')
+  })
 })
 
 describe('genesCodingVariantsRouters.allCodingVariantsFromGenes', () => {

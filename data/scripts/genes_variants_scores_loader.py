@@ -1,7 +1,7 @@
 # Script to create genes_coding_variants_scores collection in ArangoDB
 # It aggregates variant scores from different sources for each gene.
 # The list of genes is read from a file where each line contains a JSON array with gene ID and gene name.
-
+#
 # Usage:
 # 1. Ensure you have the ArangoDB Python driver installed: pip install python-arango
 # 2. Create the input file with gene IDs and names using arangoexport as described in the comments.
@@ -120,9 +120,9 @@ with open(GENES, 'r') as file:
                     '_key': @key,
                     'variant_scores': (
                         FOR vws IN variantWithScores
-                        COLLECT protein_change = vws.protein_change INTO grouped = vws
+                        COLLECT protein_change = vws.protein_change, alt = vws.cvDoc.alt INTO grouped = vws
                         LET firstCvDoc = FIRST(grouped).cvDoc
-                        SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC
+                        SORT firstCvDoc.protein_id ASC, firstCvDoc.aapos ASC, alt ASC
                         RETURN {
                             protein_change: {
                                 protein_id: firstCvDoc.protein_id,
@@ -131,7 +131,7 @@ with open(GENES, 'r') as file:
                                 hgvsp: protein_change,
                                 aapos: firstCvDoc.aapos,
                                 ref: firstCvDoc.ref,
-                                alt: firstCvDoc.alt
+                                alt: alt
                             },
                             variants: grouped[* RETURN {
                                 variant: CURRENT.variant,
