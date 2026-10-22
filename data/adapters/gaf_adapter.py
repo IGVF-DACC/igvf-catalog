@@ -103,14 +103,17 @@ class GAF(BaseAdapter):
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 go_term_keys.add(annotation['GO_ID'].replace(':', '_'))
-        self.ontology_term_validator.preload(go_term_keys)
+        self.ontology_term_validator.preload(
+            go_term_keys, resolve_via_ols=True)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 go_term_key = annotation['GO_ID'].replace(':', '_')
-                if not self.ontology_term_validator.validate(go_term_key):
+                resolved_term_key = self.ontology_term_validator.resolve(
+                    go_term_key)
+                if resolved_term_key is None:
                     continue
-                _to = 'ontology_terms/' + go_term_key
+                _to = 'ontology_terms/' + resolved_term_key
 
                 if self.label == 'rna':
                     transcript_id = self.rnacentral_mapping.get(
@@ -138,7 +141,7 @@ class GAF(BaseAdapter):
                         'gene_product_name': annotation['DB_Object_Name'],
                         'gene_product_type': annotation['DB_Object_Type'],
                         'qualifier': annotation['Qualifier'],
-                        'go_id': annotation['GO_ID'],
+                        'go_id': resolved_term_key.replace('_', ':', 1),
                         'db_reference': annotation['DB:Reference'],
                         'evidence': annotation['Evidence'],
                         'with': annotation['With'],

@@ -34,6 +34,9 @@ def mock_ontology_term_validator():
         mock_validator = MockValidator.return_value
         mock_validator.validate.return_value = True
         mock_validator.ensure.return_value = True
+        mock_validator.resolve.side_effect = (
+            lambda term_key: OntologyTermValidator.normalize_term_key(term_key)
+        )
         yield mock_validator
 
 
@@ -44,6 +47,8 @@ def test_gaf_adapter_human(mock_file_fileset, mock_protein_map, mock_ontology_te
     adapter.file_accession = 'IGVFFI1490WZCV'
     adapter.process_file()
     mock_file_fileset.assert_called_once_with('IGVFFI1490WZCV')
+    _, preload_kwargs = mock_ontology_term_validator.preload.call_args
+    assert preload_kwargs.get('resolve_via_ols') is True
     mock_protein_map.assert_called_once_with(
         field='uniprot_ids',
         organism='Homo sapiens',
@@ -60,6 +65,27 @@ def test_gaf_adapter_human(mock_file_fileset, mock_protein_map, mock_ontology_te
     assert first_item['method'] is None
     assert first_item['label'] is None
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI1490WZCV'
+
+
+def test_gaf_adapter_uses_remapped_go_term(
+        mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
+    mock_ontology_term_validator.resolve.side_effect = (
+        lambda term_key: 'GO_0003674'
+        if OntologyTermValidator.normalize_term_key(term_key) == 'GO_0003723'
+        else OntologyTermValidator.normalize_term_key(term_key)
+    )
+    writer = SpyWriter()
+    adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
+                  label='human', writer=writer, validate=False)
+    adapter.file_accession = 'IGVFFI1490WZCV'
+    adapter.process_file()
+
+    docs = [json.loads(c)
+            for c in writer.contents if c.strip().startswith('{')]
+    remapped = [d for d in docs if d['gene_product_id'] == 'A0A024RBG1'
+                and d['_to'] == 'ontology_terms/GO_0003674']
+    assert remapped
+    assert all(d['go_id'] == 'GO:0003674' for d in remapped)
 
 
 def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
