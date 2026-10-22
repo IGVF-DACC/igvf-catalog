@@ -322,7 +322,7 @@ const variantsFromVariantID = publicProcedure
 
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant-ld/summary', description: descriptions.variants_variants_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
+  .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
   .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))
 
