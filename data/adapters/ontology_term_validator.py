@@ -14,7 +14,8 @@ class OntologyTermValidator:
     the full ontology_terms collection into memory.
 
     Pass ``resolve_via_ols=True`` to ``preload()`` to remap obsolete terms
-    (absent from the DB) to their current successors via OLS.
+    (absent from the DB) to their current successors via OLS, or via the
+    Cellosaurus API for ``CVCL_*`` accessions (Cellosaurus is not in OLS).
 
     OLS current-term lookup (``resolve_via_ols``) supports:
 
@@ -25,8 +26,13 @@ class OntologyTermValidator:
     - ORPHANET / Orphanet (``http://www.orpha.net/ORDO/{TERM_KEY}``,
       OLS id ``ordo``)
 
-    Not supported for OLS remap: Oncotree, ENCODE custom terms, and any
-    ontology without a matching OLS id / IRI pattern above.
+    Cellosaurus (``CVCL_*``) uses
+    ``https://api.cellosaurus.org/search/cell-line`` and remaps secondary
+    accessions to the single primary accession when that primary exists in
+    the DB.
+
+    Not supported for external remap: Oncotree, ENCODE custom terms, and any
+    OLS ontology without a matching OLS id / IRI pattern above.
     """
 
     OLS_API_BASE = 'https://www.ebi.ac.uk/ols4/api/ontologies/{ontology}/terms'
@@ -38,6 +44,9 @@ class OntologyTermValidator:
         'ORPHANET': ('ordo', 'http://www.orpha.net/ORDO/{term_key}'),
     }
     OLS_TIMEOUT_SECONDS = 30
+    CELLOSAURUS_SEARCH_URL = (
+        'https://api.cellosaurus.org/search/cell-line?q={term_key}'
+    )
 
     def __init__(self, collection='ontology_terms', chunk_size=500):
         if collection != 'ontology_terms':
@@ -108,8 +117,9 @@ class OntologyTermValidator:
         cached valid set. Must be called before ``validate()`` or ``resolve()``.
 
         If ``resolve_via_ols`` is True, terms missing from the DB are looked up
-        in OLS and remapped when there is a single ``replaced_by`` successor
-        that exists in the DB. Updates both ``_valid_term_keys`` and ``_remaps``.
+        in OLS (or Cellosaurus for ``CVCL_*``) and remapped when there is a
+        single unambiguous successor that exists in the DB. Updates both
+        ``_valid_term_keys`` and ``_remaps``.
         """
         normalized = {
             key for key in (
@@ -211,6 +221,8 @@ class OntologyTermValidator:
     def _follow_replaced_by_chain(self, term_key, seen=None):
         """Recursively follow OLS replaced_by until a non-obsolete term.
 
+        ``CVCL_*`` terms are resolved via the Cellosaurus API instead of OLS.
+
         Returns the final candidate key, or None if no unambiguous remap
         (including cycles).
         """
@@ -219,6 +231,9 @@ class OntologyTermValidator:
         if term_key in seen:
             return None
         seen.add(term_key)
+
+        if term_key.startswith('CVCL_'):
+            return self._resolve_cellosaurus_primary(term_key)
 
         ols_term = self._fetch_ols_term(term_key)
         if ols_term is None:
@@ -230,6 +245,54 @@ class OntologyTermValidator:
         if replacement is None:
             return None
         return self._follow_replaced_by_chain(replacement, seen)
+
+    def _fetch_cellosaurus_cell_line(self, term_key):
+        """Return the first Cellosaurus search hit for ``term_key``, or None."""
+        url = self.CELLOSAURUS_SEARCH_URL.format(
+            term_key=quote(term_key, safe=''))
+        try:
+            req = urllib.request.Request(
+                url, headers={'Accept': 'application/json'})
+            with urllib.request.urlopen(req, timeout=self.OLS_TIMEOUT_SECONDS) as resp:
+                data = json.load(resp)
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError,
+                json.JSONDecodeError, ValueError):
+            return None
+        lines = (data.get('Cellosaurus') or {}).get('cell-line-list') or []
+        if not lines:
+            return None
+        return lines[0]
+
+    def _resolve_cellosaurus_primary(self, term_key):
+        """Return the primary CVCL accession for ``term_key``, or None.
+
+        Remaps only when search returns a hit whose accession-list contains
+        ``term_key`` and a single primary accession. If ``term_key`` is already
+        primary, returns it unchanged.
+        """
+        cell_line = self._fetch_cellosaurus_cell_line(term_key)
+        if cell_line is None:
+            return None
+
+        accessions = cell_line.get('accession-list') or []
+        values = {
+            self.normalize_term_key(entry.get('value'))
+            for entry in accessions
+            if entry.get('value')
+        }
+        if term_key not in values:
+            # Free-text search hit that does not list this accession.
+            return None
+
+        primaries = [
+            self.normalize_term_key(entry.get('value'))
+            for entry in accessions
+            if entry.get('type') == 'primary' and entry.get('value')
+        ]
+        primaries = [key for key in primaries if key]
+        if len(primaries) != 1:
+            return None
+        return primaries[0]
 
     def resolve(self, term_key):
         """Return the current DB term key (identity or remapped), or None."""
@@ -259,6 +322,7 @@ class OntologyTermValidator:
             print('All ontology term IDs are valid.')
         if self._remaps:
             print(
-                f'Ontology term IDs remapped via OLS: {len(self._remaps)}')
+                f'Ontology term IDs remapped via OLS/Cellosaurus: '
+                f'{len(self._remaps)}')
             for old_key, new_key in sorted(self._remaps.items()):
                 print(f'  {old_key} -> {new_key}')
