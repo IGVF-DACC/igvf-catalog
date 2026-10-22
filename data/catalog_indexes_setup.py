@@ -24,8 +24,58 @@ parser.add_argument('-y', '--yes', action='store_true',
 
 args = parser.parse_args()
 
+# 'primary' and 'edge' indexes are created automatically by ArangoDB and can't be dropped -
+# attempting to do so raises an error, so they're always skipped.
+SYSTEM_INDEX_TYPES = ('primary', 'edge')
+
+
+def find_views_for_collection(db, collection):
+    """Names of search-alias views backed by an index on this collection."""
+    matching = []
+    for summary in db.views():
+        view = db.view(summary['name'])
+        if any(entry.get('collection') == collection for entry in view.get('indexes', [])):
+            matching.append(summary['name'])
+    return matching
+
+
+def drop_all_indexes(collection):
+    db = ArangoDB().get_igvf_connection()
+    collection_db = db.collection(collection)
+
+    # Views are dropped before the inverted indexes backing them, so ArangoDB never has to
+    # handle deleting an index a view still references.
+    for view_name in find_views_for_collection(db, collection):
+        print('Dropping view \'{}\' (backed by an index on {})'.format(
+            view_name, collection))
+        try:
+            db.delete_view(view_name, ignore_missing=True)
+        except Exception as error:
+            print('  failed to drop view \'{}\': {}'.format(view_name, error))
+
+    dropped = []
+    for index in collection_db.indexes():
+        if index['type'] in SYSTEM_INDEX_TYPES:
+            continue
+
+        index_name = index.get('name', index['id'])
+        print('Dropping {} index \'{}\' on {} (fields: {})'.format(
+            index['type'], index_name, collection, index.get('fields')))
+
+        # Caught per-index (rather than letting one failure abort the rest) so one failure
+        # doesn't leave later indexes untouched.
+        try:
+            collection_db.delete_index(index['id'], ignore_missing=True)
+            dropped.append(index_name)
+        except Exception as error:
+            print('  failed to drop \'{}\': {}'.format(index_name, error))
+
+    return dropped
+
+
 if args.drop:
-    print('About to drop all non-system indexes from: {}'.format(', '.join(args.drop)))
+    print('About to drop all non-system indexes (and any views backed by them) from: {}'.format(
+        ', '.join(args.drop)))
     if not args.yes:
         confirmation = input('Type "yes" to continue: ')
         if confirmation.strip().lower() != 'yes':
@@ -35,7 +85,7 @@ if args.drop:
     for collection in args.drop:
         print('{} - dropping indexes...'.format(collection))
         try:
-            dropped = ArangoDB().drop_all_indexes(collection)
+            dropped = drop_all_indexes(collection)
             print('{} - dropped {} index(es).'.format(collection, len(dropped)))
         except Exception as error:
             print('{} - failed to drop indexes. {}'.format(collection, error))
