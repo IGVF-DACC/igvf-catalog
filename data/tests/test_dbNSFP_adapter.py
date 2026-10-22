@@ -22,7 +22,7 @@ def test_dbNSFP_adapter_coding_variants(mocker):
                  return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbNSFP(
-        filepath='./samples/dbNSFP4.5a_variant.chrY_sample', writer=writer, validate=True)
+        filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample', writer=writer, validate=True)
     adapter.process_file()
 
     assert len(writer.contents) > 1
@@ -41,7 +41,7 @@ def test_dbNSFP_adapter_variants_coding_variants(mock_bulk_check_variants, mocke
                  return_value='fake_variant_id')
     writer = SpyWriter()
 
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
+    adapter = DbNSFP(filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample',
                      label='variants_coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -65,7 +65,7 @@ def test_dbNSFP_adapter_skips_edge_when_variant_not_loaded(mock_bulk_check_varia
     mock_bulk_check_variants.return_value = set()
     writer = SpyWriter()
 
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
+    adapter = DbNSFP(filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample',
                      label='variants_coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -96,7 +96,7 @@ def test_dbNSFP_adapter_variants_label_creates_missing_variant(mock_bulk_check_v
     }, None)
     writer = SpyWriter()
 
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
+    adapter = DbNSFP(filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample',
                      label='variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -112,7 +112,8 @@ def test_dbNSFP_adapter_variants_label_creates_missing_variant(mock_bulk_check_v
 
 
 def test_dbNSFP_adapter_multiple_records():
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample')
+    adapter = DbNSFP(
+        filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample')
     data_line = ['Y', '2786989', 'C', 'A', 'X', 'Y', '.', 'Y', '2655030', 'Y', '2715030', '205;206', 'SRY;SRY',
                  'ENSG00000184895;ENSG00000184895', 'ENST00000383070;ENST00000383070', 'ENSP00000372547;ENSP00000372547']
 
@@ -120,7 +121,8 @@ def test_dbNSFP_adapter_multiple_records():
 
 
 def test_dbNSFP_adapter_breakdown_line():
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample')
+    adapter = DbNSFP(
+        filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample')
     original_data_line = ['Y', '2786989', 'C', 'A', 'X', 'Y', '.', 'Y', '2655030', 'Y', '2715030', '205;206', 'SRY;SRY',
                           'ENSG00000184895;ENSG00000184895', 'ENST00000383070;ENST00000383070', 'ENSP00000372547;ENSP00000372547']
 
@@ -134,16 +136,16 @@ def test_dbNSFP_adapter_breakdown_line():
 
 
 def test_dbNSFP_adapter_initialization():
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
+    adapter = DbNSFP(filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample',
                      label='variants_coding_variants')
 
-    assert adapter.filepath == './samples/dbNSFP4.5a_variant.chrY_sample'
+    assert adapter.filepath == './tests/fixtures/dbNSFP4.5a_variant.chrY_sample'
     assert adapter.label == 'variants_coding_variants'
 
 
 def test_dbNSFP_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
+    adapter = DbNSFP(filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample',
                      label='variants_coding_variants', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

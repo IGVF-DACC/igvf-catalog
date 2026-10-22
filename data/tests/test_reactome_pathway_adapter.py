@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def filepath():
-    return './samples/reactome/ReactomePathways_20240603.txt'
+    return './tests/fixtures/reactome/ReactomePathways_20240603.txt'
 
 
 @pytest.fixture

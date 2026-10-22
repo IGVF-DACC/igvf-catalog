@@ -9,7 +9,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def sample_filepath():
-    return './samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'
+    return './tests/fixtures/mouse_variants/mouse_variant_snps_rsid_sample.vcf'
 
 
 @pytest.fixture

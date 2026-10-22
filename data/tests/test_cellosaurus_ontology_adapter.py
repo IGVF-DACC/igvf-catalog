@@ -19,7 +19,7 @@ def mock_file_fileset():
 
 def test_cellosaurus_adapter_node(mock_file_fileset):
     writer = SpyWriter()
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+    adapter = Cellosaurus(filepath='./tests/fixtures/cellosaurus_example.obo.txt',
                           label='ontology_term', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
@@ -35,7 +35,7 @@ def test_cellosaurus_adapter_node(mock_file_fileset):
 
 def test_cellosaurus_adapter_edge(mock_file_fileset):
     writer = SpyWriter()
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+    adapter = Cellosaurus(filepath='./tests/fixtures/cellosaurus_example.obo.txt',
                           label='ontology_relationship', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
@@ -53,13 +53,13 @@ def test_cellosaurus_adapter_edge(mock_file_fileset):
 
 def test_cellosaurus_adapter_species_filter(mock_file_fileset):
     writer = SpyWriter()
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+    adapter = Cellosaurus(filepath='./tests/fixtures/cellosaurus_example.obo.txt',
                           label='ontology_term', species_filter=True, writer=writer)
     adapter.process_file()
     filtered_count = len(writer.contents)
 
     writer = SpyWriter()
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+    adapter = Cellosaurus(filepath='./tests/fixtures/cellosaurus_example.obo.txt',
                           label='ontology_term', species_filter=False, writer=writer)
     adapter.process_file()
     unfiltered_count = len(writer.contents)
@@ -68,7 +68,8 @@ def test_cellosaurus_adapter_species_filter(mock_file_fileset):
 
 
 def test_cellosaurus_adapter_to_key():
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt')
+    adapter = Cellosaurus(
+        filepath='./tests/fixtures/cellosaurus_example.obo.txt')
     assert adapter.to_key('NCBI_TaxID:9606') == 'NCBITaxon_9606'
     assert adapter.to_key('ORDO:Orphanet_102') == 'Orphanet_102'
     assert adapter.to_key('CLO:CLO_0001001') == 'CLO_0001001'
@@ -76,13 +77,13 @@ def test_cellosaurus_adapter_to_key():
 
 def test_cellosaurus_adapter_initialization():
     adapter = Cellosaurus(
-        filepath='./samples/cellosaurus_example.obo.txt', label='ontology_term')
-    assert adapter.filepath == './samples/cellosaurus_example.obo.txt'
+        filepath='./tests/fixtures/cellosaurus_example.obo.txt', label='ontology_term')
+    assert adapter.filepath == './tests/fixtures/cellosaurus_example.obo.txt'
     assert adapter.label == 'ontology_term'
     assert adapter.species_filter == True
 
     adapter = Cellosaurus(
-        filepath='./samples/cellosaurus_example.obo.txt', label='ontology_relationship')
+        filepath='./tests/fixtures/cellosaurus_example.obo.txt', label='ontology_relationship')
     assert adapter.label == 'ontology_relationship'
     assert adapter.species_filter == True
 
@@ -92,7 +93,7 @@ def test_cellosaurus_adapter_relationship_edges_are_validated(mock_file_fileset)
     # originate_from_same_individual_as) used to call save_props without ever calling
     # validate_doc, so validate=True silently let through edges the schema didn't allow.
     writer = SpyWriter()
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+    adapter = Cellosaurus(filepath='./tests/fixtures/cellosaurus_example.obo.txt',
                           label='ontology_relationship', species_filter=False,
                           writer=writer, validate=True)
     adapter.process_file()
@@ -105,7 +106,7 @@ def test_cellosaurus_adapter_relationship_edges_are_validated(mock_file_fileset)
 
 def test_cellosaurus_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+    adapter = Cellosaurus(filepath='./tests/fixtures/cellosaurus_example.obo.txt',
                           label='ontology_term', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

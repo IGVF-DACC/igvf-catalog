@@ -46,7 +46,7 @@ def mock_ontology_term_validator():
 def test_depmap_adapter_process_file(mock_file_fileset):
     writer = SpyWriter()
     adapter = DepMap(
-        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
         label='depmap',
         writer=writer,
         validate=True
@@ -93,7 +93,7 @@ def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
     import tempfile
     import os
 
-    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     model_id = header[1]
@@ -131,10 +131,10 @@ def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
 
 def test_depmap_adapter_initialization():
     adapter = DepMap(
-        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
         label='depmap'
     )
-    assert adapter.filepath == './samples/DepMap/CRISPRGeneDependency_transposed_example.csv'
+    assert adapter.filepath == './tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv'
     assert adapter.label == 'depmap'
     assert adapter.writer is None, 'Writer should be None by default.'
     assert adapter.file_accession == 'CRISPRGeneDependency_transposed_example'
@@ -143,7 +143,7 @@ def test_depmap_adapter_initialization():
 def test_depmap_adapter_missing_gene_id_mapping():
     writer = SpyWriter()
     adapter = DepMap(
-        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
         label='depmap',
         writer=writer
     )
@@ -169,7 +169,7 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
     import tempfile
     import os
 
-    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -207,7 +207,7 @@ def test_depmap_adapter_synonym_fallback(mocker):
     import tempfile
     import os
 
-    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -240,7 +240,7 @@ def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
     import tempfile
     import os
 
-    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -271,7 +271,7 @@ def test_depmap_adapter_gene_id_mapping_override(mocker):
     import tempfile
     import os
 
-    with open('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -297,7 +297,7 @@ def test_depmap_adapter_gene_id_mapping_override(mocker):
 def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
     adapter = DepMap(
-        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
         label='depmap',
         writer=writer
     )
@@ -313,7 +313,7 @@ def test_depmap_adapter_dependency_cutoff():
 def test_depmap_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = DepMap(
-        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
         label='depmap',
         writer=writer,
         validate=True

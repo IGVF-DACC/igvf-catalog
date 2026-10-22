@@ -83,7 +83,7 @@ def mock_ontology_term_validator():
 def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator, mocker):
     writer = SpyWriter()
 
-    adapter = STARRseqVariantBiosample(filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv', writer=writer,
+    adapter = STARRseqVariantBiosample(filepath='./tests/fixtures/IGVFFI7664HHXI_starr_seq.example.tsv', writer=writer,
                                        label='variant', validate=True)
 
     # Use a more precise mock that only affects opening the data file.
@@ -109,7 +109,7 @@ def test_process_file_variant_biosample(
     writer = SpyWriter()
 
     adapter = STARRseqVariantBiosample(
-        filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv', writer=writer, label='variant_biosample', validate=True)
+        filepath='./tests/fixtures/IGVFFI7664HHXI_starr_seq.example.tsv', writer=writer, label='variant_biosample', validate=True)
 
     # Use a more precise mock that only affects opening the data file.
     with patch('builtins.open', mock_open(read_data=mock_bed_data)) as mock_file_open:
@@ -148,7 +148,7 @@ def test_process_file_variant_biosample_significant_true(
     """Edges set significant=True when postProbEffect is strictly greater than THRESHOLD."""
     writer = SpyWriter()
     adapter = STARRseqVariantBiosample(
-        filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv',
+        filepath='./tests/fixtures/IGVFFI7664HHXI_starr_seq.example.tsv',
         writer=writer,
         label='variant_biosample',
         validate=True,
@@ -164,7 +164,7 @@ def test_invalid_label(mock_file_fileset, mock_load_variant, mock_seqrepo_and_tr
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_biosample'):
         STARRseqVariantBiosample(
-            filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv',
+            filepath='./tests/fixtures/IGVFFI7664HHXI_starr_seq.example.tsv',
             label='invalid_label',
             writer=writer,
             validate=True
@@ -174,7 +174,7 @@ def test_invalid_label(mock_file_fileset, mock_load_variant, mock_seqrepo_and_tr
 def test_validate_doc_invalid(mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator):
     writer = SpyWriter()
     adapter = STARRseqVariantBiosample(
-        filepath='./samples/IGVFFI7664HHXI_starr_seq.example.tsv',
+        filepath='./tests/fixtures/IGVFFI7664HHXI_starr_seq.example.tsv',
         label='variant',
         writer=writer,
         validate=True

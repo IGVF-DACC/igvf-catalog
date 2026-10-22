@@ -19,7 +19,7 @@ def mock_file_fileset():
 def test_biogrid_gene_gene_adapter_gene_gene_biogrid(mock_file_fileset):
     writer = SpyWriter()
     adapter = GeneGeneBiogrid(
-        filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='human_gene_gene_biogrid', writer=writer, validate=True)
+        filepath='./tests/fixtures/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='human_gene_gene_biogrid', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 2
@@ -39,7 +39,7 @@ def test_biogrid_gene_gene_adapter_gene_gene_biogrid(mock_file_fileset):
 
 def test_biogrid_gene_gene_adapter_mouse_gene_gene_biogrid(mock_file_fileset):
     writer = SpyWriter()
-    adapter = GeneGeneBiogrid(filepath='./samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv',
+    adapter = GeneGeneBiogrid(filepath='./tests/fixtures/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv',
                               label='mouse_gene_gene_biogrid', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -55,7 +55,7 @@ def test_biogrid_gene_gene_adapter_mouse_gene_gene_biogrid(mock_file_fileset):
 
 def test_biogrid_gene_gene_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = GeneGeneBiogrid(filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv',
+    adapter = GeneGeneBiogrid(filepath='./tests/fixtures/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv',
                               label='human_gene_gene_biogrid', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
