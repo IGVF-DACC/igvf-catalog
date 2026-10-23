@@ -73,6 +73,38 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const row = {
+      log2FC: 1.5,
+      strand: '+',
+      neg_log10_pvalue: 3.2,
+      neg_log10_pvalue_adj: 2.8,
+      DNA_count: 120,
+      RNA_count: 80,
+      significant: true,
+      source: 'ENCODE',
+      source_url: 'http://example.com/mpra',
+      genomic_element: 'genomic_elements/GE1',
+      biosample: 'ontology_terms/CL_0000001',
+      name: 'expression effect in',
+      class: 'observed data',
+      method: 'MPRA',
+      files_filesets: 'files_filesets/FILESET1',
+      preferred_assay_titles: ['TAP-seq']
+    }
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([row])
+    } as any)
+
+    const input = { region: 'chr1:1000-2000', method: 'MPRA', page: 0 }
+    const result = await genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...row, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('genomicElementsBiosamplesRouters.genomicElementsFromBiosamples', () => {

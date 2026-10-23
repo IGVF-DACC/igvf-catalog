@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { motifFormat } from '../nodes/motifs'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, motifsCommonQueryFormat, proteinsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
@@ -22,7 +22,8 @@ export const motifsToProteinsFormat = z.object({
   name: z.string(),
   class: z.string().nullish(),
   method: z.string().nullish(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(z.object({
@@ -105,7 +106,8 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
         'name': record.name,
         'class': record.class,
         'method': record.method,
-        'files_filesets': record.files_filesets
+        'files_filesets': record.files_filesets,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
    )
     LET motifsComplexes = (
@@ -120,7 +122,8 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
           'name': record.name,
           'class': record.class,
           'method': record.method,
-          'files_filesets': record.files_filesets
+          'files_filesets': record.files_filesets,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         }
     )
     RETURN APPEND(motifsProteins, motifsComplexes)
@@ -173,7 +176,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
         'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
         'class': record.class,
         'method': record.method,
-        'files_filesets': record.files_filesets
+        'files_filesets': record.files_filesets,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
       )
       LET complexes = (
@@ -195,7 +199,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
           'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
           'class': record.class,
           'method': record.method,
-          'files_filesets': record.files_filesets
+          'files_filesets': record.files_filesets,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         }
       )
       RETURN APPEND(proteinsMotifs, complexesMotifs)
@@ -239,7 +244,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
             'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
             'class': record.class,
             'method': record.method,
-            'files_filesets': record.files_filesets
+            'files_filesets': record.files_filesets,
+            'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
           }
       )
       LET motifsComplexes = (
@@ -254,7 +260,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
             'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
             'class': record.class,
             'method': record.method,
-            'files_filesets': record.files_filesets
+            'files_filesets': record.files_filesets,
+            'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
           }
       )
       RETURN APPEND(motifsProteins, motifsComplexes)
@@ -270,14 +277,14 @@ const motifsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
   .input(proteinsQuery)
   .output(z.array(motifsToProteinsFormat))
-  .query(async ({ input }) => await motifsFromProteinSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await motifsFromProteinSearch(input)))
 
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
   .input(motifsToProteinsQueryFormat)
   .output(z.array(motifsToProteinsFormat))
-  .query(async ({ input }) => await proteinsFromMotifSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await proteinsFromMotifSearch(input)))
 
 export const motifsProteinsRouters = {
   proteinsFromMotifs,

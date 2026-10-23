@@ -137,6 +137,47 @@ describe('variantsGenesRouters', () => {
       const input = {}
       await expect(callProcedure(variantsGenesRouters.genesFromVariants, input)).rejects.toThrow(TRPCError)
     })
+
+    it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+      const mockResult = [{
+        gene: 'genes/ENSG00000187583',
+        sequence_variant: 'variants/NC_000001.11:10000:T:A',
+        effect_size: null,
+        neg_log10_pvalue: null,
+        neg_log10_pvalue_adj: null,
+        log2FC: 0.5,
+        posterior_inclusion_probability: null,
+        coefficient_stddev: null,
+        power: null,
+        significant: true,
+        standard_error: null,
+        z_score: null,
+        credible_set_min_r2: null,
+        method: 'Perturb-seq',
+        crispr_modality: null,
+        source: 'IGVF',
+        source_url: 'https://data.igvf.org/tabular-files/IGVFFI0524YUIL/',
+        label: 'variant effect on gene expression',
+        p_value: null,
+        chr: null,
+        biological_context: 'THP-1',
+        biosample_term: 'ontology_terms/EFO_0002067',
+        name: 'expression modulated by',
+        class: null,
+        files_filesets: 'files_filesets/IGVFFI0332UGDD',
+        preferred_assay_titles: ['TAP-seq']
+      }]
+
+      const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+        all: jest.fn().mockResolvedValue(mockResult)
+      } as any)
+
+      const input = { method: 'CRISPR screen', page: 0 }
+      const result = await callProcedure(variantsGenesRouters.genesFromVariants, input)
+
+      expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+      expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+    })
   })
 
   describe('variantsFromGenes', () => {

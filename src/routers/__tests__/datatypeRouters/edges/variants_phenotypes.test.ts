@@ -87,6 +87,44 @@ describe('variantsPhenotypesRouters', () => {
       expect(result).toEqual(mockResult)
     })
 
+    it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+      const mockResult = [{
+        variant: 'variants/NC_000001.11:25253603:G:A',
+        phenotype_id: 'ontology_terms/NTR_0001118',
+        name: 'associated with',
+        source: 'IGVF',
+        source_url: 'https://data.igvf.org/tabular-files/IGVFFI2014OOZP/',
+        class: 'observed data',
+        method: 'CRISPR screen',
+        label: 'variant effect on phenotype',
+        crispr_modality: 'prime editing',
+        biological_context: 'human HCT116 cell line',
+        biosample_term: 'ontology_terms/EFO_0002824',
+        files_filesets: 'files_filesets/IGVFFI2014OOZP',
+        preferred_assay_titles: ['TAP-seq'],
+        effect_size: 0.3,
+        z_score: 1.2,
+        significant: true,
+        num_guides: 4,
+        edit_rate_mean: 0.6,
+        effect_size_ci95_lower: 0.1,
+        effect_size_ci95_upper: 0.5,
+        p_value_adj: 0.01,
+        neg_log10_pvalue_adj: 2,
+        phenotype_term: 'cell migration'
+      }]
+
+      const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+        all: jest.fn().mockResolvedValue(mockResult)
+      } as any)
+
+      const input = { method: 'CRISPR screen', page: 0 }
+      const result = await callProcedure(variantsPhenotypesRouters.phenotypesFromVariants, input)
+
+      expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+      expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+    })
+
     it('throws BAD_REQUEST when no variant-identifying property, method, or files_fileset is provided', async () => {
       const input = {}
       await expect(callProcedure(variantsPhenotypesRouters.phenotypesFromVariants, input)).rejects.toThrow(TRPCError)

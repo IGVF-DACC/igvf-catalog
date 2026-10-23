@@ -91,6 +91,35 @@ describe('variantsDiseasesRouters.variantsFromDiseases', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const row = {
+      sequence_variant: 'variants/NC_000005.10:1779518:G:A',
+      disease: 'ontology_terms/MONDO_0009861',
+      gene_name: 'CFTR',
+      assertion: 'Pathogenic',
+      pmids: ['http://pubmed.ncbi.nlm.nih.gov/2574002'],
+      class: 'observed data',
+      method: null,
+      label: null,
+      files_filesets: 'files_filesets/IGVFFI5852GYTT',
+      preferred_assay_titles: ['TAP-seq'],
+      source: 'ClinGen',
+      source_url: 'https://search.clinicalgenome.org/kb/downloads',
+      name: 'associated with'
+    }
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([row])
+    } as any)
+
+    const input = { disease_id: 'MONDO_0009861', page: 0 }
+    const result = await variantsDiseasesRouters.variantsFromDiseases({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...row, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('variantsDiseasesRouters.diseaseFromVariants', () => {

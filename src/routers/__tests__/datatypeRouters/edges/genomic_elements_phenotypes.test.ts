@@ -112,6 +112,20 @@ describe('genomicElementsPhenotypesRouters', () => {
       const input = {}
       await expect(callProcedure(genomicElementsPhenotypesRouters.phenotypesFromGenomicElements, input)).rejects.toThrow(TRPCError)
     })
+
+    it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+      const mockResult = [buildEdgeRecord({ preferred_assay_titles: ['TAP-seq'] })]
+
+      const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+        all: jest.fn().mockResolvedValue(mockResult)
+      } as any)
+
+      const input = { method: 'CRISPR screen', page: 0 }
+      const result = await callProcedure(genomicElementsPhenotypesRouters.phenotypesFromGenomicElements, input)
+
+      expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+      expect(result).toEqual([buildEdgeRecord({ preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] })])
+    })
   })
 
   describe('genomicElementsFromPhenotypes', () => {

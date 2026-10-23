@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
-import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, withHgncPrefix } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, withExpandedAssayTitles, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
@@ -165,6 +165,7 @@ export const outputFormat = z.array(z.object({
   cell_annotation_term: z.string().nullish(),
   treatments_term_ids: z.array(z.string()).nullish(),
   files_filesets: z.string(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   crispr_modality: z.string().nullish(),
   score: z.number().nullish(),
   transcription_start_site: z.number().nullish(),
@@ -211,6 +212,7 @@ export const grnOutputFormat = z.object({
   source: z.string(),
   biological_context: z.string(),
   files_filesets: z.string(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   log2FC: z.number().nullish(),
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
@@ -299,6 +301,7 @@ function buildQuery (params: {
         'source': record.source,
         'source_url': record.source_url,
         'files_filesets': record.files_filesets,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
         'biological_context': record.biological_context,
         'biosample_term': record.biosample_term,
         'cell_annotation': record.cell_annotation,
@@ -673,6 +676,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           'method': record.method,
           'source': record.source,
           'files_filesets': record.files_filesets,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
           'biological_context': record.biological_context,
           'log2FC': record.log2FC,
           'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -713,6 +717,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
             'method': record.method,
             'source': record.source,
             'files_filesets': record.files_filesets,
+            'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
             'biological_context': record.biological_context,
             'log2FC': record.log2FC,
             'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -756,6 +761,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
                   'method': record.method,
                   'source': record.source,
                   'files_filesets': record.files_filesets,
+                  'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
                   'biological_context': record.biological_context,
                   'log2FC': record.log2FC,
                   'neg_log10_pvalue': record.neg_log10_pvalue,
@@ -973,19 +979,19 @@ const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_genomic_elements } })
   .input(geneQueryFormat)
   .output(outputFormat)
-  .query(async ({ input }) => await findGenomicElementsFromGene(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenomicElementsFromGene(input)))
 
 const genesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes } })
   .input(genomicElementQueryFormat)
   .output(outputFormat)
-  .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenesFromGenomicElementsSearch(input)))
 
 const grn = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/gene-regulatory-network', description: descriptions.grn } })
   .input(gnrGeneQueryFormat)
   .output(z.array(grnOutputFormat))
-  .query(async ({ input }) => await grnSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await grnSearch(input)))
 
 const genesGenomicElementsScoreSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements/score-summary', description: descriptions.genes_genomic_elements_score_summary } })
