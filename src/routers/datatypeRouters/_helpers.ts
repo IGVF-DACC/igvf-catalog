@@ -53,6 +53,40 @@ export function resolveValidatedLimit (input: paramsFormatType, defaultLimit: nu
   return limit
 }
 
+// Some files_filesets.preferred_assay_titles values are a specific sub-type of a broader,
+// also-valid preferred_assay_titles value, and callers filtering/grouping by the broader
+// term shouldn't have to know about every specific variant - e.g. TAP-seq is a kind of
+// Perturb-seq, so a TAP-seq record should surface both terms. Extend this map as more such
+// groupings are identified.
+const ASSAY_TITLE_GROUPS: Record<string, string[]> = {
+  'TAP-seq': ['Perturb-seq']
+}
+
+export function expandPreferredAssayTitles (titles: string[] | null | undefined): string[] | null {
+  if (titles == null || titles.length === 0) {
+    return titles ?? null
+  }
+  const expanded = new Set(titles)
+  titles.forEach(title => {
+    ASSAY_TITLE_GROUPS[title]?.forEach(group => expanded.add(group))
+  })
+  return Array.from(expanded)
+}
+
+// Applies expandPreferredAssayTitles to every record in an array fetched from AQL (which
+// returns files_filesets.preferred_assay_titles verbatim, un-expanded) that has the field -
+// records from sources/paths that never attached it (e.g. verbose-mode object/string unions)
+// are left untouched.
+export function withExpandedAssayTitles <T> (records: T[]): T[] {
+  records.forEach(record => {
+    if (record != null && typeof record === 'object' && 'preferred_assay_titles' in record) {
+      const typed = record as unknown as { preferred_assay_titles?: string[] | null }
+      typed.preferred_assay_titles = expandPreferredAssayTitles(typed.preferred_assay_titles)
+    }
+  })
+  return records
+}
+
 // The gene schema's `hgnc` property stores IDs with an `HGNC:` prefix (e.g. `HGNC:4232`),
 // but the `hgnc_id` API param accepts the bare number. Any caller that filters on `hgnc`
 // directly (rather than delegating to geneSearch()) must apply this same prefixing or the

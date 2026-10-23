@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, verboseItems } from '../_helpers'
+import { expandPreferredAssayTitles, getDBReturnStatements, getFilterStatements, paramsFormatType, verboseItems } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { getSchema } from '../schema'
 
@@ -61,14 +61,16 @@ const relatedQTLFormat = z.object({
   neg_log10_pvalue: z.number().nullish(),
   biological_context: z.string(),
   name: z.string(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const relatedMotifFormat = z.object({
   motif: z.string().nullable(),
   source: z.string(),
   name: z.string(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const geneProteinRelatedFormat = z.object({
@@ -145,7 +147,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     LET A = (
       FOR record in ${variantToGeneCollectionName}
       FILTER record._to IN ['${genes.join('\',\'')}']
-      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToGeneSchema, true)}}
+      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, 'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles, ${getDBReturnStatements(variantToGeneSchema, true)}}
       RETURN {
         'sequence_variant': from,
         'related': { 'gene': to, 'sources': sources }
@@ -157,7 +159,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     LET B = (
       FOR record in ${variantToProteinCollectionName}
       FILTER record._to IN ['${proteins.join('\',\'')}']
-      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, ${getDBReturnStatements(variantToProteinSchema, true)}}
+      COLLECT from = record._from, to = record._to INTO sources = { 'name': record.inverse_name, 'files_filesets': record.files_filesets, 'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles, ${getDBReturnStatements(variantToProteinSchema, true)}}
       RETURN {
         'sequence_variant': from,
         'related': { 'protein': to, 'sources': sources }
@@ -193,6 +195,10 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
   const variantsFromProteins = new Set<string>()
   objs.forEach(obj => {
     obj.related.forEach((related: Record<string, any>) => {
+      related.sources?.forEach((source: Record<string, any>) => {
+        source.preferred_assay_titles = expandPreferredAssayTitles(source.preferred_assay_titles)
+      })
+
       if (related.gene !== undefined) {
         variantsFromGenes.add(related.gene)
 
@@ -241,7 +247,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   LET A = (
     FOR record in ${variantToGeneCollectionName}
     FILTER record._from == '${id}'
-    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToGeneSchema, true)}}
+    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, 'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles, ${getDBReturnStatements(variantToGeneSchema, true)}}
     RETURN {
       'sequence_variant': from,
       'related': { 'gene': to, 'sources': sources }
@@ -252,7 +258,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     FOR record in ${variantToProteinCollectionName}
     FILTER record._from == '${id}'
     FILTER LEFT(record._to, 9) == 'proteins/'
-    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToProteinSchema, true)}}
+    COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, 'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles, ${getDBReturnStatements(variantToProteinSchema, true)}}
     RETURN {
       'sequence_variant': from,
       'related': { 'protein': to, 'sources': sources }
@@ -290,6 +296,10 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   const proteinsFromVariant = new Set<string>()
   objs.forEach(obj => {
     obj.related.forEach((related: Record<string, any>) => {
+      related.sources?.forEach((source: Record<string, any>) => {
+        source.preferred_assay_titles = expandPreferredAssayTitles(source.preferred_assay_titles)
+      })
+
       if (related.gene !== undefined) {
         genesFromVariant.add(related.gene)
       }

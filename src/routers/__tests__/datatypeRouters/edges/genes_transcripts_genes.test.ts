@@ -66,6 +66,36 @@ it('returns the relationship ID and all three node handles', async () => {
   expect(await call({ morf_id: 'AATF_1', page: 0 })).toEqual([row])
 })
 
+it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+  const row = {
+    _id: 'genes_transcripts_genes/effect',
+    gene_transcript: 'genes_transcripts/existing_edge',
+    gene: 'genes/ENSG00000275700',
+    transcript: 'transcripts/ENST00000619387',
+    readout_gene: 'genes/ENSG00000198846',
+    morf_id: 'AATF_1',
+    transcript_mapping_method: 'supplied ENST',
+    standard_error: 0.5,
+    log2FC: 1,
+    significant: false,
+    name: 'modulates expression of',
+    label: 'gene overexpression effect on gene expression',
+    class: 'observed data',
+    method: 'MORF screen',
+    source: 'IGVF',
+    source_url: 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/',
+    files_filesets: 'files_filesets/IGVFFI6734IWRB',
+    preferred_assay_titles: ['TAP-seq'],
+    biological_context: 'T cell',
+    biosample_term: 'ontology_terms/CL_0000625'
+  }
+  jest.spyOn(db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue([row]) } as any)
+  const result = await call({ morf_id: 'AATF_1', page: 0 })
+  const aql = (db.query as jest.Mock).mock.calls[0][0]
+  expect(aql).toContain('preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles')
+  expect(result).toEqual([{ ...row, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+})
+
 it('rejects missing selectors and malformed numeric filters', async () => {
   await expect(call({ page: 0 })).rejects.toThrow('Define at least one')
   for (const log2FC of ['gt:NaN', 'wrong:2', '1:2:3', 'Infinity']) {

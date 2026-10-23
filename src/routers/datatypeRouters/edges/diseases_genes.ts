@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { ontologyFormat } from '../nodes/ontologies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, genesCommonQueryFormat } from '../params'
@@ -52,6 +52,7 @@ export const diseasesToGenesFormat = z.object({
   method: z.string().nullish(),
   label: z.string().nullish(),
   files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
@@ -157,7 +158,8 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
         {
           'disease': ${verbose ? `(${sourceQuery})[0]` : 'record._from'},
           'gene': ${verbose ? `(${targetQuery})[0]` : 'record._to'},
-          'name': record.name
+          'name': record.name,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         },
         record.source == 'GenCC' ? { ${getDBReturnStatements(genccDiseaseToGeneSchema)} } : { ${getDBReturnStatements(diseaseToGeneSchema)} }
       )
@@ -191,7 +193,8 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
         {
           'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'},
           'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},
-          'name': record.name
+          'name': record.name,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         },
         record.source == 'GenCC' ? { ${getDBReturnStatements(genccDiseaseToGeneSchema)} } : { ${getDBReturnStatements(diseaseToGeneSchema)} }
       )
@@ -243,7 +246,8 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
       RETURN MERGE(
         {
           'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
-          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         },
         record.source == 'GenCC' ? { ${getDBReturnStatements(genccDiseaseToGeneSchema)} } : { ${getDBReturnStatements(diseaseToGeneSchema)} }
       )
@@ -262,7 +266,8 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
           'disease': edgeRecord._to,
           'term_name': DOCUMENT(edgeRecord._to)['name'],
           ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
-          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         }
       )[0]
     )
@@ -286,14 +291,15 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
           'variant': ${`(${verboseQueryVariantClinGen})[0]`},
           'disease': ${`(${verboseQueryDiseaseClinGen})[0]`},
           ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
-          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         }
       )[0]
     )
 
   LET CLINGENUNIQ = (
     FOR record IN CLINGEN
-    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, class = record.class, method = record.method, label = record.label, files_filesets = record.files_filesets, name = record.name INTO variantGroup = record.variant
+    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, class = record.class, method = record.method, label = record.label, files_filesets = record.files_filesets, preferred_assay_titles = record.preferred_assay_titles, name = record.name INTO variantGroup = record.variant
     LET variants = (
       FOR v IN variantGroup
         FILTER v != null
@@ -310,6 +316,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
       'method': method,
       'label': label,
       'files_filesets': files_filesets,
+      'preferred_assay_titles': preferred_assay_titles,
       'name': name
     }
   )
@@ -330,13 +337,13 @@ const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
   .input(geneQuery)
   .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await diseasesFromGeneSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await diseasesFromGeneSearch(input)))
 
 const genesFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
   .input(diseaseQuery)
   .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await genesFromDiseaseSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await genesFromDiseaseSearch(input)))
 
 export const diseasesGenesRouters = {
   genesFromDiseases,

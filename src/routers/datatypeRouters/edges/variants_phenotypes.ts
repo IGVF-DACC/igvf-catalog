@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { studyFormat } from '../nodes/studies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
@@ -60,7 +60,8 @@ const gwasVariantPhenotypeFormat = z.object({
   version: z.string().default('October 2022 (22.10)'),
   name: z.string(),
   variant: z.string().or(variantSimplifiedFormat),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const igvfVariantPhenotypeFormat = z.object({
@@ -98,6 +99,7 @@ const igvfVariantPhenotypeFormat = z.object({
   class: z.string().nullish(),
   label: z.string().nullish(),
   files_filesets: z.string().nullable(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   biosample_term: z.string().nullish(),
   phenotype_term: z.string().nullable(),
   variant: z.string().or(variantSimplifiedFormat),
@@ -213,6 +215,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       {
         variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'},
         phenotype_id: record._to,
+        preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles,
       },
       (record.source == 'OpenTargets' ? {
         study: ${input.verbose === 'true' ? `(${studyVerboseQuery})[0]` : 'record.study'},
@@ -297,6 +300,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
       {
         variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'},
         phenotype_id: record._to,
+        preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles,
       },
 
         (record.source == 'OpenTargets' ? {
@@ -328,13 +332,13 @@ const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
   .input(phenotypesVariantsInputFormat)
   .output(z.array(variantPhenotypeFormat))
-  .query(async ({ input }) => await findVariantsFromPhenotypesSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findVariantsFromPhenotypesSearch(input)))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
   .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({ files_fileset: z.string().optional() })))
   .output(z.array(variantPhenotypeFormat))
-  .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findPhenotypesFromVariantSearch(input)))
 
 export const variantsPhenotypesRouters = {
   variantsFromPhenotypes,

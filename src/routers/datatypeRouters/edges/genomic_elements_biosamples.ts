@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withExpandedAssayTitles } from '../_helpers'
 import { ontologyFormat } from '../nodes/ontologies'
 import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
@@ -30,7 +30,8 @@ export const genomicElementsToBiosampleFormat = z.object({
   name: z.string(),
   class: z.string().optional(),
   method: z.string().optional(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.MPRAAdapter.json')
@@ -136,7 +137,8 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         'neg_log10_pvalue': record.neg_log10_pvalue,
         'name': record.inverse_name,
         'class': record.class,
-        'method': record.method
+        'method': record.method,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
   `
   return await (await db.query(query)).all()
@@ -220,7 +222,8 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'name': record.name,
         'class': record.class,
         'method': record.method,
-        'files_filesets': record.files_filesets
+        'files_filesets': record.files_filesets,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
   `
 
@@ -254,13 +257,13 @@ const biosamplesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/biosamples', description: descriptions.genomic_elements_biosamples } })
   .input(genomicBiosamplesQuery)
   .output(z.array(genomicElementsToBiosampleFormat))
-  .query(async ({ input }) => await findBiosamplesFromGenomicElementsQuery(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findBiosamplesFromGenomicElementsQuery(input)))
 
 const genomicElementsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements } })
   .input(biosamplesGenomicElementsQuery)
   .output(z.array(genomicElementsToBiosampleFormat))
-  .query(async ({ input }) => await findGenomicElementsFromBiosamplesQuery(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenomicElementsFromBiosamplesQuery(input)))
 
 export const genomicElementsBiosamplesRouters = {
   biosamplesFromGenomicElements,

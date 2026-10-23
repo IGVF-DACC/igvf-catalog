@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
@@ -37,7 +37,8 @@ const predictionFormat = z.object({
   dataset: z.string(),
   name: z.string(),
   method: z.string().nullish(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const genomicElementsPredictionsFormat = z.object({
@@ -71,6 +72,7 @@ export const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   neg_log10_pvalue: z.number().nullish(),
   beta: z.number().nullish(),
   files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   biological_context: z.string().nullish(),
   biosample_term: z.string().nullish(),
   source: z.string().nullish(),
@@ -196,6 +198,7 @@ const buildReturnObject = (): string => `{
   'neg_log10_pvalue': record.neg_log10_pvalue,
   'beta': record.beta,
   'files_filesets': record.files_filesets,
+  'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
   'biological_context': record.biological_context,
   'biosample_term': record.biosample_term,
   'source': record.source,
@@ -555,7 +558,8 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
             'element_start': ge.start,
             'element_end': ge.end,
             'element_type': ge.type,
-            'files_filesets': record.files_filesets
+            'files_filesets': record.files_filesets,
+            'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
           }
   `
 
@@ -789,7 +793,7 @@ const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
   .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
-  .query(async ({ input }) => await findPredictionsFromVariant(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findPredictionsFromVariant(input)))
 
 const variantsRegionSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/region-summary', description: descriptions.variants_region_summary } })
@@ -801,13 +805,13 @@ const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
   .input(variantsQueryFormat)
   .output(genomicElementsFromVariantsOutputFormat)
-  .query(async ({ input }) => await findGenomicElementsFromVariantsQuery(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenomicElementsFromVariantsQuery(input)))
 
 const variantsFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/variants', description: descriptions.genomic_elements_variants_edge } })
   .input(genomicBiosamplesQuery)
   .output(genomicElementsFromVariantsOutputFormat)
-  .query(async ({ input }) => await findVariantsFromGenomicElementsQuery(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findVariantsFromGenomicElementsQuery(input)))
 
 const genomicElementsPredictionsFromVariant = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/cell-gene-predictions', description: descriptions.cell_gene_genomic_elements } })

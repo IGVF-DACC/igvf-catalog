@@ -109,4 +109,18 @@ describe('proteinsProteinsRouters.proteinsProteins', () => {
     const input = { organism: 'Homo sapiens', page: 0 }
     await expect(callProcedure(proteinsProteinsRouters.proteinsProteins, input)).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [buildInteractionRecord({ preferred_assay_titles: ['TAP-seq'] })]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { protein_id: 'ENSP00000340898', page: 0 }
+    const result = await callProcedure(proteinsProteinsRouters.proteinsProteins, input)
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([buildInteractionRecord({ preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] })])
+  })
 })

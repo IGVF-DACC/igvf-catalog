@@ -57,6 +57,46 @@ describe('genesProteinsVariants.variantsFromGeneProteins', () => {
     expect(result[0].sequence_variant._id).toBe('NC_000001.11:69433:A:G')
     expect(dbModule.db.query).toHaveBeenCalledTimes(5)
   })
+
+  it('expands TAP-seq to include Perturb-seq on each related source', async () => {
+    const mainQueryResult = [
+      {
+        related: [
+          {
+            gene: 'genes/ENSG1',
+            sources: [
+              { label: 'CRISPR screen', source: 'IGVF', neg_log10_pvalue: 5.2, biological_context: 'K562', name: 'acts on', files_filesets: 'files_filesets/FILESET1', preferred_assay_titles: ['TAP-seq'] }
+            ]
+          }
+        ],
+        sequence_variant: {
+          _id: 'NC_000001.11:69433:A:G',
+          chr: 'chr1',
+          pos: 69433,
+          rsid: ['rs123'],
+          ref: 'A',
+          alt: 'G',
+          spdi: 'NC_000001.11:69433:A:G',
+          hgvs: 'NC_000001.11:g.69434A>G',
+          ca_id: 'CA123456'
+        }
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG1']) } as any) // geneIds
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // proteinIds
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mainQueryResult) } as any) // main query
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any) // verboseItems
+
+    const input = { query: 'GENE1', page: 0 }
+    const result: any = await genesProteinsVariants.variantsFromGeneProteins({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[2][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result[0].related[0].sources[0].preferred_assay_titles).toEqual(['TAP-seq', 'Perturb-seq'])
+  })
 })
 
 describe('genesProteinsVariants.genesProteinsFromVariants', () => {
@@ -105,6 +145,44 @@ describe('genesProteinsVariants.genesProteinsFromVariants', () => {
 
     expect(result[0].related[0].protein).toEqual(verboseProteinResult[0])
     expect(dbModule.db.query).toHaveBeenCalledTimes(3)
+  })
+
+  it('expands TAP-seq to include Perturb-seq on each related source', async () => {
+    const mainQueryResult = [
+      {
+        sequence_variant: {
+          _id: 'NC_000001.11:69433:A:G',
+          chr: 'chr1',
+          pos: 69433,
+          rsid: ['rs123'],
+          ref: 'A',
+          alt: 'G',
+          spdi: 'NC_000001.11:69433:A:G',
+          hgvs: 'NC_000001.11:g.69434A>G',
+          ca_id: 'CA123456'
+        },
+        related: [
+          { protein: 'proteins/ENSP1', sources: [{ motif: null, source: 'HOCOMOCOv11', name: 'binds', files_filesets: 'files_filesets/FILESET2', preferred_assay_titles: ['TAP-seq'] }] }
+        ]
+      }
+    ]
+
+    const verboseProteinResult = [
+      { _id: 'proteins/ENSP1', name: 'PROT1', uniprot_names: ['P12345'], files_filesets: null }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mainQueryResult) } as any) // main query
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // verboseItems genes
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(verboseProteinResult) } as any) // verboseItems proteins
+
+    const input = { variant_id: 'NC_000001.11:69433:A:G', page: 0 }
+    const result: any = await genesProteinsVariants.genesProteinsFromVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result[0].related[0].sources[0].preferred_assay_titles).toEqual(['TAP-seq', 'Perturb-seq'])
   })
 })
 

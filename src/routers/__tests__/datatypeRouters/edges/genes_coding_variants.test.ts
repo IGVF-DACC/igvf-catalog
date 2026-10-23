@@ -117,6 +117,51 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles per score via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [
+      {
+        protein_change: {
+          protein_id: 'ENSP00000493376',
+          protein_name: 'A0A2U3U0J3_HUMAN',
+          transcript_id: 'ENST00000641515',
+          hgvsp: 'p.Met1?',
+          aapos: 1,
+          ref: 'M',
+          alt: 'I'
+        },
+        variants: [{
+          variant: {
+            _id: 'NC_000001.11:69633:TGT:GAA',
+            chr: 'chr1',
+            pos: 69633,
+            rsid: null,
+            ref: 'TGT',
+            alt: 'GAA',
+            spdi: 'NC_000001.11:69633:TGT:GAA',
+            hgvs: 'NC_000001.11:g.69634_69636delinsGAA',
+            ca_id: null
+          },
+          scores: [
+            { method: 'Perturb-seq', score: 1.2, files_filesets: 'files_filesets/FILESET1', source_url: 'http://example.com/score', preferred_assay_titles: ['TAP-seq'] }
+          ]
+        }]
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(undefined) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue(mockResult) } as any)
+
+    const input = { gene_id: 'GENE1', page: 0 }
+    const result: any = await genesCodingVariantsRouters.codingVariantsFromGenes({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    const liveQuery = query.mock.calls[1][0] as string
+    expect(liveQuery).toContain('preferred_assay_titles: DOCUMENT(CURRENT.files_filesets).preferred_assay_titles')
+    expect(result[0].variants[0].scores[0].preferred_assay_titles).toEqual(['TAP-seq', 'Perturb-seq'])
+  })
 })
 
 describe('genesCodingVariantsRouters.allCodingVariantsFromGenes', () => {

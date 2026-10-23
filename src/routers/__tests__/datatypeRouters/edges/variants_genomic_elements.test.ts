@@ -56,6 +56,38 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+    const mockResult = [{
+      distance_gene_variant: 1000,
+      element_chr: 'chr1',
+      element_start: 69000,
+      element_end: 70000,
+      element_type: 'candidate cis regulatory element',
+      id: 'genomic_elements/GE1',
+      cell_type: 'K562',
+      target_gene: { gene_name: 'BRCA1', id: 'genes/ENSG00000012048', chr: 'chr1', start: 68000, end: 71000 },
+      score: 0.87,
+      model: 'scE2G',
+      dataset: 'https://example.com/dataset',
+      name: 'GE1_BRCA1',
+      method: 'scE2G',
+      files_filesets: 'files_filesets/IGVFFI0001XXXX',
+      preferred_assay_titles: ['TAP-seq']
+    }]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { spdi: 'NC_000001.11:69634:A:G', page: 0 }
+    const result = await variantsGenomicElementsRouters.predictionsFromVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain("'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles")
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () => {
@@ -340,6 +372,48 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariants', () => {
         rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+    const mockResult = [{
+      variant: {
+        chr: 'chr1',
+        pos: 69634,
+        ref: 'A',
+        alt: 'G',
+        rsid: ['rs123'],
+        spdi: 'NC_000001.11:69634:A:G',
+        hgvs: 'NC_000001.11:g.69634A>G',
+        ca_id: 'CA123',
+        _id: 'variants/V1'
+      },
+      name: 'modulates accessibility of',
+      label: 'variant-element',
+      method: 'Perturb-seq',
+      class: 'observed data',
+      log2FC: 0.5,
+      neg_log10_pvalue: 3.2,
+      beta: null,
+      files_filesets: 'files_filesets/IGVFFI0001XXXX',
+      preferred_assay_titles: ['TAP-seq'],
+      biological_context: 'lymphoblastoid cell line',
+      biosample_term: 'ontology_terms/EFO_0005292',
+      source: 'IGVF',
+      source_url: 'https://data.igvf.org',
+      genomic_element: null
+    }]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { method: 'caQTL', page: 0 }
+    const result = await variantsGenomicElementsRouters.genomicElementsFromVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain("'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles")
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 })
 

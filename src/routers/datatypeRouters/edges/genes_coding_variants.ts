@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { getDBReturnStatements, paramsFormatType } from '../_helpers'
+import { expandPreferredAssayTitles, getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
@@ -43,7 +43,8 @@ export const codingVariantsScoresFormat = z.object({
       method: z.string(),
       score: z.number().nullish(),
       source_url: z.string().nullish(),
-      files_filesets: z.string().nullish()
+      files_filesets: z.string().nullish(),
+      preferred_assay_titles: z.array(z.string()).nullish()
     }))
   })).nullish()
 })
@@ -295,7 +296,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         COLLECT variant = result.variant INTO variantGroup = result
         RETURN {
           variant: variant,
-          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url, files_filesets: CURRENT.files_filesets }],
+          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url, files_filesets: CURRENT.files_filesets, preferred_assay_titles: DOCUMENT(CURRENT.files_filesets).preferred_assay_titles }],
           maxScore: MAX(variantGroup[*].score),
           protein_change: FIRST(variantGroup).protein_change,
           cvDoc: FIRST(variantGroup).cvDoc
@@ -329,11 +330,25 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
   return await ((await db.query(query)).all())
 }
 
+// preferred_assay_titles lives on each individual score (nested under variants[].scores[]),
+// not at the top level of a protein_change group - withExpandedAssayTitles only expands a
+// top-level field, so this walks the nested structure directly instead.
+function withExpandedScoreAssayTitles (results: any[]): any[] {
+  results.forEach(result => {
+    (result.variants as any[] | undefined)?.forEach(variantEntry => {
+      (variantEntry.scores as any[] | undefined)?.forEach(score => {
+        score.preferred_assay_titles = expandPreferredAssayTitles(score.preferred_assay_titles)
+      })
+    })
+  })
+  return results
+}
+
 const codingVariantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/scores', description: descriptions.genes_coding_variants } })
   .input(geneQueryFormat)
   .output(z.array(codingVariantsScoresFormat))
-  .query(async ({ input }) => await findCodingVariantsFromGenes(input))
+  .query(async ({ input }) => withExpandedScoreAssayTitles(await findCodingVariantsFromGenes(input)))
 
 const allCodingVariantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/all-scores', description: descriptions.genes_coding_variants_all_scores } })
