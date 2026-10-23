@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 from adapters.MORF_gene_transcript_gene_adapter import MORFGeneTranscriptGene
 from adapters.writer import SpyWriter
 
-DESEQ_PATH = './samples/IGVFFI6734IWRB_morf_transcript_gene_deseq2.example.tsv'
-ORF_PATH = './samples/IGVFFI2373SYJW_morf_orf_transcripts.example.tsv'
-CHRONIC_DESEQ_PATH = './samples/IGVFFI6032GREJ_morf_transcript_gene_deseq2.example.tsv'
+DESEQ_PATH = './tests/fixtures/IGVFFI6734IWRB_morf_transcript_gene_deseq2.example.tsv'
+ORF_PATH = './tests/fixtures/IGVFFI2373SYJW_morf_orf_transcripts.example.tsv'
+CHRONIC_DESEQ_PATH = './tests/fixtures/IGVFFI6032GREJ_morf_transcript_gene_deseq2.example.tsv'
 
 
 @pytest.fixture

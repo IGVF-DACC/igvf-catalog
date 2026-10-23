@@ -88,7 +88,7 @@ def test_convert_freq_value_handles_dot_and_float(mock_get_caid_provider, mock_g
     mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
+        filepath='./tests/fixtures/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
     assert adapter.convert_freq_value('.') == 0
     assert adapter.convert_freq_value('1.23') == 1.23
     assert adapter.convert_freq_value('abc') == 'abc'
@@ -101,7 +101,7 @@ def test_parse_metadata_freq_and_favor_fields(mock_get_caid_provider, mock_get_c
     mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
+        filepath='./tests/fixtures/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
 
     info = 'FREQ=Korea1K:0.9545,0.04545|TOPMED:0.8587|dbGaP_PopFreq:0.9243,0.07566;FAVORFullDB/variant_annovar=21-5025532-5025532-G-C;FAVORFullDB/cadd_phred=2.753'
     result = adapter.parse_metadata(info)
@@ -122,7 +122,7 @@ def test_parse_metadata_handles_missing_value(mock_get_caid_provider, mock_get_c
     mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
+        filepath='./tests/fixtures/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
 
     info = 'FREQ=Korea1K:1.0'
     result = adapter.parse_metadata(info)
@@ -137,7 +137,7 @@ def test_parse_metadata_ignores_unknown_favor_fields(mock_get_caid_provider, moc
     mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
+        filepath='./tests/fixtures/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
 
     info = 'FAVORFullDB/unknown_field=foo'
     result = adapter.parse_metadata(info)

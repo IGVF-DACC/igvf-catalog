@@ -48,7 +48,7 @@ from adapters.protein_map import ProteinMap
 
 class GAF(BaseAdapter):
     # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
-    RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
+    RNACENTRAL_ID_MAPPING_PATH = './data_loading_support_files/rnacentral_ensembl_gencode.tsv.gz'
     SOURCES = {
         'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
         'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',

@@ -9,7 +9,7 @@ from adapters.writer import SpyWriter
 
 
 FILE_ACCESSION = 'IGVFFI9678CVIS'
-SAMPLE_DIR = './samples/motifs'
+SAMPLE_DIR = './tests/fixtures/motifs'
 SAMPLE_PROTEIN_MAP = {
     'P35869': ['ENSP00000242057'],  # AHR_HUMAN
     'P05549': ['ENSP00000292482'],  # AP2A_HUMAN

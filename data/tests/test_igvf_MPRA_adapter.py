@@ -47,9 +47,9 @@ def test_variant(mock_load_variant, mock_check, mock_file_fileset):
 
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
         label='variant',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True
     )
@@ -123,9 +123,9 @@ def test_genomic_element(mock_file_fileset):
 
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
         label='genomic_element',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True
     )
@@ -170,9 +170,9 @@ def test_elements_from_variant_file(mock_file_fileset):
 
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
         label='genomic_element_from_variant',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True
     )
@@ -185,9 +185,9 @@ def test_elements_from_variant_file(mock_file_fileset):
 def test_elements_from_variant_file_no_duplicates_across_chunks(mock_file_fileset):
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
         label='genomic_element_from_variant',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True
     )
@@ -211,9 +211,9 @@ def test_variant_biosample(
 
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_variant_effects.example.tsv',
         label='variant_biosample',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True
     )
@@ -386,9 +386,9 @@ def test_genomic_element_biosample(mock_file_fileset, mock_ontology_term_validat
 
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
         label='genomic_element_biosample',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True
     )
@@ -588,9 +588,9 @@ def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label'):
         MPRAAdapter(
-            filepath='./samples/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
+            filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
             label='invalid_label',
-            reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+            reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
             writer=writer,
             validate=True)
 
@@ -598,9 +598,9 @@ def test_invalid_label(mock_file_fileset):
 def test_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = MPRAAdapter(
-        filepath='./samples/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
+        filepath='./tests/fixtures/IGVFFI1323RCIE_igvf_mpra_element_effects.example.tsv',
         label='genomic_element',
-        reference_filepath='./samples/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
+        reference_filepath='./tests/fixtures/IGVFFI4914OUJH_igvf_mpra_sequence_designs.example.tsv',
         writer=writer,
         validate=True)
     invalid_doc = {

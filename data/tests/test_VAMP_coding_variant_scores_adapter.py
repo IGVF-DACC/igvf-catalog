@@ -80,7 +80,7 @@ def test_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants_phenotypes'):
         VAMPAdapter(
-            './samples/VAMP_CYP2C19_example.tsv.gz',
+            './tests/fixtures/VAMP_CYP2C19_example.tsv.gz',
             label='invalid_label',
             writer=writer,
             validate=True

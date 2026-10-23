@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def filepath():
-    return './samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv'
+    return './tests/fixtures/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv'
 
 
 @pytest.fixture
@@ -79,7 +79,7 @@ def test_proteins_interaction_adapter_initialization(filepath, spy_writer):
 
 
 def test_proteins_interaction_adapter_mouse(spy_writer):
-    mouse_filepath = './samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv'
+    mouse_filepath = './tests/fixtures/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv'
     adapter = ProteinsInteraction(
         filepath=mouse_filepath, label='protein_protein_mouse', writer=spy_writer, validate=True)
     assert adapter.label == 'protein_protein_mouse'

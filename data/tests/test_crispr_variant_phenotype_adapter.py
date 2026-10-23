@@ -7,9 +7,9 @@ from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
-PRIME_PATH = './samples/IGVFFI2014OOZP_crispr_variant_phenotype_sherwood_prime.example.csv'
-CRISPRI_PATH = './samples/IGVFFI9726GFTC_crispr_variant_phenotype_sherwood_crispri.example.csv'
-ABE_PATH = './samples/IGVFFI1678CDBR_crispr_variant_phenotype_sherwood_abe.example.csv'
+PRIME_PATH = './tests/fixtures/IGVFFI2014OOZP_crispr_variant_phenotype_sherwood_prime.example.csv'
+CRISPRI_PATH = './tests/fixtures/IGVFFI9726GFTC_crispr_variant_phenotype_sherwood_crispri.example.csv'
+ABE_PATH = './tests/fixtures/IGVFFI1678CDBR_crispr_variant_phenotype_sherwood_abe.example.csv'
 
 MOCK_VARIANT = {
     '_key': 'NC_000001.11:25253603:G:A',

@@ -16,8 +16,8 @@ except ImportError:
 
 def test_gencode_adapter_transcript():
     writer = SpyWriter()
-    adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
-                      filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(reference_filepath='./tests/fixtures/gencode_refseq_sample.tsv',
+                      filepath='./tests/fixtures/gencode_sample.gtf',
                       label='gencode_transcript', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -40,7 +40,7 @@ def test_gencode_adapter_transcript():
 
 def test_gencode_adapter_transcribed_to():
     writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(filepath='./tests/fixtures/gencode_sample.gtf',
                       label='transcribed_to', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -56,7 +56,7 @@ def test_gencode_adapter_transcribed_to():
 
 def test_gencode_adapter_mouse_transcript():
     writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
+    adapter = Gencode(filepath='./tests/fixtures/gencode_mouse_sample.gtf',
                       label='mm_gencode_transcript', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -70,7 +70,7 @@ def test_gencode_adapter_mouse_transcript():
 
 def test_gencode_adapter_mm_transcribed_to():
     writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
+    adapter = Gencode(filepath='./tests/fixtures/gencode_mouse_sample.gtf',
                       label='mm_transcribed_to', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -83,7 +83,7 @@ def test_gencode_adapter_mm_transcribed_to():
 def test_gencode_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to, mm_transcribed_to'):
-        Gencode(filepath='./samples/gencode_sample.gtf',
+        Gencode(filepath='./tests/fixtures/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
 
 
@@ -99,7 +99,7 @@ def test_refseq_mapping_preserves_versions_and_par_y(tmp_path, compressed):
                      'ENST00000353224.9\tNM_999.1\n')
     writer = SpyWriter()
     adapter = Gencode(reference_filepath=mapping,
-                      filepath='./samples/gencode_sample.gtf', writer=writer,
+                      filepath='./tests/fixtures/gencode_sample.gtf', writer=writer,
                       validate=True)
     assert adapter.load_refseq_mapping()['ENST00000353224.10_PAR_Y'] == [
         'NM_789.3']
@@ -110,9 +110,9 @@ def test_refseq_mapping_preserves_versions_and_par_y(tmp_path, compressed):
 
 
 @pytest.mark.parametrize('label,filepath', [
-    ('transcribed_to', './samples/gencode_sample.gtf'),
-    ('mm_gencode_transcript', './samples/gencode_mouse_sample.gtf'),
-    ('mm_transcribed_to', './samples/gencode_mouse_sample.gtf'),
+    ('transcribed_to', './tests/fixtures/gencode_sample.gtf'),
+    ('mm_gencode_transcript', './tests/fixtures/gencode_mouse_sample.gtf'),
+    ('mm_transcribed_to', './tests/fixtures/gencode_mouse_sample.gtf'),
 ])
 def test_refseq_mapping_only_loaded_for_human_nodes(label, filepath):
     writer = SpyWriter()
@@ -128,9 +128,9 @@ def test_gencode_adapter_initialization():
     writer = SpyWriter()
     for label in Gencode.ALLOWED_LABELS:
         filepath = (
-            './samples/gencode_mouse_sample.gtf'
+            './tests/fixtures/gencode_mouse_sample.gtf'
             if label in Gencode.MOUSE_LABELS
-            else './samples/gencode_sample.gtf'
+            else './tests/fixtures/gencode_sample.gtf'
         )
         adapter = Gencode(filepath=filepath, label=label, writer=writer)
         assert adapter.filepath == filepath
@@ -143,7 +143,7 @@ def test_gencode_adapter_initialization():
 
 
 def test_gencode_adapter_parse_info_metadata():
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(filepath='./tests/fixtures/gencode_sample.gtf',
                       label='gencode_transcript')
     info = ['gene_id', '"ENSG00000223972.5";', 'transcript_id', '"ENST00000456328.2";', 'gene_type', '"transcribed_unprocessed_pseudogene";',
             'gene_name', '"DDX11L1";', 'transcript_type', '"processed_transcript";', 'transcript_name', '"DDX11L1-202";']
@@ -160,8 +160,8 @@ def test_gencode_adapter_parse_info_metadata():
 def test_gencode_adapter_validate_doc_invalid():
     """Test that ValidationError is properly caught and converted to ValueError"""
     writer = SpyWriter()
-    adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
-                      filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(reference_filepath='./tests/fixtures/gencode_refseq_sample.tsv',
+                      filepath='./tests/fixtures/gencode_sample.gtf',
                       label='gencode_transcript', writer=writer, validate=True)
 
     # Create an invalid document that will fail validation
@@ -193,7 +193,7 @@ NA_CHR	HAVANA	gene	1	100	.	+	.	gene_id "ENSG00000101351.1"; gene_name "TEST_GENE
 
     try:
         # Create adapter - it will automatically use the correct mapping file
-        adapter = Gencode(reference_filepath='./samples/gencode_refseq_sample.tsv',
+        adapter = Gencode(reference_filepath='./tests/fixtures/gencode_refseq_sample.tsv',
                           filepath=gtf_file_path,
                           label='gencode_transcript', writer=writer, validate=False)
 
@@ -218,7 +218,7 @@ NA_CHR	HAVANA	gene	1	100	.	+	.	gene_id "ENSG00000101351.1"; gene_name "TEST_GENE
 
 
 def test_human_transcripts_require_refseq_mapping():
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
+    adapter = Gencode(filepath='./tests/fixtures/gencode_sample.gtf',
                       writer=SpyWriter())
     with pytest.raises(ValueError, match='reference_filepath is required'):
         adapter.process_file()

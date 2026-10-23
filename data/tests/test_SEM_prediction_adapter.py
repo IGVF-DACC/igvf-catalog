@@ -46,7 +46,7 @@ def mock_bulk_check_variants():
 
 def test_sem_pred_adapter(mock_file_fileset, mock_protein_map, mock_bulk_check_variants):
     writer = SpyWriter()
-    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+    adapter = SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz',
                       label='sem_predicted_asb', writer=writer, validate=True)
     adapter.process_file()
     mock_protein_map.assert_called_once_with(
@@ -85,13 +85,13 @@ def test_sem_pred_adapter(mock_file_fileset, mock_protein_map, mock_bulk_check_v
 def test_sem_pred_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: sem_predicted_asb, variants'):
-        SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+        SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz',
                 label='invalid_label', writer=writer)
 
 
 def p():
-    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz',
-                      sem_provenance_path='./samples/SEM/provenance_file.tsv.gz')
+    adapter = SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz',
+                      sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz')
     adapter.load_tf_id_mapping()
     assert hasattr(adapter, 'tf_id_mapping')
     assert isinstance(adapter.tf_id_mapping, dict)
@@ -100,7 +100,7 @@ def p():
 
 def test_sem_pred_adapter_binding_effect_filtering(mock_file_fileset, mock_protein_map, mock_bulk_check_variants):
     writer = SpyWriter()
-    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+    adapter = SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz',
                       label='sem_predicted_asb', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -113,7 +113,7 @@ def test_sem_pred_adapter_skips_edge_when_variant_not_loaded(mock_file_fileset, 
     mock_bulk_check_variants.side_effect = None
     mock_bulk_check_variants.return_value = set()
     writer = SpyWriter()
-    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+    adapter = SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz',
                       label='sem_predicted_asb', writer=writer, validate=True)
     adapter.process_file()
 
@@ -143,7 +143,7 @@ def test_sem_pred_adapter_variants_label_creates_missing_variant(mock_file_files
     }, None)
 
     writer = SpyWriter()
-    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
+    adapter = SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz',
                       label='variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -157,8 +157,8 @@ def test_sem_pred_adapter_variants_label_creates_missing_variant(mock_file_files
 
 def test_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz',
-                      sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='sem_predicted_asb', writer=writer, validate=True)
+    adapter = SEMPred(filepath='./tests/fixtures/SEM/SEM_prediction_file.tsv.gz',
+                      sem_provenance_path='./tests/fixtures/SEM/provenance_file.tsv.gz', label='sem_predicted_asb', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

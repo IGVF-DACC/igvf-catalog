@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.writer import SpyWriter
 
-SAMPLE_PATH = './samples/epiraction_ENCFF712SUP.bed.gz'
+SAMPLE_PATH = './tests/fixtures/epiraction_ENCFF712SUP.bed.gz'
 
 
 def _write_bed_gz(path, rows):
