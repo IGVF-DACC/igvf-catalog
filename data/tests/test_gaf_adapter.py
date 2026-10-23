@@ -116,7 +116,8 @@ def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_te
 def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
-                  label='rna', writer=writer, validate=True)
+                  label='rna', writer=writer, validate=True,
+                  reference_filepath='./samples/rnacentral_ensembl_gencode.tsv.gz')
     adapter.file_accession = 'IGVFFI6501YXMX'
     adapter.process_file()
     mock_file_fileset.assert_called_once_with('IGVFFI6501YXMX')
@@ -140,10 +141,18 @@ def test_gaf_adapter_invalid_type():
             label='invalid_type', writer=writer, validate=True)
 
 
+def test_gaf_adapter_rna_requires_reference_filepath():
+    writer = SpyWriter()
+    with pytest.raises(ValueError, match='reference_filepath is required'):
+        GAF(filepath='./samples/goa_human_rna.gaf.gz',
+            label='rna', writer=writer, validate=False)
+
+
 def test_gaf_adapter_load_rnacentral_mapping():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
-                  label='rna', writer=writer, validate=True)
+                  label='rna', writer=writer, validate=True,
+                  reference_filepath='./samples/rnacentral_ensembl_gencode.tsv.gz')
     adapter.load_rnacentral_mapping()
     assert hasattr(adapter, 'rnacentral_mapping')
     assert isinstance(adapter.rnacentral_mapping, dict)

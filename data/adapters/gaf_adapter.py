@@ -47,8 +47,6 @@ from adapters.protein_map import ProteinMap
 # URS0000000CF3	ENSEMBL_GENCODE	ENST00000414886	9606	lncRNA	ENSG00000226856.9
 
 class GAF(BaseAdapter):
-    # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
-    RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
     SOURCES = {
         'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
         'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
@@ -57,10 +55,16 @@ class GAF(BaseAdapter):
     }
     ALLOWED_LABELS = list(SOURCES.keys())
 
-    def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, reference_filepath=None, **kwargs):
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
+        if self.label == 'rna':
+            if not reference_filepath:
+                raise ValueError(
+                    'reference_filepath is required for the rna label '
+                    '(RNAcentral Ensembl mapping, ensembl_gencode.tsv).')
+            self.reference_filepath = reference_filepath
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -72,7 +76,7 @@ class GAF(BaseAdapter):
 
     def load_rnacentral_mapping(self):
         self.rnacentral_mapping = {}
-        with gzip.open(GAF.RNACENTRAL_ID_MAPPING_PATH, 'rt') as mapping_file:
+        with gzip.open(self.reference_filepath, 'rt') as mapping_file:
             for annotation in mapping_file:
                 mapping = annotation.split('\t')
                 self.rnacentral_mapping[mapping[0] +
