@@ -2,7 +2,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { ontologyFormat } from '../nodes/ontologies'
-import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
@@ -56,6 +56,7 @@ export const outputFormat = z.object({
   name: z.string(),
   method: z.string().nullish(),
   files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   source: z.string().nullish(),
   source_url: z.string().nullish(),
   is_complex: z.boolean(),
@@ -200,7 +201,8 @@ const buildQuery = ({
       'sequence_variant': variant,
       'protein_complex': proteinComplex,
       'name': record.${nameField},
-      'is_complex': is_complex
+      'is_complex': is_complex,
+      'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
     }
 
     // Append source-specific metadata
@@ -359,13 +361,13 @@ const variantsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants } })
   .input(proteinsQuery)
   .output(z.array(outputFormat))
-  .query(async ({ input }) => await variantsFromProteinSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await variantsFromProteinSearch(input)))
 
 const proteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
   .input(variantsQuery)
   .output(z.array(outputFormat))
-  .query(async ({ input }) => await proteinsFromVariantSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await proteinsFromVariantSearch(input)))
 
 export const variantsProteinsRouters = {
   proteinsFromVariants,

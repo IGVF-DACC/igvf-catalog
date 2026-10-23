@@ -77,6 +77,37 @@ describe('diseasesGenesRouters.genesFromDiseases', () => {
     expect(dbModule.db.query).toHaveBeenCalledTimes(1)
   })
 
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [
+      {
+        disease: 'ontology_terms/DOID_123',
+        gene: 'genes/ENSG1',
+        name: 'is associated with',
+        pmids: ['12345'],
+        class: 'observed data',
+        method: 'Perturb-seq',
+        label: 'disease-gene association',
+        source: 'Orphanet',
+        source_url: 'https://example.com',
+        association_status: 'Assessed',
+        files_filesets: 'files_filesets/FILESET1',
+        preferred_assay_titles: ['TAP-seq']
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { disease_id: 'DOID_123', page: 0 }
+    const result = await diseasesGenesRouters.genesFromDiseases({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
+
   it('throws BAD_REQUEST when neither disease_id nor disease_name is provided', async () => {
     const input = { page: 0 } as any
     await expect(
@@ -129,6 +160,38 @@ describe('diseasesGenesRouters.diseasesFromGenes', () => {
 
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalledTimes(2)
+  })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const geneSearchResult = [
+      { _id: 'ENSG1', chr: 'chr1', start: 100, end: 200, gene_type: 'protein_coding', name: 'GENE1', source: 'GENCODE', version: '44', source_url: 'http://x' }
+    ]
+    const mockResult = [
+      {
+        disease: 'ontology_terms/DOID_123',
+        name: 'is associated with',
+        pmids: ['12345'],
+        class: 'observed data',
+        method: 'Perturb-seq',
+        label: 'disease-gene association',
+        source: 'Orphanet',
+        source_url: 'https://example.com',
+        files_filesets: 'files_filesets/FILESET1',
+        preferred_assay_titles: ['TAP-seq']
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(geneSearchResult) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue(mockResult) } as any)
+
+    const input = { gene_id: 'ENSG1', page: 0 }
+    const result = await diseasesGenesRouters.diseasesFromGenes({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[1][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 
   it('throws BAD_REQUEST when no gene identifying property is provided', async () => {

@@ -112,4 +112,40 @@ describe('genesGenesEdgeRouters.genesGenes', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [
+      {
+        _id: 'genes_genes/80185_2222_coxpresdb',
+        name: 'coexpressed with',
+        gene_1: 'genes/ENSG1',
+        gene_2: 'genes/ENSG2',
+        z_score: 3.2,
+        associated_process: 'ontology_terms/GO_0010467',
+        source: 'COXPRESdb',
+        source_url: 'https://coxpresdb.jp/',
+        method: 'COXPRESdb',
+        class: 'observed data',
+        label: 'co-expression',
+        files_filesets: 'files_filesets/FILESET1',
+        preferred_assay_titles: ['TAP-seq']
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { gene_id: 'ENSG1', page: 0 }
+    const result = await genesGenesEdgeRouters.genesGenes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })

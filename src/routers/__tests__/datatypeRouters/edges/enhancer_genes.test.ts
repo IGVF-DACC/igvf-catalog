@@ -117,6 +117,44 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
     ).rejects.toThrow(TRPCError)
   })
 
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings on each element', async () => {
+    const mainQueryResult = [
+      {
+        gene: { name: 'GENE1', _id: 'genes/GENE1', start: 1000, end: 5000, chr: 'chr1' },
+        elements: [
+          {
+            id: 'genomic_elements/GE1',
+            cell_type: 'K562',
+            score: 0.85,
+            model: 'ENCODE-rE2G',
+            dataset: 'http://example.com/dataset1',
+            element_type: 'enhancer',
+            element_chr: 'chr1',
+            element_start: 1200,
+            element_end: 1400,
+            name: 'predicted to regulate',
+            class: 'observed data',
+            method: 'ENCODE-rE2G',
+            files_filesets: 'files_filesets/FILESET1',
+            preferred_assay_titles: ['TAP-seq']
+          }
+        ]
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'GENE1', name: 'GENE1', chr: 'chr1', start: 1000, end: 5000 }]) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue(mainQueryResult) } as any)
+
+    const input = { gene_id: 'GENE1', page: 0 }
+    const result: any = await enhancerGenePredictionsRouters.enhancerGenePredictions({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[1][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result[0].elements[0].preferred_assay_titles).toEqual(['TAP-seq', 'Perturb-seq'])
+  })
+
   it('throws BAD_REQUEST if method is invalid', async () => {
     const input = { gene_id: 'GENE1', method: 'NOT_A_METHOD', page: 0 } as any
     await expect(

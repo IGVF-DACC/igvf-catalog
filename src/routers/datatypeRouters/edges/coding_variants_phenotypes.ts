@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
@@ -68,6 +68,7 @@ export const outputFormat = z.object({
   class: z.string().nullish(),
   label: z.string().nullish().optional(),
   files_filesets: z.string().nullish().optional(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   source: z.string(),
   source_url: z.string(),
   variant: variantSimplifiedFormat.nullish()
@@ -214,7 +215,8 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'label': phenoEdges.label,
         'source': phenoEdges.source,
         'source_url': phenoEdges.source_url,
-        'files_filesets': phenoEdges.files_filesets
+        'files_filesets': phenoEdges.files_filesets,
+        'preferred_assay_titles': DOCUMENT(phenoEdges.files_filesets).preferred_assay_titles
       }
   `
 
@@ -317,6 +319,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
       'class': phenoEdges.class,
       'label': phenoEdges.label,
       'files_filesets': phenoEdges.files_filesets,
+      'preferred_assay_titles': DOCUMENT(phenoEdges.files_filesets).preferred_assay_titles,
       'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
       'property_scores': ${PROPERTY_SCORES_AQL},
       'source_url': phenoEdges.source_url
@@ -431,13 +434,13 @@ const codingVariantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants } })
   .input(phenotypesCodingVariantsInput.merge(commonHumanEdgeParamsFormat).omit({ verbose: true, organism: true }))
   .output(z.array(outputFormat))
-  .query(async ({ input }) => await findCodingVariantsFromPhenotypesSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findCodingVariantsFromPhenotypesSearch(input)))
 
 const phenotypesFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes', description: descriptions.coding_variants_phenotypes } })
   .input(fromCodingVariantsQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ verbose: true, organism: true }))
   .output(z.array(outputFormat))
-  .query(async ({ input }) => await findPhenotypesFromCodingVariantSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findPhenotypesFromCodingVariantSearch(input)))
 
 const codingVariantsCountFromGene = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes-count', description: descriptions.coding_variants_phenotypes_count } })

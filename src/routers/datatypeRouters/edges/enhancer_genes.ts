@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
-import { paramsFormatType } from '../_helpers'
+import { expandPreferredAssayTitles, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { genesCommonQueryFormat } from '../params'
@@ -35,7 +35,8 @@ const elementOutputFormat = z.object({
   name: z.string(),
   method: z.string().optional(),
   class: z.string().optional(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const geneOutputFormat = z.object({
@@ -121,6 +122,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
       score: record.score,
       model: record.source,
       files_filesets: record.files_filesets,
+      preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles,
       dataset: record.source_url,
       element_type: genomicElement.type,
       element_chr: genomicElement.chr,
@@ -137,7 +139,14 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     }
   `
 
-  return (await (await db.query(query)).all())
+  const results = await (await db.query(query)).all()
+  results.forEach((item: { elements: any }) => {
+    const elements = Array.isArray(item.elements) ? item.elements : [item.elements]
+    elements.forEach((element: { preferred_assay_titles?: string[] | null }) => {
+      element.preferred_assay_titles = expandPreferredAssayTitles(element.preferred_assay_titles)
+    })
+  })
+  return results
 }
 
 const enhancerGenePredictions = publicProcedure

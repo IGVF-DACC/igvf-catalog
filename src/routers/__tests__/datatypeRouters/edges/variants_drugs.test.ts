@@ -73,6 +73,34 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [{
+      _to: 'drugs/DRUG1',
+      pmid: '12345678',
+      phenotype_categories: ['Toxicity'],
+      source: 'pharmGKB',
+      source_url: 'https://api.pharmgkb.org/v1/data/annotation/1',
+      name: 'associated with',
+      class: 'observed data',
+      method: null,
+      files_filesets: 'files_filesets/IGVFFI0001XXXX',
+      preferred_assay_titles: ['TAP-seq'],
+      sequence_variant: 'variants/NC_000001.11:69633:TGT:GAA'
+    }]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { drug_id: 'DRUG1', page: 0 }
+    const result: any = await variantsDrugsRouters.variantsFromDrugs({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result[0].preferred_assay_titles).toEqual(['TAP-seq', 'Perturb-seq'])
+  })
 })
 
 describe('variantsDrugsRouters.drugsFromVariants', () => {

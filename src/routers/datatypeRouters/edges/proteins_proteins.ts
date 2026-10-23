@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getEnumValuesOrThrow, getSchema } from '../schema'
 import { TRPCError } from '@trpc/server'
@@ -55,7 +55,8 @@ export const proteinsProteinsFormat = z.object({
   organism: z.string(),
   pmids: z.array(z.string()),
   name: z.string(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 function validateInput (input: paramsFormatType): void {
@@ -195,7 +196,8 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         'protein_1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'protein_2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(proteinProteinSchema)},
-        'name': record.name
+        'name': record.name,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
     `
 
@@ -206,7 +208,7 @@ const proteinsProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins } })
   .input(proteinsProteinsQueryFormat)
   .output(z.array(proteinsProteinsFormat))
-  .query(async ({ input }) => await proteinProteinSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await proteinProteinSearch(input)))
 
 export const proteinsProteinsRouters = {
   proteinsProteins
