@@ -332,10 +332,10 @@ async function nearestGenes (variant: variantType): Promise<any> {
 
   if (variant.annotations?.funseq_description === 'coding') {
     nearestGene = nearestGenes[0]
-    distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, variant.pos)
+    distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, nearestGene.strand, variant.pos)
 
     for (let index = 1; index < nearestGenes.length; index++) {
-      const newDistance = distanceGeneVariant(nearestGenes[index].start, nearestGenes[index].end, variant.pos)
+      const newDistance = distanceGeneVariant(nearestGenes[index].start, nearestGenes[index].end, nearestGenes[index].strand, variant.pos)
       if (newDistance < distNearestGene) {
         distNearestGene = newDistance
         nearestGene = nearestGenes[index]
@@ -349,9 +349,9 @@ async function nearestGenes (variant: variantType): Promise<any> {
     const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
     nearestGene = nearestGenes[0]
-    distNearestGene = distanceGeneVariant(nearestGenes[0].start, nearestGenes[0].end, variant.pos)
+    distNearestGene = distanceGeneVariant(nearestGenes[0].start, nearestGenes[0].end, nearestGenes[0].strand, variant.pos)
     if (nearestGenes.length > 1) {
-      const distGene1 = distanceGeneVariant(nearestGenes[1].start, nearestGenes[1].end, variant.pos)
+      const distGene1 = distanceGeneVariant(nearestGenes[1].start, nearestGenes[1].end, nearestGenes[1].strand, variant.pos)
       if (distGene1 < distNearestGene) {
         nearestGene = nearestGenes[1]
         distNearestGene = distGene1
@@ -359,9 +359,9 @@ async function nearestGenes (variant: variantType): Promise<any> {
     }
 
     nearestCodingGene = nearestCodingGenes[0]
-    distCodingGene = distanceGeneVariant(nearestCodingGenes[0].start, nearestCodingGenes[0].end, variant.pos)
+    distCodingGene = distanceGeneVariant(nearestCodingGenes[0].start, nearestCodingGenes[0].end, nearestCodingGenes[0].strand, variant.pos)
     if (nearestCodingGenes.length > 1) {
-      const distGene1 = distanceGeneVariant(nearestCodingGenes[1].start, nearestCodingGenes[1].end, variant.pos)
+      const distGene1 = distanceGeneVariant(nearestCodingGenes[1].start, nearestCodingGenes[1].end, nearestCodingGenes[1].strand, variant.pos)
       if (distGene1 < distCodingGene) {
         nearestCodingGene = nearestCodingGenes[1]
         distCodingGene = distGene1

@@ -78,7 +78,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
     LET LEFT = (
       FOR record in genes
       FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]} ${geneTypeFilter}
-      SORT record.end DESC
+      SORT (record.strand == '-' ? record.end : record.start) DESC
       LIMIT 1
       RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
@@ -86,7 +86,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
     LET RIGHT = (
       FOR record in genes
       FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]} ${geneTypeFilter}
-      SORT record.start
+      SORT (record.strand == '-' ? record.end : record.start) ASC
       LIMIT 1
       RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
@@ -95,11 +95,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   `
 
   const nearestGenes = await (await db.query(nearestQuery)).all()
-  if (nearestGenes !== undefined) {
-    return nearestGenes[0]
-  }
-
-  return []
+  return nearestGenes[0] ?? []
 }
 
 export async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
