@@ -1,8 +1,7 @@
 import { z } from 'zod'
-import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, probeThenFetchPage } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
@@ -38,118 +37,98 @@ export const ontologyFormat = z.object({
   files_filesets: z.string().nullish()
 })
 
-async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
-
-  if (input.name !== undefined) {
-    input.name = (input.name as string).toLowerCase().replaceAll('\'', '\\\'')
-  }
-
-  let filterBy = ''
+function exactMatchQueryBody (input: paramsFormatType, limitClause: string): string {
   const filterSts = getFilterStatements(ontologySchema, input)
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  }
-
-  const query = `
+  const filterBy = filterSts !== '' ? `FILTER ${filterSts}` : ''
+  return `
     FOR record IN ${ontologyCollectionName}
     ${filterBy}
     SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
+    ${limitClause}
     RETURN { ${getDBReturnStatements(ontologySchema)} }
   `
-  const cursor = await db.query(query)
-  return await cursor.all()
 }
 
-async function prefixMatchSearch (name: string, page: number, limit: number, filters: string): Promise<any[]> {
-  const query = `
+function prefixMatchQueryBody (name: string, filters: string, limitClause: string): string {
+  return `
     FOR record IN ${ontologyCollectionName}
       FILTER STARTS_WITH(record.name, "${name}") ${filters ? `AND ${filters}` : ''}
-      LIMIT ${page * limit}, ${limit}
+      ${limitClause}
       RETURN { ${getDBReturnStatements(ontologySchema)} }
   `
-  return await (await db.query(query)).all()
 }
 
-async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
-  const queryStatementsFuzzy = []
-  const queryStatementsToken = []
-
-  let name
-  if (input.name !== undefined) {
-    name = (input.name as string).toLowerCase()
-    queryStatementsToken.push(`TOKENS("${decodeURIComponent(name)}", "text_en_no_stem") ALL in record.name`)
-    queryStatementsFuzzy.push(`LEVENSHTEIN_MATCH(
-      record.name,
-      TOKENS("${decodeURIComponent(name)}", "text_en_no_stem")[0],
-      1,    // max distance
-      false // without transpositions
-    )`)
-
-    delete input.name
-  }
-
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
-
-  const filterSts = getFilterStatements(ontologySchema, input)
-
-  if (name !== undefined) {
-    const prefixObjects = await prefixMatchSearch(name, input.page as number, limit, filterSts)
-    if (prefixObjects.length !== 0) {
-      return prefixObjects
-    }
-  }
-
-  let filterBy = ''
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  }
-
+function searchViewQueryBody (searchClause: string, filterBy: string, limitClause: string): string {
   const searchViewName = `${ontologyCollectionName}_text_en_no_stem_inverted_search_alias`
-
-  let objects: any[] = []
-
-  for (const queryStatements of [queryStatementsToken, queryStatementsFuzzy]) {
-    const query = `
-      FOR record IN ${searchViewName}
-      SEARCH ${queryStatements.join(' AND ')}
-      ${filterBy}
-      LIMIT ${input.page as number * limit}, ${limit}
-      SORT BM25(record) DESC
-      RETURN { ${getDBReturnStatements(ontologySchema)} }
-    `
-
-    objects = await (await db.query(query)).all()
-    if (objects.length > 0) {
-      break
-    }
-  }
-
-  return objects
+  // SORT must precede LIMIT - relevance ranking has to decide which rows make each page,
+  // not just reorder whichever arbitrary rows a premature LIMIT happened to keep.
+  return `
+    FOR record IN ${searchViewName}
+    SEARCH ${searchClause}
+    ${filterBy}
+    SORT BM25(record) DESC
+    ${limitClause}
+    RETURN { ${getDBReturnStatements(ontologySchema)} }
+  `
 }
 
+// Each stage's applicability is decided by probeThenFetchPage via a page-independent
+// existence probe (not "is page N empty"), so the same stage - and therefore a stable,
+// non-overlapping result set - is used across every page of the same query. See
+// probeThenFetchPage's own comment in _helpers.ts for why that distinction matters.
 export async function ontologySearch (input: paramsFormatType): Promise<any[]> {
   if (input.files_fileset !== undefined) {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
     delete input.files_fileset
   }
 
-  const objects = await exactMatchSearch(input)
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+  const page = input.page as number
+  const rawName = input.name as string | undefined
 
-  if (('name' in input && input.name !== undefined) && objects.length === 0) {
-    return await fuzzyTextSearch(input)
+  const exactInput = { ...input }
+  if (exactInput.name !== undefined) {
+    exactInput.name = (exactInput.name as string).toLowerCase().replaceAll('\'', '\\\'')
+  }
+  const exactResults = await probeThenFetchPage((limitClause) => exactMatchQueryBody(exactInput, limitClause), page, limit)
+  if (exactResults !== null) {
+    return exactResults
   }
 
-  return objects
+  if (rawName === undefined) {
+    return []
+  }
+
+  const name = rawName.toLowerCase()
+  const remainingInput = { ...input }
+  delete remainingInput.name
+  const filterSts = getFilterStatements(ontologySchema, remainingInput)
+
+  const prefixResults = await probeThenFetchPage((limitClause) => prefixMatchQueryBody(name, filterSts, limitClause), page, limit)
+  if (prefixResults !== null) {
+    return prefixResults
+  }
+
+  const filterBy = filterSts !== '' ? `FILTER ${filterSts}` : ''
+
+  const tokenSearchClause = `TOKENS("${decodeURIComponent(name)}", "text_en_no_stem") ALL in record.name`
+  const tokenResults = await probeThenFetchPage((limitClause) => searchViewQueryBody(tokenSearchClause, filterBy, limitClause), page, limit)
+  if (tokenResults !== null) {
+    return tokenResults
+  }
+
+  const fuzzySearchClause = `LEVENSHTEIN_MATCH(
+    record.name,
+    TOKENS("${decodeURIComponent(name)}", "text_en_no_stem")[0],
+    1,    // max distance
+    false // without transpositions
+  )`
+  const fuzzyResults = await probeThenFetchPage((limitClause) => searchViewQueryBody(fuzzySearchClause, filterBy, limitClause), page, limit)
+  return fuzzyResults ?? []
 }
 
 export const ontologyTerm = publicProcedure

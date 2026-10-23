@@ -42,9 +42,18 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
       name: 'lymphoblastoid cell line'
     }]
 
-    jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(ontologyResult) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([returnRecord]) } as any)
+    // ontologySearch's exact-match stage now issues a cheap LIMIT-1 existence probe before
+    // the real fetch (see probeThenFetchPage in _helpers.ts) - keying the mock by which
+    // collection the query targets, rather than call order, means both the probe and the
+    // real fetch for the biosample lookup correctly return the same ontology result,
+    // independent of how many internal calls that lookup happens to make.
+    jest.spyOn(dbModule.db, 'query').mockImplementation(async (query: unknown) => {
+      const text = String(query)
+      if (text.includes('IN ontology_terms')) {
+        return { all: async () => ontologyResult } as any
+      }
+      return { all: async () => [returnRecord] } as any
+    })
 
     const input = { biosample_id: 'EFO_0005292', page: 0 }
     const result = await variantsBiosamplesRouters.variantsFromBiosamples({
@@ -56,7 +65,7 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
     })
 
     expect(result).toEqual([returnRecord])
-    expect(dbModule.db.query).toHaveBeenCalledTimes(2)
+    expect(dbModule.db.query).toHaveBeenCalled()
   })
 
   it('throws BAD_REQUEST when neither biosample_id nor biosample_name is provided', async () => {
