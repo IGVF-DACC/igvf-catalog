@@ -126,6 +126,20 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via the files_filesets reference and expands TAP-seq to include Perturb-seq', async () => {
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([{ ...returnRecord, preferred_assay_titles: ['TAP-seq'] }])
+    } as any)
+
+    const input = { files_fileset: 'IGVFFI0001XXXX', page: 0 }
+    const result = await variantsBiosamplesRouters.biosamplesFromVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...returnRecord, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('mouse MPRA variant routing', () => {

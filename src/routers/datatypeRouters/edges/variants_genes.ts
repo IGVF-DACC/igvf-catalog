@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, validRegion } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, validRegion, withExpandedAssayTitles } from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -86,7 +86,8 @@ export const completeQtlsFormat = z.object({
   study: z.string().or(studyFormat).nullish(),
   name: z.string().nullish(),
   class: z.string().nullish(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const variantsGenesAFGSRQtl = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
@@ -347,7 +348,8 @@ const buildVariantsGenesQuery = ({
     LET base = {
       'sequence_variant': variant,
       'gene': gene,
-      'name': record.${nameField}
+      'name': record.${nameField},
+      'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
     }
     RETURN MERGE(base,
       record.source == 'IGVF' ? {
@@ -870,13 +872,13 @@ const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(variantsQueryFormat)
   .output(z.array(completeQtlsFormat))
-  .query(async ({ input }) => await getGeneFromVariant(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await getGeneFromVariant(input)))
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
   .input(genesQueryFormat)
   .output(z.array(completeQtlsFormat))
-  .query(async ({ input }) => await getVariantFromGene(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await getVariantFromGene(input)))
 
 const nearestGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })

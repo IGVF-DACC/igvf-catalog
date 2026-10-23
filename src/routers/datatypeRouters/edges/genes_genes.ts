@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, withHgncPrefix } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles, withHgncPrefix } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
@@ -80,7 +80,8 @@ export const genesGenesRelativeFormat = z.object({
   source: z.string(),
   source_url: z.string().optional(),
   name: z.string(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 function validateInput (input: paramsFormatType): void {
@@ -215,7 +216,8 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       '_id': record._id,
       'name': record.name,
       'gene_1': ${input.verbose === 'true' ? `(${sourceVerboseQuery})` : 'record._from'},
-      'gene_2': ${input.verbose === 'true' ? `(${targetVerboseQuery})` : 'record._to'}},
+      'gene_2': ${input.verbose === 'true' ? `(${targetVerboseQuery})` : 'record._to'},
+      'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles},
       (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}})))
   `
 
@@ -226,7 +228,7 @@ const genesGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genes', description: descriptions.genes_genes } })
   .input(genesGenesQueryFormat)
   .output(z.array(genesGenesRelativeFormat))
-  .query(async ({ input }) => await findGenesGenes(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenesGenes(input)))
 
 export const genesGenesEdgeRouters = {
   genesGenes

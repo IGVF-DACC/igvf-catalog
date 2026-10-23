@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { paramsFormatType } from '../_helpers'
+import { paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, variantSimplifiedFormat } from '../nodes/variants'
@@ -47,6 +47,7 @@ export const outputFormat = z.array(z.object({
   source: z.string(),
   source_url: z.string(),
   files_filesets: z.string(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   biological_context: z.string(),
   biosample_term: z.string(),
   crispr_modality: z.string().nullish(),
@@ -166,6 +167,7 @@ function buildMainQuery (nearbyGenes: boolean, edgeFilters: string): string {
         source: record.source,
         source_url: record.source_url,
         files_filesets: record.files_filesets,
+        preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles,
         biological_context: record.biological_context,
         biosample_term: record.biosample_term,
         crispr_modality: record.crispr_modality,
@@ -261,7 +263,7 @@ const variantsGenomicElementsGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/genes', description: descriptions.variants_genomic_elements_genes } })
   .input(inputFormat)
   .output(outputFormat)
-  .query(async ({ input }) => await findGenesFromVariantViaElements(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenesFromVariantViaElements(input)))
 
 export const variantsGenomicElementsGenesRouters = {
   variantsGenomicElementsGenes

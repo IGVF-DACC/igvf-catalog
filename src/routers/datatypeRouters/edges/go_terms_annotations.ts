@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
@@ -44,7 +44,8 @@ const goAnnotationFormat = z.object({
   class: z.string().nullish(),
   method: z.string().nullish(),
   label: z.string().nullish(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 }).optional()
 
 async function transcriptIds (id: string): Promise<any[]> {
@@ -118,6 +119,7 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
           'gene_product_id': sourceReturn._id,
           'gene_product_name': sourceReturn.name,
           'go_term_name': targetReturn.name,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
           ${getDBReturnStatements(goTermsAnnotationsSchema)}
         }
     `
@@ -167,6 +169,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
         'gene_product_id': sourceReturn._id OR dbxrefTargetReturn._id,
         'gene_product_name': sourceReturn.name,
         'go_term_name': targetReturn.name,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }
   `
@@ -177,13 +180,13 @@ const goTermsFromAnnotations = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/gene-products/go-terms', description: descriptions.annotations_go_terms } })
   .input(queryFormat)
   .output(z.array(goAnnotationFormat))
-  .query(async ({ input }) => await goTermsSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await goTermsSearch(input)))
 
 const annotationsFromGoTerms = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/go-terms/gene-products', description: descriptions.go_terms_annotations } })
   .input(goTermQueryFormat)
   .output(z.array(goAnnotationFormat))
-  .query(async ({ input }) => await annotationsSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await annotationsSearch(input)))
 
 export const goTermsAnnotations = {
   goTermsFromAnnotations,

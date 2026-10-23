@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
@@ -60,6 +60,7 @@ export const returnFormat = z.object({
   source_url: z.string(),
   name: z.string(),
   files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   biological_context: z.string().nullish(),
   biosample_term: z.string().nullish(),
   treatments_term_ids: z.array(z.string()).nullish()
@@ -185,6 +186,7 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
         'source_url': record.source_url,
         'name': record.name,
         'files_filesets': record.files_filesets,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
         'biological_context': record.biological_context,
         'biosample_term': record.biosample_term
       },
@@ -265,13 +267,13 @@ const variantsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/variants', description: descriptions.biosamples_variants } })
   .input(biosamplesQueryFormat)
   .output(z.array(returnFormat))
-  .query(async ({ input }) => await findVariantsFromBiosamplesSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findVariantsFromBiosamplesSearch(input)))
 
 const biosamplesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/biosamples', description: descriptions.variants_biosamples } })
   .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsBiosamplesQueryFormat).merge(commonEdgeParamsFormat))
   .output(z.array(returnFormat))
-  .query(async ({ input }) => await findBiosamplesFromVariantSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findBiosamplesFromVariantSearch(input)))
 
 export const variantsBiosamplesRouters = {
   variantsFromBiosamples,

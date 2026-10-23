@@ -96,6 +96,20 @@ describe('goTermsAnnotations.goTermsFromAnnotations', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['transcripts/ENST00000357654']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ ...goAnnotation, preferred_assay_titles: ['TAP-seq'] }]) } as any)
+
+    const input = { query: 'ENST00000357654', page: 0 }
+    const result = await goTermsAnnotations.goTermsFromAnnotations({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[1][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...goAnnotation, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('goTermsAnnotations.annotationsFromGoTerms', () => {
@@ -132,5 +146,19 @@ describe('goTermsAnnotations.annotationsFromGoTerms', () => {
         rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([{ ...goAnnotation, preferred_assay_titles: ['TAP-seq'] }])
+    } as any)
+
+    const input = { go_term_id: 'GO_0006281', page: 0 }
+    const result = await goTermsAnnotations.annotationsFromGoTerms({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...goAnnotation, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 })
