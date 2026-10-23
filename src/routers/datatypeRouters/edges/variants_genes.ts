@@ -1,11 +1,15 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
+<<<<<<< Updated upstream
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, validRegion } from '../_helpers'
+=======
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, resolveValidatedLimit, withExpandedAssayTitles } from '../_helpers'
+>>>>>>> Stashed changes
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { geneFormat, geneSearch } from '../nodes/genes'
+import { geneFormat, geneSearch, nearestGeneSearch } from '../nodes/genes'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
@@ -702,56 +706,6 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     bindVars
   })
   return levenshteinMatchObjects
-}
-
-async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
-  const regionParams = validRegion(input.region as string)
-
-  if (regionParams === null) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Region format invalid. Please use the format as the example: "chr1:12345-54321"'
-    })
-  }
-
-  const inRegionQuery = `
-    FOR record in genes
-    FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(input))}
-    RETURN {${getDBReturnStatements(geneSchema)}}
-  `
-
-  const codingRegionGenes = await (await db.query(inRegionQuery)).all()
-
-  if (codingRegionGenes.length !== 0) {
-    return codingRegionGenes
-  }
-
-  const nearestQuery = `
-    LET LEFT = (
-      FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]}
-      SORT record.end DESC
-      LIMIT 1
-      RETURN {${getDBReturnStatements(geneSchema)}}
-    )
-
-    LET RIGHT = (
-      FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]}
-      SORT record.start
-      LIMIT 1
-      RETURN {${getDBReturnStatements(geneSchema)}}
-    )
-
-    RETURN UNION(LEFT, RIGHT)
-  `
-
-  const nearestGenes = await (await db.query(nearestQuery)).all()
-  if (nearestGenes !== undefined) {
-    return nearestGenes[0]
-  }
-
-  return []
 }
 
 // Aggregates entirely in AQL (COLLECT ... AGGREGATE), same approach as the sibling
