@@ -3,6 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
+import { transcriptFormat } from '../nodes/transcripts'
 import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -75,11 +76,11 @@ const gnrGeneQueryFormat = z.object({
   response_synonym: z.string().optional(),
   neg_log10_pvalue: z.string().optional(),
   neg_log10_pvalue_adj: z.string().optional(),
-  method: z.enum(['CRISPR screen', 'Perturb-seq']).optional(),
+  method: z.enum(['CRISPR screen', 'Perturb-seq', 'MORF screen']).optional(),
   files_fileset: z.string().optional(),
   significant: z.enum(['true']).optional(),
-  crispr_modality: z.enum(['knockout', 'interference', 'activation']).optional()
-}).merge(commonEdgeParamsFormat).omit({ verbose: true })
+  perturbation: z.enum(getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'perturbation')).optional()
+}).merge(commonEdgeParamsFormat)
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -117,7 +118,7 @@ const geneScoreSummaryGroupFormat = z.object({
   biological_context: z.string().nullable(),
   cell_annotation: z.string().nullable(),
   cell_annotation_term: z.string().nullable(),
-  crispr_modality: z.string().nullable(),
+  perturbation: z.string().nullable(),
   min: z.number().nullable(),
   max: z.number().nullable(),
   edge_count: z.number(),
@@ -165,10 +166,22 @@ export const outputFormat = z.array(z.object({
   cell_annotation_term: z.string().nullish(),
   treatments_term_ids: z.array(z.string()).nullish(),
   files_filesets: z.string(),
-  crispr_modality: z.string().nullish(),
+  perturbation: z.string().nullish(),
   score: z.number().nullish(),
   transcription_start_site: z.number().nullish(),
   rna_pseudobulk_tpm: z.number().nullish(),
+  negative_selection_log2FC: z.number().nullish(),
+  negative_selection_p_value: z.number().nullish(),
+  negative_selection_p_value_adj: z.number().nullish(),
+  negative_selection_neg_log10_pvalue: z.number().nullish(),
+  negative_selection_neg_log10_pvalue_adj: z.number().nullish(),
+  negative_selection_significant: z.boolean().nullish(),
+  positive_selection_log2FC: z.number().nullish(),
+  positive_selection_p_value: z.number().nullish(),
+  positive_selection_p_value_adj: z.number().nullish(),
+  positive_selection_neg_log10_pvalue: z.number().nullish(),
+  positive_selection_neg_log10_pvalue_adj: z.number().nullish(),
+  positive_selection_significant: z.boolean().nullish(),
   log2FC: z.number().nullish(),
   log2FC_ci95_lower: z.number().nullish(),
   log2FC_ci95_upper: z.number().nullish(),
@@ -204,8 +217,10 @@ export const grnOutputFormat = z.object({
     start: z.number(),
     end: z.number(),
     regulator_gene: z.string()
-  }),
-  crispr_modality: z.string().nullish(),
+  }).nullish(),
+  regulator_gene: z.string().optional(),
+  transcript: z.string().or(transcriptFormat.partial()).nullish(),
+  perturbation: z.string().nullish(),
   class: z.string(),
   method: z.string(),
   source: z.string(),
@@ -215,6 +230,8 @@ export const grnOutputFormat = z.object({
   neg_log10_pvalue: z.number().or(z.string()).nullish(),
   neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
   significant: z.boolean().nullish(),
+  p_value: z.number().or(z.string()).nullish(),
+  p_value_adj: z.number().or(z.string()).nullish(),
   perturbation_efficiency_log2FC: z.number().nullish(),
   perturbation_efficiency_neg_log10_pvalue: z.number().or(z.string()).nullish(),
   perturbation_efficiency_neg_log10_pvalue_adj: z.number().or(z.string()).nullish(),
@@ -304,10 +321,22 @@ function buildQuery (params: {
         'cell_annotation': record.cell_annotation,
         'cell_annotation_term': record.cell_annotation_term,
         'treatments_term_ids': record.treatments_term_ids,
-        'crispr_modality': record.crispr_modality,
+        'perturbation': record.perturbation,
         'score': record.score,
         'transcription_start_site': record.transcription_start_site,
         'rna_pseudobulk_tpm': record.rna_pseudobulk_tpm,
+        'negative_selection_log2FC': record.negative_selection_log2FC,
+        'negative_selection_p_value': record.negative_selection_p_value,
+        'negative_selection_p_value_adj': record.negative_selection_p_value_adj,
+        'negative_selection_neg_log10_pvalue': record.negative_selection_neg_log10_pvalue,
+        'negative_selection_neg_log10_pvalue_adj': record.negative_selection_neg_log10_pvalue_adj,
+        'negative_selection_significant': record.negative_selection_significant,
+        'positive_selection_log2FC': record.positive_selection_log2FC,
+        'positive_selection_p_value': record.positive_selection_p_value,
+        'positive_selection_p_value_adj': record.positive_selection_p_value_adj,
+        'positive_selection_neg_log10_pvalue': record.positive_selection_neg_log10_pvalue,
+        'positive_selection_neg_log10_pvalue_adj': record.positive_selection_neg_log10_pvalue_adj,
+        'positive_selection_significant': record.positive_selection_significant,
         'log2FC': record.log2FC,
         'log2FC_ci95_lower': record.log2FC_ci95_lower,
         'log2FC_ci95_upper': record.log2FC_ci95_upper,
@@ -596,11 +625,24 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   })
 }
 
+// Directional screen results remain separate in storage; GRN reports depletion.
+const grnRecord = (variable: string): string => `(
+  HAS(${variable}, 'negative_selection_p_value_adj') ? MERGE(${variable}, {
+    log2FC: ${variable}.negative_selection_log2FC,
+    p_value: ${variable}.negative_selection_p_value,
+    p_value_adj: ${variable}.negative_selection_p_value_adj,
+    neg_log10_pvalue: ${variable}.negative_selection_neg_log10_pvalue,
+    neg_log10_pvalue_adj: ${variable}.negative_selection_neg_log10_pvalue_adj,
+    significant: ${variable}.negative_selection_significant
+  }) : ${variable}
+)`
+
 async function grnSearch (input: paramsFormatType): Promise<any> {
   const organism = input.organism ?? 'Homo sapiens'
   const routing = getRouting(organism)
   grnQueryValidation(input)
   const limit = applyLimit(input)
+  const candidateLimit = ((input.page as number || 0) + 1) * limit
 
   const regulatorGeneInput: paramsFormatType = { _key: input.regulator_gene_id, hgnc: input.regulator_hgnc_id !== undefined ? withHgncPrefix(input.regulator_hgnc_id as string) : undefined, name: input.regulator_gene_name, synonyms: input.regulator_synonym, organism: organism as string, page: 0 }
   const responseGeneInput: paramsFormatType = { _key: input.response_gene_id, hgnc: input.response_hgnc_id !== undefined ? withHgncPrefix(input.response_hgnc_id as string) : undefined, name: input.response_gene_name, synonyms: input.response_synonym, organism: organism as string, page: 0 }
@@ -620,14 +662,14 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     pvalueFilter = `FILTER ${getFilterStatements(routing.filterSchema, pvalueFilters)}`
   }
 
-  let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\']'
+  let methodFilter = '[\'Perturb-seq\', \'CRISPR screen\', \'MORF screen\']'
   if (input.method !== undefined) {
     methodFilter = `['${input.method as string}']`
   }
 
   let filesFilesetFilter = ''
   if (input.files_fileset !== undefined) {
-    filesFilesetFilter = `AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    filesFilesetFilter = `AND record.files_filesets == 'files_filesets/${escapeAqlString(input.files_fileset as string)}'`
   }
 
   let significantFilter = ''
@@ -635,17 +677,23 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     significantFilter = `AND record.significant == ${input.significant as string}`
   }
 
-  let crisprModalityFilter = ''
-  if (input.crispr_modality !== undefined) {
-    crisprModalityFilter = `AND record.crispr_modality == '${input.crispr_modality as string}'`
+  let perturbationFilter = ''
+  if (input.perturbation !== undefined) {
+    perturbationFilter = `AND record.perturbation == '${input.perturbation as string}'`
   }
+
+  // Filter stored edges before MERGE so ArangoDB can use its edge indexes.
+  const rawFilesFilesetFilter = filesFilesetFilter.replaceAll('record.', 'rawRecord.')
+  const rawPerturbationFilter = perturbationFilter.replaceAll('record.', 'rawRecord.')
 
   const responseQuery = `
     FOR gene IN ${routing.geneCollection}
         FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'gene')}
 
-        FOR record in ${routing.edgeCollection}
-          FILTER record._to == gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
+        FOR rawRecord in ${routing.edgeCollection}
+          FILTER rawRecord._to == gene._id AND rawRecord.method IN ${methodFilter} ${rawFilesFilesetFilter} ${rawPerturbationFilter}
+          LET record = ${grnRecord('rawRecord')}
+          ${significantFilter === '' ? '' : `FILTER record.significant == ${input.significant as string}`}
           ${pvalueFilter}
           LET ge = DOCUMENT(record._from)
           // Not every genomic element has a presumed promoter gene (promoter_of is
@@ -654,27 +702,29 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           // regulatorQuery/regulatorResponseQuery, which already only join elements that
           // have a promoter_of set.
           FILTER ge.promoter_of != null
-          SORT record._key
 
-          LIMIT ${(input.page as number || 0) * limit}, ${limit}
-
+          SORT record._id
+          LIMIT ${candidateLimit}
           LET perturbationEfficiencyEdge = FIRST(
             FOR se IN ${routing.edgeCollection}
               FILTER se._from == ge._id AND se._to == ge.promoter_of AND se.files_filesets == record.files_filesets
               LIMIT 1
-              RETURN se
+              RETURN ${grnRecord('se')}
           )
 
           RETURN {
+            _sort_id: record._id,
           'response_gene': gene.name,
           'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': DOCUMENT(ge.promoter_of).name },
-          'crispr_modality': record.crispr_modality,
+          'perturbation': record.perturbation,
           'class': record.class,
           'method': record.method,
           'source': record.source,
           'files_filesets': record.files_filesets,
           'biological_context': record.biological_context,
           'log2FC': record.log2FC,
+          'p_value': record.p_value,
+          'p_value_adj': record.p_value_adj,
           'neg_log10_pvalue': record.neg_log10_pvalue,
           'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
           'significant': record.significant,
@@ -692,29 +742,34 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FOR ge in ${routing.elementCollection}
           FILTER ge.promoter_of == gene._id
 
-          FOR record in ${routing.edgeCollection}
-            FILTER record._from == ge._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
+          FOR rawRecord in ${routing.edgeCollection}
+          FILTER rawRecord._from == ge._id AND rawRecord.method IN ${methodFilter} ${rawFilesFilesetFilter} ${rawPerturbationFilter}
+          LET record = ${grnRecord('rawRecord')}
+          ${significantFilter === '' ? '' : `FILTER record.significant == ${input.significant as string}`}
             ${pvalueFilter}
-            SORT record._key
-            LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
+            SORT record._id
+            LIMIT ${candidateLimit}
             LET perturbationEfficiencyEdge = FIRST(
               FOR se IN ${routing.edgeCollection}
                 FILTER se._from == ge._id AND se._to == gene._id AND se.files_filesets == record.files_filesets
                 LIMIT 1
-                RETURN se
+                RETURN ${grnRecord('se')}
             )
 
             RETURN {
+            _sort_id: record._id,
             'response_gene': DOCUMENT(record._to).name,
             'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': gene.name },
-            'crispr_modality': record.crispr_modality,
+            'perturbation': record.perturbation,
             'class': record.class,
             'method': record.method,
             'source': record.source,
             'files_filesets': record.files_filesets,
             'biological_context': record.biological_context,
             'log2FC': record.log2FC,
+          'p_value': record.p_value,
+          'p_value_adj': record.p_value_adj,
             'neg_log10_pvalue': record.neg_log10_pvalue,
             'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
             'significant': record.significant,
@@ -732,32 +787,37 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
         FOR response_gene IN ${routing.geneCollection}
             FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}
 
-            FOR record in ${routing.edgeCollection}
-              FILTER record._to == response_gene._id AND record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${crisprModalityFilter}
+            FOR rawRecord in ${routing.edgeCollection}
+          FILTER rawRecord._to == response_gene._id AND rawRecord.method IN ${methodFilter} ${rawFilesFilesetFilter} ${rawPerturbationFilter}
+          LET record = ${grnRecord('rawRecord')}
+          ${significantFilter === '' ? '' : `FILTER record.significant == ${input.significant as string}`}
               ${pvalueFilter}
 
               FOR ge IN ${routing.elementCollection}
                 FILTER ge._id == record._from AND ge.promoter_of == regulator_gene._id
-                SORT record._key
-                LIMIT ${(input.page as number || 0) * limit}, ${limit}
 
+                SORT record._id
+                LIMIT ${candidateLimit}
                 LET perturbationEfficiencyEdge = FIRST(
                   FOR se IN ${routing.edgeCollection}
                     FILTER se._from == ge._id AND se._to == regulator_gene._id AND se.files_filesets == record.files_filesets
                     LIMIT 1
-                    RETURN se
+                    RETURN ${grnRecord('se')}
                 )
 
                 RETURN {
+                  _sort_id: record._id,
                   'response_gene': response_gene.name,
                   'genomic_element': { 'start': ge.start, 'end': ge.end, 'chr': ge.chr, 'regulator_gene': regulator_gene.name },
-                  'crispr_modality': record.crispr_modality,
+                  'perturbation': record.perturbation,
                   'class': record.class,
                   'method': record.method,
                   'source': record.source,
                   'files_filesets': record.files_filesets,
                   'biological_context': record.biological_context,
                   'log2FC': record.log2FC,
+          'p_value': record.p_value,
+          'p_value_adj': record.p_value_adj,
                   'neg_log10_pvalue': record.neg_log10_pvalue,
                   'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
                   'significant': record.significant,
@@ -777,11 +837,67 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
     query = responseQuery
   }
 
-  const objs = (await db.query(query)).all()
-  if (Array.isArray(objs) && objs.length > 0) {
-    return await objs
+  // MORF constructs are human gene-transcript relationships. Keep mouse queries
+  // independent of the human MORF collection.
+  if (organism === 'Homo sapiens') {
+    const morfQuery = `
+      FOR record IN genes_transcripts_genes
+        FILTER record.method IN ${methodFilter} ${filesFilesetFilter} ${significantFilter} ${perturbationFilter}
+        ${pvalueFilter}
+        LET relationship = DOCUMENT(record._from)
+        FILTER relationship != null
+        LET regulator_gene = DOCUMENT(relationship._from)
+        LET response_gene = DOCUMENT(record._to)
+        FILTER regulator_gene != null AND response_gene != null
+        ${hasRegulatorInput ? `FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(regulatorGeneInput)).replaceAll('record', 'regulator_gene')}` : ''}
+        ${hasResponseInput ? `FILTER ${getFilterStatements(routing.geneSchema, preProcessRegionParam(responseGeneInput)).replaceAll('record', 'response_gene')}` : ''}
+        SORT record._id
+        LIMIT ${candidateLimit}
+        // TOX_1 measures overexpression of the readout gene itself. Its statistics
+        // apply to every construct in this screen, including different regulators.
+        LET perturbationEfficiencyEdge = FIRST(
+          FOR se IN genes_transcripts_genes
+            FILTER se.files_filesets == record.files_filesets
+              AND se._to == record._to AND se.morf_id == 'TOX_1'
+            SORT se._key
+            LIMIT 1
+            RETURN ${grnRecord('se')}
+        )
+        RETURN {
+          _sort_id: record._id,
+          response_gene: response_gene.name,
+          regulator_gene: regulator_gene.name,
+          genomic_element: null,
+          transcript: ${input.verbose === 'true' ? `FIRST(FOR transcript IN [DOCUMENT(relationship._to)] FILTER transcript != null RETURN {${getDBReturnStatements(getSchema('data/schemas/nodes/transcripts.Gencode.json')).replaceAll('record', 'transcript')}})` : 'relationship._to'},
+          perturbation: record.perturbation,
+          class: record.class,
+          method: record.method,
+          source: record.source,
+          files_filesets: record.files_filesets,
+          biological_context: record.biological_context,
+          log2FC: record.log2FC,
+          p_value: record.p_value,
+          p_value_adj: record.p_value_adj,
+          neg_log10_pvalue: record.neg_log10_pvalue,
+          neg_log10_pvalue_adj: record.neg_log10_pvalue_adj,
+          significant: record.significant,
+          perturbation_efficiency_log2FC: perturbationEfficiencyEdge.log2FC,
+          perturbation_efficiency_neg_log10_pvalue: perturbationEfficiencyEdge.neg_log10_pvalue,
+          perturbation_efficiency_neg_log10_pvalue_adj: perturbationEfficiencyEdge.neg_log10_pvalue_adj,
+          perturbation_efficiency_significant: perturbationEfficiencyEdge.significant
+        }
+    `
+    query = `LET crispr = (${query}) LET morf = (${morfQuery})
+      FOR result IN UNION(crispr, morf)`
+  } else {
+    query = `FOR result IN (${query})`
   }
-  return await objs
+  // Paginate the combined network once, retaining each construct/transcript edge.
+  query += `
+    SORT result._sort_id
+    LIMIT ${(input.page as number || 0) * limit}, ${limit}
+    RETURN UNSET(result, '_sort_id')`
+  return await (await db.query(query)).all()
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
@@ -930,7 +1046,7 @@ async function findGeneScoreSummary (input: paramsFormatType): Promise<any> {
           biological_context = record.biological_context,
           cell_annotation = record.cell_annotation,
           cell_annotation_term = record.cell_annotation_term,
-          crispr_modality = record.crispr_modality
+          perturbation = record.perturbation
         AGGREGATE
           edge_count = SUM(1),
           numeric_count = SUM(isNumeric ? 1 : 0),
@@ -939,9 +1055,9 @@ async function findGeneScoreSummary (input: paramsFormatType): Promise<any> {
           zero_count = SUM((isNumeric && rawScore == 0) ? 1 : 0),
           minScore = MIN(isNumeric ? rawScore : null),
           maxScore = MAX(isNumeric ? rawScore : null)
-        SORT method, source, files_filesets, biosample_term, biological_context, cell_annotation, cell_annotation_term, crispr_modality
+        SORT method, source, files_filesets, biosample_term, biological_context, cell_annotation, cell_annotation_term, perturbation
         RETURN {
-          method, source, files_filesets, biosample_term, biological_context, cell_annotation, cell_annotation_term, crispr_modality,
+          method, source, files_filesets, biosample_term, biological_context, cell_annotation, cell_annotation_term, perturbation,
           'min': minScore,
           'max': maxScore,
           edge_count, numeric_count, missing_count, invalid_count, zero_count

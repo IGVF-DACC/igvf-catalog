@@ -17,7 +17,7 @@ def parse(label, filepath=SAMPLE):
         validator.return_value.validate.return_value = True
         metadata.return_value = {
             'method': 'Multiome Perturb-seq', 'class': 'observed data',
-            'crispr_modality': 'interference',
+            'perturbation': 'CRISPR interference',
             'simple_sample_summaries': ['hTERT RPE-1 cell'],
             'samples': ['ontology_terms/CLO_0004290'],
             'treatments_term_ids': None, 'file_set_id': 'IGVFDS1890GPOK',

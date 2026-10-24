@@ -54,6 +54,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         'genomic_element_gene'
     ]
     SOURCE = 'IGVF'
+    MACS_GENOME_WIDE_REFERENCE_ACCESSION = 'IGVFFI9629WVUU'
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
     # Two-tailed normal critical value for SIGNIFICANCE_THRESHOLD (≈ normsinv(0.975)).
@@ -82,6 +83,18 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         'z_score',
         't_score',
         'idr',
+        'negative_selection_log2FC',
+        'negative_selection_p_value',
+        'negative_selection_p_value_adj',
+        'negative_selection_neg_log10_pvalue',
+        'negative_selection_neg_log10_pvalue_adj',
+        'negative_selection_significant',
+        'positive_selection_log2FC',
+        'positive_selection_p_value',
+        'positive_selection_p_value_adj',
+        'positive_selection_neg_log10_pvalue',
+        'positive_selection_neg_log10_pvalue_adj',
+        'positive_selection_significant'
     })
 
     @staticmethod
@@ -206,12 +219,35 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 return False
         return True
 
+    def _configured_row_exceptions(self):
+        """Read inline skip rules or a dataset's exclusion/alias TSV once."""
+        configured = self.file_config.get('skip_rows', [])
+        if not isinstance(configured, str):
+            return configured
+        if not hasattr(self, '_row_exceptions'):
+            with (_CRISPR_E2G_DEFINITIONS_PATH.parent / configured).open() as handle:
+                reader = csv.DictReader(handle, delimiter='\t')
+                if not {'element_id', 'reference_id', 'reason'} <= set(reader.fieldnames or []):
+                    raise ValueError(
+                        f'Invalid exclusion list columns: {configured}')
+                self._row_exceptions = list(reader)
+            ids = [entry['element_id'] for entry in self._row_exceptions]
+            if any(not element_id for element_id in ids) or len(set(ids)) != len(ids):
+                raise ValueError(
+                    f'Missing or duplicate element ID in exclusion list: {configured}')
+        return self._row_exceptions
+
     def _is_explicitly_skipped_row(
         self,
         row: list,
         name_to_idx: Dict[str, int],
     ) -> bool:
-        for skip_spec in self.file_config.get('skip_rows', []):
+        for skip_spec in self._configured_row_exceptions():
+            if 'reference_id' in skip_spec:
+                if skip_spec['reference_id']:
+                    # An alias supplies annotation; it does not exclude the row.
+                    continue
+                skip_spec = {'id': skip_spec['element_id']}
             if self._matches_configured_skip_row(row, name_to_idx, skip_spec):
                 return True
         return False
@@ -552,8 +588,19 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     f'File {self.file_accession} uses unknown adapter calculated '
                     f'field rule: {rule_type!r}'
                 )
-        self._apply_standard_neg_log10_fields(metrics)
-        self._apply_standard_significant_field(metrics)
+        if 'negative_selection_p_value_adj' in metrics:
+            for prefix, sign in (('negative_selection', -1), ('positive_selection', 1)):
+                metrics[f'{prefix}_neg_log10_pvalue'] = self._neg_log10_pvalue(
+                    metrics[f'{prefix}_p_value'])
+                metrics[f'{prefix}_neg_log10_pvalue_adj'] = self._neg_log10_pvalue(
+                    metrics[f'{prefix}_p_value_adj'])
+                metrics[f'{prefix}_significant'] = (
+                    metrics[f'{prefix}_p_value_adj'] < self.SIGNIFICANCE_THRESHOLD
+                    and sign * metrics[f'{prefix}_log2FC'] > 0
+                )
+        else:
+            self._apply_standard_neg_log10_fields(metrics)
+            self._apply_standard_significant_field(metrics)
         return self._drop_nonfinite_metrics(metrics)
 
     @staticmethod
@@ -611,7 +658,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         file_accession: str,
         file_fileset: dict,
         method: str,
-        crispr_modality: str,
+        perturbation: str,
         metrics: dict,
         gene_collection: str = 'genes',
     ) -> dict:
@@ -628,12 +675,13 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             'name': 'modulates expression of',
             'inverse_name': 'expression modulated by',
             'method': method,
-            'crispr_modality': crispr_modality,
+            'perturbation': perturbation,
             'biological_context': file_fileset['simple_sample_summaries'][0],
             'biosample_term': file_fileset['samples'][0],
             'treatments_term_ids': file_fileset['treatments_term_ids'],
         }
-        edge['significant'] = metrics['significant']
+        if 'significant' in metrics:
+            edge['significant'] = metrics['significant']
         if 'neg_log10_pvalue' in metrics:
             edge['neg_log10_pvalue'] = metrics['neg_log10_pvalue']
         if 'log2FC' in metrics:
@@ -831,12 +879,132 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             )
         seen_element_gene_ids.add(element_gene_id)
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def _load_macs_screens_reference(self):
+        filepath = self.reference_filepath
+        reference_fields = (
+            'intended_target_name', 'intended_target_chr',
+            'intended_target_start', 'intended_target_end',
+        )
+        if not filepath:
+            raise ValueError(
+                f'IGVFFI9001HIYI requires reference_filepath for {self.MACS_GENOME_WIDE_REFERENCE_ACCESSION}.')
+        elements = {}
+        opener = gzip.open if str(filepath).endswith('.gz') else open
+        with opener(filepath, 'rt') as handle:
+            reader = csv.DictReader(handle, delimiter='\t')
+            missing = set(reference_fields + ('description',)) - \
+                set(reader.fieldnames or [])
+            if missing:
+                raise ValueError(
+                    f'MACS screen guide reference missing columns: {sorted(missing)}')
+            for row in reader:
+                match = re.search(
+                    r'legacy promoter target ([^;]+);', row['description'])
+                if not match:
+                    continue
+                element_id = match.group(1)
+                annotation = tuple(row[field] for field in reference_fields)
+                if element_id in elements and elements[element_id] != annotation:
+                    raise ValueError(
+                        f'Conflicting guide annotations for {element_id}')
+                elements[element_id] = annotation
+        return elements
+
+    def _normalize_macs_screens_rows(self, header, rows):
+        """Join guide annotations and validate native MACS screen rows.
+
+        Only explicitly curated exclusions are omitted. New unresolved IDs fail the
+        load; aliases never merge rows or their measurements.
+        """
+        config = self.file_config
+        element_fields = ('ensembl_gene_id', 'element_chr',
+                          'element_start', 'element_end')
+        required = {'id', 'num'} | {f'{direction}|{metric}' for direction in ('neg', 'pos')
+                                    for metric in ('lfc', 'p-value', 'fdr')}
+        requires_reference = config.get('layout') == 'macs_genome_wide'
+        if not requires_reference:
+            required.update(element_fields + ('element_guide_count',))
+        missing = required - set(header)
+        if missing:
+            raise ValueError(
+                f'MACS screen results missing columns: {sorted(missing)}')
+        elements = self._load_macs_screens_reference() if requires_reference else None
+        if elements is not None:
+            element_fields = ('intended_target_name', 'intended_target_chr',
+                              'intended_target_start', 'intended_target_end')
+        curation = {
+            entry['element_id']: entry['reference_id']
+            for entry in self._configured_row_exceptions()
+            if entry.get('reference_id')
+        }
+        name_to_idx = {name: idx for idx, name in enumerate(header)}
+        output_header = list(
+            header) + [field for field in element_fields if field not in header]
+
+        def normalized():
+            skipped = 0
+            seen = set()
+            for values in rows:
+                if not values:
+                    continue
+                if len(values) != len(header):
+                    raise ValueError(
+                        'MACS screen row does not match the header length')
+                row = dict(zip(header, values))
+                element_id = row['id']
+                if not element_id or element_id in seen:
+                    raise ValueError(
+                        f'Missing or duplicate MACS screen element ID: {element_id!r}')
+                seen.add(element_id)
+                if self._is_explicitly_skipped_row(values, name_to_idx):
+                    skipped += 1
+                    continue
+                if elements is not None:
+                    reference_id = curation.get(element_id, element_id)
+                    if reference_id not in elements:
+                        raise ValueError(
+                            f'No guide reference for MACS screen element {element_id!r}; curate explicitly.')
+                    annotation = elements[reference_id]
+                    if not all(annotation):
+                        raise ValueError(
+                            f'Incomplete promoter annotation for {element_id!r}; curate explicitly.')
+                    row.update(zip(element_fields, annotation))
+                for direction in ('neg', 'pos'):
+                    lfc, pvalue, fdr = (
+                        float(row[f'{direction}|{field}']) for field in ('lfc', 'p-value', 'fdr'))
+                    if not all(math.isfinite(value) for value in (lfc, pvalue, fdr)) or not (0 <= pvalue <= 1 and 0 <= fdr <= 1):
+                        raise ValueError(
+                            f'Invalid MACS screen statistics for {element_id!r}')
+                yield [row[field] for field in output_header]
+            if skipped:
+                self.logger.warning(
+                    'Omitted %d explicitly curated MACS screen controls/unmapped elements.', skipped)
+
+        return output_header, normalized()
+
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, reference_filepath=None, reference_source_url=None, **kwargs):
         self.file_accession = get_file_accession(filepath)
         self.source_url = (
             f'https://data.igvf.org/tabular-files/{self.file_accession}'
         )
+        self.reference_filepath = reference_filepath
+        self.reference_source_url = reference_source_url
         self.file_config = CRISPR_E2G_FILE_CONFIG.get(self.file_accession, {})
+        self.element_file_accession = self.file_accession
+        self.element_source_url = self.source_url
+        if self.file_config.get('layout') == 'macs_genome_wide' and reference_filepath:
+            self.element_file_accession = get_file_accession(
+                reference_filepath)
+            if self.element_file_accession != self.MACS_GENOME_WIDE_REFERENCE_ACCESSION:
+                raise ValueError(
+                    f'Expected guide reference {self.MACS_GENOME_WIDE_REFERENCE_ACCESSION}')
+            self.element_source_url = (
+                f'https://data.igvf.org/tabular-files/{self.element_file_accession}/'
+            )
+        if self.file_config.get('layout') == 'macs_genome_wide' and reference_source_url:
+            if reference_source_url.rstrip('/').split('/')[-1] != self.MACS_GENOME_WIDE_REFERENCE_ACCESSION:
+                raise ValueError(
+                    f'Expected guide reference {self.MACS_GENOME_WIDE_REFERENCE_ACCESSION}')
         self.assembly = self.file_config.get('assembly', 'GRCh38')
         self.gene_collection = 'mm_genes' if self.assembly == 'GRCm39' else 'genes'
         self.element_collection = 'mm_genomic_elements' if self.assembly == 'GRCm39' else 'genomic_elements'
@@ -883,11 +1051,14 @@ class CRISPRElementGeneIGVF(BaseAdapter):
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.writer.add_tag('portal_accessions', self.file_accession)
+        if self.element_file_accession != self.file_accession:
+            self.writer.add_tag('portal_accessions',
+                                self.element_file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         method = self.file_fileset['method']
-        crispr_modality = self.file_fileset.get('crispr_modality')
+        perturbation = self.file_fileset.get('perturbation')
         layout_name = self.file_config.get('layout')
         is_scaled_screen = layout_name == 'scaled_screen'
         is_pyspade = layout_name == 'pySpade'
@@ -901,6 +1072,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
             reader = csv.reader(
                 data_file, delimiter=self.layout.get('delimiter', '\t'))
             header = next(reader)
+            if layout_name in ('macs_genome_wide', 'macs_validation'):
+                header, reader = self._normalize_macs_screens_rows(
+                    header, reader)
             name_to_idx = {h.strip(): i for i, h in enumerate(header)}
 
             if not self.layout:
@@ -976,6 +1150,11 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                     promoter_gene,
                     source_annotation,
                 )
+                native_element_id = None
+                if layout_name in ('macs_genome_wide', 'macs_validation'):
+                    # Distinct native tests may share coordinates; preserve their IDs.
+                    native_element_id = row[name_to_idx['id']]
+                    element_coordinates += (native_element_id,)
                 if element_coordinates not in genomic_coordinates_to_element_id:
                     element_id = build_regulatory_region_id(
                         intended_target_chr,
@@ -984,6 +1163,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         'CRISPR',
                         assembly=self.assembly,
                     )
+                    if native_element_id is not None:
+                        element_id += '_' + native_element_id
                     genomic_coordinates_to_element_id[element_coordinates] = element_id
                 else:
                     element_id = genomic_coordinates_to_element_id[
@@ -1000,14 +1181,14 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         _key=_id,
                         _from=(
                             self.element_collection + '/' + element_id + '_'
-                            + self.file_accession
+                            + self.element_file_accession
                         ),
                         readout_gene=readout_gene,
                         source_url=self.source_url,
                         file_accession=self.file_accession,
                         file_fileset=self.file_fileset,
                         method=method,
-                        crispr_modality=crispr_modality,
+                        perturbation=perturbation,
                         metrics=metrics,
                         gene_collection=self.gene_collection,
                     )
@@ -1050,7 +1231,7 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                 for genomic_element, element_id in genomic_coordinates_to_element_id.items():
                     source_annotation = genomic_element[4]
                     promoter_gene = genomic_element[3]
-                    _id = element_id + '_' + self.file_accession
+                    _id = element_id + '_' + self.element_file_accession
                     _props = {
                         '_key': _id,
                         'name': _id,
@@ -1060,9 +1241,9 @@ class CRISPRElementGeneIGVF(BaseAdapter):
                         'method': method,
                         'source_annotation': source_annotation,
                         'source': CRISPRElementGeneIGVF.SOURCE,
-                        'source_url': self.source_url,
+                        'source_url': self.element_source_url,
                         'type': 'tested elements',
-                        'files_filesets': 'files_filesets/' + self.file_accession
+                        'files_filesets': 'files_filesets/' + self.element_file_accession
                     }
                     if source_annotation == 'promoter':
                         if not promoter_gene:

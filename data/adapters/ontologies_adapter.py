@@ -1,19 +1,33 @@
+from schemas.registry import get_schema
+from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
+from adapters.archive_utils import get_file_accession
 import json
 import os
 import re
-from contextlib import ExitStack
+import sys
+from contextlib import ExitStack, redirect_stderr
+from io import StringIO
 from typing import Optional
 from rdflib import Graph as RDFGraph, RDF, BNode, Literal, URIRef
 from rdflib.collection import Collection
 from funowl.converters.functional_converter import to_python as parse_functional_syntax
 from jsonschema import Draft202012Validator, ValidationError
 
-from owlready2 import *
-
-from adapters.archive_utils import get_file_accession
-from adapters.helpers import get_file_fileset_by_accession_in_arangodb
-from adapters.writer import Writer
-from schemas.registry import get_schema
+# Owlready2 prints this optional-acceleration notice directly to stderr on import,
+# including when another adapter is selected through active_adapters.
+_OWLREADY2_FALLBACK_NOTICE = (
+    "* Owlready2 * Warning: optimized Cython parser module 'owlready2_optimized' "
+    'is not available, defaulting to slower Python implementation'
+)
+with StringIO() as _owlready2_stderr:
+    try:
+        with redirect_stderr(_owlready2_stderr):
+            from owlready2 import *
+    finally:
+        for _line in _owlready2_stderr.getvalue().splitlines(keepends=True):
+            if _line.rstrip('\r\n') != _OWLREADY2_FALLBACK_NOTICE:
+                sys.stderr.write(_line)
 
 
 class Ontology:

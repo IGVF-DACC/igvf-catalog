@@ -135,7 +135,7 @@ class CRISPRElementGeneENCODE(BaseAdapter):
                             'neg_log10_pvalue_adj': neglog10pvalue_adj,
                             'significant': significant == 'TRUE',
                             'method': self.file_fileset.get('method'),
-                            'crispr_modality': self.file_fileset.get('crispr_modality'),
+                            'perturbation': self.file_fileset.get('perturbation'),
                             'class': self.file_fileset.get('class'),
                             'label': self.COLLECTION_LABEL,
                             'source': self.SOURCE,

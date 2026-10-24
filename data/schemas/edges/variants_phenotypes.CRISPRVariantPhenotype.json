@@ -94,12 +94,12 @@
             "CRISPR screen"
           ]
         },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality",
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
           "enum": [
-            "prime editing",
-            "interference",
-            "base editing"
+            "CRISPR prime editing",
+            "CRISPR interference",
+            "CRISPR base editing"
           ]
         },
         "class": {
@@ -157,7 +157,7 @@
         "p_value_adj",
         "neg_log10_pvalue_adj",
         "files_filesets",
-        "crispr_modality",
+        "perturbation",
         "biological_context",
         "biosample_term"
       ],
@@ -166,7 +166,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "effect_size, z_score, p_value_adj, neg_log10_pvalue_adj",
-    "return": "name, class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
+    "return": "name, class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
   },
   "db_collection_name": "variants_phenotypes"
 }

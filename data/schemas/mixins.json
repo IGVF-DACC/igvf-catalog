@@ -66,17 +66,19 @@
       "biological relationship": "A curated relationship between biological entities."
     }
   },
-  "crispr_modality": {
-    "title": "CRISPR Perturbation",
-    "description": "The purpose or intended effect of the CRISPR modification applied to the samples.",
+  "perturbation": {
+    "title": "Perturbation",
+    "description": "The experimental perturbation applied to the samples.",
     "type": "string",
     "enum_descriptions": {
-      "interference": "Represses target gene expression using a CRISPR-directed regulatory effector.",
-      "activation": "Increases target gene expression using a CRISPR-directed regulatory effector.",
-      "base editing": "Introduces targeted nucleotide substitutions using a base editor.",
-      "prime editing": "Introduces targeted substitutions, insertions, or deletions using a prime editor and a template-bearing guide RNA.",
-      "knockout": "Disrupts a target gene to eliminate its function.",
-      "null": "No CRISPR modality is recorded or applicable."
+      "CRISPR interference": "Represses target gene expression using a CRISPR-directed regulatory effector.",
+      "CRISPR activation": "Increases target gene expression using a CRISPR-directed regulatory effector.",
+      "CRISPR base editing": "Introduces targeted nucleotide substitutions using a base editor.",
+      "CRISPR prime editing": "Introduces targeted substitutions, insertions, or deletions using a prime editor and a template-bearing guide RNA.",
+      "CRISPR knockout": "Disrupts a target gene to eliminate its function.",
+      "CRISPR cutting": "Cuts target DNA using a CRISPR-directed nuclease.",
+      "ORF overexpression": "Increases expression using an open reading frame construct.",
+      "null": "No perturbation is recorded or applicable."
     }
   },
   "organism": {

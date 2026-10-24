@@ -243,7 +243,7 @@ def test_parse_sample_donor_treatment_igvf():
     assert modality is None
 
 
-def test_parse_sample_donor_treatment_igvf_crispr_modality():
+def test_parse_sample_donor_treatment_igvf_perturbation():
     samples = [{'accession': 'IGVFSM0001AAAA'}]
     method = 'CRISPR screen'
     sample_objects = [{
@@ -342,7 +342,7 @@ def test_fileset_query_files_props_igvf():
     assert sample_term_ids == ['UBERON_0014374']
 
 
-def test_query_fileset_files_props_igvf_with_crispr_modality():
+def test_query_fileset_files_props_igvf_with_perturbation():
     file_object = {
         '@id': '/tabular-files/IGVFFI0000TEST/',
         'accession': 'IGVFFI0000TEST',
@@ -380,7 +380,7 @@ def test_query_fileset_files_props_igvf_with_crispr_modality():
                     ):
                         props, donor_ids, sample_term_ids = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
-    assert props['crispr_modality'] == 'interference'
+    assert props['perturbation'] == 'CRISPR interference'
     assert props['method'] == 'CRISPR screen'
     assert donor_ids == {'IGVFDO0000TEST'}
     assert sample_term_ids == ['EFO_0002067']
@@ -935,7 +935,7 @@ def test_query_fileset_files_props_encode():
         props, donor_ids, sample_types, disease_ids = FileFileSet.query_fileset_files_props_encode(
             file_object, igvf_dbxref)
     assert props == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None, 'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'perturbation': None, 'browser_index_file': None, 'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'}
     assert donor_ids == {'ENCDO948PMW'}
     assert sample_types == ['/biosample-types/tissue_UBERON_0002626/']
     assert disease_ids == []
@@ -980,7 +980,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'ENCFF003BKC', 'name': 'ENCFF003BKC', 'file_set_id': 'ENCSR297HTV', 'lab': 'jesse-engreitz', 'preferred_assay_titles': ['DNase-seq'], 'assay_term_ids': ['OBI:0001853'], 'method': 'ENCODE-rE2G', 'class': 'prediction', 'software': ['Distal regulation ENCODE-rE2G'], 'samples': ['ontology_terms/UBERON_0002626'], 'sample_ids': None, 'simple_sample_summaries': [
-        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'crispr_modality': None, 'browser_index_file': None, 'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'}
+        'head of caudate nucleus from ENCDO948PMW'], 'donors': ['donors/ENCDO948PMW'], 'treatments_term_ids': None, 'publication': None, 'collections': ['genomic_elements', 'genomic_elements_genes'], 'source': 'ENCODE', 'source_url': 'https://www.encodeproject.org/files/ENCFF003BKC/', 'download_link': 'https://www.encodeproject.org/files/ENCFF003BKC/@@download/ENCFF003BKC.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': 'https://www.encodeproject.org/files/ENCFF669BKC/@@download/ENCFF669BKC.bigInteract', 'perturbation': None, 'browser_index_file': None, 'dbxref_name': 'IGVFFI1193PGVX', 'dbxref_fileset_id': 'IGVFDS1047BFMY'}
 
     writer = SpyWriter()
     adapter = FileFileSet(accessions=[
@@ -989,7 +989,7 @@ def test_process_file():
         adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0]) == {'_key': 'IGVFFI5688VHRS', 'name': 'IGVFFI5688VHRS', 'file_set_id': 'IGVFDS2175LLDQ', 'lab': 'tim-reddy', 'preferred_assay_titles': ['STARR-seq'], 'assay_term_ids': ['OBI:0002041'], 'method': 'STARR-seq', 'class': 'observed data', 'software': ['BIRD', 'Samtools', 'pandas'], 'samples': ['ontology_terms/EFO_0002067'], 'sample_ids': ['IGVFSM3422QUYJ'], 'simple_sample_summaries': [
-        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'version': None, 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': None, 'crispr_modality': None, 'browser_index_file': None}
+        'Homo sapiens K562 cell line, transfected with a reporter library'], 'donors': ['donors/IGVFDO9208RPQQ'], 'treatments_term_ids': None, 'publication': None, 'collections': ['variants_biosamples', 'variants'], 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI5688VHRS/', 'version': None, 'download_link': 'https://api.data.igvf.org/tabular-files/IGVFFI5688VHRS/@@download/IGVFFI5688VHRS.bed.gz', 'cell_annotation': None, 'cell_annotation_term': None, 'genome_browser_link': None, 'perturbation': None, 'browser_index_file': None}
 
     write = SpyWriter()
     adapter = FileFileSet(
@@ -1063,3 +1063,52 @@ def test_process_file_encode_dbxref_mismatch_raises():
         with pytest.raises(ValueError, match='Expected exactly one IGVF file with dbxref ENCODE:ENCFF003BKC'):
             adapter.process_file()
     assert writer.contents == []
+
+
+@pytest.mark.parametrize('modality,expected', [
+    ('interference', 'CRISPR interference'),
+    ('activation', 'CRISPR activation'),
+    ('base editing', 'CRISPR base editing'),
+    ('prime editing', 'CRISPR prime editing'),
+    ('cutting', 'CRISPR cutting'),
+    ('knockout', 'CRISPR knockout'),
+    (None, None),
+])
+def test_perturbation_vocabulary(modality, expected):
+    assert FileFileSet.get_perturbation(modality, 'CRISPR screen') == expected
+
+
+def test_morf_perturbation_without_crispr_modification():
+    assert FileFileSet.get_perturbation(
+        None, 'MORF screen') == 'ORF overexpression'
+
+
+@pytest.mark.parametrize('accession,expected_method', [
+    ('IGVFFI6853MYBE', 'Perturb-seq'), ('IGVFFI7203AWIC', 'Perturb-seq'),
+    ('IGVFFI9001HIYI', 'CRISPR screen'), ('IGVFFI3975KRIX', 'CRISPR screen'),
+])
+def test_crispr_e2g_metadata_uses_portal_catalog_annotations(accession, expected_method):
+    file_object = {
+        '@id': f'/tabular-files/{accession}/', 'accession': accession,
+        'href': f'/tabular-files/{accession}/@@download/{accession}.tsv.gz',
+        'file_set': {'@id': '/analysis-sets/IGVFDS0000TEST/'},
+        'catalog_class': 'observed data',
+        'catalog_collections': ['genomic_elements', 'genomic_elements_genes'],
+    }
+    fileset = {
+        'accession': 'IGVFDS0000TEST', '@type': ['AnalysisSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/jesse-engreitz/'}, 'files': [], 'samples': [],
+        'input_file_sets': [], 'simplified_sample_summary': 'endothelial cells',
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset)), \
+            patch.object(FileFileSet, 'get_software_igvf', return_value={'MAGeCK'}), \
+            patch.object(FileFileSet, 'parse_analysis_set_igvf', return_value=({'CRISPR MACS screen' if expected_method == 'CRISPR screen' else 'Perturb-seq'}, {'OBI:0003659'})), \
+            patch.object(FileFileSet, 'get_publication_igvf', return_value=None), \
+            patch.object(FileFileSet, 'parse_sample_donor_treatment_igvf', return_value=(set(), set(), {'CL:0000115'}, {'endothelial cells'}, set(), 'interference')):
+        props, _, _ = FileFileSet.query_fileset_files_props_igvf(file_object)
+    assert props['collections'] == [
+        'genomic_elements', 'genomic_elements_genes']
+    assert props['method'] == expected_method
+    assert props['class'] == 'observed data'
+    FileFileSet(accessions=[], label='igvf_file_fileset',
+                validate=True).validate_doc(props)
