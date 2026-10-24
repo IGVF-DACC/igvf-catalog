@@ -112,7 +112,7 @@ node	files_filesets.FileFileSet	cell_annotation	The cell annotation of the file 
 node	files_filesets.FileFileSet	cell_annotation_term	Base ontology term describing the cell type of a single-cell derived result.
 node	files_filesets.FileFileSet	genome_browser_link	Link to a file that can be rendered in a genome browser: the file set's bigInteract, bigBed, bigWig, or bedpe file where one exists, or the file itself for a pseudobulk set.
 node	files_filesets.FileFileSet	browser_index_file	Download link for the genome browser index file (.tbi).
-node	files_filesets.FileFileSet	crispr_modality	The purpose or intended effect of the CRISPR modification applied to the samples.
+node	files_filesets.FileFileSet	perturbation	The experimental perturbation applied to the samples.
 node	files_filesets.FileFileSet	version	Version of the external data source
 node	genes.GencodeGene	gene_id	Ensembl gene ID including its version suffix.
 node	genes.GencodeGene	gene_type	Biotype GENCODE assigns to the gene.
@@ -761,7 +761,7 @@ edge	genomic_elements_genes.CRISPRElementGeneENCODE	neg_log10_pvalue	Negative lo
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	significant	Boolean indicator of the significance of the element-gene interactions.
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	method	Name of the experimental class or prediction model that produced this result.
-edge	genomic_elements_genes.CRISPRElementGeneENCODE	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	genomic_elements_genes.CRISPRElementGeneENCODE	perturbation	The perturbation from the associated files_filesets record
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	label	Non-method specific human readable label for the node or edge
 edge	genomic_elements_genes.CRISPRElementGeneENCODE	source	The database, dataset or organization that is a source for these data.
@@ -778,7 +778,7 @@ edge	genomic_elements_genes.CRISPRElementGeneIGVF	label	Non-method specific huma
 edge	genomic_elements_genes.CRISPRElementGeneIGVF	name	Directional human readable label for the relationship, _from to _to.
 edge	genomic_elements_genes.CRISPRElementGeneIGVF	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
 edge	genomic_elements_genes.CRISPRElementGeneIGVF	method	Name of the experimental class or prediction model that produced this result.
-edge	genomic_elements_genes.CRISPRElementGeneIGVF	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	genomic_elements_genes.CRISPRElementGeneIGVF	perturbation	The perturbation from the associated files_filesets record
 edge	genomic_elements_genes.CRISPRElementGeneIGVF	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
 edge	genomic_elements_genes.CRISPRElementGeneIGVF	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
 edge	genomic_elements_genes.CRISPRElementGeneIGVF	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
@@ -868,13 +868,13 @@ edge	genomic_elements_mm_genomic_elements.HumanMouseElementAdapter	inverse_name	
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	z_score	Average phenotype z-score across guides targeting the genomic element
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	p_value	P-value for the element's association with the screened phenotype.
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
-edge	genomic_elements_phenotypes.CRISPRElementPhenotype	significant	Boolean indicator of the significance of the element's effect on the phenotype.
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	significant	Whether the p-value is below the adapter-defined threshold of 0.05.
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	num_guides	Number of guides targeting the pertubed element in the screen.
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	num_guides_hit	Number of guides that met hit thresholds
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	num_guides_nonhit	Number of guides that did not meet hit thresholds
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	fraction_guides_hit	Fraction of guides that met hit thresholds
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	method	Name of the experimental class or prediction model that produced this result.
-edge	genomic_elements_phenotypes.CRISPRElementPhenotype	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	genomic_elements_phenotypes.CRISPRElementPhenotype	perturbation	The perturbation from the associated files_filesets record
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	label	Non-method specific human readable label for the node or edge
 edge	genomic_elements_phenotypes.CRISPRElementPhenotype	source	The database, dataset or organization that is a source for these data.
@@ -1158,7 +1158,7 @@ edge	variants_genes.CRISPRVariantGene	source	The database, dataset or organizati
 edge	variants_genes.CRISPRVariantGene	source_url	The URL for the source.
 edge	variants_genes.CRISPRVariantGene	files_filesets	Reference to the File and Metadata
 edge	variants_genes.CRISPRVariantGene	method	Name of the experimental class or prediction model that produced this result.
-edge	variants_genes.CRISPRVariantGene	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	variants_genes.CRISPRVariantGene	perturbation	The perturbation from the associated files_filesets record
 edge	variants_genes.CRISPRVariantGene	biological_context	Plain-language summary of the sample the assay was run in, taken from the associated files_filesets record.
 edge	variants_genes.CRISPRVariantGene	biosample_term	Ontology term for the experimental sample, or the sample the prediction is valid for
 edge	variants_genes.CRISPRVariantGene	treatments_term_ids	Ontology term identifiers for the treatments applied to the samples for the purpose of perturbation.
@@ -1224,7 +1224,7 @@ edge	variants_phenotypes.CRISPRVariantPhenotype	edit_rate_mean	Mean effective pr
 edge	variants_phenotypes.CRISPRVariantPhenotype	effect_size_ci95_lower	Lower bound of the 95% confidence interval for effect size.
 edge	variants_phenotypes.CRISPRVariantPhenotype	effect_size_ci95_upper	Upper bound of the 95% confidence interval for effect size.
 edge	variants_phenotypes.CRISPRVariantPhenotype	method	Name of the experimental class or prediction model that produced this result.
-edge	variants_phenotypes.CRISPRVariantPhenotype	crispr_modality	The CRISPR modality from the associated files_filesets record
+edge	variants_phenotypes.CRISPRVariantPhenotype	perturbation	The perturbation from the associated files_filesets record
 edge	variants_phenotypes.CRISPRVariantPhenotype	class	The class of the data this record belongs to: 'observed data' for a direct experimental measurement, 'prediction' for the output of a computational model, and 'biological relationship' for a curated relationship.
 edge	variants_phenotypes.CRISPRVariantPhenotype	label	Non-method specific human readable label for the node or edge
 edge	variants_phenotypes.CRISPRVariantPhenotype	source	The database, dataset or organization that is a source for these data.
@@ -1405,3 +1405,4 @@ edge	variants_variants.TopLD	name	Directional human readable label for the relat
 edge	variants_variants.TopLD	inverse_name	Reversed directional human readable label for the relationship, _to to _from.
 edge	variants_variants.TopLD	source	The database, dataset or organization that is a source for these data.
 edge	variants_variants.TopLD	source_url	The URL for the source.
+edge	genes_transcripts_genes.MORFGeneTranscriptGene	perturbation	The experimental perturbation applied to the samples.

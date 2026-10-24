@@ -9,7 +9,7 @@ const callProcedure = async (procedure: any, input: Record<string, unknown>): Pr
 
 describe('variantsGenesRouters', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   describe('qtlSummaryEndpoint', () => {
@@ -64,7 +64,7 @@ describe('variantsGenesRouters', () => {
         z_score: null,
         credible_set_min_r2: null,
         method: 'CRISPR screen',
-        crispr_modality: null,
+        perturbation: null,
         source: 'IGVF',
         source_url: 'https://data.igvf.org/tabular-files/IGVFFI0524YUIL/',
         label: 'variant effect on gene expression',
@@ -104,7 +104,7 @@ describe('variantsGenesRouters', () => {
         z_score: null,
         credible_set_min_r2: null,
         method: 'CRISPR screen',
-        crispr_modality: null,
+        perturbation: null,
         source: 'IGVF',
         source_url: 'https://data.igvf.org/tabular-files/IGVFFI0524YUIL/',
         label: 'variant effect on gene expression',
@@ -156,7 +156,7 @@ describe('variantsGenesRouters', () => {
         z_score: null,
         credible_set_min_r2: null,
         method: 'CRISPR screen',
-        crispr_modality: null,
+        perturbation: null,
         source: 'IGVF',
         source_url: 'https://data.igvf.org/tabular-files/IGVFFI0524YUIL/',
         label: 'variant effect on gene expression',
@@ -218,7 +218,7 @@ describe('variantsGenesRouters', () => {
 
 describe('variantsGenesRouters.genesVariantsScoreSummary', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   it('returns grouped min/max summaries for a known gene, restricted to CRISPR screen edges', async () => {
@@ -284,7 +284,7 @@ describe('variantsGenesRouters.genesVariantsScoreSummary', () => {
     })
   })
 
-  it('maps perturbation to the stored crispr_modality field and filters biological_context exactly', async () => {
+  it('maps perturbation to the stored perturbation field and filters biological_context exactly', async () => {
     const query = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)
@@ -292,14 +292,14 @@ describe('variantsGenesRouters.genesVariantsScoreSummary', () => {
     const input = {
       gene_id: 'ENSG00000108179',
       score_field: 'effect_size',
-      perturbation: 'base editing',
+      perturbation: 'CRISPR base editing',
       biological_context: 'human THP-1 cell line'
     }
     await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
 
     const [aql, bindVars] = query.mock.calls[1]
     const aqlText = String(aql)
-    expect(aqlText).toContain("record.crispr_modality == 'base editing'")
+    expect(aqlText).toContain("record.perturbation == 'CRISPR base editing'")
     expect(aqlText).toContain('record.biological_context == @biologicalContext')
     expect(bindVars).toMatchObject({ biologicalContext: 'human THP-1 cell line' })
   })
@@ -313,7 +313,7 @@ describe('variantsGenesRouters.genesVariantsScoreSummary', () => {
     await callProcedure(variantsGenesRouters.genesVariantsScoreSummary, input)
     expect(query.mock.calls[1][1]).toMatchObject({ page: 0, limit: 25 })
 
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     const query2 = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['genes/ENSG00000108179']) } as any)
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ total_edge_count: 0, groups: [] }]) } as any)

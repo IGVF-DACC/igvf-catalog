@@ -198,7 +198,7 @@ export const descriptions = {
     'QTL records sharing the variants_genes collection (AFGR eQTL/spliceQTL, EBI eQTL Catalog) ' +
     'are excluded.<br> \
     Optional filters are \
-    combined with and matched exactly. Perturbation filters the stored crispr_modality field.<br> \
+    combined with and matched exactly. Perturbation filters the stored perturbation field.<br> \
     Results are grouped by every distinct combination of those fields, so measurements from \
     incompatible sources are never pooled. \
     Groups with no numeric scores are omitted, and total_edge_count only counts edges with a \
@@ -214,7 +214,7 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000108179',
               'score_field = effect_size',
-              'perturbation = prime editing'
+              'perturbation = CRISPR prime editing'
             ]
           }
         ]
@@ -228,7 +228,7 @@ export const descriptions = {
             items: [
               'gene_id = ENSG00000177455',
               'score_field = effect_size',
-              'perturbation = base editing'
+              'perturbation = CRISPR base editing'
             ]
           }
         ]
@@ -1993,7 +1993,8 @@ export const descriptions = {
     'Retrieve regulatory or response genes for a given regulatory gene. The network is modeled as: (regulators) -> (responses).<br> \
     Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
-    crispr_modality accepts knockout, interference, or activation.<br> \
+    perturbation accepts CRISPR interference, CRISPR activation, CRISPR knockout, CRISPR cutting, CRISPR base editing, CRISPR prime editing, or ORF overexpression.<br> \
+    MORF screen results return regulator_gene and the specific transcript from genes_transcripts; genomic_element is null. Set verbose = true to expand transcript into an object including its name; otherwise transcript is an ID.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -2007,7 +2008,7 @@ export const descriptions = {
               'regulator_gene_id = ENSG00000143190',
               'p_value = gte:0.9',
               'method = CRISPR screen',
-              'crispr_modality = interference',
+              'perturbation = CRISPR interference',
               'files_fileset = IGVFFI1336XWXJ'
             ]
           },
@@ -2039,6 +2040,29 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'morf-screen',
+        label: 'MORF screen',
+        examples: [
+          {
+            label: 'AATF overexpression effect on TOX',
+            items: [
+              'regulator_gene_id = ENSG00000275700',
+              'response_gene_id = ENSG00000198846',
+              'method = MORF screen',
+              'perturbation = ORF overexpression',
+              'files_fileset = IGVFFI6734IWRB'
+            ]
+          },
+          {
+            label: 'All MORF effects on TOX',
+            items: [
+              'response_gene_name = TOX',
+              'method = MORF screen'
+            ]
+          }
+        ]
       }
     ]),
 
@@ -2046,7 +2070,7 @@ export const descriptions = {
     'Observed min/max and counts for a score field across every genomic-element-to-gene edge for ' +
     'one gene - without paginating through the edges themselves.<br> \
     Optional filters are combined with and matched exactly.<br> \
-    Results are grouped by every distinct combination of those fields plus crispr_modality, so \
+    Results are grouped by every distinct combination of those fields plus perturbation, so \
     measurements from incompatible sources are never pooled. Groups with no numeric scores are omitted, and total_edge_count \
     only counts edges with a numeric score.<br> \
     Default page size is 25, maximum 500; pagination is \

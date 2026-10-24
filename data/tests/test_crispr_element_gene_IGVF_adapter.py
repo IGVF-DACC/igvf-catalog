@@ -2,6 +2,7 @@ import json
 import gzip
 import logging
 import math
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -18,7 +19,7 @@ def mock_file_fileset_perturb_seq():
         mock_get_file_fileset.return_value = {
             'method': 'Perturb-seq',
             'class': 'observed data',
-            'crispr_modality': 'interference',
+            'perturbation': 'CRISPR interference',
             'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
             'samples': ['ontology_terms/CL_0000909'],
             'treatments_term_ids': None
@@ -33,7 +34,7 @@ def mock_file_fileset_facs_screen():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'activation',
+            'perturbation': 'CRISPR activation',
             'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
             'samples': ['ontology_terms/CL_0000909'],
             'treatments_term_ids': None
@@ -87,7 +88,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_genomic_elements_genes(moc
         assert first_item['significant'] is True
         assert first_item['neg_log10_pvalue'] == CRISPRElementGeneIGVF.MAX_LOG10_PVALUE
         assert first_item['method'] == 'Perturb-seq'
-        assert first_item['crispr_modality'] == 'interference'
+        assert first_item['perturbation'] == 'CRISPR interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None
@@ -462,7 +463,7 @@ def test_crispr_element_gene_igvf_adapter_facs_screen_genomic_elements_genes(moc
             -math.log10(0.9994257067617868))
         assert first_item['log2FC'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR screen'
-        assert first_item['crispr_modality'] == 'activation'
+        assert first_item['perturbation'] == 'CRISPR activation'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None
@@ -1477,19 +1478,19 @@ def test_igvf_e2g_ccr_perturb_seq_drops_failing_qc_and_labels_mixed_types(
 
 def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
         mock_file_fileset_perturb_seq, tmp_path):
-    """IGVFFI2104BKIF: promoter TF Perturb-seq; effect_score is z_score, not log2FC."""
+    """IGVFFI7203AWIC: promoter TF Perturb-seq; effect_score and log2_fold_change remain distinct."""
     writer = SpyWriter()
-    test_file = tmp_path / 'IGVFFI2104BKIF_crispr_element_gene_igvf_hs27_tf_perturb_seq.tsv.gz'
+    test_file = tmp_path / 'IGVFFI7203AWIC_crispr_element_gene_igvf_hs27_tf_perturb_seq.tsv.gz'
     header = (
         'effect_score\tp_val\tp_val_adj\tguide_id\ttarget_gene\t'
         'intended_target_name\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\n'
+        'intended_target_start\tintended_target_end\tlog2_fold_change\n'
     )
     rows = (
         '1.85\t1.2e-8\t3.4e-6\tFOXL1-3\tENSG00000139618\t'
-        'ENSG00000176678\tchr16\t86611420\t86612920\n'
+        'ENSG00000176678\tchr16\t86611420\t86612920\t-0.75\n'
         '0.12\t0.41\t0.88\tFOXL1-3\tENSG00000157764\t'
-        'ENSG00000176678\tchr16\t86611420\t86612920\n'
+        'ENSG00000176678\tchr16\t86611420\t86612920\t-0.75\n'
     )
     with gzip.open(test_file, 'wt') as out:
         out.write(header)
@@ -1515,7 +1516,7 @@ def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
     assert hit['p_value'] == pytest.approx(1.2e-8)
     assert hit['p_value_adj'] == pytest.approx(3.4e-6)
     assert hit['significant'] is True
-    assert 'log2FC' not in hit
+    assert hit['log2FC'] == pytest.approx(-0.75)
 
     assert miss['z_score'] == pytest.approx(0.12)
     assert miss['significant'] is False
@@ -1541,79 +1542,6 @@ def test_igvf_e2g_hs27_tf_perturb_seq_maps_z_score_and_promoter(
     assert element['end'] == 86612920
     assert element['source_annotation'] == 'promoter'
     assert element['promoter_of'] == 'genes/ENSG00000176678'
-
-
-def test_igvf_e2g_2104_configured_skip_row_omits_invalid_promoter_gene(
-        mock_file_fileset_perturb_seq, tmp_path):
-    """IGVFFI2104BKIF: ENSG00000292149 is listed in skip_rows."""
-    writer = SpyWriter()
-    test_file = tmp_path / 'IGVFFI2104BKIF_crispr_element_gene_igvf_2104_skip.tsv.gz'
-    header = (
-        'effect_score\tp_val\tp_val_adj\tguide_id\ttarget_gene\t'
-        'intended_target_name\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\n'
-    )
-    rows = (
-        '1.85\t1.2e-8\t3.4e-6\tFOXL1-3\tENSG00000139618\t'
-        'ENSG00000176678\tchr16\t86611420\t86612920\n'
-        '0.12\t0.41\t0.88\tFOXL1-3\tENSG00000157764\t'
-        'ENSG00000292149\tchr1\t1000\t2000\n'
-    )
-    with gzip.open(test_file, 'wt') as out:
-        out.write(header)
-        out.write(rows)
-
-    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
-        MockGeneValidator.return_value.validate.side_effect = (
-            lambda gene_id: gene_id != 'ENSG00000292149'
-        )
-        adapter = CRISPRElementGeneIGVF(
-            filepath=str(test_file),
-            label='genomic_element_gene',
-            writer=writer,
-            validate=True)
-        adapter.process_file()
-
-    parsed = [json.loads(line) for line in writer.contents if line.strip()]
-    assert len(parsed) == 1
-    assert parsed[0]['_to'] == 'genes/ENSG00000139618'
-
-
-def test_igvf_e2g_0192_configured_skip_row_omits_missing_target_gene(
-        mock_file_fileset_perturb_seq, tmp_path):
-    """IGVFFI0192YMEY: empty target_gene rows are listed in skip_rows."""
-    writer = SpyWriter()
-    test_file = tmp_path / 'IGVFFI0192YMEY_crispr_element_gene_igvf_0192_skip.tsv.gz'
-    header = (
-        'effect_score\tp_val\tp_val_adj\tguide_id\ttarget_gene\t'
-        'intended_target_name\tintended_target_chr\t'
-        'intended_target_start\tintended_target_end\n'
-    )
-    rows = (
-        '1.85\t1.2e-8\t3.4e-6\tACTL6A_GCCCACCTCAGGCAACAAAG\t'
-        'ENSG00000139618\tENSG00000136518\tchr3\t179561926\t179562936\n'
-        '0.0433734312333153\t0.00015981522644701901\t0.012181054665708319\t'
-        'ACTL6A_GCCCACCTCAGGCAACAAAG\t\tENSG00000136518\t'
-        'chr3\t179561926\t179562936\n'
-    )
-    with gzip.open(test_file, 'wt') as out:
-        out.write(header)
-        out.write(rows)
-
-    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
-        MockGeneValidator.return_value.validate.side_effect = (
-            lambda x: x.startswith('ENSG')
-        )
-        adapter = CRISPRElementGeneIGVF(
-            filepath=str(test_file),
-            label='genomic_element_gene',
-            writer=writer,
-            validate=True)
-        adapter.process_file()
-
-    parsed = [json.loads(line) for line in writer.contents if line.strip()]
-    assert len(parsed) == 1
-    assert parsed[0]['_to'] == 'genes/ENSG00000139618'
 
 
 @pytest.mark.parametrize('label,collection', [
@@ -1692,3 +1620,217 @@ def test_flowfish_promoter_override_retains_nodes_and_edges(
     assert edge['log2FC'] == -1.768807043
     assert edge['p_value'] == 1.64e-17
     assert edge['p_value_adj'] == 1.72e-16
+
+
+@pytest.mark.parametrize('accession,log2fc,z_score', [
+    ('IGVFFI6853MYBE', -0.8168859481811523, -0.1270749744073581),
+    ('IGVFFI7203AWIC', -0.10302283993428271, 0.19537870585918427),
+])
+def test_norman_replacements_preserve_log2fc_and_nonsignificant_pairs(
+        accession, log2fc, z_score, mock_file_fileset_perturb_seq, tmp_path):
+    from pathlib import Path
+    source = Path(f'samples/crispr_{accession}.example.tsv').read_text()
+    path = tmp_path / f'{accession}.tsv.gz'
+    with gzip.open(path, 'wt') as output:
+        output.write(source)
+    writer = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as validator:
+        validator.return_value.validate.return_value = True
+        adapter = CRISPRElementGeneIGVF(
+            filepath=str(path), label='genomic_element_gene',
+            writer=writer, validate=True)
+        adapter.process_file()
+    records = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(records) == 3
+    assert records[0]['log2FC'] == pytest.approx(log2fc)
+    assert records[0]['z_score'] == pytest.approx(z_score)
+    assert records[0]['significant'] is False
+    assert records[0]['files_filesets'] == f'files_filesets/{accession}'
+
+
+@pytest.mark.parametrize('accession,count', [('IGVFFI9001HIYI', 5), ('IGVFFI3975KRIX', 5)])
+@pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_gene'])
+@pytest.mark.parametrize('provide_reference_url', [True, False])
+def test_cdh5_macs_screens(accession, count, label, provide_reference_url, mock_file_fileset_facs_screen, tmp_path):
+    from pathlib import Path
+    path = tmp_path / f'{accession}.tsv.gz'
+    with gzip.open(path, 'wt') as output:
+        output.write(
+            Path(f'samples/crispr_{accession}.example.tsv').read_text())
+    writer = SpyWriter()
+    with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as validator:
+        validator.return_value.validate.return_value = True
+        CRISPRElementGeneIGVF(
+            filepath=str(path), label=label,
+            **({'reference_filepath': 'samples/crispr_IGVFFI9629WVUU.example.tsv',
+                'reference_source_url': 'https://data.igvf.org/tabular-files/IGVFFI9629WVUU/' if provide_reference_url else None}
+               if accession == 'IGVFFI9001HIYI' else {}),
+            writer=writer, validate=True).process_file()
+    records = [json.loads(line) for line in writer.contents if line.strip()]
+    assert len(records) == count
+    assert len({r['_key'] for r in records}) == count
+    element_accession = 'IGVFFI9629WVUU' if accession == 'IGVFFI9001HIYI' else accession
+    if label == 'genomic_element_gene':
+        assert all(r['_from'].endswith('_' + element_accession)
+                   for r in records)
+        assert all(r['_key'].endswith('_' + accession) for r in records)
+        assert all(r['files_filesets'] ==
+                   f'files_filesets/{accession}' for r in records)
+        assert all(r['source_url'].rstrip('/').endswith('/' + accession)
+                   for r in records)
+        assert all(r['_to'] == 'genes/ENSG00000179776' for r in records)
+        assert records[0]['negative_selection_significant'] is True
+        assert records[0]['negative_selection_log2FC'] < 0
+        assert records[0]['negative_selection_p_value_adj'] == pytest.approx(
+            0.000068 if accession == 'IGVFFI9001HIYI' else 0.000114)
+        if accession == 'IGVFFI3975KRIX':
+            notch = [r for r in records if 'NOTCH1' in r['_key']]
+            assert len(notch) == 2
+            assert notch[0]['negative_selection_log2FC'] == notch[1]['negative_selection_log2FC']
+            assert all(r['num_guides'] == 6 for r in notch)
+    else:
+        assert all(r['_key'].endswith('_' + element_accession)
+                   for r in records)
+        assert all(r['files_filesets'] ==
+                   f'files_filesets/{element_accession}' for r in records)
+        assert all(r['source_url'].rstrip(
+            '/').endswith('/' + element_accession) for r in records)
+        assert all(r['source_annotation'] == 'promoter' for r in records)
+        assert all(r['promoter_of'].startswith('genes/ENSG') for r in records)
+
+
+def _normalize_macs_screens_test_rows(header, rows, config, reference_filepath, logger):
+    adapter = CRISPRElementGeneIGVF.__new__(CRISPRElementGeneIGVF)
+    adapter.file_config = config
+    adapter.reference_filepath = reference_filepath
+    adapter.logger = logger
+    return adapter._normalize_macs_screens_rows(header, rows)
+
+
+MACS_SCREENS_HEADER = ['id', 'num', 'neg|lfc', 'neg|p-value', 'neg|fdr',
+                       'pos|lfc', 'pos|p-value', 'pos|fdr', 'ensembl_gene_id',
+                       'element_chr', 'element_start', 'element_end', 'element_guide_count']
+MACS_SCREENS_ROW = ['TEST', '12', '-0.2', '0.4', '0.8', '0.3', '0.002', '0.01',
+                    'ENSG00000179776', 'chr16', '100', '200', '6']
+MACS_SCREENS_LOGGER = logging.getLogger(__name__)
+
+
+def test_preserves_both_selection_results():
+    header, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [MACS_SCREENS_ROW], {}, None, MACS_SCREENS_LOGGER)
+    normalized_row = next(rows)
+    assert header == MACS_SCREENS_HEADER
+    assert normalized_row == MACS_SCREENS_ROW
+    record = _macs_screens_test_metrics(header, normalized_row)
+    assert float(record['negative_selection_log2FC']) == -0.2
+    assert record['positive_selection_log2FC'] == 0.3
+    assert record['positive_selection_p_value'] == 0.002
+    assert record['positive_selection_p_value_adj'] == 0.01
+    assert record['positive_selection_significant'] is True
+    assert record['negative_selection_significant'] is False
+    assert 'log2FC' not in record
+    assert 'significant' not in record
+    assert float(record['negative_selection_p_value']) == 0.4
+    assert float(record['negative_selection_p_value_adj']) == 0.8
+    # element-specific, not native test's 12
+    assert int(record['num_guides']) == 6
+
+
+def test_equal_fdr_preserves_both_directions():
+    row = MACS_SCREENS_ROW.copy()
+    row[4] = row[7]
+    header, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [row], {}, None, MACS_SCREENS_LOGGER)
+    record = _macs_screens_test_metrics(header, next(rows))
+    assert float(record['negative_selection_log2FC']) == -0.2
+    assert float(record['negative_selection_p_value']) == 0.4
+
+
+@pytest.mark.parametrize('field,value', [('neg|fdr', '1.5'), ('pos|lfc', 'nan'), ('pos|p-value', '-0.1')])
+def test_rejects_invalid_statistics(field, value):
+    row = MACS_SCREENS_ROW.copy()
+    row[MACS_SCREENS_HEADER.index(field)] = value
+    _, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [row], {}, None, MACS_SCREENS_LOGGER)
+    with pytest.raises(ValueError, match='Invalid MACS screen statistics'):
+        list(rows)
+
+
+def test_rejects_duplicate_native_ids():
+    _, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [MACS_SCREENS_ROW, MACS_SCREENS_ROW], {}, None, MACS_SCREENS_LOGGER)
+    with pytest.raises(ValueError, match='duplicate MACS screen element ID'):
+        list(rows)
+
+
+def test_requires_reference_for_genome_wide_screen():
+    with pytest.raises(ValueError, match='requires reference_filepath'):
+        _normalize_macs_screens_test_rows(MACS_SCREENS_HEADER, [], {
+            'layout': 'macs_genome_wide'}, None, MACS_SCREENS_LOGGER)
+
+
+def test_unknown_native_ids_require_explicit_curation():
+    _, rows = _normalize_macs_screens_test_rows(
+        MACS_SCREENS_HEADER, [MACS_SCREENS_ROW], {
+            'layout': 'macs_genome_wide'},
+        'samples/crispr_IGVFFI9629WVUU.example.tsv', MACS_SCREENS_LOGGER)
+    with pytest.raises(ValueError, match='No guide reference'):
+        list(rows)
+
+
+def test_conflicting_guide_annotations_are_rejected(tmp_path):
+    reference = tmp_path / 'guides.tsv'
+    lines = Path(
+        'samples/crispr_IGVFFI9629WVUU.example.tsv').read_text().splitlines()
+    fields = lines[1].split('\t')
+    fields[lines[0].split('\t').index('intended_target_start')] = '12345'
+    reference.write_text(
+        '\n'.join([lines[0], lines[1], '\t'.join(fields)]) + '\n')
+    with pytest.raises(ValueError, match='Conflicting guide annotations'):
+        _normalize_macs_screens_test_rows(MACS_SCREENS_HEADER, [], {
+            'layout': 'macs_genome_wide'}, reference, MACS_SCREENS_LOGGER)
+
+
+def _macs_screens_test_metrics(header, row, layout='macs_validation'):
+    adapter = CRISPRElementGeneIGVF.__new__(CRISPRElementGeneIGVF)
+    adapter.layout = CRISPR_E2G_LAYOUTS[layout]
+    colmap = adapter._columns_from_layout(
+        {name: idx for idx, name in enumerate(header)})
+    metrics = adapter._metrics_from_row(row, colmap)
+    return adapter._apply_adapter_calculated_fields(row, colmap, metrics)
+
+
+def test_macs_metric_mappings_reference_actual_source_columns():
+    for layout, accession in [('macs_validation', 'IGVFFI3975KRIX'),
+                              ('macs_genome_wide', 'IGVFFI9001HIYI')]:
+        header = Path(
+            f'samples/crispr_{accession}.example.tsv').read_text().splitlines()[0].split('\t')
+        for sources in CRISPR_E2G_LAYOUTS[layout]['semantic_columns']['metrics'].values():
+            sources = [sources] if isinstance(sources, str) else sources
+            assert set(sources) <= set(header)
+
+
+def test_genome_wide_guide_count_uses_native_num():
+    metrics = _macs_screens_test_metrics(
+        MACS_SCREENS_HEADER, MACS_SCREENS_ROW, 'macs_genome_wide')
+    assert metrics['num_guides'] == 12
+
+
+@pytest.mark.parametrize('negative_lfc,positive_lfc,expected_negative,expected_positive', [
+    ('-1', '1', True, True), ('1', '-1', False, False), ('0', '0', False, False),
+])
+def test_directional_significance_requires_matching_sign(negative_lfc, positive_lfc, expected_negative, expected_positive):
+    row = MACS_SCREENS_ROW.copy()
+    row[2], row[5] = negative_lfc, positive_lfc
+    row[4] = row[7] = '0.01'
+    metrics = _macs_screens_test_metrics(MACS_SCREENS_HEADER, row)
+    assert metrics['negative_selection_significant'] is expected_negative
+    assert metrics['positive_selection_significant'] is expected_positive
+
+
+def test_directional_significance_threshold_is_strict():
+    row = MACS_SCREENS_ROW.copy()
+    row[4] = row[7] = '0.05'
+    metrics = _macs_screens_test_metrics(MACS_SCREENS_HEADER, row)
+    assert metrics['negative_selection_significant'] is False
+    assert metrics['positive_selection_significant'] is False

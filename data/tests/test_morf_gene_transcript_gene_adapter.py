@@ -17,7 +17,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'MORF screen',
             'class': 'observed data',
-            'crispr_modality': None,
+            'perturbation': None,
             'simple_sample_summaries': ['CD8-positive, alpha-beta T cell'],
             'samples': ['ontology_terms/CL_0000625'],
             'treatments_term_ids': None,
@@ -77,6 +77,7 @@ def test_morf_gene_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_
         -math.log10(0.260422575712608))
     assert aatf['significant'] is False
     assert aatf['method'] == 'MORF screen'
+    assert aatf['perturbation'] == 'ORF overexpression'
     assert aatf['label'] == 'gene overexpression effect on gene expression'
     assert aatf['name'] == 'modulates expression of'
     assert aatf['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/'

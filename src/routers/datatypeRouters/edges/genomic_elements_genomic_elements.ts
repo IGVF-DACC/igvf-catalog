@@ -23,7 +23,7 @@ const inputFormat = z.object({
   biological_context: textFilter,
   method: z.enum(getCollectionEnumValuesOrThrow('edges', collection, 'method')).optional(),
   source: z.enum(getCollectionEnumValuesOrThrow('edges', collection, 'source')).optional(),
-  crispr_modality: z.enum(getCollectionEnumValuesOrThrow('edges', collection, 'crispr_modality')).optional(),
+  perturbation: z.enum(getCollectionEnumValuesOrThrow('edges', collection, 'perturbation')).optional(),
   significant: z.enum(['true', 'false']).optional(),
   log2FC: textFilter,
   p_value: textFilter,
@@ -58,7 +58,7 @@ const outputFormat = z.array(z.object({
   biological_context: z.string().nullish(),
   biosample_term: z.string().nullish(),
   treatments_term_ids: z.array(z.string()).nullish(),
-  crispr_modality: z.string().nullish(),
+  perturbation: z.string().nullish(),
   log2FC: z.number().nullish(),
   p_value: z.number().nullish(),
   p_value_adj: z.number().nullish(),
@@ -88,7 +88,7 @@ const genomicElementsFromGenomicElements = publicProcedure
       biological_context: input.biological_context,
       method: input.method,
       source: input.source,
-      crispr_modality: input.crispr_modality,
+      perturbation: input.perturbation,
       significant: input.significant === undefined ? undefined : input.significant === 'true'
     }
     for (const [field, value] of Object.entries(equalityFilters)) {

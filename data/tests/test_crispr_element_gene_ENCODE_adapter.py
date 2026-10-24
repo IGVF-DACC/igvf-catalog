@@ -13,7 +13,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'interference',
+            'perturbation': 'CRISPR interference',
             'simple_sample_summaries': ['K562'],
             'samples': ['ontology_terms/EFO_0002067']
         }
@@ -74,7 +74,7 @@ def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset, mock_g
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
     assert first_item['label'] == 'regulatory element effect on gene expression'
     assert first_item['method'] == 'CRISPR screen'
-    assert first_item['crispr_modality'] == 'interference'
+    assert first_item['perturbation'] == 'CRISPR interference'
     assert first_item['class'] == 'observed data'
 
 

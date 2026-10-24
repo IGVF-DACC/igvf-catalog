@@ -132,7 +132,7 @@ class CRISPRElementElement(BaseAdapter):
                             'inverse_name': 'accessibility modulated by',
                             'class': self.file_fileset['class'],
                             'method': self.file_fileset['method'],
-                            'crispr_modality': self.file_fileset.get('crispr_modality'),
+                            'perturbation': self.file_fileset.get('perturbation'),
                             'biological_context': self.file_fileset['simple_sample_summaries'][0],
                             'biosample_term': self.file_fileset['samples'][0],
                             'treatments_term_ids': self.file_fileset['treatments_term_ids'],
