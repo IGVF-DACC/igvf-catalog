@@ -3,6 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
+import { transcriptFormat } from '../nodes/transcripts'
 import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -79,7 +80,7 @@ const gnrGeneQueryFormat = z.object({
   files_fileset: z.string().optional(),
   significant: z.enum(['true']).optional(),
   perturbation: z.enum(getCollectionEnumValuesOrThrow('nodes', 'files_filesets', 'perturbation')).optional()
-}).merge(commonEdgeParamsFormat).omit({ verbose: true })
+}).merge(commonEdgeParamsFormat)
 
 const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
   source: true
@@ -218,7 +219,7 @@ export const grnOutputFormat = z.object({
     regulator_gene: z.string()
   }).nullish(),
   regulator_gene: z.string().optional(),
-  transcript: z.string().optional(),
+  transcript: z.string().or(transcriptFormat.partial()).nullish(),
   perturbation: z.string().nullish(),
   class: z.string(),
   method: z.string(),
@@ -867,7 +868,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           response_gene: response_gene.name,
           regulator_gene: regulator_gene.name,
           genomic_element: null,
-          transcript: relationship._to,
+          transcript: ${input.verbose === 'true' ? `FIRST(FOR transcript IN [DOCUMENT(relationship._to)] FILTER transcript != null RETURN {${getDBReturnStatements(getSchema('data/schemas/nodes/transcripts.Gencode.json')).replaceAll('record', 'transcript')}})` : 'relationship._to'},
           perturbation: record.perturbation,
           class: record.class,
           method: record.method,

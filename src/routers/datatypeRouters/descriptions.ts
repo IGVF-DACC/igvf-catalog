@@ -1994,7 +1994,7 @@ export const descriptions = {
     Set organism = Mus musculus for mouse data; the default is Homo sapiens.<br> \
     files_fileset filters results to a single files_fileset accession (e.g. files_fileset = IGVFFI3069QCRA). significant only accepts true (omit the parameter to not filter on it).<br> \
     perturbation accepts CRISPR interference, CRISPR activation, CRISPR knockout, CRISPR cutting, CRISPR base editing, CRISPR prime editing, or ORF overexpression.<br> \
-    MORF screen results return regulator_gene and the specific transcript from genes_transcripts; genomic_element is null.<br> \
+    MORF screen results return regulator_gene and the specific transcript from genes_transcripts; genomic_element is null. Set verbose = true to expand transcript into an object including its name; otherwise transcript is an ID.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([

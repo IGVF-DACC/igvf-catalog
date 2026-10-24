@@ -541,12 +541,12 @@ describe('MORF gene regulatory network', () => {
     expect(aql.indexOf('LIMIT 10, 10')).toBeGreaterThan(aql.indexOf('UNION(crispr, morf)'))
   })
 
-  it('preserves each MORF transcript and nullable efficiency in the response', async () => {
+  it.each(['false', 'true'])('preserves MORF transcripts and nullable efficiency with verbose=%s', async (verbose) => {
     const records = ['ENST00000450518', 'ENST00000392662'].map(transcript => ({
       response_gene: 'TOX',
       regulator_gene: 'ACTL6A',
       genomic_element: null,
-      transcript: `transcripts/${transcript}`,
+      transcript: verbose === 'true' ? { _id: `transcripts/${transcript}`, name: 'ACTL6A-201' } : `transcripts/${transcript}`,
       perturbation: 'ORF overexpression',
       method: 'MORF screen',
       class: 'observed data',
@@ -563,8 +563,15 @@ describe('MORF gene regulatory network', () => {
       perturbation_efficiency_significant: null
     }))
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(records) } as any)
-    const input = { response_gene_name: 'TOX' }
+    const input = { response_gene_name: 'TOX', verbose }
     expect(await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })).toEqual(records)
+    const aql = String((dbModule.db.query as jest.Mock).mock.calls[0][0])
+    if (verbose === 'true') {
+      expect(aql).toContain('DOCUMENT(relationship._to)')
+      expect(aql).toContain("transcript['name']")
+    } else {
+      expect(aql).not.toContain('DOCUMENT(relationship._to)')
+    }
   })
 
   it('does not join human MORF data for mouse requests', async () => {
