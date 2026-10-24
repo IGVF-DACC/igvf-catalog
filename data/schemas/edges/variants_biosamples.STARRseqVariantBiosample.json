@@ -72,12 +72,12 @@
         "CI_lower_95": {
           "title": "95% Confidence Interval Lower Bound",
           "type": "number",
-          "description": "Lower bound of a 95% interval for the variant effect."
+          "description": "Log2 lower bound of a 95% interval for the variant effect."
         },
         "CI_upper_95": {
           "title": "95% Confidence Interval Upper Bound",
           "type": "number",
-          "description": "Upper bound of a 95% interval for the variant effect."
+          "description": "Log2 upper bound of a 95% interval for the variant effect."
         },
         "label": {
           "enum": [
