@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/gene_programs.GenePrograms.json",
+  "allOf": [
+    { "$ref": "node.base.json" },
+    {
+      "properties": {
+        "files_filesets": { "$ref": "../mixins.json#/files_filesets" },
+        "class": { "$ref": "../mixins.json#/class", "enum": ["observed data"] },
+        "method": { "$ref": "../mixins.json#/method", "type": ["string", "null"] },
+        "label": { "$ref": "../mixins.json#/label", "type": ["string", "null"] }
+      }
+    },
+    {
+      "properties": {
+        "_key": {
+          "description": "Defining gene-program file accession followed by the file-local program ID. Shared programs retain this identity across conditions.",
+          "pattern": "^IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
+          "example": "IGVFFI9532OEFJ_GP_1"
+        },
+        "name": { "example": "GP_1" },
+        "program_id": {
+          "title": "Program ID",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "description": "Program identifier in the defining input file; not globally unique.",
+          "example": "GP_1"
+        },
+        "reported_gene_count": {
+          "title": "Reported Gene Count",
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of distinct genes listed for this program in the input. A top-gene export may omit other genes from the underlying model.",
+          "example": 300
+        },
+        "source": { "enum": ["IGVF"] },
+        "source_url": {
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/IGVFFI[0-9]{4}[A-Z]{4}/$",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9532OEFJ/"
+        }
+      },
+      "required": ["program_id", "reported_gene_count", "files_filesets", "class", "method", "label"]
+    }
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, program_id, reported_gene_count, files_filesets, class, method, label, source, source_url"
+  },
+  "db_collection_name": "gene_programs"
+}

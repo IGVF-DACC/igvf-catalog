@@ -85,6 +85,34 @@ igvf_file_accessions:
     - IGVFFI9001HIYI
     - IGVFFI9629WVUU # Guide reference for IGVFFI9001HIYI
     - IGVFFI3975KRIX
+  Gene programs:
+    - IGVFFI9532OEFJ # HCASMC-hTERT; gene programs
+    - IGVFFI7611VVSS # HCASMC-hTERT; gene program regulators
+    - IGVFFI9407YNQA # HCASMC-hTERT; program-program correlation
+    - IGVFFI5227NZPM # HCASMC-hTERT; regulator-regulator correlation
+    - IGVFFI0156PMEA # TeloHAEC GW: shared programs for resting, oxLDL, and IL-1beta; gene programs
+    - IGVFFI7887NYRJ # TeloHAEC GW: resting; gene program regulators
+    - IGVFFI3821MANP # TeloHAEC GW: resting; regulator-regulator correlation
+    - IGVFFI9545WAUX # TeloHAEC GW: resting; program-program correlation
+    - IGVFFI2627GHHU # TeloHAEC GW: IL-1beta; gene program regulators
+    - IGVFFI5706ASJE # TeloHAEC GW: IL-1beta; program-program correlation
+    - IGVFFI6502THLB # TeloHAEC GW: IL-1beta; regulator-regulator correlation
+    - IGVFFI2454MTFS # TeloHAEC GW: oxLDL; gene program regulators
+    - IGVFFI5778ELFM # TeloHAEC GW: oxLDL; program-program correlation
+    - IGVFFI9392SDHV # TeloHAEC GW: oxLDL; regulator-regulator correlation
+    - IGVFFI6391GCJR # iPSC to EC: shared programs for D0, D1, D2, and D3; gene programs
+    - IGVFFI8214DMKC # iPSC to EC: D0; gene program regulators
+    - IGVFFI5671ZTPF # iPSC to EC: D0; program-program correlation
+    - IGVFFI1127PXEP # iPSC to EC: D0; regulator-regulator correlation
+    - IGVFFI4053SPMD # iPSC to EC: D1; gene program regulators
+    - IGVFFI3541QUUN # iPSC to EC: D1; regulator-regulator correlation
+    - IGVFFI0574VVJA # iPSC to EC: D1; program-program correlation
+    - IGVFFI9940ZZPJ # iPSC to EC: D2; gene program regulators
+    - IGVFFI3823LYPH # iPSC to EC: D2; program-program correlation
+    - IGVFFI6275JIJY # iPSC to EC: D2; regulator-regulator correlation
+    - IGVFFI3188WQFI # iPSC to EC: D3; program-program correlation
+    - IGVFFI5389NMWB # iPSC to EC: D3; gene program regulators
+    - IGVFFI5745PRRI # iPSC to EC: D3; regulator-regulator correlation
   CRISPR element element:
     - IGVFFI2419ZSGC
   CRISPR element phenotype:
