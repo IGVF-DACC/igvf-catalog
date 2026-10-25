@@ -105,6 +105,15 @@ class GenePrograms(BaseAdapter):
             'method': metadata.get('method'),
             'label': metadata.get('method'),
         }
+        samples = metadata.get('samples') or []
+        if samples:
+            provenance['biosample_term'] = samples[0]
+        # Temporary attribution requested for the shared iPSC-to-EC programs.
+        # TODO: revisit when biosample context supports multiple terms; the
+        # current singular field represents these programs as endothelial cell.
+        # Keep this explanation in the adapter, not in the emitted records.
+        if self.file_accession == 'IGVFFI6391GCJR':
+            provenance['biosample_term'] = 'ontology_terms/CL_0000115'
         gene_validator = GeneValidator() if self.label == 'gene_program_membership' else None
         for program_id, genes in programs.items():
             program_key = self.program_key(self.file_accession, program_id)

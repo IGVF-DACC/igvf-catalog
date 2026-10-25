@@ -121,8 +121,7 @@ def test_membership_preserves_scores_and_resolves_node_ids(tmp_path, metadata):
     assert len({edge['_key'] for edge in edges}) == 3
     assert {edge['name'] for edge in edges} == {'is a member of'}
     assert {edge['inverse_name'] for edge in edges} == {'has member'}
-    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1])
-               : edge['score'] for edge in edges}
+    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1])              : edge['score'] for edge in edges}
     assert scores == {
         ('genes/ENSG00000119707', '1'): 0.5,
         ('genes/ENSG00000289740', '1'): 0.2,
@@ -160,3 +159,45 @@ def test_zero_and_negative_membership_scores_are_not_filtered(tmp_path, metadata
         GenePrograms(path, label='gene_program_membership',
                      writer=writer).process_file()
     assert json.loads(writer.contents[0])['score'] == score
+
+
+@pytest.mark.parametrize('accession', ['IGVFFI6391GCJR', 'IGVFFI9532OEFJ', 'IGVFFI0156PMEA'])
+def test_biosample_attribution_on_nodes_and_membership(tmp_path, metadata, accession):
+    path = tmp_path / f'{accession}.tsv'
+    path.write_text(HEADER + ROWS)
+    metadata.return_value['samples'] = ['ontology_terms/CL_0000034']
+    for label in GenePrograms.ALLOWED_LABELS:
+        writer = SpyWriter()
+        with patch('adapters.gene_programs_adapter.GeneValidator') as validator:
+            validator.return_value.validate.return_value = True
+            GenePrograms(path, label=label, writer=writer,
+                         validate=True).process_file()
+        docs = [json.loads(row) for row in writer.contents if row.strip()]
+        for doc in docs:
+            if accession == 'IGVFFI6391GCJR':
+                assert doc['biosample_term'] == 'ontology_terms/CL_0000115'
+            else:
+                assert doc['biosample_term'] == 'ontology_terms/CL_0000034'
+            assert not any('override' in key or 'note' in key for key in doc)
+    assert metadata.return_value['samples'] == ['ontology_terms/CL_0000034']
+
+
+@pytest.mark.parametrize('samples', [None, []])
+@pytest.mark.parametrize('accession', ['IGVFFI9532OEFJ', 'IGVFFI6391GCJR'])
+def test_missing_samples_allow_nodes_and_membership(tmp_path, metadata, samples, accession):
+    path = tmp_path / f'{accession}.tsv'
+    path.write_text(HEADER + ROWS)
+    metadata.return_value['samples'] = samples
+    for label in GenePrograms.ALLOWED_LABELS:
+        writer = SpyWriter()
+        with patch('adapters.gene_programs_adapter.GeneValidator') as validator:
+            validator.return_value.validate.return_value = True
+            GenePrograms(path, label=label, writer=writer,
+                         validate=True).process_file()
+        docs = [json.loads(row) for row in writer.contents if row.strip()]
+        assert docs
+        for doc in docs:
+            if accession == 'IGVFFI6391GCJR':
+                assert doc['biosample_term'] == 'ontology_terms/CL_0000115'
+            else:
+                assert 'biosample_term' not in doc
