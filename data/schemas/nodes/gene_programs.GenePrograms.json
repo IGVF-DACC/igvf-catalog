@@ -6,6 +6,7 @@
     {
       "properties": {
         "files_filesets": { "$ref": "../mixins.json#/files_filesets" },
+        "biosample_term": { "$ref": "../mixins.json#/biosample_term" },
         "class": { "$ref": "../mixins.json#/class", "enum": ["observed data"] },
         "method": { "$ref": "../mixins.json#/method", "type": ["string", "null"] },
         "label": { "$ref": "../mixins.json#/label", "type": ["string", "null"] }
@@ -44,7 +45,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, program_id, reported_gene_count, files_filesets, class, method, label, source, source_url"
+    "return": "_id, name, program_id, reported_gene_count, biosample_term, files_filesets, class, method, label, source, source_url"
   },
   "db_collection_name": "gene_programs"
 }

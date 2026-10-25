@@ -5,7 +5,8 @@
     { "$ref": "edges.base.json" },
     {
       "properties": {
-        "files_filesets": { "$ref": "../mixins.json#/files_filesets" }
+        "files_filesets": { "$ref": "../mixins.json#/files_filesets" },
+        "biosample_term": { "$ref": "../mixins.json#/biosample_term" }
       }
     },
     {
@@ -46,7 +47,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "name, inverse_name, score, files_filesets, class, method, label, source, source_url"
+    "return": "name, inverse_name, score, biosample_term, files_filesets, class, method, label, source, source_url"
   },
   "db_collection_name": "genes_gene_programs"
 }
