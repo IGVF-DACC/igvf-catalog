@@ -97,6 +97,7 @@ class GenePrograms(BaseAdapter):
         self.writer.add_tag('portal_accessions', self.file_accession)
         if metadata.get('file_set_id'):
             self.writer.add_tag('portal_accessions', metadata['file_set_id'])
+        sample_summaries = metadata.get('simple_sample_summaries') or []
         provenance = {
             'source': 'IGVF',
             'source_url': f'https://data.igvf.org/tabular-files/{self.file_accession}/',
@@ -104,6 +105,9 @@ class GenePrograms(BaseAdapter):
             'class': metadata['class'],
             'method': metadata.get('method'),
             'label': metadata.get('method'),
+            'biological_context': sample_summaries[0] if sample_summaries else None,
+            'treatments_term_ids': metadata.get('treatments_term_ids'),
+            'perturbation': metadata.get('perturbation'),
         }
         samples = metadata.get('samples') or []
         if samples:

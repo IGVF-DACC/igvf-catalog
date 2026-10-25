@@ -7,6 +7,9 @@
       "properties": {
         "files_filesets": { "$ref": "../mixins.json#/files_filesets" },
         "biosample_term": { "$ref": "../mixins.json#/biosample_term" },
+        "biological_context": { "$ref": "../mixins.json#/biological_context", "type": ["string", "null"] },
+        "treatments_term_ids": { "$ref": "../mixins.json#/treatments_term_ids" },
+        "perturbation": { "$ref": "../mixins.json#/perturbation", "type": ["string", "null"] },
         "class": { "$ref": "../mixins.json#/class", "enum": ["observed data"] },
         "method": { "$ref": "../mixins.json#/method", "type": ["string", "null"] },
         "label": { "$ref": "../mixins.json#/label", "type": ["string", "null"] }
@@ -40,12 +43,12 @@
           "example": "https://data.igvf.org/tabular-files/IGVFFI9532OEFJ/"
         }
       },
-      "required": ["program_id", "reported_gene_count", "files_filesets", "class", "method", "label"]
+      "required": ["program_id", "reported_gene_count", "files_filesets", "class", "method", "label", "biological_context", "treatments_term_ids", "perturbation"]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "_id, name, program_id, reported_gene_count, biosample_term, files_filesets, class, method, label, source, source_url"
+    "return": "_id, name, program_id, reported_gene_count, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url"
   },
   "db_collection_name": "gene_programs"
 }
