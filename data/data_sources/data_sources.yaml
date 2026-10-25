@@ -2745,3 +2745,71 @@ genomic_element_genomic_element IGVF CRISPR accessibility:
   command: python3 data_parser.py --adapter crispr_element_element --filepath {datafile} --label genomic_element_genomic_element --output-bucket-key genomic_elements_genomic_elements/crispr_element_element_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2419ZSGC/@@download/IGVFFI2419ZSGC.tsv.gz
+
+
+# Gene programs: nodes and membership implemented; regulation and correlations are deferred.
+# Download: python3 data/scripts/download_gene_programs.py (from the repository root).
+# GO enrichment supplied in the program files is ignored (August 19 Tiger Team decision).
+# GO enrichment will be calculated separately in a future loading phase.
+gene program IGVF:
+  collection: gene_programs
+  source: IGVF
+  pypy3: false
+  command: python3 data_parser.py --adapter gene_programs --filepath {datafile} --label gene_program --output-bucket-key gene_programs/gene_programs_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  # Gene program definitions; ignore supplied GO enrichment.
+  datafiles: &igvf_gene_program_files
+    - https://api.data.igvf.org/tabular-files/IGVFFI9532OEFJ/@@download/IGVFFI9532OEFJ.tsv.gz # IGVFDS1435ERVG; HCASMC-hTERT
+    - https://api.data.igvf.org/tabular-files/IGVFFI0156PMEA/@@download/IGVFFI0156PMEA.tsv.gz # IGVFDS9578FQKI; TeloHAEC GW: shared programs for resting, oxLDL, and IL-1beta
+    - https://api.data.igvf.org/tabular-files/IGVFFI6391GCJR/@@download/IGVFFI6391GCJR.tsv.gz # IGVFDS9440URJB; iPSC to EC: shared programs for D0, D1, D2, and D3
+gene gene program membership IGVF:
+  collection: genes_gene_programs
+  source: IGVF
+  pypy3: false
+  command: python3 data_parser.py --adapter gene_programs --filepath {datafile} --label gene_program_membership --output-bucket-key genes_gene_programs/gene_program_membership_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  # Membership edges with gene weights/scores; reuse the program files.
+  datafiles: *igvf_gene_program_files
+gene gene program regulation IGVF:
+  collection: genes_gene_programs
+  source: IGVF
+  pypy3: false
+  command: "" # Placeholder: no parser or loader yet.
+  # Regulator effects on gene programs, distinct from membership edges.
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI7611VVSS/@@download/IGVFFI7611VVSS.tsv.gz # IGVFDS1435ERVG; HCASMC-hTERT
+    - https://api.data.igvf.org/tabular-files/IGVFFI7887NYRJ/@@download/IGVFFI7887NYRJ.tsv.gz # IGVFDS1612GWIZ; TeloHAEC GW: resting
+    - https://api.data.igvf.org/tabular-files/IGVFFI2627GHHU/@@download/IGVFFI2627GHHU.tsv.gz # IGVFDS3093XVZE; TeloHAEC GW: IL-1beta
+    - https://api.data.igvf.org/tabular-files/IGVFFI2454MTFS/@@download/IGVFFI2454MTFS.tsv.gz # IGVFDS1432SULL; TeloHAEC GW: oxLDL
+    - https://api.data.igvf.org/tabular-files/IGVFFI8214DMKC/@@download/IGVFFI8214DMKC.tsv.gz # IGVFDS0463XTUH; iPSC to EC: D0
+    - https://api.data.igvf.org/tabular-files/IGVFFI4053SPMD/@@download/IGVFFI4053SPMD.tsv.gz # IGVFDS0991DBQZ; iPSC to EC: D1
+    - https://api.data.igvf.org/tabular-files/IGVFFI9940ZZPJ/@@download/IGVFFI9940ZZPJ.tsv.gz # IGVFDS4402ZGWJ; iPSC to EC: D2
+    - https://api.data.igvf.org/tabular-files/IGVFFI5389NMWB/@@download/IGVFFI5389NMWB.tsv.gz # IGVFDS2307REVJ; iPSC to EC: D3
+gene program gene program correlation IGVF:
+  collection: gene_programs_gene_programs
+  source: IGVF
+  pypy3: false
+  command: "" # Placeholder: no parser or loader yet.
+  # Correlation in log2FC across all gene perturbations.
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI9407YNQA/@@download/IGVFFI9407YNQA.tsv.gz # IGVFDS1435ERVG; HCASMC-hTERT
+    - https://api.data.igvf.org/tabular-files/IGVFFI9545WAUX/@@download/IGVFFI9545WAUX.tsv.gz # IGVFDS1612GWIZ; TeloHAEC GW: resting
+    - https://api.data.igvf.org/tabular-files/IGVFFI5706ASJE/@@download/IGVFFI5706ASJE.tsv.gz # IGVFDS3093XVZE; TeloHAEC GW: IL-1beta
+    - https://api.data.igvf.org/tabular-files/IGVFFI5778ELFM/@@download/IGVFFI5778ELFM.tsv.gz # IGVFDS1432SULL; TeloHAEC GW: oxLDL
+    - https://api.data.igvf.org/tabular-files/IGVFFI5671ZTPF/@@download/IGVFFI5671ZTPF.tsv.gz # IGVFDS0463XTUH; iPSC to EC: D0
+    - https://api.data.igvf.org/tabular-files/IGVFFI0574VVJA/@@download/IGVFFI0574VVJA.tsv.gz # IGVFDS0991DBQZ; iPSC to EC: D1
+    - https://api.data.igvf.org/tabular-files/IGVFFI3823LYPH/@@download/IGVFFI3823LYPH.tsv.gz # IGVFDS4402ZGWJ; iPSC to EC: D2
+    - https://api.data.igvf.org/tabular-files/IGVFFI3188WQFI/@@download/IGVFFI3188WQFI.tsv.gz # IGVFDS2307REVJ; iPSC to EC: D3
+gene gene regulator correlation IGVF:
+  collection: genes_genes
+  source: IGVF
+  pypy3: false
+  command: "" # Placeholder: no parser or loader yet.
+  # Correlation in log2FC across all programs.
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI5227NZPM/@@download/IGVFFI5227NZPM.tsv.gz # IGVFDS1435ERVG; HCASMC-hTERT
+    - https://api.data.igvf.org/tabular-files/IGVFFI3821MANP/@@download/IGVFFI3821MANP.tsv.gz # IGVFDS1612GWIZ; TeloHAEC GW: resting
+    - https://api.data.igvf.org/tabular-files/IGVFFI6502THLB/@@download/IGVFFI6502THLB.tsv.gz # IGVFDS3093XVZE; TeloHAEC GW: IL-1beta
+    - https://api.data.igvf.org/tabular-files/IGVFFI9392SDHV/@@download/IGVFFI9392SDHV.tsv.gz # IGVFDS1432SULL; TeloHAEC GW: oxLDL
+    - https://api.data.igvf.org/tabular-files/IGVFFI1127PXEP/@@download/IGVFFI1127PXEP.tsv.gz # IGVFDS0463XTUH; iPSC to EC: D0
+    - https://api.data.igvf.org/tabular-files/IGVFFI3541QUUN/@@download/IGVFFI3541QUUN.tsv.gz # IGVFDS0991DBQZ; iPSC to EC: D1
+    - https://api.data.igvf.org/tabular-files/IGVFFI6275JIJY/@@download/IGVFFI6275JIJY.tsv.gz # IGVFDS4402ZGWJ; iPSC to EC: D2
+    - https://api.data.igvf.org/tabular-files/IGVFFI5745PRRI/@@download/IGVFFI5745PRRI.tsv.gz # IGVFDS2307REVJ; iPSC to EC: D3

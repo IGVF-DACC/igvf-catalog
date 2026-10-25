@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/genes_gene_programs.GenePrograms.json",
+  "allOf": [
+    { "$ref": "edges.base.json" },
+    {
+      "properties": {
+        "files_filesets": { "$ref": "../mixins.json#/files_filesets" }
+      }
+    },
+    {
+      "properties": {
+        "_key": {
+          "description": "Program key, Ensembl gene ID, and membership suffix. The suffix distinguishes membership from future regulation edges for the same gene/program pair.",
+          "example": "IGVFFI9532OEFJ_GP_1_ENSG00000119707_membership"
+        },
+        "_from": {
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": ["genes"],
+          "example": "genes/ENSG00000119707"
+        },
+        "_to": {
+          "pattern": "^gene_programs/IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
+          "collections": ["gene_programs"],
+          "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
+        },
+        "name": { "enum": ["is a member of"], "example": "is a member of" },
+        "inverse_name": { "enum": ["has member"], "example": "has member" },
+        "score": {
+          "title": "Score",
+          "type": "number",
+          "description": "Program score or loading derived from the method. Positive values indicate a positive relationship between the program and the gene, while a negative value indicates an inverse relationship.",
+          "example": 0.0004757702483593
+        },
+        "source": { "enum": ["IGVF"] },
+        "source_url": {
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/IGVFFI[0-9]{4}[A-Z]{4}/$",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9532OEFJ/"
+        },
+        "class": { "enum": ["observed data"] },
+        "method": { "type": ["string", "null"] },
+        "label": { "type": ["string", "null"] }
+      },
+      "required": ["files_filesets", "score"]
+    }
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "name, inverse_name, score, files_filesets, class, method, label, source, source_url"
+  },
+  "db_collection_name": "genes_gene_programs"
+}

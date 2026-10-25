@@ -21,6 +21,9 @@
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },
+        "gene_programs": {
+            "GenePrograms": "schemas/nodes/gene_programs.GenePrograms.json"
+        },
         "genes_structure": {
             "GencodeStructure": "schemas/nodes/genes_structure.GencodeStructure.json"
         },
@@ -143,6 +146,9 @@
         },
         "genes_pathways": {
             "Reactome": "schemas/edges/genes_pathways.Reactome.json"
+        },
+        "genes_gene_programs": {
+            "GenePrograms": "schemas/edges/genes_gene_programs.GenePrograms.json"
         },
         "genes_transcripts": {
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
