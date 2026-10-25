@@ -1,3 +1,4 @@
+from copy import deepcopy
 import gzip
 import json
 from unittest.mock import patch
@@ -121,7 +122,7 @@ def test_membership_preserves_scores_and_resolves_node_ids(tmp_path, metadata):
     assert len({edge['_key'] for edge in edges}) == 3
     assert {edge['name'] for edge in edges} == {'is a member of'}
     assert {edge['inverse_name'] for edge in edges} == {'has member'}
-    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1])              : edge['score'] for edge in edges}
+    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1]): edge['score'] for edge in edges}
     assert scores == {
         ('genes/ENSG00000119707', '1'): 0.5,
         ('genes/ENSG00000289740', '1'): 0.2,
@@ -201,3 +202,39 @@ def test_missing_samples_allow_nodes_and_membership(tmp_path, metadata, samples,
                 assert doc['biosample_term'] == 'ontology_terms/CL_0000115'
             else:
                 assert 'biosample_term' not in doc
+
+
+@pytest.mark.parametrize('context', [
+    {
+        'simple_sample_summaries': ['combined resting and treated cells', 'another summary'],
+        'treatments_term_ids': ['CHEBI:15367', 'CHEBI:27732'],
+        'perturbation': 'CRISPR interference',
+    },
+    {},
+    {'simple_sample_summaries': None,
+        'treatments_term_ids': None, 'perturbation': None},
+    {'simple_sample_summaries': [], 'treatments_term_ids': [], 'perturbation': None},
+])
+def test_file_sample_context_is_shared_by_nodes_and_membership(tmp_path, metadata, context):
+    path = tmp_path / 'IGVFFI6391GCJR.tsv'
+    path.write_text(HEADER + ROWS)
+    metadata.return_value.update(context)
+    original_metadata = deepcopy(metadata.return_value)
+    summaries = context.get('simple_sample_summaries') or []
+    expected = {
+        'biological_context': summaries[0] if summaries else None,
+        'treatments_term_ids': context.get('treatments_term_ids'),
+        'perturbation': context.get('perturbation'),
+    }
+    for label in GenePrograms.ALLOWED_LABELS:
+        writer = SpyWriter()
+        with patch('adapters.gene_programs_adapter.GeneValidator') as validator:
+            validator.return_value.validate.return_value = True
+            GenePrograms(path, label=label, writer=writer,
+                         validate=True).process_file()
+        docs = [json.loads(row) for row in writer.contents if row.strip()]
+        assert docs
+        for doc in docs:
+            assert {field: doc[field] for field in expected} == expected
+            assert doc['biosample_term'] == 'ontology_terms/CL_0000115'
+    assert metadata.return_value == original_metadata

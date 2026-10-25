@@ -6,7 +6,10 @@
     {
       "properties": {
         "files_filesets": { "$ref": "../mixins.json#/files_filesets" },
-        "biosample_term": { "$ref": "../mixins.json#/biosample_term" }
+        "biosample_term": { "$ref": "../mixins.json#/biosample_term" },
+        "biological_context": { "$ref": "../mixins.json#/biological_context", "type": ["string", "null"] },
+        "treatments_term_ids": { "$ref": "../mixins.json#/treatments_term_ids" },
+        "perturbation": { "$ref": "../mixins.json#/perturbation", "type": ["string", "null"] }
       }
     },
     {
@@ -42,12 +45,12 @@
         "method": { "type": ["string", "null"] },
         "label": { "type": ["string", "null"] }
       },
-      "required": ["files_filesets", "score"]
+      "required": ["files_filesets", "score", "biological_context", "treatments_term_ids", "perturbation"]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "name, inverse_name, score, biosample_term, files_filesets, class, method, label, source, source_url"
+    "return": "name, inverse_name, score, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url"
   },
   "db_collection_name": "genes_gene_programs"
 }
