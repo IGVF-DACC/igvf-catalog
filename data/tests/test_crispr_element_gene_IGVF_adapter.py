@@ -49,7 +49,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_genomic_elements(mock_file
         mock_validator_instance.validate.return_value = True
 
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='genomic_element', writer=writer, validate=True)
+            filepath='./tests/fixtures/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='genomic_element', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
@@ -74,7 +74,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_genomic_elements_genes(moc
         mock_validator_instance.validate.return_value = True
 
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='genomic_element_gene', writer=writer, validate=True)
+            filepath='./tests/fixtures/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='genomic_element_gene', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert first_item['_key'] == 'CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI3069QCRA'
@@ -423,7 +423,7 @@ def test_crispr_element_gene_igvf_adapter_facs_screen_genomic_elements(mock_file
         mock_validator_instance.validate.return_value = True
 
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI9100GKNS_crispr_element_gene_igvf_facs_screen.example.txt.gz', label='genomic_element', writer=writer, validate=True)
+            filepath='./tests/fixtures/IGVFFI9100GKNS_crispr_element_gene_igvf_facs_screen.example.txt.gz', label='genomic_element', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
@@ -448,7 +448,7 @@ def test_crispr_element_gene_igvf_adapter_facs_screen_genomic_elements_genes(moc
         mock_validator_instance.validate.return_value = True
 
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI9100GKNS_crispr_element_gene_igvf_facs_screen.example.txt.gz', label='genomic_element_gene', writer=writer, validate=True)
+            filepath='./tests/fixtures/IGVFFI9100GKNS_crispr_element_gene_igvf_facs_screen.example.txt.gz', label='genomic_element_gene', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert first_item['_key'] == 'CRISPR_chr1_998962_999432_GRCh38_ENSG00000126353_IGVFFI9100GKNS'
@@ -842,7 +842,7 @@ def test_igvf_e2g_crudo_real_sample_skips_negative_control_and_emits_expected_ed
     with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
         MockGeneValidator.return_value.validate.return_value = True
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI5903QAWP_crudo_tap_seq.tsv.gz',
+            filepath='./tests/fixtures/IGVFFI5903QAWP_crudo_tap_seq.tsv.gz',
             label='genomic_element_gene',
             writer=writer,
             validate=True)
@@ -859,7 +859,7 @@ def test_igvf_e2g_crudo_real_sample_ccnd1_tss_element_is_promoter_with_hardcoded
     with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
         MockGeneValidator.return_value.validate.return_value = True
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI5903QAWP_crudo_tap_seq.tsv.gz',
+            filepath='./tests/fixtures/IGVFFI5903QAWP_crudo_tap_seq.tsv.gz',
             label='genomic_element',
             writer=writer,
             validate=True)
@@ -1072,7 +1072,7 @@ def test_igvf_e2g_crudo_real_sample_putative_enhancer_edge_uses_no_aux_columns(
     with patch('adapters.CRISPR_element_gene_IGVF_adapter.GeneValidator') as MockGeneValidator:
         MockGeneValidator.return_value.validate.return_value = True
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI5903QAWP_crudo_tap_seq.tsv.gz',
+            filepath='./tests/fixtures/IGVFFI5903QAWP_crudo_tap_seq.tsv.gz',
             label='genomic_element_gene',
             writer=writer,
             validate=True)
@@ -1102,7 +1102,7 @@ def test_crispr_element_gene_igvf_adapter_invalid_label(mock_file_fileset_pertur
     writer = SpyWriter()
     with pytest.raises(ValueError):
         adapter = CRISPRElementGeneIGVF(
-            filepath='./samples/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='invalid_label', writer=writer, validate=True)
+            filepath='./tests/fixtures/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='invalid_label', writer=writer, validate=True)
 
 
 def test_apply_standard_neg_log10_fields():
@@ -1224,7 +1224,7 @@ def test_apply_adapter_calculated_fields_crudo_rules():
 def test_crispr_element_gene_igvf_adapter_validate_doc_invalid(mock_file_fileset_perturb_seq):
     writer = SpyWriter()
     adapter = CRISPRElementGeneIGVF(
-        filepath='./samples/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='genomic_element', writer=writer, validate=True)
+        filepath='./tests/fixtures/IGVFFI3069QCRA_crispr_element_gene_igvf_perturb_seq.example.txt.gz', label='genomic_element', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

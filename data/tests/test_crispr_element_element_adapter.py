@@ -7,7 +7,7 @@ from adapters.CRISPR_element_element_adapter import CRISPRElementElement
 from adapters.writer import SpyWriter
 
 MODULE = 'adapters.CRISPR_element_element_adapter'
-SAMPLE = './samples/IGVFFI2419ZSGC_crispr_element_element.example.tsv.gz'
+SAMPLE = './tests/fixtures/IGVFFI2419ZSGC_crispr_element_element.example.tsv.gz'
 ACCESSION = 'IGVFFI2419ZSGC'
 
 

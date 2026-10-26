@@ -25,9 +25,9 @@ def test_gencode_gene_adapter_human(mock_get):
     mock_get.return_value.json.return_value = mock_response
 
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./tests/fixtures/gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get(
-                              'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
+                              'TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'),
                           label='gencode_gene',
                           writer=writer,
                           validate=True)
@@ -49,16 +49,16 @@ def test_gencode_gene_adapter_human(mock_get):
 def test_gencode_gene_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_gene, mm_gencode_gene'):
-        GencodeGene(filepath='./samples/gencode_sample.gtf',
+        GencodeGene(filepath='./tests/fixtures/gencode_sample.gtf',
                     gene_alias_file_path=os.environ.get(
-                        'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
+                        'TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'),
                     label='invalid_label',
                     writer=writer)
 
 
 def test_gencode_gene_adapter_parse_info_metadata():
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
-                          gene_alias_file_path=os.environ.get('TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'))
+    adapter = GencodeGene(filepath='./tests/fixtures/gencode_sample.gtf',
+                          gene_alias_file_path=os.environ.get('TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'))
     info = ['gene_id', '"ENSG00000223972.5";', 'gene_type',
             '"transcribed_unprocessed_pseudogene";', 'gene_name', '"DDX11L1";']
     parsed_info = adapter.parse_info_metadata(info)
@@ -69,8 +69,8 @@ def test_gencode_gene_adapter_parse_info_metadata():
 
 def test_gencode_gene_adapter_mouse():
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_mouse_sample.gtf',
-                          gene_alias_file_path='./samples/Mus_musculus.gene_info.gz',
+    adapter = GencodeGene(filepath='./tests/fixtures/gencode_mouse_sample.gtf',
+                          gene_alias_file_path='./tests/fixtures/Mus_musculus.gene_info.gz',
                           label='mm_gencode_gene',
                           writer=writer,
                           validate=True)
@@ -92,9 +92,9 @@ def test_gencode_gene_adapter_mouse():
 
 def test_gencode_gene_adapter_not_catalog():
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./tests/fixtures/gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get(
-                              'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
+                              'TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'),
                           label='gencode_gene',
                           writer=writer,
                           validate=True,
@@ -112,9 +112,9 @@ def test_gencode_gene_adapter_not_catalog():
 
 def test_gencode_gene_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+    adapter = GencodeGene(filepath='./tests/fixtures/gencode_sample.gtf',
                           gene_alias_file_path=os.environ.get(
-                              'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
+                              'TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'),
                           label='gencode_gene',
                           writer=writer,
                           validate=True)
@@ -129,9 +129,9 @@ def test_gencode_gene_adapter_validate_doc_invalid():
 def test_gencode_gene_adapter_invalid_mode():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid mode. Allowed values: igvfd,catalog'):
-        GencodeGene(filepath='./samples/gencode_sample.gtf',
+        GencodeGene(filepath='./tests/fixtures/gencode_sample.gtf',
                     gene_alias_file_path=os.environ.get(
-                        'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
+                        'TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'),
                     label='gencode_gene',
                     writer=writer,
                     mode='invalid_mode')
@@ -150,7 +150,7 @@ GL000008.2	HAVANA	gene	1	100	.	+	.	gene_id "ENSG00000101349.1"; gene_name "TEST_
     try:
         adapter = GencodeGene(filepath=gtf_file_path,
                               gene_alias_file_path=os.environ.get(
-                                  'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),
+                                  'TEST_GENE_INFO_PATH', './tests/fixtures/Homo_sapiens.gene_info.gz'),
                               label='gencode_gene', mode='igvfd', writer=writer, validate=False)
         adapter.process_file()
 

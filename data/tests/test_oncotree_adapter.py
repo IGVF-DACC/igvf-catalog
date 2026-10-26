@@ -5,7 +5,7 @@ import pytest
 from adapters.oncotree_adapter import Oncotree
 from adapters.writer import SpyWriter
 
-SAMPLE_FILEPATH = './samples/IGVFFI4975UFZM.example.tar.gz'
+SAMPLE_FILEPATH = './tests/fixtures/IGVFFI4975UFZM.example.tar.gz'
 SAMPLE_ACCESSION = 'IGVFFI4975UFZM'
 
 

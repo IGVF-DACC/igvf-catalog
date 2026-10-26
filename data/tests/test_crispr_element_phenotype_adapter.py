@@ -5,8 +5,8 @@ from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
-MIGRATION_PATH = './samples/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
-GROWTH_PATH = './samples/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
+MIGRATION_PATH = './tests/fixtures/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
+GROWTH_PATH = './tests/fixtures/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
 
 
 @pytest.fixture

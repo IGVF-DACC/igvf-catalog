@@ -9,7 +9,7 @@ from adapters.writer import SpyWriter
 
 
 FILE_ACCESSION = 'IGVFFI5943XCOS'
-SAMPLE_DIR = './samples/allele_specific_binding'
+SAMPLE_DIR = './tests/fixtures/allele_specific_binding'
 SAMPLE_PROTEIN_MAP = {
     'P18846': ['ENSP00000262053'],  # ATF1_HUMAN
     'P17098': ['ENSP00000262317'],  # ZNF8_HUMAN

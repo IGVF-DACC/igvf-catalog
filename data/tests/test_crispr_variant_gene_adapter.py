@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
 ACCESSION = 'IGVFFI9602ILPC'
-SAMPLE = f'./samples/{ACCESSION}_crispr_variant_gene.example.tsv'
+SAMPLE = f'./tests/fixtures/{ACCESSION}_crispr_variant_gene.example.tsv'
 
 
 @pytest.mark.parametrize('effect_size, log2_fold_change', [
@@ -228,7 +228,7 @@ def test_invalid_label(mock_file_fileset):
 
 
 CRISPR_MILLIPEDE_ACCESSION = 'IGVFFI8101RHSC'
-CRISPR_MILLIPEDE_SAMPLE = f'./samples/{CRISPR_MILLIPEDE_ACCESSION}_crispr_variant_gene_millipede.example.csv'
+CRISPR_MILLIPEDE_SAMPLE = f'./tests/fixtures/{CRISPR_MILLIPEDE_ACCESSION}_crispr_variant_gene_millipede.example.csv'
 mock_crispr_millipede_data = (
     'variants,PIP,Betas,Coefficient StdDev\n'
     'NC_000016.10:28930710:G:A,0.0284163262526425,-0.0116633875205405,0.0699744682130392\n'

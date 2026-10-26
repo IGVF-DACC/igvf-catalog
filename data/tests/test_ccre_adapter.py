@@ -21,7 +21,7 @@ def mock_file_fileset():
 @pytest.mark.external_dependency
 def test_ccre_adapter(mock_file_fileset):
     writer = SpyWriter()
-    adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
+    adapter = CCRE(filepath='./tests/fixtures/ENCFF420VPZ.example.bed.gz',
                    label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) == 5510
@@ -33,7 +33,7 @@ def test_ccre_adapter(mock_file_fileset):
 
 
 def test_ccre_adapter_initialization():
-    adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
+    adapter = CCRE(filepath='./tests/fixtures/ENCFF420VPZ.example.bed.gz',
                    label='genomic_element')
     assert adapter.label == 'genomic_element'
     assert adapter.filename == 'ENCFF420VPZ'
@@ -44,7 +44,7 @@ def test_ccre_adapter_initialization():
 
 def test_ccre_adapter_mm_genomic_element_collection_name():
     """Test that mm_genomic_element label returns correct collection name."""
-    adapter = CCRE(filepath='./samples/IGVFFI8753TTYC.example.bed.gz',
+    adapter = CCRE(filepath='./tests/fixtures/IGVFFI8753TTYC.example.bed.gz',
                    label='mm_genomic_element')
     assert adapter.label == 'mm_genomic_element'
     assert adapter.filename == 'IGVFFI8753TTYC'
@@ -55,7 +55,7 @@ def test_ccre_adapter_mm_genomic_element_collection_name():
 @pytest.mark.external_dependency
 def test_ccre_adapter_mm_genomic_element_key_uses_grcm39(mock_file_fileset):
     writer = SpyWriter()
-    adapter = CCRE(filepath='./samples/IGVFFI8753TTYC.example.bed.gz',
+    adapter = CCRE(filepath='./tests/fixtures/IGVFFI8753TTYC.example.bed.gz',
                    label='mm_genomic_element', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
@@ -69,7 +69,7 @@ def test_ccre_adapter_mm_genomic_element_key_uses_grcm39(mock_file_fileset):
 
 def test_ccre_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
+    adapter = CCRE(filepath='./tests/fixtures/ENCFF420VPZ.example.bed.gz',
                    label='genomic_element', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

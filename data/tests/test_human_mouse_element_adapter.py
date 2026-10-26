@@ -10,7 +10,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def human_mouse_files():
-    return './samples/element_mapping_example.txt.gz'
+    return './tests/fixtures/element_mapping_example.txt.gz'
 
 
 @pytest.fixture

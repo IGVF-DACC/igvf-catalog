@@ -8,7 +8,7 @@ from adapters.writer import SpyWriter
 
 FILE_ACCESSION = 'IGVFFI8835SMSP'
 DRUG_FILE_ACCESSION = 'IGVFFI2997DUKO'
-SAMPLE_DIR = './samples/pharmGKB'
+SAMPLE_DIR = './tests/fixtures/pharmGKB'
 
 
 @pytest.fixture

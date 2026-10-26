@@ -10,7 +10,7 @@ from adapters.writer import SpyWriter
 
 
 FILE_ACCESSION = 'IGVFFI3321YNBP'
-SAMPLE_DIR = './samples/coxpresdb/'
+SAMPLE_DIR = './tests/fixtures/coxpresdb/'
 
 
 @pytest.fixture
