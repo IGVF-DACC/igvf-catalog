@@ -90,7 +90,7 @@
           "type": "number",
           "minimum": -1,
           "maximum": 1,
-          "description": "Submitted Pearson correlation of regulator log2 fold changes across all programs. This symmetric association does not imply causation."
+          "description": "Pearson correlation between the two regulators' log2FC values across gene programs."
         },
         "genomic_elements_from": {
           "title": "Genomic Elements From",
