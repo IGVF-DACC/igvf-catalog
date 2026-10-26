@@ -33,7 +33,7 @@ const phenotypesVariantsInputFormat = z.object({
   class: z.enum(CLASS).optional(),
   files_fileset: z.string().optional(),
   source: z.enum(SOURCES).optional()
-}).merge(commonHumanEdgeParamsFormat)
+}).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
 
 const gwasVariantPhenotypeFormat = z.object({
   rsid: z.array(z.string()).nullish(),
@@ -159,7 +159,6 @@ function buildCombinedFilter (phenotypeFilter: string, nonGWASFilter: string, GW
 
 async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promise<any[]> {
   phenotypeQueryValidation(input)
-  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -247,7 +246,6 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   }
 
   variantQueryValidation(input)
-  delete input.organism
 
   if (input.files_fileset !== undefined) {
     input.files_filesets = `files_filesets/${input.files_fileset as string}`
@@ -332,7 +330,7 @@ const variantsFromPhenotypes = publicProcedure
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({ files_fileset: z.string().optional() })))
+  .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({ files_fileset: z.string().optional() })).omit({ organism: true }))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 

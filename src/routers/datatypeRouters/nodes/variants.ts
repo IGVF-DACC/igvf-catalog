@@ -145,7 +145,7 @@ const variantsFreqQueryFormat = z.object({
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_af: z.number().default(0),
   maximum_af: z.number().default(1)
-}).merge(commonHumanNodesParamsFormat)
+}).merge(commonHumanNodesParamsFormat).omit({ organism: true })
 
 export const variantFormat = z.object({
   _id: z.string(),

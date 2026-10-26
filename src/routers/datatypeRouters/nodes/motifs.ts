@@ -32,7 +32,6 @@ export const motifFormat = z.object({
 })
 
 async function motifSearch (input: paramsFormatType): Promise<any[]> {
-  delete input.organism
   if (input.tf_name !== undefined) {
     input.tf_name = (input.tf_name as string).toUpperCase()
   }
@@ -66,7 +65,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
 
 const motifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs } })
-  .input(motifsQueryFormat.merge(commonHumanNodesParamsFormat))
+  .input(motifsQueryFormat.merge(commonHumanNodesParamsFormat).omit({ organism: true }))
   .output(z.array(motifFormat))
   .query(async ({ input }) => await motifSearch(input))
 
