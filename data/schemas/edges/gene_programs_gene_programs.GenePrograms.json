@@ -92,7 +92,7 @@
           "type": "number",
           "minimum": -1,
           "maximum": 1,
-          "description": "Submitted Pearson correlation between programs in log2 fold change across all gene perturbations. This symmetric association does not imply causation."
+          "description": "Pearson correlation between the two programs' log2FC values across gene perturbations."
         }
       },
       "required": [

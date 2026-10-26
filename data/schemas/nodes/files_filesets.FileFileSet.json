@@ -64,6 +64,7 @@
             "type": "string",
             "enum": [
               "ATAC-seq",
+              "CC-Perturb-seq",
               "CRISPR FACS screen",
               "CRISPR FlowFISH screen",
               "CRISPR MACS screen",
@@ -195,6 +196,7 @@
               "Cell Profiler",
               "Cooler",
               "CountESS",
+              "cNMF",
               "cV2F",
               "cyp2c19_2c9",
               "DESeq2",
@@ -205,12 +207,14 @@
               "ESM-1v",
               "FRACTEL",
               "Irreproducible Discovery Rate",
+              "MAST",
               "MAGeCK",
               "matplotlib",
               "MPRAflow tsv-to-bed",
               "mpralm",
               "MutPred2",
               "NumPy",
+              "PerturbNMF",
               "pandas",
               "pybedtools",
               "Pysam",
@@ -234,7 +238,8 @@
               "in_vivo_MPRA_downstream_analysis",
               "schizophrenia-MPRA",
               "crossdisorder-MPRA",
-              "AD_MPRA"
+              "AD_MPRA",
+              "TeloHAEC genome-wide Perturb-seq analysis"
             ]
           }
         },
