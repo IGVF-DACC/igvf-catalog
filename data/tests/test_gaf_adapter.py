@@ -44,9 +44,9 @@ def test_gaf_adapter_human(mock_file_fileset, mock_protein_map, mock_ontology_te
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
                   label='human', writer=writer, validate=True)
-    adapter.file_accession = 'IGVFFI1490WZCV'
+    adapter.file_accession = 'IGVFFI4899LHFM'
     adapter.process_file()
-    mock_file_fileset.assert_called_once_with('IGVFFI1490WZCV')
+    mock_file_fileset.assert_called_once_with('IGVFFI4899LHFM')
     _, preload_kwargs = mock_ontology_term_validator.preload.call_args
     assert preload_kwargs.get('resolve_via_ols') is True
     mock_protein_map.assert_called_once_with(
@@ -64,7 +64,7 @@ def test_gaf_adapter_human(mock_file_fileset, mock_protein_map, mock_ontology_te
     assert first_item['class'] == 'biological relationship'
     assert first_item['method'] is None
     assert first_item['label'] is None
-    assert first_item['files_filesets'] == 'files_filesets/IGVFFI1490WZCV'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI4899LHFM'
 
 
 def test_gaf_adapter_uses_remapped_go_term(
@@ -77,7 +77,7 @@ def test_gaf_adapter_uses_remapped_go_term(
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
                   label='human', writer=writer, validate=False)
-    adapter.file_accession = 'IGVFFI1490WZCV'
+    adapter.file_accession = 'IGVFFI4899LHFM'
     adapter.process_file()
 
     docs = [json.loads(c)
@@ -92,9 +92,9 @@ def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_te
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/mgi_sample.gaf.gz',
                   label='mouse', writer=writer, validate=True)
-    adapter.file_accession = 'IGVFFI9807JOKT'
+    adapter.file_accession = 'IGVFFI0062EMMC'
     adapter.process_file()
-    mock_file_fileset.assert_called_once_with('IGVFFI9807JOKT')
+    mock_file_fileset.assert_called_once_with('IGVFFI0062EMMC')
     mock_protein_map.assert_called_once_with(
         field='uniprot_ids',
         organism='Mus musculus',
@@ -110,7 +110,7 @@ def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_te
     assert first_item['class'] == 'biological relationship'
     assert first_item['method'] is None
     assert first_item['label'] is None
-    assert first_item['files_filesets'] == 'files_filesets/IGVFFI9807JOKT'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI0062EMMC'
 
 
 def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
@@ -118,9 +118,9 @@ def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
     adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
                   label='rna', writer=writer, validate=True,
                   reference_filepath='./samples/rnacentral_ensembl_gencode.tsv.gz')
-    adapter.file_accession = 'IGVFFI6501YXMX'
+    adapter.file_accession = 'IGVFFI6197DHVQ'
     adapter.process_file()
-    mock_file_fileset.assert_called_once_with('IGVFFI6501YXMX')
+    mock_file_fileset.assert_called_once_with('IGVFFI6197DHVQ')
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_from'].startswith('transcripts/')
@@ -131,7 +131,7 @@ def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
     assert first_item['class'] == 'biological relationship'
     assert first_item['method'] is None
     assert first_item['label'] is None
-    assert first_item['files_filesets'] == 'files_filesets/IGVFFI6501YXMX'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI6197DHVQ'
 
 
 def test_gaf_adapter_invalid_type():
