@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/genomic_elements.GenePrograms.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "class": {
+          "$ref": "../mixins.json#/class",
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "$ref": "../mixins.json#/label",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "_key": {
+          "description": "CRISPR interval, GRCh38 assembly, regulator gene, and upstream regulator file accession (also when parsed from downstream correlations). Gene-specific keys preserve distinct promoter annotations for shared intervals.",
+          "example": "CRISPR_chr15_67254569_67254657_GRCh38_ENSG00000103591_IGVFFI7611VVSS"
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/IGVFFI[0-9]{4}[A-Z]{4}/$"
+        },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
+        "source_annotation": {
+          "title": "Source Annotation",
+          "type": "string",
+          "enum": [
+            "promoter"
+          ],
+          "description": "Annotation of the targeted element supplied by the regulator file."
+        },
+        "promoter_of": {
+          "title": "Promoter Of",
+          "type": "string",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ],
+          "description": "Regulator gene whose promoter was targeted."
+        }
+      },
+      "required": [
+        "source_annotation",
+        "promoter_of",
+        "files_filesets",
+        "class",
+        "label",
+        "biological_context",
+        "treatments_term_ids",
+        "perturbation"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, chr, start, end, type, source_annotation, promoter_of, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url"
+  },
+  "db_collection_name": "genomic_elements"
+}
