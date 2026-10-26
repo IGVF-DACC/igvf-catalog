@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/genes_genes.GenePrograms.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/IGVFFI[0-9]{4}[A-Z]{4}/$",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9532OEFJ/"
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "_key": {
+          "description": "Correlation file accession, upstream regulator file accession, canonical gene pair, and correlation suffix."
+        },
+        "_from": {
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "_to": {
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "name": {
+          "enum": [
+            "correlated with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "correlated with"
+          ]
+        },
+        "pearson_correlation": {
+          "title": "Pearson Correlation",
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Submitted Pearson correlation of regulator log2 fold changes across all programs. This symmetric association does not imply causation."
+        },
+        "genomic_elements_from": {
+          "title": "Genomic Elements From",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "Targeted elements of the _from regulator, keyed to its upstream regulator file.",
+          "items": {
+            "type": "string",
+            "pattern": "^genomic_elements/",
+            "collections": [
+              "genomic_elements"
+            ]
+          }
+        },
+        "genomic_elements_to": {
+          "title": "Genomic Elements To",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "Targeted elements of the _to regulator, keyed to its upstream regulator file.",
+          "items": {
+            "type": "string",
+            "pattern": "^genomic_elements/",
+            "collections": [
+              "genomic_elements"
+            ]
+          }
+        }
+      },
+      "required": [
+        "files_filesets",
+        "biological_context",
+        "treatments_term_ids",
+        "perturbation",
+        "pearson_correlation",
+        "genomic_elements_from",
+        "genomic_elements_to"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "name, inverse_name, pearson_correlation, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url, genomic_elements_from, genomic_elements_to",
+    "filter_by_range": "pearson_correlation"
+  },
+  "db_collection_name": "genes_genes"
+}
