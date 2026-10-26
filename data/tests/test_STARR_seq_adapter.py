@@ -1,5 +1,6 @@
 import json
 import pytest
+from math import log2
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
@@ -127,8 +128,10 @@ def test_process_file_variant_biosample(
     assert first_item['outputCountAlt'] == 0.2149853195124717
     assert first_item['postProbEffect'] == 0.35
     assert first_item['significant'] is False
-    assert first_item['CI_lower_95'] == 0.620196
-    assert first_item['CI_upper_95'] == 4.98262
+    # Source reports CI_lower_95/CI_upper_95 on the fold-change scale (no change = 1) - the
+    # adapter log2-transforms them so they sit on the same scale as log2FC (no change = 0).
+    assert first_item['CI_lower_95'] == log2(0.620196)
+    assert first_item['CI_upper_95'] == log2(4.98262)
     assert first_item['label'] == 'variant effect on regulatory element activity'
     assert first_item['method'] == 'STARR-seq'
     assert first_item['class'] == 'observed data'

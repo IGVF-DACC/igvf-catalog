@@ -2,6 +2,7 @@ import csv
 import gzip
 import hashlib
 import json
+from math import log2
 from typing import Optional
 
 from biocommons.seqrepo import SeqRepo
@@ -201,8 +202,8 @@ class STARRseqVariantBiosample(BaseAdapter):
                         'inputCountAlt': float(row[9]),
                         'outputCountAlt': float(row[10]),
                         'postProbEffect': float(row[13]),
-                        'CI_lower_95': float(row[14]),
-                        'CI_upper_95': float(row[15]),
+                        'CI_lower_95': log2(float(row[14])),
+                        'CI_upper_95': log2(float(row[15])),
                         'significant': float(row[13]) > self.THRESHOLD,
                         'label': self.collection_label,
                         'method': self.method,
