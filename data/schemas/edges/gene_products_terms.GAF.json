@@ -220,10 +220,10 @@
         },
         "source_url": {
           "enum": [
-            "http://geneontology.org/gene-associations/goa_human.gaf.gz",
-            "http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz",
-            "https://current.geneontology.org/annotations/mgi.gaf.gz",
-            "http://geneontology.org/gene-associations/goa_human_rna.gaf.gz"
+            "https://current.geneontology.org/annotations/gaf/HUMAN-uniprot.gaf.gz",
+            "https://ftp.ebi.ac.uk/pub/databases/GO/goa/HUMAN/goa_human_isoform.gaf.gz",
+            "https://current.geneontology.org/annotations/gaf/MOUSE-mod.gaf.gz",
+            "https://ftp.ebi.ac.uk/pub/databases/GO/goa/HUMAN/goa_human_rna.gaf.gz"
           ]
         },
         "name": {

@@ -48,10 +48,10 @@ from adapters.protein_map import ProteinMap
 
 class GAF(BaseAdapter):
     SOURCES = {
-        'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
-        'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
-        'mouse': 'https://current.geneontology.org/annotations/mgi.gaf.gz',
-        'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
+        'human': 'https://current.geneontology.org/annotations/gaf/HUMAN-uniprot.gaf.gz',
+        'human_isoform': 'https://ftp.ebi.ac.uk/pub/databases/GO/goa/HUMAN/goa_human_isoform.gaf.gz',
+        'mouse': 'https://current.geneontology.org/annotations/gaf/MOUSE-mod.gaf.gz',
+        'rna': 'https://ftp.ebi.ac.uk/pub/databases/GO/goa/HUMAN/goa_human_rna.gaf.gz'
     }
     ALLOWED_LABELS = list(SOURCES.keys())
 
