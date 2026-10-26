@@ -2,55 +2,262 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genes_gene_programs.GenePrograms.json",
   "allOf": [
-    { "$ref": "edges.base.json" },
+    {
+      "$ref": "edges.base.json"
+    },
     {
       "properties": {
-        "files_filesets": { "$ref": "../mixins.json#/files_filesets" },
-        "biosample_term": { "$ref": "../mixins.json#/biosample_term" },
-        "biological_context": { "$ref": "../mixins.json#/biological_context", "type": ["string", "null"] },
-        "treatments_term_ids": { "$ref": "../mixins.json#/treatments_term_ids" },
-        "perturbation": { "$ref": "../mixins.json#/perturbation", "type": ["string", "null"] }
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
     {
       "properties": {
         "_key": {
-          "description": "Program key, Ensembl gene ID, and membership suffix. The suffix distinguishes membership from future regulation edges for the same gene/program pair.",
+          "description": "Membership keys contain the defining file, program, gene, and membership suffix. Regulation keys also contain the regulator result file, preserving separate conditions and experiments.",
           "example": "IGVFFI9532OEFJ_GP_1_ENSG00000119707_membership"
         },
         "_from": {
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-          "collections": ["genes"],
+          "collections": [
+            "genes"
+          ],
           "example": "genes/ENSG00000119707"
         },
         "_to": {
           "pattern": "^gene_programs/IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
-          "collections": ["gene_programs"],
+          "collections": [
+            "gene_programs"
+          ],
           "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
         },
-        "name": { "enum": ["is a member of"], "example": "is a member of" },
-        "inverse_name": { "enum": ["has member"], "example": "has member" },
+        "name": {
+          "enum": [
+            "is a member of",
+            "regulates"
+          ],
+          "example": "is a member of"
+        },
+        "inverse_name": {
+          "enum": [
+            "has member",
+            "regulated by"
+          ],
+          "example": "has member"
+        },
         "score": {
           "title": "Score",
           "type": "number",
           "description": "Program score or loading derived from the method. Positive values indicate a positive relationship between the program and the gene, while a negative value indicates an inverse relationship.",
           "example": 0.0004757702483593
         },
-        "source": { "enum": ["IGVF"] },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
         "source_url": {
           "pattern": "^https://data\\.igvf\\.org/tabular-files/IGVFFI[0-9]{4}[A-Z]{4}/$",
           "example": "https://data.igvf.org/tabular-files/IGVFFI9532OEFJ/"
         },
-        "class": { "enum": ["observed data"] },
-        "method": { "type": ["string", "null"] },
-        "label": { "type": ["string", "null"] }
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "genomic_elements": {
+          "title": "Genomic Elements",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "Targeted promoter intervals associated with this gene-level perturbation result. Multiple intervals share one reported effect; they are not separate independent tests.",
+          "items": {
+            "type": "string",
+            "pattern": "^genomic_elements/",
+            "collections": [
+              "genomic_elements"
+            ]
+          }
+        },
+        "log2FC": {
+          "title": "Log2 Fold Change",
+          "type": "number",
+          "description": "Submitted log2 fold change of mean program score in perturbed cells versus the reference group. Sign describes the perturbation effect, not an inferred direction of gene regulation."
+        },
+        "test_statistic": {
+          "title": "Test Statistic",
+          "type": "number",
+          "description": "Submitted test statistic for the difference in program scores between perturbed and reference cells."
+        },
+        "neg_log10_pvalue": {
+          "title": "Negative Log10 P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Submitted p_nominal_nlog10, retained without clipping or transformation; null when unavailable."
+        },
+        "neg_log10_pvalue_adj": {
+          "title": "Adjusted Negative Log10 P-Value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Submitted fdr_nlog10, the negative log10 of the multiple-testing-adjusted p-value or q-value."
+        },
+        "reference_group": {
+          "title": "Reference Group",
+          "type": "string",
+          "minLength": 1,
+          "description": "Submitted description of the control/reference group used to calculate the perturbation effect."
+        },
+        "fdr_method": {
+          "title": "FDR Method",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Submitted multiple-testing correction method."
+        },
+        "significant": {
+          "title": "Significant?",
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the adjusted p-value or q-value is below 0.05 (fdr_nlog10 > -log10(0.05)); null when unavailable."
+        }
       },
-      "required": ["files_filesets", "score", "biological_context", "treatments_term_ids", "perturbation"]
+      "required": [
+        "files_filesets",
+        "biological_context",
+        "treatments_term_ids",
+        "perturbation"
+      ]
     }
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "return": "name, inverse_name, score, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url"
+    "return": "name, inverse_name, score, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url, genomic_elements, log2FC, test_statistic, neg_log10_pvalue, neg_log10_pvalue_adj, reference_group, fdr_method, significant",
+    "filter_by_range": "score, log2FC, test_statistic, neg_log10_pvalue, neg_log10_pvalue_adj"
   },
-  "db_collection_name": "genes_gene_programs"
+  "db_collection_name": "genes_gene_programs",
+  "oneOf": [
+    {
+      "properties": {
+        "name": {
+          "const": "is a member of"
+        },
+        "inverse_name": {
+          "const": "has member"
+        }
+      },
+      "required": [
+        "score"
+      ],
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "genomic_elements"
+            ]
+          },
+          {
+            "required": [
+              "log2FC"
+            ]
+          },
+          {
+            "required": [
+              "test_statistic"
+            ]
+          },
+          {
+            "required": [
+              "neg_log10_pvalue"
+            ]
+          },
+          {
+            "required": [
+              "neg_log10_pvalue_adj"
+            ]
+          },
+          {
+            "required": [
+              "reference_group"
+            ]
+          },
+          {
+            "required": [
+              "fdr_method"
+            ]
+          },
+          {
+            "required": [
+              "significant"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "properties": {
+        "name": {
+          "const": "regulates"
+        },
+        "inverse_name": {
+          "const": "regulated by"
+        }
+      },
+      "required": [
+        "genomic_elements",
+        "log2FC",
+        "test_statistic",
+        "neg_log10_pvalue",
+        "neg_log10_pvalue_adj",
+        "reference_group",
+        "fdr_method",
+        "significant"
+      ],
+      "not": {
+        "required": [
+          "score"
+        ]
+      }
+    }
+  ]
 }
