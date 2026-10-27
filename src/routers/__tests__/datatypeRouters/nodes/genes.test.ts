@@ -126,6 +126,7 @@ describe('genesRouters.genes', () => {
     const nearestQuery = (dbModule.db.query as jest.Mock).mock.calls[1][0] as string
     expect(nearestQuery).toContain('FOR record IN UNION(LEFT, RIGHT)')
     expect(nearestQuery).toContain('SORT distance ASC')
+    expect(nearestQuery).toMatch(/SORT distance ASC\s+LIMIT 1/)
   })
 
   it('findGenesByTextSearch returns fuzzy results if no token results', async () => {

@@ -95,6 +95,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
       LET anchorPos = record.strand == '-' ? record.end : record.start
       LET distance = anchorPos < ${regionParams[2]} ? ${regionParams[2]} - anchorPos : anchorPos - ${regionParams[3]}
       SORT distance ASC
+      LIMIT 1
       RETURN record
   `
 

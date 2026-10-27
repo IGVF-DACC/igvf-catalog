@@ -1406,7 +1406,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 25. <br> \
   Pagination is 0-based.',
 
-  nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. <br> \
+  nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the single nearest human gene. <br> \
   Example: region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
