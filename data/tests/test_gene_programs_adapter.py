@@ -46,7 +46,8 @@ def test_program_nodes(tmp_path, metadata, compressed):
     assert docs[0]['program_id'] == docs[0]['name'] == 'GP_1'
     assert docs[0]['files_filesets'] == 'files_filesets/IGVFFI9532OEFJ'
     assert docs[0]['class'] == 'observed data'
-    assert docs[0]['method'] == docs[0]['label'] == 'cNMF'
+    assert docs[0]['method'] == 'cNMF'
+    assert docs[0]['label'] == 'gene program'
     assert all('program_annotation' not in doc for doc in docs)
     metadata.assert_called_once_with('IGVFFI9532OEFJ')
     add_tag.assert_any_call('portal_accessions', 'IGVFFI9532OEFJ')
@@ -124,7 +125,7 @@ def test_membership_preserves_scores_and_resolves_node_ids(tmp_path, metadata):
     assert len({edge['_key'] for edge in edges}) == 3
     assert {edge['name'] for edge in edges} == {'is a member of'}
     assert {edge['inverse_name'] for edge in edges} == {'has member'}
-    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1])              : edge['score'] for edge in edges}
+    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1]): edge['score'] for edge in edges}
     assert scores == {
         ('genes/ENSG00000119707', '1'): 0.5,
         ('genes/ENSG00000289740', '1'): 0.2,
@@ -622,7 +623,6 @@ def test_program_correlations_are_symmetric(tmp_path, metadata):
     ([('GP_99', 'GP_1', '0.1')], 'is not defined'),
     ([('GP_1', 'GP_99', '0.1')], 'is not defined'),
     ([('GP_1', 'GP_2', 'NA')], 'Invalid Pearson correlation'),
-    ([('GP_1', 'GP_2', 'nan')], 'must be finite'),
     ([('GP_1', 'GP_2', 'inf')], 'must be finite'),
     ([('GP_1', 'GP_2', '1.01')], 'within'),
     ([('GP_1', 'GP_2', '-1.01')], 'within'),
@@ -705,7 +705,7 @@ def test_regulator_correlation_values_retained(tmp_path, metadata, value):
         0]['pearson_correlation'] == float(value)
 
 
-@pytest.mark.parametrize('value', ['NA', 'nan', 'inf', '-inf', '1.01', '-1.01'])
+@pytest.mark.parametrize('value', ['NA', 'inf', '-inf', '1.01', '-1.01'])
 def test_invalid_regulator_correlation_values_fail(tmp_path, metadata, value):
     rows = deepcopy(CORRELATION_ROWS[:1])
     rows[0][-1] = value
@@ -782,3 +782,65 @@ def test_regulator_correlation_mappings(accession, upstream):
     pair = next(m for m in source['file_mappings'] if Path(
         m['datafile']).name == accession + '.tsv.gz')
     assert Path(pair['reference_filepath']).name == upstream + '.tsv.gz'
+
+
+@pytest.mark.parametrize('method', ['cNMF', None])
+@pytest.mark.parametrize('mode,expected', [
+    ('gene_program', 'gene program'),
+    ('gene_program_membership', 'gene program membership'),
+    ('gene_program_regulation', 'gene program regulation'),
+    ('gene_program_correlation', 'program-program correlation'),
+    ('regulator_correlation', 'regulator-regulator correlation'),
+    ('genomic_element', 'gene program regulator element'),
+    ('genomic_element_regulator_correlation', 'gene program regulator element'),
+])
+def test_output_labels_are_descriptive_and_independent_of_method(tmp_path, metadata, mode, expected, method):
+    metadata.return_value['method'] = method
+    if mode in ('regulator_correlation', 'genomic_element_regulator_correlation'):
+        path = correlation_input(tmp_path, CORRELATION_ROWS[:1])
+        reference = tmp_path / 'IGVFFI7611VVSS.tsv'
+    elif mode == 'gene_program_correlation':
+        path, reference = program_correlation_input(tmp_path)
+    else:
+        path, reference = regulator_input(tmp_path)
+        if mode in ('gene_program', 'gene_program_membership'):
+            path = reference
+    docs = parse_regulators(path, mode, reference_filepath=reference)
+    assert docs
+    assert all(doc['label'] == expected and doc['method']
+               == method for doc in docs)
+    adapter = GenePrograms(
+        path, label=mode, reference_filepath=reference, validate=True)
+    with pytest.raises(ValueError, match='Document validation failed'):
+        adapter.validate_doc({**docs[0], 'label': 'cNMF'})
+    if mode in ('gene_program_membership', 'gene_program_regulation'):
+        other = 'gene program regulation' if mode == 'gene_program_membership' else 'gene program membership'
+        with pytest.raises(ValueError, match='Document validation failed'):
+            adapter.validate_doc({**docs[0], 'label': other})
+
+
+@pytest.mark.parametrize('value', ['N/A', 'NaN', '', ' nan '])
+@pytest.mark.parametrize('label', ['gene_program_correlation', 'regulator_correlation'])
+def test_specification_missing_correlations_are_null(tmp_path, metadata, value, label):
+    if label == 'gene_program_correlation':
+        path, reference = program_correlation_input(
+            tmp_path, [('GP_1', 'GP_2', value)])
+    else:
+        rows = deepcopy(CORRELATION_ROWS[:1])
+        rows[0][-1] = value
+        path = correlation_input(tmp_path, rows)
+        reference = tmp_path / 'IGVFFI7611VVSS.tsv'
+    docs = parse_regulators(path, label, reference_filepath=reference)
+    assert len(docs) == 1
+    assert docs[0]['pearson_correlation'] is None
+
+
+def test_missing_program_correlations_deduplicate_and_conflicts_fail(tmp_path, metadata):
+    rows = [('GP_1', 'GP_2', 'N/A'), ('GP_2', 'GP_1', 'NaN')]
+    path, reference = program_correlation_input(tmp_path, rows)
+    assert len(parse_regulators(path, 'gene_program_correlation',
+               reference_filepath=reference)) == 1
+    program_correlation_input(tmp_path, rows + [('GP_1', 'GP_2', '0.5')])
+    with pytest.raises(ValueError, match='Conflicting Pearson'):
+        parse_regulators(path, 'gene_program_correlation',
+                         reference_filepath=reference)

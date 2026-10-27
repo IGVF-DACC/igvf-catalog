@@ -23,6 +23,15 @@ from adapters.writer import Writer
 
 
 class GenePrograms(BaseAdapter):
+    OUTPUT_LABELS = {
+        'gene_program': 'gene program',
+        'gene_program_membership': 'gene program membership',
+        'gene_program_regulation': 'gene program regulation',
+        'gene_program_correlation': 'program-program correlation',
+        'regulator_correlation': 'regulator-regulator correlation',
+        'genomic_element': 'gene program regulator element',
+        'genomic_element_regulator_correlation': 'gene program regulator element',
+    }
     ALLOWED_LABELS = ['gene_program', 'gene_program_membership',
                       'gene_program_regulation', 'genomic_element',
                       'genomic_element_regulator_correlation', 'gene_program_correlation',
@@ -133,7 +142,7 @@ class GenePrograms(BaseAdapter):
             'files_filesets': f'files_filesets/{accession}',
             'class': metadata['class'],
             'method': metadata.get('method'),
-            'label': metadata.get('method'),
+            'label': self.OUTPUT_LABELS[self.label],
             'biological_context': sample_summaries[0] if sample_summaries else None,
             'treatments_term_ids': metadata.get('treatments_term_ids'),
             'perturbation': metadata.get('perturbation'),
@@ -308,6 +317,22 @@ class GenePrograms(BaseAdapter):
                 'Preserved %s submitted negative p_nominal_nlog10 values', negative_nominal_count)
         gene_validator.log()
 
+    @staticmethod
+    def _pearson_correlation(value, pair):
+        # Both linked correlation specifications permit N/A, NaN, and blank
+        # missing values. Serialize these as JSON null, never IEEE NaN.
+        if value.strip().lower() in ('n/a', 'nan', ''):
+            return None
+        try:
+            correlation = float(value)
+        except ValueError as error:
+            raise ValueError(
+                f'Invalid Pearson correlation for {pair}') from error
+        if not math.isfinite(correlation) or not -1 <= correlation <= 1:
+            raise ValueError(
+                f'Pearson correlation must be finite and within [-1, 1]: {pair}')
+        return correlation
+
     def _parse_program_correlations(self):
         defining_accession, programs = self._reference_programs()
         provenance = self._provenance()
@@ -320,14 +345,8 @@ class GenePrograms(BaseAdapter):
                 if program_id not in programs:
                     raise ValueError(
                         f'Program {program_id!r} is not defined in {defining_accession}')
-            try:
-                correlation = float(row['pearson_correlation'])
-            except ValueError as error:
-                raise ValueError(
-                    f'Invalid Pearson correlation for {pair}') from error
-            if not math.isfinite(correlation) or not -1 <= correlation <= 1:
-                raise ValueError(
-                    f'Pearson correlation must be finite and within [-1, 1]: {pair}')
+            correlation = self._pearson_correlation(
+                row['pearson_correlation'], pair)
             if pair in seen_pairs:
                 if seen_pairs[pair] != correlation:
                     raise ValueError(
@@ -436,14 +455,8 @@ class GenePrograms(BaseAdapter):
                 continue
             endpoints.sort(key=lambda endpoint: endpoint[0])
             (gene_from, keys_from), (gene_to, keys_to) = endpoints
-            try:
-                correlation = float(row['pearson_correlation'])
-            except ValueError as error:
-                raise ValueError(
-                    f'Invalid Pearson correlation for {gene_from}/{gene_to}') from error
-            if not math.isfinite(correlation) or not -1 <= correlation <= 1:
-                raise ValueError(
-                    f'Pearson correlation must be finite and within [-1, 1]: {gene_from}/{gene_to}')
+            correlation = self._pearson_correlation(
+                row['pearson_correlation'], (gene_from, gene_to))
             i, j = gene_indices[gene_from], gene_indices[gene_to]
             pair_index = j * (j + 1) // 2 + i
             byte, bit = divmod(pair_index, 8)

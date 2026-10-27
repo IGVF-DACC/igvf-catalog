@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/gene_programs_gene_programs.GenePrograms.json",
+  "$comment": "Source file_format_specifications: https://data.igvf.org/documents/30f2e55c-1e8f-4a96-b45a-35e28d9695ef/ Endpoint handles and symmetric keys are catalog-derived; source program IDs must resolve to the associated gene-program file.",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -54,12 +55,7 @@
             "null"
           ]
         },
-        "label": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
+        "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["program-program correlation"]},
         "_key": {
           "description": "Correlation file accession, defining program file accession, hash of the canonically ordered program-ID pair, and correlation suffix."
         },
@@ -68,14 +64,16 @@
           "collections": [
             "gene_programs"
           ],
-          "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
+          "example": "gene_programs/IGVFFI9532OEFJ_GP_1",
+          "description": "Catalog program identified by program_1_id or program_2_id in the associated gene-program file. Catalog endpoints are canonically ordered because the correlation is symmetric."
         },
         "_to": {
           "pattern": "^gene_programs/IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
           "collections": [
             "gene_programs"
           ],
-          "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
+          "example": "gene_programs/IGVFFI9532OEFJ_GP_1",
+          "description": "Catalog program identified by program_1_id or program_2_id in the associated gene-program file. Catalog endpoints are canonically ordered because the correlation is symmetric."
         },
         "name": {
           "enum": [
@@ -89,10 +87,13 @@
         },
         "pearson_correlation": {
           "title": "Pearson Correlation",
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": -1,
           "maximum": 1,
-          "description": "Pearson correlation between the two programs' log2FC values across gene perturbations."
+          "description": "Pearson correlation of the two programs' log2FC measurements over gene perturbations. N/A, NaN, and blank source values are represented as null."
         }
       },
       "required": [
