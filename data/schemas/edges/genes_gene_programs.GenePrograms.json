@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genes_gene_programs.GenePrograms.json",
+  "$comment": "Membership definitions follow https://data.igvf.org/documents/ddaf9ce5-471e-4cec-b344-c1071c0362b1/ Regulation fields originate from https://data.igvf.org/documents/c24cf62b-4e4e-45bb-80bf-dc9c0f99a0f4/; that linked document returned HTTP 403 on 2026-10-26 and its definitions have not been reverified. This is a catalog edge schema, not the complete source-file schema.",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -43,14 +44,16 @@
           "collections": [
             "genes"
           ],
-          "example": "genes/ENSG00000119707"
+          "example": "genes/ENSG00000119707",
+          "description": "Catalog gene referenced by the source gene column: an Ensembl identifier using the specification's IGVF GENCODE v43 annotation."
         },
         "_to": {
           "pattern": "^gene_programs/IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
           "collections": [
             "gene_programs"
           ],
-          "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
+          "example": "gene_programs/IGVFFI9532OEFJ_GP_1",
+          "description": "Catalog program referenced by the source program_id, scoped to the associated defining gene-program file."
         },
         "name": {
           "enum": [
@@ -69,7 +72,7 @@
         "score": {
           "title": "Score",
           "type": "number",
-          "description": "Program score or loading derived from the method. Positive values indicate a positive relationship between the program and the gene, while a negative value indicates an inverse relationship.",
+          "description": "Method-derived score or loading for a gene in the program. A positive score denotes a positive gene-program relationship; a negative score denotes an inverse relationship.",
           "example": 0.0004757702483593
         },
         "source": {
@@ -92,12 +95,7 @@
             "null"
           ]
         },
-        "label": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
+        "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["gene program membership", "gene program regulation"]},
         "genomic_elements": {
           "title": "Genomic Elements",
           "type": "array",
@@ -184,7 +182,8 @@
         },
         "inverse_name": {
           "const": "has member"
-        }
+        },
+        "label": {"const": "gene program membership"}
       },
       "required": [
         "score"
@@ -241,7 +240,8 @@
         },
         "inverse_name": {
           "const": "regulated by"
-        }
+        },
+        "label": {"const": "gene program regulation"}
       },
       "required": [
         "genomic_elements",

@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/gene_programs.GenePrograms.json",
+  "$comment": "Source file_format_specifications: https://data.igvf.org/documents/ddaf9ce5-471e-4cec-b344-c1071c0362b1/ Catalog nodes group the source rows by program_id; reported_gene_count and file-scoped keys are catalog-derived. Supplied GO annotations are intentionally excluded.",
   "allOf": [
     { "$ref": "node.base.json" },
     {
@@ -12,7 +13,7 @@
         "perturbation": { "$ref": "../mixins.json#/perturbation", "type": ["string", "null"] },
         "class": { "$ref": "../mixins.json#/class", "enum": ["observed data"] },
         "method": { "$ref": "../mixins.json#/method", "type": ["string", "null"] },
-        "label": { "$ref": "../mixins.json#/label", "type": ["string", "null"] }
+        "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["gene program"]}
       }
     },
     {
@@ -27,14 +28,14 @@
           "title": "Program ID",
           "type": "string",
           "pattern": "^[A-Za-z0-9_-]+$",
-          "description": "Program identifier in the defining input file; not globally unique.",
+          "description": "Identifier of the gene program in its defining file, using the GP_{number} naming convention in the gene-program specification.",
           "example": "GP_1"
         },
         "reported_gene_count": {
           "title": "Reported Gene Count",
           "type": "integer",
           "minimum": 1,
-          "description": "Number of distinct genes listed for this program in the input. A top-gene export may omit other genes from the underlying model.",
+          "description": "Catalog-derived count of genes reported for this program in the input file; not a field in the source specification and not necessarily the full program size.",
           "example": 300
         },
         "source": { "enum": ["IGVF"] },
