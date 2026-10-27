@@ -1939,6 +1939,22 @@ export const descriptions = {
               'spdi = NC_000001.11:155904168:A:G',
               'method = ColocBoost'
             ]
+          },
+          {
+            label: 'query by variant identifier and gene (gene_name also accepted, e.g. gene_name = WNT2B)',
+            items: [
+              'spdi = NC_000001.11:155904168:A:G',
+              'method = ColocBoost',
+              'gene_id = ENSG00000134245'
+            ]
+          },
+          {
+            label: 'query by variant identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = mean arterial pressure)',
+            items: [
+              'spdi = NC_000001.11:155904168:A:G',
+              'method = ColocBoost',
+              'phenotype_id = EFO_0006340'
+            ]
           }
         ]
       }
@@ -2011,6 +2027,22 @@ export const descriptions = {
             items: [
               'biosample_id = UBERON_0001225',
               'method = ColocBoost'
+            ]
+          },
+          {
+            label: 'query by biosample identifier and gene (gene_name also accepted, e.g. gene_name = WNT2B)',
+            items: [
+              'biosample_id = UBERON_0001225',
+              'method = ColocBoost',
+              'gene_id = ENSG00000134245'
+            ]
+          },
+          {
+            label: 'query by biosample identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = mean arterial pressure)',
+            items: [
+              'biosample_id = UBERON_0001225',
+              'method = ColocBoost',
+              'phenotype_id = EFO_0006340'
             ]
           }
         ]
