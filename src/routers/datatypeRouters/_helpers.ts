@@ -20,11 +20,10 @@ function assertValidNumericOperand (field: string, raw: string | undefined): str
 }
 
 // Distance to a gene's transcription start site, not to the nearest edge of the gene body -
-// the TSS is the biologically relevant reference point and depends on strand: it's the lower
-// coordinate (start) for '+' strand genes, the higher coordinate (end) for '-' strand genes.
+// it depends on strand: it's the lower coordinate (start) for '+' strand genes, the higher coordinate (end) for '-' strand genes.
 export function distanceGeneVariant (geneStart: number, geneEnd: number, geneStrand: string, variantPos: number): number {
-  const tss = geneStrand === '-' ? geneEnd : geneStart
-  return Math.abs(variantPos - tss)
+  const startSite = geneStrand === '-' ? geneEnd : geneStart
+  return Math.abs(variantPos - startSite)
 }
 
 // Validates page/limit and resolves the effective limit, mutating input by deleting

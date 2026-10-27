@@ -105,11 +105,27 @@ describe('genesRouters.genes', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // inRegionQuery returns []
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([mockResult]) } as any) // nearestQuery returns [[{...}]]
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mockResult) } as any) // nearestQuery returns [{...}], sorted by distance
 
     const input = { region: 'chr1:100-200', page: 0 }
     const result = await nearestGeneSearch(input)
     expect(result).toEqual(mockResult)
+  })
+
+  it('sorts left/right nearest-gene candidates by actual distance to the region', async () => {
+    jest.spyOn(helpers, 'validRegion').mockReturnValue(['region', 'chr1', '100', '200'])
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // inRegionQuery returns []
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // nearestQuery (actual sorting happens in AQL, not mocked here)
+
+    const input = { region: 'chr1:100-200', page: 0 }
+    await nearestGeneSearch(input)
+
+    const nearestQuery = (dbModule.db.query as jest.Mock).mock.calls[1][0] as string
+    expect(nearestQuery).toContain('FOR record IN UNION(LEFT, RIGHT)')
+    expect(nearestQuery).toContain('SORT distance ASC')
   })
 
   it('findGenesByTextSearch returns fuzzy results if no token results', async () => {

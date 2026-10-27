@@ -91,11 +91,14 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
       RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
 
-    RETURN UNION(LEFT, RIGHT)
+    FOR record IN UNION(LEFT, RIGHT)
+      LET anchorPos = record.strand == '-' ? record.end : record.start
+      LET distance = anchorPos < ${regionParams[2]} ? ${regionParams[2]} - anchorPos : anchorPos - ${regionParams[3]}
+      SORT distance ASC
+      RETURN record
   `
 
-  const nearestGenes = await (await db.query(nearestQuery)).all()
-  return nearestGenes[0] ?? []
+  return await (await db.query(nearestQuery)).all()
 }
 
 export async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
