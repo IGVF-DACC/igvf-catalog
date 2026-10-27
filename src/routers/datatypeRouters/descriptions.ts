@@ -1409,6 +1409,10 @@ export const descriptions = {
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the single nearest human gene. <br> \
   Example: region = chr1:1157520-1158189 (maximum length: 10kb).',
 
+  nearest_genes_deprecated: 'DEPRECATED. Please use /nearest-genes. <br> \
+  Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the single nearest human gene. <br> \
+  Example: region = chr1:1157520-1158189 (maximum length: 10kb).',
+
   variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
   At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, or region. <br> \
   Example: variant_id = NC_000012.12:102917129:T:C <br> \

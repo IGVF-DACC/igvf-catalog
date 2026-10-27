@@ -185,7 +185,7 @@ describe('variantsGenesRouters', () => {
     })
   })
 
-  describe('nearestGenes', () => {
+  describe('deprecatedNearestGenes', () => {
     it('returns coding-region genes for a valid region', async () => {
       const mockResult = [{
         _id: 'ENSG00000187583',
@@ -204,14 +204,14 @@ describe('variantsGenesRouters', () => {
       } as any)
 
       const input = { region: 'chr1:1000-2000' }
-      const result = await callProcedure(variantsGenesRouters.nearestGenes, input)
+      const result = await callProcedure(variantsGenesRouters.deprecatedNearestGenes, input)
 
       expect(result).toEqual(mockResult)
     })
 
     it('throws BAD_REQUEST for an invalid region format', async () => {
       const input = { region: 'not-a-region' }
-      await expect(callProcedure(variantsGenesRouters.nearestGenes, input)).rejects.toThrow(TRPCError)
+      await expect(callProcedure(variantsGenesRouters.deprecatedNearestGenes, input)).rejects.toThrow(TRPCError)
     })
   })
 })

@@ -230,6 +230,13 @@ const genes = publicProcedure
   .output(z.array(geneFormat))
   .query(async ({ input }) => await geneSearch(input))
 
+const nearestGenes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/nearest-genes', description: descriptions.nearest_genes } })
+  .input(z.object({ region: z.string().trim() }))
+  .output(z.array(geneFormat))
+  .query(async ({ input }) => await nearestGeneSearch(input))
+
 export const genesRouters = {
-  genes
+  genes,
+  nearestGenes
 }

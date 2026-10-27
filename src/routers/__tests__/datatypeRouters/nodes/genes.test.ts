@@ -129,6 +129,26 @@ describe('genesRouters.genes', () => {
     expect(nearestQuery).toMatch(/SORT distance ASC\s+LIMIT 1/)
   })
 
+  it('genesRouters.nearestGenes delegates to nearestGeneSearch', async () => {
+    const mockResult = [{ _id: '4', name: 'GeneD', chr: 'chr1', source: 'src', source_url: 'url', version: 'v1', start: null, end: null, gene_type: null, strand: null, hgnc: null, entrez: null, collections: null, study_sets: null }]
+    jest.spyOn(helpers, 'validRegion').mockReturnValue(['region', 'chr1', '100', '200'])
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // inRegionQuery returns []
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mockResult) } as any) // nearestQuery
+
+    const input = { region: 'chr1:100-200' }
+    const result = await genesRouters.nearestGenes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+    expect(result).toEqual(mockResult)
+  })
+
   it('findGenesByTextSearch returns fuzzy results if no token results', async () => {
     const mockResult = [{ _id: '5', name: 'GeneE', chr: 'chr1', source: 'src', source_url: 'url', version: 'v1', start: null, end: null, gene_type: null, strand: null, hgnc: null, entrez: null, collections: null, study_sets: null }]
     const geneSchema = { db_collection_name: 'genes' }

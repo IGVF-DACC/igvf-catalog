@@ -828,8 +828,9 @@ const variantsFromGenes = publicProcedure
   .output(z.array(completeQtlsFormat))
   .query(async ({ input }) => await getVariantFromGene(input))
 
-const nearestGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })
+// deprecated -> replaced by GET /nearest-genes in nodes/genes.ts
+const deprecatedNearestGenes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes_deprecated } })
   .input(z.object({ region: z.string().trim() }))
   .output(z.array(geneFormat))
   .query(async ({ input }) => await nearestGeneSearch(input))
@@ -850,6 +851,6 @@ export const variantsGenesRouters = {
   qtlSummaryEndpoint,
   genesFromVariants,
   variantsFromGenes,
-  nearestGenes,
+  deprecatedNearestGenes,
   genesVariantsScoreSummary
 }
