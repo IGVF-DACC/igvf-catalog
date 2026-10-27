@@ -51,13 +51,11 @@
         },
         "start": {
           "type": "integer",
-          "minimum": 0,
-          "description": "Start of a source hg38 interval. Stored as 0-based using the data-owner-confirmed coordinate convention."
+          "minimum": 0
         },
         "end": {
           "type": "integer",
-          "minimum": 1,
-          "description": "End of a source hg38 interval. Stored as end-exclusive using the data-owner-confirmed coordinate convention."
+          "minimum": 1
         },
         "method": {
           "type": [
@@ -84,7 +82,7 @@
           "enum": [
             "promoter"
           ],
-          "description": "Perturbed element category from genomic_element (regulator results) or genomic_element_1 / genomic_element_2 (correlations). The source standard permits promoters, enhancers, and other types; this catalog implementation currently supports promoters."
+          "description": "Perturbed element category."
         },
         "promoter_of": {
           "title": "Promoter Of",
