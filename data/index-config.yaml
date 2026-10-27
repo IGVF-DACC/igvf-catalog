@@ -116,6 +116,19 @@ genes_transcripts_genes:
     fields:
       - log2FC, neg_log10_pvalue_adj
 
+genes_transcripts_genomic_elements:
+  # ATAC-seq overexpression: fileset/significance filters with _key pagination.
+  # Method is constant; context uses equality filters rather than text search.
+  persistent:
+    fields:
+      - files_filesets, _key
+      - significant, _key
+  # DESeq2 metrics may be null. Keep independent range filters usable.
+  zkd_sparse:
+    fields:
+      - log2FC
+      - neg_log10_pvalue_adj
+
 genes_structure:
   persistent:
     fields:
