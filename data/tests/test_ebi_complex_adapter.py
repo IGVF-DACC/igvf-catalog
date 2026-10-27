@@ -100,6 +100,24 @@ def test_ebi_complex_process_file(
             assert '_to' in first_item
 
 
+def test_ebi_complex_to_ontology_term_key():
+    assert EBIComplex.to_ontology_term_key(
+        'GO:0006914(autophagy)') == 'GO_0006914'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:Orphanet : 370927(see-also)', source='efo') == 'Orphanet_370927'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:Orphanet: 244(see-also)', source='efo') == 'Orphanet_244'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:ORPHA2044(see-also)', source='efo') == 'Orphanet_2044'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:ORPHA93160(see-also)', source='efo') == 'Orphanet_93160'
+    assert EBIComplex.to_ontology_term_key(
+        'orphanet:ORPHA:459061(see-also)', source='orphanet') == 'Orphanet_459061'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:EFO:0000311(see-also)', source='efo') == 'EFO_0000311'
+    assert EBIComplex.to_ontology_term_key('') is None
+
+
 def test_ebi_complex_get_chain_id():
     adapter = EBIComplex(
         './tests/fixtures/EBI_complex_example.tsv', label='complex')
