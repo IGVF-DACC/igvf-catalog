@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/edges/genes_genes.GenePrograms.json",
-  "$comment": "Source file_format_specifications: https://data.igvf.org/documents/e204bbb2-3249-499f-bfc8-0e0ab38cc3a4/ The standard also allows enhancer and other element types with optional gene IDs. This catalog genes_genes schema and current adapter support gene-associated promoters only. Coordinates and element types are represented through linked genomic_elements; endpoint ordering is catalog-defined.",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -63,15 +62,13 @@
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
-          ],
-          "description": "Catalog gene for a perturbed regulator, derived from gene_1 or gene_2 (IGVF GENCODE v43 Ensembl ID). Required for promoter-targeting regulators; this genes_genes schema represents that subset of the standard. Endpoints are canonically ordered."
+          ]
         },
         "_to": {
           "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
           "collections": [
             "genes"
-          ],
-          "description": "Catalog gene for a perturbed regulator, derived from gene_1 or gene_2 (IGVF GENCODE v43 Ensembl ID). Required for promoter-targeting regulators; this genes_genes schema represents that subset of the standard. Endpoints are canonically ordered."
+          ]
         },
         "name": {
           "enum": [
@@ -91,14 +88,14 @@
           ],
           "minimum": -1,
           "maximum": 1,
-          "description": "Pearson correlation of the two perturbed regulators' log2FC measurements over gene programs. N/A, NaN, and blank source values are represented as null."
+          "description": "Pearson correlation between the two regulators' log2FC values across gene programs."
         },
         "genomic_elements_from": {
           "title": "Genomic Elements From",
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "description": "Catalog elements for the _from regulator, derived from the corresponding genomic_element_coordinates_1 or genomic_element_coordinates_2 hg38 coordinates. Comma-separated source intervals become separate references, retaining their upstream regulator identity.",
+          "description": "Targeted elements of the _from regulator, keyed to its upstream regulator file.",
           "items": {
             "type": "string",
             "pattern": "^genomic_elements/",
@@ -112,7 +109,7 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "description": "Catalog elements for the _to regulator, derived from the corresponding genomic_element_coordinates_1 or genomic_element_coordinates_2 hg38 coordinates. Comma-separated source intervals become separate references, retaining their upstream regulator identity.",
+          "description": "Targeted elements of the _to regulator, keyed to its upstream regulator file.",
           "items": {
             "type": "string",
             "pattern": "^genomic_elements/",
