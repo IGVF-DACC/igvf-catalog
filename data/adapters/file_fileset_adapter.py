@@ -19,6 +19,12 @@ class FileFileSet:
     SOURCE_IGVF = 'IGVF'
     SOURCE_COMMUNITY = 'Community'
 
+    # Temporary until these DESeq2 files have catalog annotations in igvfd.
+    OVEREXPRESSION_ATAC_FILES = {
+        'IGVFFI0911IUZS': ['genomic_elements', 'genes_transcripts_genomic_elements'],
+        'IGVFFI2320OTYL': ['genomic_elements', 'genes_transcripts_genomic_elements'],
+    }
+
     CRISPR_PERTURBATION_MAPPING = {
         'interference': 'CRISPR interference',
         'activation': 'CRISPR activation',
@@ -29,8 +35,8 @@ class FileFileSet:
     }
 
     @staticmethod
-    def get_perturbation(modality, method):
-        if method == 'MORF screen':
+    def get_perturbation(modality, method, accession=None):
+        if method == 'MORF screen' or accession in FileFileSet.OVEREXPRESSION_ATAC_FILES:
             return 'ORF overexpression'
         if modality is None:
             return None
@@ -759,6 +765,15 @@ class FileFileSet:
 
     @staticmethod
     def query_fileset_files_props_igvf(file_object):
+        # Preserve explicit portal annotations; fill only missing catalog fields.
+        fallback_collections = FileFileSet.OVEREXPRESSION_ATAC_FILES.get(
+            file_object['accession'])
+        if fallback_collections:
+            file_object = dict(file_object)
+            file_object['catalog_collections'] = (
+                file_object.get('catalog_collections') or fallback_collections)
+            file_object['catalog_class'] = (
+                file_object.get('catalog_class') or 'observed data')
         source_url = urljoin(FileFileSet.IGVF_SOURCE_URL, file_object['@id'])
         href = file_object.get('href')
         download_link = urljoin(FileFileSet.IGVF_API, href)
@@ -907,7 +922,7 @@ class FileFileSet:
             'cell_annotation': cell_annotation,
             'cell_annotation_term': cell_annotation_term,
             'genome_browser_link': genome_browser_link,
-            'perturbation': FileFileSet.get_perturbation(modality, method),
+            'perturbation': FileFileSet.get_perturbation(modality, method, file_object['accession']),
             'browser_index_file': browser_index_file
         }
         return props, donor_ids, sample_term_ids

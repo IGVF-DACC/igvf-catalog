@@ -2968,3 +2968,21 @@ genomic_element_genomic_element IGVF CRISPR accessibility:
   command: python3 data_parser.py --adapter crispr_element_element --filepath {datafile} --label genomic_element_genomic_element --output-bucket-key genomic_elements_genomic_elements/crispr_element_element_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI2419ZSGC/@@download/IGVFFI2419ZSGC.tsv.gz
+
+genomic_element IGVF overexpression ATAC-seq:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter overexpression_atac --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/overexpression_atac_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI0911IUZS/@@download/IGVFFI0911IUZS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2320OTYL/@@download/IGVFFI2320OTYL.tsv.gz
+
+gene_transcript_genomic_element IGVF overexpression ATAC-seq:
+  collection: genes_transcripts_genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter overexpression_atac --filepath {datafile} --label gene_transcript_genomic_element --output-bucket-key genes_transcripts_genomic_elements/overexpression_atac_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI0911IUZS/@@download/IGVFFI0911IUZS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2320OTYL/@@download/IGVFFI2320OTYL.tsv.gz

@@ -115,6 +115,9 @@ igvf_file_accessions:
     - IGVFFI6734IWRB
     - IGVFFI6032GREJ
     - IGVFFI2373SYJW
+  Overexpression ATAC-seq:
+    - IGVFFI0911IUZS
+    - IGVFFI2320OTYL
   SEM prediction:
     - IGVFFI2943RVII
     - IGVFFI3116SMJK
