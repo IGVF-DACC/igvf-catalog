@@ -255,7 +255,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
-  genes_transcripts_genomic_elements: 'Retrieve gene overexpression effects on chromatin accessibility through the source gene–transcript relationship.<br> gene_id, gene_name, and transcript_id select the overexpressed construct. genomic_element_id or accessible_region select readout peaks; regions use GRCh38 0-based, half-open chr:start-end coordinates and match overlapping peaks. At least one source gene, transcript, peak, region, files_fileset, method, or perturbation selector is required. Filter DESeq2 metrics with a number or gt/gte/lt/lte/eq:number. significant accepts true or false; significance means adjusted p-value < 0.05. Set verbose=true to expand the gene, transcript, and accessible genomic element. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+  genes_transcripts_genomic_elements: 'Retrieve gene overexpression effects on chromatin accessibility through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; genomic_element_id or accessible_region identifies the readout peaks. Filter by a source gene, transcript, peak, region, files_fileset, or method. Set verbose=true to expand gene, transcript, and genomic element nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
     {
       id: 'overexpression-atac',
       label: 'Overexpression ATAC-seq',
