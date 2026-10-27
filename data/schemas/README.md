@@ -66,7 +66,7 @@ gene–disease classifications follow [GenCC](https://thegencc.org/faq).
 
 The eleven mixins cover `files_filesets`, `biological_context`, `biosample_term`,
 `treatments_term_ids`, `source`, `source_url`, `method`, `label`, `class`,
-`crispr_modality`, and `organism`.
+`perturbation`, and `organism`.
 
 Keep every consistent attribute in the mixin. For example, file references
 share a string type, the `^files_filesets/` pattern, collection metadata, and an

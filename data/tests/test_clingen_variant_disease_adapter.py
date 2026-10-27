@@ -7,7 +7,7 @@ from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
-SAMPLE_PATH = './samples/clinGen_variant_pathogenicity_example.csv'
+SAMPLE_PATH = './tests/fixtures/clinGen_variant_pathogenicity_example.csv'
 SAMPLE_VARIANT_KEY = 'NC_000012.12:102917129:T:C'
 
 

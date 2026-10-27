@@ -11,7 +11,7 @@ FILE_ACCESSION = 'IGVFFI9177QQPS'
 
 @pytest.fixture
 def sample_filepath():
-    return './samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'
+    return './tests/fixtures/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def _collect_sample_entrez_and_mgi_ids(filepath):
     return entrez_ids, mgi_ids
 
 
-def mock_human_entrez_gene_map(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'):
+def mock_human_entrez_gene_map(filepath='./tests/fixtures/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'):
     entrez_ids, _ = _collect_sample_entrez_and_mgi_ids(filepath)
     return {
         f'ENTREZ:{entrez_id}': [f'ENSG{int(entrez_id):011d}']
@@ -52,7 +52,7 @@ def mock_human_entrez_gene_map(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHuman
     }
 
 
-def mock_mouse_mgi_gene_map(filepath='./samples/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'):
+def mock_mouse_mgi_gene_map(filepath='./tests/fixtures/IGVFFI9177QQPS.HOM_MouseHumanSequence_sample.rpt'):
     _, mgi_ids = _collect_sample_entrez_and_mgi_ids(filepath)
     return {
         mgi_id: [f'ENSMUSG{int(mgi_id.split(":")[1]):011d}']

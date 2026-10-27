@@ -8,7 +8,7 @@ from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
 
-SAMPLE_TSV = './samples/gencc_submissions.example.tsv'
+SAMPLE_TSV = './tests/fixtures/gencc_submissions.example.tsv'
 MOCK_GENE_MAP = {'HGNC:10896': ['ENSG00000123456', 'ENSG00000654321']}
 
 

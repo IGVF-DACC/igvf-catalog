@@ -29,6 +29,7 @@ class CRISPRElementPhenotype(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on phenotype'
     MAX_LOG10_PVALUE = 240
+    SIGNIFICANCE_THRESHOLD = 0.05
 
     # Accession -> phenotype ontology term and file column names.
     FILE_CONFIG = {
@@ -39,7 +40,6 @@ class CRISPRElementPhenotype(BaseAdapter):
             'num_guides_nonhit_col': 'nonhit_gRNA_count_mig',
             'fraction_guides_hit_col': 'fraction_hit_mig',
             'p_value_col': 'migration_pval',
-            'significant_col': 'mig_significant',
         },
         'IGVFFI9584UDAS': {
             'phenotype_term': 'GO_0008283',  # cell population proliferation
@@ -48,7 +48,6 @@ class CRISPRElementPhenotype(BaseAdapter):
             'num_guides_nonhit_col': 'nonhit_gRNA_count_growth',
             'fraction_guides_hit_col': 'fraction_hit_growth',
             'p_value_col': 'growth_pval',
-            'significant_col': 'growth_significant',
         },
     }
 
@@ -72,7 +71,7 @@ class CRISPRElementPhenotype(BaseAdapter):
         self.simple_sample_summaries = self.file_fileset['simple_sample_summaries']
         self.biosample_term = self.file_fileset['samples'][0]
         self.treatments_term_ids = self.file_fileset.get('treatments_term_ids')
-        self.crispr_modality = self.file_fileset.get('crispr_modality')
+        self.perturbation = self.file_fileset.get('perturbation')
         self.edge_class = self.file_fileset.get('class')
 
         super().__init__(filepath, label, writer, validate)
@@ -111,10 +110,6 @@ class CRISPRElementPhenotype(BaseAdapter):
             raise ValueError(
                 f'Unrecognized element coordinates: {dhs_coords!r}'
             ) from exc
-
-    @staticmethod
-    def _parse_bool(value: str) -> bool:
-        return value.strip().upper() == 'TRUE'
 
     def _neg_log10_pvalue(self, p_value: float) -> float:
         if p_value == 0:
@@ -188,13 +183,13 @@ class CRISPRElementPhenotype(BaseAdapter):
                 'z_score': float(row[config['z_score_col']]),
                 'p_value': p_value,
                 'neg_log10_pvalue': self._neg_log10_pvalue(p_value),
-                'significant': self._parse_bool(row[config['significant_col']]),
+                'significant': p_value < self.SIGNIFICANCE_THRESHOLD,
                 'num_guides': int(row['dhs_count']),
                 'num_guides_hit': int(row[config['num_guides_hit_col']]),
                 'num_guides_nonhit': int(row[config['num_guides_nonhit_col']]),
                 'fraction_guides_hit': float(row[config['fraction_guides_hit_col']]),
                 'method': self.method,
-                'crispr_modality': self.crispr_modality,
+                'perturbation': self.perturbation,
                 'class': self.edge_class,
                 'label': self.COLLECTION_LABEL,
                 'name': 'associated with',

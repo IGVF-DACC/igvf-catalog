@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
 ACCESSION = 'IGVFFI9602ILPC'
-SAMPLE = f'./samples/{ACCESSION}_crispr_variant_gene.example.tsv'
+SAMPLE = f'./tests/fixtures/{ACCESSION}_crispr_variant_gene.example.tsv'
 
 
 @pytest.mark.parametrize('effect_size, log2_fold_change', [
@@ -48,7 +48,7 @@ def mock_file_fileset():
             'simple_sample_summaries': ['donor:human'],
             'samples': ['ontology_terms/EFO_0001253'],
             'treatments_term_ids': [],
-            'crispr_modality': 'prime editing'
+            'perturbation': 'CRISPR prime editing'
         }
         yield mock_get_file_fileset
 
@@ -162,7 +162,7 @@ def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene
     assert first_item['label'] == 'variant effect on gene expression'
     assert first_item['source_url'] == adapter.source_url
     assert first_item['method'] == 'CRISPR screen'
-    assert first_item['crispr_modality'] == 'prime editing'
+    assert first_item['perturbation'] == 'CRISPR prime editing'
     assert first_item['class'] == 'observed data'
     assert first_item['biological_context'] == 'donor:human'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'
@@ -228,7 +228,7 @@ def test_invalid_label(mock_file_fileset):
 
 
 CRISPR_MILLIPEDE_ACCESSION = 'IGVFFI8101RHSC'
-CRISPR_MILLIPEDE_SAMPLE = f'./samples/{CRISPR_MILLIPEDE_ACCESSION}_crispr_variant_gene_millipede.example.csv'
+CRISPR_MILLIPEDE_SAMPLE = f'./tests/fixtures/{CRISPR_MILLIPEDE_ACCESSION}_crispr_variant_gene_millipede.example.csv'
 mock_crispr_millipede_data = (
     'variants,PIP,Betas,Coefficient StdDev\n'
     'NC_000016.10:28930710:G:A,0.0284163262526425,-0.0116633875205405,0.0699744682130392\n'
@@ -247,7 +247,7 @@ def mock_crispr_millipede_file_fileset():
             'simple_sample_summaries': ['human NALM-6 cell line'],
             'samples': ['ontology_terms/CLO_0007938'],
             'treatments_term_ids': None,
-            'crispr_modality': 'base editing'
+            'perturbation': 'CRISPR base editing'
         }
         yield mock_get_file_fileset
 
@@ -308,5 +308,5 @@ def test_crispr_millipede_file_uses_hardcoded_cd19_gene(
     assert first_item['neg_log10_pvalue'] is None
     assert first_item['neg_log10_pvalue_adj'] is None
     assert first_item['method'] == 'CRISPR screen'
-    assert first_item['crispr_modality'] == 'base editing'
+    assert first_item['perturbation'] == 'CRISPR base editing'
     assert first_item['significant'] is False

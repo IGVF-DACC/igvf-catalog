@@ -5,8 +5,8 @@ from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
-MIGRATION_PATH = './samples/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
-GROWTH_PATH = './samples/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
+MIGRATION_PATH = './tests/fixtures/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
+GROWTH_PATH = './tests/fixtures/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'interference',
+            'perturbation': 'CRISPR interference',
             'simple_sample_summaries': ['human HFF-1 cell line from donor(s) IGVFDO0058YJWC'],
             'samples': ['ontology_terms/CLO_0003730'],
             'treatments_term_ids': None,
@@ -81,7 +81,7 @@ def test_crispr_element_phenotype_genomic_element_phenotype_migration(
     assert first_item['num_guides_hit'] == 0
     assert first_item['num_guides_nonhit'] == 32
     assert first_item['fraction_guides_hit'] == 0.0
-    assert first_item['crispr_modality'] == 'interference'
+    assert first_item['perturbation'] == 'CRISPR interference'
     assert first_item['label'] == 'regulatory element effect on phenotype'
     assert first_item['name'] == 'associated with'
     assert first_item[
@@ -177,3 +177,32 @@ def test_crispr_element_phenotype_skips_na_coordinate_rows(
     assert len(writer.contents) == 1
     item = json.loads(writer.contents[0])
     assert item['_from'] == 'genomic_elements/CRISPR_chr1_101174581_101175330_GRCh38_IGVFFI5135QZCS'
+
+
+@pytest.mark.parametrize('accession', ['IGVFFI5135QZCS', 'IGVFFI9584UDAS'])
+@pytest.mark.parametrize('p_value,source_flag,expected', [
+    (0.049, 'FALSE', True),
+    (0.05, 'TRUE', False),
+    (0.051, 'TRUE', False),
+])
+def test_significance_uses_adapter_threshold(
+        mock_file_fileset, mock_ontology_term_validator, tmp_path, accession, p_value, source_flag, expected):
+    config = CRISPRElementPhenotype.FILE_CONFIG[accession]
+    row = {
+        'dhs_coords': 'chr1:100-200_1', 'dhs_count': 2,
+        config['z_score_col']: 0,
+        config['p_value_col']: p_value,
+        config['num_guides_hit_col']: 0,
+        config['num_guides_nonhit_col']: 2,
+        config['fraction_guides_hit_col']: 0,
+        'mig_significant': source_flag, 'growth_significant': source_flag,
+    }
+    sample = tmp_path / f'{accession}_threshold.tsv'
+    sample.write_text('\t'.join(row) + '\n' +
+                      '\t'.join(map(str, row.values())) + '\n')
+    writer = SpyWriter()
+    CRISPRElementPhenotype(
+        filepath=str(sample), label='genomic_element_phenotype',
+        writer=writer, validate=True,
+    ).process_file()
+    assert json.loads(writer.contents[0])['significant'] is expected

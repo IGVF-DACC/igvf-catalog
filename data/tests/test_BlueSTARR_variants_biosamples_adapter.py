@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open
 
 FILE_ACCESSION = 'IGVFFI5288RAAV'
-FILEPATH = f'./samples/bluestarr.{FILE_ACCESSION}.tsv'
+FILEPATH = f'./tests/fixtures/bluestarr.{FILE_ACCESSION}.tsv'
 
 mock_bed_data = (
     'chr10\t100005234\t100005491\t0.126\tNC_000010.11:100005302:A:C\n'

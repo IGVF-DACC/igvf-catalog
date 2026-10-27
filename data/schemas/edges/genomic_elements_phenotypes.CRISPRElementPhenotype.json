@@ -44,7 +44,7 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the element's effect on the phenotype."
+          "description": "Whether the p-value is below the adapter-defined threshold of 0.05."
         },
         "num_guides": {
           "title": "Number of Guides",
@@ -71,10 +71,10 @@
             "CRISPR screen"
           ]
         },
-        "crispr_modality": {
-          "$ref": "../mixins.json#/crispr_modality",
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
           "enum": [
-            "interference"
+            "CRISPR interference"
           ]
         },
         "class": {
@@ -131,7 +131,7 @@
         "num_guides_nonhit",
         "fraction_guides_hit",
         "files_filesets",
-        "crispr_modality",
+        "perturbation",
         "biological_context",
         "biosample_term"
       ],
@@ -140,7 +140,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "z_score, p_value, neg_log10_pvalue",
-    "return": "class, label, method, crispr_modality, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, num_guides_hit, num_guides_nonhit, fraction_guides_hit"
+    "return": "class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, num_guides_hit, num_guides_nonhit, fraction_guides_hit"
   },
   "db_collection_name": "genomic_elements_phenotypes"
 }

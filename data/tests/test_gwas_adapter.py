@@ -42,7 +42,7 @@ def mock_ontology_term_validator():
 @pytest.fixture
 def gwas_files():
     return {
-        'variants_to_ontology': './samples/gwas_v2d_igvf_sample.tsv'
+        'variants_to_ontology': './tests/fixtures/gwas_v2d_igvf_sample.tsv'
     }
 
 

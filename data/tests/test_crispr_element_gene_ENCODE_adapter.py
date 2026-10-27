@@ -13,7 +13,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'interference',
+            'perturbation': 'CRISPR interference',
             'simple_sample_summaries': ['K562'],
             'samples': ['ontology_terms/EFO_0002067']
         }
@@ -36,7 +36,7 @@ def mock_gene_map():
 def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
     writer = SpyWriter()
     adapter = CRISPRElementGeneENCODE(
-        filepath='./samples/crispr_element_gene_encode.example.tsv', label='genomic_element', writer=writer, validate=True)
+        filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv', label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -53,7 +53,7 @@ def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
 @pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset, mock_gene_map):
     writer = SpyWriter()
-    adapter = CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv',
+    adapter = CRISPRElementGeneENCODE(filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv',
                                       label='genomic_element_gene', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -74,7 +74,7 @@ def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset, mock_g
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
     assert first_item['label'] == 'regulatory element effect on gene expression'
     assert first_item['method'] == 'CRISPR screen'
-    assert first_item['crispr_modality'] == 'interference'
+    assert first_item['perturbation'] == 'CRISPR interference'
     assert first_item['class'] == 'observed data'
 
 
@@ -121,7 +121,7 @@ def test_encode2gcrispr_adapter_multiple_gene_ids(mock_file_fileset, mocker):
 def test_encode2gcrispr_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_gene'):
-        CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv',
+        CRISPRElementGeneENCODE(filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv',
                                 label='invalid_label', writer=writer)
 
 
@@ -129,8 +129,8 @@ def test_encode2gcrispr_adapter_initialization(mock_file_fileset):
     writer = SpyWriter()
     for label in CRISPRElementGeneENCODE.ALLOWED_LABELS:
         adapter = CRISPRElementGeneENCODE(
-            filepath='./samples/crispr_element_gene_encode.example.tsv', label=label, writer=writer)
-        assert adapter.filepath == './samples/crispr_element_gene_encode.example.tsv'
+            filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv', label=label, writer=writer)
+        assert adapter.filepath == './tests/fixtures/crispr_element_gene_encode.example.tsv'
         assert adapter.label == label
         assert adapter.writer == writer
         assert adapter.files_filesets is not None
@@ -139,7 +139,7 @@ def test_encode2gcrispr_adapter_initialization(mock_file_fileset):
 def test_encode2gcrispr_adapter_load_regulatory_region(mock_file_fileset):
     writer = SpyWriter()
     adapter = CRISPRElementGeneENCODE(
-        filepath='./samples/crispr_element_gene_encode.example.tsv', label='genomic_element', writer=writer)
+        filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv', label='genomic_element', writer=writer)
     adapter.load_genomic_element()
     assert hasattr(adapter, 'genomic_element_nodes')
     assert isinstance(adapter.genomic_element_nodes, dict)
@@ -148,7 +148,7 @@ def test_encode2gcrispr_adapter_load_regulatory_region(mock_file_fileset):
 
 def test_encode2gcrispr_adapter_load_gene_id_mapping(mock_file_fileset, mock_gene_map):
     writer = SpyWriter()
-    adapter = CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv',
+    adapter = CRISPRElementGeneENCODE(filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv',
                                       label='genomic_element_gene', writer=writer)
     adapter.load_gene_id_mapping()
     assert hasattr(adapter, 'gene_id_mapping')
@@ -158,7 +158,7 @@ def test_encode2gcrispr_adapter_load_gene_id_mapping(mock_file_fileset, mock_gen
 
 def test_encode2gcrispr_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
-    adapter = CRISPRElementGeneENCODE(filepath='./samples/crispr_element_gene_encode.example.tsv',
+    adapter = CRISPRElementGeneENCODE(filepath='./tests/fixtures/crispr_element_gene_encode.example.tsv',
                                       label='genomic_element_gene', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

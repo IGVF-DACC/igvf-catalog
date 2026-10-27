@@ -7,9 +7,9 @@ from adapters.CRISPR_variant_phenotype_adapter import CRISPRVariantPhenotype
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
-PRIME_PATH = './samples/IGVFFI2014OOZP_crispr_variant_phenotype_sherwood_prime.example.csv'
-CRISPRI_PATH = './samples/IGVFFI9726GFTC_crispr_variant_phenotype_sherwood_crispri.example.csv'
-ABE_PATH = './samples/IGVFFI1678CDBR_crispr_variant_phenotype_sherwood_abe.example.csv'
+PRIME_PATH = './tests/fixtures/IGVFFI2014OOZP_crispr_variant_phenotype_sherwood_prime.example.csv'
+CRISPRI_PATH = './tests/fixtures/IGVFFI9726GFTC_crispr_variant_phenotype_sherwood_crispri.example.csv'
+ABE_PATH = './tests/fixtures/IGVFFI1678CDBR_crispr_variant_phenotype_sherwood_abe.example.csv'
 
 MOCK_VARIANT = {
     '_key': 'NC_000001.11:25253603:G:A',
@@ -33,7 +33,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'CRISPR screen',
             'class': 'observed data',
-            'crispr_modality': 'prime editing',
+            'perturbation': 'CRISPR prime editing',
             'simple_sample_summaries': ['Homo sapiens HepG2 cell line'],
             'samples': ['ontology_terms/EFO_0001187'],
             'treatments_term_ids': None,
@@ -118,7 +118,7 @@ def test_invalid_label(mock_file_fileset):
     side_effect=_mock_load_variant,
 )
 def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
-    mock_file_fileset.return_value['crispr_modality'] = 'prime editing'
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR prime editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
         filepath=PRIME_PATH,
@@ -147,9 +147,8 @@ def test_variant_sherwood_prime(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_prime(
-        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
-    mock_file_fileset.return_value['crispr_modality'] = 'prime editing'
+def test_variant_phenotype_sherwood_prime(mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR prime editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
         filepath=PRIME_PATH,
@@ -161,7 +160,7 @@ def test_variant_phenotype_sherwood_prime(
 
     assert len(writer.contents) == 2
     first = json.loads(writer.contents[0])
-    assert first['crispr_modality'] == 'prime editing'
+    assert first['perturbation'] == 'CRISPR prime editing'
     assert first['significant'] is True
     assert first['num_guides'] == 1
     assert first['p_value_adj'] is None
@@ -228,7 +227,7 @@ def test_to_loadable_variant_id_converts_hg38_ids():
     side_effect=_mock_load_variant,
 )
 def test_variant_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
-    mock_file_fileset.return_value['crispr_modality'] = 'interference'
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR interference'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
         filepath=CRISPRI_PATH,
@@ -259,9 +258,8 @@ def test_variant_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_crispri(
-        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
-    mock_file_fileset.return_value['crispr_modality'] = 'interference'
+def test_variant_phenotype_sherwood_crispri(mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR interference'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
         filepath=CRISPRI_PATH,
@@ -276,7 +274,7 @@ def test_variant_phenotype_sherwood_crispri(
     by_key = {doc['_key']: doc for doc in docs}
     sig = by_key['NC_MOCK:11091517:GC:G_NTR_0001118_IGVFFI9726GFTC']
     nonsig = by_key['NC_MOCK:26915517:G:A_NTR_0001118_IGVFFI9726GFTC']
-    assert sig['crispr_modality'] == 'interference'
+    assert sig['perturbation'] == 'CRISPR interference'
     assert sig['significant'] is True
     assert sig['num_guides'] == 5
     assert sig['effect_size'] == pytest.approx(-0.14773342)
@@ -294,7 +292,7 @@ def test_variant_phenotype_sherwood_crispri(
     side_effect=_mock_load_variant,
 )
 def test_variant_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
-    mock_file_fileset.return_value['crispr_modality'] = 'base editing'
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR base editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
         filepath=ABE_PATH,
@@ -323,9 +321,8 @@ def test_variant_sherwood_abe(mock_load, mock_bulk, mock_file_fileset):
     'adapters.CRISPR_variant_phenotype_adapter.load_variant',
     side_effect=_mock_load_variant,
 )
-def test_variant_phenotype_sherwood_abe(
-        mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
-    mock_file_fileset.return_value['crispr_modality'] = 'base editing'
+def test_variant_phenotype_sherwood_abe(mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator):
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR base editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
         filepath=ABE_PATH,
@@ -340,7 +337,7 @@ def test_variant_phenotype_sherwood_abe(
     by_key = {doc['_key']: doc for doc in docs}
     sig = by_key['NC_MOCK:25395598:A:G_NTR_0001118_IGVFFI1678CDBR']
     nonsig = by_key['NC_MOCK:25253603:G:A_NTR_0001118_IGVFFI1678CDBR']
-    assert sig['crispr_modality'] == 'base editing'
+    assert sig['perturbation'] == 'CRISPR base editing'
     assert sig['significant'] is True
     assert sig['num_guides'] is None
     assert sig['edit_rate_mean'] == pytest.approx(0.515483206)

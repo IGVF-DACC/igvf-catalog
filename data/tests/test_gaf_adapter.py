@@ -42,7 +42,7 @@ def mock_ontology_term_validator():
 
 def test_gaf_adapter_human(mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
     writer = SpyWriter()
-    adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
+    adapter = GAF(filepath='./tests/fixtures/goa_human_sample.gaf.gz',
                   label='human', writer=writer, validate=True)
     adapter.file_accession = 'IGVFFI4899LHFM'
     adapter.process_file()
@@ -90,7 +90,7 @@ def test_gaf_adapter_uses_remapped_go_term(
 
 def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_term_validator):
     writer = SpyWriter()
-    adapter = GAF(filepath='./samples/mgi_sample.gaf.gz',
+    adapter = GAF(filepath='./tests/fixtures/mgi_sample.gaf.gz',
                   label='mouse', writer=writer, validate=True)
     adapter.file_accession = 'IGVFFI0062EMMC'
     adapter.process_file()
@@ -115,9 +115,9 @@ def test_gaf_adapter_mouse(mock_file_fileset, mock_protein_map, mock_ontology_te
 
 def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
     writer = SpyWriter()
-    adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
+    adapter = GAF(filepath='./tests/fixtures/goa_human_rna.gaf.gz',
                   label='rna', writer=writer, validate=True,
-                  reference_filepath='./samples/rnacentral_ensembl_gencode.tsv.gz')
+                  reference_filepath='./data_loading_support_files/rnacentral_ensembl_gencode.tsv.gz')
     adapter.file_accession = 'IGVFFI6197DHVQ'
     adapter.process_file()
     mock_file_fileset.assert_called_once_with('IGVFFI6197DHVQ')
@@ -137,7 +137,7 @@ def test_gaf_adapter_rna(mock_file_fileset, mock_ontology_term_validator):
 def test_gaf_adapter_invalid_type():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_type. Allowed values: human, human_isoform, mouse, rna'):
-        GAF(filepath='./samples/goa_human_sample.gaf.gz',
+        GAF(filepath='./tests/fixtures/goa_human_sample.gaf.gz',
             label='invalid_type', writer=writer, validate=True)
 
 
@@ -150,9 +150,9 @@ def test_gaf_adapter_rna_requires_reference_filepath():
 
 def test_gaf_adapter_load_rnacentral_mapping():
     writer = SpyWriter()
-    adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
+    adapter = GAF(filepath='./tests/fixtures/goa_human_rna.gaf.gz',
                   label='rna', writer=writer, validate=True,
-                  reference_filepath='./samples/rnacentral_ensembl_gencode.tsv.gz')
+                  reference_filepath='./data_loading_support_files/rnacentral_ensembl_gencode.tsv.gz')
     adapter.load_rnacentral_mapping()
     assert hasattr(adapter, 'rnacentral_mapping')
     assert isinstance(adapter.rnacentral_mapping, dict)
@@ -161,7 +161,7 @@ def test_gaf_adapter_load_rnacentral_mapping():
 
 def test_gaf_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
+    adapter = GAF(filepath='./tests/fixtures/goa_human_sample.gaf.gz',
                   label='human', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
@@ -172,7 +172,8 @@ def test_gaf_adapter_validate_doc_invalid():
 
 
 def test_gaf_adapter_initialization():
-    adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz', label='human')
-    assert adapter.filepath == './samples/goa_human_sample.gaf.gz'
+    adapter = GAF(
+        filepath='./tests/fixtures/goa_human_sample.gaf.gz', label='human')
+    assert adapter.filepath == './tests/fixtures/goa_human_sample.gaf.gz'
     assert adapter.label == 'human'
     assert adapter.file_accession == 'goa_human_sample'

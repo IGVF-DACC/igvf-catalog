@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 from adapters.MORF_gene_transcript_gene_adapter import MORFGeneTranscriptGene
 from adapters.writer import SpyWriter
 
-DESEQ_PATH = './samples/IGVFFI6734IWRB_morf_transcript_gene_deseq2.example.tsv'
-ORF_PATH = './samples/IGVFFI2373SYJW_morf_orf_transcripts.example.tsv'
-CHRONIC_DESEQ_PATH = './samples/IGVFFI6032GREJ_morf_transcript_gene_deseq2.example.tsv'
+DESEQ_PATH = './tests/fixtures/IGVFFI6734IWRB_morf_transcript_gene_deseq2.example.tsv'
+ORF_PATH = './tests/fixtures/IGVFFI2373SYJW_morf_orf_transcripts.example.tsv'
+CHRONIC_DESEQ_PATH = './tests/fixtures/IGVFFI6032GREJ_morf_transcript_gene_deseq2.example.tsv'
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def mock_file_fileset():
         mock_get_file_fileset.return_value = {
             'method': 'MORF screen',
             'class': 'observed data',
-            'crispr_modality': None,
+            'perturbation': None,
             'simple_sample_summaries': ['CD8-positive, alpha-beta T cell'],
             'samples': ['ontology_terms/CL_0000625'],
             'treatments_term_ids': None,
@@ -77,6 +77,7 @@ def test_morf_gene_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_
         -math.log10(0.260422575712608))
     assert aatf['significant'] is False
     assert aatf['method'] == 'MORF screen'
+    assert aatf['perturbation'] == 'ORF overexpression'
     assert aatf['label'] == 'gene overexpression effect on gene expression'
     assert aatf['name'] == 'modulates expression of'
     assert aatf['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/'
