@@ -26,6 +26,25 @@ mock_tsv_row_multi_biosample = (
 )
 mock_tsv_data_multi_biosample = mock_tsv_header + mock_tsv_row_multi_biosample
 
+OUTLIER_FILE_ACCESSION = 'IGVFFI5870RJQU'
+OUTLIER_FILEPATH = f'./samples/{OUTLIER_FILE_ACCESSION}.tsv.gz'
+
+mock_tsv_header_outlier = (
+    'VariantChr\tVariantStart\tVariantEnd\tEffectAllele\tOtherAllele\t'
+    'SPDI_ID\tVCP\tGeneEnsembl\tGeneName\tTraitName\tOntologyTerm\tBiosampleTermName\tBiosampleTerm\n'
+)
+mock_tsv_row_above_threshold = (
+    f'chr1\t112503772\t112503773\tT\tC\t{MOCK_SPDI}\t'
+    '0.9993\tENSG00000134245\tWNT2B\tmean arterial pressure\tEFO_0006340\ttibial nerve\tUBERON_0001323\n'
+)
+mock_tsv_row_below_threshold = (
+    f'chr1\t112503772\t112503773\tT\tC\t{MOCK_SPDI}\t'
+    '0.05\tENSG00000134245\tWNT2B\tmean arterial pressure\tEFO_0006340\ttibial nerve\tUBERON_0001323\n'
+)
+mock_tsv_data_outlier_mixed_vcp = (
+    mock_tsv_header_outlier + mock_tsv_row_above_threshold + mock_tsv_row_below_threshold
+)
+
 
 @pytest.fixture
 def mock_file_fileset():
@@ -162,6 +181,27 @@ def test_multiple_biosamples_per_row(mock_bulk_check, mock_split_spdi, mock_buil
     assert f'{MOCK_VARIANT_ID}_UBERON_0001323_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}' in by_key
     assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0007610_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}']['biological_context'] == 'tibial artery'
     assert by_key[f'{MOCK_VARIANT_ID}_UBERON_0001323_ENSG00000155363_EFO_0006340_{FILE_ACCESSION}']['biological_context'] == 'tibial nerve'
+
+
+@patch('adapters.ColocBoost_variants_biosamples_adapter.build_variant_id', return_value=MOCK_VARIANT_ID)
+@patch('adapters.ColocBoost_variants_biosamples_adapter.split_spdi', return_value=('chr1', 112503772, 'T', 'C'))
+@patch('adapters.ColocBoost_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value={MOCK_SPDI})
+def test_outlier_file_drops_rows_below_vcp_threshold(mock_bulk_check, mock_split_spdi, mock_build_id, mock_file_fileset, mock_load_variant):
+    writer = SpyWriter()
+    adapter = ColocBoostVariantBiosample(
+        filepath=OUTLIER_FILEPATH,
+        label='variant_biosample',
+        writer=writer,
+        validate=False
+    )
+    with patch('gzip.open', mock_open(read_data=mock_tsv_data_outlier_mixed_vcp)):
+        adapter.process_file()
+
+    # Only the row with VCP > 0.1 should survive; this file was uploaded
+    # without the lab's usual pre-filter applied.
+    assert len(writer.contents) == 1
+    item = json.loads(writer.contents[0])
+    assert item['VCP'] == 0.9993
 
 
 @patch('adapters.ColocBoost_variants_biosamples_adapter.bulk_check_variants_in_arangodb', return_value=set())

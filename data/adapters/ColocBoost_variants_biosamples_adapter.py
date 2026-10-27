@@ -16,6 +16,11 @@ from adapters.writer import Writer
 class ColocBoostVariantBiosample(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
+    VCP_THRESHOLD = 0.1
+    # IGVFFI5870RJQU was uploaded without the VCP > 0.1 pre-filter applied.
+    # Enforce the threshold here instead; remove this once the lab uploads
+    # a filtered version to the portal.
+    OUTLIER_FILE_WITHOUT_THRESHOLD = 'IGVFFI5870RJQU'
 
     def __init__(
         self,
@@ -63,6 +68,7 @@ class ColocBoostVariantBiosample(BaseAdapter):
             # Files are expected to have at most one row per
             # (variant, gene, trait); rows are not merged.
             rows = self.normalize_rows(list(reader))
+            rows = self.apply_vcp_threshold(rows)
             self.warn_duplicate_rows(rows)
 
         chunk_size = 6500
@@ -89,6 +95,16 @@ class ColocBoostVariantBiosample(BaseAdapter):
         for row in rows:
             row['UBERONTerm'] = row.get('BiosampleTerm', '')
         return rows
+
+    def apply_vcp_threshold(self, rows):
+        """
+        Every other ColocBoost file is pre-filtered by the lab to VCP > 0.1
+        before upload. IGVFFI5870RJQU did not have that filter applied, so
+        apply it here instead.
+        """
+        if self.file_accession != self.OUTLIER_FILE_WITHOUT_THRESHOLD:
+            return rows
+        return [row for row in rows if float(row['VCP']) > self.VCP_THRESHOLD]
 
     def warn_duplicate_rows(self, rows):
         """
