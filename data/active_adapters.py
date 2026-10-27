@@ -58,8 +58,10 @@ from adapters.gencc_diseases_genes_adapter import GenccDiseasesGenes
 from adapters.scE2G_adapter import scE2G
 from adapters.DUAL_IPA_coding_variant_scores_adapter import DUALIPAAdapter
 from adapters.variant_painting_coding_variant_scores_adapter import VariantPaintingAdapter
+from adapters.gene_programs_adapter import GenePrograms
 
 KEY_TO_ADAPTER = {
+    'gene_programs': GenePrograms,
     'gencode_genes': GencodeGene,
     'gencode_transcripts': Gencode,
     'transcribed_to': Gencode,

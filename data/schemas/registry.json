@@ -21,10 +21,14 @@
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },
+        "gene_programs": {
+            "GenePrograms": "schemas/nodes/gene_programs.GenePrograms.json"
+        },
         "genes_structure": {
             "GencodeStructure": "schemas/nodes/genes_structure.GencodeStructure.json"
         },
         "genomic_elements": {
+            "GenePrograms": "schemas/nodes/genomic_elements.GenePrograms.json",
             "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
             "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json",
@@ -135,6 +139,7 @@
             "DepMap": "schemas/edges/genes_biosamples.DepMap.json"
         },
         "genes_genes": {
+            "GenePrograms": "schemas/edges/genes_genes.GenePrograms.json",
             "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
             "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
         },
@@ -143,6 +148,12 @@
         },
         "genes_pathways": {
             "Reactome": "schemas/edges/genes_pathways.Reactome.json"
+        },
+        "gene_programs_gene_programs": {
+            "GenePrograms": "schemas/edges/gene_programs_gene_programs.GenePrograms.json"
+        },
+        "genes_gene_programs": {
+            "GenePrograms": "schemas/edges/genes_gene_programs.GenePrograms.json"
         },
         "genes_transcripts": {
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"

@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/gene_programs_gene_programs.GenePrograms.json",
+  "$comment": "Source file_format_specifications: https://data.igvf.org/documents/30f2e55c-1e8f-4a96-b45a-35e28d9695ef/ Endpoint handles and symmetric keys are catalog-derived; source program IDs must resolve to the associated gene-program file.",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "properties": {
+        "files_filesets": {
+          "$ref": "../mixins.json#/files_filesets"
+        },
+        "biosample_term": {
+          "$ref": "../mixins.json#/biosample_term"
+        },
+        "biological_context": {
+          "$ref": "../mixins.json#/biological_context",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "treatments_term_ids": {
+          "$ref": "../mixins.json#/treatments_term_ids"
+        },
+        "perturbation": {
+          "$ref": "../mixins.json#/perturbation",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "pattern": "^https://data\\.igvf\\.org/tabular-files/IGVFFI[0-9]{4}[A-Z]{4}/$",
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9532OEFJ/"
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["program-program correlation"]},
+        "_key": {
+          "description": "Correlation file accession, defining program file accession, hash of the canonically ordered program-ID pair, and correlation suffix."
+        },
+        "_from": {
+          "pattern": "^gene_programs/IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
+          "collections": [
+            "gene_programs"
+          ],
+          "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
+        },
+        "_to": {
+          "pattern": "^gene_programs/IGVFFI[0-9]{4}[A-Z]{4}_[A-Za-z0-9_-]+$",
+          "collections": [
+            "gene_programs"
+          ],
+          "example": "gene_programs/IGVFFI9532OEFJ_GP_1"
+        },
+        "name": {
+          "enum": [
+            "correlated with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "correlated with"
+          ]
+        },
+        "pearson_correlation": {
+          "title": "Pearson Correlation",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Pearson correlation between the two programs' log2FC values across gene perturbations."
+        }
+      },
+      "required": [
+        "files_filesets",
+        "biological_context",
+        "treatments_term_ids",
+        "perturbation",
+        "pearson_correlation"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "name, inverse_name, pearson_correlation, biosample_term, biological_context, treatments_term_ids, perturbation, files_filesets, class, method, label, source, source_url",
+    "filter_by_range": "pearson_correlation"
+  },
+  "db_collection_name": "gene_programs_gene_programs"
+}

@@ -840,6 +840,7 @@ class FileFileSet:
                 'scCRISPR screen',
                 'Multiome Perturb-seq',
                 'in vivo Perturb-seq',
+                'CC-Perturb-seq',
             }):
                 method = 'Perturb-seq'
             elif set(preferred_assay_titles).issubset({

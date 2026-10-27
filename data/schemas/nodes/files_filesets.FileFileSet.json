@@ -62,6 +62,7 @@
           "items": {
             "type": "string",
             "enum": [
+              "CC-Perturb-seq",
               "CRISPR FACS screen",
               "CRISPR FlowFISH screen",
               "CRISPR MACS screen",
@@ -188,6 +189,7 @@
               "Cell Profiler",
               "Cooler",
               "CountESS",
+              "cNMF",
               "cV2F",
               "cyp2c19_2c9",
               "DESeq2",
@@ -198,12 +200,14 @@
               "ESM-1v",
               "FRACTEL",
               "Irreproducible Discovery Rate",
+              "MAST",
               "MAGeCK",
               "matplotlib",
               "MPRAflow tsv-to-bed",
               "mpralm",
               "MutPred2",
               "NumPy",
+              "PerturbNMF",
               "pandas",
               "pybedtools",
               "Pysam",
@@ -222,7 +226,8 @@
               "Snakemake",
               "statsmodels",
               "Straw",
-              "snapATAC2"
+              "snapATAC2",
+              "TeloHAEC genome-wide Perturb-seq analysis"
             ]
           }
         },
