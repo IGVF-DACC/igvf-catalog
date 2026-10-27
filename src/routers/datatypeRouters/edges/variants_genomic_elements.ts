@@ -648,7 +648,6 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
   let elementIDs: string[] = []
   const isElementQuery = input.region !== undefined
   if (isElementQuery) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     const elementInput: paramsFormatType = (({ region, type }) => ({ region, type }))(input)
     delete input.region
     delete input.type

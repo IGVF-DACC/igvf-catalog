@@ -933,7 +933,6 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
 
   let sourceAnnotationFilter = ''
   if (input.source_annotation !== undefined) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     sourceAnnotationFilter = `DOCUMENT(record._from).source_annotation == '${escapeAqlString(input.source_annotation as string)}'`
     delete input.source_annotation
   }

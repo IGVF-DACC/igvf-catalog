@@ -89,7 +89,7 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
         cell_annotation_term: null,
         files_filesets: 'files_filesets/IGVFFI0001XXXX',
         preferred_assay_titles: ['TAP-seq'],
-        crispr_modality: null,
+        perturbation: null,
         score: null,
         transcription_start_site: null,
         rna_pseudobulk_tpm: null,
@@ -323,7 +323,7 @@ describe('genomicElementsGenesRouters.grn', () => {
       {
         response_gene: 'CALML6',
         genomic_element: { chr: 'chr1', start: 1850597, end: 1858437, regulator_gene: 'SAMD11' },
-        crispr_modality: null,
+        perturbation: null,
         class: 'observed data',
         method: 'Perturb-seq',
         source: 'IGVF',

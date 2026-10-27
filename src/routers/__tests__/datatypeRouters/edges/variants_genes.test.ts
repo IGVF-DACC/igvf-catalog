@@ -154,7 +154,7 @@ describe('variantsGenesRouters', () => {
         z_score: null,
         credible_set_min_r2: null,
         method: 'Perturb-seq',
-        crispr_modality: null,
+        perturbation: null,
         source: 'IGVF',
         source_url: 'https://data.igvf.org/tabular-files/IGVFFI0524YUIL/',
         label: 'variant effect on gene expression',

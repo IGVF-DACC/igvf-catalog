@@ -82,6 +82,7 @@ it('looks up preferred_assay_titles via files_filesets and expands TAP-seq group
     label: 'gene overexpression effect on gene expression',
     class: 'observed data',
     method: 'MORF screen',
+    perturbation: 'ORF overexpression',
     source: 'IGVF',
     source_url: 'https://data.igvf.org/tabular-files/IGVFFI6734IWRB/',
     files_filesets: 'files_filesets/IGVFFI6734IWRB',
