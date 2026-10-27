@@ -258,7 +258,7 @@ export const descriptions = {
   genes_transcripts_genomic_elements: 'Retrieve gene overexpression effects on chromatin accessibility through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; genomic_element_id or accessible_region identifies the readout peaks. Filter by a source gene, transcript, peak, region, files_fileset, or method. Set verbose=true to expand gene, transcript, and genomic element nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
     {
       id: 'overexpression-atac',
-      label: 'Overexpression ATAC-seq',
+      label: 'ATAC-seq',
       examples: [
         {
           label: 'BATF3 transcript overexpression effects on accessibility',
