@@ -69,14 +69,3 @@ registry in `data/schemas/registry.json`.
 | DUALIPAAdapter               | DUAL_IPA_coding_variant_scores_adapter | coding_variants_phenotypes                                                               |
 | MORFGeneTranscriptGene       | MORF_gene_transcript_gene_adapter   | genes_transcripts_genes                                                                 |
 | OverexpressionATAC          | overexpression_ATAC_adapter        | genomic_elements, genes_transcripts_genomic_elements                                    |
-
-`overexpression_atac` ingests DESeq2 files IGVFFI0911IUZS and IGVFFI2320OTYL.
-Run the `genomic_element` and `gene_transcript_genomic_element` labels for each
-file. Both use the 0-based, half-open GRCh38 intervals encoded in `rowID`;
-edges originate from `genes_transcripts/ENSG00000123685_ENST00000243440`.
-All rows are retained, with significance defined as adjusted p-value < 0.05.
-Load the corresponding `files_filesets` documents and the source gene-transcript
-relationship first. The files/filesets adapter supplies missing catalog class
-and collections for these accessions, and sets `ORF overexpression` while
-retaining the portal's `ATAC-seq` method. The raw counts file IGVFFI4762WUEH
-is not ingested.
