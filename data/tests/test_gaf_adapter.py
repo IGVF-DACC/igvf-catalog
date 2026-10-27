@@ -75,7 +75,7 @@ def test_gaf_adapter_uses_remapped_go_term(
         else OntologyTermValidator.normalize_term_key(term_key)
     )
     writer = SpyWriter()
-    adapter = GAF(filepath='./data/tests/fixtures/goa_human_sample.gaf.gz',
+    adapter = GAF(filepath='./tests/fixtures/goa_human_sample.gaf.gz',
                   label='human', writer=writer, validate=False)
     adapter.file_accession = 'IGVFFI4899LHFM'
     adapter.process_file()
