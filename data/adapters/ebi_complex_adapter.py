@@ -99,7 +99,7 @@ class EBIComplex(BaseAdapter):
             self.load_linked_features_dict()
         if self.label == 'complex_term':
             self.ontology_term_validator.preload(
-                self._collect_complex_term_keys())
+                self._collect_complex_term_keys(), resolve_via_ols=True)
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
@@ -228,13 +228,15 @@ class EBIComplex(BaseAdapter):
                         go_term_id = self.to_ontology_term_key(go_term)
                         if not go_term_id:
                             continue
-                        if not self.ontology_term_validator.validate(go_term_id):
+                        resolved_term_id = self.ontology_term_validator.resolve(
+                            go_term_id)
+                        if resolved_term_id is None:
                             continue
                         go_term_name = go_term.split('(')[1].replace(')', '')
 
-                        _key = complex_ac + '_' + go_term_id
+                        _key = complex_ac + '_' + resolved_term_id
                         _from = 'complexes/' + complex_ac
-                        _to = 'ontology_terms/' + go_term_id
+                        _to = 'ontology_terms/' + resolved_term_id
                         props = {
                             '_key': _key,
                             '_from': _from,
@@ -278,12 +280,14 @@ class EBIComplex(BaseAdapter):
                                 if not xref_term_id:
                                     continue
 
-                                if not self.ontology_term_validator.validate(xref_term_id):
+                                resolved_term_id = self.ontology_term_validator.resolve(
+                                    xref_term_id)
+                                if resolved_term_id is None:
                                     continue
 
-                                _key = complex_ac + '_' + xref_term_id
+                                _key = complex_ac + '_' + resolved_term_id
                                 _from = 'complexes/' + complex_ac
-                                _to = 'ontology_terms/' + xref_term_id
+                                _to = 'ontology_terms/' + resolved_term_id
                                 props = {
                                     '_key': _key,
                                     '_from': _from,
