@@ -44,6 +44,9 @@ def mock_ontology_term_validator():
         mock_validator = MockValidator.return_value
         mock_validator.validate.return_value = True
         mock_validator.ensure.return_value = True
+        mock_validator.resolve.side_effect = (
+            lambda term_key: OntologyTermValidator.normalize_term_key(term_key)
+        )
         yield mock_validator
 
 
@@ -95,9 +98,53 @@ def test_ebi_complex_process_file(
             assert first_item['_from'] == 'complexes/CPX-1'
             assert first_item['_to'] == 'proteins/ENSP00000341551'
         elif label == 'complex_term':
+            _, preload_kwargs = mock_ontology_term_validator.preload.call_args
+            assert preload_kwargs.get('resolve_via_ols') is True
             assert '_key' in first_item
             assert '_from' in first_item
             assert '_to' in first_item
+
+
+def test_ebi_complex_uses_remapped_ontology_term(
+        mock_file_fileset, mock_ontology_term_validator):
+    mock_ontology_term_validator.resolve.side_effect = (
+        lambda term_key: 'GO_0003674'
+        if OntologyTermValidator.normalize_term_key(term_key) == 'GO_0003690'
+        else OntologyTermValidator.normalize_term_key(term_key)
+    )
+    sample_filepath = './tests/fixtures/EBI_complex_example.tsv'
+    writer = SpyWriter()
+    adapter = EBIComplex(
+        sample_filepath, label='complex_term', writer=writer, validate=False)
+    adapter.process_file()
+
+    docs = [json.loads(c)
+            for c in writer.contents if c.strip().startswith('{')]
+    remapped = [
+        d for d in docs
+        if d['_from'] == 'complexes/CPX-1'
+        and d['_to'] == 'ontology_terms/GO_0003674'
+    ]
+    assert remapped
+    assert all(d['_key'] == 'CPX-1_GO_0003674' for d in remapped)
+
+
+def test_ebi_complex_to_ontology_term_key():
+    assert EBIComplex.to_ontology_term_key(
+        'GO:0006914(autophagy)') == 'GO_0006914'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:Orphanet : 370927(see-also)', source='efo') == 'Orphanet_370927'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:Orphanet: 244(see-also)', source='efo') == 'Orphanet_244'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:ORPHA2044(see-also)', source='efo') == 'Orphanet_2044'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:ORPHA93160(see-also)', source='efo') == 'Orphanet_93160'
+    assert EBIComplex.to_ontology_term_key(
+        'orphanet:ORPHA:459061(see-also)', source='orphanet') == 'Orphanet_459061'
+    assert EBIComplex.to_ontology_term_key(
+        'efo:EFO:0000311(see-also)', source='efo') == 'EFO_0000311'
+    assert EBIComplex.to_ontology_term_key('') is None
 
 
 def test_ebi_complex_get_chain_id():

@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import pickle
+import re
 from typing import Optional
 
 from adapters.base import BaseAdapter
@@ -29,7 +30,8 @@ class EBIComplex(BaseAdapter):
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
     # cross-references to ontology terms we want to load
-    XREF_SOURCES = ['efo', 'intact', 'mondo', 'orphanet', 'pubmed']
+    # intact (EBI-* IntAct accessions) and pubmed are not ontology terms
+    XREF_SOURCES = ['efo', 'mondo', 'orphanet']
     # removed biorxiv, -> only one case, and difficult to convert to key id
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
@@ -39,6 +41,32 @@ class EBIComplex(BaseAdapter):
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
+
+    @staticmethod
+    def to_ontology_term_key(raw_id, source=None):
+        """Normalize a GO/xref annotation to an ontology_terms _key.
+
+        Drops the parenthetical label, optionally strips an xref source prefix
+        (e.g. ``efo:``), removes BOM/whitespace (EBI sometimes has
+        ``Orphanet : 370927``), then converts ``:`` to ``_``.
+
+        Also rewrites compact Orphanet forms such as ``ORPHA2044`` /
+        ``ORPHA_459061`` to ``Orphanet_<id>``.
+        """
+        if not raw_id:
+            return None
+        key = str(raw_id).split('(')[0]
+        if source:
+            key = key.replace(source + ':', '')
+        key = key.replace('\ufeff', '')
+        key = ''.join(key.split())
+        if not key:
+            return None
+        key = key.replace(':', '_')
+        orpha = re.fullmatch(r'ORPHA_?(\d+)', key, flags=re.IGNORECASE)
+        if orpha:
+            return f'Orphanet_{orpha.group(1)}'
+        return key
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -71,7 +99,7 @@ class EBIComplex(BaseAdapter):
             self.load_linked_features_dict()
         if self.label == 'complex_term':
             self.ontology_term_validator.preload(
-                self._collect_complex_term_keys())
+                self._collect_complex_term_keys(), resolve_via_ols=True)
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
@@ -197,14 +225,18 @@ class EBIComplex(BaseAdapter):
 
                 elif self.label == 'complex_term':  # parse cross-references & go annotations
                     for go_term in go_terms:
-                        go_term_id = go_term.split('(')[0].replace(':', '_')
-                        if not self.ontology_term_validator.validate(go_term_id):
+                        go_term_id = self.to_ontology_term_key(go_term)
+                        if not go_term_id:
+                            continue
+                        resolved_term_id = self.ontology_term_validator.resolve(
+                            go_term_id)
+                        if resolved_term_id is None:
                             continue
                         go_term_name = go_term.split('(')[1].replace(')', '')
 
-                        _key = complex_ac + '_' + go_term_id
+                        _key = complex_ac + '_' + resolved_term_id
                         _from = 'complexes/' + complex_ac
-                        _to = 'ontology_terms/' + go_term_id
+                        _to = 'ontology_terms/' + resolved_term_id
                         props = {
                             '_key': _key,
                             '_from': _from,
@@ -243,22 +275,19 @@ class EBIComplex(BaseAdapter):
                     for xref in xrefs:
                         for source in EBIComplex.XREF_SOURCES:
                             if xref.startswith(source):
-                                if xref.startswith('pubmed'):
-                                    xref_term_id = xref.split(
-                                        '(')[0].replace(':', '_')
-                                else:
-                                    xref_term_id = xref.split('(')[0].replace(
-                                        source + ':', '').replace(':', '_')
-
-                                xref_term_id = xref_term_id.replace(
-                                    '\ufeff', '')
-
-                                if not self.ontology_term_validator.validate(xref_term_id):
+                                xref_term_id = self.to_ontology_term_key(
+                                    xref, source=source)
+                                if not xref_term_id:
                                     continue
 
-                                _key = complex_ac + '_' + xref_term_id
+                                resolved_term_id = self.ontology_term_validator.resolve(
+                                    xref_term_id)
+                                if resolved_term_id is None:
+                                    continue
+
+                                _key = complex_ac + '_' + resolved_term_id
                                 _from = 'complexes/' + complex_ac
-                                _to = 'ontology_terms/' + xref_term_id
+                                _to = 'ontology_terms/' + resolved_term_id
                                 props = {
                                     '_key': _key,
                                     '_from': _from,
@@ -306,17 +335,16 @@ class EBIComplex(BaseAdapter):
                 if any(m.startswith('CHEBI:') or m.startswith('URS') for m in molecules):
                     continue
                 for go_term in complex_row[7].split('|'):
-                    term_keys.add(go_term.split('(')[0].replace(':', '_'))
+                    go_term_id = self.to_ontology_term_key(go_term)
+                    if go_term_id:
+                        term_keys.add(go_term_id)
                 for xref in complex_row[8].split('|'):
                     for source in EBIComplex.XREF_SOURCES:
                         if xref.startswith(source):
-                            if xref.startswith('pubmed'):
-                                xref_term_id = xref.split(
-                                    '(')[0].replace(':', '_')
-                            else:
-                                xref_term_id = xref.split('(')[0].replace(
-                                    source + ':', '').replace(':', '_')
-                            term_keys.add(xref_term_id.replace('\ufeff', ''))
+                            xref_term_id = self.to_ontology_term_key(
+                                xref, source=source)
+                            if xref_term_id:
+                                term_keys.add(xref_term_id)
         return term_keys
 
     def get_chain_id(self, protein):
