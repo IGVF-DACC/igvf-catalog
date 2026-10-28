@@ -129,6 +129,26 @@ describe('genesRouters.genes', () => {
     expect(nearestQuery).toMatch(/SORT distance ASC\s+LIMIT 1/)
   })
 
+  it('includes genes whose TSS lands exactly on the region boundary (distance 0)', async () => {
+    // a gene ending (or starting) exactly at the query region's edge must not fall through
+    // the crack between the "overlaps the region" and "nearest neighbor" filters - see
+    // the MESD/chr15:80989828-80989829 bug report this regression guards against.
+    jest.spyOn(helpers, 'validRegion').mockReturnValue(['region', 'chr1', '100', '200'])
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name')
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // inRegionQuery returns []
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // nearestQuery
+
+    const input = { region: 'chr1:100-200', page: 0 }
+    await nearestGeneSearch(input)
+
+    const nearestQuery = (dbModule.db.query as jest.Mock).mock.calls[1][0] as string
+    expect(nearestQuery).toContain('record.end <= 100')
+    expect(nearestQuery).toContain('record.start >= 200')
+    expect(nearestQuery).toContain('anchorPos <= 100')
+  })
+
   it('genesRouters.nearestGenes delegates to nearestGeneSearch', async () => {
     const mockResult = [{ _id: '4', name: 'GeneD', chr: 'chr1', source: 'src', source_url: 'url', version: 'v1', start: null, end: null, gene_type: null, strand: null, hgnc: null, entrez: null, collections: null, study_sets: null }]
     jest.spyOn(helpers, 'validRegion').mockReturnValue(['region', 'chr1', '100', '200'])
