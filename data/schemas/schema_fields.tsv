@@ -737,8 +737,8 @@ edge	genes_transcripts.Gencode	biological_process	Gene Ontology term for the pro
 edge	genomic_elements_biosamples.MPRAAdapter	bed_score	Score column of the source BED file.
 edge	genomic_elements_biosamples.MPRAAdapter	strand	Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.
 edge	genomic_elements_biosamples.MPRAAdapter	log2FC	Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio.
-edge	genomic_elements_biosamples.MPRAAdapter	DNA_count	Input count (DNA), normalized to counts per million and averaged across replicates.
-edge	genomic_elements_biosamples.MPRAAdapter	RNA_count	Output count (RNA), normalized to counts per million and averaged across replicates.
+edge	genomic_elements_biosamples.MPRAAdapter	inputCount	Input count (DNA), normalized to counts per million and averaged across replicates.
+edge	genomic_elements_biosamples.MPRAAdapter	outputCount	Output count (RNA), normalized to counts per million and averaged across replicates.
 edge	genomic_elements_biosamples.MPRAAdapter	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
 edge	genomic_elements_biosamples.MPRAAdapter	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
 edge	genomic_elements_biosamples.MPRAAdapter	significant	Boolean indicator of the significance of the element's activity. The threshold is: a neg_log10_pvalue_adj of 1 or more.
@@ -1000,10 +1000,10 @@ edge	variants_biosamples.MPRAAdapter	genomic_element	Reference to the genomic el
 edge	variants_biosamples.MPRAAdapter	strand	Strand the tile was tested in: '+' or '-', or '.' where the reference sequence design does not record one.
 edge	variants_biosamples.MPRAAdapter	bed_score	Score column of the source BED file.
 edge	variants_biosamples.MPRAAdapter	log2FC	Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space.
-edge	variants_biosamples.MPRAAdapter	DNA_count_ref	Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates.
-edge	variants_biosamples.MPRAAdapter	RNA_count_ref	Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates.
-edge	variants_biosamples.MPRAAdapter	DNA_count_alt	Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates.
-edge	variants_biosamples.MPRAAdapter	RNA_count_alt	Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	inputCountRef	Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	outputCountRef	Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	inputCountAlt	Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates.
+edge	variants_biosamples.MPRAAdapter	outputCountAlt	Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates.
 edge	variants_biosamples.MPRAAdapter	neg_log10_pvalue	Negative log 10 p-value of the measurement or prediction
 edge	variants_biosamples.MPRAAdapter	neg_log10_pvalue_adj	Adjusted negative log 10 p-value of the measurement or prediction
 edge	variants_biosamples.MPRAAdapter	significant	Boolean indicator of the significance of the element's activity.  The threshold is: a neg_log10_pvalue_adj of 1 or more.

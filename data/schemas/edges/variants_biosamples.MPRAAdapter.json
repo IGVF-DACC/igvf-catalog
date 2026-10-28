@@ -61,22 +61,22 @@
           "type": "number",
           "description": "Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space."
         },
-        "DNA_count_ref": {
+        "inputCountRef": {
           "title": "DNA Count for Reference Allele",
           "type": "number",
           "description": "Input count (DNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
-        "RNA_count_ref": {
+        "outputCountRef": {
           "title": "RNA Count for Reference Allele",
           "type": "number",
           "description": "Output count (RNA) for the reference allele, normalized to counts per million and averaged across replicates."
         },
-        "DNA_count_alt": {
+        "inputCountAlt": {
           "title": "DNA Count for Alternate Allele",
           "type": "number",
           "description": "Input count (DNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
-        "RNA_count_alt": {
+        "outputCountAlt": {
           "title": "RNA Count for Alternate Allele",
           "type": "number",
           "description": "Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates."
@@ -179,7 +179,7 @@
     }
   ],
   "accessible_via": {
-    "return": "strand, log2FC, bed_score, DNA_count_ref, RNA_count_ref, DNA_count_alt, RNA_count_alt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
+    "return": "strand, log2FC, bed_score, inputCountRef, outputCountRef, inputCountAlt, outputCountAlt, neg_log10_pvalue, neg_log10_pvalue_adj, significant, postProbEffect, source, source_url, genomic_element"
   },
   "db_collection_name": "variants_biosamples"
 }

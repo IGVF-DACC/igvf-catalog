@@ -309,7 +309,7 @@ genomic_elements: |
 
 genomic_elements_biosamples: |
   INSERT INTO genomic_elements_biosamples
-  SELECT element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
+  SELECT element_name, strand, activity_score, bed_score, inputCount, outputCount, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
   FROM s3('s3://igvf-catalog-parsed-collections/genomic_elements_biosamples/*.jsonl', 'JSONEachRow')
 
 donors: |

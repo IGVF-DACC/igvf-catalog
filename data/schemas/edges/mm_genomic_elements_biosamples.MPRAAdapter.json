@@ -38,11 +38,11 @@
           "type": "number",
           "description": "Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio."
         },
-        "DNA_count": {
+        "inputCount": {
           "type": "number",
           "description": "Input count (DNA), normalized to counts per million and averaged across replicates."
         },
-        "RNA_count": {
+        "outputCount": {
           "type": "number",
           "description": "Output count (RNA), normalized to counts per million and averaged across replicates."
         },
@@ -126,7 +126,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
+    "return": "_id, strand, log2FC, bed_score, inputCount, outputCount, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
   },
   "db_collection_name": "mm_genomic_elements_biosamples"
 }

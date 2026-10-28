@@ -236,10 +236,10 @@ def test_variant_biosample(
         'strand': '+',
         'bed_score': 66,
         'log2FC': -0.0768,
-        'DNA_count_ref': 0.5948,
-        'RNA_count_ref': 0.3434,
-        'DNA_count_alt': 0.6516,
-        'RNA_count_alt': 0.3039,
+        'inputCountRef': 0.5948,
+        'outputCountRef': 0.3434,
+        'inputCountAlt': 0.6516,
+        'outputCountAlt': 0.3039,
         'neg_log10_pvalue': 5.9634,
         'neg_log10_pvalue_adj': 4.7221,
         'significant': True,
@@ -742,12 +742,12 @@ def test_omit_nonfinite_metrics_preserves_record(value):
     record = {
         '_key': 'test-edge',
         'log2FC': MPRAAdapter.safe_float(value),
-        'RNA_count': MPRAAdapter.safe_float('0'),
-        'DNA_count': MPRAAdapter.safe_float('12.5'),
+        'outputCount': MPRAAdapter.safe_float('0'),
+        'inputCount': MPRAAdapter.safe_float('12.5'),
         'optional': None,
     }
     cleaned = MPRAAdapter._drop_nonfinite_metrics(record)
-    assert cleaned == {'_key': 'test-edge', 'RNA_count': 0.0,
-                       'DNA_count': 12.5, 'optional': None}
+    assert cleaned == {'_key': 'test-edge', 'outputCount': 0.0,
+                       'inputCount': 12.5, 'optional': None}
     json.dumps(cleaned, allow_nan=False)
     assert MPRAAdapter.safe_int(value) is None
