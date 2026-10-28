@@ -791,7 +791,6 @@ class MPRAAdapter(BaseAdapter):
                 edge_key = '_'.join([
                     variant_id,
                     element_id,
-                    self.strand_token(element_strand),
                     biosample_term_key,
                     self.file_accession,
                 ])

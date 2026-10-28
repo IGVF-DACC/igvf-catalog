@@ -223,7 +223,7 @@ def test_variant_biosample(
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
     biosample_term_key = 'CL_0000679'
-    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_plus_{biosample_term_key}_IGVFFI1323RCIE'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
@@ -659,7 +659,7 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, mock
         elif label == 'variant_biosample':
             assert record['_from'] == f'mm_variants/{spdi}'
             assert record['genomic_element'] == f'mm_genomic_elements/{element_key}'
-            assert record['_key'] == f'{spdi}_{element_key}_plus_CL_0000679_IGVFFI2111LQGF'
+            assert record['_key'] == f'{spdi}_{element_key}_CL_0000679_IGVFFI2111LQGF'
         if label in ('variant', 'variant_biosample'):
             assert check.call_args.kwargs['collection'] == 'mm_variants'
             load.assert_called_once_with(spdi, assembly='GRCm39')
