@@ -135,6 +135,33 @@ def test_dbNSFP_adapter_breakdown_line():
     assert broken_down_lines[1][12] == 'SRY'
 
 
+def test_dbNSFP_adapter_resolves_met1_placeholder_hgvsp():
+    """dbNSFP writes 'p.Met1?' for start-loss variants where it left the
+    resulting amino acid unresolved - fill in the '?' from aaalt (column 5)."""
+    writer = SpyWriter()
+    adapter = DbNSFP(
+        filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample', writer=writer)
+
+    data_line = ['.'] * 143
+    data_line[0] = 'Y'
+    data_line[1] = '2786989'
+    data_line[4] = 'M'
+    data_line[5] = 'L'
+    data_line[11] = '1'
+    data_line[12] = 'SRY'
+    data_line[14] = 'ENST00000383070'
+    data_line[15] = 'ENSP00000372547'
+    data_line[17] = 'SRY'
+    data_line[19] = 'p.Met1?'
+    data_line[20] = 'NC_000024.10:g.2786989C>A'
+
+    adapter.write_coding_variant_record(data_line)
+
+    item = json.loads(writer.contents[0])
+    assert item['hgvsp'] == 'p.Met1Leu'
+    assert item['alt'] == 'Leu'
+
+
 def test_dbNSFP_adapter_initialization():
     adapter = DbNSFP(filepath='./tests/fixtures/dbNSFP4.5a_variant.chrY_sample',
                      label='variants_coding_variants')
