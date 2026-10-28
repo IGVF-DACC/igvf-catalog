@@ -260,13 +260,78 @@ def test_preload_resolve_via_ols_orphanet(mock_urlopen):
     assert 'www.orpha.net%2FORDO%2FOrphanet_111' in requested
 
 
+def _cellosaurus_response(primary, secondaries=None):
+    accessions = [{'type': 'primary', 'value': primary}]
+    for secondary in secondaries or []:
+        accessions.append({'type': 'secondary', 'value': secondary})
+    payload = {
+        'Cellosaurus': {
+            'cell-line-list': [
+                {'accession-list': accessions},
+            ],
+        },
+    }
+    return io.BytesIO(json.dumps(payload).encode('utf-8'))
+
+
+@patch('adapters.ontology_term_validator.urllib.request.urlopen')
+def test_preload_resolve_via_cellosaurus_secondary(mock_urlopen):
+    mock_urlopen.return_value.__enter__.return_value = _cellosaurus_response(
+        'CVCL_1658', secondaries=['CVCL_V618', 'CVCL_5915'])
+
+    v = _validator_with_db({'CVCL_1658'})
+    v.preload(['CVCL_V618'], resolve_via_ols=True)
+
+    assert v._remaps == {'CVCL_V618': 'CVCL_1658'}
+    assert v.resolve('CVCL_V618') == 'CVCL_1658'
+    requested = mock_urlopen.call_args.args[0]
+    if hasattr(requested, 'full_url'):
+        requested = requested.full_url
+    assert 'api.cellosaurus.org/search/cell-line' in requested
+    assert 'CVCL_V618' in requested
+
+
+@patch('adapters.ontology_term_validator.urllib.request.urlopen')
+def test_preload_resolve_via_cellosaurus_rejects_unrelated_hit(mock_urlopen):
+    # Search returned a hit that does not list the queried accession.
+    mock_urlopen.return_value.__enter__.return_value = _cellosaurus_response(
+        'CVCL_0001', secondaries=['CVCL_9999'])
+
+    v = _validator_with_db({'CVCL_0001'})
+    v.preload(['CVCL_V618'], resolve_via_ols=True)
+
+    assert v._remaps == {}
+    assert v.resolve('CVCL_V618') is None
+
+
+@patch('adapters.ontology_term_validator.urllib.request.urlopen')
+def test_preload_resolve_via_cellosaurus_rejects_primary_not_in_db(mock_urlopen):
+    mock_urlopen.return_value.__enter__.return_value = _cellosaurus_response(
+        'CVCL_1658', secondaries=['CVCL_V618'])
+
+    v = _validator_with_db(set())
+    v.preload(['CVCL_V618'], resolve_via_ols=True)
+
+    assert v._remaps == {}
+    assert v.resolve('CVCL_V618') is None
+
+
+def test_preload_resolve_via_ols_noop_for_cvcl_already_in_db():
+    v = _validator_with_db({'CVCL_1658'})
+    with patch.object(v, '_fetch_cellosaurus_cell_line') as mock_fetch:
+        v.preload(['CVCL_1658'], resolve_via_ols=True)
+        mock_fetch.assert_not_called()
+    assert v._remaps == {}
+    assert v.resolve('CVCL_1658') == 'CVCL_1658'
+
+
 def test_log_prints_remaps(capsys):
     v = OntologyTermValidator()
     v._valid_term_keys = {'MONDO_0018894'}
     v._remaps = {'MONDO_0000075': 'MONDO_0018894'}
     v.log()
     captured = capsys.readouterr().out
-    assert 'Ontology term IDs remapped via OLS: 1' in captured
+    assert 'Ontology term IDs remapped via OLS/Cellosaurus: 1' in captured
     assert 'MONDO_0000075 -> MONDO_0018894' in captured
     assert 'All ontology term IDs are valid.' not in captured
 

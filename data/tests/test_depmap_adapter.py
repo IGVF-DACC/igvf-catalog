@@ -5,6 +5,9 @@ from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 import pytest
 
+CRISPR_SAMPLE = './tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv'
+MODEL_SAMPLE = './tests/fixtures/DepMap/DepMap_model_example.csv'
+
 
 # mock get_gene_map_from_arangodb so gene collection data change will not affect the test
 @pytest.fixture(autouse=True)
@@ -38,23 +41,32 @@ def mock_ontology_term_validator():
         MockValidator.normalize_term_key = staticmethod(
             OntologyTermValidator.normalize_term_key)
         mock_validator = MockValidator.return_value
+        mock_validator.resolve.side_effect = (
+            lambda term_key: OntologyTermValidator.normalize_term_key(term_key)
+        )
         mock_validator.validate.return_value = True
         mock_validator.ensure.return_value = True
         yield mock_validator
 
 
+def _make_adapter(**kwargs):
+    defaults = {
+        'filepath': CRISPR_SAMPLE,
+        'reference_filepath': MODEL_SAMPLE,
+        'label': 'depmap',
+    }
+    defaults.update(kwargs)
+    return DepMap(**defaults)
+
+
 def test_depmap_adapter_process_file(mock_file_fileset):
     writer = SpyWriter()
-    adapter = DepMap(
-        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        label='depmap',
-        writer=writer,
-        validate=True
-    )
-    adapter.file_accession = 'IGVFFI8863BMFF'
+    adapter = _make_adapter(writer=writer, validate=True)
+    adapter.file_accession = 'IGVFFI8832ZBCC'
+    adapter.model_file_accession = 'IGVFFI6415FDRI'
     adapter.process_file()
 
-    mock_file_fileset.assert_called_once_with('IGVFFI8863BMFF')
+    mock_file_fileset.assert_called_once_with('IGVFFI8832ZBCC')
     assert len(writer.contents) > 1, 'No records were parsed.'
     first_item = json.loads(writer.contents[0])
 
@@ -78,7 +90,8 @@ def test_depmap_adapter_process_file(mock_file_fileset):
     assert first_item['class'] == 'observed data'
     assert first_item['method'] == 'DepMap'
     assert first_item['label'] == first_item['method']
-    assert first_item['files_filesets'] == 'files_filesets/IGVFFI8863BMFF'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI8832ZBCC'
+    assert first_item['_to'].startswith('ontology_terms/CVCL_')
     assert first_item['cancer_term'].startswith('ontology_terms/Oncotree_')
     assert first_item['cancer_term'].count('/') == 1
 
@@ -93,7 +106,7 @@ def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
     import tempfile
     import os
 
-    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     model_id = header[1]
@@ -105,9 +118,8 @@ def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
 
     try:
         writer = SpyWriter()
-        adapter = DepMap(filepath=temp_file_path,
-                         label='depmap', writer=writer)
-        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter = _make_adapter(filepath=temp_file_path, writer=writer)
+        adapter.file_accession = 'IGVFFI8832ZBCC'
 
         original_load = adapter.load_cell_ontology_id_mapping
 
@@ -130,24 +142,24 @@ def test_depmap_adapter_sanitizes_oncotree_slash_in_cancer_term(mocker):
 
 
 def test_depmap_adapter_initialization():
-    adapter = DepMap(
-        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        label='depmap'
-    )
-    assert adapter.filepath == './tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv'
+    adapter = _make_adapter()
+    assert adapter.filepath == CRISPR_SAMPLE
+    assert adapter.reference_filepath == MODEL_SAMPLE
     assert adapter.label == 'depmap'
     assert adapter.writer is None, 'Writer should be None by default.'
     assert adapter.file_accession == 'CRISPRGeneDependency_transposed_example'
+    assert adapter.model_file_accession == 'DepMap_model_example'
+
+
+def test_depmap_adapter_requires_reference_filepath():
+    with pytest.raises(TypeError):
+        DepMap(filepath=CRISPR_SAMPLE, label='depmap')
 
 
 def test_depmap_adapter_missing_gene_id_mapping():
     writer = SpyWriter()
-    adapter = DepMap(
-        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        label='depmap',
-        writer=writer
-    )
-    adapter.file_accession = 'IGVFFI8863BMFF'
+    adapter = _make_adapter(writer=writer)
+    adapter.file_accession = 'IGVFFI8832ZBCC'
     adapter.process_file()
 
     assert len(
@@ -169,7 +181,7 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
     import tempfile
     import os
 
-    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -180,9 +192,8 @@ def test_depmap_adapter_multiple_gene_ids(mocker):
 
     try:
         writer = SpyWriter()
-        adapter = DepMap(filepath=temp_file_path,
-                         label='depmap', writer=writer)
-        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter = _make_adapter(filepath=temp_file_path, writer=writer)
+        adapter.file_accession = 'IGVFFI8832ZBCC'
         adapter.process_file()
 
         gene_ids = {json.loads(item)['_from']
@@ -207,7 +218,7 @@ def test_depmap_adapter_synonym_fallback(mocker):
     import tempfile
     import os
 
-    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -218,9 +229,8 @@ def test_depmap_adapter_synonym_fallback(mocker):
 
     try:
         writer = SpyWriter()
-        adapter = DepMap(filepath=temp_file_path,
-                         label='depmap', writer=writer)
-        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter = _make_adapter(filepath=temp_file_path, writer=writer)
+        adapter.file_accession = 'IGVFFI8832ZBCC'
         adapter.process_file()
 
         gene_ids = {json.loads(item)['_from']
@@ -230,17 +240,71 @@ def test_depmap_adapter_synonym_fallback(mocker):
         os.unlink(temp_file_path)
 
 
-def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
-    """The (expensive) synonyms lookup should not run when every gene symbol is already matched by name."""
+def test_depmap_adapter_maps_by_entrez_not_shared_synonym(mocker):
+    """CFAP90 and WBP11 share a synonym hit but have distinct Entrez ids."""
+    def fake_gene_map(field):
+        if field == 'entrez':
+            return {
+                'ENTREZ:134121': ['ENSG00000215217'],
+                'ENTREZ:51729': ['ENSG00000084463'],
+            }
+        if field == 'name':
+            return {'WBP11': ['ENSG00000084463']}
+        if field == 'synonyms':
+            return {'CFAP90': ['ENSG00000215217', 'ENSG00000084463']}
+        return {}
+
     mock_get_gene_map = mocker.patch(
         'adapters.depmap_adapter.get_gene_map_from_arangodb',
-        return_value={'FAKEGENE': ['ENSG00000000001']}
+        side_effect=fake_gene_map,
     )
 
     import tempfile
     import os
 
-    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
+    with open(CRISPR_SAMPLE, 'r') as sample_file:
+        header = sample_file.readline().strip().split(',')
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        f.write(','.join(header) + '\n')
+        empty_tail = [''] * (len(header) - 2)
+        f.write(','.join(['CFAP90 (134121)', '0.9'] + empty_tail) + '\n')
+        f.write(','.join(['WBP11 (51729)', '0.9'] + empty_tail) + '\n')
+        temp_file_path = f.name
+
+    try:
+        writer = SpyWriter()
+        adapter = _make_adapter(filepath=temp_file_path, writer=writer)
+        adapter.file_accession = 'IGVFFI8832ZBCC'
+        adapter.process_file()
+
+        gene_ids = {json.loads(item)['_from']
+                    for item in writer.contents if item.startswith('{')}
+        assert gene_ids == {
+            'genes/ENSG00000215217',
+            'genes/ENSG00000084463',
+        }
+        assert mock_get_gene_map.call_args_list == [mocker.call('entrez')]
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
+    """The synonyms lookup should not run when every still-unmapped symbol matches by name."""
+    def fake_gene_map(field):
+        if field == 'name':
+            return {'FAKEGENE': ['ENSG00000000001']}
+        return {}
+
+    mock_get_gene_map = mocker.patch(
+        'adapters.depmap_adapter.get_gene_map_from_arangodb',
+        side_effect=fake_gene_map,
+    )
+
+    import tempfile
+    import os
+
+    with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -251,57 +315,20 @@ def test_depmap_adapter_skips_synonym_lookup_when_all_matched(mocker):
 
     try:
         writer = SpyWriter()
-        adapter = DepMap(filepath=temp_file_path,
-                         label='depmap', writer=writer)
-        adapter.file_accession = 'IGVFFI8863BMFF'
+        adapter = _make_adapter(filepath=temp_file_path, writer=writer)
+        adapter.file_accession = 'IGVFFI8832ZBCC'
         adapter.process_file()
 
-        mock_get_gene_map.assert_called_once_with('name')
-    finally:
-        os.unlink(temp_file_path)
-
-
-def test_depmap_adapter_gene_id_mapping_override(mocker):
-    """LOC118142757 has no reliable name/synonym match in the genes collection, so it's hardcoded."""
-    mocker.patch(
-        'adapters.depmap_adapter.get_gene_map_from_arangodb',
-        return_value={}
-    )
-
-    import tempfile
-    import os
-
-    with open('./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv', 'r') as sample_file:
-        header = sample_file.readline().strip().split(',')
-
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        f.write(','.join(header) + '\n')
-        row = ['LOC118142757 (0)'] + ['0.9'] + [''] * (len(header) - 2)
-        f.write(','.join(row) + '\n')
-        temp_file_path = f.name
-
-    try:
-        writer = SpyWriter()
-        adapter = DepMap(filepath=temp_file_path,
-                         label='depmap', writer=writer)
-        adapter.file_accession = 'IGVFFI8863BMFF'
-        adapter.process_file()
-
-        gene_ids = {json.loads(item)['_from']
-                    for item in writer.contents if item.startswith('{')}
-        assert gene_ids == {'genes/ENSG00000290147'}
+        assert [call.args[0] for call in mock_get_gene_map.call_args_list] == [
+            'entrez', 'name']
     finally:
         os.unlink(temp_file_path)
 
 
 def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
-    adapter = DepMap(
-        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        label='depmap',
-        writer=writer
-    )
-    adapter.file_accession = 'IGVFFI8863BMFF'
+    adapter = _make_adapter(writer=writer)
+    adapter.file_accession = 'IGVFFI8832ZBCC'
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -312,15 +339,20 @@ def test_depmap_adapter_dependency_cutoff():
 
 def test_depmap_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = DepMap(
-        filepath='./tests/fixtures/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        label='depmap',
-        writer=writer,
-        validate=True
-    )
+    adapter = _make_adapter(writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123
     }
     with pytest.raises(ValueError, match='Document validation failed:'):
         adapter.validate_doc(invalid_doc)
+
+
+def test_depmap_adapter_loads_model_columns_by_header():
+    adapter = _make_adapter()
+    adapter.load_cell_ontology_id_mapping()
+    props = adapter.cell_ontology_id_mapping['ACH-000001']
+    assert props['cell_ontology_id'] == 'CVCL_0465'
+    assert props['biological_context'] == 'NIH:OVCAR-3'
+    assert props['model_type'] == 'HGSOC'
+    assert props['oncotree_code'] == 'HGSOC'
