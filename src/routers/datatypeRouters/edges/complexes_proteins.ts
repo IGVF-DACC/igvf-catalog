@@ -55,7 +55,6 @@ const complexVerboseQuery = `
 `
 
 async function complexesFromProteinSearch (input: paramsFormatType): Promise<any[]> {
-  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -107,7 +106,6 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
 }
 
 async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<any[]> {
-  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -140,10 +138,10 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
   return await (await db.query(query)).all()
 }
 
-const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
+const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ organism: true })
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const complexQuery = commonComplexQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ complex_name, ...rest }) => ({
+const complexQuery = commonComplexQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ organism: true }).transform(({ complex_name, ...rest }) => ({
   name: complex_name,
   ...rest
 }))

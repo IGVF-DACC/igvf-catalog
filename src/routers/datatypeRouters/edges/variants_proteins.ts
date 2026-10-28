@@ -39,11 +39,12 @@ const variantsProteinsQueryFormat = z.object({
 const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
   name: z.enum(INVERSE_NAMES).optional(),
   method: z.enum(METHODS).optional()
-}))
+})).omit({ organism: true })
 
 const variantsQuery = variantsCommonQueryFormat
   .merge(variantsProteinsQueryFormat)
   .merge(commonHumanEdgeParamsFormat)
+  .omit({ organism: true })
 
 export const outputFormat = z.object({
   sequence_variant: z.string().or(variantSimplifiedFormat).optional(),
@@ -247,7 +248,6 @@ function proteinQueryValidation (input: paramsFormatType): void {
 
 async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   proteinQueryValidation(input)
-  delete input.organism
   const verbose = input.verbose === 'true'
   delete input.verbose
 
@@ -312,7 +312,6 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
 
 async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   variantQueryValidation(input)
-  delete input.organism
   const verbose = input.verbose === 'true'
   delete input.verbose
 

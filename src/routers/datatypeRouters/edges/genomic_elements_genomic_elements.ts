@@ -33,7 +33,7 @@ const inputFormat = z.object({
   ...commonHumanEdgeParamsFormat.shape,
   page: z.number().int().nonnegative().default(0),
   limit: z.number().int().positive().optional()
-})
+}).omit({ organism: true })
 const elementFormat = z.object({
   _id: z.string(),
   name: z.string(),

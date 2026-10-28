@@ -59,12 +59,12 @@ export const outputFormat = z.array(z.object({
   significant: z.boolean().nullish()
 }))
 
-const inputFormat = singleVariantQueryFormat.omit({ organism: true }).merge(z.object({
+const inputFormat = singleVariantQueryFormat.merge(z.object({
   files_fileset: z.string().optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
   nearby_genes: z.enum(['true', 'false']).default('true')
-})).merge(commonHumanEdgeParamsFormat).omit({ verbose: true })
+})).merge(commonHumanEdgeParamsFormat).omit({ verbose: true, organism: true })
 
 function validateVariantInput (input: paramsFormatType): void {
   const isInvalidInput = Object.keys(input).every(item => !VARIANT_QUERY_KEYS.includes(item as typeof VARIANT_QUERY_KEYS[number]))

@@ -55,7 +55,6 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   delete input.name_aliases
   delete input.disease_ontology_terms
   delete input.biological_process
-  delete input.organism
   const pathways = await pathwaySearchPersistent(pathwayInput)
   const pathwayIDs = pathways.map(pathway => `${pathwayCollectionName}/${pathway._id as string}`)
   const verboseQueryForParent = `
@@ -86,7 +85,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
 
 const pathwaysFromPathways = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/pathways/pathways', description: descriptions.pathways_pathways } })
-  .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat))
+  .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
   .output(z.array(pathwaysPathwaysFormat))
   .query(async ({ input }) => await findGenesFromPathways(input))
 

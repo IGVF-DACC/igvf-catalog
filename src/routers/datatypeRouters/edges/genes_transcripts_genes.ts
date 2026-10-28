@@ -32,7 +32,7 @@ const inputFormat = z.object({
   p_value_adj: identifier,
   neg_log10_pvalue: identifier,
   neg_log10_pvalue_adj: identifier
-}).merge(commonHumanEdgeParamsFormat)
+}).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
 
 const outputFormat = z.object({
   _id: z.string(),
