@@ -67,6 +67,33 @@ describe('motifsProteinsRouters.motifsFromProteins', () => {
     expect(result).toEqual(combinedResult)
     expect(dbModule.db.query).toHaveBeenCalledTimes(1)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const combinedResult = [
+      {
+        motif: 'TFDP1_HUMAN_HOCOMOCOv11',
+        protein: 'proteins/ENSP00000281043',
+        source: 'HOCOMOCOv11',
+        name: 'binding modulated by',
+        class: 'observed data',
+        method: 'Perturb-seq',
+        files_filesets: 'files_filesets/IGVFFI5943XCOS',
+        preferred_assay_titles: ['TAP-seq']
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue([combinedResult])
+    } as any)
+
+    const input = { protein_id: 'ENSP00000281043', page: 0 }
+    const result = await motifsProteinsRouters.motifsFromProteins({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...combinedResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('motifsProteinsRouters.proteinsFromMotifs', () => {

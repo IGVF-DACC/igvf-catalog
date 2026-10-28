@@ -124,6 +124,44 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [
+      {
+        coding_variant: {
+          _id: 'CV1',
+          aapos: 203,
+          hgvsp: 'p.Cys203Glu',
+          protein_name: 'A0A2U3U0J3_HUMAN',
+          gene_name: 'BRCA1',
+          ref: 'C',
+          alt: 'E'
+        },
+        phenotype: { phenotype_id: 'PHENOTYPE1', phenotype_name: 'breast cancer' },
+        variant: null,
+        score: 1.2,
+        method: 'Perturb-seq',
+        class: 'observed data',
+        label: 'functional score',
+        source: 'IGVF',
+        source_url: 'http://example.com/score',
+        files_filesets: 'files_filesets/FILESET1',
+        preferred_assay_titles: ['TAP-seq']
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { phenotype_id: 'PHENOTYPE1', page: 0 }
+    const result = await codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(phenoEdges.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
@@ -192,6 +230,44 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
         input, ctx: {}, type: 'query', path: '', rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+    const mockResult = [
+      {
+        coding_variant: {
+          _id: 'CV1',
+          aapos: 203,
+          hgvsp: 'p.Cys203Glu',
+          protein_name: 'A0A2U3U0J3_HUMAN',
+          gene_name: 'BRCA1',
+          ref: 'C',
+          alt: 'E'
+        },
+        variant: null,
+        phenotype: { phenotype_id: 'PHENOTYPE1', phenotype_name: 'breast cancer' },
+        source: 'IGVF',
+        method: 'Perturb-seq',
+        class: 'observed data',
+        label: 'functional score',
+        files_filesets: 'files_filesets/FILESET1',
+        preferred_assay_titles: ['TAP-seq'],
+        score: 1.2,
+        source_url: 'http://example.com/score'
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { coding_variant_name: 'CV1', page: 0 }
+    const result = await codingVariantsPhenotypesRouters.phenotypesFromCodingVariants({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(phenoEdges.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 })
 

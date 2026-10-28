@@ -41,6 +41,15 @@ it('returns accessibility metrics and verbose promoter gene links', async () => 
   expect(await call({ files_fileset: 'IGVFFI2419ZSGC', verbose: 'true' })).toEqual([record])
 })
 
+it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
+  const record = { perturbed_genomic_element: 'genomic_elements/promoter', accessible_genomic_element: 'genomic_elements/peak', name: 'modulates accessibility of', inverse_name: 'accessibility modulated by', label: 'regulatory element effect on chromatin accessibility', class: 'observed data', method: 'Multiome Perturb-seq', source: 'IGVF', source_url: 'https://data.igvf.org/tabular-files/IGVFFI2419ZSGC/', files_filesets: 'files_filesets/IGVFFI2419ZSGC', preferred_assay_titles: ['TAP-seq'], p_value_adj: 0.07, log2FC: -1.3, significant: false }
+  jest.spyOn(db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue([record]) } as any)
+  const result = await call({ files_fileset: 'IGVFFI2419ZSGC' })
+  const query = (db.query as jest.Mock).mock.calls[0][0]
+  expect(query).toContain('preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles')
+  expect(result).toEqual([{ ...record, preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+})
+
 it.each([
   {}, { page: -1, method: 'Multiome Perturb-seq' }, { limit: 0, method: 'Multiome Perturb-seq' },
   { perturbed_region: 'invalid' }, { accessible_region: 'invalid' }, { source_element_id: 'promoter' }, { target_element_id: 'peak' },

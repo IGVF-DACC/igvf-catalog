@@ -4,7 +4,7 @@ import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { QUERY_LIMIT } from '../../../constants'
 import { commonHumanEdgeParamsFormat } from '../params'
-import { getDBReturnStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 import { geneFormat } from '../nodes/genes'
 import { transcriptFormat } from '../nodes/transcripts'
@@ -59,6 +59,7 @@ const outputFormat = z.object({
   source: z.string(),
   source_url: z.string(),
   files_filesets: z.string(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   biological_context: z.string(),
   biosample_term: z.string(),
   treatments_term_ids: z.array(z.string()).nullish()
@@ -128,7 +129,8 @@ async function findEffects (input: paramsFormatType): Promise<any[]> {
       gene_transcript: record._from,
       gene: ${verbose ? expand('relationship._from', geneSchema) : 'relationship._from'},
       transcript: ${verbose ? expand('relationship._to', transcriptSchema) : 'relationship._to'},
-      readout_gene: ${verbose ? expand('record._to', geneSchema) : 'record._to'}
+      readout_gene: ${verbose ? expand('record._to', geneSchema) : 'record._to'},
+      preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles
     })`
   return await (await db.query(query, bindVars)).all()
 }
@@ -138,5 +140,5 @@ export const genesTranscriptsGenesRouters = {
     .meta({ openapi: { method: 'GET', path: '/genes/transcripts/genes', description: descriptions.genes_transcripts_genes } })
     .input(inputFormat)
     .output(z.array(outputFormat))
-    .query(async ({ input }) => await findEffects(input))
+    .query(async ({ input }) => withExpandedAssayTitles(await findEffects(input)))
 }

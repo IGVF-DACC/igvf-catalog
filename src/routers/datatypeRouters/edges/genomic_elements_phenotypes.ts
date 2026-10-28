@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
@@ -58,6 +58,7 @@ export const outputFormat = z.array(z.object({
   biological_context: z.string(),
   biosample_term: z.string(),
   files_filesets: z.string(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   perturbation: z.string().nullish(),
   z_score: z.number().nullish(),
   p_value: z.number().nullish(),
@@ -173,6 +174,7 @@ function buildQuery (params: {
         'source': record.source,
         'source_url': record.source_url,
         'files_filesets': record.files_filesets,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
         'biological_context': record.biological_context,
         'biosample_term': record.biosample_term,
         'perturbation': record.perturbation,
@@ -259,13 +261,13 @@ const phenotypesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/phenotypes', description: descriptions.genomic_elements_phenotypes } })
   .input(genomicElementQueryFormat)
   .output(outputFormat)
-  .query(async ({ input }) => await findPhenotypesFromGenomicElements(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findPhenotypesFromGenomicElements(input)))
 
 const genomicElementsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/genomic-elements', description: descriptions.phenotypes_genomic_elements } })
   .input(phenotypeQueryFormat)
   .output(outputFormat)
-  .query(async ({ input }) => await findGenomicElementsFromPhenotypes(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await findGenomicElementsFromPhenotypes(input)))
 
 export const genomicElementsPhenotypesRouters = {
   phenotypesFromGenomicElements,
