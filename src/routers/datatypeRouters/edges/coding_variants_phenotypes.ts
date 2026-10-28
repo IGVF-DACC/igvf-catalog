@@ -49,11 +49,21 @@ export const scoreSummaryOutputFormat = z.object({
   portalLink: z.string().nullable()
 })
 
+const mutpred2PropertyScoreFormat = z.object({
+  Property: z.string(),
+  'Posterior Probability': z.number(),
+  'P-value': z.number(),
+  'Affected Position': z.string(),
+  Type: z.enum(['Loss', 'Gain', 'Altered'])
+})
+
 export const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
   // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence)
   score: z.number().nullable(),
+  // only populated for method == 'MutPred2' - the molecular mechanisms it predicts the substitution to disrupt
+  property_scores: z.array(mutpred2PropertyScoreFormat).nullish(),
   method: z.string().nullish().optional(),
   class: z.string().nullish(),
   label: z.string().nullish().optional(),
@@ -184,6 +194,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
           ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
         },
         'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
+        'property_scores': phenoEdges.property_scores,
         'method': phenoEdges.method,
         'class': phenoEdges.class,
         'label': phenoEdges.label,
@@ -293,6 +304,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
       'label': phenoEdges.label,
       'files_filesets': phenoEdges.files_filesets,
       'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
+      'property_scores': phenoEdges.property_scores,
       'source_url': phenoEdges.source_url
     }
   `

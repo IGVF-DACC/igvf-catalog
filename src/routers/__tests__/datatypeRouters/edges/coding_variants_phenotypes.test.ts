@@ -124,6 +124,54 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('returns MutPred2 property_scores alongside the pathogenicity score', async () => {
+    const mockResult = [
+      {
+        coding_variant: {
+          _id: 'CV3',
+          aapos: 183,
+          hgvsp: 'p.Tyr183His',
+          protein_name: 'PROT2_HUMAN',
+          gene_name: 'BRCA2',
+          ref: 'Y',
+          alt: 'H'
+        },
+        phenotype: {
+          phenotype_id: 'PHENOTYPE3',
+          phenotype_name: 'breast cancer'
+        },
+        variant: null,
+        score: 0.85,
+        property_scores: [
+          { Property: 'VSL2B_disorder', 'Posterior Probability': 0.162, 'P-value': 0.345, 'Affected Position': 'Y183', Type: 'Gain' }
+        ],
+        method: 'MutPred2',
+        class: 'prediction',
+        label: 'predicted protein variant effect',
+        source: 'IGVF',
+        source_url: 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA',
+        files_filesets: 'files_filesets/FILESET2'
+      }
+    ]
+
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { phenotype_id: 'PHENOTYPE3', method: 'MutPred2', page: 0 }
+    const result = await codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual(mockResult)
+    const query = (dbModule.db.query as jest.Mock).mock.calls[0][0] as string
+    expect(query).toContain("'property_scores': phenoEdges.property_scores")
+  })
 })
 
 describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
@@ -192,6 +240,54 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
         input, ctx: {}, type: 'query', path: '', rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('returns MutPred2 property_scores alongside the pathogenicity score', async () => {
+    const mockResult = [
+      {
+        coding_variant: {
+          _id: 'CV3',
+          aapos: 183,
+          hgvsp: 'p.Tyr183His',
+          protein_name: 'PROT2_HUMAN',
+          gene_name: 'BRCA2',
+          ref: 'Y',
+          alt: 'H'
+        },
+        variant: null,
+        phenotype: {
+          phenotype_id: 'PHENOTYPE3',
+          phenotype_name: 'breast cancer'
+        },
+        source: 'IGVF',
+        method: 'MutPred2',
+        class: 'prediction',
+        label: 'predicted protein variant effect',
+        files_filesets: 'files_filesets/FILESET2',
+        score: 0.85,
+        property_scores: [
+          { Property: 'VSL2B_disorder', 'Posterior Probability': 0.162, 'P-value': 0.345, 'Affected Position': 'Y183', Type: 'Gain' }
+        ],
+        source_url: 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'
+      }
+    ]
+
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { coding_variant_name: 'CV3', method: 'MutPred2', page: 0 }
+    const result = await codingVariantsPhenotypesRouters.phenotypesFromCodingVariants({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual(mockResult)
+    const query = (dbModule.db.query as jest.Mock).mock.calls[0][0] as string
+    expect(query).toContain("'property_scores': phenoEdges.property_scores")
   })
 })
 

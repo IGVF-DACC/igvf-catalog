@@ -1478,6 +1478,7 @@ export const descriptions = {
 
   phenotypes_coding_variants:
     'Retrieve coding variants associated with the query phenotype.<br> \
+    For MutPred2 results, the molecular mechanisms it predicts the substitution to disrupt are returned in property_scores. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -1612,6 +1613,7 @@ export const descriptions = {
   coding_variants_phenotypes:
     'Retrieve phenotypes associated with the query coding variant.<br> \
     At least one of these fields is required: coding_variant_name, hgvsp, uniprot_name, gene_name, amino_acid_position, transcript_id, method, files_fileset. <br> \
+    For MutPred2 results, the molecular mechanisms it predicts the substitution to disrupt are returned in property_scores. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
