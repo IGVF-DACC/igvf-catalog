@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+import gzip
 import json
 import pytest
 from adapters.mpra_adapter import MPRAAdapter
@@ -611,19 +612,26 @@ def test_validate_doc_invalid(mock_file_fileset):
         adapter.validate_doc(invalid_doc)
 
 
-@pytest.mark.parametrize('label,collection', [
-    ('genomic_element', 'mm_genomic_elements'),
-    ('genomic_element_biosample', 'mm_genomic_elements_biosamples'),
-    ('genomic_element_from_variant', 'mm_genomic_elements'),
-    ('variant', 'mm_variants'),
-    ('variant_biosample', 'mm_variants_biosamples'),
+@pytest.mark.parametrize('compressed', [False, True])
+@pytest.mark.parametrize('prefix,assembly,organism', [
+    ('', 'GRCh38', 'Homo sapiens'),
+    ('mm_', 'GRCm39', 'Mus musculus'),
 ])
-def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, mock_ontology_term_validator, label, collection):
-    spdi = 'NC_000067.7:11:A:C'
+@pytest.mark.parametrize('label,collection', [
+    ('genomic_element', 'genomic_elements'),
+    ('genomic_element_biosample', 'genomic_elements_biosamples'),
+    ('genomic_element_from_variant', 'genomic_elements'),
+    ('variant', 'variants'),
+    ('variant_biosample', 'variants_biosamples'),
+])
+def test_mpra_collections_and_references(tmp_path, mock_file_fileset, mock_ontology_term_validator,
+                                         label, collection, prefix, assembly, organism, compressed):
+    accession = 'NC_000067.7' if prefix else 'NC_000001.11'
+    spdi = f'{accession}:11:A:C'
     design = tmp_path / 'IGVFFI4261NSQZ.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tSPDI\tallele\tvariant_pos\n'
-        f'ref_tile\tGRCm39\tchr1\t10\t20\t+\t["{spdi}"]\t["ref"]\t[1]\n'
+        f'ref_tile\t{assembly}\tchr1\t10\t20\t+\t["{spdi}"]\t["ref"]\t[1]\n'
     )
     effects = tmp_path / 'IGVFFI2111LQGF.bed'
     if label in ('genomic_element', 'genomic_element_biosample'):
@@ -632,37 +640,47 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, mock
     else:
         effects.write_text(
             f'chr1\t11\t12\t{spdi}\t100\t+\t0.25\t1\t2\t3\t4\t5\t6\t0.9\t0.1\t0.4\t1\tA\tC\n')
+    if compressed:
+        compressed_design = design.with_suffix(design.suffix + '.gz')
+        compressed_effects = effects.with_suffix(effects.suffix + '.gz')
+        compressed_design.write_bytes(gzip.compress(design.read_bytes()))
+        compressed_effects.write_bytes(gzip.compress(effects.read_bytes()))
+        design.unlink()
+        effects.unlink()
+        design, effects = compressed_design, compressed_effects
+    input_files = set(tmp_path.iterdir())
     variant = {
         '_key': spdi, 'name': spdi, 'spdi': spdi, 'chr': 'chr1', 'pos': 11,
         'ref': 'A', 'alt': 'C', 'variation_type': 'SNP',
-        'hgvs': 'NC_000067.7:g.12A>C', 'organism': 'Mus musculus',
+        'hgvs': f'{accession}:g.12A>C', 'organism': organism,
     }
     writer = SpyWriter()
     with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb',
                return_value={spdi} if label == 'variant_biosample' else set()) as check, \
             patch('adapters.mpra_adapter.load_variant', return_value=(variant, None)) as load:
         adapter = MPRAAdapter(
-            filepath=str(effects), label=f'mm_{label}', writer=writer, validate=True,
-            reference_filepath=str(design),
+            filepath=effects, label=f'{prefix}{label}', writer=writer, validate=True,
+            reference_filepath=design,
         )
-        assert adapter._get_collection_name() == collection
-        assert adapter.schema['db_collection_name'] == collection
+        assert adapter._get_collection_name() == prefix + collection
+        assert adapter.schema['db_collection_name'] == prefix + collection
         adapter.process_file()
         records = [json.loads(row) for row in writer.contents]
         assert len(records) == 1
         record = records[0]
-        element_key = 'MPRA_chr1_10_20_GRCm39_plus_IGVFFI4261NSQZ'
+        element_key = f'MPRA_chr1_10_20_{assembly}_plus_IGVFFI4261NSQZ'
         if label in ('genomic_element', 'genomic_element_from_variant'):
             assert record['_key'] == element_key
         elif label == 'genomic_element_biosample':
-            assert record['_from'] == f'mm_genomic_elements/{element_key}'
+            assert record['_from'] == f'{prefix}genomic_elements/{element_key}'
         elif label == 'variant_biosample':
-            assert record['_from'] == f'mm_variants/{spdi}'
-            assert record['genomic_element'] == f'mm_genomic_elements/{element_key}'
+            assert record['_from'] == f'{prefix}variants/{spdi}'
+            assert record['genomic_element'] == f'{prefix}genomic_elements/{element_key}'
             assert record['_key'] == f'{spdi}_{element_key}_CL_0000679_IGVFFI2111LQGF'
         if label in ('variant', 'variant_biosample'):
-            assert check.call_args.kwargs['collection'] == 'mm_variants'
-            load.assert_called_once_with(spdi, assembly='GRCm39')
+            assert check.call_args.kwargs['collection'] == f'{prefix}variants'
+            load.assert_called_once_with(spdi, assembly=assembly)
+        assert set(tmp_path.iterdir()) == input_files
 
 
 def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset, mock_ontology_term_validator):

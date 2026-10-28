@@ -214,11 +214,14 @@ class MPRAAdapter(BaseAdapter):
             raise ValueError(
                 f'Failed to resolve IGVF accession from ENCODE accession: {encode_accession}, response: {response.json()}') from e
 
+    @staticmethod
+    def _open_text_file(filepath):
+        """Stream plain or gzipped effects/designs without extracting a local copy."""
+        opener = gzip.open if str(filepath).endswith('.gz') else open
+        return opener(filepath, 'rt')
+
     def _open_file(self):
-        """Open file as text, handling optional gzip."""
-        if self.filepath.endswith('.gz'):
-            return gzip.open(self.filepath, 'rt')
-        return open(self.filepath, 'r')
+        return self._open_text_file(self.filepath)
 
     def _get_schema_type(self):
         if self.effect_label in ['genomic_element_biosample', 'variant_biosample']:
@@ -323,8 +326,7 @@ class MPRAAdapter(BaseAdapter):
         # class docstring. Alt-only rows only contribute to allele *sets*, not to catalog keys.
         pending_alt_spdi_mappings = []
         reference_tiles = set()
-        opener = gzip.open if str(mpra_design_file).endswith('.gz') else open
-        with opener(mpra_design_file, 'rt') as f:
+        with self._open_text_file(mpra_design_file) as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
                 if row.get('ref', self.assembly) not in (self.assembly, '', 'NA'):
