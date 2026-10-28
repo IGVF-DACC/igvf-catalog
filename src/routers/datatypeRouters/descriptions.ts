@@ -1941,19 +1941,19 @@ export const descriptions = {
             ]
           },
           {
-            label: 'query by variant identifier and gene (gene_name also accepted, e.g. gene_name = WNT2B)',
+            label: 'query by variant identifier and gene (gene_name also accepted, e.g. gene_name = RIT1)',
             items: [
               'spdi = NC_000001.11:155904168:A:G',
               'method = ColocBoost',
-              'gene_id = ENSG00000134245'
+              'gene_id = ENSG00000143622'
             ]
           },
           {
-            label: 'query by variant identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = mean arterial pressure)',
+            label: 'query by variant identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = type 2 diabetes nephropathy)',
             items: [
               'spdi = NC_000001.11:155904168:A:G',
               'method = ColocBoost',
-              'phenotype_id = EFO_0006340'
+              'phenotype_id = EFO_0004997'
             ]
           }
         ]
@@ -2030,19 +2030,19 @@ export const descriptions = {
             ]
           },
           {
-            label: 'query by biosample identifier and gene (gene_name also accepted, e.g. gene_name = WNT2B)',
+            label: 'query by biosample identifier and gene (gene_name also accepted, e.g. gene_name = UBIAD1)',
             items: [
               'biosample_id = UBERON_0001225',
               'method = ColocBoost',
-              'gene_id = ENSG00000134245'
+              'gene_id = ENSG00000120942'
             ]
           },
           {
-            label: 'query by biosample identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = mean arterial pressure)',
+            label: 'query by biosample identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = c-reactive protein measurement)',
             items: [
               'biosample_id = UBERON_0001225',
               'method = ColocBoost',
-              'phenotype_id = EFO_0006340'
+              'phenotype_id = EFO_0004458'
             ]
           }
         ]
