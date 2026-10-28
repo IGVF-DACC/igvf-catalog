@@ -144,7 +144,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
         variant: null,
         score: 0.85,
         property_scores: [
-          { Property: 'VSL2B_disorder', 'Posterior Probability': 0.162, 'P-value': 0.345, 'Affected Position': 'Y183', Type: 'Gain' }
+          { property: 'VSL2B_disorder', posterior_probability: 0.162, p_value: 0.345, affected_position: 'Y183', type: 'Gain' }
         ],
         method: 'MutPred2',
         class: 'prediction',
@@ -170,7 +170,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
 
     expect(result).toEqual(mockResult)
     const query = (dbModule.db.query as jest.Mock).mock.calls[0][0] as string
-    expect(query).toContain("'property_scores': phenoEdges.property_scores")
+    expect(query).toContain('posterior_probability: p[')
   })
 })
 
@@ -266,7 +266,7 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
         files_filesets: 'files_filesets/FILESET2',
         score: 0.85,
         property_scores: [
-          { Property: 'VSL2B_disorder', 'Posterior Probability': 0.162, 'P-value': 0.345, 'Affected Position': 'Y183', Type: 'Gain' }
+          { property: 'VSL2B_disorder', posterior_probability: 0.162, p_value: 0.345, affected_position: 'Y183', type: 'Gain' }
         ],
         source_url: 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'
       }
@@ -287,7 +287,7 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
 
     expect(result).toEqual(mockResult)
     const query = (dbModule.db.query as jest.Mock).mock.calls[0][0] as string
-    expect(query).toContain("'property_scores': phenoEdges.property_scores")
+    expect(query).toContain('posterior_probability: p[')
   })
 })
 
