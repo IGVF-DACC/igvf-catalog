@@ -610,7 +610,7 @@ igvf_file_accessions:
       - IGVFFI4845SDZI
       - IGVFFI8207IHFY
       - IGVFFI1843KICT
-      - IGVFFI9459EBKC
+      - IGVFFI7710YMVN
       - IGVFFI9957NAEL
       - IGVFFI7420UUSE
       - IGVFFI3476PDCJ
@@ -629,6 +629,7 @@ igvf_file_accessions:
       - IGVFFI4328UUGV
       - IGVFFI2950PCZI
     MPRA sequence designs:
+      - IGVFFI2260ZLFH
       - IGVFFI1789LDNT
       - IGVFFI1204BCKQ
       - IGVFFI0802WDXY

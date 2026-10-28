@@ -1765,8 +1765,7 @@ genomic element to gene IGVF scE2G:
   label: predicted regulatory element effect on gene expression
 
 # MPRA refresh: replacement/new effect files and designs checked against the IGVF portal.
-# IGVFDS9175DMRR (240K-HEK293T) has no replacement element-effects file yet.
-# Its revoked element effects are omitted; the replacement variant effects are included.
+# IGVFDS9175DMRR (240K-HEK293T) replacement element effects: IGVFFI7710YMVN.
 # ENCODE-attributed reformatted IGVFFI files below use the IGVF adapter path.
 # See docs/mpra_downloads.md for replacements, pending review, and download commands.
 # Example: python3 data_parser.py --adapter mpra --filepath ~/dataset/IGVFFI3487ZAEN.bed.gz --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --label genomic_element --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI3487ZAEN.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1785,6 +1784,9 @@ genomic element igvf mpra:
     # IGVFDS2165KBMD 8k-neuro
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3487ZAEN/@@download/IGVFFI3487ZAEN.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
+    # IGVFDS9175DMRR 240K-HEK293T
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7710YMVN/@@download/IGVFFI7710YMVN.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2260ZLFH/@@download/IGVFFI2260ZLFH.tsv.gz
     # IGVFDS6149YGOL 240K-HepG2
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6207LRJZ/@@download/IGVFFI6207LRJZ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2260ZLFH/@@download/IGVFFI2260ZLFH.tsv.gz
@@ -1965,6 +1967,9 @@ genomic element to biosample igvf mpra:
     # IGVFDS2165KBMD 8k-neuro
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3487ZAEN/@@download/IGVFFI3487ZAEN.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
+    # IGVFDS9175DMRR 240K-HEK293T
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7710YMVN/@@download/IGVFFI7710YMVN.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2260ZLFH/@@download/IGVFFI2260ZLFH.tsv.gz
     # IGVFDS6149YGOL 240K-HepG2
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6207LRJZ/@@download/IGVFFI6207LRJZ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2260ZLFH/@@download/IGVFFI2260ZLFH.tsv.gz
