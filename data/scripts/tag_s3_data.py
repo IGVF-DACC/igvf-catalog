@@ -1,7 +1,7 @@
 # This script appends a value to a specified tag (key_name) of S3 objects in a specified bucket.
 # It checks if the tag already exists and updates it accordingly.
 # If the tag does not exist, it creates a new one. The script can run in dry-run mode to preview changes without applying them.
-# Useful when deploying new versions of the IGVF Catalog in S3.
+# Useful when deploying new collections of the IGVF Catalog in S3.
 #
 # Usage:
 # python tag_s3_data.py --bucket_name <bucket_name> --append_value <append_value> --key_name <key_name> --profile <aws_profile> --dry_run
@@ -20,7 +20,7 @@ import argparse
 # default values:
 BUCKET_NAME = 'igvf-catalog-parsed-collections'
 APPEND_VALUE = 'IGVF_catalog_v1.0.0'
-KEY_NAME = 'version'
+KEY_NAME = 'collections'
 
 
 def append_to_tag(bucket_name, key_name, append_value, dry_run=True, profile=None):

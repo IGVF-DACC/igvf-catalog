@@ -148,7 +148,9 @@ These two tags are applied at different stages of the pipeline:
 
 1. **Parsing.** When an adapter writes a JSONL to S3, it tags the object with
    `portal_accessions`, recording which portal object(s) the parsed data was derived
-   from.
+   from. If `data_parser.py` is run with `--collections-tag <collection>`, the object
+   is also tagged with `collections` at parse time, so the portal patch is triggered as
+   soon as the file is uploaded rather than at release.
 2. **Release.** As part of publishing a catalog version, a separate script,
    [`data/scripts/tag_s3_data.py`](https://github.com/IGVF-DACC/igvf-catalog/blob/dev/data/scripts/tag_s3_data.py),
    adds the `collections` tag naming the catalog version being released

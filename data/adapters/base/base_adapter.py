@@ -209,7 +209,7 @@ class BaseAdapter(ABC):
         writer lifecycle so subclasses never have to: the writer is opened on
         entry and closed on exit (including early returns and exceptions) via
         the writer's context-manager protocol. The output is only finalized
-        (e.g. version-tagged) when parse() completes without raising.
+        (e.g. collections-tagged) when parse() completes without raising.
 
         Subclasses implement parse(), not this method.
         """
