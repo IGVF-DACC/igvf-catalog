@@ -46,27 +46,10 @@ describe('variantsGenesRouters', () => {
       await expect(callProcedure(variantsGenesRouters.qtlSummaryEndpoint, input)).rejects.toThrow(TRPCError)
     })
 
-    it('silently ignores organism=Mus musculus (no longer a valid input field) and still returns the human result', async () => {
-      const variantSearchResult = [{ _id: 'NC_000001.11:10000:T:A', chr: 'chr1', pos: 10000 }]
-      const summaryResult = [{
-        qtl_type: 'eQTL',
-        neg_log10_pvalue: 5.2,
-        chr: 'chr1',
-        biological_context: 'liver',
-        effect_size: 0.4,
-        gene: { gene_name: 'GENE1', gene_id: 'ENSG00000187583', gene_start: 1000, gene_end: 5000 },
-        name: 'modulates expression of',
-        files_filesets: 'files_filesets/IGVFFI0332UGDD'
-      }]
-
-      jest.spyOn(dbModule.db, 'query')
-        .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(variantSearchResult) } as any)
-        .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(summaryResult) } as any)
-
+    it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
       const input = { spdi: 'NC_000001.11:10000:T:A', organism: 'Mus musculus', page: 0 }
-      const result = await callProcedure(variantsGenesRouters.qtlSummaryEndpoint, input)
-
-      expect(result).toEqual(summaryResult)
+      await expect(callProcedure(variantsGenesRouters.qtlSummaryEndpoint, input)).rejects.toThrow(TRPCError)
+      expect(dbModule.db.query).not.toHaveBeenCalled()
     })
   })
 

@@ -765,13 +765,13 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
 
 const genomicElementsFromVariantsCount = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
-  .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ files_fileset: z.string().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), files_fileset: z.string().optional() })))
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
 const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
-  .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 

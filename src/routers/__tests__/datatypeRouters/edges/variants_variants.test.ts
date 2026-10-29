@@ -106,32 +106,12 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
     ).rejects.toThrow(TRPCError)
   })
 
-  it('silently ignores organism=Mus musculus (no longer a valid input field) and still returns the human result', async () => {
-    const variantSearchResult = [{
-      _id: 'NC_000001.11:69633:TGT:GAA',
-      chr: 'chr1',
-      pos: 69633,
-      rsid: ['rs123'],
-      ref: 'TGT',
-      alt: 'GAA',
-      spdi: 'NC_000001.11:69633:TGT:GAA',
-      hgvs: 'NC_000001.11:g.69634_69636delinsGAA',
-      ca_id: null,
-      annotations: { funseq_description: 'noncoding' },
-      source: 'FAVOR',
-      source_url: 'http://example.com/favor'
-    }]
-
-    jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(variantSearchResult) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any)
-
+  it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
     const input = { variant_id: 'NC_000001.11:69633:TGT:GAA', organism: 'Mus musculus', page: 0 }
-    const result = await variantsVariantsRouters.variantsFromVariantIDSummary({
+    await expect(variantsVariantsRouters.variantsFromVariantIDSummary({
       input, ctx: {}, type: 'query', path: '', rawInput: input
-    })
-
-    expect(result).toEqual([])
+    })).rejects.toThrow(TRPCError)
+    expect(dbModule.db.query).not.toHaveBeenCalled()
   })
 })
 

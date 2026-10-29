@@ -57,38 +57,16 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
     ).rejects.toThrow(TRPCError)
   })
 
-  it('silently ignores organism=Mus musculus (no longer a valid input field) and still returns the human result', async () => {
-    const mockResult = [{
-      distance_gene_variant: 1000,
-      element_chr: 'chr1',
-      element_start: 69000,
-      element_end: 70000,
-      element_type: 'candidate cis regulatory element',
-      id: 'genomic_elements/GE1',
-      cell_type: 'K562',
-      target_gene: { gene_name: 'BRCA1', id: 'genes/ENSG00000012048', chr: 'chr1', start: 68000, end: 71000 },
-      score: 0.87,
-      model: 'scE2G',
-      dataset: 'https://example.com/dataset',
-      name: 'GE1_BRCA1',
-      method: 'scE2G',
-      files_filesets: 'files_filesets/IGVFFI0001XXXX'
-    }]
-
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue(mockResult)
-    } as any)
-
+  it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
     const input = { spdi: 'NC_000001.11:69634:A:G', organism: 'Mus musculus', page: 0 }
-    const result = await variantsGenomicElementsRouters.predictionsFromVariants({
+    await expect(variantsGenomicElementsRouters.predictionsFromVariants({
       input,
       ctx: {},
       type: 'query',
       path: '',
       rawInput: input
-    })
-
-    expect(result).toEqual(mockResult)
+    })).rejects.toThrow(TRPCError)
+    expect(dbModule.db.query).not.toHaveBeenCalled()
   })
 })
 
@@ -156,31 +134,16 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () =
     ).rejects.toThrow(TRPCError)
   })
 
-  it('silently ignores organism=Mus musculus (no longer a valid input field) and still returns the human result', async () => {
-    const variantSearchResult = [{ _id: 'V1', chr: 'chr1', pos: 69634, ref: 'A', alt: 'G' }]
-    const genomicElementsResult = [{ id: 'genomic_elements/GE1', chr: 'chr1', start: 69000, end: 70000, type: 'candidate cis regulatory element' }]
-    const finalResult = [{
-      cell_types: ['K562'],
-      genes: [{ gene_name: 'BRCA1', id: 'genes/ENSG00000012048' }],
-      methods: [{ method: 'scE2G', count: 3 }],
-      name: 'regulates'
-    }]
-
-    jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(variantSearchResult) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(genomicElementsResult) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(finalResult) } as any)
-
+  it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
     const input = { spdi: 'NC_000001.11:69634:A:G', organism: 'Mus musculus' }
-    const result = await variantsGenomicElementsRouters.genomicElementsFromVariantsCount({
+    await expect(variantsGenomicElementsRouters.genomicElementsFromVariantsCount({
       input,
       ctx: {},
       type: 'query',
       path: '',
       rawInput: input
-    })
-
-    expect(result).toEqual(finalResult)
+    })).rejects.toThrow(TRPCError)
+    expect(dbModule.db.query).not.toHaveBeenCalled()
   })
 })
 
