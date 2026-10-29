@@ -19,7 +19,6 @@ class FileFileSet:
     SOURCE_IGVF = 'IGVF'
     SOURCE_COMMUNITY = 'Community'
 
-    # These ATAC-seq analyses measure ORF overexpression, not CRISPR modulation.
     OVEREXPRESSION_ATAC_ACCESSIONS = frozenset(
         {'IGVFFI0911IUZS', 'IGVFFI2320OTYL'})
 
