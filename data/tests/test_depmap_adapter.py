@@ -265,7 +265,7 @@ def test_depmap_adapter_maps_by_entrez_not_shared_synonym(mocker):
     with open(CRISPR_SAMPLE, 'r') as sample_file:
         header = sample_file.readline().strip().split(',')
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', prefix='IGVFFI8863BMFF.', suffix='.csv', delete=False) as f:
         f.write(','.join(header) + '\n')
         empty_tail = [''] * (len(header) - 2)
         f.write(','.join(['CFAP90 (134121)', '0.9'] + empty_tail) + '\n')
