@@ -1734,6 +1734,7 @@ genomic element CRISPR element phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4336LSYJ/@@download/IGVFFI4336LSYJ.csv.gz
   source: IGVF
   type: tested elements
   source_annotation: enhancer
@@ -1747,6 +1748,7 @@ genomic element to phenotype CRISPR element phenotype:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI5135QZCS/@@download/IGVFFI5135QZCS.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9584UDAS/@@download/IGVFFI9584UDAS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4336LSYJ/@@download/IGVFFI4336LSYJ.csv.gz
   source: IGVF
   label: regulatory element effect on phenotype
 

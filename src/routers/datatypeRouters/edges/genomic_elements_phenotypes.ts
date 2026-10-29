@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
@@ -29,9 +29,15 @@ const edgeQueryFormat = z.object({
 
 const genomicElementQueryFormat = z.object({
   region: z.string().trim().optional()
-}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat).extend({
+  page: z.number().int().nonnegative().default(0),
+  limit: z.number().int().positive().optional()
+})
 
-const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat)
+const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat).extend({
+  page: z.number().int().nonnegative().default(0),
+  limit: z.number().int().positive().optional()
+})
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -60,8 +66,11 @@ export const outputFormat = z.array(z.object({
   files_filesets: z.string(),
   perturbation: z.string().nullish(),
   z_score: z.number().nullish(),
+  log2FC: z.number().nullish(),
   p_value: z.number().nullish(),
+  p_value_adj: z.number().nullish(),
   neg_log10_pvalue: z.number().nullish(),
+  neg_log10_pvalue_adj: z.number().nullish(),
   significant: z.boolean().nullish(),
   num_guides: z.number().nullish(),
   num_guides_hit: z.number().nullish(),
@@ -177,8 +186,11 @@ function buildQuery (params: {
         'biosample_term': record.biosample_term,
         'perturbation': record.perturbation,
         'z_score': record.z_score,
+        'log2FC': record.log2FC,
         'p_value': record.p_value,
+        'p_value_adj': record.p_value_adj,
         'neg_log10_pvalue': record.neg_log10_pvalue,
+        'neg_log10_pvalue_adj': record.neg_log10_pvalue_adj,
         'significant': record.significant,
         'num_guides': record.num_guides,
         'num_guides_hit': record.num_guides_hit,
@@ -213,6 +225,14 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
   let elementIDs: string[] = []
   let isElementQuery = false
   if (input.region !== undefined) {
+    const region = input.region as string
+    const coordinates = validRegion(region)
+    if (coordinates !== null && parseInt(coordinates[3]) - parseInt(coordinates[2]) > 10000) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Region length cannot exceed 10kb.'
+      })
+    }
     isElementQuery = true
     const elementInput: paramsFormatType = {
       region: input.region,

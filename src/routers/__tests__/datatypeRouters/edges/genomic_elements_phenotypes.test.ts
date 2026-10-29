@@ -37,6 +37,43 @@ describe('genomicElementsPhenotypesRouters', () => {
     jest.clearAllMocks()
   })
 
+  it.each(['phenotypesFromGenomicElements', 'genomicElementsFromPhenotypes'] as const)(
+    '%s preserves FRACTEL metrics without guide statistics', async (procedure) => {
+      const record = buildEdgeRecord({
+        files_filesets: 'files_filesets/IGVFFI4336LSYJ',
+        source_url: 'https://data.igvf.org/tabular-files/IGVFFI4336LSYJ/',
+        biological_context: 'human K562 cell line',
+        biosample_term: 'ontology_terms/EFO_0002067',
+        phenotype_name: 'cell population proliferation',
+        phenotype: 'ontology_terms/GO_0008283',
+        genomic_element: 'genomic_elements/CRISPR_chr7_74019708_74019787_GRCh38_IGVFFI4336LSYJ',
+        log2FC: -0.2722013279866264,
+        p_value: 0,
+        p_value_adj: 0,
+        neg_log10_pvalue: 240,
+        neg_log10_pvalue_adj: 240
+      })
+      delete record.z_score
+      delete record.num_guides
+      delete record.num_guides_hit
+      delete record.num_guides_nonhit
+      delete record.fraction_guides_hit
+      jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+        all: jest.fn().mockResolvedValue([record])
+      } as any)
+
+      const result = await callProcedure(genomicElementsPhenotypesRouters[procedure], {
+        files_fileset: 'IGVFFI4336LSYJ', page: 0
+      })
+
+      expect(result).toEqual([record])
+      const query = (dbModule.db.query as jest.Mock).mock.calls[0][0] as string
+      for (const field of ['log2FC', 'p_value_adj', 'neg_log10_pvalue_adj']) {
+        expect(query).toContain(`'${field}': record.${field}`)
+      }
+    }
+  )
+
   describe('phenotypesFromGenomicElements', () => {
     it('returns phenotype associations for genomic elements filtered by method', async () => {
       const mockResult = [buildEdgeRecord()]
