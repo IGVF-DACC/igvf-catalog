@@ -62,6 +62,7 @@
           "items": {
             "type": "string",
             "enum": [
+              "ATAC-seq",
               "CRISPR FACS screen",
               "CRISPR FlowFISH screen",
               "CRISPR MACS screen",
@@ -114,6 +115,7 @@
           ],
           "enum": [
             "ADASTRA",
+            "ATAC-seq",
             "BlueSTARR",
             "ClinGen",
             "ColocBoost",

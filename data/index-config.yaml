@@ -116,6 +116,16 @@ genes_transcripts_genes:
     fields:
       - log2FC, neg_log10_pvalue_adj
 
+genes_transcripts_genomic_elements:
+  persistent:
+    fields:
+      - files_filesets, _key
+      - significant, _key
+  zkd_sparse:
+    fields:
+      - log2FC
+      - neg_log10_pvalue_adj
+
 genes_structure:
   persistent:
     fields:

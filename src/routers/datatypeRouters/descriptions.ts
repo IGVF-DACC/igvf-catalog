@@ -255,6 +255,23 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
+  genes_transcripts_genomic_elements: 'Retrieve gene overexpression effects on chromatin accessibility through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; genomic_element_id or accessible_region identifies the readout peaks. Filter by a source gene, transcript, peak, region, files_fileset, or method. Set verbose=true to expand gene, transcript, and genomic element nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+    {
+      id: 'overexpression-atac',
+      label: 'ATAC-seq',
+      examples: [
+        {
+          label: 'BATF3 transcript overexpression effects on accessibility',
+          items: ['gene_id = ENSG00000123685', 'transcript_id = ENST00000243440', 'files_fileset = IGVFFI0911IUZS', 'significant = true']
+        },
+        {
+          label: 'Differential accessibility in the second BATF3 analysis',
+          items: ['files_fileset = IGVFFI2320OTYL', 'p_value_adj = lt:0.05', 'verbose = true']
+        }
+      ]
+    }
+  ]),
+
   genes_transcripts_genes: 'Retrieve MORF gene overexpression effects through the source gene–transcript relationship.<br> Source gene_id and transcript_id identify the overexpressed construct; readout_gene_id identifies the readout gene. Filter by a source gene, transcript, readout gene, morf_id, files_fileset, or method. Set verbose=true to expand gene and transcript nodes. Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
     {
       id: 'morf-screen',

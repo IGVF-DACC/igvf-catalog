@@ -19,6 +19,9 @@ class FileFileSet:
     SOURCE_IGVF = 'IGVF'
     SOURCE_COMMUNITY = 'Community'
 
+    OVEREXPRESSION_ATAC_ACCESSIONS = frozenset(
+        {'IGVFFI0911IUZS', 'IGVFFI2320OTYL'})
+
     CRISPR_PERTURBATION_MAPPING = {
         'interference': 'CRISPR interference',
         'activation': 'CRISPR activation',
@@ -29,8 +32,8 @@ class FileFileSet:
     }
 
     @staticmethod
-    def get_perturbation(modality, method):
-        if method == 'MORF screen':
+    def get_perturbation(modality, method, accession=None):
+        if method == 'MORF screen' or accession in FileFileSet.OVEREXPRESSION_ATAC_ACCESSIONS:
             return 'ORF overexpression'
         if modality is None:
             return None
@@ -907,7 +910,7 @@ class FileFileSet:
             'cell_annotation': cell_annotation,
             'cell_annotation_term': cell_annotation_term,
             'genome_browser_link': genome_browser_link,
-            'perturbation': FileFileSet.get_perturbation(modality, method),
+            'perturbation': FileFileSet.get_perturbation(modality, method, file_object['accession']),
             'browser_index_file': browser_index_file
         }
         return props, donor_ids, sample_term_ids

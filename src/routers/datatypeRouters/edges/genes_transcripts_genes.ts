@@ -45,6 +45,7 @@ const outputFormat = z.object({
   transcript_mapping_method: z.string(),
   log2FC: z.number(),
   standard_error: z.number().nullish(),
+  stat: z.number().nullish(),
   base_mean: z.number().nullish(),
   p_value: z.number().nullish(),
   p_value_adj: z.number().nullish(),

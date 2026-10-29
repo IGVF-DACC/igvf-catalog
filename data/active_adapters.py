@@ -48,6 +48,7 @@ from adapters.BlueSTARR_variants_biosamples_adapter import BlueSTARRVariantBiosa
 from adapters.CRISPR_variant_gene_adapter import CRISPRVariantGene
 from adapters.MORF_gene_transcript_gene_adapter import MORFGeneTranscriptGene
 from adapters.ColocBoost_variants_biosamples_adapter import ColocBoostVariantBiosample
+from adapters.overexpression_ATAC_adapter import OverexpressionATAC
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
@@ -95,6 +96,7 @@ KEY_TO_ADAPTER = {
     'crispr_variant_gene': CRISPRVariantGene,
     'crispr_variant_phenotype': CRISPRVariantPhenotype,
     'morf_gene_transcript_gene': MORFGeneTranscriptGene,
+    'overexpression_atac': OverexpressionATAC,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,

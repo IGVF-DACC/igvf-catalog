@@ -68,3 +68,4 @@ registry in `data/schemas/registry.json`.
 | scE2G                        | scE2G_adapter                       | genomic_elements<br>genomic_elements_genes                                                  |
 | DUALIPAAdapter               | DUAL_IPA_coding_variant_scores_adapter | coding_variants_phenotypes                                                               |
 | MORFGeneTranscriptGene       | MORF_gene_transcript_gene_adapter   | genes_transcripts_genes                                                                 |
+| OverexpressionATAC          | overexpression_ATAC_adapter        | genomic_elements, genes_transcripts_genomic_elements                                    |

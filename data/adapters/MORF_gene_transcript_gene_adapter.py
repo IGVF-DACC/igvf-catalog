@@ -359,7 +359,7 @@ class MORFGeneTranscriptGene(BaseAdapter):
         with self._open_file(self.filepath) as deseq_file:
             reader = csv.DictReader(deseq_file, delimiter='\t')
             self._check_columns(reader, {'rowID', 'log2FoldChange', 'lfcSE',
-                                         'baseMean', 'pvalue', 'padj'}, self.filepath)
+                                         'baseMean', 'stat', 'pvalue', 'padj'}, self.filepath)
             seen_ids = set()
             for row in reader:
                 row_id = (row.get('rowID') or '').strip()
@@ -392,7 +392,7 @@ class MORFGeneTranscriptGene(BaseAdapter):
 
                 try:
                     stats = {field: self._parse_optional_float(row.get(field))
-                             for field in ('log2FoldChange', 'lfcSE', 'baseMean', 'pvalue', 'padj')}
+                             for field in ('log2FoldChange', 'lfcSE', 'baseMean', 'stat', 'pvalue', 'padj')}
                     p_value = stats['pvalue']
                     p_value_adj = stats['padj']
                     neg_log10_pvalue = self._neg_log10_pvalue(p_value)
@@ -428,6 +428,7 @@ class MORFGeneTranscriptGene(BaseAdapter):
                         '_to': f'genes/{self.readout_gene}',
                         'log2FC': log2fc,
                         'standard_error': stats['lfcSE'],
+                        'stat': stats['stat'],
                         'base_mean': stats['baseMean'],
                         'p_value': p_value,
                         'p_value_adj': p_value_adj,
