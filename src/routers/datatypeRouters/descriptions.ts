@@ -2309,31 +2309,90 @@ export const descriptions = {
     ]),
 
   genomic_elements_phenotypes:
-    'Retrieve genomic element to phenotype associations by querying genomic elements.<br> \
-    At least one of these properties must be defined: region, files_fileset, phenotype_id, phenotype_name, or method. <br> \
-    Set significant = true to return only significant associations.<br> \
-    Set verbose = true to retrieve full info on the genomic element.<br> \
-    Example: phenotype_id = GO_0016477, <br> \
-    phenotype_name = cell migration, <br> \
-    method = CRISPR screen, <br> \
-    significant = true, <br> \
-    files_fileset = IGVFFI5135QZCS, <br> \
-    region = chr1:101174581-101175330 (maximum length: 10kb). <br> \
-    The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based.',
+    'Retrieve phenotype associations for perturbed genomic elements.<br> \
+    At least one filter is required: region (chr:start-end; maximum length: 10kb), files_fileset, phenotype_id, phenotype_name, or method. \
+    Set significant=true to return only significant associations. \
+    Set verbose=true to expand both the genomic element and phenotype records. \
+    Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by genomic element region',
+            items: [
+              'region = chr1:101174581-101175330',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Cell migration screen',
+            items: [
+              'phenotype_name = cell migration',
+              'files_fileset = IGVFFI5135QZCS'
+            ]
+          },
+          {
+            label: 'K562 proliferation screen',
+            items: [
+              'phenotype_name = cell population proliferation',
+              'files_fileset = IGVFFI4336LSYJ'
+            ]
+          },
+          {
+            label: 'Significant proliferation associations',
+            items: [
+              'phenotype_id = GO_0008283',
+              'significant = true',
+              'verbose = true'
+            ]
+          }
+        ]
+      }
+    ]),
 
   phenotypes_genomic_elements:
-    'Retrieve genomic elements associated with phenotypes.<br> \
-    At least one of these properties must be defined: phenotype_id, phenotype_name, files_fileset, or method. <br> \
-    Set significant = true to return only significant associations.<br> \
-    Set verbose = true to retrieve full info on the genomic element.<br> \
-    Example: phenotype_id = GO_0008283, <br> \
-    phenotype_name = cell population proliferation, <br> \
-    method = CRISPR screen, <br> \
-    significant = true, <br> \
-    files_fileset = IGVFFI9584UDAS. <br> \
-    The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based.',
+    'Retrieve genomic elements associated with cell migration or cell population proliferation.<br> \
+    At least one filter is required: phenotype_id, phenotype_name, files_fileset, or method. \
+    Set significant=true to return only significant associations. \
+    Set verbose=true to expand both the genomic element and phenotype records. \
+    Pagination is 0-based; maximum page size is 500.<br><br>' + examples([
+      {
+        id: 'crispr-screen',
+        label: 'CRISPR screen',
+        examples: [
+          {
+            label: 'Query by phenotype identifier',
+            items: [
+              'phenotype_id = GO_0008283',
+              'method = CRISPR screen'
+            ]
+          },
+          {
+            label: 'Cell migration screen',
+            items: [
+              'phenotype_name = cell migration',
+              'files_fileset = IGVFFI5135QZCS'
+            ]
+          },
+          {
+            label: 'K562 proliferation screen',
+            items: [
+              'phenotype_name = cell population proliferation',
+              'files_fileset = IGVFFI4336LSYJ'
+            ]
+          },
+          {
+            label: 'Significant proliferation associations',
+            items: [
+              'phenotype_id = GO_0008283',
+              'significant = true',
+              'verbose = true'
+            ]
+          }
+        ]
+      }
+    ]),
 
   genomic_elements_genomic_elements:
     'Retrieve promoter perturbation effects on chromatin accessibility at target peaks.<br> \
