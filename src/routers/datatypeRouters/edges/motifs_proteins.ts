@@ -28,12 +28,12 @@ export const motifsToProteinsFormat = z.object({
 const proteinsQuery = proteinsCommonQueryFormat.merge(z.object({
   files_fileset: z.string().optional(),
   method: z.enum(METHODS).optional()
-})).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
+})).merge(commonHumanEdgeParamsFormat)
 
 const motifsToProteinsQueryFormat = motifsCommonQueryFormat.merge(z.object({
   files_fileset: z.string().optional(),
   method: z.enum(METHODS).optional()
-})).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
+})).merge(commonHumanEdgeParamsFormat)
 
 const motifProteinCollectionName = 'motifs_proteins'
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
@@ -45,6 +45,7 @@ const complexCollectionName = complexSchema.db_collection_name as string
 const complexesProteinsCollectionName = 'complexes_proteins'
 
 async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.name !== undefined) {
     input.tf_name = (input.name as string).toUpperCase()
   }
@@ -129,6 +130,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
 }
 
 async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let query
 
   let limit = QUERY_LIMIT

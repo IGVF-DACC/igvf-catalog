@@ -60,13 +60,14 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
     delete input.limit
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, gene_name: name, synonym, region } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, region, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, synonym, region, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, region, organism, page: 0 }
 
   delete input.hgnc_id
   delete input.gene_name
   delete input.synonym
   delete input.region
+  delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
 
@@ -110,6 +111,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   delete input.name_aliases
   delete input.disease_ontology_terms
   delete input.biological_process
+  delete input.organism
   const pathways = await pathwaySearchPersistent(pathwayInput)
   const pathwayIDs = pathways.map(pathway => `${pathwayCollectionName}/${pathway._id as string}`)
   const verboseQuery = `
@@ -135,13 +137,13 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
 
 const pathwaysFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/pathways', description: descriptions.genes_pathways } })
-  .input(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(genesCommonQueryFormat.merge(commonHumanEdgeParamsFormat))
   .output(z.array(genesPathwaysFormat))
   .query(async ({ input }) => await findPathwaysFromGeneSearch(input))
 
 const genesFromPathways = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/pathways/genes', description: descriptions.pathways_genes } })
-  .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat))
   .output(z.array(genesPathwaysFormat))
   .query(async ({ input }) => await findGenesFromPathways(input))
 

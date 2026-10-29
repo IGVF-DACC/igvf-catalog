@@ -29,9 +29,9 @@ const edgeQueryFormat = z.object({
 
 const genomicElementQueryFormat = z.object({
   region: z.string().trim().optional()
-}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
+}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
-const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat).omit({ organism: true })
+const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat)
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -203,6 +203,7 @@ async function executePhenotypesQuery (
 
 async function findPhenotypesFromGenomicElements (input: paramsFormatType): Promise<any[]> {
   validateQuery(input, ['region', 'files_fileset', 'phenotype_id', 'phenotype_name', 'method'])
+  delete input.organism
   const limit = applyLimit(input)
   const page = input.page as number
   delete input.page
@@ -239,6 +240,7 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
 
 async function findGenomicElementsFromPhenotypes (input: paramsFormatType): Promise<any[]> {
   validateQuery(input, ['phenotype_id', 'phenotype_name', 'files_fileset', 'method'])
+  delete input.organism
   const limit = applyLimit(input)
   const page = input.page as number
   delete input.page

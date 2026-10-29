@@ -54,7 +54,7 @@ const variantToDiseaseSchema = getSchema('data/schemas/edges/variants_diseases.C
 const variantToDiseaseCollectionName = variantToDiseaseSchema.db_collection_name as string
 
 function validateInput (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'pmid', 'assertion'].includes(item)).length === 0) {
+  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'assertion'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one node property for variant / disease must be defined.'
@@ -94,6 +94,8 @@ RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord
 
 async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   validateInput(input)
+  // only allow human
+  delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, region }) => ({ variant_id, spdi, hgvs, rsid, ca_id, region }))(input)
@@ -140,6 +142,9 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
 }
 
 async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]> {
+  // only allow human
+  delete input.organism
+
   const verbose = input.verbose === 'true'
   delete input.verbose
 
@@ -209,13 +214,13 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
 
 const variantsFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/variants', description: descriptions.diseases_variants } })
-  .input(diseasessCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(diseasessCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await variantFromDiseaseSearch(input))
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
-  .input(variantsCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(variantsCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 

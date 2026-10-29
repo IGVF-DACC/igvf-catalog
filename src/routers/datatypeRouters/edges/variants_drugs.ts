@@ -66,7 +66,7 @@ export const drugsToVariantsFormat = z.object({
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
 function validateInput (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'pmid', 'phenotype_categories'].includes(item)).length === 0) {
+  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'phenotype_categories'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one node property for variant / drug must be defined.'
@@ -91,6 +91,7 @@ function getCustomFilters (input: paramsFormatType): string {
 
 async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> {
   validateInput(input)
+  delete input.organism
   if (input.drug_id !== undefined) {
     input._id = `drugs/${input.drug_id as string}`
     delete input.drug_id
@@ -140,6 +141,7 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
 
 async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []> {
   validateInput(input)
+  delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
@@ -186,13 +188,13 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
 
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
-  .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(drugsToVariantsFormat))
   .query(async ({ input }) => await variantsFromDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
-  .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await drugsFromVariantSearch(input))
 

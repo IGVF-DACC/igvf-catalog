@@ -77,13 +77,13 @@ const DiseasesGenesQueryFormat = z.object({
 })
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }).transform(({ gene_name, ...rest }) => ({
+const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }).transform(({ disease_name, ...rest }) => ({
+const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ disease_name, ...rest }) => ({
   term_name: disease_name,
   ...rest
 }))
@@ -113,6 +113,7 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.disease_id === undefined && input.term_name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -201,11 +202,12 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc_id, name, synonym } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, page: 0 }
+  const { gene_id, hgnc_id, name, synonym, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, synonym, organism, page: 0 }
   delete input.hgnc_id
   delete input.gene_name
   delete input.synonym
+  delete input.organism
 
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `genes/${gene._id as string}`)
