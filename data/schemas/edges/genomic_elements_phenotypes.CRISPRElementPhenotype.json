@@ -31,6 +31,11 @@
           "type": "number",
           "description": "Average phenotype z-score across guides targeting the genomic element"
         },
+        "log2FC": {
+          "title": "Log2 Fold Change",
+          "type": "number",
+          "description": "FRACTEL element-level estimate on the log2 fold-change scale: the signed directional weighted average of guide-level log2 fold changes with the largest absolute magnitude."
+        },
         "p_value": {
           "title": "P-Value",
           "type": "number",
@@ -41,10 +46,20 @@
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction"
         },
+        "p_value_adj": {
+          "title": "Adjusted P-Value",
+          "type": "number",
+          "description": "FDR-adjusted p-value reported by FRACTEL."
+        },
+        "neg_log10_pvalue_adj": {
+          "title": "Negative Log10 Adjusted P-Value",
+          "type": "number",
+          "description": "Negative log 10 FDR-adjusted p-value, capped at 240 for zero p-values."
+        },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Whether the p-value is below the adapter-defined threshold of 0.05."
+          "description": "Whether the FDR-adjusted p-value (when available), otherwise the raw p-value, is below 0.05."
         },
         "num_guides": {
           "title": "Number of Guides",
@@ -122,25 +137,28 @@
         }
       },
       "required": [
-        "z_score",
         "p_value",
         "neg_log10_pvalue",
         "significant",
-        "num_guides",
-        "num_guides_hit",
-        "num_guides_nonhit",
-        "fraction_guides_hit",
         "files_filesets",
         "perturbation",
         "biological_context",
         "biosample_term"
       ],
+      "anyOf": [
+        {
+          "required": ["z_score", "num_guides", "num_guides_hit", "num_guides_nonhit", "fraction_guides_hit"]
+        },
+        {
+          "required": ["log2FC", "p_value_adj", "neg_log10_pvalue_adj"]
+        }
+      ],
       "additionalProperties": false
     }
   ],
   "accessible_via": {
-    "filter_by_range": "z_score, p_value, neg_log10_pvalue",
-    "return": "class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, z_score, p_value, neg_log10_pvalue, significant, num_guides, num_guides_hit, num_guides_nonhit, fraction_guides_hit"
+    "filter_by_range": "z_score, log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj",
+    "return": "class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, z_score, log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant, num_guides, num_guides_hit, num_guides_nonhit, fraction_guides_hit"
   },
   "db_collection_name": "genomic_elements_phenotypes"
 }

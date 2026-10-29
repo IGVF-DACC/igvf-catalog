@@ -1,4 +1,8 @@
+import csv
+import gzip
 import json
+from math import log10
+from pathlib import Path
 import pytest
 from unittest.mock import patch
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
@@ -7,6 +11,7 @@ from adapters.writer import SpyWriter
 
 MIGRATION_PATH = './tests/fixtures/IGVFFI5135QZCS_crispr_element_phenotype_migration.example.tsv'
 GROWTH_PATH = './tests/fixtures/IGVFFI9584UDAS_crispr_element_phenotype_growth.example.tsv'
+FRACTEL_PATH = './tests/fixtures/IGVFFI4336LSYJ_crispr_element_phenotype_fractel.example.csv'
 
 
 @pytest.fixture
@@ -109,6 +114,81 @@ def test_crispr_element_phenotype_genomic_element_phenotype_growth(
     assert first_item['num_guides_nonhit'] == 31
     assert first_item['fraction_guides_hit'] == pytest.approx(0.03125)
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI9584UDAS'
+
+
+@pytest.mark.parametrize('compressed', [False, True])
+def test_crispr_element_phenotype_fractel(
+        mock_file_fileset, mock_ontology_term_validator, tmp_path, compressed):
+    mock_file_fileset.return_value.update({
+        'file_set_id': 'IGVFDS7817TGWI',
+        'simple_sample_summaries': ['human K562 cell line from donor(s) IGVFDO9208RPQQ'],
+        'samples': ['ontology_terms/EFO_0002067'],
+    })
+    filepath = FRACTEL_PATH
+    if compressed:
+        filepath = str(tmp_path / 'IGVFFI4336LSYJ.csv.gz')
+        with gzip.open(filepath, 'wt') as f:
+            f.write(Path(FRACTEL_PATH).read_text())
+
+    writers = {}
+    for label in CRISPRElementPhenotype.ALLOWED_LABELS:
+        writer = SpyWriter()
+        CRISPRElementPhenotype(
+            filepath=filepath, label=label, writer=writer, validate=True,
+        ).process_file()
+        writers[label] = [json.loads(line) for line in writer.contents]
+
+    nodes = writers['genomic_element']
+    edges = writers['genomic_element_phenotype']
+    assert len(nodes) == len(edges) == 3
+    assert nodes[0]['_key'] == 'CRISPR_chr7_74019708_74019787_GRCh38_IGVFFI4336LSYJ'
+    assert (nodes[0]['chr'], nodes[0]['start'], nodes[0]['end']) == (
+        'chr7', 74019708, 74019787)
+    for node, edge in zip(nodes, edges):
+        assert edge['_from'] == f'genomic_elements/{node["_key"]}'
+        assert edge['_key'] == f'{node["_key"]}_GO_0008283'
+        assert edge['_to'] == 'ontology_terms/GO_0008283'
+        assert edge['files_filesets'] == 'files_filesets/IGVFFI4336LSYJ'
+        assert edge['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI4336LSYJ/'
+        assert edge['biosample_term'] == 'ontology_terms/EFO_0002067'
+        assert edge['biological_context'] == mock_file_fileset.return_value['simple_sample_summaries'][0]
+        assert not {'z_score', 'num_guides', 'num_guides_hit',
+                    'num_guides_nonhit', 'fraction_guides_hit'} & edge.keys()
+    assert edges[0]['log2FC'] == pytest.approx(-0.2722013279866264)
+    assert edges[0]['p_value'] == edges[0]['p_value_adj'] == 0
+    assert edges[0]['neg_log10_pvalue'] == edges[0]['neg_log10_pvalue_adj'] == 240
+    assert edges[0]['significant'] is True
+    assert edges[1]['p_value'] == pytest.approx(1e-7)
+    assert edges[1]['p_value_adj'] == pytest.approx(1.0785498489425983e-7)
+    assert edges[1]['neg_log10_pvalue'] == pytest.approx(7)
+    assert edges[1]['neg_log10_pvalue_adj'] == pytest.approx(
+        -log10(1.0785498489425983e-7))
+    assert edges[2]['log2FC'] == pytest.approx(0.0202159843218936)
+    assert edges[2]['significant'] is False
+
+
+@pytest.mark.parametrize('adjusted_p_value,expected', [
+    (0.049, True), (0.05, False), (0.051, False),
+])
+def test_fractel_significance_uses_adjusted_p_value(
+        mock_file_fileset, mock_ontology_term_validator, tmp_path,
+        adjusted_p_value, expected):
+    with open(FRACTEL_PATH) as f:
+        reader = csv.DictReader(f, delimiter='\t')
+        row = next(reader)
+    row['FRACTEL_pval'] = '0.001'
+    row['FRACTEL_pval_fdr_corr'] = str(adjusted_p_value)
+    filepath = tmp_path / 'IGVFFI4336LSYJ.csv'
+    with filepath.open('w') as f:
+        writer = csv.DictWriter(f, fieldnames=row, delimiter='\t')
+        writer.writeheader()
+        writer.writerow(row)
+    writer = SpyWriter()
+    CRISPRElementPhenotype(
+        filepath=str(filepath), label='genomic_element_phenotype',
+        writer=writer, validate=True,
+    ).process_file()
+    assert json.loads(writer.contents[0])['significant'] is expected
 
 
 def test_crispr_element_phenotype_invalid_label(mock_file_fileset):

@@ -13,7 +13,9 @@ from adapters.writer import Writer
 # Element-level CRISPR element-to-phenotype screens (Gersbach lab).
 # IGVFFI5135QZCS – cell migration (GO:0016477); columns use migration/mig suffixes.
 # IGVFFI9584UDAS – cell population proliferation (GO:0008283); columns use growth suffixes.
-# Coordinates are 0-based, half-open (submitter_comment on both files). Stored as provided.
+# IGVFFI4336LSYJ – K562 proliferation (GO:0008283); FRACTEL element-level estimates.
+# The FRACTEL file is tab-delimited despite its .csv.gz filename.
+# Coordinates are stored as provided (0-based, half-open for the migration/growth files).
 
 # Example rows (migration):
 # dhs	dhs_coords	dhs_count	avg_migration_pZ	hit_gRNA_count_mig	nonhit_gRNA_count_mig	fraction_hit_mig	migration_pval	mig_significant
@@ -48,6 +50,13 @@ class CRISPRElementPhenotype(BaseAdapter):
             'num_guides_nonhit_col': 'nonhit_gRNA_count_growth',
             'fraction_guides_hit_col': 'fraction_hit_growth',
             'p_value_col': 'growth_pval',
+        },
+        'IGVFFI4336LSYJ': {
+            'phenotype_term': 'GO_0008283',  # cell population proliferation
+            'format': 'fractel',
+            'log2FC_col': 'FRACTEL_effect_size',
+            'p_value_col': 'FRACTEL_pval',
+            'p_value_adj_col': 'FRACTEL_pval_fdr_corr',
         },
     }
 
@@ -116,6 +125,39 @@ class CRISPRElementPhenotype(BaseAdapter):
             return self.MAX_LOG10_PVALUE
         return -1 * log10(p_value)
 
+    def _get_element_coords(self, row):
+        if self.file_config.get('format') == 'fractel':
+            return (row['intended_target_chr'],
+                    int(row['intended_target_start']),
+                    int(row['intended_target_end']))
+        return self._parse_element_coords(row['dhs_coords'])
+
+    def _get_metrics(self, row):
+        config = self.file_config
+        p_value = float(row[config['p_value_col']])
+        metrics = {
+            'p_value': p_value,
+            'neg_log10_pvalue': self._neg_log10_pvalue(p_value),
+        }
+        if config.get('format') == 'fractel':
+            p_value_adj = float(row[config['p_value_adj_col']])
+            metrics.update({
+                'log2FC': float(row[config['log2FC_col']]),
+                'p_value_adj': p_value_adj,
+                'neg_log10_pvalue_adj': self._neg_log10_pvalue(p_value_adj),
+                'significant': p_value_adj < self.SIGNIFICANCE_THRESHOLD,
+            })
+        else:
+            metrics.update({
+                'z_score': float(row[config['z_score_col']]),
+                'significant': p_value < self.SIGNIFICANCE_THRESHOLD,
+                'num_guides': int(row['dhs_count']),
+                'num_guides_hit': int(row[config['num_guides_hit_col']]),
+                'num_guides_nonhit': int(row[config['num_guides_nonhit_col']]),
+                'fraction_guides_hit': float(row[config['fraction_guides_hit_col']]),
+            })
+        return metrics
+
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
         fileset_accession = self.file_fileset.get('file_set_id')
@@ -138,7 +180,7 @@ class CRISPRElementPhenotype(BaseAdapter):
         seen = set()
 
         for row in reader:
-            parsed = self._parse_element_coords(row['dhs_coords'])
+            parsed = self._get_element_coords(row)
             if parsed is None:
                 continue
             chrom, start, end = parsed
@@ -167,27 +209,18 @@ class CRISPRElementPhenotype(BaseAdapter):
             self.writer.write(json.dumps(props) + '\n')
 
     def _write_genomic_element_phenotypes(self, reader):
-        config = self.file_config
         for row in reader:
-            parsed = self._parse_element_coords(row['dhs_coords'])
+            parsed = self._get_element_coords(row)
             if parsed is None:
                 continue
             chrom, start, end = parsed
             genomic_element_id = build_regulatory_region_id(
                 chrom, start, end, 'CRISPR') + '_' + self.file_accession
-            p_value = float(row[config['p_value_col']])
             props = {
                 '_key': f'{genomic_element_id}_{self.phenotype_term}',
                 '_from': f'genomic_elements/{genomic_element_id}',
                 '_to': f'ontology_terms/{self.phenotype_term}',
-                'z_score': float(row[config['z_score_col']]),
-                'p_value': p_value,
-                'neg_log10_pvalue': self._neg_log10_pvalue(p_value),
-                'significant': p_value < self.SIGNIFICANCE_THRESHOLD,
-                'num_guides': int(row['dhs_count']),
-                'num_guides_hit': int(row[config['num_guides_hit_col']]),
-                'num_guides_nonhit': int(row[config['num_guides_nonhit_col']]),
-                'fraction_guides_hit': float(row[config['fraction_guides_hit_col']]),
+                **self._get_metrics(row),
                 'method': self.method,
                 'perturbation': self.perturbation,
                 'class': self.edge_class,
