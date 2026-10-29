@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
@@ -29,9 +29,15 @@ const edgeQueryFormat = z.object({
 
 const genomicElementQueryFormat = z.object({
   region: z.string().trim().optional()
-}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat).extend({
+  page: z.number().int().nonnegative().default(0),
+  limit: z.number().int().positive().optional()
+})
 
-const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat)
+const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat).extend({
+  page: z.number().int().nonnegative().default(0),
+  limit: z.number().int().positive().optional()
+})
 
 const elementOutputFormat = z.object({
   _id: z.string(),
@@ -219,6 +225,13 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
   let elementIDs: string[] = []
   let isElementQuery = false
   if (input.region !== undefined) {
+    const coordinates = validRegion(input.region)
+    if (coordinates !== null && parseInt(coordinates[3]) - parseInt(coordinates[2]) > 10000) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Region length cannot exceed 10kb.'
+      })
+    }
     isElementQuery = true
     const elementInput: paramsFormatType = {
       region: input.region,
