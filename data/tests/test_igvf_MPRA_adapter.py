@@ -403,8 +403,8 @@ def test_genomic_element_biosample_ref_allele_only_writes(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\t["ref"]\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\t["ref"]\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -428,8 +428,8 @@ def test_genomic_element_biosample_mixed_ref_alt_writes_ref_element_effect(
     """Design row with both ref and alt is valid; biosample edge loads (ref is present)."""
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\t["ref", "alt"]\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\t["ref", "alt"]\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -452,8 +452,8 @@ def test_genomic_element_biosample_missing_allele_writes(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\tNA\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\tNA\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -476,9 +476,9 @@ def test_genomic_element_biosample_missing_allele_multi_effect_is_flagged(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\tNA\n'
-        'chr1\t10\t20\tElem2\tNA\t["ref"]\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\tNA\t+\n'
+        'chr1\t10\t20\tElem2\tNA\t["ref"]\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -502,10 +502,10 @@ def test_genomic_element_biosample_control_ignored_and_ref_loaded(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\tclass\n'
-        'chr1\t10\t20\tNegative 1 (chr1:11-21)\tNA\tNA\telement inactive control\n'
-        'chr1\t10\t20\tVariant 1 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["ref"]\ttest\n'
-        'chr1\t10\t20\tVariant 2 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["alt"]\ttest\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
+        'chr1\t10\t20\tNegative 1 (chr1:11-21)\tNA\tNA\telement inactive control\t+\n'
+        'chr1\t10\t20\tVariant 1 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["ref"]\ttest\t+\n'
+        'chr1\t10\t20\tVariant 2 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["alt"]\ttest\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -556,14 +556,14 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
 
 
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample'])
-def test_igvffi1436trih_exclusion_list_is_applied(
-        tmp_path, mock_file_fileset, mock_ontology_term_validator, label):
-    excluded_name = (
-        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|'
-        'EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|'
-        'EH38E3227108|17-46152590-G-C'
-    )
-    design_file = tmp_path / 'IGVFFI1436TRIH_design.tsv'
+def test_design_file_element_exclusion_list_is_applied(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, label):
+    excluded_name = 'excluded_element'
+    monkeypatch.setattr(MPRAAdapter, 'EXCLUSION_DIR', tmp_path)
+    (tmp_path / 'IGVFFI0000REF_exclusion_list.tsv').write_text(
+        'kind\tidentifier\treason\n'
+        f'element\t{excluded_name}\treviewed annotation issue\n')
+    design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
         f'chr17\t46152515\t46152785\t{excluded_name}\tNA\tNA\ttest\t-\n'
@@ -725,10 +725,12 @@ def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
         filepath=str(effects), label='mm_genomic_element_biosample', writer=writer, validate=True,
         reference_filepath=str(design),
     )
-    assert adapter.variant_to_element['NC_000067.7:11:A:C'] == {
-        ('chr1', '10', '20', strand)}
-    assert adapter.variant_pos_to_element[('NC_000067.7:11:A:C', 1)] == {
-        ('chr1', '10', '20', strand)}
+    expected = {('chr1', '10', '20', strand)
+                } if design_accession in adapter.SATMUT_DESIGN_ACCESSIONS else set()
+    assert adapter.variant_to_element.get(
+        'NC_000067.7:11:A:C', set()) == expected
+    assert adapter.variant_pos_to_element.get(
+        ('NC_000067.7:11:A:C', 1), set()) == expected
     adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0])['_from'].startswith(
@@ -739,7 +741,7 @@ def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
                                             'ref_a\tGRCm39\tchr1\t10\t20\t+\t["ref"]\tNA\n'
                                             'ref_b\tGRCm39\tchr1\t9\t21\t+\t["ref"]\tNA\n'])
 def test_mouse_design_requires_unique_containing_reference(tmp_path, mock_file_fileset, reference_rows):
-    design = tmp_path / 'IGVFFI0000TEST.tsv'
+    design = tmp_path / 'IGVFFI1789LDNT.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
         'variant\tGRCm39\tchr1\t11\t12\t+\t["alt"]\t["NC_000067.7:11:A:C"]\n'
@@ -769,3 +771,77 @@ def test_omit_nonfinite_metrics_preserves_record(value):
                        'inputCount': 12.5, 'optional': None}
     json.dumps(cleaned, allow_nan=False)
     assert MPRAAdapter.safe_int(value) is None
+
+
+@pytest.mark.parametrize('label', ['variant', 'variant_biosample', 'genomic_element_from_variant'])
+def test_variant_exclusions_apply_to_all_outputs_and_only_named_file(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, label):
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    spdi = 'NC_000001.11:11:A:C'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    exclusion = tmp_path / 'IGVFFI0000TEST_exclusion_list.tsv'
+    exclusion.write_text(
+        f'kind\tidentifier\treason\nvariant\t{spdi}\treviewed problem\n')
+    with patch.object(MPRAAdapter, 'EXCLUSION_DIR', tmp_path), \
+            patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set() if label == 'variant' else {spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        for accession, count in [('IGVFFI0000TEST', 0), ('IGVFFI0001TEST', 1)]:
+            effects = tmp_path / f'{accession}.bed'
+            effects.write_text(
+                f'chr1\t11\t12\t{spdi}\t100\t+\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n')
+            writer = SpyWriter()
+            adapter = MPRAAdapter(
+                str(effects), label, writer=writer, reference_filepath=str(design))
+            adapter.process_file()
+            assert len(writer.contents) == count
+
+
+@pytest.mark.parametrize('accession,assembly,expected', [
+    ('IGVFFI7237HYCA', 'GRCh38.p13', 1),
+    ('IGVFFI0000TEST', 'GRCh38.p13', 0),
+    ('IGVFFI7237HYCA', 'GRCh37', 0),
+])
+def test_assembly_alias_is_file_specific(tmp_path, mock_file_fileset, accession, assembly, expected):
+    design = tmp_path / f'{accession}.tsv'
+    design.write_text('name\tref\tchr\tstart\tend\tstrand\tallele\n'
+                      f'tile\t{assembly}\tchr1\t10\t20\t+\t["ref"]\n')
+    adapter = MPRAAdapter('IGVFFI0000EFFT.bed', 'genomic_element',
+                          writer=SpyWriter(), reference_filepath=str(design))
+    assert len(adapter.design_elements) == expected
+
+
+@pytest.mark.parametrize('accession,second_score,passes', [
+    ('IGVFFI3759TMLT', '1', True),
+    ('IGVFFI3759TMLT', '2', False),
+    ('IGVFFI0000TEST', '1', False),
+])
+def test_duplicate_reference_effects_require_review_and_identical_scores(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, accession, second_score, passes):
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\n'
+                      'first\tchr1\t10\t20\t+\t["ref"]\n'
+                      'second\tchr1\t10\t20\t+\t["ref"]\n')
+    effects = tmp_path / f'{accession}.bed'
+    effects.write_text('chr1\t10\t20\tfirst\t100\t+\t1\t2\t3\t4\t5\n'
+                       f'chr1\t10\t20\tsecond\t100\t+\t{second_score}\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), 'genomic_element_biosample',
+                          writer=writer, reference_filepath=str(design))
+    with nullcontext() if passes else pytest.raises(ValueError, match='duplicate element effect'):
+        adapter.process_file()
+    assert len(writer.contents) == 1
+
+
+def test_missing_reference_tile_never_writes_dangling_edge(tmp_path, mock_file_fileset, mock_ontology_term_validator):
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\n'
+                      'tile\tchr1\t10\t20\t+\t["ref"]\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text('chr1\t10\t20\ttile\t100\t-\t1\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), 'genomic_element_biosample',
+                          writer=writer, reference_filepath=str(design))
+    with pytest.raises(ValueError, match='no reference design tile'):
+        adapter.process_file()
+    assert not writer.contents

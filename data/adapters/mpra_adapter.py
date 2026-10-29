@@ -25,7 +25,8 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
      populate allele sets to skip ``ALT_``* effect names for ref-only biosample edges. A
      *single* row with ``[ref, alt]`` is one reference tile (not two elements).
   3. **Significance** — ``minusLog10QValue >= THRESHOLD`` (default 1) when Q is available.
-  4. **IGVFFI1436TRIH** — optional name exclusion file (``IGVFFI1436TRIH_EXCLUSION_LIST``).
+  4. **File exceptions** — accession-scoped, reasoned exclusions under
+     ``data_loading_support_files/mpra/<accession>_exclusion_list.tsv``.
 
 """
 
@@ -111,13 +112,51 @@ class MPRAAdapter(BaseAdapter):
 
     SATMUT_DESIGN_ACCESSIONS = frozenset({'IGVFFI4261NSQZ', 'IGVFFI1789LDNT'})
 
+    # Reviewed IGVF-reformatted ENCODE files repeat reference effects for nearby
+    # variants. Collapse only identical emitted records; conflicting scores fail.
+    IDENTICAL_ELEMENT_EFFECT_FILES = frozenset({
+        'IGVFFI0697ERLC',
+        'IGVFFI1403DXAG',
+        'IGVFFI1510BIKA',
+        'IGVFFI1539EUOM',
+        'IGVFFI1657SPYA',
+        'IGVFFI1741RWXP',
+        'IGVFFI1774BLKA',
+        'IGVFFI2065HRKJ',
+        'IGVFFI2088BWUT',
+        'IGVFFI2612KYGU',
+        'IGVFFI3051BDVJ',
+        'IGVFFI3067GFJQ',
+        'IGVFFI3404GVKG',
+        'IGVFFI3512THBD',
+        'IGVFFI3759TMLT',
+        'IGVFFI4402NIMA',
+        'IGVFFI4549EUOM',
+        'IGVFFI4580CPIW',
+        'IGVFFI4920GDBI',
+        'IGVFFI6128ABQP',
+        'IGVFFI6430GOGX',
+        'IGVFFI6713XUAJ',
+        'IGVFFI6745NQHO',
+        'IGVFFI6956JADI',
+        'IGVFFI6981UWPM',
+        'IGVFFI6988MJTJ',
+        'IGVFFI7020ICIO',
+        'IGVFFI8760OJPL',
+        'IGVFFI8768JREA',
+        'IGVFFI9189WMAU',
+        'IGVFFI9363OYOI',
+        'IGVFFI9704CYED',
+        'IGVFFI9835TEFQ',
+        'IGVFFI9887JSVV',
+    })
+
     THRESHOLD = 1
     CHUNK_SIZE = 6500
-    IGVFFI1436TRIH_EXCLUSION_LIST = (
-        Path(__file__).resolve().parents[1] /
-        'data_loading_support_files' /
-        'MPRA_IGVFFI1436TRIH_element_exclusion_list.tsv'
-    )
+    EXCLUSION_DIR = (Path(__file__).resolve().parents[1] /
+                     'data_loading_support_files' / 'mpra')
+    # These 12K designs use patch-version names for GRCh38 primary chromosomes.
+    DESIGN_ASSEMBLY_ALIASES = {'IGVFFI7237HYCA': {'GRCh38.p13': 'GRCh38'}}
 
     def __init__(
         self,
@@ -197,12 +236,13 @@ class MPRAAdapter(BaseAdapter):
             )
             self.writer.add_tag('portal_accessions',
                                 self.reference_file_accession)
-            self.load_mpra_design_mapping(self.mpra_design_file)
         else:
             self.mpra_design_file = None
             self.reference_source_url = None
             self.reference_file_accession = None
-        self.excluded_effect_names = self._load_excluded_effect_names()
+        self.excluded_effect_names, self.excluded_variants = self._load_exclusions()
+        if self.has_sequence_designs:
+            self.load_mpra_design_mapping(self.mpra_design_file)
 
     def _resolve_igvf_accession_from_encode_accession(self, encode_accession, igvf_api_url='https://api.data.igvf.org'):
         response = requests.get(
@@ -329,7 +369,12 @@ class MPRAAdapter(BaseAdapter):
         with self._open_text_file(mpra_design_file) as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
-                if row.get('ref', self.assembly) not in (self.assembly, '', 'NA'):
+                if self._is_blacklisted_effect_name(row.get('name')):
+                    continue
+                assembly = row.get('ref', self.assembly)
+                assembly = self.DESIGN_ASSEMBLY_ALIASES.get(
+                    self.reference_file_accession, {}).get(assembly, assembly)
+                if assembly not in (self.assembly, '', 'NA'):
                     self.excluded_assembly_design_names.add(
                         self.normalize_design_name(row.get('name')))
                     continue
@@ -423,12 +468,16 @@ class MPRAAdapter(BaseAdapter):
 
         for key, spdi_list, variant_pos_list in pending_alt_spdi_mappings:
             if key not in self.design_elements:
+                if self.reference_file_accession not in self.SATMUT_DESIGN_ACCESSIONS:
+                    # Only these reviewed SatMut designs encode ALT coordinates
+                    # as changed bases. Do not infer tiles for other files.
+                    continue
                 # ALT coordinates may describe only the changed bases rather
                 # than the full reference tile. When there is no exact tile
                 # match, require a unique reference tile containing that interval
                 # on the same chromosome and strand. This mapping uses reference
                 # coordinates, not sequence identity or provenance names, and
-                # applies to every design dataset.
+                # applies only to the explicitly listed SatMut designs.
                 candidates = {
                     tile for tile in reference_tiles
                     if key[0] == tile[0] and key[3] == tile[3]
@@ -450,28 +499,26 @@ class MPRAAdapter(BaseAdapter):
                     if pos is not None:
                         self.variant_pos_to_element[(spdi, pos)].add(key)
 
-    def _load_excluded_effect_names(self):
-        accession = (self.reference_file_accession or '').strip()
-        if accession != 'IGVFFI1436TRIH':
-            return frozenset()
-        exclusion_path = self.IGVFFI1436TRIH_EXCLUSION_LIST
-        if not exclusion_path.exists():
-            raise FileNotFoundError(
-                f'Configured MPRA exclusion list not found for {accession}: {exclusion_path}'
-            )
-
-        names = set()
-        with open(exclusion_path, 'r') as f:
-            for line in f:
-                raw = line.strip()
-                if not raw:
-                    continue
-                # Some rows include a secondary alias separated by ';'.
-                for token in raw.split(';'):
-                    normalized = token.strip()
-                    if normalized:
-                        names.add(normalized)
-        return frozenset(names)
+    def _load_exclusions(self):
+        """Exact identifiers only; a replacement accession never inherits exceptions."""
+        exclusions = {'element': set(), 'variant': set()}
+        for accession in (self.file_accession, self.reference_file_accession):
+            if not accession:
+                continue
+            path = self.EXCLUSION_DIR / f'{accession}_exclusion_list.tsv'
+            if not path.exists():
+                continue
+            with path.open() as stream:
+                reader = csv.DictReader(stream, delimiter='\t')
+                if reader.fieldnames != ['kind', 'identifier', 'reason']:
+                    raise ValueError(f'Invalid MPRA exclusion header: {path}')
+                for row in reader:
+                    if (row['kind'] not in exclusions or not row['identifier']
+                            or not row['reason'] or None in row):
+                        raise ValueError(
+                            f'Invalid MPRA exclusion entry in {path}: {row}')
+                    exclusions[row['kind']].add(row['identifier'])
+        return frozenset(exclusions['element']), frozenset(exclusions['variant'])
 
     def _is_blacklisted_effect_name(self, effect_name):
         return (effect_name or '').strip() in self.excluded_effect_names
@@ -512,6 +559,8 @@ class MPRAAdapter(BaseAdapter):
             chunk = []
             # in this case the file is always from IGVF so we add the tag
             for i, row in enumerate(reader, 1):
+                if row[3] in self.excluded_variants:
+                    continue
                 chunk.append(row)
                 if i % self.CHUNK_SIZE == 0:
                     self._process_chunk_igvf(chunk)
@@ -530,6 +579,7 @@ class MPRAAdapter(BaseAdapter):
         ``self.label`` (both branches are in the same loop; only one label per run is active).
         """
         seen_element_ids = set()
+        seen_edges = {}
         biosample_term_key = (self.biosample_term or '').split('/')[-1]
         # Element id suffix: design file accession when we have sequence designs (IGVF), else effect file accession (ENCODE)
         element_id_suffix = self.reference_file_accession if self.has_sequence_designs else self.file_accession
@@ -556,6 +606,8 @@ class MPRAAdapter(BaseAdapter):
                 if self.normalize_design_name(row[3]) in self.excluded_assembly_design_names:
                     continue
 
+                if self._is_blacklisted_effect_name(row[3]):
+                    continue
                 if self.effect_label == 'genomic_element':
                     if self.has_sequence_designs and element_key not in self.design_elements:
                         self.logger.warning(
@@ -628,6 +680,10 @@ class MPRAAdapter(BaseAdapter):
                         if alleles and 'ref' not in alleles:
                             # Only ref element effects should be loaded.
                             continue
+                    if self.has_sequence_designs and element_key not in self.design_elements:
+                        raise ValueError(
+                            f'{self.file_accession}: element {row[3]!r} has no reference design tile '
+                            f'{element_key}; review the input or add a file-specific exclusion.')
                     edge_id = '_'.join(
                         [region_id, self.strand_token(strand), self.file_accession, biosample_term_key])
                     minus_p = self.safe_float(row[9]) if len(
@@ -659,6 +715,14 @@ class MPRAAdapter(BaseAdapter):
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
                     }
                     props = self._drop_nonfinite_metrics(props)
+                    if edge_id in seen_edges:
+                        if (self.file_accession in self.IDENTICAL_ELEMENT_EFFECT_FILES
+                                and seen_edges[edge_id] == props):
+                            continue
+                        raise ValueError(
+                            f'{self.file_accession}: duplicate element effect {edge_id}; '
+                            'conflicting or unreviewed duplicate reference scores')
+                    seen_edges[edge_id] = props
                     if self.validate:
                         self.validate_doc(props)
                     self.writer.write(json.dumps(
@@ -704,11 +768,12 @@ class MPRAAdapter(BaseAdapter):
     def _process_genomic_element_chunk(self, chunk):
         """``genomic_element_from_variant``: ``genomic_element`` nodes for coords in ``variant_to_element``.
 
-        The ``chunk`` argument is unused (variant file is not re-parsed here); coordinates
-        come from the design TSV. ``self.seen_elements`` dedupes across chunk invocations.
+        Only reported, non-excluded variants contribute nodes. ``self.seen_elements``
+        dedupes across chunk invocations.
         """
         keys = set()
-        for element_coords_set in self.variant_to_element.values():
+        for row in chunk:
+            element_coords_set = self.variant_to_element.get(row[3], set())
             for chr_, start, end, strand in element_coords_set:
                 keys.add(self.make_design_key(chr_, start, end, strand))
 
