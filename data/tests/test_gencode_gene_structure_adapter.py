@@ -95,7 +95,8 @@ def test_gencode_structure_adapter_initialization():
 
 
 def test_gencode_structure_adapter_parse_info_metadata():
-    adapter = GencodeStructure(filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf')
+    adapter = GencodeStructure(
+        filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf')
     info = ['gene_id', '"ENSG00000223972.5";', 'transcript_id', '"ENST00000456328.2";', 'gene_name',
             '"DDX11L1";', 'transcript_name', '"DDX11L1-202";', 'exon_number', '1', 'exon_id', '"ENSE00002234944.1";']
     parsed_info = adapter.parse_info_metadata(info)

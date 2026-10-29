@@ -134,7 +134,8 @@ def test_asb_gvatdb_adapter_initialization():
 
 
 def test_asb_gvatdb_adapter_load_tf_uniprot_id_mapping():
-    adapter = ASB_GVATDB(filepath='./tests/fixtures/IGVFFI8897VGII_GVATdb_sample.tsv')
+    adapter = ASB_GVATDB(
+        filepath='./tests/fixtures/IGVFFI8897VGII_GVATdb_sample.tsv')
     adapter.load_tf_uniprot_id_mapping()
     assert hasattr(adapter, 'tf_uniprot_id_mapping')
     assert isinstance(adapter.tf_uniprot_id_mapping, dict)
