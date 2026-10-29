@@ -71,6 +71,39 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('filters ColocBoost results by gene_id and phenotype_id', async () => {
+    const ontologyResult = [{
+      _id: 'EFO_0005292',
+      uri: 'https://uri/EFO_0005292',
+      term_id: 'EFO_0005292',
+      name: 'lymphoblastoid cell line'
+    }]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(ontologyResult) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]) } as any)
+
+    const input = {
+      biosample_id: 'EFO_0005292',
+      method: 'ColocBoost',
+      gene_id: 'ENSG00000134245',
+      phenotype_id: 'EFO_0006340',
+      page: 0
+    }
+    const result = await variantsBiosamplesRouters.variantsFromBiosamples({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
+    const edgeQuery = query.mock.calls[1][0] as string
+    expect(edgeQuery).toContain("record.gene == 'genes/ENSG00000134245'")
+    expect(edgeQuery).toContain("record.phenotype == 'ontology_terms/EFO_0006340'")
+  })
 })
 
 describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
@@ -125,6 +158,82 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
         rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('filters ColocBoost results by gene_id and phenotype_id', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['variants/NC_000001.11:69633:TGT:GAA']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]) } as any)
+
+    const input = {
+      spdi: 'NC_000001.11:69633:TGT:GAA',
+      method: 'ColocBoost',
+      gene_id: 'ENSG00000134245',
+      phenotype_id: 'EFO_0006340',
+      page: 0
+    }
+    const result = await variantsBiosamplesRouters.biosamplesFromVariants({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
+    const edgeQuery = query.mock.calls[1][0] as string
+    expect(edgeQuery).toContain("record.gene == 'genes/ENSG00000134245'")
+    expect(edgeQuery).toContain("record.phenotype == 'ontology_terms/EFO_0006340'")
+  })
+
+  it('resolves gene_name and phenotype_name to ids before filtering', async () => {
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['variants/NC_000001.11:69633:TGT:GAA']) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'ENSG00000134245', name: 'TP53' }]) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'EFO_0006340', name: 'some phenotype' }]) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]) } as any)
+
+    const input = {
+      spdi: 'NC_000001.11:69633:TGT:GAA',
+      method: 'ColocBoost',
+      gene_name: 'TP53',
+      phenotype_name: 'some phenotype',
+      page: 0
+    }
+    const result = await variantsBiosamplesRouters.biosamplesFromVariants({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
+    const edgeQuery = query.mock.calls[3][0] as string
+    expect(edgeQuery).toContain("record.gene == 'genes/ENSG00000134245'")
+    expect(edgeQuery).toContain("record.phenotype == 'ontology_terms/EFO_0006340'")
+  })
+
+  it('returns an empty array when gene_name does not resolve to a known gene', async () => {
+    jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['variants/NC_000001.11:69633:TGT:GAA']) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
+
+    const input = {
+      spdi: 'NC_000001.11:69633:TGT:GAA',
+      method: 'ColocBoost',
+      gene_name: 'NOT_A_REAL_GENE',
+      page: 0
+    }
+    const result = await variantsBiosamplesRouters.biosamplesFromVariants({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    expect(result).toEqual([])
   })
 })
 

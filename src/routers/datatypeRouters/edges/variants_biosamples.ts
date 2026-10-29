@@ -7,6 +7,7 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
+import { geneSearch } from '../nodes/genes'
 import { commonEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
@@ -16,7 +17,11 @@ const METHODS = getCollectionEnumValuesOrThrow('edges', 'variants_biosamples', '
 const variantsBiosamplesQueryFormat = z.object({
   method: z.enum(METHODS).optional(),
   element_id: z.string().optional(),
-  significant: z.enum(['true', 'false']).optional()
+  significant: z.enum(['true', 'false']).optional(),
+  gene_id: z.string().trim().optional(),
+  gene_name: z.string().trim().optional(),
+  phenotype_id: z.string().trim().optional(),
+  phenotype_name: z.string().trim().optional()
 })
 const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),
@@ -53,6 +58,10 @@ export const returnFormat = z.object({
   significant: z.boolean().nullish(),
   neg_log10_pvalue: z.number().nullish(),
   neg_log10_pvalue_adj: z.number().nullish(),
+  phenotype: z.string().nullish(),
+  VCP: z.number().nullish(),
+  gene: z.string().nullish(),
+  phenotype_name: z.string().nullish(),
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
@@ -92,6 +101,42 @@ function biosampleQueryValidation (input: paramsFormatType): void {
   }
 }
 
+async function resolveGeneId (input: paramsFormatType): Promise<string | null | undefined> {
+  if (input.gene_id !== undefined) {
+    const geneId = input.gene_id as string
+    delete input.gene_id
+    delete input.gene_name
+    return geneId
+  }
+
+  if (input.gene_name !== undefined) {
+    const geneName = input.gene_name as string
+    delete input.gene_name
+    const genes = await geneSearch({ name: geneName, page: 0 })
+    return genes.length > 0 ? genes[0]._id as string : null
+  }
+
+  return undefined
+}
+
+async function resolvePhenotypeId (input: paramsFormatType): Promise<string | null | undefined> {
+  if (input.phenotype_id !== undefined) {
+    const phenotypeId = input.phenotype_id as string
+    delete input.phenotype_id
+    delete input.phenotype_name
+    return phenotypeId
+  }
+
+  if (input.phenotype_name !== undefined) {
+    const phenotypeName = input.phenotype_name as string
+    delete input.phenotype_name
+    const phenotypes = await ontologySearch({ name: phenotypeName, page: 0 })
+    return phenotypes.length > 0 ? phenotypes[0]._id as string : null
+  }
+
+  return undefined
+}
+
 function getLimit (input: paramsFormatType): number {
   if (input.limit === undefined) {
     return QUERY_LIMIT
@@ -122,6 +167,16 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
   const mouse = input.organism === 'Mus musculus'
   const elementCollection = mouse ? 'mm_genomic_elements' : genomicElementsCollectionName
   input.limit = getLimit(input)
+
+  const geneId = await resolveGeneId(input)
+  if (geneId === null) {
+    return []
+  }
+
+  const phenotypeId = await resolvePhenotypeId(input)
+  if (phenotypeId === null) {
+    return []
+  }
 
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
@@ -165,11 +220,16 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     delete input.significant
   }
 
+  const filterGene = geneId !== undefined ? `FILTER record.gene == 'genes/${geneId}'` : ''
+  const filterPhenotype = phenotypeId !== undefined ? `FILTER record.phenotype == 'ontology_terms/${phenotypeId}'` : ''
+
   const query = `
     FOR record IN ${mouse ? 'mm_variants_biosamples' : variantToBiosamplesCollecionName}
     FILTER ${filterCondition} ${methodFilter} ${filesetFilter}
     ${filterGenomicElements}
     ${filterSignificant}
+    ${filterGene}
+    ${filterPhenotype}
     SORT record._key
     LIMIT ${input.page as number * input.limit}, ${input.limit}
     LET genomic_element = ${input.verbose === 'true' ? `(${genomicElementVerboseQuery(mouse)})[0]` : 'record.genomic_element'}
@@ -200,6 +260,11 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
         'CI_upper_95': record.CI_upper_95,
         'significant': record.significant,
         'treatments_term_ids': record.treatments_term_ids
+      } : record.method == 'ColocBoost' ? {
+        'phenotype': record.phenotype,
+        'VCP': record.VCP,
+        'gene': record.gene,
+        'phenotype_name': record.phenotype_name
       } : {
         'genomic_element': genomic_element,
         'strand': record.strand,

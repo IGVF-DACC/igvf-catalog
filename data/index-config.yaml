@@ -420,6 +420,10 @@ variants_biosamples:
       - source, files_filesets, method
       - source, class, files_filesets, method
       - _to, method, _key
+  persistent_sparse:
+    fields:
+      - gene
+      - phenotype
 
 variants_coding_variants:
   persistent:

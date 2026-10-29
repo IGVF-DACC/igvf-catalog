@@ -1852,7 +1852,7 @@ export const descriptions = {
   dataset = VAMP-seq',
 
   variants_biosamples:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given variant. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, MPRA, and ColocBoost for a given variant. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: variant_id, spdi, hgvs, rsid, ca_id, region, method, or files_fileset. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1928,11 +1928,40 @@ export const descriptions = {
             ]
           }
         ]
+      },
+      {
+        id: 'colocboost',
+        label: 'ColocBoost',
+        examples: [
+          {
+            label: 'query by variant identifier',
+            items: [
+              'spdi = NC_000001.11:155904168:A:G',
+              'method = ColocBoost'
+            ]
+          },
+          {
+            label: 'query by variant identifier and gene (gene_name also accepted, e.g. gene_name = RIT1)',
+            items: [
+              'spdi = NC_000001.11:155904168:A:G',
+              'method = ColocBoost',
+              'gene_id = ENSG00000143622'
+            ]
+          },
+          {
+            label: 'query by variant identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = type 2 diabetes nephropathy)',
+            items: [
+              'spdi = NC_000001.11:155904168:A:G',
+              'method = ColocBoost',
+              'phenotype_id = EFO_0004997'
+            ]
+          }
+        ]
       }
     ]),
 
   biosamples_variants:
-    'Retrieve data from STARR-seq, BlueSTARR, and MPRA for a given biosample. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
+    'Retrieve data from STARR-seq, BlueSTARR, MPRA, and ColocBoost for a given biosample. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38).<br> \
     At least one of these fields is required: biosample_id or biosample_name. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
@@ -1985,6 +2014,35 @@ export const descriptions = {
             items: [
               'biosample_id = EFO_0002067',
               'method = BlueSTARR'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'colocboost',
+        label: 'ColocBoost',
+        examples: [
+          {
+            label: 'query by biosample identifier',
+            items: [
+              'biosample_id = UBERON_0001225',
+              'method = ColocBoost'
+            ]
+          },
+          {
+            label: 'query by biosample identifier and gene (gene_name also accepted, e.g. gene_name = UBIAD1)',
+            items: [
+              'biosample_id = UBERON_0001225',
+              'method = ColocBoost',
+              'gene_id = ENSG00000120942'
+            ]
+          },
+          {
+            label: 'query by biosample identifier and phenotype (phenotype_name also accepted, e.g. phenotype_name = c-reactive protein measurement)',
+            items: [
+              'biosample_id = UBERON_0001225',
+              'method = ColocBoost',
+              'phenotype_id = EFO_0004458'
             ]
           }
         ]
