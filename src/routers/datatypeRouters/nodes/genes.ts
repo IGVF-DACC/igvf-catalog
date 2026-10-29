@@ -77,29 +77,29 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   const nearestQuery = `
     LET LEFT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]} ${geneTypeFilter}
-      SORT record.end DESC
+      FILTER record.chr == '${regionParams[1]}' and record.end <= ${regionParams[2]} ${geneTypeFilter}
+      SORT (record.strand == '-' ? record.end : record.start) DESC
       LIMIT 1
       RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
 
     LET RIGHT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]} ${geneTypeFilter}
-      SORT record.start
+      FILTER record.chr == '${regionParams[1]}' and record.start >= ${regionParams[3]} ${geneTypeFilter}
+      SORT (record.strand == '-' ? record.end : record.start) ASC
       LIMIT 1
       RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
 
-    RETURN UNION(LEFT, RIGHT)
+    FOR record IN UNION(LEFT, RIGHT)
+      LET anchorPos = record.strand == '-' ? record.end : record.start
+      LET distance = anchorPos <= ${regionParams[2]} ? ${regionParams[2]} - anchorPos : anchorPos - ${regionParams[3]}
+      SORT distance ASC
+      LIMIT 1
+      RETURN record
   `
 
-  const nearestGenes = await (await db.query(nearestQuery)).all()
-  if (nearestGenes !== undefined) {
-    return nearestGenes[0]
-  }
-
-  return []
+  return await (await db.query(nearestQuery)).all()
 }
 
 export async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
@@ -230,6 +230,13 @@ const genes = publicProcedure
   .output(z.array(geneFormat))
   .query(async ({ input }) => await geneSearch(input))
 
+const nearestGenes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/nearest-genes', description: descriptions.nearest_genes } })
+  .input(z.object({ region: z.string().trim() }))
+  .output(z.array(geneFormat))
+  .query(async ({ input }) => await nearestGeneSearch(input))
+
 export const genesRouters = {
-  genes
+  genes,
+  nearestGenes
 }

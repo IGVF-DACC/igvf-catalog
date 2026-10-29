@@ -2,10 +2,10 @@ import { variantsGenesRouters, completeQtlsFormat, qtlsSummaryFormat } from '../
 import { geneFormat } from '../../../datatypeRouters/nodes/genes'
 
 // Hits the real shared dev ArangoDB (config/development.json) - no jest.mock here on purpose.
-describe('variantsGenesRouters.nearestGenes (integration)', () => {
+describe('variantsGenesRouters.deprecatedNearestGenes (integration)', () => {
   it('returns schema-valid coding-region genes for a real region', async () => {
     const input = { region: 'chr1:33306765-33321098' }
-    const result: any = await variantsGenesRouters.nearestGenes({
+    const result: any = await variantsGenesRouters.deprecatedNearestGenes({
       input,
       ctx: {},
       type: 'query',

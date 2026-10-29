@@ -64,6 +64,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/variants/predictions-count', tag: 'Bespoke Endpoints' },
   { path: '/variants/predictions', tag: 'Bespoke Endpoints' },
   { path: '/variants/phenotypes/score-summary', tag: 'Bespoke Endpoints' },
+  { path: '/nearest-genes', tag: 'Bespoke Endpoints' },
   { path: '/variants/nearest-genes', tag: 'Bespoke Endpoints' },
   { path: '/variants/gnomad-alleles', tag: 'Bespoke Endpoints' },
   { path: '/variants/genomic-elements/genes', tag: 'Bespoke Endpoints' },
