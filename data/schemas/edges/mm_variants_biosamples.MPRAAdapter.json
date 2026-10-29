@@ -26,8 +26,11 @@
           ]
         },
         "genomic_element": {
-          "type": "string",
-          "description": "Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reference to the genomic element (hyper-edge); the variant effect is measured in this element in the given biosample. Null only for a file-specific exception permitting a variant without a reference element.",
           "example": "mm_genomic_elements/MPRA_chr9_136886228_136886428_GRCm39_IGVFFI4914OUJH",
           "pattern": "^mm_genomic_elements/",
           "collections": [

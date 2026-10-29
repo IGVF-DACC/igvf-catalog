@@ -8,7 +8,7 @@ Use tab-separated columns `kind`, `identifier`, `reason`:
 
 ```tsv
 kind	identifier	reason
-variant	NC_000009.12:133278859:T:C	Reference tile is supplied only in GRCh37
+variant_without_reference_element	NC_000009.12:133278859:T:C	Reference tile is supplied only in GRCh37
 ```
 
 - `element`: exact BED element name. When attached to a design accession, also
@@ -17,12 +17,19 @@ variant	NC_000009.12:133278859:T:C	Reference tile is supplied only in GRCh37
 - `variant`: exact identifier from BED column 4. Applies to variant nodes,
   variant activity edges, and variant-derived element generation. Other retained
   variants can still contribute a shared element node.
+- `variant_without_reference_element`: exact BED variant identifier permitted to
+  lack a reference design tile. Retains the variant node and activity effect,
+  emitting `genomic_element: null` when no mapping exists. A valid mapping, when
+  available, is still used. No placeholder element node is created. The effect's
+  BED strand is retained; null-link keys include strand and variant position.
+  Variant normalization and database node checks still apply. An identifier
+  cannot also have a `variant` exclusion.
 - `reason`: required explanation suitable for following up with submitters.
 
 Prefer an effect accession when the problem is confined to that effect file.
 Use a design accession only when every analysis using that design is affected.
 Do not add broad filters or infer an assembly, strand, or reference sequence
-from element names. Unknown missing reference tiles fail activity-edge parsing;
+from element names. Unlisted missing reference tiles fail activity-edge parsing;
 review them before adding an exclusion. Reference sequence validation continues
 to reject invalid variants through the shared variant loader.
 

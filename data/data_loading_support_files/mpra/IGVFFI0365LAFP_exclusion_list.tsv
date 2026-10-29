@@ -1,2 +1,2 @@
 kind	identifier	reason
-variant	NC_000009.12:133278859:T:C	Design IGVFFI2260ZLFH provides this control tile in GRCh37; no GRCh38 reference tile
+variant_without_reference_element	NC_000009.12:133278859:T:C	Design IGVFFI2260ZLFH provides this control tile in GRCh37; no GRCh38 reference tile

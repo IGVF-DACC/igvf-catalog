@@ -845,3 +845,47 @@ def test_missing_reference_tile_never_writes_dangling_edge(tmp_path, mock_file_f
     with pytest.raises(ValueError, match='no reference design tile'):
         adapter.process_file()
     assert not writer.contents
+
+
+@pytest.mark.parametrize('prefix', ['', 'mm_'])
+@pytest.mark.parametrize('listed', [True, False])
+def test_explicit_missing_reference_retains_variant_effect(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, prefix, listed):
+    spdi = 'NC_000067.7:11:A:C' if prefix else 'NC_000001.11:11:A:C'
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text(''.join(
+        f'chr1\t11\t12\t{spdi}\t100\t{strand}\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n'
+        for strand in ['+', '-']))
+    monkeypatch.setattr(MPRAAdapter, 'EXCLUSION_DIR', tmp_path)
+    if listed:
+        (tmp_path / 'IGVFFI0000TEST_exclusion_list.tsv').write_text(
+            f'kind\tidentifier\treason\nvariant_without_reference_element\t{spdi}\tNo reference tile\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), prefix + 'variant_biosample', writer=writer,
+                          reference_filepath=str(design), validate=True)
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        with nullcontext() if listed else pytest.raises(ValueError, match='not in MPRA design mapping'):
+            adapter.process_file()
+    if listed:
+        records = [json.loads(x) for x in writer.contents]
+        assert len(records) == 2
+        assert all(r['genomic_element'] is None and r['log2FC']
+                   == 1 for r in records)
+        assert len({r['_key'] for r in records}) == 2
+        assert {r['strand'] for r in records} == {'+', '-'}
+        assert spdi not in adapter.excluded_variants
+        adapter.effect_label = 'genomic_element_from_variant'
+        adapter.writer = SpyWriter()
+        adapter.parse()
+        assert not adapter.writer.contents
+        adapter.effect_label = 'variant'
+        adapter.validate = False
+        with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set()), \
+                patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+            adapter.parse()
+        assert len(adapter.writer.contents) == 2
+    else:
+        assert not writer.contents

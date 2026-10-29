@@ -240,7 +240,8 @@ class MPRAAdapter(BaseAdapter):
             self.mpra_design_file = None
             self.reference_source_url = None
             self.reference_file_accession = None
-        self.excluded_effect_names, self.excluded_variants = self._load_exclusions()
+        (self.excluded_effect_names, self.excluded_variants,
+         self.variants_without_reference_element) = self._load_exclusions()
         if self.has_sequence_designs:
             self.load_mpra_design_mapping(self.mpra_design_file)
 
@@ -501,7 +502,8 @@ class MPRAAdapter(BaseAdapter):
 
     def _load_exclusions(self):
         """Exact identifiers only; a replacement accession never inherits exceptions."""
-        exclusions = {'element': set(), 'variant': set()}
+        exclusions = {'element': set(), 'variant': set(),
+                      'variant_without_reference_element': set()}
         for accession in (self.file_accession, self.reference_file_accession):
             if not accession:
                 continue
@@ -518,7 +520,11 @@ class MPRAAdapter(BaseAdapter):
                         raise ValueError(
                             f'Invalid MPRA exclusion entry in {path}: {row}')
                     exclusions[row['kind']].add(row['identifier'])
-        return frozenset(exclusions['element']), frozenset(exclusions['variant'])
+        if exclusions['variant'] & exclusions['variant_without_reference_element']:
+            raise ValueError(
+                'MPRA variant cannot be both excluded and retained without a reference element')
+        return tuple(frozenset(exclusions[kind]) for kind in (
+            'element', 'variant', 'variant_without_reference_element'))
 
     def _is_blacklisted_effect_name(self, effect_name):
         return (effect_name or '').strip() in self.excluded_effect_names
@@ -821,7 +827,8 @@ class MPRAAdapter(BaseAdapter):
             spdi = row[3]
             if spdi not in loaded_spdis:
                 continue
-            if spdi not in self.variant_to_element:
+            if (not self.variant_to_element.get(spdi)
+                    and spdi not in self.variants_without_reference_element):
                 raise ValueError(
                     f'SPDI {spdi} found in variant file but not in MPRA design mapping. '
                     'Ensure all genomic element edges are mapped via the sequence design file.'
@@ -850,14 +857,22 @@ class MPRAAdapter(BaseAdapter):
                     if strand_matched:
                         mapped_elements = strand_matched
             if not mapped_elements:
-                mapped_elements = self.variant_to_element[spdi]
+                mapped_elements = self.variant_to_element.get(spdi, set())
 
-            for element_chr, element_start, element_end, element_strand in mapped_elements:
-                element_id = self.build_mpra_element_node_id(
-                    element_chr, element_start, element_end, element_strand, self.reference_file_accession)
+            # Only an explicit file exception permits a missing reference tile.
+            for element in mapped_elements or [None]:
+                if element is None:
+                    element_id = None
+                    element_strand = bed_strand
+                    element_key = f'no_reference_element_{self.strand_token(bed_strand)}_{bed_variant_pos}'
+                else:
+                    element_chr, element_start, element_end, element_strand = element
+                    element_id = self.build_mpra_element_node_id(
+                        element_chr, element_start, element_end, element_strand, self.reference_file_accession)
+                    element_key = element_id
                 edge_key = '_'.join([
                     variant_id,
-                    element_id,
+                    element_key,
                     biosample_term_key,
                     self.file_accession,
                 ])
@@ -870,7 +885,7 @@ class MPRAAdapter(BaseAdapter):
                     '_key': edge_key,
                     '_from': f'{self.variant_collection}/{variant_id}',
                     '_to': self.biosample_term,
-                    'genomic_element': f'{self.element_collection}/{element_id}',
+                    'genomic_element': f'{self.element_collection}/{element_id}' if element_id else None,
                     'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
                     'bed_score': self.safe_int(row[4]),
