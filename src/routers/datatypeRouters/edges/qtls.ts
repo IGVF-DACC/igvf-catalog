@@ -68,7 +68,7 @@ const inputFormat = z.object({
   biological_context: z.string().trim().optional(),
   method: METHODS.optional(),
   source: SOURCES.optional()
-}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
+}).merge(commonHumanEdgeParamsFormat).omit({ verbose: true })
 
 function validateInput (input: paramsFormatType): void {
   const geneKeys = ['gene_id', 'gene_name']
@@ -249,10 +249,11 @@ function variantsGenomicElementsQuery (filterClause: string, withLimit: boolean)
 
 async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, gene_name } = input
-  const geneInput: paramsFormatType = { gene_id, name: gene_name, page: 0 }
+  const { gene_id, gene_name, organism } = input
+  const geneInput: paramsFormatType = { gene_id, name: gene_name, organism, page: 0 }
   delete input.gene_id
   delete input.gene_name
+  delete input.organism
 
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `genes/${gene._id as string}`)
@@ -305,13 +306,14 @@ async function qtlsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 async function qtlsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { variant_id, spdi, rsid, ca_id, region } = input
-  const variantInput: paramsFormatType = { variant_id, spdi, rsid, ca_id, region, page: 0 }
+  const { variant_id, spdi, rsid, ca_id, region, organism } = input
+  const variantInput: paramsFormatType = { variant_id, spdi, rsid, ca_id, region, organism, page: 0 }
   delete input.variant_id
   delete input.spdi
   delete input.rsid
   delete input.ca_id
   delete input.region
+  delete input.organism
   const variantIDs = await variantIDSearch(variantInput)
   if (variantIDs.length === 0) {
     return []

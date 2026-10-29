@@ -34,7 +34,7 @@ const QueryFormat = z.object({
   }, z.boolean()).optional(),
   disease_ontology_terms: z.string().trim().optional(),
   biological_process: z.string().trim().optional()
-}).merge(commonHumanNodesParamsFormat).omit({ organism: true })
+}).merge(commonHumanNodesParamsFormat)
 
 export const pathwayFormat = z.object({
   _id: z.string(),

@@ -54,8 +54,8 @@ const variantsGenesQueryFormat = z.object({
   source: z.enum(SOURCES).optional()
 })
 
-const variantsQueryFormat = variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(NAMES).optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
-const genesQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(INVERSE_NAMES).optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
+const variantsQueryFormat = variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(NAMES).optional() })).merge(commonHumanEdgeParamsFormat)
+const genesQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(z.object({ name: z.enum(INVERSE_NAMES).optional() })).merge(commonHumanEdgeParamsFormat)
 
 export const completeQtlsFormat = z.object({
   gene: z.string().or(geneFormat).nullable(),
@@ -499,6 +499,7 @@ const executeLevenshteinMatchQuery = async ({
 
 async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
+  delete input.organism
   const verbose = input.verbose === 'true'
   delete input.verbose
 
@@ -521,6 +522,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     delete input.hgnc_id
     delete input.gene_name
     delete input.synonym
+    delete input.organism
     const genes = await geneSearch(geneInput)
     geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
   }
@@ -605,6 +607,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
 
 async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   validateVariantInput(input)
+  delete input.organism
   const verbose = input.verbose === 'true'
   delete input.verbose
 

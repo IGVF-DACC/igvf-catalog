@@ -262,6 +262,7 @@ function validateInput (input: paramsFormatType): void {
 
 async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   validateInput(input)
+  delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
@@ -315,7 +316,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
 
 const variantsFromVariantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant-ld', description: descriptions.variants_variants } })
-  .input(variantsCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ organism: true }))
+  .input(variantsCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await findVariantLDs(input))
 
