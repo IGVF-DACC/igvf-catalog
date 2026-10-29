@@ -225,7 +225,8 @@ async function findPhenotypesFromGenomicElements (input: paramsFormatType): Prom
   let elementIDs: string[] = []
   let isElementQuery = false
   if (input.region !== undefined) {
-    const coordinates = validRegion(input.region)
+    const region = input.region as string
+    const coordinates = validRegion(region)
     if (coordinates !== null && parseInt(coordinates[3]) - parseInt(coordinates[2]) > 10000) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
