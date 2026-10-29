@@ -159,7 +159,7 @@ def test_dbNSFP_adapter_resolves_met1_placeholder_hgvsp():
 
     item = json.loads(writer.contents[0])
     assert item['hgvsp'] == 'p.Met1Leu'
-    assert item['alt'] == 'Leu'
+    assert item['alt'] == 'L'
 
 
 def test_dbNSFP_adapter_initialization():

@@ -153,8 +153,7 @@ class DbNSFP(BaseAdapter):
             ref = '*'
 
         if hgvsp == 'p.Met1?':
-            alt = AA_TABLE_REV[alt]
-            hgvsp = hgvsp.replace('?', alt)
+            hgvsp = hgvsp.replace('?', AA_TABLE_REV[alt])
 
         to_json = {
             '_key': key,
