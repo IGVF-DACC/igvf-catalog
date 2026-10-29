@@ -1,6 +1,6 @@
 # MPRA file exceptions
 
-Name each exclusion list `<accession>_exclusion_list.tsv`. The accession must be
+Name each exception list `<accession>_exception_list.tsv`. The accession must be
 an exact effect-file or sequence-design accession. Replacements do not inherit
 an older file's exceptions. Lists are optional; malformed lists fail parsing.
 
@@ -24,6 +24,11 @@ variant_without_reference_element	NC_000009.12:133278859:T:C	Reference tile is s
   BED strand is retained; null-link keys include strand and variant position.
   Variant normalization and database node checks still apply. An identifier
   cannot also have a `variant` exclusion.
+- `variant_deduplicate`: retain one identical effect per variant–element–biosample
+  key for this listed variant. Any differing emitted value still fails.
+- `variant_deduplicate_first_bed_score`: deduplicate this listed variant's effects,
+  retaining the first BED score when every other emitted value agrees. Other
+  conflicts still fail. This retains the effect; it is not a full exclusion.
 - `reason`: required explanation suitable for following up with submitters.
 
 Prefer an effect accession when the problem is confined to that effect file.
@@ -44,3 +49,17 @@ identical duplicate reference effects in IGVF-reformatted ENCODE files.
 Duplicates with conflicting emitted metrics always fail, even in reviewed files.
 
 See [the review](../../../docs/qa/mpra-2026-10-28.md) for evidence and remaining blockers.
+
+## UNC Library duplicate rules
+
+- IGVFFI4828YSPS (Library1.1) and IGVFFI4797FSIV (Library1.3): individual
+  variants are explicitly listed as `variant_deduplicate` or
+  `variant_deduplicate_first_bed_score`. There is no file-wide deduplication rule for
+  these two files. The lists contain 10 and 16 variants, respectively, with one
+  first-BED-score exception in each.
+- IGVFFI6587LCPK (Library1.4): exclude the 76 explicitly listed conflicting
+  variants, then collapse exact duplicate effects. The twelve missing-reference
+  permissions remain separate and retain effects with null element links.
+
+Unexpected measurement conflicts still fail. Rules are accession-specific and
+persist across parsing chunks; replacements do not inherit them.

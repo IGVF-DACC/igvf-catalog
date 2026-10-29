@@ -556,11 +556,11 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
 
 
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample'])
-def test_design_file_element_exclusion_list_is_applied(
+def test_design_file_element_exception_list_is_applied(
         tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, label):
     excluded_name = 'excluded_element'
-    monkeypatch.setattr(MPRAAdapter, 'EXCLUSION_DIR', tmp_path)
-    (tmp_path / 'IGVFFI0000REF_exclusion_list.tsv').write_text(
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    (tmp_path / 'IGVFFI0000REF_exception_list.tsv').write_text(
         'kind\tidentifier\treason\n'
         f'element\t{excluded_name}\treviewed annotation issue\n')
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
@@ -780,10 +780,10 @@ def test_variant_exclusions_apply_to_all_outputs_and_only_named_file(
     spdi = 'NC_000001.11:11:A:C'
     design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
                       f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
-    exclusion = tmp_path / 'IGVFFI0000TEST_exclusion_list.tsv'
+    exclusion = tmp_path / 'IGVFFI0000TEST_exception_list.tsv'
     exclusion.write_text(
         f'kind\tidentifier\treason\nvariant\t{spdi}\treviewed problem\n')
-    with patch.object(MPRAAdapter, 'EXCLUSION_DIR', tmp_path), \
+    with patch.object(MPRAAdapter, 'EXCEPTION_DIR', tmp_path), \
             patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set() if label == 'variant' else {spdi}), \
             patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
         for accession, count in [('IGVFFI0000TEST', 0), ('IGVFFI0001TEST', 1)]:
@@ -858,9 +858,9 @@ def test_explicit_missing_reference_retains_variant_effect(
     effects.write_text(''.join(
         f'chr1\t11\t12\t{spdi}\t100\t{strand}\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n'
         for strand in ['+', '-']))
-    monkeypatch.setattr(MPRAAdapter, 'EXCLUSION_DIR', tmp_path)
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
     if listed:
-        (tmp_path / 'IGVFFI0000TEST_exclusion_list.tsv').write_text(
+        (tmp_path / 'IGVFFI0000TEST_exception_list.tsv').write_text(
             f'kind\tidentifier\treason\nvariant_without_reference_element\t{spdi}\tNo reference tile\n')
     writer = SpyWriter()
     adapter = MPRAAdapter(str(effects), prefix + 'variant_biosample', writer=writer,
@@ -889,3 +889,59 @@ def test_explicit_missing_reference_retains_variant_effect(
         assert len(adapter.writer.contents) == 2
     else:
         assert not writer.contents
+
+
+@pytest.mark.parametrize('accession,score,fc,expected,error', [
+    ('IGVFFI4828YSPS', 129, 1, 1, False),
+    ('IGVFFI4797FSIV', 886, 1, 1, False),
+    ('IGVFFI4828YSPS', 510, 2, 1, True),
+    ('IGVFFI6587LCPK', 510, 1, 1, False),
+    ('IGVFFI6587LCPK', 129, 1, 1, True),
+    ('IGVFFI0000TEST', 510, 1, 2, False),
+])
+def test_reviewed_variant_dedup_across_chunks(tmp_path, mock_file_fileset,
+                                              mock_ontology_term_validator, monkeypatch, accession, score, fc, expected, error):
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    spdi = 'NC_000001.11:11:A:C'
+    if accession in ('IGVFFI4828YSPS', 'IGVFFI4797FSIV'):
+        (tmp_path / f'{accession}_exception_list.tsv').write_text(
+            f'kind\tidentifier\treason\nvariant_deduplicate_first_bed_score\t{spdi}\tReviewed BED score discrepancy\n')
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    effects = tmp_path / f'{accession}.bed'
+    effects.write_text(''.join(
+        f'chr1\t11\t12\t{spdi}\t{s}\t+\t{effect}\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n'
+        for s, effect in [(510, 1), (score, fc)]))
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), 'variant_biosample', reference_filepath=str(
+        design), writer=writer, validate=True)
+    adapter.CHUNK_SIZE = 1
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        with pytest.raises(ValueError, match='conflicting variant effect') if error else nullcontext():
+            adapter.process_file()
+    assert len(writer.contents) == expected
+    assert json.loads(writer.contents[0])['bed_score'] == 510
+
+
+@pytest.mark.parametrize('label', ['variant', 'variant_biosample', 'genomic_element_from_variant'])
+def test_file_variant_exclusion_filters_all_variant_outputs(tmp_path, mock_file_fileset,
+                                                            mock_ontology_term_validator, monkeypatch, label):
+    spdi = 'NC_000001.11:11:A:C'
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text(
+        f'chr1\t11\t12\t{spdi}\t100\t+\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n')
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    (tmp_path / 'IGVFFI0000TEST_exception_list.tsv').write_text(
+        f'kind\tidentifier\treason\nvariant\t{spdi}\tConflicting measurements\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), label,
+                          reference_filepath=str(design), writer=writer)
+    with patch('adapters.mpra_adapter.load_variant') as load:
+        adapter.process_file()
+        load.assert_not_called()
+    assert not writer.contents

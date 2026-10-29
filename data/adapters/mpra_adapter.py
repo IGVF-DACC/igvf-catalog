@@ -26,7 +26,7 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
      *single* row with ``[ref, alt]`` is one reference tile (not two elements).
   3. **Significance** — ``minusLog10QValue >= THRESHOLD`` (default 1) when Q is available.
   4. **File exceptions** — accession-scoped, reasoned exclusions under
-     ``data_loading_support_files/mpra/<accession>_exclusion_list.tsv``.
+     ``data_loading_support_files/mpra/<accession>_exception_list.tsv``.
 
 """
 
@@ -151,9 +151,12 @@ class MPRAAdapter(BaseAdapter):
         'IGVFFI9887JSVV',
     })
 
+    # Library1.4: collapse exact repeats after explicit conflicting-variant exclusions.
+    IDENTICAL_VARIANT_EFFECT_FILES = frozenset({'IGVFFI6587LCPK'})
+
     THRESHOLD = 1
     CHUNK_SIZE = 6500
-    EXCLUSION_DIR = (Path(__file__).resolve().parents[1] /
+    EXCEPTION_DIR = (Path(__file__).resolve().parents[1] /
                      'data_loading_support_files' / 'mpra')
     # These 12K designs use patch-version names for GRCh38 primary chromosomes.
     DESIGN_ASSEMBLY_ALIASES = {'IGVFFI7237HYCA': {'GRCh38.p13': 'GRCh38'}}
@@ -241,7 +244,8 @@ class MPRAAdapter(BaseAdapter):
             self.reference_source_url = None
             self.reference_file_accession = None
         (self.excluded_effect_names, self.excluded_variants,
-         self.variants_without_reference_element) = self._load_exclusions()
+         self.variants_without_reference_element, self.deduplicated_variants,
+         self.first_bed_score_variants) = self._load_exceptions()
         if self.has_sequence_designs:
             self.load_mpra_design_mapping(self.mpra_design_file)
 
@@ -500,31 +504,33 @@ class MPRAAdapter(BaseAdapter):
                     if pos is not None:
                         self.variant_pos_to_element[(spdi, pos)].add(key)
 
-    def _load_exclusions(self):
+    def _load_exceptions(self):
         """Exact identifiers only; a replacement accession never inherits exceptions."""
-        exclusions = {'element': set(), 'variant': set(),
-                      'variant_without_reference_element': set()}
+        exceptions = {'element': set(), 'variant': set(),
+                      'variant_without_reference_element': set(),
+                      'variant_deduplicate': set(), 'variant_deduplicate_first_bed_score': set()}
         for accession in (self.file_accession, self.reference_file_accession):
             if not accession:
                 continue
-            path = self.EXCLUSION_DIR / f'{accession}_exclusion_list.tsv'
+            path = self.EXCEPTION_DIR / f'{accession}_exception_list.tsv'
             if not path.exists():
                 continue
             with path.open() as stream:
                 reader = csv.DictReader(stream, delimiter='\t')
                 if reader.fieldnames != ['kind', 'identifier', 'reason']:
-                    raise ValueError(f'Invalid MPRA exclusion header: {path}')
+                    raise ValueError(f'Invalid MPRA exception header: {path}')
                 for row in reader:
-                    if (row['kind'] not in exclusions or not row['identifier']
+                    if (row['kind'] not in exceptions or not row['identifier']
                             or not row['reason'] or None in row):
                         raise ValueError(
-                            f'Invalid MPRA exclusion entry in {path}: {row}')
-                    exclusions[row['kind']].add(row['identifier'])
-        if exclusions['variant'] & exclusions['variant_without_reference_element']:
+                            f'Invalid MPRA exception entry in {path}: {row}')
+                    exceptions[row['kind']].add(row['identifier'])
+        if exceptions['variant'] & exceptions['variant_without_reference_element']:
             raise ValueError(
                 'MPRA variant cannot be both excluded and retained without a reference element')
-        return tuple(frozenset(exclusions[kind]) for kind in (
-            'element', 'variant', 'variant_without_reference_element'))
+        return tuple(frozenset(exceptions[kind]) for kind in (
+            'element', 'variant', 'variant_without_reference_element',
+            'variant_deduplicate', 'variant_deduplicate_first_bed_score'))
 
     def _is_blacklisted_effect_name(self, effect_name):
         return (effect_name or '').strip() in self.excluded_effect_names
@@ -536,6 +542,7 @@ class MPRAAdapter(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.seen_elements = set()
+        self.seen_variant_effects = {}
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = (
             'regulatory reference element activity')
@@ -913,6 +920,18 @@ class MPRAAdapter(BaseAdapter):
                 }
 
                 edge_props = self._drop_nonfinite_metrics(edge_props)
+                if (self.file_accession in self.IDENTICAL_VARIANT_EFFECT_FILES
+                        or spdi in self.deduplicated_variants
+                        or spdi in self.first_bed_score_variants):
+                    comparable = {k: v for k, v in edge_props.items()
+                                  if k != 'bed_score' or spdi not in self.first_bed_score_variants}
+                    if edge_key in self.seen_variant_effects:
+                        if self.seen_variant_effects[edge_key] != comparable:
+                            raise ValueError(
+                                f'{self.file_accession}: conflicting variant effect for {spdi}; '
+                                'review and add an explicit variant exclusion')
+                        continue
+                    self.seen_variant_effects[edge_key] = comparable
                 if self.validate:
                     self.validate_doc(edge_props)
                 self.writer.write(json.dumps(
