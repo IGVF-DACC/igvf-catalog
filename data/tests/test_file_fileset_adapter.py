@@ -1084,9 +1084,9 @@ def test_morf_perturbation_without_crispr_modification():
 
 
 @pytest.mark.parametrize('accession', ['IGVFFI0911IUZS', 'IGVFFI2320OTYL'])
-@pytest.mark.parametrize('annotations', [{}, {'catalog_class': None, 'catalog_collections': []},
+@pytest.mark.parametrize('annotations', [{'catalog_class': 'observed data', 'catalog_collections': ['genomic_elements', 'genes_transcripts_genomic_elements']},
                                          {'catalog_class': 'prediction', 'catalog_collections': ['genomic_elements']}])
-def test_overexpression_atac_catalog_fallback(accession, annotations):
+def test_overexpression_atac_uses_portal_catalog_annotations(accession, annotations):
     file_object = {
         '@id': f'/tabular-files/{accession}/', 'accession': accession,
         'href': f'/tabular-files/{accession}/@@download/{accession}.tsv.gz',
@@ -1104,10 +1104,8 @@ def test_overexpression_atac_catalog_fallback(accession, annotations):
             patch.object(FileFileSet, 'parse_sample_donor_treatment_igvf', return_value=(set(), set(), {'CL:0000909'}, set(), set(), None)):
         props, _, _ = FileFileSet.query_fileset_files_props_igvf(file_object)
     assert file_object == original
-    assert props['class'] == (annotations.get(
-        'catalog_class') or 'observed data')
-    assert props['collections'] == (annotations.get('catalog_collections') or [
-        'genomic_elements', 'genes_transcripts_genomic_elements'])
+    assert props['class'] == annotations['catalog_class']
+    assert props['collections'] == annotations['catalog_collections']
     assert props['method'] == 'ATAC-seq'
     assert props['perturbation'] == 'ORF overexpression'
     assert props['samples'] == ['ontology_terms/CL_0000909']
@@ -1115,7 +1113,27 @@ def test_overexpression_atac_catalog_fallback(accession, annotations):
                 validate=True).validate_doc(props)
 
 
+@pytest.mark.parametrize('accession', ['IGVFFI0911IUZS', 'IGVFFI2320OTYL'])
+@pytest.mark.parametrize('annotations', [{}, {'catalog_collections': []}])
+def test_overexpression_atac_requires_portal_catalog_collections(accession, annotations):
+    file_object = {
+        '@id': f'/tabular-files/{accession}/', 'accession': accession,
+        'href': f'/tabular-files/{accession}/@@download/{accession}.tsv.gz',
+        'file_set': {'@id': '/analysis-sets/IGVFDS6344XBAV/'}, **annotations,
+    }
+    fileset = {
+        'accession': 'IGVFDS6344XBAV', '@type': ['AnalysisSet'],
+        'lab': {'@id': '/labs/charles-gersbach/'},
+    }
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset)):
+        with pytest.raises(ValueError, match='Catalog collections are required'):
+            FileFileSet.query_fileset_files_props_igvf(file_object)
+
+
 def test_atac_perturbation_is_accession_specific():
+    for accession in ['IGVFFI0911IUZS', 'IGVFFI2320OTYL']:
+        assert FileFileSet.get_perturbation(
+            None, 'ATAC-seq', accession) == 'ORF overexpression'
     assert FileFileSet.get_perturbation(None, 'ATAC-seq') is None
     assert FileFileSet.get_perturbation(
         None, 'ATAC-seq', 'IGVFFI4762WUEH') is None
