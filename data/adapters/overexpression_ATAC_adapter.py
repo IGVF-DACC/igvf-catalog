@@ -23,7 +23,7 @@ class OverexpressionATAC(BaseAdapter):
     SIGNIFICANCE_THRESHOLD = 0.05
     MAX_LOG10_PVALUE = 240
     METRICS = {'log2FC': 'log2FoldChange', 'standard_error': 'lfcSE',
-               'base_mean': 'baseMean', 'p_value': 'pvalue', 'p_value_adj': 'padj'}
+               'base_mean': 'baseMean', 'stat': 'stat', 'p_value': 'pvalue', 'p_value_adj': 'padj'}
 
     def __init__(self, filepath, label, writer=None, validate=False, **kwargs):
         self.file_accession = get_file_accession(filepath)

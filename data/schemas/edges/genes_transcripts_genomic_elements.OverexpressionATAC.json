@@ -35,7 +35,12 @@
             "number",
             "null"
           ],
-          "description": "DESeq2 log2 fold change in chromatin accessibility for BATF3 overexpression versus control."
+          "description": "DESeq2 log2 fold change in chromatin accessibility for overexpressed gene versus control."
+        },
+        "stat": {
+          "title": "DESeq2 Test Statistic",
+          "type": ["number", "null"],
+          "description": "DESeq2 test statistic reported in the source stat column."
         },
         "base_mean": {
           "title": "Base DESeq2 mean",
@@ -158,7 +163,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "log2FC, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, base_mean",
-    "return": "class, label, name, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, standard_error, base_mean, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant"
+    "return": "class, label, name, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, treatments_term_ids, log2FC, standard_error, stat, base_mean, p_value, p_value_adj, neg_log10_pvalue, neg_log10_pvalue_adj, significant"
   },
   "db_collection_name": "genes_transcripts_genomic_elements"
 }

@@ -70,6 +70,7 @@ def test_morf_gene_transcript_gene_writes_ensembl_edges(mock_file_fileset, mock_
                 'refseq_transcript_ids', 'crispr_modality', 'log2FC_se'} & aatf.keys()
     assert aatf['_to'] == 'genes/ENSG00000198846'
     assert aatf['log2FC'] == pytest.approx(-0.786997515211818)
+    assert aatf['stat'] == pytest.approx(-1.12539290634503)
     assert aatf['standard_error'] == pytest.approx(0.699309113088129)
     assert aatf['p_value'] == pytest.approx(0.260422575712608)
     assert aatf['p_value_adj'] == pytest.approx(0.997637901873519)
@@ -263,7 +264,7 @@ def test_transcript_parser_rejects_partial_ids():
 
 @pytest.mark.parametrize('field,value', [('pvalue', '-0.1'), ('padj', '1.1'),
                                          ('baseMean', '-1'), ('lfcSE', '-1'),
-                                         ('log2FoldChange', 'inf')])
+                                         ('log2FoldChange', 'inf'), ('stat', 'inf')])
 def test_invalid_statistics_have_row_context(tmp_path, mock_file_fileset, mock_gene_validator, field, value):
     import csv
     with open(DESEQ_PATH) as f:
@@ -301,10 +302,11 @@ def test_duplicate_screen_rows_fail(tmp_path, mock_file_fileset, mock_gene_valid
 def test_null_pvalues_are_preserved(tmp_path, mock_file_fileset, mock_gene_validator):
     path = tmp_path / 'IGVFFI6734IWRB_null.tsv'
     path.write_text(
-        'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tpvalue\tpadj\nAATF_1\t1\t2\t0.1\tNA\tNA\n')
+        'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tstat\tpvalue\tpadj\nAATF_1\t1\t2\t0.1\tNA\tNA\tNA\n')
     writer = SpyWriter()
     _build_adapter(writer, filepath=str(path)).process_file()
     doc = _parsed_docs(writer)[0]
+    assert doc['stat'] is None
     assert doc['p_value'] is None
     assert doc['neg_log10_pvalue'] is None
     assert doc['significant'] is False
@@ -452,7 +454,7 @@ def test_multiple_source_edges_are_rejected(mock_file_fileset, mock_gene_validat
 def test_unlisted_missing_reference_fails(tmp_path, mock_file_fileset, mock_gene_validator):
     path = tmp_path / 'IGVFFI6734IWRB_unknown.tsv'
     path.write_text(
-        'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tpvalue\tpadj\nUNKNOWN_1\t1\t1\t1\t0.5\t0.5\n')
+        'rowID\tbaseMean\tlog2FoldChange\tlfcSE\tstat\tpvalue\tpadj\nUNKNOWN_1\t1\t1\t1\t1\t0.5\t0.5\n')
     with pytest.raises(ValueError, match='UNKNOWN_1.*no matching MORF_id'):
         _build_adapter(SpyWriter(), filepath=str(path)).process_file()
 

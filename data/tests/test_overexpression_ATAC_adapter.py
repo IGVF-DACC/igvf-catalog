@@ -50,6 +50,7 @@ def test_nodes_and_edges_share_exact_half_open_intervals(tmp_path, accession, co
     assert edge['files_filesets'] == f'files_filesets/{accession}'
     assert edge['perturbation'] == 'ORF overexpression'
     assert edge['log2FC'] == pytest.approx(-0.344752844)
+    assert edge['stat'] == pytest.approx(-0.957172185)
     assert edge['standard_error'] == pytest.approx(0.360178503)
     assert edge['base_mean'] == pytest.approx(55.37700577)
     assert edge['significant'] is False
@@ -62,6 +63,7 @@ def test_zero_missing_pvalues_and_significance_boundary(tmp_path):
     assert docs[0]['significant'] is True
     assert docs[0]['neg_log10_pvalue'] == 240
     assert docs[0]['neg_log10_pvalue_adj'] == 240
+    assert docs[1]['stat'] is None
     assert docs[1]['log2FC'] is None
     assert docs[1]['p_value_adj'] is None
     assert docs[1]['neg_log10_pvalue_adj'] is None
@@ -71,6 +73,7 @@ def test_zero_missing_pvalues_and_significance_boundary(tmp_path):
 
 
 @pytest.mark.parametrize('row, message', [
+    ('chr1_0_10\t1\t2\t1\tinf\t0.1\t0.1\n', 'finite number'),
     ('chr1_10_10\t1\t2\t1\t2\t0.1\t0.1\n', 'Invalid peak interval'),
     ('chr1_-1_10\t1\t2\t1\t2\t0.1\t0.1\n', 'Invalid peak identifier'),
     ('chr1_0_10\t1\tinf\t1\t2\t0.1\t0.1\n', 'finite number'),

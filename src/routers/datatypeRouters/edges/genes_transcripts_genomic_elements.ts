@@ -49,6 +49,7 @@ const outputFormat = z.object({
   accessible_genomic_element: z.string().or(genomicElementFormat.extend({ _id: z.string() })).nullable(),
   log2FC: z.number().nullable(),
   standard_error: z.number().nullish(),
+  stat: z.number().nullish(),
   base_mean: z.number().nullish(),
   p_value: z.number().nullish(),
   p_value_adj: z.number().nullish(),

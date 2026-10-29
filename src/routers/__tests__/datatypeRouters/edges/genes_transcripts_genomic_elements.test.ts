@@ -51,6 +51,7 @@ it('expands all three nodes in verbose mode and preserves full document handles'
   expect(query).toContain('DOCUMENT(record._to)')
   expect(query).toContain("'_id': node['_id']")
   expect(query).toContain('gene_transcript: record._from')
+  expect(query).toContain("'stat': record['stat']")
   expect(query).toContain('inverse_name: record.inverse_name')
 })
 
@@ -62,6 +63,7 @@ const row = {
   accessible_genomic_element: 'genomic_elements/ATAC_chr1_10002_10616_GRCh38_IGVFFI0911IUZS',
   log2FC: null,
   standard_error: null,
+  stat: null,
   base_mean: 0,
   p_value: null,
   p_value_adj: null,

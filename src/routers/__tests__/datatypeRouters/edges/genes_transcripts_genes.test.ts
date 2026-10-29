@@ -37,6 +37,7 @@ it('expands all three nodes in verbose mode and exposes the source edge ID', asy
   expect(query).toContain('DOCUMENT(relationship._to)')
   expect(query).toContain('DOCUMENT(record._to)')
   expect(query).toContain('gene_transcript: record._from')
+  expect(query).toContain("'stat': record['stat']")
 })
 
 it('returns the relationship ID and all three node handles', async () => {
@@ -49,6 +50,7 @@ it('returns the relationship ID and all three node handles', async () => {
     morf_id: 'AATF_1',
     transcript_mapping_method: 'supplied ENST',
     standard_error: 0.5,
+    stat: -1.12539290634503,
     log2FC: 1,
     significant: false,
     name: 'modulates expression of',
