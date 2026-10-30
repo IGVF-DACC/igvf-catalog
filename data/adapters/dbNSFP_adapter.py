@@ -1,6 +1,7 @@
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_variant_coding_variant_key,
@@ -8,6 +9,7 @@ from adapters.helpers import (
     bulk_check_variants_in_arangodb,
     CHR_MAP,
     build_hgvs_from_spdi,
+    get_file_fileset_by_accession_in_arangodb,
     load_variant,
 )
 from adapters.writer import Writer
@@ -33,6 +35,7 @@ class DbNSFP(BaseAdapter):
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
         self.written_variant_keys = set()
+        self.file_accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -274,6 +277,12 @@ class DbNSFP(BaseAdapter):
                 f'Skipped {skipped_missing} row(s) - variant not found in variants collection')
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        file_set_accession = file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         chunk = []
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
