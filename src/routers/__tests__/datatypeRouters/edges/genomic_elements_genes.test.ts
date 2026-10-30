@@ -630,6 +630,7 @@ describe('MORF gene regulatory network', () => {
     expect(morf).toContain("record.method IN ['MORF screen']")
     expect(morf).toContain("record.perturbation == 'ORF overexpression'")
     expect(morf).toContain("record.files_filesets == 'files_filesets/IGVFFI6734IWRB'")
+    expect(morf).toContain("'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles")
     expect(morf).toContain('record.significant == true')
     expect(morf).toContain("record['neg_log10_pvalue_adj'] >= 2")
     if ('regulator_gene_id' in genes) expect(morf).toContain("regulator_gene._key == 'ENSG00000275700'")
@@ -680,6 +681,34 @@ describe('MORF gene regulatory network', () => {
     } else {
       expect(aql).not.toContain('DOCUMENT(relationship._to)')
     }
+  })
+
+  it('includes and expands preferred_assay_titles for MORF screen results', async () => {
+    const records = [{
+      response_gene: 'TOX',
+      regulator_gene: 'ACTL6A',
+      genomic_element: null,
+      transcript: 'transcripts/ENST00000450518',
+      perturbation: 'ORF overexpression',
+      method: 'MORF screen',
+      class: 'observed data',
+      source: 'IGVF',
+      biological_context: 'T cell',
+      files_filesets: 'files_filesets/IGVFFI6734IWRB',
+      preferred_assay_titles: ['TAP-seq'],
+      log2FC: 0.5,
+      neg_log10_pvalue: 3,
+      neg_log10_pvalue_adj: 2,
+      significant: true,
+      perturbation_efficiency_log2FC: null,
+      perturbation_efficiency_neg_log10_pvalue: null,
+      perturbation_efficiency_neg_log10_pvalue_adj: null,
+      perturbation_efficiency_significant: null
+    }]
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(records) } as any)
+    const input = { response_gene_name: 'TOX' }
+    const result = await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    expect(result).toEqual([{ ...records[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 
   it('does not join human MORF data for mouse requests', async () => {

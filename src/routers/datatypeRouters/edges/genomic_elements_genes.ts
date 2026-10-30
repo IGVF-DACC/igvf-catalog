@@ -880,6 +880,7 @@ async function grnSearch (input: paramsFormatType): Promise<any> {
           method: record.method,
           source: record.source,
           files_filesets: record.files_filesets,
+          'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles,
           biological_context: record.biological_context,
           log2FC: record.log2FC,
           p_value: record.p_value,
