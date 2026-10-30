@@ -56,6 +56,18 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
+    const input = { spdi: 'NC_000001.11:69634:A:G', organism: 'Mus musculus', page: 0 }
+    await expect(variantsGenomicElementsRouters.predictionsFromVariants({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })).rejects.toThrow(TRPCError)
+    expect(dbModule.db.query).not.toHaveBeenCalled()
+  })
 })
 
 describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () => {
@@ -120,6 +132,18 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () =
         rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
+    const input = { spdi: 'NC_000001.11:69634:A:G', organism: 'Mus musculus' }
+    await expect(variantsGenomicElementsRouters.genomicElementsFromVariantsCount({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })).rejects.toThrow(TRPCError)
+    expect(dbModule.db.query).not.toHaveBeenCalled()
   })
 })
 

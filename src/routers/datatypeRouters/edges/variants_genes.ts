@@ -832,7 +832,7 @@ const deprecatedNearestGenes = publicProcedure
 
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().optional().default(0), limit: z.number().optional(), files_fileset: z.string().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), page: z.number().optional().default(0), limit: z.number().optional(), files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 

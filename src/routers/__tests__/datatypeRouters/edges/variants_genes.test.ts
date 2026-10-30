@@ -45,6 +45,12 @@ describe('variantsGenesRouters', () => {
       const input = { spdi: 'NC_000001.11:99999:T:A', page: 0 }
       await expect(callProcedure(variantsGenesRouters.qtlSummaryEndpoint, input)).rejects.toThrow(TRPCError)
     })
+
+    it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
+      const input = { spdi: 'NC_000001.11:10000:T:A', organism: 'Mus musculus', page: 0 }
+      await expect(callProcedure(variantsGenesRouters.qtlSummaryEndpoint, input)).rejects.toThrow(TRPCError)
+      expect(dbModule.db.query).not.toHaveBeenCalled()
+    })
   })
 
   describe('genesFromVariants', () => {

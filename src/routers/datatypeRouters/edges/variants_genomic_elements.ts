@@ -128,12 +128,9 @@ const regionSummaryFormat = z.object({
 })
 
 const humanGeneCollectionName = 'genes' as string
-const mouseGeneCollectionName = 'mm_genes' as string
 const humanGenomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
-const mouseGenomicElementSchema = getSchema('data/schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes' as string
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
 const variantsGenomicElementsAFGRCAQtl = getSchema('data/schemas/edges/variants_genomic_elements.AFGRCAQtl.json')
 
 function validateVariantPredictionsInput (input: paramsFormatType): void {
@@ -350,13 +347,7 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
   validateVariantInput(input)
 
-  let genomicElementSchema = humanGenomicElementSchema
-  let geneCollectionName = humanGeneCollectionName
-
-  if (input.organism === 'Mus musculus') {
-    genomicElementSchema = mouseGenomicElementSchema
-    geneCollectionName = mouseGeneCollectionName
-  }
+  const geneCollectionName = humanGeneCollectionName
 
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
@@ -364,7 +355,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     delete input.files_fileset
   }
 
-  if (Object.keys(input).filter((key) => !['limit', 'page'].includes(key)).length === 1 && input.organism !== undefined) {
+  if (Object.keys(input).filter((key) => !['limit', 'page'].includes(key)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one node property for variant must be defined.'
@@ -381,7 +372,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], humanGenomicElementSchema)
 
   let shouldCount = 'LENGTH'
   if (!countGenes) {
@@ -484,16 +475,9 @@ async function findVariantsRegionSummary (input: paramsFormatType): Promise<any>
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
   validateVariantPredictionsInput(input)
 
-  let genomicElementSchema = humanGenomicElementSchema
-  let geneCollectionName = humanGeneCollectionName
-  let variantSchema = humanVariantSchema
-
-  if (input.organism === 'Mus musculus') {
-    genomicElementSchema = mouseGenomicElementSchema
-    geneCollectionName = mouseGeneCollectionName
-    variantSchema = mouseVariantSchema
-  }
-  delete input.organism
+  const genomicElementSchema = humanGenomicElementSchema
+  const geneCollectionName = humanGeneCollectionName
+  const variantSchema = humanVariantSchema
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -781,13 +765,13 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
 
 const genomicElementsFromVariantsCount = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
-  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), files_fileset: z.string().optional() })))
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
 const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
-  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 

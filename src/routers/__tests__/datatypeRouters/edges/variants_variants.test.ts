@@ -105,6 +105,14 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
+    const input = { variant_id: 'NC_000001.11:69633:TGT:GAA', organism: 'Mus musculus', page: 0 }
+    await expect(variantsVariantsRouters.variantsFromVariantIDSummary({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })).rejects.toThrow(TRPCError)
+    expect(dbModule.db.query).not.toHaveBeenCalled()
+  })
 })
 
 describe('variantsVariantsRouters.variantsFromVariantID', () => {
