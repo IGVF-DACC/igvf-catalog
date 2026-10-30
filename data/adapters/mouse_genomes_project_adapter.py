@@ -5,8 +5,14 @@ from ga4gh.vrs.extras.translator import AlleleTranslator as Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
-from adapters.helpers import build_mouse_variant_id, build_spdi, build_hgvs_from_spdi
+from adapters.helpers import (
+    build_mouse_variant_id,
+    build_spdi,
+    build_hgvs_from_spdi,
+    get_file_fileset_by_accession_in_arangodb
+)
 from adapters.writer import Writer
 
 # source files are from here: https://ftp.ebi.ac.uk/pub/databases/mousegenomes/REL-2112-v8-SNPs_Indels/
@@ -45,6 +51,7 @@ class MouseGenomesProjectAdapter(BaseAdapter):
         self.organism = 'Mus musculus'
 
         super().__init__(filepath, label, writer, validate)
+        self.accession = get_file_accession(filepath)
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -55,12 +62,17 @@ class MouseGenomesProjectAdapter(BaseAdapter):
         return 'mm_variants'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.accession)
         # Check install seqrepo instrunction in docs folder
         dp = create_dataproxy(
             'seqrepo+file:///usr/local/share/seqrepo/mouse')
         seq_repo = SeqRepo('/usr/local/share/seqrepo/mouse')
         translator = Translator(data_proxy=dp, default_assembly_name='GRCm39')
-
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         reading_data = False
 
         # Several lines are duplicated in the file, only differring by strain.

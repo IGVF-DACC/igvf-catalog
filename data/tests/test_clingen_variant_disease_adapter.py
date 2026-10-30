@@ -7,7 +7,7 @@ from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
-SAMPLE_PATH = './tests/fixtures/clinGen_variant_pathogenicity_example.csv'
+SAMPLE_PATH = './tests/fixtures/IGVFFI5852GYTT_clinGen_variant_pathogenicity_example.csv'
 SAMPLE_VARIANT_KEY = 'NC_000012.12:102917129:T:C'
 
 
@@ -138,7 +138,7 @@ def test_clingen_adapter_initialization():
         assert adapter.filepath == SAMPLE_PATH
         assert adapter.label == 'variant_disease'
         assert adapter.gene_validator is not None
-        assert adapter.file_accession == 'clinGen_variant_pathogenicity_example'
+        assert adapter.file_accession == 'IGVFFI5852GYTT'
 
 
 def test_clingen_adapter_validate_doc_invalid():

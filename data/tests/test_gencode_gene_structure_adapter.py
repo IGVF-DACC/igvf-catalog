@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_gencode_structure_adapter_gene_structure():
     writer = SpyWriter()
     adapter = GencodeStructure(
-        filepath='./tests/fixtures/gencode_sample.gtf', label='gene_structure', writer=writer, validate=True)
+        filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf', label='gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -33,7 +33,7 @@ def test_gencode_structure_adapter_gene_structure():
 def test_gencode_structure_adapter_mm_gene_structure():
     writer = SpyWriter()
     adapter = GencodeStructure(
-        filepath='./tests/fixtures/gencode_sample.gtf', label='mm_gene_structure', writer=writer, validate=True)
+        filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf', label='mm_gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -46,7 +46,7 @@ def test_gencode_structure_adapter_mm_gene_structure():
 
 def test_gencode_structure_adapter_transcript_contains_gene_structure():
     writer = SpyWriter()
-    adapter = GencodeStructure(filepath='./tests/fixtures/gencode_sample.gtf',
+    adapter = GencodeStructure(filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf',
                                label='transcript_contains_gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -63,7 +63,7 @@ def test_gencode_structure_adapter_transcript_contains_gene_structure():
 
 def test_gencode_structure_adapter_mm_transcript_contains_mm_gene_structure():
     writer = SpyWriter()
-    adapter = GencodeStructure(filepath='./tests/fixtures/gencode_mouse_sample.gtf',
+    adapter = GencodeStructure(filepath='./tests/fixtures/IGVFFI5842FWGQ_gencode_mouse_sample.gtf',
                                label='mm_transcript_contains_mm_gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -79,7 +79,7 @@ def test_gencode_structure_adapter_mm_transcript_contains_mm_gene_structure():
 def test_gencode_structure_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gene_structure, mm_gene_structure, transcript_contains_gene_structure, mm_transcript_contains_mm_gene_structure'):
-        GencodeStructure(filepath='./tests/fixtures/gencode_sample.gtf',
+        GencodeStructure(filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf',
                          label='invalid_label', writer=writer)
 
 
@@ -87,15 +87,16 @@ def test_gencode_structure_adapter_initialization():
     writer = SpyWriter()
     for label in GencodeStructure.ALLOWED_LABELS:
         adapter = GencodeStructure(
-            filepath='./tests/fixtures/gencode_sample.gtf', label=label, writer=writer)
-        assert adapter.filepath == './tests/fixtures/gencode_sample.gtf'
+            filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf', label=label, writer=writer)
+        assert adapter.filepath == './tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf'
         assert adapter.label == label
         assert adapter.writer == writer
         assert adapter.organism in ['Homo sapiens', 'Mus musculus']
 
 
 def test_gencode_structure_adapter_parse_info_metadata():
-    adapter = GencodeStructure(filepath='./tests/fixtures/gencode_sample.gtf')
+    adapter = GencodeStructure(
+        filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf')
     info = ['gene_id', '"ENSG00000223972.5";', 'transcript_id', '"ENST00000456328.2";', 'gene_name',
             '"DDX11L1";', 'transcript_name', '"DDX11L1-202";', 'exon_number', '1', 'exon_id', '"ENSE00002234944.1";']
     parsed_info = adapter.parse_info_metadata(info)
@@ -109,7 +110,7 @@ def test_gencode_structure_adapter_parse_info_metadata():
 
 def test_gencode_structure_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = GencodeStructure(filepath='./tests/fixtures/gencode_sample.gtf',
+    adapter = GencodeStructure(filepath='./tests/fixtures/IGVFFI7217ZMJZ_gencode_sample.gtf',
                                label='transcript_contains_gene_structure', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

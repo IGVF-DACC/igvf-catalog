@@ -29,7 +29,7 @@ def mock_bulk_check_variants():
 def test_AFGR_caqtl_adapter_regulatory_region(mock_request):
     mock_igvf_metadata(mock_request)
     writer = SpyWriter()
-    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
+    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/IGVFFI2476KZWY_sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
                         label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -45,7 +45,7 @@ def test_AFGR_caqtl_adapter_AFGR_caqtl(mock_request, mock_bulk_check_variants, m
     mocker.patch('adapters.AFGR_caqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
-    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
+    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/IGVFFI2476KZWY_sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
                         label='AFGR_caqtl', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
@@ -69,7 +69,7 @@ def test_AFGR_caqtl_adapter_skips_edge_when_variant_not_loaded(mock_request, moc
     mock_bulk_check_variants.return_value = set()
 
     writer = SpyWriter()
-    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
+    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/IGVFFI2476KZWY_sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
                         label='AFGR_caqtl', writer=writer, validate=True)
     adapter.process_file()
 
@@ -100,7 +100,7 @@ def test_AFGR_caqtl_adapter_variants_label_creates_missing_variant(mock_request,
     }, None)
 
     writer = SpyWriter()
-    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
+    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/IGVFFI2476KZWY_sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
                         label='variants', writer=writer, validate=True)
     adapter.process_file()
 
@@ -113,19 +113,19 @@ def test_AFGR_caqtl_adapter_variants_label_creates_missing_variant(mock_request,
     assert item['_key'] == 'fake_variant_id'
     assert item['source'] == AFGRCAQtl.SOURCE
     assert item['source_url'] == AFGRCAQtl.SOURCE_URL
-    assert item['files_filesets'] == 'files_filesets/sorted'
+    assert item['files_filesets'] == 'files_filesets/IGVFFI2476KZWY'
 
 
 def test_AFGR_caqtl_adapter_invalid_label():
     writer = SpyWriter()
     with pytest.raises(ValueError):
-        adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
+        adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/IGVFFI2476KZWY_sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
                             label='invalid_label', writer=writer, validate=True)
 
 
 def test_AFGR_caqtl_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
+    adapter = AFGRCAQtl(filepath='./tests/fixtures/AFGR/IGVFFI2476KZWY_sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
                         label='AFGR_caqtl', writer=writer, validate=True)
 
     invalid_doc = {
