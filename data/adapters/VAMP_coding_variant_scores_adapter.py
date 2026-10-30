@@ -6,7 +6,7 @@ import re
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
@@ -48,14 +48,11 @@ class VAMPAdapter(BaseAdapter):
 
     def process_coding_variant_phenotype_chunk(self, chunk, type='hgvsp'):
         skipped_coding_variants = []
-        if type == 'hgvsp':
+        if type in ['hgvsp', 'Met1']:
             mapped_coding_variants = bulk_query_coding_variants_in_arangodb(
                 [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
         elif type == 'hgvsc':  # query from hgvsc at transcript level
             mapped_coding_variants = bulk_query_coding_variants_from_hgvsc_in_arangodb(
-                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
-        elif type == 'Met1':  # Met1 case
-            mapped_coding_variants = bulk_query_coding_variants_Met1_in_arangodb(
                 [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
         else:
             self.logger.error('Invalid type in bulk coding variants query.')
