@@ -22,6 +22,9 @@ class FileFileSet:
     OVEREXPRESSION_ATAC_ACCESSIONS = frozenset(
         {'IGVFFI0911IUZS', 'IGVFFI2320OTYL'})
 
+    SEMI_QY2H_ASSAY_TITLES = frozenset(
+        {'Arrayed semi-qY2H v1', 'Arrayed semi-qY2H v2', 'Arrayed semi-qY2H v3'})
+
     CRISPR_PERTURBATION_MAPPING = {
         'interference': 'CRISPR interference',
         'activation': 'CRISPR activation',
@@ -818,10 +821,14 @@ class FileFileSet:
         if fileset_object_type in ['AnalysisSet', 'PseudobulkSet']:
             preferred_assay_titles, assay_term_ids = FileFileSet.parse_analysis_set_igvf(
                 fileset_object)
-            if len(preferred_assay_titles) != 1:
+            # semi-qY2H analysis sets combine multiple versions of the same assay
+            if preferred_assay_titles and preferred_assay_titles.issubset(FileFileSet.SEMI_QY2H_ASSAY_TITLES):
+                method = 'Arrayed semi-qY2H'
+            elif len(preferred_assay_titles) != 1:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
-            method = list(preferred_assay_titles)[0]
+            else:
+                method = list(preferred_assay_titles)[0]
         if is_external_curated_set:
             method = file_object.get('catalog_method')
         elif fileset_object_type == 'CuratedSet' and not method:

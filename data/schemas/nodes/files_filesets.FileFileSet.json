@@ -62,6 +62,9 @@
           "items": {
             "type": "string",
             "enum": [
+              "Arrayed semi-qY2H v1",
+              "Arrayed semi-qY2H v2",
+              "Arrayed semi-qY2H v3",
               "ATAC-seq",
               "CRISPR FACS screen",
               "CRISPR FlowFISH screen",
@@ -115,6 +118,7 @@
           ],
           "enum": [
             "ADASTRA",
+            "Arrayed semi-qY2H",
             "ATAC-seq",
             "BlueSTARR",
             "ClinGen",
