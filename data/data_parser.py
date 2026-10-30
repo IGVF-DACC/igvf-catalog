@@ -21,8 +21,8 @@ parser.add_argument('--adapter', help='Loads the sample data for an adapter.',
                     choices=KEY_TO_ADAPTER.keys(), required=True)
 parser.add_argument('--aws-profile', type=str, default=None,
                     help='The AWS profile to use, for example "igvf-dev".')
-parser.add_argument('--version-tag', type=str, default=None,
-                    help='The version tag to use, for example "IGVF_catalog_beta_v0.4".')
+parser.add_argument('--collections-tag', type=str, default=None,
+                    help='The collections tag to use, for example "IGVF_catalog_beta_v0.4".')
 
 # arguments that are in at least one adapter signature
 parser.add_argument('--gene-alias-file-path', type=str,
@@ -97,7 +97,7 @@ non_adapter_signature_args = [
     'output_local_path',
     'adapter',
     'aws_profile',
-    'version_tag',
+    'collections_tag',
 ]
 
 non_adapter_signature_namespace = argparse.Namespace()
@@ -119,7 +119,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        version_tag=non_adapter_signature_namespace.version_tag
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     writer_secondary = get_writer(
@@ -128,7 +128,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        version_tag=non_adapter_signature_namespace.version_tag
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     writer_edge_primary = get_writer(
@@ -137,7 +137,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        version_tag=non_adapter_signature_namespace.version_tag
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     writer_edge_secondary = get_writer(
@@ -146,7 +146,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        version_tag=non_adapter_signature_namespace.version_tag
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
@@ -164,7 +164,7 @@ else:
         key=non_adapter_signature_namespace.output_bucket_key,
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        version_tag=non_adapter_signature_namespace.version_tag
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     adapter_kwargs = {
