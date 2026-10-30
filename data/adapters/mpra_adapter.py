@@ -114,7 +114,7 @@ class MPRAAdapter(BaseAdapter):
 
     # Reviewed IGVF-reformatted ENCODE files repeat reference effects for nearby
     # variants. Collapse only identical emitted records; conflicting scores fail.
-    IDENTICAL_ELEMENT_EFFECT_FILES = frozenset({
+    ELEMENT_EFFECT_DEDUPLICATION_FILES = frozenset({
         'IGVFFI0697ERLC',
         'IGVFFI1403DXAG',
         'IGVFFI1510BIKA',
@@ -829,7 +829,7 @@ class MPRAAdapter(BaseAdapter):
                     }
                     props = self._drop_nonfinite_metrics(props)
                     if edge_id in seen_edges:
-                        if (self.file_accession in self.IDENTICAL_ELEMENT_EFFECT_FILES
+                        if (self.file_accession in self.ELEMENT_EFFECT_DEDUPLICATION_FILES
                                 and seen_edges[edge_id] == props):
                             continue
                         raise ValueError(

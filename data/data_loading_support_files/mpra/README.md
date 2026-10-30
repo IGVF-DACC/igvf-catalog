@@ -88,3 +88,7 @@ explicitly assigns shared reference tiles to IGVFFI3757JVGI after confirming equ
 fully-reference sequence sets. Other overlapping pairs fail. IGVFFI9022VCNU is
 also explicitly listed for identical element-effect deduplication; conflicting
 scores fail. These are file-level rules in `MPRAAdapter`, not per-variant exceptions.
+
+Identical reference-element activity edges are deduplicated only for accessions
+in `ELEMENT_EFFECT_DEDUPLICATION_FILES`. Conflicting output properties and
+duplicates in unlisted files still raise an error.

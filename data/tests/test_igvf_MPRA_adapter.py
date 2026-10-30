@@ -817,7 +817,8 @@ def test_assembly_alias_is_file_specific(tmp_path, mock_file_fileset, accession,
     ('IGVFFI0000TEST', '1', False),
 ])
 def test_duplicate_reference_effects_require_review_and_identical_scores(
-        tmp_path, mock_file_fileset, mock_ontology_term_validator, accession, second_score, passes):
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, accession, second_score, passes):
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
     design = tmp_path / 'IGVFFI0000REF.tsv'
     design.write_text('name\tchr\tstart\tend\tstrand\tallele\n'
                       'first\tchr1\t10\t20\t+\t["ref"]\n'
