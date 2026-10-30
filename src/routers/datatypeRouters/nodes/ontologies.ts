@@ -53,6 +53,7 @@ function prefixMatchQueryBody (name: string, filters: string, limitClause: strin
   return `
     FOR record IN ${ontologyCollectionName}
       FILTER STARTS_WITH(record.name, "${name}") ${filters ? `AND ${filters}` : ''}
+      SORT record._key
       ${limitClause}
       RETURN { ${getDBReturnStatements(ontologySchema)} }
   `
@@ -60,13 +61,11 @@ function prefixMatchQueryBody (name: string, filters: string, limitClause: strin
 
 function searchViewQueryBody (searchClause: string, filterBy: string, limitClause: string): string {
   const searchViewName = `${ontologyCollectionName}_text_en_no_stem_inverted_search_alias`
-  // SORT must precede LIMIT - relevance ranking has to decide which rows make each page,
-  // not just reorder whichever arbitrary rows a premature LIMIT happened to keep.
   return `
     FOR record IN ${searchViewName}
     SEARCH ${searchClause}
     ${filterBy}
-    SORT BM25(record) DESC
+    SORT BM25(record) DESC, record._key
     ${limitClause}
     RETURN { ${getDBReturnStatements(ontologySchema)} }
   `

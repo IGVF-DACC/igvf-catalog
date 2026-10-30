@@ -154,6 +154,30 @@ describe('ontologyRouters.ontologyTerm', () => {
     expect(result).toEqual([])
   })
 
+  it('sorts prefix and token/fuzzy search stages with a deterministic tiebreaker', async () => {
+    // Regression guard for NCIT_C60959 appearing on both page 0 and page 1 of
+    // ?name=cancer lung: probeThenFetchPage runs a separate query execution per page, so a
+    // stage with no (or no fully deterministic) SORT can place a tied/unordered row in the
+    // overlapping edge of two different pages. A mocked DB can't catch this itself (it slices
+    // deterministically regardless of the real SORT clause), so assert directly on the AQL.
+    const queries: string[] = []
+    jest.spyOn(dbModule.db, 'query').mockImplementation(async (query: unknown) => {
+      queries.push(String(query))
+      return { all: async () => [] } as any
+    })
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('uri, term_id, name')
+
+    const input = { name: 'cancer lung', page: 0, limit: 25 }
+    await ontologyRouters.ontologyTerm({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+
+    const prefixQuery = queries.find(q => q.includes('STARTS_WITH'))
+    expect(prefixQuery).toContain('SORT record._key')
+
+    const tokenQuery = queries.find(q => q.includes('TOKENS(') && q.includes('SEARCH'))
+    expect(tokenQuery).toContain('SORT BM25(record) DESC, record._key')
+  })
+
   it('transforms files_fileset input into a files_filesets filter', async () => {
     mockDbQueryByStage({})
     const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
