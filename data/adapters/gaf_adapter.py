@@ -47,20 +47,24 @@ from adapters.protein_map import ProteinMap
 # URS0000000CF3	ENSEMBL_GENCODE	ENST00000414886	9606	lncRNA	ENSG00000226856.9
 
 class GAF(BaseAdapter):
-    # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
-    RNACENTRAL_ID_MAPPING_PATH = './data_loading_support_files/rnacentral_ensembl_gencode.tsv.gz'
     SOURCES = {
-        'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
-        'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
-        'mouse': 'https://current.geneontology.org/annotations/mgi.gaf.gz',
-        'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
+        'human': 'https://current.geneontology.org/annotations/gaf/HUMAN-uniprot.gaf.gz',
+        'human_isoform': 'https://ftp.ebi.ac.uk/pub/databases/GO/goa/HUMAN/goa_human_isoform.gaf.gz',
+        'mouse': 'https://current.geneontology.org/annotations/gaf/MOUSE-mod.gaf.gz',
+        'rna': 'https://ftp.ebi.ac.uk/pub/databases/GO/goa/HUMAN/goa_human_rna.gaf.gz'
     }
     ALLOWED_LABELS = list(SOURCES.keys())
 
-    def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, reference_filepath=None, **kwargs):
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
         self.file_accession = os.path.basename(filepath).split('.')[0]
+        if self.label == 'rna':
+            if not reference_filepath:
+                raise ValueError(
+                    'reference_filepath is required for the rna label '
+                    '(RNAcentral Ensembl mapping, ensembl_gencode.tsv).')
+            self.reference_filepath = reference_filepath
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -72,7 +76,7 @@ class GAF(BaseAdapter):
 
     def load_rnacentral_mapping(self):
         self.rnacentral_mapping = {}
-        with gzip.open(GAF.RNACENTRAL_ID_MAPPING_PATH, 'rt') as mapping_file:
+        with gzip.open(self.reference_filepath, 'rt') as mapping_file:
             for annotation in mapping_file:
                 mapping = annotation.split('\t')
                 self.rnacentral_mapping[mapping[0] +
@@ -103,14 +107,17 @@ class GAF(BaseAdapter):
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 go_term_keys.add(annotation['GO_ID'].replace(':', '_'))
-        self.ontology_term_validator.preload(go_term_keys)
+        self.ontology_term_validator.preload(
+            go_term_keys, resolve_via_ols=True)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 go_term_key = annotation['GO_ID'].replace(':', '_')
-                if not self.ontology_term_validator.validate(go_term_key):
+                resolved_term_key = self.ontology_term_validator.resolve(
+                    go_term_key)
+                if resolved_term_key is None:
                     continue
-                _to = 'ontology_terms/' + go_term_key
+                _to = 'ontology_terms/' + resolved_term_key
 
                 if self.label == 'rna':
                     transcript_id = self.rnacentral_mapping.get(
@@ -138,7 +145,7 @@ class GAF(BaseAdapter):
                         'gene_product_name': annotation['DB_Object_Name'],
                         'gene_product_type': annotation['DB_Object_Type'],
                         'qualifier': annotation['Qualifier'],
-                        'go_id': annotation['GO_ID'],
+                        'go_id': resolved_term_key.replace('_', ':', 1),
                         'db_reference': annotation['DB:Reference'],
                         'evidence': annotation['Evidence'],
                         'with': annotation['With'],

@@ -778,7 +778,7 @@ igvf_file_accessions:
     - IGVFFI6943UNEF
     - IGVFFI9728HRIF
     - IGVFFI5318ERCL
-    - IGVFFI9807JOKT
+    - IGVFFI0062EMMC # MOUSE-mod.gaf.gz
     - IGVFFI1864LTZS
     - IGVFFI8566AKFC
     - IGVFFI7713FBDK
@@ -805,7 +805,7 @@ igvf_file_accessions:
     - IGVFFI1406USNM
     - IGVFFI6311OHVO
     - IGVFFI4124TCZU
-    - IGVFFI8870ZOTO
+    - IGVFFI4335XJNF # goa_human_isoform.gaf.gz
     - IGVFFI3605PGCI
     - IGVFFI7659ZULI
     - IGVFFI4660WFJE
@@ -933,7 +933,7 @@ igvf_file_accessions:
     - IGVFFI9453GVNC
     - IGVFFI8551EYSR
     - IGVFFI4287QQKV
-    - IGVFFI1490WZCV
+    - IGVFFI4899LHFM # HUMAN-uniprot.gaf.gz
     - IGVFFI7066NQSP
     - IGVFFI3501NOVI
     - IGVFFI6812BYNZ
@@ -1031,7 +1031,8 @@ igvf_file_accessions:
     - IGVFFI5891JNPA
     - IGVFFI0274HPWD
     - IGVFFI5557ZASX
-    - IGVFFI6501YXMX
+    - IGVFFI6197DHVQ # goa_human_rna.gaf.gz
+    - IGVFFI8486MZLV # ensembl_gencode.tsv.gz
     - IGVFFI4022KZPF
     - IGVFFI9584PAKE
     - IGVFFI9487HSWR

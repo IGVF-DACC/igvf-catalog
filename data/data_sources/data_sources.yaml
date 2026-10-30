@@ -2310,21 +2310,28 @@ genomic element to biosample encode mpra:
   source: ENCODE
 
 # Example:
-# 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human
-# 2) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8870ZOTO.gaf.gz --output-bucket-key gene_products_terms/gaf_human_isoform.jsonl --gaf-type human_isoform
-# 3) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6501YXMX.gaf.gz --output-bucket-key gene_products_terms/gaf_human_rna.jsonl --gaf-type rna
-# 4) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9807JOKT.gaf.gz --output-bucket-key gene_products_terms/gaf_mouse.jsonl --gaf-type mouse
+# 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4899LHFM.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --label human
+# 2) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4335XJNF.gaf.gz --output-bucket-key gene_products_terms/gaf_human_isoform.jsonl --label human_isoform
+# 3) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6197DHVQ.gaf.gz --reference-filepath ~/dataset/IGVFFI8486MZLV.tsv.gz --output-bucket-key gene_products_terms/gaf_human_rna.jsonl --label rna
+# 4) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI0062EMMC.gaf.gz --output-bucket-key gene_products_terms/gaf_mouse.jsonl --label mouse
+# reference_filepath is required for the rna label only (RNAcentral ensembl_gencode.tsv.gz).
 gaf:
   collection: gene_products_terms
   params:
-    - gaf-type
+    - label
+    - reference_filepath
   pypy3: false
-  command: python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key gene_products_terms/gaf_human_rna.jsonl --gaf-type {gaf_type}
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI1490WZCV/@@download/IGVFFI1490WZCV.gaf.gz # goa_human.gaf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8870ZOTO/@@download/IGVFFI8870ZOTO.gaf.gz # goa_human_isoform.gaf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz # goa_human_rna.gaf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9807JOKT/@@download/IGVFFI9807JOKT.gaf.gz # mgi.gaf.gz
+  command: python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key gene_products_terms/gaf_{label}.jsonl --label {label}
+  file_mappings:
+    - datafile: https://api.data.igvf.org/reference-files/IGVFFI4899LHFM/@@download/IGVFFI4899LHFM.gaf.gz # HUMAN-uniprot.gaf.gz
+      label: human
+    - datafile: https://api.data.igvf.org/reference-files/IGVFFI4335XJNF/@@download/IGVFFI4335XJNF.gaf.gz # goa_human_isoform.gaf.gz
+      label: human_isoform
+    - datafile: https://api.data.igvf.org/reference-files/IGVFFI6197DHVQ/@@download/IGVFFI6197DHVQ.gaf.gz # goa_human_rna.gaf.gz
+      label: rna
+      reference_filepath: https://api.data.igvf.org/reference-files/IGVFFI8486MZLV/@@download/IGVFFI8486MZLV.tsv.gz # ensembl_gencode.tsv.gz
+    - datafile: https://api.data.igvf.org/reference-files/IGVFFI0062EMMC/@@download/IGVFFI0062EMMC.gaf.gz # MOUSE-mod.gaf.gz
+      label: mouse
   source: Gene Ontology
 
 # Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9678CVIS.tar.gz --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label motif
