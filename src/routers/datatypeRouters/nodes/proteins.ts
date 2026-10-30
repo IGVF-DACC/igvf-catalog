@@ -88,7 +88,7 @@ function exactMatchQueryBody (input: paramsFormatType, limitClause: string): str
   return `
     FOR record IN ${proteinCollectionName}
     ${exactMatchFilterClause(input)}
-    SORT record.chr
+    SORT record._key
     ${limitClause}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
@@ -122,7 +122,7 @@ function searchViewQueryBody (
     FOR record IN ${SEARCH_ALIAS}
     SEARCH ${searchFilters.join(' AND ')}
     ${filters}
-    SORT BM25(record) DESC
+    SORT BM25(record) DESC, record._key
     ${limitClause}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `

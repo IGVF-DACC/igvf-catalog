@@ -259,6 +259,30 @@ describe('proteinsRouters.proteins', () => {
     expect(new Set(ids).size).toBe(11)
   })
 
+  it('sorts the exact-match and search-view stages with a deterministic tiebreaker', async () => {
+    // Regression guard, same bug class as the ontology_terms pagination fix: record.chr isn't
+    // even a field on this collection (every row ties on `undefined`), and BM25(record) DESC
+    // alone ties whenever multiple records match equally well. probeThenFetchPage runs a
+    // separate query execution per page, so an untied SORT can place a row in the overlapping
+    // edge of two different pages (or skip it from both).
+    const queries: string[] = []
+    jest.spyOn(dbModule.db, 'query').mockImplementation(async (query: unknown) => {
+      queries.push(String(query))
+      return { all: async () => [] } as any
+    })
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
+
+    const input = { name: 'SAM', page: 0, limit: 10 }
+    await proteinsRouters.proteins({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+
+    const exactQuery = queries.find(q => !q.includes('STARTS_WITH') && !q.includes('LEVENSHTEIN_MATCH'))
+    expect(exactQuery).toContain('SORT record._key')
+
+    const prefixQuery = queries.find(q => q.includes('STARTS_WITH'))
+    expect(prefixQuery).toContain('SORT BM25(record) DESC, record._key')
+  })
+
   it('caps limit to MAX_PAGE_SIZE', async () => {
     const mockRecord = {
       _id: 'P7',
