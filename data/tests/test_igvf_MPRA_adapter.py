@@ -1062,6 +1062,7 @@ def test_multiple_designs_canonical_owner(tmp_path, mock_file_fileset,
         assert record['_key'].endswith('_IGVFFI3757JVGI')
         assert record['files_filesets'] == 'files_filesets/IGVFFI3757JVGI'
         assert record['name'] == 'right'
+        assert record['aliases'] == ['left', 'right']
     else:
         assert record['_from' if label == 'genomic_element_biosample' else 'genomic_element'].endswith(
             '_IGVFFI3757JVGI')
@@ -1083,3 +1084,27 @@ def test_multiple_designs_reject_unreviewed_overlap(tmp_path, mock_file_fileset,
     with pytest.raises(ValueError, match=message):
         MPRAAdapter('IGVFFI0000TEST.bed', 'genomic_element',
                     writer=SpyWriter(), reference_filepath=paths)
+
+
+@pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_from_variant'])
+@pytest.mark.parametrize('prefix', ['', 'mm_'])
+@pytest.mark.parametrize('design_accession', ['IGVFFI0358RUFK', 'IGVFFI1144FUYP', 'IGVFFI0000REF'])
+def test_element_aliases_include_names_and_reviewed_info(tmp_path, mock_file_fileset,
+                                                         mock_ontology_term_validator, label, prefix, design_accession):
+    spdi = 'NC_000067.7:11:A:C' if prefix else 'NC_000001.11:11:A:C'
+    design = tmp_path / f'{design_accession}.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\tinfo\n'
+                      f'hash1\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\told1; old2;old1;;NA\n'
+                      f'hash2\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\told3\n'
+                      f'alt_hash\tchr1\t10\t20\t+\t["alt"]\t["{spdi}"]\talt_name\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text('chr1\t10\t20\t' + (spdi if label.endswith('from_variant')
+                       else 'hash1') + '\t100\t+\t1\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), prefix+label, writer=writer,
+                          reference_filepath=str(design), validate=True)
+    adapter.process_file()
+    record, = [json.loads(x) for x in writer.contents]
+    assert record['name'] == 'hash2'
+    assert record['aliases'] == (['hash1', 'hash2', 'old1', 'old2', 'old3']
+                                 if design_accession in MPRAAdapter.INFO_ALIAS_DESIGNS else ['hash1', 'hash2'])

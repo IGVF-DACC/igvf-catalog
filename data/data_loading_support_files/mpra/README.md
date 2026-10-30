@@ -58,8 +58,8 @@ See [the review](../../../docs/qa/mpra-2026-10-28.md) for evidence and remaining
   these two files. The lists contain 10 and 16 variants, respectively, with one
   first-BED-score exception in each.
 - IGVFFI6587LCPK (Library1.4): exclude the 76 explicitly listed conflicting
-  variants, then collapse exact duplicate effects. The twelve missing-reference
-  permissions remain separate and retain effects with null element links.
+  variants, then collapse exact duplicate effects. Replacement design IGVFFI1144FUYP
+  resolves the twelve formerly missing references; their null-link permissions were removed.
 
 Unexpected measurement conflicts still fail. Rules are accession-specific and
 persist across parsing chunks; replacements do not inherit them.
@@ -92,3 +92,11 @@ scores fail. These are file-level rules in `MPRAAdapter`, not per-variant except
 Identical reference-element activity edges are deduplicated only for accessions
 in `ELEMENT_EFFECT_DEDUPLICATION_FILES`. Conflicting output properties and
 duplicates in unlisted files still raise an error.
+
+MPRA element nodes preserve a single `name` and expose sorted, unique `aliases`
+including that name and every eligible reference-design name for the same tile.
+Shared tiles collect aliases from both designs without changing ownership or IDs.
+UNC Library1.1–1.4 designs (IGVFFI4997GUQE, IGVFFI0358RUFK, IGVFFI8319ZOLO, IGVFFI1144FUYP)
+also contribute semicolon-separated names from `info`; their hash remains `name`.
+Library1.4 uses replacement design IGVFFI1144FUYP, which supersedes IGVFFI7706JKWK.
+ALT-only construct names are not reference aliases.

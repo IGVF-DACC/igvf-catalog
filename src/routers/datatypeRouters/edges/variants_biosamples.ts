@@ -27,6 +27,7 @@ const biosamplesQueryFormat = z.object({
 const genomicElementFormat = z.object({
   _id: z.string(),
   name: z.string().nullish(),
+  aliases: z.array(z.string()).nullish(),
   chr: z.string().nullish(),
   start: z.number().nullish(),
   end: z.number().nullish(),

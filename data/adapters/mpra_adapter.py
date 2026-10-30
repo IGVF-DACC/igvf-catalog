@@ -159,6 +159,10 @@ class MPRAAdapter(BaseAdapter):
     CD_EFFECT_DESIGNS = {'IGVFFI2909LNFX': 'IGVFFI5857RBRC',
                          'IGVFFI4623ATHV': 'IGVFFI5857RBRC'}
 
+    # UNC Libraries 1.1–1.4 store original oligo names in semicolon-separated info.
+    INFO_ALIAS_DESIGNS = frozenset({'IGVFFI4997GUQE', 'IGVFFI0358RUFK',
+                                    'IGVFFI8319ZOLO', 'IGVFFI1144FUYP'})
+
     THRESHOLD = 1
     CHUNK_SIZE = 6500
     EXCEPTION_DIR = (Path(__file__).resolve().parents[1] /
@@ -232,6 +236,7 @@ class MPRAAdapter(BaseAdapter):
         self.variant_pos_to_element = defaultdict(set)
         self.design_elements = set()
         self.coords_to_element_name = {}
+        self.coords_to_element_aliases = defaultdict(set)
         self.design_name_alleles = defaultdict(set)
         self.design_element_alleles = defaultdict(set)
         self.design_name_class = {}
@@ -508,6 +513,11 @@ class MPRAAdapter(BaseAdapter):
                     self.design_elements.add(key)
                     if row.get('name') is not None and str(row.get('name')).strip():
                         self.coords_to_element_name[key] = row.get('name')
+                        self.coords_to_element_aliases[key].add(row['name'])
+                    if self.reference_file_accession in self.INFO_ALIAS_DESIGNS:
+                        self.coords_to_element_aliases[key].update(
+                            alias.strip() for alias in (row.get('info') or '').split(';')
+                            if alias.strip() and alias.strip().lower() not in {'na', 'nan', 'null', '.'})
                     if name_role == 'ref':
                         reference_tiles.add(key)
 
@@ -704,6 +714,11 @@ class MPRAAdapter(BaseAdapter):
                 effect_counts_by_region[self.make_design_key(
                     row[0], row[1], row[2], row[5])] += 1
 
+            if not self.has_sequence_designs:
+                for row in rows:
+                    self.coords_to_element_aliases[self.make_design_key(
+                        row[0], row[1], row[2], row[5])].add(row[3])
+
             missing_allele_multi_effect = []
             for row in rows:
                 chr_, start, end, strand = row[0], row[1], row[2], row[5]
@@ -747,6 +762,7 @@ class MPRAAdapter(BaseAdapter):
                     props = {
                         '_key': element_id,
                         'name': element_name,
+                        'aliases': sorted(self.coords_to_element_aliases[element_key] | {element_name}),
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
@@ -905,6 +921,7 @@ class MPRAAdapter(BaseAdapter):
             props = {
                 '_key': _id,
                 'name': element_name,
+                'aliases': sorted(self.coords_to_element_aliases[key] | {element_name}),
                 'chr': chr_,
                 'start': int(start),
                 'end': int(end),

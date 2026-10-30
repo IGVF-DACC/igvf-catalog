@@ -34,6 +34,7 @@ export const genomicElementFormat = z.object({
   end: z.number(),
   strand: z.string().nullish(),
   name: z.string(),
+  aliases: z.array(z.string()).nullish(),
   method: z.string().nullish(),
   source_annotation: z.string().nullable(),
   type: z.string(),
