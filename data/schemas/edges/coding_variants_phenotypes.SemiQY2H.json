@@ -9,8 +9,8 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
-          "description": "Unique identifier for the coding variant to phenotype edge"
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores.",
+          "example": "ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T_GO_0005515_IGVFFI7393MGJK"
         },
         "_from": {
           "example": "coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T",
@@ -51,8 +51,9 @@
           ]
         },
         "method": {
-          "type": "string",
-          "description": "The method of the coding variants to phenotypes edge"
+          "enum": [
+            "Arrayed semi-qY2H"
+          ]
         },
         "label": {
           "enum": [
@@ -60,8 +61,9 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the coding variants to phenotypes edge"
+          "enum": [
+            "observed data"
+          ]
         },
         "files_filesets": {
           "type": "string",

@@ -186,7 +186,7 @@ class SemiQY2H(BaseAdapter):
             coding_variant_key = coding_variant_keys[0]
 
             _props = {
-                '_key': coding_variant_key + '_' + self.file_accession,
+                '_key': coding_variant_key + '_' + self.PROTEIN_BINDING_TERM + '_' + self.file_accession,
                 '_from': 'coding_variants/' + coding_variant_key,
                 '_to': 'ontology_terms/' + self.PROTEIN_BINDING_TERM,
                 'name': self.CODING_VARIANTS_PHENOTYPES_EDGE_NAME,

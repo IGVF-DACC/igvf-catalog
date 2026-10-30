@@ -9,8 +9,8 @@
       "type": "object",
       "properties": {
         "_key": {
-          "type": "string",
-          "description": "Unique identifier for the coding variant to PPI edge"
+          "description": "Coding variant key, proteins_proteins edge key and source file accession, joined by underscores.",
+          "example": "ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T_000002a5a51a3c5a92fc1245bb32701679a33f20b67baff8dfa1a359998dafa4_IGVFFI2460BBXY"
         },
         "_from": {
           "example": "coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T",
@@ -62,8 +62,9 @@
           ]
         },
         "method": {
-          "type": "string",
-          "description": "The method of the coding variant to PPI edge"
+          "enum": [
+            "Arrayed semi-qY2H"
+          ]
         },
         "label": {
           "enum": [
@@ -71,8 +72,9 @@
           ]
         },
         "class": {
-          "type": "string",
-          "description": "The class of the coding variant to PPI edge"
+          "enum": [
+            "observed data"
+          ]
         },
         "files_filesets": {
           "type": "string",

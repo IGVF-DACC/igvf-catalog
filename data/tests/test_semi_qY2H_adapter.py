@@ -51,7 +51,7 @@ MOCKED_PPI_EDGES = {
 }
 
 MOCKED_FILE_FILESET = {
-    'method': 'yeast two-hybrid',
+    'method': 'Arrayed semi-qY2H',
     'class': 'observed data',
 }
 
@@ -98,7 +98,7 @@ def test_process_file_coding_variants_PPI(
     assert record['wt_consensus_score'] == 311.16
     assert record['log2FC'] == -3.48
     assert record['molecular_function'] == 'ontology_terms/GO_0005515'
-    assert record['method'] == 'yeast two-hybrid'
+    assert record['method'] == 'Arrayed semi-qY2H'
     assert record['label'] == 'protein variant effect'
     assert record['class'] == 'observed data'
     assert record['source'] == 'IGVF'
@@ -168,13 +168,13 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     assert len(records) == 1
 
     record = records[0]
-    assert record['_key'] == 'ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T_IGVFFI7393MGJK'
+    assert record['_key'] == 'ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T_GO_0005515_IGVFFI7393MGJK'
     assert record['_from'] == 'coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T'
     assert record['_to'] == 'ontology_terms/GO_0005515'
     assert record['name'] == 'mutational effect'
     assert record['inverse_name'] == 'altered due to mutation'
     assert record['norm_dist_rms'] == 0.3868541857467328
-    assert record['method'] == 'yeast two-hybrid'
+    assert record['method'] == 'Arrayed semi-qY2H'
     assert record['label'] == 'protein variant effect'
     assert record['class'] == 'observed data'
     assert record['source'] == 'IGVF'
