@@ -623,7 +623,7 @@ igvf_file_accessions:
       - IGVFFI4645HYXC # Library1.3
       - IGVFFI5618OYLS # Library1.4
       - IGVFFI8967CJTO # in vivo MPRA
-      - IGVFFI5421BINO # ADD MPRA
+      # IGVFFI5421BINO # ADD MPRA — withheld pending submitter corrections
       - IGVFFI4623ATHV # CD MPRA
       - IGVFFI3759TMLT # ENCSR833BYO
       - IGVFFI1403DXAG # ENCSR736XUK
@@ -685,7 +685,7 @@ igvf_file_accessions:
       - IGVFFI6587LCPK # Library1.4
       - IGVFFI7473KZAS # in vivo MPRA
       - IGVFFI3376ESBQ # SCZ MPRA HEK293
-      - IGVFFI1091AVCO # ADD MPRA
+      # IGVFFI1091AVCO # ADD MPRA — withheld pending submitter corrections
       - IGVFFI9305NVAF # SCZ MPRA HNP
       - IGVFFI2909LNFX # CD MPRA
       - IGVFFI1697PYNU # ENCSR833BYO
@@ -743,7 +743,7 @@ igvf_file_accessions:
       - IGVFFI7706JKWK # Library1.4
       - IGVFFI9387FGKR # in vivo MPRA
       - IGVFFI4515NAGP # SCZ MPRA HEK293 / SCZ MPRA HNP
-      - IGVFFI8906TRGI # ADD MPRA
+      # IGVFFI8906TRGI # ADD MPRA — withheld pending submitter corrections
       - IGVFFI5857RBRC # CD MPRA
       - IGVFFI3757JVGI # ENCODE library ENCFF728XQT
       - IGVFFI6665CZUU # ENCODE library ENCFF074MMO

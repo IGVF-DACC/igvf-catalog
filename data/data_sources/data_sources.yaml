@@ -1813,8 +1813,7 @@ genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2652OGSE/@@download/IGVFFI2652OGSE.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8967CJTO/@@download/IGVFFI8967CJTO.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI5421BINO/@@download/IGVFFI5421BINO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI8906TRGI/@@download/IGVFFI8906TRGI.tsv.gz
+    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4623ATHV/@@download/IGVFFI4623ATHV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5857RBRC/@@download/IGVFFI5857RBRC.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3759TMLT/@@download/IGVFFI3759TMLT.bed.gz
@@ -1941,8 +1940,7 @@ genomic element to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2652OGSE/@@download/IGVFFI2652OGSE.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8967CJTO/@@download/IGVFFI8967CJTO.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI5421BINO/@@download/IGVFFI5421BINO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI8906TRGI/@@download/IGVFFI8906TRGI.tsv.gz
+    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4623ATHV/@@download/IGVFFI4623ATHV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5857RBRC/@@download/IGVFFI5857RBRC.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3759TMLT/@@download/IGVFFI3759TMLT.bed.gz
@@ -2071,8 +2069,7 @@ genomic element from variants igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3376ESBQ/@@download/IGVFFI3376ESBQ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1091AVCO/@@download/IGVFFI1091AVCO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI8906TRGI/@@download/IGVFFI8906TRGI.tsv.gz
+    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9305NVAF/@@download/IGVFFI9305NVAF.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2909LNFX/@@download/IGVFFI2909LNFX.bed.gz
@@ -2203,8 +2200,7 @@ variant igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3376ESBQ/@@download/IGVFFI3376ESBQ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1091AVCO/@@download/IGVFFI1091AVCO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI8906TRGI/@@download/IGVFFI8906TRGI.tsv.gz
+    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9305NVAF/@@download/IGVFFI9305NVAF.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2909LNFX/@@download/IGVFFI2909LNFX.bed.gz
@@ -2334,8 +2330,7 @@ variant to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3376ESBQ/@@download/IGVFFI3376ESBQ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
-    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1091AVCO/@@download/IGVFFI1091AVCO.bed.gz
-      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI8906TRGI/@@download/IGVFFI8906TRGI.tsv.gz
+    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9305NVAF/@@download/IGVFFI9305NVAF.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2909LNFX/@@download/IGVFFI2909LNFX.bed.gz
@@ -2415,15 +2410,86 @@ variant to biosample igvf mpra:
   label: variant effect on regulatory element activity
 
 
-encode reformatted igvf mpra multiple designs:
-  adapter: mpra
-  download_only: true
+encode reformatted igvf mpra multiple designs genomic_element:
+  collection: genomic_elements
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --filepath {datafile}
+    --reference-filepath {reference_filepaths[0]} {reference_filepaths[1]}
+    --label genomic_element
+    --output-bucket-key genomic_elements/mpra_genomic_element_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
   source: IGVF
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9022VCNU/@@download/IGVFFI9022VCNU.bed.gz
       reference_filepaths:
         - https://api.data.igvf.org/tabular-files/IGVFFI5128MGTU/@@download/IGVFFI5128MGTU.tsv.gz
         - https://api.data.igvf.org/tabular-files/IGVFFI3757JVGI/@@download/IGVFFI3757JVGI.tsv.gz
+
+encode reformatted igvf mpra multiple designs genomic_element_biosample:
+  collection: genomic_elements_biosamples
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --filepath {datafile}
+    --reference-filepath {reference_filepaths[0]} {reference_filepaths[1]}
+    --label genomic_element_biosample
+    --output-bucket-key genomic_elements_biosamples/mpra_genomic_element_biosample_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  source: IGVF
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9022VCNU/@@download/IGVFFI9022VCNU.bed.gz
+      reference_filepaths:
+        - https://api.data.igvf.org/tabular-files/IGVFFI5128MGTU/@@download/IGVFFI5128MGTU.tsv.gz
+        - https://api.data.igvf.org/tabular-files/IGVFFI3757JVGI/@@download/IGVFFI3757JVGI.tsv.gz
+
+encode reformatted igvf mpra multiple designs variant:
+  collection: variants
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --filepath {datafile}
+    --reference-filepath {reference_filepaths[0]} {reference_filepaths[1]}
+    --label variant
+    --output-bucket-key variants/mpra_variant_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  source: IGVF
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6562FSUE/@@download/IGVFFI6562FSUE.bed.gz
+      reference_filepaths:
+        - https://api.data.igvf.org/tabular-files/IGVFFI5128MGTU/@@download/IGVFFI5128MGTU.tsv.gz
+        - https://api.data.igvf.org/tabular-files/IGVFFI3757JVGI/@@download/IGVFFI3757JVGI.tsv.gz
+
+encode reformatted igvf mpra multiple designs genomic_element_from_variant:
+  collection: genomic_elements
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --filepath {datafile}
+    --reference-filepath {reference_filepaths[0]} {reference_filepaths[1]}
+    --label genomic_element_from_variant
+    --output-bucket-key genomic_elements/mpra_genomic_element_from_variant_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  source: IGVF
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6562FSUE/@@download/IGVFFI6562FSUE.bed.gz
+      reference_filepaths:
+        - https://api.data.igvf.org/tabular-files/IGVFFI5128MGTU/@@download/IGVFFI5128MGTU.tsv.gz
+        - https://api.data.igvf.org/tabular-files/IGVFFI3757JVGI/@@download/IGVFFI3757JVGI.tsv.gz
+
+encode reformatted igvf mpra multiple designs variant_biosample:
+  collection: variants_biosamples
+  command: >
+    python3 data_parser.py
+    --adapter mpra
+    --filepath {datafile}
+    --reference-filepath {reference_filepaths[0]} {reference_filepaths[1]}
+    --label variant_biosample
+    --output-bucket-key variants_biosamples/mpra_variant_biosample_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  source: IGVF
+  file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI6562FSUE/@@download/IGVFFI6562FSUE.bed.gz
       reference_filepaths:
         - https://api.data.igvf.org/tabular-files/IGVFFI5128MGTU/@@download/IGVFFI5128MGTU.tsv.gz

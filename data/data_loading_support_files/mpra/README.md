@@ -63,3 +63,28 @@ See [the review](../../../docs/qa/mpra-2026-10-28.md) for evidence and remaining
 
 Unexpected measurement conflicts still fail. Rules are accession-specific and
 persist across parsing chunks; replacements do not inherit them.
+
+## CD MPRA corrections
+
+The adapter's `CD_EFFECT_DESIGNS` explicitly pairs IGVFFI2909LNFX and
+IGVFFI4623ATHV with IGVFFI5857RBRC. No other file uses these corrections.
+Variant identifiers resolve through a unique design SPDI at the exact tile and
+strand, with checks on the original identifier, ref/alt alleles, and the known
+one-base position discrepancy. The reported position is replaced with the design
+position. Named element effects resolve by exact tile, strand, and allele suffix.
+Unknown or ambiguous mappings fail. IGVFFI4623ATHV's `element` exception for `NA`
+excludes 948 ambiguous rows before name correction.
+
+## Reformatted ENCODE variant duplicates
+
+IGVFFI7911XJRB, IGVFFI2880GNLL, IGVFFI2064FJPL, and IGVFFI5864KSZH each have an
+explicit `variant_deduplicate` entry for `NC_000018.10:45198868:T:` (a deletion;
+the trailing colon is intentional). The repeated emitted edge is identical in
+all fields. One copy is retained per edge key; other element associations for
+the same variant remain distinct. Conflicting values still fail.
+
+For the reviewed two-design pair IGVFFI5128MGTU / IGVFFI3757JVGI, the adapter
+explicitly assigns shared reference tiles to IGVFFI3757JVGI after confirming equal
+fully-reference sequence sets. Other overlapping pairs fail. IGVFFI9022VCNU is
+also explicitly listed for identical element-effect deduplication; conflicting
+scores fail. These are file-level rules in `MPRAAdapter`, not per-variant exceptions.

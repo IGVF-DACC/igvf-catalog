@@ -57,7 +57,7 @@
         "bed_score": {
           "title": "BED Score",
           "type": "number",
-          "description": "Score column of the source BED file."
+          "description": "Optional score column of the source BED file; omitted when unavailable."
         },
         "log2FC": {
           "title": "Log2 Fold Change",
@@ -175,8 +175,7 @@
         "biological_context",
         "treatments_term_ids",
         "genomic_element",
-        "strand",
-        "bed_score"
+        "strand"
       ],
       "additionalProperties": false
     }

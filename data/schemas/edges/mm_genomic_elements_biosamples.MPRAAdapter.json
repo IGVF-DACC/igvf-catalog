@@ -28,7 +28,7 @@
         },
         "bed_score": {
           "type": "integer",
-          "description": "Score column of the source BED file."
+          "description": "Optional score column of the source BED file; omitted when unavailable."
         },
         "strand": {
           "type": "string",
@@ -114,7 +114,6 @@
       },
       "required": [
         "_key",
-        "bed_score",
         "strand",
         "significant",
         "files_filesets",

@@ -49,7 +49,7 @@
         },
         "bed_score": {
           "type": "number",
-          "description": "Score column of the source BED file."
+          "description": "Optional score column of the source BED file; omitted when unavailable."
         },
         "log2FC": {
           "type": "number",
@@ -156,8 +156,7 @@
         "biological_context",
         "treatments_term_ids",
         "genomic_element",
-        "strand",
-        "bed_score"
+        "strand"
       ],
       "additionalProperties": false
     }

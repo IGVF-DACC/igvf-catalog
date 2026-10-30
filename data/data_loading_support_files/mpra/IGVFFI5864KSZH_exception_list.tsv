@@ -1,0 +1,2 @@
+kind	identifier	reason
+variant_deduplicate	NC_000018.10:45198868:T:	Identical duplicate variant effects; emit one record per variant-element-biosample key
