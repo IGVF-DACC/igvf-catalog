@@ -53,7 +53,7 @@ function prefixMatchQueryBody (name: string, filters: string, limitClause: strin
   return `
     FOR record IN ${ontologyCollectionName}
       FILTER STARTS_WITH(record.name, "${name}") ${filters ? `AND ${filters}` : ''}
-      SORT record._key
+      SORT record.name, record._key
       ${limitClause}
       RETURN { ${getDBReturnStatements(ontologySchema)} }
   `

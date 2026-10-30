@@ -172,7 +172,7 @@ describe('ontologyRouters.ontologyTerm', () => {
     await ontologyRouters.ontologyTerm({ input, ctx: {}, type: 'query', path: '', rawInput: input })
 
     const prefixQuery = queries.find(q => q.includes('STARTS_WITH'))
-    expect(prefixQuery).toContain('SORT record._key')
+    expect(prefixQuery).toContain('SORT record.name, record._key')
 
     const tokenQuery = queries.find(q => q.includes('TOKENS(') && q.includes('SEARCH'))
     expect(tokenQuery).toContain('SORT BM25(record) DESC, record._key')
