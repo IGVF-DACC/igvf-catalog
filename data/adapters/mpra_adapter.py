@@ -157,7 +157,7 @@ class MPRAAdapter(BaseAdapter):
 
     # Reviewed CD corrections are restricted to these exact effect/design pairs.
     CD_EFFECT_DESIGNS = {'IGVFFI2909LNFX': 'IGVFFI5857RBRC',
-                         'IGVFFI4623ATHV': 'IGVFFI5857RBRC'}
+                         'IGVFFI4623ATHV': ('IGVFFI5857RBRC', 'IGVFFI9507GZKH')}
 
     # UNC Libraries 1.1–1.4 store original oligo names in semicolon-separated info.
     INFO_ALIAS_DESIGNS = frozenset({'IGVFFI4997GUQE', 'IGVFFI0358RUFK',
@@ -298,7 +298,9 @@ class MPRAAdapter(BaseAdapter):
         if expected_design is None:
             yield from reader
             return
-        if self.reference_file_accession != expected_design:
+        allowed_designs = (expected_design,) if isinstance(
+            expected_design, str) else expected_design
+        if self.reference_file_accession not in allowed_designs:
             raise ValueError(
                 f'{self.file_accession}: CD correction requires {expected_design}')
         by_coordinate = defaultdict(list)

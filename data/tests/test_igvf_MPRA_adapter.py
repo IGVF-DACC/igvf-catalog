@@ -968,8 +968,9 @@ def test_cd_variant_correction_is_file_specific(tmp_path, mock_file_fileset, acc
         assert result == row
 
 
-def test_cd_element_name_resolution_and_na_exclusion(tmp_path, mock_file_fileset):
-    design = tmp_path / 'IGVFFI5857RBRC.tsv'
+@pytest.mark.parametrize('design_accession', ['IGVFFI5857RBRC', 'IGVFFI9507GZKH'])
+def test_cd_element_name_resolution_and_na_exclusion(tmp_path, mock_file_fileset, design_accession):
+    design = tmp_path / f'{design_accession}.tsv'
     design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
                       'chr1_12_cdg2:A:C_A\tchr1\t10\t20\t+\t["ref"]\t["NC_000001.11:11:A:C"]\t[1]\n'
                       'chr1_12_cdg2:A:C_C\tchr1\t10\t20\t+\t["alt"]\t["NC_000001.11:11:A:C"]\t[1]\n')
