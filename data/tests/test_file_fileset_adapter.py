@@ -431,6 +431,53 @@ def test_query_fileset_files_props_igvf_crispr_flowfish_maps_method_to_crispr_sc
     assert props['method'] == 'CRISPR screen'
 
 
+def test_query_fileset_files_props_igvf_semi_qy2h_maps_method_to_arrayed_semi_qy2h():
+    file_object = {
+        '@id': '/tabular-files/IGVFFI7393MGJK/',
+        'accession': 'IGVFFI7393MGJK',
+        'catalog_class': 'observed data',
+        'catalog_collections': ['coding_variants_phenotypes'],
+        'file_set': {
+            '@id': '/analysis-sets/IGVFDS9876GIEQ/'
+        },
+        'href': '/tabular-files/IGVFFI7393MGJK/@@download/IGVFFI7393MGJK.tsv.gz'
+    }
+    fileset_object = {
+        'accession': 'IGVFDS9876GIEQ',
+        '@type': ['AnalysisSet', 'FileSet', 'Item'],
+        'lab': {'@id': '/labs/marc-vidal/'},
+        'samples': [{'accession': 'IGVFSM0000TEST'}],
+        'publications': [],
+        'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000Y2H/'}],
+        'simplified_sample_summary': 'yeast',
+    }
+    assay_titles = {'Arrayed semi-qY2H v1',
+                    'Arrayed semi-qY2H v2', 'Arrayed semi-qY2H v3'}
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
+        with patch.object(FileFileSet, 'get_software_igvf', return_value=set()):
+            with patch.object(
+                    FileFileSet,
+                    'parse_analysis_set_igvf',
+                    return_value=(assay_titles, {'OBI:0000288'})):
+                with patch.object(FileFileSet, 'get_publication_igvf', return_value=None):
+                    with patch.object(
+                        FileFileSet,
+                        'parse_sample_donor_treatment_igvf',
+                        return_value=(
+                            {'IGVFSM0000TEST'},
+                            set(),
+                            set(),
+                            {'yeast'},
+                            set(),
+                            None
+                        )
+                    ):
+                        props, _, _ = FileFileSet.query_fileset_files_props_igvf(
+                            file_object)
+    assert sorted(props['preferred_assay_titles']) == sorted(assay_titles)
+    assert props['method'] == 'Arrayed semi-qY2H'
+
+
 @pytest.mark.parametrize('assay_title', ['Multiome Perturb-seq', 'in vivo Perturb-seq'])
 @pytest.mark.parametrize('accession, expected_method', [
     ('IGVFFI0000MULT', 'Perturb-seq'),
