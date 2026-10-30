@@ -1813,7 +1813,6 @@ genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2652OGSE/@@download/IGVFFI2652OGSE.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8967CJTO/@@download/IGVFFI8967CJTO.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
-    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4623ATHV/@@download/IGVFFI4623ATHV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5857RBRC/@@download/IGVFFI5857RBRC.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3759TMLT/@@download/IGVFFI3759TMLT.bed.gz
@@ -1940,7 +1939,6 @@ genomic element to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI2652OGSE/@@download/IGVFFI2652OGSE.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8967CJTO/@@download/IGVFFI8967CJTO.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
-    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4623ATHV/@@download/IGVFFI4623ATHV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5857RBRC/@@download/IGVFFI5857RBRC.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3759TMLT/@@download/IGVFFI3759TMLT.bed.gz
@@ -2069,7 +2067,6 @@ genomic element from variants igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3376ESBQ/@@download/IGVFFI3376ESBQ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
-    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9305NVAF/@@download/IGVFFI9305NVAF.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2909LNFX/@@download/IGVFFI2909LNFX.bed.gz
@@ -2200,7 +2197,6 @@ variant igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3376ESBQ/@@download/IGVFFI3376ESBQ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
-    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9305NVAF/@@download/IGVFFI9305NVAF.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2909LNFX/@@download/IGVFFI2909LNFX.bed.gz
@@ -2330,7 +2326,6 @@ variant to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9387FGKR/@@download/IGVFFI9387FGKR.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3376ESBQ/@@download/IGVFFI3376ESBQ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
-    # ADD MPRA (IGVFDS9178PAHE) withheld pending coordinate and allele-orientation corrections.
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9305NVAF/@@download/IGVFFI9305NVAF.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4515NAGP/@@download/IGVFFI4515NAGP.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2909LNFX/@@download/IGVFFI2909LNFX.bed.gz
