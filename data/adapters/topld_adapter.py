@@ -36,7 +36,9 @@ class TopLD(BaseAdapter):
         self.chr = chr
         self.ancestry = ancestry
         self.written_variant_keys = set()
-        self.accession = get_file_accession(filepath)
+        self.file_accession = get_file_accession(filepath)
+        self.annotation_file_accession = get_file_accession(
+            annotation_filepath)
 
         super().__init__(filepath, label, writer, validate)
 
@@ -67,13 +69,18 @@ class TopLD(BaseAdapter):
                     )
                 }
 
+    def tag_file_and_fileset_portal_accession(self, file_accession):
+        self.writer.add_tag('portal_accessions', file_accession)
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            file_accession)
+        file_file_set_accession = file_fileset.get('file_set_id')
+        if file_file_set_accession:
+            self.writer.add_tag('portal_accessions', file_file_set_accession)
+
     def parse(self):
-        self.writer.add_tag('portal_accessions', self.accession)
-        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
-            self.accession)
-        file_set_accession = self.file_fileset.get('file_set_id')
-        if file_set_accession:
-            self.writer.add_tag('portal_accessions', file_set_accession)
+        self.tag_file_and_fileset_portal_accession(self.file_accession)
+        self.tag_file_and_fileset_portal_accession(
+            self.annotation_file_accession)
         if self.label == 'variants':
             self.process_variants()
             return
