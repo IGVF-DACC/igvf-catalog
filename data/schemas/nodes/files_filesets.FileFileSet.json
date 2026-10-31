@@ -33,6 +33,7 @@
             "doug-fowler",
             "encode",
             "gary-hon",
+            "hyejung-won",
             "j-michael-cherry",
             "jay-shendure",
             "jesse-engreitz",
@@ -69,6 +70,8 @@
               "DUAL-IPA",
               "electroporated MPRA",
               "lentiMPRA",
+              "AAV-MPRA",
+              "in vivo MPRA",
               "Migration CRISPR screen",
               "MORF screen",
               "MPRA",
@@ -222,7 +225,12 @@
               "Snakemake",
               "statsmodels",
               "Straw",
-              "snapATAC2"
+              "snapATAC2",
+              "Tewhey ENCODE allelic MPRA to IGVF converter",
+              "in_vivo_MPRA_downstream_analysis",
+              "schizophrenia-MPRA",
+              "crossdisorder-MPRA",
+              "AD_MPRA"
             ]
           }
         },

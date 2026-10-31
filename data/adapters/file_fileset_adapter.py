@@ -548,7 +548,9 @@ class FileFileSet:
             input_file_set_id = input_file_set.get('@id')
             if not input_file_set_id:
                 continue
-            if input_file_set_id.startswith('/measurement-sets/'):
+            if (input_file_set_id.startswith('/measurement-sets/')
+                    or (input_file_set_id.startswith('/curated-sets/')
+                        and input_file_set.get('file_set_type') == 'external sequencing data')):
                 accession = input_file_set.get('accession') if isinstance(
                     input_file_set, dict) else None
                 if not accession:
@@ -600,7 +602,9 @@ class FileFileSet:
                     FileFileSet.decompose_analysis_set_to_measurement_set_igvf(
                         input_id)
                 )
-            elif input_id.startswith('/measurement-sets/'):
+            elif (input_id.startswith('/measurement-sets/')
+                  or (input_id.startswith('/curated-sets/')
+                      and input_file_set.get('file_set_type') == 'external sequencing data')):
                 accession = input_file_set.get('accession') if isinstance(
                     input_file_set, dict) else None
                 if not accession:
@@ -609,12 +613,24 @@ class FileFileSet:
         measurement_set_objects = FileFileSet.get_batch_objects(
             list(measurement_set_accessions), ['preferred_assay_titles', 'assay_term'], api_url=FileFileSet.IGVF_API)
         for measurement_set_object in measurement_set_objects:
-            preferred_assay_titles.add(
-                measurement_set_object.get('preferred_assay_titles')[0])
-            assay_term_obj = measurement_set_object.get('assay_term')
-            assay_term_id = assay_term_obj.get(
-                '@id').split('/')[-2].replace('_', ':')
+            assay_term_obj = measurement_set_object.get('assay_term') or {}
+            if isinstance(assay_term_obj, str):
+                assay_term_obj = {'@id': assay_term_obj}
+            assay_id = assay_term_obj.get('@id')
+            if not assay_id:
+                # Curated inputs such as element libraries carry no assay metadata.
+                continue
+            assay_term_id = assay_id.strip(
+                '/').split('/')[-1].replace('_', ':')
             assay_term_ids.add(assay_term_id)
+            titles = measurement_set_object.get('preferred_assay_titles') or []
+            if titles:
+                preferred_assay_titles.update(titles)
+            elif assay_term_id == 'OBI:0002675':
+                # Curated external MPRA inputs expose assay_term but may omit titles.
+                preferred_assay_titles.add('MPRA')
+            elif assay_term_obj.get('term_name'):
+                preferred_assay_titles.add(assay_term_obj['term_name'])
         return preferred_assay_titles, assay_term_ids
 
     @staticmethod
@@ -816,6 +832,7 @@ class FileFileSet:
             preferred_assay_titles, assay_term_ids = FileFileSet.parse_analysis_set_igvf(
                 fileset_object)
             if len(preferred_assay_titles) != 1:
+                print(preferred_assay_titles)
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             method = list(preferred_assay_titles)[0]
