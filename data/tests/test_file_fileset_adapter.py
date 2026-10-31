@@ -1168,3 +1168,46 @@ def test_crispr_e2g_metadata_uses_portal_catalog_annotations(accession, expected
     assert props['class'] == 'observed data'
     FileFileSet(accessions=[], label='igvf_file_fileset',
                 validate=True).validate_doc(props)
+
+
+@pytest.mark.parametrize('nested', [False, True])
+@pytest.mark.parametrize('assay_term', [
+    '/assay-terms/OBI_0002675/',
+    {'@id': '/assay-terms/OBI_0002675/',
+        'term_name': 'massively parallel reporter assay'},
+])
+def test_analysis_set_curated_mpra_inputs(nested, assay_term):
+    inputs = [
+        {'@id': '/curated-sets/IGVFDS0213AAOK/', 'accession': 'IGVFDS0213AAOK',
+         'file_set_type': 'external sequencing data'},
+        {'@id': '/curated-sets/IGVFDS8654ODYD/', 'accession': 'IGVFDS8654ODYD',
+         'file_set_type': 'elements'},
+        {'@id': '/curated-sets/IGVFDS0000OTHER/', 'file_set_type': 'other'},
+        {'@id': '/curated-sets/IGVFDS0000MISSING/'}]
+    analysis = {'input_file_sets': inputs}
+    outer = {'input_file_sets': [
+        {'@id': '/analysis-sets/IGVFDS2987PAMW/'}]} if nested else analysis
+    response = Mock()
+    response.json.return_value = analysis
+    with patch('adapters.file_fileset_adapter.requests.get', return_value=response), \
+            patch.object(FileFileSet, 'get_batch_objects', return_value=[{
+                'assay_term': assay_term}]) as batch:
+        titles, terms = FileFileSet.parse_analysis_set_igvf(outer)
+    assert titles == {'MPRA'}
+    assert terms == {'OBI:0002675'}
+    assert batch.call_args.args[0] == ['IGVFDS0213AAOK']
+
+
+def test_analysis_set_mixed_curated_and_measurement_inputs():
+    analysis = {'input_file_sets': [
+        {'@id': '/curated-sets/IGVFDS0213AAOK/',
+            'file_set_type': 'external sequencing data'},
+        {'@id': '/measurement-sets/IGVFDS0000TEST/'}]}
+    assay = {'@id': '/assay-terms/OBI_0002675/',
+             'term_name': 'massively parallel reporter assay'}
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=[
+            {'assay_term': assay}, {'assay_term': assay,
+                                    'preferred_assay_titles': ['MPRA']},
+            {'file_set_type': 'elements'}]):
+        assert FileFileSet.parse_analysis_set_igvf(
+            analysis) == ({'MPRA'}, {'OBI:0002675'})

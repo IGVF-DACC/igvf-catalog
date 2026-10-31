@@ -28,7 +28,7 @@
         "bed_score": {
           "title": "BED Score",
           "type": "integer",
-          "description": "Score column of the source BED file."
+          "description": "Optional score column of the source BED file; omitted when unavailable."
         },
         "strand": {
           "title": "Strand",
@@ -50,12 +50,12 @@
           "type": "number",
           "description": "Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio."
         },
-        "DNA_count": {
+        "inputCount": {
           "title": "DNA Count",
           "type": "number",
           "description": "Input count (DNA), normalized to counts per million and averaged across replicates."
         },
-        "RNA_count": {
+        "outputCount": {
           "title": "RNA Count",
           "type": "number",
           "description": "Output count (RNA), normalized to counts per million and averaged across replicates."
@@ -131,7 +131,6 @@
         }
       },
       "required": [
-        "bed_score",
         "strand",
         "significant",
         "files_filesets",
@@ -143,7 +142,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, strand, log2FC, bed_score, DNA_count, RNA_count, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
+    "return": "_id, strand, log2FC, bed_score, inputCount, outputCount, significant, neg_log10_pvalue, neg_log10_pvalue_adj, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }

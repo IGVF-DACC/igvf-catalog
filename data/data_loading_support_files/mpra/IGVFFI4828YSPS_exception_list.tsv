@@ -1,0 +1,11 @@
+kind	identifier	reason
+variant_deduplicate	NC_000001.11:109274967:G:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate_first_bed_score	NC_000001.11:11805746:A:G	Duplicate effects differ only in BED score; retain the first score in file order
+variant_deduplicate	NC_000001.11:230158967:C:A	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000001.11:230159168:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000001.11:230161389:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000002.12:203018469:C:G	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000002.12:21047681:A:C	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000002.12:21176343:G:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000002.12:232655543:A:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:100315721:G:A	Identical duplicate variant effects; emit one record per variant-element-biosample key

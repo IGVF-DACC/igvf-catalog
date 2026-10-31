@@ -52,8 +52,8 @@ parser.add_argument('--phenotype_term', type=str,
                     help='The phenotype term id for VAMP-seq and MultiSTEP assays.')
 parser.add_argument('--filepath', type=str,
                     help='The path to the input file or archive.')
-parser.add_argument('--reference-filepath', type=str,
-                    help='The path to a related reference input file that has reference data for adapting the data file. e.g. MPRA sequence designs')
+parser.add_argument('--reference-filepath', type=str, nargs='+',
+                    help='Related reference input path. MPRA accepts one or more sequence-design paths. Other adapters require one path.')
 parser.add_argument('--drug-reference-filepath', type=str,
                     help='PharmGKB chemicals TSV for drug name→ID mapping (IGVFFI2997DUKO). Required for variant_drug and variant_drug_gene.')
 parser.add_argument('--variant-reference-filepath', type=str,
@@ -78,6 +78,13 @@ parser.add_argument('--validate', action=argparse.BooleanOptionalAction, default
                          'default for any adapter.')
 
 args = parser.parse_args()
+# Preserve the scalar contract for all existing non-MPRA adapters.
+if args.reference_filepath is not None and args.adapter != 'mpra':
+    if len(args.reference_filepath) != 1:
+        parser.error(
+            'Multiple --reference-filepath values are supported only by MPRA')
+    args.reference_filepath = args.reference_filepath[0]
+
 if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:
     parser.error(
         '--filepath is required unless using the "file_fileset" adapter')

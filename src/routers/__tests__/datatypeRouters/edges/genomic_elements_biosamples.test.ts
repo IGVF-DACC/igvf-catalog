@@ -1,5 +1,6 @@
 import { genomicElementsBiosamplesRouters } from '../../../datatypeRouters/edges/genomic_elements_biosamples'
 import * as dbModule from '../../../../database'
+import { genomicElementFormat } from '../../../datatypeRouters/nodes/genomic_elements'
 import { TRPCError } from '@trpc/server'
 
 jest.mock('../../../../database')
@@ -16,8 +17,8 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
         strand: '+',
         neg_log10_pvalue: 3.2,
         neg_log10_pvalue_adj: 2.8,
-        DNA_count: 120,
-        RNA_count: 80,
+        inputCount: 120,
+        outputCount: 80,
         significant: true,
         source: 'ENCODE',
         source_url: 'http://example.com/mpra',
@@ -87,8 +88,8 @@ describe('genomicElementsBiosamplesRouters.genomicElementsFromBiosamples', () =>
         strand: '-',
         neg_log10_pvalue: 1.1,
         neg_log10_pvalue_adj: 0.9,
-        DNA_count: 55,
-        RNA_count: 40,
+        inputCount: 55,
+        outputCount: 40,
         significant: false,
         source: 'IGVF',
         source_url: 'http://example.com/mpra2',
@@ -160,4 +161,15 @@ describe('MPRA element routing by organism', () => {
     expect(query.mock.calls[1][0]).toContain(`FOR otherRecord IN ${prefix}genomic_elements`)
     expect(query.mock.calls[1][0]).toContain('FOR record IN ontology_terms')
   })
+})
+
+it('preserves aliases in expanded genomic elements', () => {
+  const element = {
+    name: 'oligo_hash', aliases: ['oligo_hash', 'original_name'],
+    chr: 'chr1', start: 10, end: 20, source_annotation: null,
+    type: 'tested elements', source: 'IGVF', source_url: 'https://data.igvf.org'
+  }
+  expect(genomicElementFormat.parse(element).aliases).toEqual(element.aliases)
+  const legacy = { ...element, aliases: undefined }
+  expect(genomicElementFormat.parse(legacy).aliases).toBeUndefined()
 })
