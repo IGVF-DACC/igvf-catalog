@@ -1,0 +1,17 @@
+kind	identifier	reason
+variant_deduplicate	NC_000001.11:230158967:C:A	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:100315721:G:A	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:112998589:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:121156038:T:C	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:121158214:A:G	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:121158220:T:C	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:121158312:T:C	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:89249115:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000010.11:89249121:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000011.10:72721939:G:A	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000012.12:124832196:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000015.10:62099408:C:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000015.10:73390349:T:C	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000015.10:73390366:G:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate	NC_000016.10:11551156:A:T	Identical duplicate variant effects; emit one record per variant-element-biosample key
+variant_deduplicate_first_bed_score	NC_000016.10:28846323:A:G	Duplicate effects differ only in BED score; retain the first score in file order

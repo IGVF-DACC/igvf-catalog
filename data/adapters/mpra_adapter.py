@@ -2,7 +2,7 @@
 MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
 
 **Pipelines**
-  * **IGVF** — load *MPRA sequence designs* (``reference_filepath``) once, then an *effect* file
+  * **IGVF** — load *MPRA sequence designs* (``reference_filepath``: path or list of paths) once, then an *effect* file
     per run (``filepath``). Designs supply tile metadata (incl. ``allele`` / ``SPDI``);
     effect files are BED; column usage is noted on the methods that read them.
   * **ENCODE** — no designs file. Effect file is BED (optional ``.gz``); 4th column = element
@@ -25,12 +25,13 @@ MPRA (Massively Parallel Reporter Assay) — unified IGVF and ENCODE adapter.
      populate allele sets to skip ``ALT_``* effect names for ref-only biosample edges. A
      *single* row with ``[ref, alt]`` is one reference tile (not two elements).
   3. **Significance** — ``minusLog10QValue >= THRESHOLD`` (default 1) when Q is available.
-  4. **IGVFFI1436TRIH** — optional name exclusion file (``IGVFFI1436TRIH_EXCLUSION_LIST``).
+  4. **File exceptions** — accession-scoped, reasoned exclusions under
+     ``data_loading_support_files/mpra/<accession>_exception_list.tsv``.
 
 """
 
 # Example rows from ENCODE lenti-MPRA bed file ENCFF802FUV.bed: (the last two columns are the same for all rows)
-# Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: DNA count; Column 9: RNA count
+# Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: inputCount; Column 9: outputCount
 # chr1	10410	10610	HepG2_DNasePeakNoPromoter1	212	+	-0.843	0.307	0.171	-1	-1
 
 # Example rows from IGVFFI4914OUJH - MPRA sequence designs
@@ -111,20 +112,70 @@ class MPRAAdapter(BaseAdapter):
 
     SATMUT_DESIGN_ACCESSIONS = frozenset({'IGVFFI4261NSQZ', 'IGVFFI1789LDNT'})
 
+    # Reviewed IGVF-reformatted ENCODE files repeat reference effects for nearby
+    # variants. Collapse only identical emitted records; conflicting scores fail.
+    ELEMENT_EFFECT_DEDUPLICATION_FILES = frozenset({
+        'IGVFFI0697ERLC',
+        'IGVFFI1403DXAG',
+        'IGVFFI1510BIKA',
+        'IGVFFI1539EUOM',
+        'IGVFFI1657SPYA',
+        'IGVFFI1741RWXP',
+        'IGVFFI1774BLKA',
+        'IGVFFI2065HRKJ',
+        'IGVFFI2088BWUT',
+        'IGVFFI2612KYGU',
+        'IGVFFI3051BDVJ',
+        'IGVFFI3067GFJQ',
+        'IGVFFI3404GVKG',
+        'IGVFFI3512THBD',
+        'IGVFFI3759TMLT',
+        'IGVFFI4402NIMA',
+        'IGVFFI4549EUOM',
+        'IGVFFI4580CPIW',
+        'IGVFFI4920GDBI',
+        'IGVFFI6128ABQP',
+        'IGVFFI6430GOGX',
+        'IGVFFI6713XUAJ',
+        'IGVFFI6745NQHO',
+        'IGVFFI6956JADI',
+        'IGVFFI6981UWPM',
+        'IGVFFI6988MJTJ',
+        'IGVFFI7020ICIO',
+        'IGVFFI8760OJPL',
+        'IGVFFI8768JREA',
+        'IGVFFI9022VCNU',
+        'IGVFFI9189WMAU',
+        'IGVFFI9363OYOI',
+        'IGVFFI9704CYED',
+        'IGVFFI9835TEFQ',
+        'IGVFFI9887JSVV',
+    })
+
+    # Library1.4: collapse exact repeats after explicit conflicting-variant exclusions.
+    IDENTICAL_VARIANT_EFFECT_FILES = frozenset({'IGVFFI6587LCPK'})
+
+    # Reviewed CD corrections are restricted to these exact effect/design pairs.
+    CD_EFFECT_DESIGNS = {'IGVFFI2909LNFX': 'IGVFFI5857RBRC',
+                         'IGVFFI4623ATHV': ('IGVFFI5857RBRC', 'IGVFFI9507GZKH')}
+
+    # UNC Libraries 1.1–1.4 store original oligo names in semicolon-separated info.
+    INFO_ALIAS_DESIGNS = frozenset({'IGVFFI4997GUQE', 'IGVFFI0358RUFK',
+                                    'IGVFFI8319ZOLO', 'IGVFFI1144FUYP'})
+
     THRESHOLD = 1
     CHUNK_SIZE = 6500
-    IGVFFI1436TRIH_EXCLUSION_LIST = (
-        Path(__file__).resolve().parents[1] /
-        'data_loading_support_files' /
-        'MPRA_IGVFFI1436TRIH_element_exclusion_list.tsv'
-    )
+    EXCEPTION_DIR = (Path(__file__).resolve().parents[1] /
+                     'data_loading_support_files' / 'mpra')
+    # These 12K designs use patch-version names for GRCh38 primary chromosomes.
+    DESIGN_ASSEMBLY_ALIASES = {'IGVFFI7237HYCA': {'GRCh38.p13': 'GRCh38'}}
 
     def __init__(
         self,
         filepath,
         label,
         writer: Optional[Writer] = None,
-        reference_filepath: Optional[str] = None,
+        reference_filepath: Optional[str | list[str]] = None,
         validate=False,
         **kwargs
     ):
@@ -174,6 +225,8 @@ class MPRAAdapter(BaseAdapter):
         else:
             self.writer.add_tag('portal_accessions', self.file_accession)
 
+        if isinstance(reference_filepath, (list, tuple)) and not reference_filepath:
+            raise ValueError('MPRA reference file list must not be empty')
         self.has_sequence_designs = reference_filepath is not None
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
@@ -183,26 +236,108 @@ class MPRAAdapter(BaseAdapter):
         self.variant_pos_to_element = defaultdict(set)
         self.design_elements = set()
         self.coords_to_element_name = {}
+        self.coords_to_element_aliases = defaultdict(set)
         self.design_name_alleles = defaultdict(set)
         self.design_element_alleles = defaultdict(set)
         self.design_name_class = {}
         self.excluded_assembly_design_names = set()
-        if self.has_sequence_designs:
-            self.mpra_design_file = reference_filepath
-            self.reference_file_accession = get_file_accession(
-                reference_filepath)
-            self.reference_source_url = (
-                f'https://data.igvf.org/tabular-files/'
-                f'{self.reference_file_accession}'
-            )
+        self.element_design_accessions = {}
+        self.reference_sequences = defaultdict(set)
+        self.element_design_sources = defaultdict(set)
+        paths = list(reference_filepath) if isinstance(reference_filepath, (list, tuple)) else (
+            [reference_filepath] if reference_filepath else [])
+        if len(paths) != len({get_file_accession(path) for path in paths}):
+            raise ValueError('Duplicate MPRA reference accessions')
+        self.reference_file_accessions = [
+            get_file_accession(path) for path in paths]
+        self.multiple_designs = len(paths) > 1
+        self.mpra_design_file = None
+        self.reference_file_accession = None
+        self.reference_source_url = None
+        accumulated_exceptions = [set() for _ in range(5)]
+        # Preferred owner last; input order never decides shared element ownership.
+        for path in sorted(paths, key=lambda p: (get_file_accession(p) == 'IGVFFI3757JVGI', get_file_accession(p))):
+            self.mpra_design_file = path
+            self.reference_file_accession = get_file_accession(path)
+            self.reference_source_url = f'https://data.igvf.org/tabular-files/{self.reference_file_accession}'
             self.writer.add_tag('portal_accessions',
                                 self.reference_file_accession)
-            self.load_mpra_design_mapping(self.mpra_design_file)
-        else:
-            self.mpra_design_file = None
-            self.reference_source_url = None
+            current_exceptions = self._load_exceptions()
+            (self.excluded_effect_names, self.excluded_variants,
+             self.variants_without_reference_element, self.deduplicated_variants,
+             self.first_bed_score_variants) = current_exceptions
+            for target, values in zip(accumulated_exceptions, current_exceptions):
+                target.update(values)
+            self.load_mpra_design_mapping(path)
+        if not paths:
+            accumulated_exceptions = self._load_exceptions()
+        (self.excluded_effect_names, self.excluded_variants,
+         self.variants_without_reference_element, self.deduplicated_variants,
+         self.first_bed_score_variants) = accumulated_exceptions
+        if self.excluded_variants & self.variants_without_reference_element:
+            raise ValueError(
+                'MPRA variant cannot be both excluded and retained without a reference element')
+        if self.multiple_designs:
+            for key, accessions in self.element_design_sources.items():
+                if len(accessions) > 1:
+                    sequences = [self.reference_sequences[(
+                        key, accession)] for accession in accessions]
+                    if any(not seq or seq != sequences[0] for seq in sequences):
+                        raise ValueError(
+                            f'Conflicting or missing reference sequences across MPRA designs at {key}')
+            self.mpra_design_file = paths
             self.reference_file_accession = None
-        self.excluded_effect_names = self._load_excluded_effect_names()
+            self.reference_source_url = None
+
+    def _element_owner(self, key):
+        return self.element_design_accessions.get(key, self.reference_file_accession or self.file_accession)
+
+    def _reviewed_effect_rows(self, reader):
+        """Apply only reviewed CD corrections; never infer mappings for other files."""
+        expected_design = self.CD_EFFECT_DESIGNS.get(self.file_accession)
+        if expected_design is None:
+            yield from reader
+            return
+        allowed_designs = (expected_design,) if isinstance(
+            expected_design, str) else expected_design
+        if self.reference_file_accession not in allowed_designs:
+            raise ValueError(
+                f'{self.file_accession}: CD correction requires {expected_design}')
+        by_coordinate = defaultdict(list)
+        with self._open_text_file(self.mpra_design_file) as stream:
+            for design in csv.DictReader(stream, delimiter='\t'):
+                key = self.make_design_key(
+                    *(design[k] for k in ('chr', 'start', 'end', 'strand')))
+                by_coordinate[key].append(design)
+        for row in reader:
+            row = list(row)
+            if self.file_accession == 'IGVFFI4623ATHV' and self._is_blacklisted_effect_name(row[3]):
+                continue
+            key = self.make_design_key(row[0], row[1], row[2], row[5])
+            candidates = by_coordinate.get(key, [])
+            if self.file_accession == 'IGVFFI4623ATHV':
+                # Names use old coordinates; match exact current tile and allele suffix.
+                allele = row[3].rsplit('_', 1)[-1]
+                names = {d['name'] for d in candidates if d['name'].rsplit(
+                    '_', 1)[-1] == allele}
+                if len(names) != 1:
+                    raise ValueError(
+                        f'{self.file_accession}: ambiguous CD element {row[3]} at {key}')
+                row[3] = names.pop()
+            else:
+                mappings = {(spdi, int(pos)) for d in candidates
+                            for spdi, pos in zip(ast.literal_eval(d['SPDI']), ast.literal_eval(d['variant_pos']))}
+                if len(mappings) != 1:
+                    raise ValueError(
+                        f'{self.file_accession}: ambiguous CD variant {row[3]} at {key}')
+                spdi, position = mappings.pop()
+                names = {d['name'].rsplit('_', 1)[0] for d in candidates}
+                if (row[3] not in names or row[17:19] != spdi.split(':')[2:]
+                        or self.safe_int(row[16]) != position - 1):
+                    raise ValueError(
+                        f'{self.file_accession}: unexpected CD identifier, alleles or position: {row[3]}')
+                row[3], row[16] = spdi, str(position)
+            yield row
 
     def _resolve_igvf_accession_from_encode_accession(self, encode_accession, igvf_api_url='https://api.data.igvf.org'):
         response = requests.get(
@@ -214,11 +349,14 @@ class MPRAAdapter(BaseAdapter):
             raise ValueError(
                 f'Failed to resolve IGVF accession from ENCODE accession: {encode_accession}, response: {response.json()}') from e
 
+    @staticmethod
+    def _open_text_file(filepath):
+        """Stream plain or gzipped effects/designs without extracting a local copy."""
+        opener = gzip.open if str(filepath).endswith('.gz') else open
+        return opener(filepath, 'rt')
+
     def _open_file(self):
-        """Open file as text, handling optional gzip."""
-        if self.filepath.endswith('.gz'):
-            return gzip.open(self.filepath, 'rt')
-        return open(self.filepath, 'r')
+        return self._open_text_file(self.filepath)
 
     def _get_schema_type(self):
         if self.effect_label in ['genomic_element_biosample', 'variant_biosample']:
@@ -248,7 +386,8 @@ class MPRAAdapter(BaseAdapter):
     def _drop_nonfinite_metrics(props):
         """Preserve records while omitting NaN and infinite numeric fields."""
         return {key: value for key, value in props.items()
-                if not (isinstance(value, float) and not math.isfinite(value))}
+                if not (key == 'bed_score' and value is None)
+                and not (isinstance(value, float) and not math.isfinite(value))}
 
     @classmethod
     def safe_int(cls, value):
@@ -323,11 +462,15 @@ class MPRAAdapter(BaseAdapter):
         # class docstring. Alt-only rows only contribute to allele *sets*, not to catalog keys.
         pending_alt_spdi_mappings = []
         reference_tiles = set()
-        opener = gzip.open if str(mpra_design_file).endswith('.gz') else open
-        with opener(mpra_design_file, 'rt') as f:
+        with self._open_text_file(mpra_design_file) as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
-                if row.get('ref', self.assembly) not in (self.assembly, '', 'NA'):
+                if self._is_blacklisted_effect_name(row.get('name')):
+                    continue
+                assembly = row.get('ref', self.assembly)
+                assembly = self.DESIGN_ASSEMBLY_ALIASES.get(
+                    self.reference_file_accession, {}).get(assembly, assembly)
+                if assembly not in (self.assembly, '', 'NA'):
                     self.excluded_assembly_design_names.add(
                         self.normalize_design_name(row.get('name')))
                     continue
@@ -352,9 +495,31 @@ class MPRAAdapter(BaseAdapter):
                 name_role = self.design_row_allele_role(allele_values or [])
 
                 if self._design_row_defines_catalog_element(name_role):
+                    owner = self.element_design_accessions.get(key)
+                    if owner and owner != self.reference_file_accession:
+                        if {owner, self.reference_file_accession} != {'IGVFFI5128MGTU', 'IGVFFI3757JVGI'}:
+                            raise ValueError(
+                                f'Unreviewed overlapping MPRA designs at {key}: {owner}, {self.reference_file_accession}')
+                    # Compare fully reference sequences, not mixed ref/alt constructs.
+                    if self.multiple_designs and 'alt' not in (allele_values or []):
+                        sequence = row.get('sequence')
+                        if not sequence:
+                            raise ValueError(
+                                f'Missing reference sequence at shared-design tile {key}')
+                        digest = hashlib.sha256(sequence.encode()).hexdigest()
+                        self.reference_sequences[(
+                            key, self.reference_file_accession)].add(digest)
+                    self.element_design_sources[key].add(
+                        self.reference_file_accession)
+                    self.element_design_accessions[key] = self.reference_file_accession
                     self.design_elements.add(key)
                     if row.get('name') is not None and str(row.get('name')).strip():
                         self.coords_to_element_name[key] = row.get('name')
+                        self.coords_to_element_aliases[key].add(row['name'])
+                    if self.reference_file_accession in self.INFO_ALIAS_DESIGNS:
+                        self.coords_to_element_aliases[key].update(
+                            alias.strip() for alias in (row.get('info') or '').split(';')
+                            if alias.strip() and alias.strip().lower() not in {'na', 'nan', 'null', '.'})
                     if name_role == 'ref':
                         reference_tiles.add(key)
 
@@ -421,12 +586,16 @@ class MPRAAdapter(BaseAdapter):
 
         for key, spdi_list, variant_pos_list in pending_alt_spdi_mappings:
             if key not in self.design_elements:
+                if self.reference_file_accession not in self.SATMUT_DESIGN_ACCESSIONS:
+                    # Only these reviewed SatMut designs encode ALT coordinates
+                    # as changed bases. Do not infer tiles for other files.
+                    continue
                 # ALT coordinates may describe only the changed bases rather
                 # than the full reference tile. When there is no exact tile
                 # match, require a unique reference tile containing that interval
                 # on the same chromosome and strand. This mapping uses reference
                 # coordinates, not sequence identity or provenance names, and
-                # applies to every design dataset.
+                # applies only to the explicitly listed SatMut designs.
                 candidates = {
                     tile for tile in reference_tiles
                     if key[0] == tile[0] and key[3] == tile[3]
@@ -448,28 +617,33 @@ class MPRAAdapter(BaseAdapter):
                     if pos is not None:
                         self.variant_pos_to_element[(spdi, pos)].add(key)
 
-    def _load_excluded_effect_names(self):
-        accession = (self.reference_file_accession or '').strip()
-        if accession != 'IGVFFI1436TRIH':
-            return frozenset()
-        exclusion_path = self.IGVFFI1436TRIH_EXCLUSION_LIST
-        if not exclusion_path.exists():
-            raise FileNotFoundError(
-                f'Configured MPRA exclusion list not found for {accession}: {exclusion_path}'
-            )
-
-        names = set()
-        with open(exclusion_path, 'r') as f:
-            for line in f:
-                raw = line.strip()
-                if not raw:
-                    continue
-                # Some rows include a secondary alias separated by ';'.
-                for token in raw.split(';'):
-                    normalized = token.strip()
-                    if normalized:
-                        names.add(normalized)
-        return frozenset(names)
+    def _load_exceptions(self):
+        """Exact identifiers only; a replacement accession never inherits exceptions."""
+        exceptions = {'element': set(), 'variant': set(),
+                      'variant_without_reference_element': set(),
+                      'variant_deduplicate': set(), 'variant_deduplicate_first_bed_score': set()}
+        for accession in (self.file_accession, self.reference_file_accession):
+            if not accession:
+                continue
+            path = self.EXCEPTION_DIR / f'{accession}_exception_list.tsv'
+            if not path.exists():
+                continue
+            with path.open() as stream:
+                reader = csv.DictReader(stream, delimiter='\t')
+                if reader.fieldnames != ['kind', 'identifier', 'reason']:
+                    raise ValueError(f'Invalid MPRA exception header: {path}')
+                for row in reader:
+                    if (row['kind'] not in exceptions or not row['identifier']
+                            or not row['reason'] or None in row):
+                        raise ValueError(
+                            f'Invalid MPRA exception entry in {path}: {row}')
+                    exceptions[row['kind']].add(row['identifier'])
+        if exceptions['variant'] & exceptions['variant_without_reference_element']:
+            raise ValueError(
+                'MPRA variant cannot be both excluded and retained without a reference element')
+        return tuple(frozenset(exceptions[kind]) for kind in (
+            'element', 'variant', 'variant_without_reference_element',
+            'variant_deduplicate', 'variant_deduplicate_first_bed_score'))
 
     def _is_blacklisted_effect_name(self, effect_name):
         return (effect_name or '').strip() in self.excluded_effect_names
@@ -481,6 +655,7 @@ class MPRAAdapter(BaseAdapter):
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
         self.seen_elements = set()
+        self.seen_variant_effects = {}
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = (
             'regulatory reference element activity')
@@ -509,7 +684,9 @@ class MPRAAdapter(BaseAdapter):
             reader = csv.reader(f, delimiter='\t')
             chunk = []
             # in this case the file is always from IGVF so we add the tag
-            for i, row in enumerate(reader, 1):
+            for i, row in enumerate(self._reviewed_effect_rows(reader), 1):
+                if row[3] in self.excluded_variants:
+                    continue
                 chunk.append(row)
                 if i % self.CHUNK_SIZE == 0:
                     self._process_chunk_igvf(chunk)
@@ -528,17 +705,21 @@ class MPRAAdapter(BaseAdapter):
         ``self.label`` (both branches are in the same loop; only one label per run is active).
         """
         seen_element_ids = set()
+        seen_edges = {}
         biosample_term_key = (self.biosample_term or '').split('/')[-1]
-        # Element id suffix: design file accession when we have sequence designs (IGVF), else effect file accession (ENCODE)
-        element_id_suffix = self.reference_file_accession if self.has_sequence_designs else self.file_accession
 
         with self._open_file() as f:
             reader = csv.reader(f, delimiter='\t')
-            rows = list(reader)
+            rows = list(self._reviewed_effect_rows(reader))
             effect_counts_by_region = defaultdict(int)
             for row in rows:
                 effect_counts_by_region[self.make_design_key(
                     row[0], row[1], row[2], row[5])] += 1
+
+            if not self.has_sequence_designs:
+                for row in rows:
+                    self.coords_to_element_aliases[self.make_design_key(
+                        row[0], row[1], row[2], row[5])].add(row[3])
 
             missing_allele_multi_effect = []
             for row in rows:
@@ -548,12 +729,15 @@ class MPRAAdapter(BaseAdapter):
                 significant = minus_q is not None and minus_q >= self.THRESHOLD
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA', assembly=self.assembly)
+                element_key = self.make_design_key(chr_, start, end, strand)
+                element_id_suffix = self._element_owner(element_key)
                 element_id = self.build_mpra_element_node_id(
                     chr_, start, end, strand, element_id_suffix)
-                element_key = self.make_design_key(chr_, start, end, strand)
                 if self.normalize_design_name(row[3]) in self.excluded_assembly_design_names:
                     continue
 
+                if self._is_blacklisted_effect_name(row[3]):
+                    continue
                 if self.effect_label == 'genomic_element':
                     if self.has_sequence_designs and element_key not in self.design_elements:
                         self.logger.warning(
@@ -580,6 +764,7 @@ class MPRAAdapter(BaseAdapter):
                     props = {
                         '_key': element_id,
                         'name': element_name,
+                        'aliases': sorted(self.coords_to_element_aliases[element_key] | {element_name}),
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
@@ -587,7 +772,7 @@ class MPRAAdapter(BaseAdapter):
                         'method': self.method,
                         'type': 'tested elements',
                         'source': self.source,
-                        'source_url': self.reference_source_url or self.source_url,
+                        'source_url': f'https://data.igvf.org/tabular-files/{element_id_suffix}' if self.has_sequence_designs else self.source_url,
                         'files_filesets': 'files_filesets/' + element_id_suffix
                     }
                     if self.validate:
@@ -626,6 +811,10 @@ class MPRAAdapter(BaseAdapter):
                         if alleles and 'ref' not in alleles:
                             # Only ref element effects should be loaded.
                             continue
+                    if self.has_sequence_designs and element_key not in self.design_elements:
+                        raise ValueError(
+                            f'{self.file_accession}: element {row[3]!r} has no reference design tile '
+                            f'{element_key}; review the input or add a file-specific exclusion.')
                     edge_id = '_'.join(
                         [region_id, self.strand_token(strand), self.file_accession, biosample_term_key])
                     minus_p = self.safe_float(row[9]) if len(
@@ -639,8 +828,8 @@ class MPRAAdapter(BaseAdapter):
                         'strand': strand,
                         'log2FC': self.safe_float(row[6]),
                         'bed_score': self.safe_int(row[4]),
-                        'DNA_count': self.safe_float(row[7]),
-                        'RNA_count': self.safe_float(row[8]),
+                        'inputCount': self.safe_float(row[7]),
+                        'outputCount': self.safe_float(row[8]),
                         'neg_log10_pvalue': minus_p,
                         'neg_log10_pvalue_adj': minus_q_edge,
                         'significant': significant,
@@ -657,6 +846,14 @@ class MPRAAdapter(BaseAdapter):
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
                     }
                     props = self._drop_nonfinite_metrics(props)
+                    if edge_id in seen_edges:
+                        if (self.file_accession in self.ELEMENT_EFFECT_DEDUPLICATION_FILES
+                                and seen_edges[edge_id] == props):
+                            continue
+                        raise ValueError(
+                            f'{self.file_accession}: duplicate element effect {edge_id}; '
+                            'conflicting or unreviewed duplicate reference scores')
+                    seen_edges[edge_id] = props
                     if self.validate:
                         self.validate_doc(props)
                     self.writer.write(json.dumps(
@@ -702,11 +899,12 @@ class MPRAAdapter(BaseAdapter):
     def _process_genomic_element_chunk(self, chunk):
         """``genomic_element_from_variant``: ``genomic_element`` nodes for coords in ``variant_to_element``.
 
-        The ``chunk`` argument is unused (variant file is not re-parsed here); coordinates
-        come from the design TSV. ``self.seen_elements`` dedupes across chunk invocations.
+        Only reported, non-excluded variants contribute nodes. ``self.seen_elements``
+        dedupes across chunk invocations.
         """
         keys = set()
-        for element_coords_set in self.variant_to_element.values():
+        for row in chunk:
+            element_coords_set = self.variant_to_element.get(row[3], set())
             for chr_, start, end, strand in element_coords_set:
                 keys.add(self.make_design_key(chr_, start, end, strand))
 
@@ -719,11 +917,13 @@ class MPRAAdapter(BaseAdapter):
             if element_name is None:
                 raise ValueError(
                     f'Missing MPRA sequence design name for {(chr_, start, end, strand)} in {self.reference_file_accession}.')
+            owner = self._element_owner(key)
             _id = self.build_mpra_element_node_id(
-                chr_, start, end, strand, self.reference_file_accession)
+                chr_, start, end, strand, owner)
             props = {
                 '_key': _id,
                 'name': element_name,
+                'aliases': sorted(self.coords_to_element_aliases[key] | {element_name}),
                 'chr': chr_,
                 'start': int(start),
                 'end': int(end),
@@ -731,8 +931,8 @@ class MPRAAdapter(BaseAdapter):
                 'method': self.method,
                 'type': 'tested elements',
                 'source': self.source,
-                'source_url': self.reference_source_url,
-                'files_filesets': f'files_filesets/{self.reference_file_accession}'
+                'source_url': f'https://data.igvf.org/tabular-files/{owner}',
+                'files_filesets': f'files_filesets/{owner}'
             }
             if self.validate:
                 self.validate_doc(props)
@@ -754,7 +954,8 @@ class MPRAAdapter(BaseAdapter):
             spdi = row[3]
             if spdi not in loaded_spdis:
                 continue
-            if spdi not in self.variant_to_element:
+            if (not self.variant_to_element.get(spdi)
+                    and spdi not in self.variants_without_reference_element):
                 raise ValueError(
                     f'SPDI {spdi} found in variant file but not in MPRA design mapping. '
                     'Ensure all genomic element edges are mapped via the sequence design file.'
@@ -783,15 +984,22 @@ class MPRAAdapter(BaseAdapter):
                     if strand_matched:
                         mapped_elements = strand_matched
             if not mapped_elements:
-                mapped_elements = self.variant_to_element[spdi]
+                mapped_elements = self.variant_to_element.get(spdi, set())
 
-            for element_chr, element_start, element_end, element_strand in mapped_elements:
-                element_id = self.build_mpra_element_node_id(
-                    element_chr, element_start, element_end, element_strand, self.reference_file_accession)
+            # Only an explicit file exception permits a missing reference tile.
+            for element in mapped_elements or [None]:
+                if element is None:
+                    element_id = None
+                    element_strand = bed_strand
+                    element_key = f'no_reference_element_{self.strand_token(bed_strand)}_{bed_variant_pos}'
+                else:
+                    element_chr, element_start, element_end, element_strand = element
+                    element_id = self.build_mpra_element_node_id(
+                        element_chr, element_start, element_end, element_strand, self._element_owner(element))
+                    element_key = element_id
                 edge_key = '_'.join([
                     variant_id,
-                    element_id,
-                    self.strand_token(element_strand),
+                    element_key,
                     biosample_term_key,
                     self.file_accession,
                 ])
@@ -804,14 +1012,14 @@ class MPRAAdapter(BaseAdapter):
                     '_key': edge_key,
                     '_from': f'{self.variant_collection}/{variant_id}',
                     '_to': self.biosample_term,
-                    'genomic_element': f'{self.element_collection}/{element_id}',
+                    'genomic_element': f'{self.element_collection}/{element_id}' if element_id else None,
                     'strand': element_strand,
                     'log2FC': self.safe_float(row[6]),
                     'bed_score': self.safe_int(row[4]),
-                    'DNA_count_ref': self.safe_float(row[7]),
-                    'RNA_count_ref': self.safe_float(row[8]),
-                    'DNA_count_alt': self.safe_float(row[9]),
-                    'RNA_count_alt': self.safe_float(row[10]),
+                    'inputCountRef': self.safe_float(row[7]),
+                    'outputCountRef': self.safe_float(row[8]),
+                    'inputCountAlt': self.safe_float(row[9]),
+                    'outputCountAlt': self.safe_float(row[10]),
                     'neg_log10_pvalue': self.safe_float(row[11]),
                     'neg_log10_pvalue_adj': minus_q,
                     'significant': minus_q is not None and minus_q >= self.THRESHOLD,
@@ -832,6 +1040,18 @@ class MPRAAdapter(BaseAdapter):
                 }
 
                 edge_props = self._drop_nonfinite_metrics(edge_props)
+                if (self.file_accession in self.IDENTICAL_VARIANT_EFFECT_FILES
+                        or spdi in self.deduplicated_variants
+                        or spdi in self.first_bed_score_variants):
+                    comparable = {k: v for k, v in edge_props.items()
+                                  if k != 'bed_score' or spdi not in self.first_bed_score_variants}
+                    if edge_key in self.seen_variant_effects:
+                        if self.seen_variant_effects[edge_key] != comparable:
+                            raise ValueError(
+                                f'{self.file_accession}: conflicting variant effect for {spdi}; '
+                                'review and add an explicit variant exclusion')
+                        continue
+                    self.seen_variant_effects[edge_key] = comparable
                 if self.validate:
                     self.validate_doc(edge_props)
                 self.writer.write(json.dumps(

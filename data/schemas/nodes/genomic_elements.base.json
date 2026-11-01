@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/nodes/genomic_elements.base.json",
   "accessible_via": {
-    "return": "_id, name, chr, start, end, strand, type, source_annotation, source, source_url"
+    "return": "aliases, _id, name, chr, start, end, strand, type, source_annotation, source, source_url"
   },
   "db_collection_name": "genomic_elements",
   "allOf": [

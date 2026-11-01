@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+import gzip
 import json
 import pytest
 from adapters.mpra_adapter import MPRAAdapter
@@ -223,7 +224,7 @@ def test_variant_biosample(
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
     biosample_term_key = 'CL_0000679'
-    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_plus_{biosample_term_key}_IGVFFI1323RCIE'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_plus_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
@@ -236,10 +237,10 @@ def test_variant_biosample(
         'strand': '+',
         'bed_score': 66,
         'log2FC': -0.0768,
-        'DNA_count_ref': 0.5948,
-        'RNA_count_ref': 0.3434,
-        'DNA_count_alt': 0.6516,
-        'RNA_count_alt': 0.3039,
+        'inputCountRef': 0.5948,
+        'outputCountRef': 0.3434,
+        'inputCountAlt': 0.6516,
+        'outputCountAlt': 0.3039,
         'neg_log10_pvalue': 5.9634,
         'neg_log10_pvalue_adj': 4.7221,
         'significant': True,
@@ -402,8 +403,8 @@ def test_genomic_element_biosample_ref_allele_only_writes(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\t["ref"]\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\t["ref"]\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -427,8 +428,8 @@ def test_genomic_element_biosample_mixed_ref_alt_writes_ref_element_effect(
     """Design row with both ref and alt is valid; biosample edge loads (ref is present)."""
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\t["ref", "alt"]\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\t["ref", "alt"]\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -451,8 +452,8 @@ def test_genomic_element_biosample_missing_allele_writes(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\tNA\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\tNA\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -475,9 +476,9 @@ def test_genomic_element_biosample_missing_allele_multi_effect_is_flagged(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\n'
-        'chr1\t10\t20\tElem1\tNA\tNA\n'
-        'chr1\t10\t20\tElem2\tNA\t["ref"]\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tstrand\n'
+        'chr1\t10\t20\tElem1\tNA\tNA\t+\n'
+        'chr1\t10\t20\tElem2\tNA\t["ref"]\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -501,10 +502,10 @@ def test_genomic_element_biosample_control_ignored_and_ref_loaded(
         tmp_path, mock_file_fileset, mock_ontology_term_validator):
     design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
-        'chr\tstart\tend\tname\tSPDI\tallele\tclass\n'
-        'chr1\t10\t20\tNegative 1 (chr1:11-21)\tNA\tNA\telement inactive control\n'
-        'chr1\t10\t20\tVariant 1 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["ref"]\ttest\n'
-        'chr1\t10\t20\tVariant 2 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["alt"]\ttest\n'
+        'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
+        'chr1\t10\t20\tNegative 1 (chr1:11-21)\tNA\tNA\telement inactive control\t+\n'
+        'chr1\t10\t20\tVariant 1 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["ref"]\ttest\t+\n'
+        'chr1\t10\t20\tVariant 2 (chr1:11-21)\t["NC_000001.11:11:A:C"]\t["alt"]\ttest\t+\n'
     )
     effects_file = tmp_path / 'IGVFFI0000TEST_effects.tsv'
     effects_file.write_text(
@@ -555,14 +556,14 @@ def test_genomic_element_biosample_same_coords_different_strands_have_unique_ids
 
 
 @pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample'])
-def test_igvffi1436trih_exclusion_list_is_applied(
-        tmp_path, mock_file_fileset, mock_ontology_term_validator, label):
-    excluded_name = (
-        'cardiac_neuro_cava_random:ALT_KANSL1|ENSG00000120071.15|'
-        'EH38E3227108_rev_tile1-1_KANSL1|ENSG00000120071.15|'
-        'EH38E3227108|17-46152590-G-C'
-    )
-    design_file = tmp_path / 'IGVFFI1436TRIH_design.tsv'
+def test_design_file_element_exception_list_is_applied(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, label):
+    excluded_name = 'excluded_element'
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    (tmp_path / 'IGVFFI0000REF_exception_list.tsv').write_text(
+        'kind\tidentifier\treason\n'
+        f'element\t{excluded_name}\treviewed annotation issue\n')
+    design_file = tmp_path / 'IGVFFI0000REF_design.tsv'
     design_file.write_text(
         'chr\tstart\tend\tname\tSPDI\tallele\tclass\tstrand\n'
         f'chr17\t46152515\t46152785\t{excluded_name}\tNA\tNA\ttest\t-\n'
@@ -611,19 +612,26 @@ def test_validate_doc_invalid(mock_file_fileset):
         adapter.validate_doc(invalid_doc)
 
 
-@pytest.mark.parametrize('label,collection', [
-    ('genomic_element', 'mm_genomic_elements'),
-    ('genomic_element_biosample', 'mm_genomic_elements_biosamples'),
-    ('genomic_element_from_variant', 'mm_genomic_elements'),
-    ('variant', 'mm_variants'),
-    ('variant_biosample', 'mm_variants_biosamples'),
+@pytest.mark.parametrize('compressed', [False, True])
+@pytest.mark.parametrize('prefix,assembly,organism', [
+    ('', 'GRCh38', 'Homo sapiens'),
+    ('mm_', 'GRCm39', 'Mus musculus'),
 ])
-def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, mock_ontology_term_validator, label, collection):
-    spdi = 'NC_000067.7:11:A:C'
+@pytest.mark.parametrize('label,collection', [
+    ('genomic_element', 'genomic_elements'),
+    ('genomic_element_biosample', 'genomic_elements_biosamples'),
+    ('genomic_element_from_variant', 'genomic_elements'),
+    ('variant', 'variants'),
+    ('variant_biosample', 'variants_biosamples'),
+])
+def test_mpra_collections_and_references(tmp_path, mock_file_fileset, mock_ontology_term_validator,
+                                         label, collection, prefix, assembly, organism, compressed):
+    accession = 'NC_000067.7' if prefix else 'NC_000001.11'
+    spdi = f'{accession}:11:A:C'
     design = tmp_path / 'IGVFFI4261NSQZ.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tSPDI\tallele\tvariant_pos\n'
-        f'ref_tile\tGRCm39\tchr1\t10\t20\t+\t["{spdi}"]\t["ref"]\t[1]\n'
+        f'ref_tile\t{assembly}\tchr1\t10\t20\t+\t["{spdi}"]\t["ref"]\t[1]\n'
     )
     effects = tmp_path / 'IGVFFI2111LQGF.bed'
     if label in ('genomic_element', 'genomic_element_biosample'):
@@ -632,37 +640,47 @@ def test_mouse_mpra_collections_and_references(tmp_path, mock_file_fileset, mock
     else:
         effects.write_text(
             f'chr1\t11\t12\t{spdi}\t100\t+\t0.25\t1\t2\t3\t4\t5\t6\t0.9\t0.1\t0.4\t1\tA\tC\n')
+    if compressed:
+        compressed_design = design.with_suffix(design.suffix + '.gz')
+        compressed_effects = effects.with_suffix(effects.suffix + '.gz')
+        compressed_design.write_bytes(gzip.compress(design.read_bytes()))
+        compressed_effects.write_bytes(gzip.compress(effects.read_bytes()))
+        design.unlink()
+        effects.unlink()
+        design, effects = compressed_design, compressed_effects
+    input_files = set(tmp_path.iterdir())
     variant = {
         '_key': spdi, 'name': spdi, 'spdi': spdi, 'chr': 'chr1', 'pos': 11,
         'ref': 'A', 'alt': 'C', 'variation_type': 'SNP',
-        'hgvs': 'NC_000067.7:g.12A>C', 'organism': 'Mus musculus',
+        'hgvs': f'{accession}:g.12A>C', 'organism': organism,
     }
     writer = SpyWriter()
     with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb',
                return_value={spdi} if label == 'variant_biosample' else set()) as check, \
             patch('adapters.mpra_adapter.load_variant', return_value=(variant, None)) as load:
         adapter = MPRAAdapter(
-            filepath=str(effects), label=f'mm_{label}', writer=writer, validate=True,
-            reference_filepath=str(design),
+            filepath=effects, label=f'{prefix}{label}', writer=writer, validate=True,
+            reference_filepath=design,
         )
-        assert adapter._get_collection_name() == collection
-        assert adapter.schema['db_collection_name'] == collection
+        assert adapter._get_collection_name() == prefix + collection
+        assert adapter.schema['db_collection_name'] == prefix + collection
         adapter.process_file()
         records = [json.loads(row) for row in writer.contents]
         assert len(records) == 1
         record = records[0]
-        element_key = 'MPRA_chr1_10_20_GRCm39_plus_IGVFFI4261NSQZ'
+        element_key = f'MPRA_chr1_10_20_{assembly}_plus_IGVFFI4261NSQZ'
         if label in ('genomic_element', 'genomic_element_from_variant'):
             assert record['_key'] == element_key
         elif label == 'genomic_element_biosample':
-            assert record['_from'] == f'mm_genomic_elements/{element_key}'
+            assert record['_from'] == f'{prefix}genomic_elements/{element_key}'
         elif label == 'variant_biosample':
-            assert record['_from'] == f'mm_variants/{spdi}'
-            assert record['genomic_element'] == f'mm_genomic_elements/{element_key}'
-            assert record['_key'] == f'{spdi}_{element_key}_plus_CL_0000679_IGVFFI2111LQGF'
+            assert record['_from'] == f'{prefix}variants/{spdi}'
+            assert record['genomic_element'] == f'{prefix}genomic_elements/{element_key}'
+            assert record['_key'] == f'{spdi}_{element_key}_CL_0000679_IGVFFI2111LQGF'
         if label in ('variant', 'variant_biosample'):
-            assert check.call_args.kwargs['collection'] == 'mm_variants'
-            load.assert_called_once_with(spdi, assembly='GRCm39')
+            assert check.call_args.kwargs['collection'] == f'{prefix}variants'
+            load.assert_called_once_with(spdi, assembly=assembly)
+        assert set(tmp_path.iterdir()) == input_files
 
 
 def test_mouse_design_ignores_human_controls(tmp_path, mock_file_fileset, mock_ontology_term_validator):
@@ -707,10 +725,12 @@ def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
         filepath=str(effects), label='mm_genomic_element_biosample', writer=writer, validate=True,
         reference_filepath=str(design),
     )
-    assert adapter.variant_to_element['NC_000067.7:11:A:C'] == {
-        ('chr1', '10', '20', strand)}
-    assert adapter.variant_pos_to_element[('NC_000067.7:11:A:C', 1)] == {
-        ('chr1', '10', '20', strand)}
+    expected = {('chr1', '10', '20', strand)
+                } if design_accession in adapter.SATMUT_DESIGN_ACCESSIONS else set()
+    assert adapter.variant_to_element.get(
+        'NC_000067.7:11:A:C', set()) == expected
+    assert adapter.variant_pos_to_element.get(
+        ('NC_000067.7:11:A:C', 1), set()) == expected
     adapter.process_file()
     assert len(writer.contents) == 1
     assert json.loads(writer.contents[0])['_from'].startswith(
@@ -721,7 +741,7 @@ def test_mouse_design_maps_changed_bases_by_coordinates(tmp_path, mock_file_file
                                             'ref_a\tGRCm39\tchr1\t10\t20\t+\t["ref"]\tNA\n'
                                             'ref_b\tGRCm39\tchr1\t9\t21\t+\t["ref"]\tNA\n'])
 def test_mouse_design_requires_unique_containing_reference(tmp_path, mock_file_fileset, reference_rows):
-    design = tmp_path / 'IGVFFI0000TEST.tsv'
+    design = tmp_path / 'IGVFFI1789LDNT.tsv'
     design.write_text(
         'name\tref\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
         'variant\tGRCm39\tchr1\t11\t12\t+\t["alt"]\t["NC_000067.7:11:A:C"]\n'
@@ -742,12 +762,350 @@ def test_omit_nonfinite_metrics_preserves_record(value):
     record = {
         '_key': 'test-edge',
         'log2FC': MPRAAdapter.safe_float(value),
-        'RNA_count': MPRAAdapter.safe_float('0'),
-        'DNA_count': MPRAAdapter.safe_float('12.5'),
+        'outputCount': MPRAAdapter.safe_float('0'),
+        'inputCount': MPRAAdapter.safe_float('12.5'),
         'optional': None,
     }
     cleaned = MPRAAdapter._drop_nonfinite_metrics(record)
-    assert cleaned == {'_key': 'test-edge', 'RNA_count': 0.0,
-                       'DNA_count': 12.5, 'optional': None}
+    assert cleaned == {'_key': 'test-edge', 'outputCount': 0.0,
+                       'inputCount': 12.5, 'optional': None}
     json.dumps(cleaned, allow_nan=False)
     assert MPRAAdapter.safe_int(value) is None
+
+
+@pytest.mark.parametrize('label', ['variant', 'variant_biosample', 'genomic_element_from_variant'])
+def test_variant_exclusions_apply_to_all_outputs_and_only_named_file(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, label):
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    spdi = 'NC_000001.11:11:A:C'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    exclusion = tmp_path / 'IGVFFI0000TEST_exception_list.tsv'
+    exclusion.write_text(
+        f'kind\tidentifier\treason\nvariant\t{spdi}\treviewed problem\n')
+    with patch.object(MPRAAdapter, 'EXCEPTION_DIR', tmp_path), \
+            patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set() if label == 'variant' else {spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        for accession, count in [('IGVFFI0000TEST', 0), ('IGVFFI0001TEST', 1)]:
+            effects = tmp_path / f'{accession}.bed'
+            effects.write_text(
+                f'chr1\t11\t12\t{spdi}\t100\t+\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n')
+            writer = SpyWriter()
+            adapter = MPRAAdapter(
+                str(effects), label, writer=writer, reference_filepath=str(design))
+            adapter.process_file()
+            assert len(writer.contents) == count
+
+
+@pytest.mark.parametrize('accession,assembly,expected', [
+    ('IGVFFI7237HYCA', 'GRCh38.p13', 1),
+    ('IGVFFI0000TEST', 'GRCh38.p13', 0),
+    ('IGVFFI7237HYCA', 'GRCh37', 0),
+])
+def test_assembly_alias_is_file_specific(tmp_path, mock_file_fileset, accession, assembly, expected):
+    design = tmp_path / f'{accession}.tsv'
+    design.write_text('name\tref\tchr\tstart\tend\tstrand\tallele\n'
+                      f'tile\t{assembly}\tchr1\t10\t20\t+\t["ref"]\n')
+    adapter = MPRAAdapter('IGVFFI0000EFFT.bed', 'genomic_element',
+                          writer=SpyWriter(), reference_filepath=str(design))
+    assert len(adapter.design_elements) == expected
+
+
+@pytest.mark.parametrize('accession,second_score,passes', [
+    ('IGVFFI3759TMLT', '1', True),
+    ('IGVFFI3759TMLT', '2', False),
+    ('IGVFFI0000TEST', '1', False),
+])
+def test_duplicate_reference_effects_require_review_and_identical_scores(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, accession, second_score, passes):
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\n'
+                      'first\tchr1\t10\t20\t+\t["ref"]\n'
+                      'second\tchr1\t10\t20\t+\t["ref"]\n')
+    effects = tmp_path / f'{accession}.bed'
+    effects.write_text('chr1\t10\t20\tfirst\t100\t+\t1\t2\t3\t4\t5\n'
+                       f'chr1\t10\t20\tsecond\t100\t+\t{second_score}\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), 'genomic_element_biosample',
+                          writer=writer, reference_filepath=str(design))
+    with nullcontext() if passes else pytest.raises(ValueError, match='duplicate element effect'):
+        adapter.process_file()
+    assert len(writer.contents) == 1
+
+
+def test_missing_reference_tile_never_writes_dangling_edge(tmp_path, mock_file_fileset, mock_ontology_term_validator):
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\n'
+                      'tile\tchr1\t10\t20\t+\t["ref"]\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text('chr1\t10\t20\ttile\t100\t-\t1\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), 'genomic_element_biosample',
+                          writer=writer, reference_filepath=str(design))
+    with pytest.raises(ValueError, match='no reference design tile'):
+        adapter.process_file()
+    assert not writer.contents
+
+
+@pytest.mark.parametrize('prefix', ['', 'mm_'])
+@pytest.mark.parametrize('listed', [True, False])
+def test_explicit_missing_reference_retains_variant_effect(
+        tmp_path, mock_file_fileset, mock_ontology_term_validator, monkeypatch, prefix, listed):
+    spdi = 'NC_000067.7:11:A:C' if prefix else 'NC_000001.11:11:A:C'
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text(''.join(
+        f'chr1\t11\t12\t{spdi}\t100\t{strand}\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n'
+        for strand in ['+', '-']))
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    if listed:
+        (tmp_path / 'IGVFFI0000TEST_exception_list.tsv').write_text(
+            f'kind\tidentifier\treason\nvariant_without_reference_element\t{spdi}\tNo reference tile\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), prefix + 'variant_biosample', writer=writer,
+                          reference_filepath=str(design), validate=True)
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        with nullcontext() if listed else pytest.raises(ValueError, match='not in MPRA design mapping'):
+            adapter.process_file()
+    if listed:
+        records = [json.loads(x) for x in writer.contents]
+        assert len(records) == 2
+        assert all(r['genomic_element'] is None and r['log2FC']
+                   == 1 for r in records)
+        assert len({r['_key'] for r in records}) == 2
+        assert {r['strand'] for r in records} == {'+', '-'}
+        assert spdi not in adapter.excluded_variants
+        adapter.effect_label = 'genomic_element_from_variant'
+        adapter.writer = SpyWriter()
+        adapter.parse()
+        assert not adapter.writer.contents
+        adapter.effect_label = 'variant'
+        adapter.validate = False
+        with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set()), \
+                patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+            adapter.parse()
+        assert len(adapter.writer.contents) == 2
+    else:
+        assert not writer.contents
+
+
+@pytest.mark.parametrize('accession,score,fc,expected,error', [
+    ('IGVFFI4828YSPS', 129, 1, 1, False),
+    ('IGVFFI4797FSIV', 886, 1, 1, False),
+    ('IGVFFI4828YSPS', 510, 2, 1, True),
+    ('IGVFFI6587LCPK', 510, 1, 1, False),
+    ('IGVFFI6587LCPK', 129, 1, 1, True),
+    ('IGVFFI0000TEST', 510, 1, 2, False),
+])
+def test_reviewed_variant_dedup_across_chunks(tmp_path, mock_file_fileset,
+                                              mock_ontology_term_validator, monkeypatch, accession, score, fc, expected, error):
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    spdi = 'NC_000001.11:11:A:C'
+    if accession in ('IGVFFI4828YSPS', 'IGVFFI4797FSIV'):
+        (tmp_path / f'{accession}_exception_list.tsv').write_text(
+            f'kind\tidentifier\treason\nvariant_deduplicate_first_bed_score\t{spdi}\tReviewed BED score discrepancy\n')
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    effects = tmp_path / f'{accession}.bed'
+    effects.write_text(''.join(
+        f'chr1\t11\t12\t{spdi}\t{s}\t+\t{effect}\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n'
+        for s, effect in [(510, 1), (score, fc)]))
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), 'variant_biosample', reference_filepath=str(
+        design), writer=writer, validate=True)
+    adapter.CHUNK_SIZE = 1
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        with pytest.raises(ValueError, match='conflicting variant effect') if error else nullcontext():
+            adapter.process_file()
+    assert len(writer.contents) == expected
+    assert json.loads(writer.contents[0])['bed_score'] == 510
+
+
+@pytest.mark.parametrize('label', ['variant', 'variant_biosample', 'genomic_element_from_variant'])
+def test_file_variant_exclusion_filters_all_variant_outputs(tmp_path, mock_file_fileset,
+                                                            mock_ontology_term_validator, monkeypatch, label):
+    spdi = 'NC_000001.11:11:A:C'
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text(
+        f'chr1\t11\t12\t{spdi}\t100\t+\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n')
+    monkeypatch.setattr(MPRAAdapter, 'EXCEPTION_DIR', tmp_path)
+    (tmp_path / 'IGVFFI0000TEST_exception_list.tsv').write_text(
+        f'kind\tidentifier\treason\nvariant\t{spdi}\tConflicting measurements\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), label,
+                          reference_filepath=str(design), writer=writer)
+    with patch('adapters.mpra_adapter.load_variant') as load:
+        adapter.process_file()
+        load.assert_not_called()
+    assert not writer.contents
+
+
+@pytest.mark.parametrize('accession', ['IGVFFI2909LNFX', 'IGVFFI0000TEST'])
+def test_cd_variant_correction_is_file_specific(tmp_path, mock_file_fileset, accession):
+    design = tmp_path / 'IGVFFI5857RBRC.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
+                      'chr1_12_cdg2:A:C_A\tchr1\t10\t20\t+\t["ref"]\t["NC_000001.11:11:A:C"]\t[1]\n')
+    adapter = MPRAAdapter(f'{accession}.bed', 'variant',
+                          writer=SpyWriter(), reference_filepath=str(design))
+    row = ['chr1', '10', '20', 'chr1_12_cdg2:A:C',
+           '1', '+'] + ['1'] * 10 + ['0', 'A', 'C']
+    result = list(adapter._reviewed_effect_rows(iter([row])))[0]
+    if accession == 'IGVFFI2909LNFX':
+        assert result[3] == 'NC_000001.11:11:A:C'
+        assert result[16] == '1'
+        row[16] = '3'
+        with pytest.raises(ValueError, match='unexpected CD'):
+            list(adapter._reviewed_effect_rows(iter([row])))
+    else:
+        assert result == row
+
+
+@pytest.mark.parametrize('design_accession', ['IGVFFI5857RBRC', 'IGVFFI9507GZKH'])
+def test_cd_element_name_resolution_and_na_exclusion(tmp_path, mock_file_fileset, design_accession):
+    design = tmp_path / f'{design_accession}.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
+                      'chr1_12_cdg2:A:C_A\tchr1\t10\t20\t+\t["ref"]\t["NC_000001.11:11:A:C"]\t[1]\n'
+                      'chr1_12_cdg2:A:C_C\tchr1\t10\t20\t+\t["alt"]\t["NC_000001.11:11:A:C"]\t[1]\n')
+    adapter = MPRAAdapter('IGVFFI4623ATHV.bed', 'genomic_element',
+                          writer=SpyWriter(), reference_filepath=str(design))
+    row = ['chr1', '10', '20', 'old_coordinate_name_A', '1', '+'] + ['1'] * 5
+    unnamed = row.copy()
+    unnamed[3] = 'NA'
+    corrected = list(adapter._reviewed_effect_rows(iter([row, unnamed])))
+    assert len(corrected) == 1
+    assert corrected[0][3] == 'chr1_12_cdg2:A:C_A'
+    row[3] = 'unknown_G'
+    with pytest.raises(ValueError, match='ambiguous CD element'):
+        list(adapter._reviewed_effect_rows(iter([row])))
+
+
+def test_cd_correction_requires_reviewed_design(tmp_path, mock_file_fileset):
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\n')
+    adapter = MPRAAdapter('IGVFFI2909LNFX.bed', 'variant',
+                          writer=SpyWriter(), reference_filepath=str(design))
+    with pytest.raises(ValueError, match='requires IGVFFI5857RBRC'):
+        list(adapter._reviewed_effect_rows(iter([])))
+
+
+@pytest.mark.parametrize('prefix', ['', 'mm_'])
+@pytest.mark.parametrize('label', ['genomic_element_biosample', 'variant_biosample'])
+@pytest.mark.parametrize('score', ['NaN', 'NA', '0'])
+def test_bed_score_is_optional(tmp_path, mock_file_fileset,
+                               mock_ontology_term_validator, prefix, label, score):
+    spdi = 'NC_000067.7:11:A:C' if prefix else 'NC_000001.11:11:A:C'
+    design = tmp_path / 'IGVFFI0000REF.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\n'
+                      f'tile\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    if label == 'variant_biosample':
+        row = f'chr1\t11\t12\t{spdi}\t{score}\t+\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n'
+    else:
+        row = f'chr1\t10\t20\ttile\t{score}\t+\t1\t2\t3\t4\t5\n'
+    effects.write_text(row)
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), prefix + label, writer=writer,
+                          reference_filepath=str(design), validate=True)
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        adapter.process_file()
+    record, = [json.loads(x) for x in writer.contents]
+    assert record['log2FC'] == 1
+    if score == '0':
+        assert record['bed_score'] == 0
+    else:
+        assert 'bed_score' not in record
+    with pytest.raises(ValueError, match='Document validation failed'):
+        adapter.validate_doc({**record, 'bed_score': 'not a number'})
+
+
+@pytest.mark.parametrize('reverse', [False, True])
+@pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_biosample',
+                                   'genomic_element_from_variant', 'variant_biosample'])
+def test_multiple_designs_canonical_owner(tmp_path, mock_file_fileset,
+                                          mock_ontology_term_validator, reverse, label):
+    spdi = 'NC_000001.11:11:A:C'
+    paths = []
+    for accession, name, start in [('IGVFFI5128MGTU', 'left', 30),
+                                   ('IGVFFI3757JVGI', 'right', 50)]:
+        path = tmp_path / f'{accession}.tsv'
+        path.write_text('name\tsequence\tchr\tstart\tend\tstrand\tallele\tSPDI\tvariant_pos\n'
+                        f'{name}\tAAAAAAAAAA\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\t[1]\n'
+                        f'{name}_unique\tAAAAAAAAAA\tchr1\t{start}\t{start+10}\t+\t["ref"]\t[]\t[]\n')
+        paths.append(str(path))
+    if reverse:
+        paths.reverse()
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    if label in ('genomic_element_from_variant', 'variant_biosample'):
+        effects.write_text(
+            f'chr1\t11\t12\t{spdi}\t100\t+\t1\t2\t3\t4\t5\t6\t7\t0.9\t0\t2\t1\tA\tC\n')
+    else:
+        effects.write_text('chr1\t10\t20\tleft\t100\t+\t1\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), label,
+                          writer=writer, reference_filepath=paths)
+    for start, owner in [(10, 'IGVFFI3757JVGI'), (30, 'IGVFFI5128MGTU'), (50, 'IGVFFI3757JVGI')]:
+        assert adapter._element_owner(adapter.make_design_key(
+            'chr1', str(start), str(start+10), '+')) == owner
+    with patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={spdi}), \
+            patch('adapters.mpra_adapter.load_variant', return_value=({'_key': spdi}, None)):
+        adapter.process_file()
+    record, = [json.loads(x) for x in writer.contents]
+    if label in ('genomic_element', 'genomic_element_from_variant'):
+        assert record['_key'].endswith('_IGVFFI3757JVGI')
+        assert record['files_filesets'] == 'files_filesets/IGVFFI3757JVGI'
+        assert record['name'] == 'right'
+        assert record['aliases'] == ['left', 'right']
+    else:
+        assert record['_from' if label == 'genomic_element_biosample' else 'genomic_element'].endswith(
+            '_IGVFFI3757JVGI')
+
+
+@pytest.mark.parametrize('second_accession,sequence,message', [
+    ('IGVFFI3757JVGI', 'CCCC', 'Conflicting or missing reference sequences'),
+    ('IGVFFI0000REF', 'AAAA', 'Unreviewed overlapping MPRA designs'),
+    ('IGVFFI5128MGTU', 'AAAA', 'Duplicate MPRA reference accessions'),
+])
+def test_multiple_designs_reject_unreviewed_overlap(tmp_path, mock_file_fileset,
+                                                    mock_ontology_term_validator, second_accession, sequence, message):
+    paths = []
+    for accession, seq in [('IGVFFI5128MGTU', 'AAAA'), (second_accession, sequence)]:
+        path = tmp_path / f'{accession}.tsv'
+        path.write_text('name\tsequence\tchr\tstart\tend\tstrand\tallele\n'
+                        f'tile\t{seq}\tchr1\t10\t14\t+\t["ref"]\n')
+        paths.append(str(path))
+    with pytest.raises(ValueError, match=message):
+        MPRAAdapter('IGVFFI0000TEST.bed', 'genomic_element',
+                    writer=SpyWriter(), reference_filepath=paths)
+
+
+@pytest.mark.parametrize('label', ['genomic_element', 'genomic_element_from_variant'])
+@pytest.mark.parametrize('prefix', ['', 'mm_'])
+@pytest.mark.parametrize('design_accession', ['IGVFFI0358RUFK', 'IGVFFI1144FUYP', 'IGVFFI0000REF'])
+def test_element_aliases_include_names_and_reviewed_info(tmp_path, mock_file_fileset,
+                                                         mock_ontology_term_validator, label, prefix, design_accession):
+    spdi = 'NC_000067.7:11:A:C' if prefix else 'NC_000001.11:11:A:C'
+    design = tmp_path / f'{design_accession}.tsv'
+    design.write_text('name\tchr\tstart\tend\tstrand\tallele\tSPDI\tinfo\n'
+                      f'hash1\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\told1; old2;old1;;NA\n'
+                      f'hash2\tchr1\t10\t20\t+\t["ref"]\t["{spdi}"]\told3\n'
+                      f'alt_hash\tchr1\t10\t20\t+\t["alt"]\t["{spdi}"]\talt_name\n')
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text('chr1\t10\t20\t' + (spdi if label.endswith('from_variant')
+                       else 'hash1') + '\t100\t+\t1\t2\t3\t4\t5\n')
+    writer = SpyWriter()
+    adapter = MPRAAdapter(str(effects), prefix+label, writer=writer,
+                          reference_filepath=str(design), validate=True)
+    adapter.process_file()
+    record, = [json.loads(x) for x in writer.contents]
+    assert record['name'] == 'hash2'
+    assert record['aliases'] == (['hash1', 'hash2', 'old1', 'old2', 'old3']
+                                 if design_accession in MPRAAdapter.INFO_ALIAS_DESIGNS else ['hash1', 'hash2'])

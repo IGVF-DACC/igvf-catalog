@@ -46,6 +46,14 @@
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "All names for this reference element, including name and original oligo names from reviewed UNC design info fields."
         }
       },
       "required": [
