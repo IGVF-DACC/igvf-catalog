@@ -4,6 +4,22 @@ import { TRPCError } from '@trpc/server'
 
 jest.mock('../../../../database')
 
+beforeEach(() => {
+  // Clear implementations and queued responses as well as call history.
+  jest.resetAllMocks()
+})
+
+function mockCollectionQueries (results: Record<string, unknown[]>): jest.SpyInstance {
+  // Ontology lookups probe and then fetch; both queries need the same fixture.
+  return jest.spyOn(dbModule.db, 'query').mockImplementation(async (query: unknown) => {
+    const collection = /FOR record IN (\w+)/.exec(String(query))?.[1]
+    if (collection === undefined || results[collection] === undefined) {
+      throw new Error(`Unexpected query: ${String(query)}`)
+    }
+    return { all: async () => results[collection] } as any
+  })
+}
+
 const returnRecord = {
   variant: 'variants/NC_000001.11:69633:TGT:GAA',
   biosample: 'ontology_terms/EFO_0005292',
@@ -30,10 +46,6 @@ const returnRecord = {
 }
 
 describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('returns variants for a biosample identified by biosample_id', async () => {
     const ontologyResult = [{
       _id: 'EFO_0005292',
@@ -42,17 +54,9 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
       name: 'lymphoblastoid cell line'
     }]
 
-    // ontologySearch's exact-match stage now issues a cheap LIMIT-1 existence probe before
-    // the real fetch (see probeThenFetchPage in _helpers.ts) - keying the mock by which
-    // collection the query targets, rather than call order, means both the probe and the
-    // real fetch for the biosample lookup correctly return the same ontology result,
-    // independent of how many internal calls that lookup happens to make.
-    jest.spyOn(dbModule.db, 'query').mockImplementation(async (query: unknown) => {
-      const text = String(query)
-      if (text.includes('IN ontology_terms')) {
-        return { all: async () => ontologyResult } as any
-      }
-      return { all: async () => [returnRecord] } as any
+    mockCollectionQueries({
+      ontology_terms: ontologyResult,
+      variants_biosamples: [returnRecord]
     })
 
     const input = { biosample_id: 'EFO_0005292', page: 0 }
@@ -89,9 +93,10 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
       name: 'lymphoblastoid cell line'
     }]
 
-    const query = jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(ontologyResult) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]) } as any)
+    const query = mockCollectionQueries({
+      ontology_terms: ontologyResult,
+      variants_biosamples: [{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]
+    })
 
     const input = {
       biosample_id: 'EFO_0005292',
@@ -109,17 +114,15 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
     })
 
     expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
-    const edgeQuery = query.mock.calls[1][0] as string
+    const edgeQuery = query.mock.calls.map(([query]) => String(query)).find(query => query.includes('FOR record IN variants_biosamples'))
+    expect(edgeQuery).toContain("record._to IN ['ontology_terms/EFO_0005292']")
+    expect(edgeQuery).toContain("record.method == 'ColocBoost'")
     expect(edgeQuery).toContain("record.gene == 'genes/ENSG00000134245'")
     expect(edgeQuery).toContain("record.phenotype == 'ontology_terms/EFO_0006340'")
   })
 })
 
 describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('returns biosamples for a variant identified by spdi', async () => {
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['variants/NC_000001.11:69633:TGT:GAA']) } as any)
@@ -196,11 +199,12 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
   })
 
   it('resolves gene_name and phenotype_name to ids before filtering', async () => {
-    const query = jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['variants/NC_000001.11:69633:TGT:GAA']) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'ENSG00000134245', name: 'TP53' }]) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'EFO_0006340', name: 'some phenotype' }]) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]) } as any)
+    const query = mockCollectionQueries({
+      variants: ['variants/NC_000001.11:69633:TGT:GAA'],
+      genes: [{ _id: 'ENSG00000134245', name: 'TP53' }],
+      ontology_terms: [{ _id: 'EFO_0006340', name: 'some phenotype' }],
+      variants_biosamples: [{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }]
+    })
 
     const input = {
       spdi: 'NC_000001.11:69633:TGT:GAA',
@@ -218,7 +222,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
     })
 
     expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
-    const edgeQuery = query.mock.calls[3][0] as string
+    const edgeQuery = query.mock.calls.map(([query]) => String(query)).find(query => query.includes('FOR record IN variants_biosamples'))
+    expect(edgeQuery).toContain("record._from IN ['variants/NC_000001.11:69633:TGT:GAA']")
+    expect(edgeQuery).toContain("record.method == 'ColocBoost'")
     expect(edgeQuery).toContain("record.gene == 'genes/ENSG00000134245'")
     expect(edgeQuery).toContain("record.phenotype == 'ontology_terms/EFO_0006340'")
   })
@@ -247,8 +253,6 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
 })
 
 describe('mouse MPRA variant routing', () => {
-  beforeEach(() => jest.clearAllMocks())
-
   it('uses mouse variant lookup, edges, element filter and verbose collections', async () => {
     const query = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['mm_variants/NC_000067.7:11:A:C']) } as any)
@@ -274,14 +278,15 @@ describe('mouse MPRA variant routing', () => {
   })
 
   it('routes biosample searches to mouse edges and verbose node collections', async () => {
-    const query = jest.spyOn(dbModule.db, 'query')
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'CL_0000001' }]) } as any)
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any)
+    const query = mockCollectionQueries({
+      ontology_terms: [{ _id: 'CL_0000001' }],
+      mm_variants_biosamples: []
+    })
     const input = { biosample_id: 'CL_0000001', organism: 'Mus musculus', verbose: 'true', page: 0 }
     await variantsBiosamplesRouters.variantsFromBiosamples({
       input, ctx: {}, type: 'query', path: '', rawInput: input
     })
-    const edgeQuery = query.mock.calls[1][0] as string
+    const edgeQuery = query.mock.calls.map(([query]) => String(query)).find(query => query.includes('FOR record IN mm_variants_biosamples'))
     expect(edgeQuery).toContain('FOR record IN mm_variants_biosamples')
     expect(edgeQuery).toContain("record._to IN ['ontology_terms/CL_0000001']")
     expect(edgeQuery).toContain('FOR otherRecord IN mm_variants')
