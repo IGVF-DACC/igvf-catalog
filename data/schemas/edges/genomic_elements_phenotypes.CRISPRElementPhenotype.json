@@ -61,7 +61,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element's effect on the phenotype.",
-          "threshold": "unknown"
+          "threshold": "True when p_value_adj < 0.05 for FRACTEL screens, or p_value < 0.05 for migration and proliferation screens."
         },
         "num_guides": {
           "title": "Number of Guides",
