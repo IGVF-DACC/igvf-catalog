@@ -234,12 +234,9 @@ const genomicBiosamplesQuery = genomicElementCommonQueryFormat
     files_fileset: z.string().optional()
   }))
   .merge(commonEdgeParamsFormat).omit({
-    source_annotation: true
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  }).transform(({ region_type, ...rest }) => ({
-    type: region_type,
-    ...rest
-  }))
+    source_annotation: true,
+    region_type: true
+  })
 
 const biosamplesGenomicElementsQuery = commonBiosamplesQueryFormat.merge(z.object({
   method: z.enum(METHODS).optional(),

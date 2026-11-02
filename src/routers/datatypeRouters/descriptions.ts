@@ -1360,20 +1360,41 @@ export const descriptions = {
   The limit parameter controls the page size of related items and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
-  Set verbose = true to retrieve full info on the cell ontology terms. <br> \
-  Human MPRA example: organism = Homo sapiens, <br> \
-  region_type = tested elements, <br> \
-  region = chr10:100038743-100038963. <br> \
-  files_fileset = ENCFF475FKV,<br> \
-  method = MPRA,<br> \
-  source = IGVF. <br> \
-  Mouse MPRA example: organism = Mus musculus, <br> \
-  region = chr11:55319627-55319927, <br> \
-  files_fileset = IGVFFI0975AQKF, <br> \
-  method = MPRA, verbose = true. <br> \
-  The limit parameter controls the page size and can not exceed 50. <br> \
-  Pagination is 0-based.',
+  genomic_elements_biosamples:
+    'Retrieve MPRA experiments by querying positions of genomic elements. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
+    Set verbose = true to retrieve full info on the cell ontology terms. <br> \
+    The limit parameter controls the page size and can not exceed 50. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'mpra',
+        label: 'MPRA',
+        examples: [
+          {
+            label: 'human IGVF MPRA by region (cardiac muscle cells)',
+            items: [
+              'organism = Homo sapiens',
+              'region = chr1:1000216-1000485',
+              'files_fileset = IGVFFI0625ESRH',
+              'method = MPRA',
+              'source = IGVF',
+              'verbose = true'
+            ]
+          },
+          {
+            label: 'mouse IGVF MPRA by region (PYS-2 cells)',
+            items: [
+              'organism = Mus musculus',
+              'region = chr11:55319627-55319927',
+              'files_fileset = IGVFFI0975AQKF',
+              'method = MPRA',
+              'source = IGVF',
+              'verbose = true'
+            ]
+          }
+        ]
+      }
+    ]),
 
   biosamples_genomic_elements: 'Retrieve MPRA experiments by querying cell ontology terms. Set organism = Mus musculus for mouse MPRA sequences (GRCm39); the default is Homo sapiens (GRCh38). <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
