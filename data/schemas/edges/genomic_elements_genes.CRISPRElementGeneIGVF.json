@@ -100,13 +100,13 @@
             "null"
           ],
           "description": "Negative log 10 p-value of the measurement or prediction",
-          "max_value": 240
+          "applied_maximum": 324
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
           "description": "Adjusted negative log 10 p-value of the measurement or prediction",
-          "max_value": 240
+          "applied_maximum": 324
         },
         "log2FC": {
           "title": "Log2 Fold Change",
@@ -248,17 +248,20 @@
             "number",
             "null"
           ],
-          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "negative_selection_neg_log10_pvalue_adj": {
           "title": "Negative Selection Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "negative_selection_significant": {
           "title": "Negative Selection Significant?",
           "type": "boolean",
-          "description": "True when this direction has FDR < 0.05 and a matching log2FC sign (negative for negative selection, positive for positive selection)."
+          "description": "Boolean indicator of significant depletion in negative selection.",
+          "threshold": "True when negative_selection_p_value_adj < 0.05 and negative_selection_log2FC < 0."
         },
         "positive_selection_log2FC": {
           "title": "Positive Selection Log2 Fold Change",
@@ -290,17 +293,20 @@
             "number",
             "null"
           ],
-          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction"
+          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "positive_selection_neg_log10_pvalue_adj": {
           "title": "Positive Selection Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "positive_selection_significant": {
           "title": "Positive Selection Significant?",
           "type": "boolean",
-          "description": "True when this direction has FDR < 0.05 and a matching log2FC sign (negative for negative selection, positive for positive selection)."
+          "description": "Boolean indicator of significant enrichment in positive selection.",
+          "threshold": "True when positive_selection_p_value_adj < 0.05 and positive_selection_log2FC > 0."
         }
       },
       "required": [

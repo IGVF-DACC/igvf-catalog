@@ -45,7 +45,7 @@
           "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
-          "max_value": 240
+          "applied_maximum": 240
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -55,7 +55,8 @@
         "neg_log10_pvalue_adj": {
           "title": "Negative Log10 Adjusted P-Value",
           "type": "number",
-          "description": "Negative log 10 FDR-adjusted p-value, capped at 240 for zero p-values."
+          "description": "Negative log 10 FDR-adjusted p-value.",
+          "applied_maximum": 240
         },
         "significant": {
           "title": "Significant?",

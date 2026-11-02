@@ -44,9 +44,10 @@
         },
         "VCP": {
           "type": "number",
-          "description": "Variant Colocalization Probability for the variants to biosamples edge. Source files only include associations above a VCP > 0.1 threshold.",
+          "description": "Variant Colocalization Probability for the variants to biosamples edge.",
           "minimum": 0,
-          "maximum": 1
+          "maximum": 1,
+          "threshold": "Source row retained when VCP > 0.1."
         },
         "gene": {
           "type": "string",

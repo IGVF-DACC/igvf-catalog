@@ -82,7 +82,7 @@
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the variant effect on gene expression.",
-          "threshold": "Uses adjusted p-value < 0.05 (10^(-neg_log10_pvalue_adj)) when available; otherwise posterior_inclusion_probability > 0.1. False if both are missing/null."
+          "threshold": "For Variant-EFFECTS, true when adjusted p-value (10^(-neg_log10_pvalue_adj)) < 0.05. For CRISPR-Millipede, true when posterior_inclusion_probability > 0.1. False if the applicable statistic is missing/null; no fallback between formats."
         },
         "class": {
           "enum": [

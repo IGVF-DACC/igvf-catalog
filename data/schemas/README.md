@@ -138,17 +138,22 @@ represent all adapters' cutoffs as one shared rule.
 
 ## Log10 p-value maxima
 
-Use a numeric `max_value` annotation on negative-log10 p-value fields with a
-defined finite replacement for zero p-values, for example `"max_value": 240`.
-Keep it separate from `threshold` and from the field's description. Omit it
-where no replacement value is established; an observed sample maximum alone
-does not establish this value.
+Use a numeric `applied_maximum` annotation on negative-log10 p-value fields
+for source-specific reference maxima derived from adapter output rules or
+observed source values. Keep it separate from `threshold` and the field's
+description. Omit it when no supported value has been established.
 
-`max_value` is documentation metadata, not JSON Schema's `maximum` constraint
-or a stored document field. It records the finite zero-p-value replacement,
-not a guarantee that every value is clipped to that bound. Positive p-values
-may yield larger values, and source-provided log scores may be preserved.
-Record source-specific behavior in `threshold-evidence.md`.
+`applied_maximum` is documentation metadata, not JSON Schema's `maximum`
+validation constraint. Values above it remain valid; it does not clip scores,
+change adapter output, or guarantee an upper bound on future data. A zero-p-value
+replacement is not necessarily the largest possible score: positive p-values
+and source-provided log scores can exceed it.
+
+Record the inspected file/version, scan scope, observed maxima, zero replacement,
+and any rounding in `threshold-evidence.md`. The standard human IGVF CRISPR
+fields retain the rounded reference value 324; the mouse fields use 250 based
+on IGVFFI9159XDOS. The shared adapter's zero-p-value replacement remains 240.
+These reference values are not significance thresholds or clipping settings.
 
 ## Base schemas
 

@@ -51,7 +51,7 @@
           "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
-          "max_value": 400
+          "applied_maximum": 400
         },
         "p_value": {
           "title": "P-Value",

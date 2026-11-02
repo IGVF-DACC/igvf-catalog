@@ -42,7 +42,7 @@
           "title": "Negative Log10 P-Value",
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
-          "max_value": 5
+          "applied_maximum": 5
         },
         "experiment": {
           "title": "GVATdb Experiment ID",
@@ -86,7 +86,7 @@
           "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
           "description": "Adjusted negative log 10 p-value of the measurement or prediction",
-          "max_value": 2
+          "applied_maximum": 2
         },
         "source": {
           "enum": [

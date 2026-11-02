@@ -117,7 +117,7 @@
           "type": "number",
           "description": "Negative log 10 p-value of the measurement or prediction",
           "example": 1,
-          "max_value": 27000
+          "applied_maximum": 27000
         },
         "tagged_variants": {
           "title": "Tagged Variants",
