@@ -30,8 +30,7 @@
           ]
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "DESeq2 log2 fold-change of ORF abundance in high versus low readout-gene FACS bins. Positive values indicate enrichment with higher readout-gene expression."
         },
         "stat": {
@@ -48,7 +47,7 @@
           "description": "DESeq2 mean normalized ORF counts across samples."
         },
         "p_value": {
-          "title": "P-Value",
+          "$ref": "../mixins.json#/p_value",
           "type": [
             "number",
             "null"
@@ -56,7 +55,7 @@
           "description": "Unadjusted DESeq2 p-value for the ORF to readout-gene association."
         },
         "p_value_adj": {
-          "title": "Adjusted P-Value",
+          "$ref": "../mixins.json#/p_value_adj",
           "type": [
             "number",
             "null"
@@ -64,20 +63,18 @@
           "description": "DESeq2 Benjamini-Hochberg adjusted p-value."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Negative log10 of p_value."
+          ]
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Negative log10 of p_value_adj."
+          ]
         },
         "significant": {
           "title": "Significant?",

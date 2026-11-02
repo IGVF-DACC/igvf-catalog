@@ -48,13 +48,10 @@
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
-          "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue"
         },
         "p_value": {
-          "title": "P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/p_value",
           "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis."
         },
         "effect_size": {
@@ -71,7 +68,7 @@
           "description": "Posterior inclusion probability that this variant is causal for the splice QTL."
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
+          "$ref": "../mixins.json#/log2FC",
           "type": [
             "number",
             "null"

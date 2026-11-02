@@ -28,19 +28,15 @@
           ]
         },
         "p_value": {
-          "title": "P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/p_value",
           "description": "Monte-Carlo p-value of the preferential binding score."
         },
         "p_value_adj": {
-          "title": "Adjusted P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/p_value_adj",
           "description": "FDR of the preferential binding score."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
-          "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue"
         },
         "experiment": {
           "title": "GVATdb Experiment ID",
@@ -80,9 +76,7 @@
           "description": "Preferential binding score: area between the reference and alternate enrichment curves. Negative values mean the TF prefers the alternate allele."
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
-          "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj"
         },
         "source": {
           "enum": [

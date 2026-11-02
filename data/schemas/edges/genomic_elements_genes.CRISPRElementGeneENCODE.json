@@ -33,12 +33,11 @@
           "example": -0.293431866
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "Effect size converted to log2 scale."
         },
         "p_value": {
-          "title": "P-Value",
+          "$ref": "../mixins.json#/p_value",
           "type": [
             "number",
             "null"
@@ -46,7 +45,7 @@
           "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
         },
         "p_value_adj": {
-          "title": "Adjusted P-Value",
+          "$ref": "../mixins.json#/p_value_adj",
           "type": [
             "number",
             "null"
@@ -55,20 +54,18 @@
           "example": 0.004023984
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "significant": {
           "title": "Significant?",

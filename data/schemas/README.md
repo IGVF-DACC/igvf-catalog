@@ -64,9 +64,10 @@ code explanations follow [GENCODE](https://www.gencodegenes.org/pages/biotypes.h
 and [Gene Ontology](https://geneontology.org/docs/guide-go-evidence-codes/);
 gene–disease classifications follow [GenCC](https://thegencc.org/faq).
 
-The eleven mixins cover `files_filesets`, `biological_context`, `biosample_term`,
+The sixteen mixins cover `files_filesets`, `biological_context`, `biosample_term`,
 `treatments_term_ids`, `source`, `source_url`, `method`, `label`, `class`,
-`perturbation`, and `organism`.
+`perturbation`, `organism`, `p_value`, `p_value_adj`, `neg_log10_pvalue`,
+`neg_log10_pvalue_adj`, and `log2FC`.
 
 Keep every consistent attribute in the mixin. For example, file references
 share a string type, the `^files_filesets/` pattern, collection metadata, and an
@@ -83,7 +84,9 @@ Sample metadata may come from files_filesets or from source data and ontology
 mappings, depending on the adapter. The files_filesets schema imports the shared
 treatment definition without importing a file-reference property.
 
-Fields such as `score`, `log2FC`, and `significant` retain adapter-specific
+`p_value`, `p_value_adj`, `neg_log10_pvalue`, `neg_log10_pvalue_adj`, and `log2FC`
+share a title, numeric type, and default description in the mixins. Assay-specific
+descriptions stay beside the `$ref`. `score` and `significant` retain adapter-specific
 meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work.
 
 ## Base schemas

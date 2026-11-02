@@ -31,7 +31,7 @@
           "description": "Estimated fractional change in gene expression for the effect allele relative to the other allele. Positive values indicate increased expression, negative values indicate decreased expression, and 0 indicates no change."
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
+          "$ref": "../mixins.json#/log2FC",
           "type": [
             "number",
             "null"
@@ -39,20 +39,18 @@
           "description": "log2 fold-change in gene expression for the effect allele relative to the other allele."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "power": {
           "title": "Power",
