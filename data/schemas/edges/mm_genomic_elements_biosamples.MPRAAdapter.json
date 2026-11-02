@@ -58,7 +58,8 @@
             "number",
             "null"
           ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "threshold": "True when neg_log10_pvalue_adj is available and >= 1; otherwise false."
         },
         "significant": {
           "type": "boolean",

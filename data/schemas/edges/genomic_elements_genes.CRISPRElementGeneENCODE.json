@@ -43,7 +43,8 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none."
+          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none.",
+          "threshold": "unknown"
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -52,7 +53,8 @@
             "null"
           ],
           "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
-          "example": 0.004023984
+          "example": 0.004023984,
+          "threshold": "unknown"
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",

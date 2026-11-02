@@ -64,7 +64,8 @@
             "number",
             "null"
           ],
-          "description": "DESeq2 Benjamini-Hochberg adjusted p-value."
+          "description": "DESeq2 Benjamini-Hochberg adjusted p-value.",
+          "threshold": "True when p_value_adj is available and < 0.05; otherwise false."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",

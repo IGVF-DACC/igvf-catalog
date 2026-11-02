@@ -90,9 +90,9 @@ meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work
 
 Use an optional field-level `threshold` string for selection, significance, or
 score-based classification rules on edge fields. Use `"threshold": "unknown"`
-when such a rule is identified but its cutoff still needs investigation. Omit
-the property when no cutoff applies or there is no evidence that the field is
-thresholded. Do not use "none" or "not applicable". Node schemas, including
+when a field is potentially used in an identified thresholding rule but its
+cutoff or role still needs investigation. Omit the property when no cutoff
+applies and there is no evidence that the field participates in such a rule. Do not use "none" or "not applicable". Node schemas, including
 their fields, do not track `threshold`.
 
 Keep the field's meaning in `description`; put the cutoff in `threshold` beside
@@ -104,8 +104,13 @@ Keep source citations, research history, and detailed evidence in
 use each field, their precedence, strict/inclusive boundaries, and missing-value
 behavior on the decision field. Do not add schema-level `threshold` annotations
 or annotate unrelated fields merely to say they are not used in that decision.
-When a schema has `significant`, document its significance rule only on
-`significant.threshold`; do not repeat it on the contributing statistic fields.
+When a schema has `significant` or an equivalent decision field, document the
+rule on both that field and each field directly compared against a cutoff.
+Repeat the complete joint rule where needed to preserve conjunctions, source-format
+conditions, fallback precedence, and missing-value behavior. Mark plausible
+input fields with `"unknown"` when their role or cutoff remains unresolved; do
+not imply that a candidate input has a verified numerical cutoff. Apply the
+same rule to nested fields used to select items within a row.
 Keep separate selection rules on the fields they filter.
 Use "Source row retained when..." for rules that determine row inclusion.
 For rules that filter entries within a row, name the retained item instead

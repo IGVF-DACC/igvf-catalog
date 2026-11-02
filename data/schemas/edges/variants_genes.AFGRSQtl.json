@@ -56,7 +56,8 @@
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis."
+          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis.",
+          "threshold": "unknown"
         },
         "effect_size": {
           "title": "Effect Size",

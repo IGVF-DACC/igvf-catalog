@@ -39,7 +39,8 @@
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "P-value for the element's association with the screened phenotype."
+          "description": "P-value for the element's association with the screened phenotype.",
+          "threshold": "True when p_value_adj < 0.05 for FRACTEL screens, or p_value < 0.05 for migration and proliferation screens."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -50,7 +51,8 @@
         "p_value_adj": {
           "title": "Adjusted P-Value",
           "type": "number",
-          "description": "FDR-adjusted p-value reported by FRACTEL."
+          "description": "FDR-adjusted p-value reported by FRACTEL.",
+          "threshold": "True when p_value_adj < 0.05 for FRACTEL screens, or p_value < 0.05 for migration and proliferation screens."
         },
         "neg_log10_pvalue_adj": {
           "title": "Negative Log10 Adjusted P-Value",

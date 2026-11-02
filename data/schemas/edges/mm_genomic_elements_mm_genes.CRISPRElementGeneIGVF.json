@@ -83,14 +83,16 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
+          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "p_value_adj": {
           "type": [
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Multiple-testing-adjusted p-value when reported by the source.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "neg_log10_pvalue": {
           "type": [
@@ -179,7 +181,8 @@
         },
         "z_score": {
           "type": "number",
-          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
+          "description": "Phenotype or effect z-score for the element-gene association when reported by the source.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "t_score": {
           "type": "number",

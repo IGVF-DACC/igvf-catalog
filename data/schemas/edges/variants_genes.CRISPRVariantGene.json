@@ -52,7 +52,8 @@
             "number",
             "null"
           ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "threshold": "For Variant-EFFECTS, true when adjusted p-value (10^(-neg_log10_pvalue_adj)) < 0.05. For CRISPR-Millipede, true when posterior_inclusion_probability > 0.1. False if the applicable statistic is missing/null; no fallback between formats."
         },
         "power": {
           "title": "Power",
@@ -68,7 +69,8 @@
             "number",
             "null"
           ],
-          "description": "Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1."
+          "description": "Posterior inclusion probability: the probability that the variant is in the causal set for the gene expression phenotype. Values range from 0 to 1.",
+          "threshold": "For Variant-EFFECTS, true when adjusted p-value (10^(-neg_log10_pvalue_adj)) < 0.05. For CRISPR-Millipede, true when posterior_inclusion_probability > 0.1. False if the applicable statistic is missing/null; no fallback between formats."
         },
         "coefficient_stddev": {
           "title": "Coefficient Standard Deviation",
