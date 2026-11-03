@@ -83,7 +83,8 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
+          "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -91,7 +92,8 @@
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Multiple-testing-adjusted p-value when reported by the source.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -99,12 +101,14 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 324
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 324
         },
         "log2FC": {
           "title": "Log2 Fold Change",
@@ -137,7 +141,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the perturbation effect."
+          "description": "Boolean indicator of the significance of the perturbation effect.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "effect_size": {
           "title": "Effect Size",
@@ -197,7 +202,8 @@
         "z_score": {
           "title": "Z-Score",
           "type": "number",
-          "description": "Phenotype or effect z-score for the element-gene association when reported by the source."
+          "description": "Phenotype or effect z-score for the element-gene association when reported by the source.",
+          "threshold": "Uses the first non-null statistic: p_value_adj < 0.05, then p_value < 0.05, then abs(z_score) >= 1.959963984540054. False if none are available."
         },
         "t_score": {
           "title": "T-Score",
@@ -221,7 +227,8 @@
             "number",
             "null"
           ],
-          "description": "Negative selection result: Log2 fold change of readout gene expression for the perturbation."
+          "description": "Negative selection result: Log2 fold change of readout gene expression for the perturbation.",
+          "threshold": "True when negative_selection_p_value_adj < 0.05 and negative_selection_log2FC < 0."
         },
         "negative_selection_p_value": {
           "title": "Negative Selection P-Value",
@@ -237,7 +244,8 @@
             "number",
             "null"
           ],
-          "description": "Negative selection result: Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Negative selection result: Multiple-testing-adjusted p-value when reported by the source.",
+          "threshold": "True when negative_selection_p_value_adj < 0.05 and negative_selection_log2FC < 0."
         },
         "negative_selection_neg_log10_pvalue": {
           "title": "Negative Selection Negative Log10 P-Value",
@@ -245,17 +253,20 @@
             "number",
             "null"
           ],
-          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "negative_selection_neg_log10_pvalue_adj": {
           "title": "Negative Selection Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "negative_selection_significant": {
           "title": "Negative Selection Significant?",
           "type": "boolean",
-          "description": "True when this direction has FDR < 0.05 and a matching log2FC sign (negative for negative selection, positive for positive selection)."
+          "description": "Boolean indicator of significant depletion in negative selection.",
+          "threshold": "True when negative_selection_p_value_adj < 0.05 and negative_selection_log2FC < 0."
         },
         "positive_selection_log2FC": {
           "title": "Positive Selection Log2 Fold Change",
@@ -263,7 +274,8 @@
             "number",
             "null"
           ],
-          "description": "Positive selection result: Log2 fold change of readout gene expression for the perturbation."
+          "description": "Positive selection result: Log2 fold change of readout gene expression for the perturbation.",
+          "threshold": "True when positive_selection_p_value_adj < 0.05 and positive_selection_log2FC > 0."
         },
         "positive_selection_p_value": {
           "title": "Positive Selection P-Value",
@@ -279,7 +291,8 @@
             "number",
             "null"
           ],
-          "description": "Positive selection result: Multiple-testing-adjusted p-value when reported by the source."
+          "description": "Positive selection result: Multiple-testing-adjusted p-value when reported by the source.",
+          "threshold": "True when positive_selection_p_value_adj < 0.05 and positive_selection_log2FC > 0."
         },
         "positive_selection_neg_log10_pvalue": {
           "title": "Positive Selection Negative Log10 P-Value",
@@ -287,17 +300,20 @@
             "number",
             "null"
           ],
-          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction"
+          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "positive_selection_neg_log10_pvalue_adj": {
           "title": "Positive Selection Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "positive_selection_significant": {
           "title": "Positive Selection Significant?",
           "type": "boolean",
-          "description": "True when this direction has FDR < 0.05 and a matching log2FC sign (negative for negative selection, positive for positive selection)."
+          "description": "Boolean indicator of significant enrichment in positive selection.",
+          "threshold": "True when positive_selection_p_value_adj < 0.05 and positive_selection_log2FC > 0."
         }
       },
       "required": [

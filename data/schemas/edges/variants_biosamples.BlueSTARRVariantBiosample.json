@@ -41,7 +41,8 @@
         "log2FC": {
           "title": "Log2 Fold Change",
           "type": "number",
-          "description": "log2 fold change in STARR-seq reporter activity."
+          "description": "log2 fold change in STARR-seq reporter activity.",
+          "threshold": "Source row retained when abs(log2FC) > 0.1 for BlueSTARR v0.1.1 K562 file IGVFFI5288RAAV."
         },
         "class": {
           "enum": [

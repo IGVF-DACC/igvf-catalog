@@ -86,6 +86,120 @@ treatment definition without importing a file-reference property.
 Fields such as `score`, `log2FC`, and `significant` retain adapter-specific
 meanings and descriptions. Reconciliation of `pmid` and `pmids` is separate work.
 
+## Threshold and significance documentation
+
+Use a field-level `threshold` string to document rules that select records or
+items, assign significance, or classify scores. These annotations belong in
+source-specific **edge schemas**, including nested item properties. Do not add
+`threshold` to node schemas or at the schema root.
+
+### Which fields to annotate
+
+Document a rule on both the decision field (`significant` or its equivalent)
+and each input field directly compared against a cutoff. For example, a rule
+based on adjusted p-value belongs on both `significant` and `p_value_adj`.
+For directional significance, annotate the decision, adjusted p-value, and
+fold-change fields when both p-value and fold-change sign determine the call.
+
+For row selection without a separate decision field, annotate the field used
+to select rows. For selection within an array, annotate the array property and
+the nested input fields used to select its items. Keep selection rules separate
+from significance rules when they serve different purposes.
+
+Do not automatically annotate every related statistic. Alternate representations
+and fields used only to calculate a decision statistic do not need `threshold`
+unless they are themselves compared against a cutoff or are plausible inputs
+to an unresolved rule. For example, an interval-based significance call belongs
+on the decision and interval-bound fields, not automatically on the effect
+estimate or an accompanying p-value.
+
+Choose the annotation according to the available evidence:
+
+| Evidence | Annotation |
+| --- | --- |
+| The rule and cutoff are established. | A concise statement of the rule. |
+| A thresholding decision is identified, but its cutoff is unresolved; or the field is a plausible input whose role is unresolved. | `"threshold": "unknown"` |
+| No applicable rule or plausible role has been identified for the field. | Omit `threshold`. |
+
+Do not use `"none"` or `"not applicable"`. `"unknown"` does not assert that a
+candidate input is definitely thresholded. Omission does not establish that
+the source data are unfiltered.
+
+### How to write the rule
+
+Keep the field's meaning in `description`; place the rule in `threshold` beside
+it. State the exact comparison (`<`, `<=`, `>`, or `>=`), any joint conditions,
+and the scope needed to interpret it. Preserve source-format distinctions,
+statistic precedence, fallback behavior, and missing/null behavior where they
+apply. Do not describe a format-specific choice as a fallback between fields.
+Do not invent a missing-value result when the input is required or invalid
+values are rejected before the decision.
+
+Repeat the complete rule on contributing fields when necessary to avoid implying
+that one condition alone is sufficient. For example, if a call requires both
+adjusted p-value < 0.05 and log2FC < 0, retain the AND condition on all three
+fields. Keep repeated annotations consistent when the rule changes.
+
+Use wording that distinguishes selection from labeling:
+
+| Purpose | Example `threshold` text |
+| --- | --- |
+| Select source rows | `Source row retained when gene_dependency >= 0.5.` |
+| Select items within a row | `Mechanism retained when its Posterior Probability >= 0.25 and P-value < 0.05.` |
+| Assign significance | `True when p_value_adj is available and < 0.05; otherwise false.` |
+| Assign a classification | `Binding called when ref_score > 2^SEMpl_baseline for the motif.` |
+
+Use row-retention wording only when the rule determines row inclusion. A
+significance or classification rule may label rows without excluding them.
+Include file accessions or model versions when needed to limit the rule's scope.
+Keep implementation references such as “by the adapter” or “upstream,” source
+citations, and investigation history in the evidence notes rather than the
+annotation.
+
+### Evidence and scope
+
+Record supporting sources, file accessions, model/workflow versions, the extent
+of data inspection, and unresolved questions in
+[threshold-evidence.md](threshold-evidence.md). Distinguish source-file selection,
+catalog preparation/loading filters, and decisions that only label retained
+records. For unresolved inputs, record why the field is a candidate and what
+still needs verification.
+
+Check the relevant adapter or preparation code, source-file headers, portal
+metadata, format specifications, and versioned generating workflows. An absent
+adapter filter does not rule out prior source filtering. A declared cutoff in
+a header does not by itself prove that the file was filtered. A score range or
+observed sample minimum alone does not establish a threshold or its boundary.
+Treat preliminary reviews as research leads, not authoritative evidence.
+
+`threshold` is documentation metadata, not a stored document field, JSON Schema
+validation constraint, or executable setting. Add it as a keyword on the field
+schema, not as a data property in `properties`, `required`, or
+`accessible_via.return`. It does not change loading behavior. Consult the
+source-specific schema: a merged collection schema cannot express every
+source's cutoff as one shared rule.
+
+## Log10 p-value maxima
+
+Use a numeric `applied_maximum` annotation on negative-log10 p-value fields for
+a source-specific reference maximum supported by adapter output rules or
+observed source values. Keep it separate from `threshold` and `description`;
+omit it when no supported value has been established.
+
+`applied_maximum` is documentation metadata, not JSON Schema's `maximum`
+constraint. Values above it remain valid. It does not clip scores, change
+adapter output, or guarantee an upper bound on future data. In particular, a
+zero-p-value replacement need not be the largest score: positive p-values and
+source-provided log scores can exceed it.
+
+In `threshold-evidence.md`, distinguish an adapter replacement value from an
+observed maximum or a rounded reference value. Record the inspected file/version,
+scan scope, observed maxima, zero replacement, and any rounding. For example,
+the standard human IGVF CRISPR fields use a rounded reference value of 324,
+and the mouse fields use 250 based on IGVFFI9159XDOS; the shared adapter's
+zero-p-value replacement remains 240. These annotations are not significance
+thresholds or clipping settings.
+
 ## Base schemas
 
 - `nodes/node.base.json` provides common node identity and provenance fields.

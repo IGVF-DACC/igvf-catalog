@@ -70,12 +70,14 @@
         "localization_score": {
           "title": "Localization Score",
           "type": "number",
-          "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant"
+          "description": "XGBoost classifier score measuring the probability of protein mislocalization caused by the variant",
+          "threshold": "unknown"
         },
         "mislocalization_hit": {
           "title": "Mislocalization Hit?",
           "type": "boolean",
-          "description": "Whether the variant is classified as causing protein mislocalization based on the localization score threshold"
+          "description": "Whether the source classifies the variant as causing protein mislocalization.",
+          "threshold": "unknown"
         },
         "files_filesets": {
           "$ref": "../mixins.json#/files_filesets"

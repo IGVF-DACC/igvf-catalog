@@ -43,7 +43,8 @@
             "number",
             "null"
           ],
-          "description": "Uncorrected differential-expression p-value for the element\u2013gene pair. Null when the source has none."
+          "description": "Uncorrected differential-expression p-value for the element–gene pair. Null when the source has none.",
+          "threshold": "unknown"
         },
         "p_value_adj": {
           "title": "Adjusted P-Value",
@@ -51,8 +52,9 @@
             "number",
             "null"
           ],
-          "description": "Benjamini\u2013Hochberg FDR of the differential-expression test. Null when the source has none.",
-          "example": 0.004023984
+          "description": "Benjamini–Hochberg FDR of the differential-expression test. Null when the source has none.",
+          "example": 0.004023984,
+          "threshold": "unknown"
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -60,7 +62,8 @@
             "number",
             "null"
           ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -68,13 +71,15 @@
             "number",
             "null"
           ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 240
         },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
           "description": "Boolean indicator of the significance of the element-gene interactions.",
-          "example": true
+          "example": true,
+          "threshold": "unknown"
         },
         "method": {
           "enum": [

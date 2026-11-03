@@ -50,12 +50,14 @@
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative log 10 p-value of the measurement or prediction",
+          "applied_maximum": 400
         },
         "p_value": {
           "title": "P-Value",
           "type": "number",
-          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis."
+          "description": "Nominal p-value of association between the variant and the splice junction, from the African-population meta-analysis.",
+          "threshold": "unknown"
         },
         "effect_size": {
           "title": "Effect Size",
@@ -81,7 +83,8 @@
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicating the significance of the variant association with splicing."
+          "description": "Boolean indicating the significance of the variant association with splicing.",
+          "threshold": "unknown"
         },
         "class": {
           "enum": [
