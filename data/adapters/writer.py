@@ -35,7 +35,7 @@ class Writer(ABC):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        # Only finalize (e.g. version-tag) the output when the body completed
+        # Only finalize (e.g. collections-tag) the output when the body completed
         # without raising. Writers open lazily on the first write(), so if the
         # body fails (or produces nothing) before writing, no output file is
         # created at all. Returning False propagates any exception.
@@ -45,15 +45,15 @@ class Writer(ABC):
 
 class S3Writer(Writer):
 
-    def __init__(self, bucket: str, key: str, session: boto3.Session, version_tag: Optional[str] = None) -> None:
+    def __init__(self, bucket: str, key: str, session: boto3.Session, collections_tag: Optional[str] = None) -> None:
         self.bucket = bucket
         self.key = key
         self.session = session
         self._s3_uri = None
         self.s3_file = None
         self.s3_tags: list[dict[str, str]] = []
-        if version_tag is not None:
-            self.add_tag('version', version_tag)
+        if collections_tag is not None:
+            self.add_tag('collections', collections_tag)
 
     def add_tag(self, key: str, value: str):
         for tag in self.s3_tags:
@@ -165,9 +165,9 @@ def get_writer(
         bucket: Optional[str] = None,
         key: Optional[str] = None,
         session: Optional[boto3.Session] = None,
-        version_tag: Optional[str] = None
+        collections_tag: Optional[str] = None
 ) -> Writer:
     if filepath is not None:
         return LocalWriter(filepath)
     else:
-        return S3Writer(bucket, key, session, version_tag)
+        return S3Writer(bucket, key, session, collections_tag)
