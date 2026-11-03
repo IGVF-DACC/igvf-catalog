@@ -27,7 +27,6 @@ class GWAS(BaseAdapter):
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
     # variants in GWAS is 1-based, need to convert gwas variant position from 1-based to 0-based
 
-    MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
     ALLOWED_LABELS = ['studies',
                       'variants',
@@ -172,11 +171,18 @@ class GWAS(BaseAdapter):
             return None
         self.processed_keys.add(key)
 
-        pvalue = float(row[17] or 0)
-        if pvalue == 0:
-            log_pvalue = GWAS.MAX_LOG10_PVALUE  # Max value based on data
-        else:
-            log_pvalue = -1 * log10(pvalue)
+        # pval, pval_mantissa, and pval_exponent are numbers on every row of
+        # IGVFFI1309WDQG. None of them is empty, non-numeric text, or an exact 0,
+        # so float() does not need a 0 fallback.
+        # The smallest pval text is already 5e-324. -log10 of that float is not
+        # the association strength once the exponent is below about -324.
+        # -log10(p) = -pval_exponent - log10(pval_mantissa).
+        # Largest value in this file is 26676.52287874528
+        # (mantissa 3, exponent -26677).
+        mantissa = float(row[15])
+        exponent = float(row[16])
+        pvalue = float(row[17])
+        log_pvalue = -exponent - log10(mantissa)
 
         return {
             '_to': 'ontology_terms/' + ontology_term_id,
@@ -199,8 +205,8 @@ class GWAS(BaseAdapter):
             'odds_ratio': float(row[12] or 0),
             'oddsr_ci_lower': float(row[13] or 0),
             'oddsr_ci_upper': float(row[14] or 0),
-            'p_val_mantissa': float(row[15] or 0),
-            'p_val_exponent': float(row[16] or 0),
+            'p_val_mantissa': mantissa,
+            'p_val_exponent': exponent,
             'p_value': pvalue,
             'neg_log10_pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
