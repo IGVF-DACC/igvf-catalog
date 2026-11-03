@@ -1109,3 +1109,28 @@ def test_element_aliases_include_names_and_reviewed_info(tmp_path, mock_file_fil
     assert record['name'] == 'hash2'
     assert record['aliases'] == (['hash1', 'hash2', 'old1', 'old2', 'old3']
                                  if design_accession in MPRAAdapter.INFO_ALIAS_DESIGNS else ['hash1', 'hash2'])
+
+
+@pytest.mark.parametrize('design_accessions', [
+    ['IGVFFI0000DESA'],
+    ['IGVFFI0000DESA', 'IGVFFI0000DESB'],
+])
+def test_portal_accessions_tagged_once_in_parse(tmp_path, mock_file_fileset, design_accessions):
+    mock_file_fileset.return_value['file_set_id'] = 'IGVFDS0000TEST'
+    designs = []
+    for accession in design_accessions:
+        design = tmp_path / f'{accession}.tsv'
+        design.write_text('name\tchr\tstart\tend\tstrand\n')
+        designs.append(str(design))
+    effects = tmp_path / 'IGVFFI0000TEST.bed'
+    effects.write_text('')
+    writer = SpyWriter()
+    with patch.object(writer, 'add_tag') as mock_add_tag:
+        adapter = MPRAAdapter(str(effects), 'genomic_element', writer=writer,
+                              reference_filepath=designs)
+        mock_add_tag.assert_not_called()
+        adapter.process_file()
+    assert {c.args[0]
+            for c in mock_add_tag.call_args_list} == {'portal_accessions'}
+    assert [c.args[1] for c in mock_add_tag.call_args_list] == [
+        'IGVFFI0000TEST', *design_accessions, 'IGVFDS0000TEST']

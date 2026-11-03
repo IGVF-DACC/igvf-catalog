@@ -221,9 +221,6 @@ class MPRAAdapter(BaseAdapter):
         if self.source == 'ENCODE':
             self.igvf_accession = self._resolve_igvf_accession_from_encode_accession(
                 self.file_accession)
-            self.writer.add_tag('portal_accessions', self.igvf_accession)
-        else:
-            self.writer.add_tag('portal_accessions', self.file_accession)
 
         if isinstance(reference_filepath, (list, tuple)) and not reference_filepath:
             raise ValueError('MPRA reference file list must not be empty')
@@ -260,8 +257,6 @@ class MPRAAdapter(BaseAdapter):
             self.mpra_design_file = path
             self.reference_file_accession = get_file_accession(path)
             self.reference_source_url = f'https://data.igvf.org/tabular-files/{self.reference_file_accession}'
-            self.writer.add_tag('portal_accessions',
-                                self.reference_file_accession)
             current_exceptions = self._load_exceptions()
             (self.excluded_effect_names, self.excluded_variants,
              self.variants_without_reference_element, self.deduplicated_variants,
@@ -650,7 +645,12 @@ class MPRAAdapter(BaseAdapter):
 
     def parse(self):
         # genomic_element_from_variant: dedupe (chr,start,end,strand) across chunks
-        self.writer.add_tag('portal_accessions', self.file_accession)
+        if self.source == 'ENCODE':
+            self.writer.add_tag('portal_accessions', self.igvf_accession)
+        else:
+            self.writer.add_tag('portal_accessions', self.file_accession)
+        for reference_file_accession in self.reference_file_accessions:
+            self.writer.add_tag('portal_accessions', reference_file_accession)
         file_set_accession = self.file_fileset.get('file_set_id')
         if file_set_accession:
             self.writer.add_tag('portal_accessions', file_set_accession)
