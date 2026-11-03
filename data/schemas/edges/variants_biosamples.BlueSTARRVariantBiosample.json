@@ -39,8 +39,7 @@
           ]
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "log2 fold change in STARR-seq reporter activity."
         },
         "class": {

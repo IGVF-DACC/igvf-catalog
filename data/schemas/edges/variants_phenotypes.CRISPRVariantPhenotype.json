@@ -74,7 +74,7 @@
           "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
         },
         "p_value_adj": {
-          "title": "Adjusted P-Value",
+          "$ref": "../mixins.json#/p_value_adj",
           "type": [
             "number",
             "null"
@@ -82,7 +82,7 @@
           "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source."
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
           "type": [
             "number",
             "null"

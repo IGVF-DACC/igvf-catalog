@@ -125,14 +125,11 @@
           "description": "Posterior inclusion probability that this variant is causal for the molecular trait, from SuSiE fine-mapping."
         },
         "p_value": {
-          "title": "P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/p_value",
           "description": "Nominal p-value of association between the variant and the molecular trait."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
-          "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue"
         },
         "effect_size": {
           "title": "Effect Size",

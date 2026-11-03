@@ -32,28 +32,22 @@
           "description": "Average phenotype z-score across guides targeting the genomic element"
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "FRACTEL element-level estimate on the log2 fold-change scale: the signed directional weighted average of guide-level log2 fold changes with the largest absolute magnitude."
         },
         "p_value": {
-          "title": "P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/p_value",
           "description": "P-value for the element's association with the screened phenotype."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
-          "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue"
         },
         "p_value_adj": {
-          "title": "Adjusted P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/p_value_adj",
           "description": "FDR-adjusted p-value reported by FRACTEL."
         },
         "neg_log10_pvalue_adj": {
-          "title": "Negative Log10 Adjusted P-Value",
-          "type": "number",
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
           "description": "Negative log 10 FDR-adjusted p-value, capped at 240 for zero p-values."
         },
         "significant": {

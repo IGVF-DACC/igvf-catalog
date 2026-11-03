@@ -85,5 +85,30 @@
     "title": "Organism",
     "type": "string",
     "description": "Species this annotation describes."
+  },
+  "p_value": {
+    "title": "P-Value",
+    "description": "Uncorrected p-value of the measurement or prediction.",
+    "type": "number"
+  },
+  "p_value_adj": {
+    "title": "Adjusted P-Value",
+    "description": "Multiple-testing-adjusted p-value of the measurement or prediction.",
+    "type": "number"
+  },
+  "neg_log10_pvalue": {
+    "title": "Negative Log10 P-Value",
+    "description": "Negative log 10 p-value of the measurement or prediction",
+    "type": "number"
+  },
+  "neg_log10_pvalue_adj": {
+    "title": "Adjusted Negative Log10 P-Value",
+    "description": "Adjusted negative log 10 p-value of the measurement or prediction",
+    "type": "number"
+  },
+  "log2FC": {
+    "title": "Log2 Fold Change",
+    "description": "Log2 fold change of the measured or predicted effect.",
+    "type": "number"
   }
 }

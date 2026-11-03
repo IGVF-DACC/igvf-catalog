@@ -60,8 +60,7 @@
           "description": "Optional score column of the source BED file; omitted when unavailable."
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "Fold change in reporter activity attributable to the variant: the alternate allele's output over input ratio divided by the reference allele's, in log2 space."
         },
         "inputCountRef": {
@@ -85,14 +84,10 @@
           "description": "Output count (RNA) for the alternate allele, normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
-          "type": "number",
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue"
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
-          "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj"
         },
         "significant": {
           "title": "Significant?",

@@ -79,6 +79,7 @@
           "example": "K562"
         },
         "p_value": {
+          "$ref": "../mixins.json#/p_value",
           "type": [
             "number",
             "null"
@@ -86,6 +87,7 @@
           "description": "Uncorrected significance statistic for the element-gene association. Meaning and scale depend on the source assay."
         },
         "p_value_adj": {
+          "$ref": "../mixins.json#/p_value_adj",
           "type": [
             "number",
             "null"
@@ -93,17 +95,17 @@
           "description": "Multiple-testing-adjusted p-value when reported by the source."
         },
         "neg_log10_pvalue": {
+          "$ref": "../mixins.json#/neg_log10_pvalue",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "neg_log10_pvalue_adj": {
-          "type": "number",
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj"
         },
         "log2FC": {
+          "$ref": "../mixins.json#/log2FC",
           "type": [
             "number",
             "null"

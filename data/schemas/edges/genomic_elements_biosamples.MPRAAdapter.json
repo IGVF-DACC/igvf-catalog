@@ -46,8 +46,7 @@
           }
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "Fold change in reporter activity for the element: its normalized output (RNA) over input (DNA) ratio."
         },
         "inputCount": {
@@ -61,20 +60,18 @@
           "description": "Output count (RNA), normalized to counts per million and averaged across replicates."
         },
         "neg_log10_pvalue": {
-          "title": "Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "neg_log10_pvalue_adj": {
-          "title": "Adjusted Negative Log10 P-Value",
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
           "type": [
             "number",
             "null"
-          ],
-          "description": "Adjusted negative log 10 p-value of the measurement or prediction"
+          ]
         },
         "significant": {
           "title": "Significant?",

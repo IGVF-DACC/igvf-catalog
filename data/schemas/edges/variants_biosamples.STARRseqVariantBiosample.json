@@ -35,8 +35,7 @@
           ]
         },
         "log2FC": {
-          "title": "Log2 Fold Change",
-          "type": "number",
+          "$ref": "../mixins.json#/log2FC",
           "description": "Log2 fold change for variant effect on gene expression."
         },
         "inputCountRef": {
