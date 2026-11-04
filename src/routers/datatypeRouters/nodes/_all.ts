@@ -1,3 +1,4 @@
+import { geneProgramsRouters } from './gene_programs'
 import { motifsRouters } from './motifs'
 import { ontologyRouters } from './ontologies'
 import { proteinsRouters } from './proteins'
@@ -16,6 +17,7 @@ import { filesFilesetsRouters } from './files_filesets'
 import { healthRouters } from './health'
 
 export const nodeRouters = {
+  ...geneProgramsRouters,
   ...ontologyRouters,
   ...genomicRegionsRouters,
   ...variantsRouters,
