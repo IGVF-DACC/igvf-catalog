@@ -65,6 +65,17 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
         elif self.label == 'coding_variants_phenotypes':
             return 'coding_variants_phenotypes'
 
+    @staticmethod
+    def _property_scores(mechanisms):
+        """Rename the source P-value key to the catalog p_value field."""
+        scores = []
+        for mechanism in mechanisms:
+            score = dict(mechanism)
+            if 'P-value' in score:
+                score['p_value'] = score.pop('P-value')
+            scores.append(score)
+        return scores
+
     def parse(self):
         self.writer.add_tag('portal_accessions', self.file_accession)
 
@@ -164,7 +175,8 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
                         self.writer.write('\n')
                 elif self.label == 'coding_variants_phenotypes':
                     # already did filtering on scores when generating the mapping file: retain predicted mechanisms with Pr >= 0.25 & Pval < 0.05
-                    mechanism_props = json.loads(row['Mechanisms'])
+                    mechanism_props = self._property_scores(
+                        json.loads(row['Mechanisms']))
                     for coding_variant_id in coding_variant_ids:
                         _props = {
                             '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.file_accession]),
