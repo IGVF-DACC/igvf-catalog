@@ -402,6 +402,44 @@ export const descriptions = {
     Pagination is 0-based. <br> <br> \
     ' + examples([
       {
+        id: 'igvf-regulator-correlation',
+        label: 'IGVF regulator correlations',
+        examples: [
+          {
+            label: 'Single regulator pair in IL-1 beta-treated TeloHAEC cells',
+            note: 'The supplied record has Pearson correlation -0.003701282078549433 across gene programs.',
+            items: [
+              'gene_id = ENSG00000000003',
+              'associated_gene_id = ENSG00000000005',
+              'label = regulator-regulator correlation',
+              'files_fileset = IGVFFI6502THLB'
+            ]
+          },
+          {
+            label: 'Positive regulator correlations in the same experiment',
+            note: 'The supplied ENSG00000000003–ENSG00000001167 pair has correlation 0.350867614728999 and passes this illustrative filter. This is not a significance threshold.',
+            items: [
+              'gene_id = ENSG00000000003',
+              'label = regulator-regulator correlation',
+              'files_fileset = IGVFFI6502THLB',
+              'pearson_correlation = gt:0.3'
+            ]
+          },
+          {
+            label: 'Negative correlations with treatment and biosample filters',
+            note: 'The supplied ENSG00000000003–ENSG00000000419 pair has correlation -0.13905125006609823 and passes this illustrative filter.',
+            items: [
+              'gene_id = ENSG00000000003',
+              'label = regulator-regulator correlation',
+              'files_fileset = IGVFFI6502THLB',
+              'biosample_term = EFO_0920063',
+              'treatment_term_id = UniProtKB:P01584',
+              'pearson_correlation = lt:-0.1'
+            ]
+          }
+        ]
+      },
+      {
         id: 'biogrid',
         label: 'BioGRID',
         examples: [
