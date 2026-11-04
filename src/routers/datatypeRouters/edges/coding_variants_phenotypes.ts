@@ -60,7 +60,7 @@ const mutpred2PropertyScoreFormat = z.object({
 export const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), hgvsp: z.string().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
-  // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence)
+  // score field: pathogenicity_score (MutPred2) | esm_1v_score (ESM-1v) | score (VAMP-seq, SGE) | dualipa_abun_score (DUAL-IPA) | localization_score (Variant painting via fluorescence) | norm_dist_rms (Arrayed semi-qY2H)
   score: z.number().nullable(),
   // only populated for method == 'MutPred2' - the molecular mechanisms it predicts the substitution to disrupt
   property_scores: z.array(mutpred2PropertyScoreFormat).nullish(),
@@ -207,7 +207,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'variant': {
           ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
         },
-        'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
+        'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score OR phenoEdges.norm_dist_rms,
         'property_scores': ${PROPERTY_SCORES_AQL},
         'method': phenoEdges.method,
         'class': phenoEdges.class,
@@ -317,7 +317,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
       'class': phenoEdges.class,
       'label': phenoEdges.label,
       'files_filesets': phenoEdges.files_filesets,
-      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score,
+      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score OR phenoEdges.dualipa_abun_score OR phenoEdges.localization_score OR phenoEdges.norm_dist_rms,
       'property_scores': ${PROPERTY_SCORES_AQL},
       'source_url': phenoEdges.source_url
     }
@@ -411,7 +411,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
         gene_name: cv.gene_name,
         transcript_id: cv.transcript_id,
         dataType: p.method,
-        score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score OR p.localization_score,
+        score: p.pathogenicity_score OR p.esm_1v_score OR p.score OR p.dualipa_abun_score OR p.localization_score OR p.norm_dist_rms,
         portalLink: p.source_url
       }
   `
