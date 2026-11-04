@@ -40,7 +40,7 @@
             "observed data"
           ]
         },
-        "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["gene program regulator element"]}
+        "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["tested elements"]}
       }
     },
     {

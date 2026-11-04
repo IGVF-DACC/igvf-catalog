@@ -29,8 +29,8 @@ class GenePrograms(BaseAdapter):
         'gene_program_regulation': 'gene program regulation',
         'gene_program_correlation': 'program-program correlation',
         'regulator_correlation': 'regulator-regulator correlation',
-        'genomic_element': 'gene program regulator element',
-        'genomic_element_regulator_correlation': 'gene program regulator element',
+        'genomic_element': 'tested elements',
+        'genomic_element_regulator_correlation': 'tested elements',
     }
     ALLOWED_LABELS = ['gene_program', 'gene_program_membership',
                       'gene_program_regulation', 'genomic_element',

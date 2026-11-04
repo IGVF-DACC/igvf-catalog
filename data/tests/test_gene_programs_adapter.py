@@ -791,8 +791,8 @@ def test_regulator_correlation_mappings(accession, upstream):
     ('gene_program_regulation', 'gene program regulation'),
     ('gene_program_correlation', 'program-program correlation'),
     ('regulator_correlation', 'regulator-regulator correlation'),
-    ('genomic_element', 'gene program regulator element'),
-    ('genomic_element_regulator_correlation', 'gene program regulator element'),
+    ('genomic_element', 'tested elements'),
+    ('genomic_element_regulator_correlation', 'tested elements'),
 ])
 def test_output_labels_are_descriptive_and_independent_of_method(tmp_path, metadata, mode, expected, method):
     metadata.return_value['method'] = method
