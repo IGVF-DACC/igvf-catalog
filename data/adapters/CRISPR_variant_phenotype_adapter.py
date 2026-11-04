@@ -1,6 +1,8 @@
 import csv
 import gzip
 import json
+import math
+import os
 from typing import Optional
 from urllib.parse import urljoin
 
@@ -26,6 +28,14 @@ from adapters.writer import Writer
 #   target_id is 1-based chr_pos_hg38_ref_alt.
 # IGVFFI1678CDBR (Sherwood / IGVFDS0021NCLH) – LDL-C uptake (NTR:0001118); base editing
 #   target_id is 1-based chr_pos_hg38_ref_alt.
+# IGVFFI4039BVDA (Bauer ChrX / IGVFDS0120EBCZ) – cell population proliferation
+#   (GO:0008283) in HUDEP-2; SpRY-ABE8e base editing; MAGeCK RRA per-variant scores.
+#   variant is SPDI (0-based). Only 'variant-concordant' variants from the variant
+#   list IGVFFI7806CLOH are loaded: their ref alleles match GRCh38. The
+#   'variant-nonconcordant' variants carry GRCh38's alt allele as ref (likely the
+#   HUDEP-2 genotype), and the clinvar and control rows are excluded.
+#   MAGeCK reports neg|/pos| selection results; the direction matching the sign of
+#   the log2 fold change supplies p_value and p_value_adj (FDR).
 #
 # NTR phenotype terms are not loaded by the standard ontology adapter, so this
 # adapter also writes ontology_terms for NTR phenotypes (e.g. NTR_0001118).
@@ -40,6 +50,7 @@ class CRISPRVariantPhenotype(BaseAdapter):
     COLLECTION_LABEL = 'variant effect on phenotype'
     CHUNK_SIZE = 6500
     WALD_Z_95 = 1.96
+    MAGECK_FDR_THRESHOLD = 0.05
 
     # Accession -> phenotype + column layout.
     FILE_CONFIG = {
@@ -93,6 +104,16 @@ class CRISPRVariantPhenotype(BaseAdapter):
             'p_value_adj_col': 'fdr_adj',
             'neg_log10_pvalue_adj_col': 'log_fdr_adj',
         },
+        'IGVFFI4039BVDA': {
+            'phenotype_term': 'GO_0008283',
+            'phenotype_name': 'cell population proliferation',
+            'format': 'mageck',
+            'variant_id_col': 'variant',
+            'effect_size_col': 'neg|lfc',
+            'num_guides_col': 'num',
+            'variant_list_accession': 'IGVFFI7806CLOH',
+            'variant_list_type': 'variant-concordant',
+        },
     }
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
@@ -108,6 +129,9 @@ class CRISPRVariantPhenotype(BaseAdapter):
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
         self.ontology_term_validator = OntologyTermValidator()
+        self.allowed_variant_ids = None
+        if label != 'ontology_term' and 'variant_list_accession' in self.file_config:
+            self.allowed_variant_ids = self._load_variant_list(filepath)
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -158,9 +182,37 @@ class CRISPRVariantPhenotype(BaseAdapter):
             return None
         return int(float(value))
 
+    def _load_variant_list(self, filepath):
+        """Read variant IDs of the configured type from the companion variant list.
+
+        The list (e.g. IGVFFI7806CLOH.csv.gz) must sit beside the input file.
+        """
+        accession = self.file_config['variant_list_accession']
+        variant_type = self.file_config['variant_list_type']
+        directory = os.path.dirname(filepath)
+        candidates = [os.path.join(directory, f'{accession}{ext}')
+                      for ext in ('.csv.gz', '.csv')]
+        list_path = next((p for p in candidates if os.path.isfile(p)), None)
+        if list_path is None:
+            raise FileNotFoundError(
+                f'Variant list {accession} for {self.file_accession} not found; '
+                f'expected one of: {", ".join(candidates)}')
+        with self._open_file(list_path) as f:
+            variant_ids = {
+                row['element_id'].strip()
+                for row in csv.DictReader(f)
+                if row['type'].strip() == variant_type
+            }
+        if not variant_ids:
+            raise ValueError(
+                f'No {variant_type!r} variants found in {list_path}')
+        return variant_ids
+
     def _is_variant_row(self, row) -> bool:
         config = self.file_config
         variant_id = row[config['variant_id_col']].strip()
+        if self.allowed_variant_ids is not None:
+            return variant_id in self.allowed_variant_ids
         skip_prefix = config.get('skip_id_prefix')
         if skip_prefix and variant_id.startswith(skip_prefix):
             return False
@@ -224,6 +276,42 @@ class CRISPRVariantPhenotype(BaseAdapter):
         effect_size = float(row[config['effect_size_col']])
         margin = self.WALD_Z_95 * sd
         return effect_size - margin, effect_size + margin
+
+    def _mageck_statistics(self, row):
+        # MAGeCK RRA tests depletion (neg|) and enrichment (pos|) separately;
+        # report the test in the direction of the observed fold change.
+        effect_size = float(row[self.file_config['effect_size_col']])
+        direction = 'neg' if effect_size < 0 else 'pos'
+        p_value = float(row[f'{direction}|p-value'])
+        p_value_adj = float(row[f'{direction}|fdr'])
+        return {
+            'z_score': None,
+            'significant': p_value_adj < self.MAGECK_FDR_THRESHOLD,
+            'effect_size_ci95_lower': None,
+            'effect_size_ci95_upper': None,
+            'p_value': p_value,
+            'p_value_adj': p_value_adj,
+            'neg_log10_pvalue_adj': -math.log10(p_value_adj),
+        }
+
+    def _bean_statistics(self, row):
+        config = self.file_config
+        ci_lower, ci_upper = self._effect_size_ci95(row)
+        return {
+            'z_score': float(row[config['z_score_col']]),
+            'significant': (
+                ci_lower is not None
+                and ci_upper is not None
+                and (ci_lower > 0 or ci_upper < 0)
+            ),
+            'effect_size_ci95_lower': ci_lower,
+            'effect_size_ci95_upper': ci_upper,
+            'p_value': None,
+            'p_value_adj': self._optional_float(
+                row, config.get('p_value_adj_col')),
+            'neg_log10_pvalue_adj': self._optional_float(
+                row, config.get('neg_log10_pvalue_adj_col')),
+        }
 
     def parse(self):
         if self.label == 'ontology_term':
@@ -332,28 +420,26 @@ class CRISPRVariantPhenotype(BaseAdapter):
             for row in rows:
                 num_guides = self._optional_int(
                     row, config.get('num_guides_col'))
-                ci_lower, ci_upper = self._effect_size_ci95(row)
+                if config.get('format') == 'mageck':
+                    stats = self._mageck_statistics(row)
+                else:
+                    stats = self._bean_statistics(row)
 
                 props = {
                     '_key': f'{spdi}_{self.phenotype_term}_{self.file_accession}',
                     '_from': f'variants/{spdi}',
                     '_to': f'ontology_terms/{self.phenotype_term}',
                     'effect_size': float(row[config['effect_size_col']]),
-                    'z_score': float(row[config['z_score_col']]),
-                    'significant': (
-                        ci_lower is not None
-                        and ci_upper is not None
-                        and (ci_lower > 0 or ci_upper < 0)
-                    ),
+                    'z_score': stats['z_score'],
+                    'significant': stats['significant'],
                     'num_guides': num_guides,
                     'edit_rate_mean': self._optional_float(
                         row, config.get('edit_rate_mean_col')),
-                    'effect_size_ci95_lower': ci_lower,
-                    'effect_size_ci95_upper': ci_upper,
-                    'p_value_adj': self._optional_float(
-                        row, config.get('p_value_adj_col')),
-                    'neg_log10_pvalue_adj': self._optional_float(
-                        row, config.get('neg_log10_pvalue_adj_col')),
+                    'effect_size_ci95_lower': stats['effect_size_ci95_lower'],
+                    'effect_size_ci95_upper': stats['effect_size_ci95_upper'],
+                    'p_value': stats['p_value'],
+                    'p_value_adj': stats['p_value_adj'],
+                    'neg_log10_pvalue_adj': stats['neg_log10_pvalue_adj'],
                     'method': self.method,
                     'perturbation': self.perturbation,
                     'class': self.collection_class,
