@@ -76,7 +76,7 @@ it('rejects missing selectors and malformed numeric filters', async () => {
   expect(db.query).not.toHaveBeenCalled()
 })
 
-it('registers a dedicated IGVF endpoint and leaves genes/genes in its original category', () => {
+it('registers the transcript endpoint as IGVF data and genes/genes as bespoke', () => {
   expect(CATALOG_ENDPOINTS.find(e => e.path === '/genes/transcripts/genes')?.tag).toBe('IGVF Data')
-  expect(CATALOG_ENDPOINTS.find(e => e.path === '/genes/genes')?.tag).toBe('Biological Context Data')
+  expect(CATALOG_ENDPOINTS.find(e => e.path === '/genes/genes')?.tag).toBe('Bespoke Endpoints')
 })
