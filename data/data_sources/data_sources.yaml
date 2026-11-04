@@ -3554,15 +3554,11 @@ gene_transcript_genomic_element IGVF overexpression ATAC-seq:
 
 
 # Gene programs: definitions, membership, regulation, and targeted elements, and program/regulator correlations.
-# Download: python3 data/scripts/download_gene_programs.py (from the repository root).
-# GO enrichment supplied in the program files is ignored (August 19 Tiger Team decision).
-# GO enrichment will be calculated separately in a future loading phase.
 gene program IGVF:
   collection: gene_programs
   source: IGVF
   pypy3: false
   command: python3 data_parser.py --adapter gene_programs --filepath {datafile} --label gene_program --output-bucket-key gene_programs/gene_programs_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
-  # Gene program definitions; ignore supplied GO enrichment.
   datafiles: &igvf_gene_program_files
     - https://api.data.igvf.org/tabular-files/IGVFFI9532OEFJ/@@download/IGVFFI9532OEFJ.tsv.gz # IGVFDS1435ERVG; HCASMC-hTERT
     - https://api.data.igvf.org/tabular-files/IGVFFI0156PMEA/@@download/IGVFFI0156PMEA.tsv.gz # IGVFDS9578FQKI; TeloHAEC GW: shared programs for resting, oxLDL, and IL-1beta

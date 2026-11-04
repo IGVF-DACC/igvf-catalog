@@ -91,7 +91,7 @@
           "collections": [
             "genes"
           ],
-          "description": "Catalog gene for the promoter-targeted regulator, derived from its GENCODE v43 Ensembl ID. The regulator-correlation standard requires a gene ID for promoter-targeting regulators."
+          "description": "Catalog gene for the genomic element regulator. The regulator-correlation standard requires a gene ID for promoter-targeting regulators."
         }
       },
       "required": [

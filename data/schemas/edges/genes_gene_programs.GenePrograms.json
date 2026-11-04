@@ -98,7 +98,7 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "description": "Targeted promoter intervals associated with this gene-level perturbation result. Multiple intervals share one reported effect; they are not separate independent tests.",
+          "description": "Targeted genomic element intervals associated with this gene-level perturbation result.",
           "items": {
             "type": "string",
             "pattern": "^genomic_elements/",
@@ -110,12 +110,12 @@
         "log2FC": {
           "title": "Log2 Fold Change",
           "type": "number",
-          "description": "Submitted log2 fold change of mean program score in perturbed cells versus the reference group. Sign describes the perturbation effect, not an inferred direction of gene regulation."
+          "description": "Log2 of the fold change of mean program scores for those cells with perturbation vs reference group. Positive values indicate the mean program score increases with the perturbation, a negative value indicates the mean program score decreases."
         },
         "test_statistic": {
           "title": "Test Statistic",
           "type": "number",
-          "description": "Submitted test statistic for the difference in program scores between perturbed and reference cells."
+          "description": "Test statistic for difference in program scores between cells that were perturbed with cells that were not perturbed."
         },
         "neg_log10_pvalue": {
           "title": "Negative Log10 P-Value",
@@ -123,7 +123,7 @@
             "number",
             "null"
           ],
-          "description": "Submitted p_nominal_nlog10, retained without clipping or transformation; null when unavailable."
+          "description": "-log10 uncorrected nominal p-value for test statistic."
         },
         "neg_log10_pvalue_adj": {
           "title": "Adjusted Negative Log10 P-Value",
@@ -132,13 +132,13 @@
             "null"
           ],
           "minimum": 0,
-          "description": "Submitted fdr_nlog10, the negative log10 of the multiple-testing-adjusted p-value or q-value."
+          "description": "-log10 p-value corrected for multiple hypothesis testing, as appropriate for this experiment."
         },
         "reference_group": {
           "title": "Reference Group",
           "type": "string",
           "minLength": 1,
-          "description": "Submitted description of the control/reference group used to calculate the perturbation effect."
+          "description": "Flexible tag describing the role of the guides used as a reference group to calculate a log2FC."
         },
         "fdr_method": {
           "title": "FDR Method",
@@ -146,7 +146,7 @@
             "string",
             "null"
           ],
-          "description": "Submitted multiple-testing correction method."
+          "description": "Method used for multiple testing correction."
         },
         "significant": {
           "title": "Significant?",
