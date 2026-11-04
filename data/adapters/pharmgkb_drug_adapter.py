@@ -497,7 +497,7 @@ class PharmGKB(BaseAdapter):
                     'study_type': study_row[2],
                     'study_cases': study_row[3],
                     'study_controls': study_row[4],
-                    'p-value': p_value,
+                    'p_value': p_value,
                     'biogeographical_groups': study_row[-1]
                 })
 
