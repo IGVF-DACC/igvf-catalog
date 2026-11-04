@@ -488,7 +488,8 @@ class FileFileSet:
             api_url=FileFileSet.IGVF_API
         )
         for sample_object in sample_objects:
-            for donor in sample_object['donors']:
+            # technical samples (e.g. semi-qY2H yeast samples) have no donors
+            for donor in sample_object.get('donors', []):
                 donor_accessions.add(donor['accession'])
             for modification in sample_object.get('modifications', []):
                 if not modification['@id'].startswith('/crispr-modifications/'):

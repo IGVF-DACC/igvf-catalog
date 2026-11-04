@@ -186,6 +186,7 @@
             "type": "string",
             "enum": [
               "2024_multistep",
+              "Arrayed semi-qY2H analysis scripts",
               "BCalm",
               "BEDTools",
               "bigWigAverageOverBed",
