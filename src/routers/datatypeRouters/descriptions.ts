@@ -35,6 +35,103 @@ function examples (
 }
 
 export const descriptions = {
+  gene_programs:
+    'Retrieve gene program definitions. Program identifiers are local to the defining file; catalog IDs include that file accession. Pagination is 0-based, with at most 100 results per page.<br><br>' + examples([
+      {
+        id: 'gene-programs-hcasmc',
+        label: 'HCASMC-hTERT',
+        examples: [
+          {
+            label: 'Program definition',
+            items: [
+              'id = IGVFFI9532OEFJ_GP_1'
+            ]
+          },
+          {
+            label: 'File-local program identifier',
+            items: [
+              'program_id = GP_1',
+              'files_fileset = IGVFFI9532OEFJ'
+            ]
+          }
+        ]
+      }
+    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
+  genes_gene_programs:
+    'Retrieve gene program membership weights and regulator effects for a gene. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+      {
+        id: 'genes-gene-programs-hcasmc',
+        label: 'HCASMC-hTERT',
+        examples: [
+          {
+            label: 'Programs containing ACTB',
+            items: [
+              'gene_id = ENSG00000075624',
+              'files_fileset = IGVFFI9532OEFJ'
+            ]
+          },
+          {
+            label: 'Programs regulated by AAGAB',
+            items: [
+              'gene_id = ENSG00000103591',
+              'files_fileset = IGVFFI7611VVSS'
+            ]
+          }
+        ]
+      }
+    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
+  gene_programs_genes:
+    'Retrieve member genes or regulators for a catalog gene_program_id. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+      {
+        id: 'gene-programs-genes-hcasmc',
+        label: 'HCASMC-hTERT',
+        examples: [
+          {
+            label: 'Members of GP_1',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'files_fileset = IGVFFI9532OEFJ'
+            ]
+          },
+          {
+            label: 'Regulators of GP_1',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'files_fileset = IGVFFI7611VVSS'
+            ]
+          }
+        ]
+      }
+    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
+  gene_programs_gene_programs:
+    'Retrieve program-program correlations in perturbation log2FC. Matches either endpoint; optional associated_gene_program_id restricts the pair. Pearson filters accept gt:, gte:, lt:, lte: and exclude missing coefficients. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+      {
+        id: 'gene-programs-gene-programs-hcasmc',
+        label: 'HCASMC-hTERT',
+        examples: [
+          {
+            label: 'Correlations for GP_1',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'files_fileset = IGVFFI9407YNQA'
+            ]
+          },
+          {
+            label: 'Correlation between GP_1 and GP_2',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'associated_gene_program_id = IGVFFI9532OEFJ_GP_2',
+              'files_fileset = IGVFFI9407YNQA',
+              'pearson_correlation = lt:0'
+            ]
+          }
+        ]
+      }
+    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
   genomic_elements: 'Retrieve genomic elements.<br> \
   Example: region = chr1:1157520-1158189, <br> \
   source_annotation = dELS: distal Enhancer-like signal, <br> \

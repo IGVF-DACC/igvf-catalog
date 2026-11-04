@@ -1,3 +1,4 @@
+import { descriptions } from '../descriptions'
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
@@ -23,7 +24,7 @@ const outputFormat = programContextFormat.extend({
 })
 
 const geneProgramsGenePrograms = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/gene-programs/gene-programs', description: 'Retrieve program-program correlations in perturbation log2FC. Matches either endpoint; optional associated_gene_program_id restricts the pair. Pearson filters accept gt:, gte:, lt:, lte: and exclude missing coefficients. Pagination is 0-based; maximum page size is 100.' } })
+  .meta({ openapi: { method: 'GET', path: '/gene-programs/gene-programs', description: descriptions.gene_programs_gene_programs } })
   .input(queryFormat).output(z.array(outputFormat))
   .query(async ({ input }) => {
     const id = escapeAqlString(documentId('gene_programs', input.gene_program_id))

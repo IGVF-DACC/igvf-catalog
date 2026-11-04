@@ -1,3 +1,4 @@
+import { descriptions } from '../descriptions'
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
@@ -20,7 +21,7 @@ const queryFormat = programContextQuery.merge(programPagination).extend({
 })
 
 const genePrograms = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/gene-programs', description: 'Retrieve gene program definitions. Program identifiers are local to the defining file; catalog IDs include that file accession. Pagination is 0-based, with at most 100 results per page.' } })
+  .meta({ openapi: { method: 'GET', path: '/gene-programs', description: descriptions.gene_programs } })
   .input(queryFormat)
   .output(z.array(geneProgramFormat))
   .query(async ({ input }) => {

@@ -1,3 +1,4 @@
+import { descriptions } from '../descriptions'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { db } from '../../../database'
@@ -79,11 +80,11 @@ async function findRelationships (input: z.infer<typeof queryFormat>, reverse: b
 }
 
 const geneProgramsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/gene-programs', description: 'Retrieve gene program membership weights and regulator effects for a gene. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.' } })
+  .meta({ openapi: { method: 'GET', path: '/genes/gene-programs', description: descriptions.genes_gene_programs } })
   .input(queryFormat).output(z.array(outputFormat))
   .query(async ({ input }) => await findRelationships(input, false))
 const genesFromGenePrograms = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/gene-programs/genes', description: 'Retrieve member genes or regulators for a catalog gene_program_id. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.' } })
+  .meta({ openapi: { method: 'GET', path: '/gene-programs/genes', description: descriptions.gene_programs_genes } })
   .input(queryFormat).output(z.array(outputFormat))
   .query(async ({ input }) => await findRelationships(input, true))
 

@@ -97,12 +97,24 @@ genes:
     fields:
       - start, end
 
-# Small gene-program edge collections use their built-in _from/_to indexes.
 # No score/correlation or context-wide indexes until query plans justify them.
 gene_programs:
   persistent:
     fields:
       - program_id, files_filesets
+
+# Baseline endpoint-plus-file lookups for membership/regulation and correlations.
+genes_gene_programs:
+  persistent:
+    fields:
+      - _from, files_filesets, _key
+      - _to, files_filesets, _key
+
+gene_programs_gene_programs:
+  persistent:
+    fields:
+      - _from, files_filesets, _key
+      - _to, files_filesets, _key
 
 genes_genes:
   zkd_sparse:

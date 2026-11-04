@@ -114,3 +114,12 @@ it('excludes regulator correlations and BioGRID from z-score range filters', asy
   await call(genesGenesEdgeRouters.genesGenes, { gene_id: 'ENSG1', z_score: 'lt:1' })
   expect(query()).toContain('IS_NUMBER(record.z_score)')
 })
+
+it('groups genes/genes as bespoke and includes gene-program examples', () => {
+  expect(openApiDocument.paths['/genes/genes']?.get?.tags).toEqual(['Bespoke Endpoints'])
+  for (const path of ['/gene-programs', '/genes/gene-programs', '/gene-programs/genes', '/gene-programs/gene-programs']) {
+    const description = openApiDocument.paths[path]?.get?.description
+    expect(description).toContain('Query examples')
+    expect(description).toContain('IGVFFI9532OEFJ')
+  }
+})
