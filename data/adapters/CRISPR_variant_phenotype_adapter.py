@@ -2,7 +2,6 @@ import csv
 import gzip
 import json
 import math
-import os
 from typing import Optional
 from urllib.parse import urljoin
 
@@ -31,7 +30,8 @@ from adapters.writer import Writer
 # IGVFFI4039BVDA (Bauer ChrX / IGVFDS0120EBCZ) – cell population proliferation
 #   (GO:0008283) in HUDEP-2; SpRY-ABE8e base editing; MAGeCK RRA per-variant scores.
 #   variant is SPDI (0-based). Only 'variant-concordant' variants from the variant
-#   list IGVFFI7806CLOH are loaded: their ref alleles match GRCh38. The
+#   list IGVFFI7806CLOH (passed as reference_filepath) are loaded: their ref
+#   alleles match GRCh38. The
 #   'variant-nonconcordant' variants carry GRCh38's alt allele as ref (likely the
 #   HUDEP-2 genotype), and the clinvar and control rows are excluded.
 #   MAGeCK reports neg|/pos| selection results; the direction matching the sign of
@@ -116,7 +116,8 @@ class CRISPRVariantPhenotype(BaseAdapter):
         },
     }
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False,
+                 reference_filepath: Optional[str] = None, **kwargs):
         self.file_accession = get_file_accession(filepath)
         if self.file_accession not in self.FILE_CONFIG:
             raise ValueError(
@@ -129,9 +130,10 @@ class CRISPRVariantPhenotype(BaseAdapter):
         self.file_config = self.FILE_CONFIG[self.file_accession]
         self.phenotype_term = self.file_config['phenotype_term']
         self.ontology_term_validator = OntologyTermValidator()
+        self.reference_filepath = reference_filepath
         self.allowed_variant_ids = None
         if label != 'ontology_term' and 'variant_list_accession' in self.file_config:
-            self.allowed_variant_ids = self._load_variant_list(filepath)
+            self.allowed_variant_ids = self._load_variant_list()
 
         self.file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -182,30 +184,35 @@ class CRISPRVariantPhenotype(BaseAdapter):
             return None
         return int(float(value))
 
-    def _load_variant_list(self, filepath):
-        """Read variant IDs of the configured type from the companion variant list.
-
-        The list (e.g. IGVFFI7806CLOH.csv.gz) must sit beside the input file.
-        """
+    def _load_variant_list(self):
+        """Read variant IDs of the configured type from the reference variant list."""
         accession = self.file_config['variant_list_accession']
         variant_type = self.file_config['variant_list_type']
-        directory = os.path.dirname(filepath)
-        candidates = [os.path.join(directory, f'{accession}{ext}')
-                      for ext in ('.csv.gz', '.csv')]
-        list_path = next((p for p in candidates if os.path.isfile(p)), None)
-        if list_path is None:
-            raise FileNotFoundError(
-                f'Variant list {accession} for {self.file_accession} not found; '
-                f'expected one of: {", ".join(candidates)}')
-        with self._open_file(list_path) as f:
+        if not self.reference_filepath:
+            raise ValueError(
+                f'{self.file_accession} requires reference_filepath for '
+                f'{accession} (variant list).')
+        reference_accession = get_file_accession(self.reference_filepath)
+        if reference_accession != accession:
+            raise ValueError(
+                f'Expected variant list {accession}, got {reference_accession}')
+        self.reference_source_url = (
+            f'https://data.igvf.org/tabular-files/{accession}/'
+        )
+        with self._open_file(self.reference_filepath) as f:
+            reader = csv.DictReader(f)
+            missing = {'element_id', 'type'} - set(reader.fieldnames or [])
+            if missing:
+                raise ValueError(
+                    f'Variant list missing columns: {sorted(missing)}')
             variant_ids = {
                 row['element_id'].strip()
-                for row in csv.DictReader(f)
+                for row in reader
                 if row['type'].strip() == variant_type
             }
         if not variant_ids:
             raise ValueError(
-                f'No {variant_type!r} variants found in {list_path}')
+                f'No {variant_type!r} variants found in {self.reference_filepath}')
         return variant_ids
 
     def _is_variant_row(self, row) -> bool:

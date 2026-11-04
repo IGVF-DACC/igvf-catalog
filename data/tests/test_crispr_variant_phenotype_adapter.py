@@ -395,23 +395,8 @@ def test_invalid_trailing_coordinates(suffix):
         )
 
 
-CHRX_MAGECK_ROWS = '''variant,num,neg|score,neg|p-value,neg|fdr,neg|rank,neg|goodsgrna,neg|lfc,pos|score,pos|p-value,pos|fdr,pos|rank,pos|goodsgrna,pos|lfc
-NC_000023.11:56802295:T:C,5,1.0602e-12,2.219e-06,0.001238,1,4,-1.6533,0.94703,0.85192,1.0,1675,0,-1.6533
-NC_000023.11:134660265:A:G,5,1.0,1.0,1.0,2127,0,1.4633,9.1505e-12,2.219e-06,9e-05,2,5,1.4633
-NC_000023.11:110639463:G:A,5,0.010587,0.082632,0.646847,272,2,0.073106,0.21022,0.20397,0.601873,755,2,0.073106
-NC_000023.11:57377840:T:C,6,2.6262e-08,2.219e-06,0.001238,2,6,-1.4426,1.0,1.0,1.0,2127,0,-1.4426
-NC_000023.11:48791984:G:A,6,2.3724e-06,1.9971e-05,0.00495,8,5,-0.98956,0.80078,0.73248,1.0,1388,1,-0.98956
-nt0,1,0.61809,0.7305,1.0,1313,0,0.21985,0.38191,0.2695,0.710712,931,1,0.21985
-GATA1,5,0.21098,0.57584,1.0,864,3,-0.46243,0.90123,0.79537,1.0,1538,1,-0.46243
-'''
-
-CHRX_VARIANT_LIST_ROWS = '''element_id,genome_ref,chromosome,element_start,element_end,ref_allele,alt_allele,type,rsid
-NC_000023.11:56802295:T:C,GRCh38,NC_000023.11,56802295,56802295,T,C,variant-concordant,rs1317882
-NC_000023.11:134660265:A:G,GRCh38,NC_000023.11,134660265,134660265,A,G,variant-concordant,rs59156614
-NC_000023.11:110639463:G:A,GRCh38,NC_000023.11,110639463,110639463,G,A,variant-concordant,rs5942662
-NC_000023.11:57377840:T:C,GRCh38,NC_000023.11,57377840,57377840,T,C,variant-nonconcordant,rs5914997
-NC_000023.11:48791984:G:A,GRCh38,NC_000023.11,48791984,48791984,G,A,clinvar,
-'''
+CHRX_SCORES_PATH = './samples/crispr_IGVFFI4039BVDA.example.csv'
+CHRX_VARIANT_LIST_PATH = './samples/crispr_IGVFFI7806CLOH.example.csv'
 
 CHRX_CONCORDANT = {
     'NC_000023.11:56802295:T:C',
@@ -421,22 +406,22 @@ CHRX_CONCORDANT = {
 
 
 @pytest.fixture
-def chrx_inputs(tmp_path):
-    (tmp_path / 'IGVFFI4039BVDA.csv').write_text(CHRX_MAGECK_ROWS)
-    (tmp_path / 'IGVFFI7806CLOH.csv').write_text(CHRX_VARIANT_LIST_ROWS)
-    return tmp_path / 'IGVFFI4039BVDA.csv'
+def chrx_inputs():
+    return CHRX_SCORES_PATH, CHRX_VARIANT_LIST_PATH
 
 
 @patch('adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('adapters.CRISPR_variant_phenotype_adapter.load_variant', side_effect=_mock_load_variant)
 def test_variant_chrx_loads_only_concordant(mock_load, mock_bulk, mock_file_fileset, chrx_inputs):
+    scores, variant_list = chrx_inputs
     mock_file_fileset.return_value['perturbation'] = 'CRISPR base editing'
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath=str(chrx_inputs),
+        filepath=str(scores),
         label='variant',
         writer=writer,
         validate=True,
+        reference_filepath=str(variant_list),
     )
     adapter.process_file()
 
@@ -451,15 +436,17 @@ def test_variant_chrx_loads_only_concordant(mock_load, mock_bulk, mock_file_file
 @patch('adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=CHRX_CONCORDANT)
 @patch('adapters.CRISPR_variant_phenotype_adapter.load_variant', side_effect=_mock_load_variant)
 def test_variant_phenotype_chrx_mageck(mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator, chrx_inputs):
+    scores, variant_list = chrx_inputs
     mock_file_fileset.return_value['perturbation'] = 'CRISPR base editing'
     mock_file_fileset.return_value['simple_sample_summaries'] = [
         'human HUDEP-2 cell line from donor(s) IGVFDO0965QSBA']
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath=str(chrx_inputs),
+        filepath=str(scores),
         label='variant_phenotype',
         writer=writer,
         validate=True,
+        reference_filepath=str(variant_list),
     )
     adapter.process_file()
 
@@ -496,23 +483,46 @@ def test_variant_phenotype_chrx_mageck(mock_load, mock_bulk, mock_file_fileset, 
     assert nonsig['significant'] is False
 
 
-def test_chrx_missing_variant_list(mock_file_fileset, tmp_path):
-    sample = tmp_path / 'IGVFFI4039BVDA.csv'
-    sample.write_text(CHRX_MAGECK_ROWS)
-    with pytest.raises(FileNotFoundError, match='IGVFFI7806CLOH'):
+def test_chrx_missing_reference_filepath(mock_file_fileset, chrx_inputs):
+    scores, _variant_list = chrx_inputs
+    with pytest.raises(ValueError, match='requires reference_filepath for IGVFFI7806CLOH'):
         CRISPRVariantPhenotype(
-            filepath=str(sample),
+            filepath=str(scores),
             label='variant',
             writer=SpyWriter(),
         )
 
 
-def test_chrx_ontology_term_skips_variant_list(mock_file_fileset, tmp_path):
-    sample = tmp_path / 'IGVFFI4039BVDA.csv'
-    sample.write_text(CHRX_MAGECK_ROWS)
+def test_chrx_wrong_reference_accession(mock_file_fileset, chrx_inputs):
+    scores, _variant_list = chrx_inputs
+    wrong = ABE_PATH
+    with pytest.raises(ValueError, match='Expected variant list IGVFFI7806CLOH'):
+        CRISPRVariantPhenotype(
+            filepath=str(scores),
+            label='variant',
+            writer=SpyWriter(),
+            reference_filepath=str(wrong),
+        )
+
+
+def test_chrx_variant_list_missing_columns(mock_file_fileset, chrx_inputs, tmp_path):
+    scores, _variant_list = chrx_inputs
+    bad = tmp_path / 'IGVFFI7806CLOH.csv'
+    bad.write_text('element_id,rsid\nNC_000023.11:56802295:T:C,rs1317882\n')
+    with pytest.raises(ValueError, match="missing columns: \\['type'\\]"):
+        CRISPRVariantPhenotype(
+            filepath=str(scores),
+            label='variant',
+            writer=SpyWriter(),
+            reference_filepath=str(bad),
+        )
+
+
+def test_chrx_ontology_term_needs_no_reference(mock_file_fileset, chrx_inputs):
+    scores, _variant_list = chrx_inputs
     writer = SpyWriter()
     adapter = CRISPRVariantPhenotype(
-        filepath=str(sample),
+        filepath=str(scores),
         label='ontology_term',
         writer=writer,
     )
