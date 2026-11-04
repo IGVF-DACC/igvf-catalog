@@ -4,7 +4,7 @@ from math import log10, log2
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
+from adapters.helpers import MAX_NEG_LOG10_PVALUE, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
 
@@ -23,7 +23,6 @@ class CRISPRElementGeneENCODE(BaseAdapter):
     SOURCE = 'ENCODE'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
     FILE_ACCESSION = 'ENCFF968BZL'
-    MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
     COLLECTION_LABEL = 'regulatory element effect on gene expression'
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
@@ -101,7 +100,7 @@ class CRISPRElementGeneENCODE(BaseAdapter):
                     if p_value == 'NA':
                         neglog10pvalue = None
                     elif float(p_value) == 0:
-                        neglog10pvalue = self.MAX_LOG10_PVALUE
+                        neglog10pvalue = MAX_NEG_LOG10_PVALUE  # max neglog10pvalue from file is 235
                     else:
                         neglog10pvalue = -1 * log10(float(p_value))
 
@@ -109,7 +108,7 @@ class CRISPRElementGeneENCODE(BaseAdapter):
                     if p_value_adj == 'NA':
                         neglog10pvalue_adj = None
                     elif float(p_value_adj) == 0:
-                        neglog10pvalue_adj = self.MAX_LOG10_PVALUE
+                        neglog10pvalue_adj = MAX_NEG_LOG10_PVALUE
                     else:
                         neglog10pvalue_adj = -1 * log10(float(p_value_adj))
 

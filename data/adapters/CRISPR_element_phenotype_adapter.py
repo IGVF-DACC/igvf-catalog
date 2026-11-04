@@ -6,7 +6,7 @@ from typing import Optional
 
 from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import MAX_NEG_LOG10_PVALUE, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import Writer
 
@@ -30,7 +30,6 @@ class CRISPRElementPhenotype(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_phenotype']
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'regulatory element effect on phenotype'
-    MAX_LOG10_PVALUE = 240
     SIGNIFICANCE_THRESHOLD = 0.05
 
     # Accession -> phenotype ontology term and file column names.
@@ -122,7 +121,7 @@ class CRISPRElementPhenotype(BaseAdapter):
 
     def _neg_log10_pvalue(self, p_value: float) -> float:
         if p_value == 0:
-            return self.MAX_LOG10_PVALUE
+            return MAX_NEG_LOG10_PVALUE
         return -1 * log10(p_value)
 
     def _get_element_coords(self, row):

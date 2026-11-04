@@ -5,6 +5,7 @@ import gzip
 import os
 from unittest.mock import patch, MagicMock
 from adapters.eqtl_catalog_adapter import EQTLCatalog
+from adapters.helpers import MAX_NEG_LOG10_PVALUE
 from adapters.writer import SpyWriter
 
 
@@ -241,7 +242,7 @@ def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo,
 
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
-        assert first_item['neg_log10_pvalue'] == EQTLCatalog.MAX_LOG10_PVALUE
+        assert first_item['neg_log10_pvalue'] == MAX_NEG_LOG10_PVALUE
     finally:
         os.unlink(temp_file_path)
 

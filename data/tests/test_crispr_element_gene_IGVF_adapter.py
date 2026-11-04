@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from adapters.CRISPR_element_gene_IGVF_adapter import CRISPR_E2G_LAYOUTS, CRISPRElementGeneIGVF
+from adapters.helpers import MAX_NEG_LOG10_PVALUE
 from adapters.writer import SpyWriter
 
 
@@ -86,7 +87,7 @@ def test_crispr_element_gene_igvf_adapter_perturb_seq_genomic_elements_genes(moc
         assert first_item['pct_2'] == 0.282
         assert first_item['p_value_adj'] == 0.0
         assert first_item['significant'] is True
-        assert first_item['neg_log10_pvalue'] == CRISPRElementGeneIGVF.MAX_LOG10_PVALUE
+        assert first_item['neg_log10_pvalue'] == MAX_NEG_LOG10_PVALUE
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['perturbation'] == 'CRISPR interference'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
@@ -775,7 +776,7 @@ def test_igvf_e2g_pyspade_omits_nonfinite_gamma_approximation_ln_p_value(
     edge = json.loads(raw)
     assert 'gamma_approximation_ln_p_value' not in edge
     assert edge['p_value_adj'] == 0.0
-    assert edge['neg_log10_pvalue_adj'] == 240
+    assert edge['neg_log10_pvalue_adj'] == MAX_NEG_LOG10_PVALUE
     assert edge['significant'] is True
 
 
@@ -1117,7 +1118,7 @@ def test_apply_standard_neg_log10_fields():
 
     metrics = {'p_value': 0.0, 'p_value_adj': 0.02}
     adapter._apply_standard_neg_log10_fields(metrics)
-    assert metrics['neg_log10_pvalue'] == CRISPRElementGeneIGVF.MAX_LOG10_PVALUE
+    assert metrics['neg_log10_pvalue'] == MAX_NEG_LOG10_PVALUE
     assert metrics['neg_log10_pvalue_adj'] == pytest.approx(-math.log10(0.02))
 
     metrics = {'neg_log10_pvalue': 99.0, 'p_value': 0.01}

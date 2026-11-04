@@ -7,6 +7,7 @@ import os
 
 from adapters.base import BaseAdapter
 from adapters.helpers import (
+    MAX_NEG_LOG10_PVALUE,
     bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
     load_variant,
@@ -26,9 +27,6 @@ class ASB_GVATDB(BaseAdapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
-    # smallest pvalue in this file is 0, the second smallest pvalue is 1e-05, so we will replace 0 with 1e-05 to calculate log10pvalue
-    # so the max log10pvalue is 5.
-    MAX_LOG10_PVALUE = 5
     # label=variants does not need to be run regularly for this adapter for now - a full pass
     # over its already-loaded edges found no variants missing from the variants collection
     # (unlike AFGR_caqtl/AFGR_eqtl/AFGR_sqtl/TopLD/EQTLCatalog/PharmGKB/pQTL, which do have
@@ -103,7 +101,7 @@ class ASB_GVATDB(BaseAdapter):
     def write_edges(self, variant_id, row):
         pvalue = float(row[-3])
         if pvalue == 0:
-            log10pvalue = ASB_GVATDB.MAX_LOG10_PVALUE
+            log10pvalue = MAX_NEG_LOG10_PVALUE
         else:
             log10pvalue = -1 * log10(pvalue)
 
@@ -123,9 +121,9 @@ class ASB_GVATDB(BaseAdapter):
             _source = 'variants/' + variant_id
             _target = 'proteins/' + ensembl_id
 
-            # if p_value_adj is 0, we will set neg_log10_pvalue_adj to 2 (max value in the dataset), otherwise we will calculate it as -log10(p_value_adj)
+            # Exact 0 stores MAX_NEG_LOG10_PVALUE. A positive adjusted p-value uses -log10.
             p_value_adj = float(row[15])
-            neg_log10_pvalue_adj = 2
+            neg_log10_pvalue_adj = MAX_NEG_LOG10_PVALUE
             if p_value_adj > 0:
                 neg_log10_pvalue_adj = -1 * log10(p_value_adj)
 

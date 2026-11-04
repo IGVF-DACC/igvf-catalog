@@ -8,6 +8,7 @@ import os
 import requests
 from adapters.base import BaseAdapter
 from adapters.helpers import (
+    MAX_NEG_LOG10_PVALUE,
     build_variant_id,
     bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
@@ -53,7 +54,6 @@ class EQTLCatalog(BaseAdapter):
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study', 'variants']
     CHUNK_SIZE = 6500
-    MAX_LOG10_PVALUE = 400
     STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
     VARIANTS_SOURCE_URL = 'https://www.ebi.ac.uk/eqtl/'
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
@@ -158,7 +158,8 @@ class EQTLCatalog(BaseAdapter):
             if p_value == 0:
                 self.logger.warning(
                     f'p_value is 0 for {variant_vcf_format} {gene_id} {dataset_id}')
-                log_pvalue = self.MAX_LOG10_PVALUE  # Max value based on data
+                # large negative log10 pvalue in real data is below 400
+                log_pvalue = MAX_NEG_LOG10_PVALUE
             else:
                 log_pvalue = -1 * log10(p_value)
             _props = {
