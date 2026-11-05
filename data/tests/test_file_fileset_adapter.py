@@ -342,25 +342,36 @@ def test_fileset_query_files_props_igvf():
     assert sample_term_ids == ['UBERON_0014374']
 
 
-def test_query_fileset_files_props_igvf_with_perturbation():
+@pytest.mark.parametrize('fileset_accession, summary, expected_summary', [
+    ('IGVFDS0000TEST', 'K562 cell line treated with drug a, drug b',
+     'K562 cell line treated with drug a, drug b'),
+    ('IGVFDS3093XVZE', 'Updated portal summary',
+     'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, treated with interleukin-1 beta'),
+    ('IGVFDS1432SULL', 'Updated portal summary',
+     'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, treated with oxidised LDL'),
+    ('IGVFDS0000TEST',
+     'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, under conditions of 2 ng/mL interleukin-1 beta for 7 days',
+     'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, under conditions of 2 ng/mL interleukin-1 beta for 7 days'),
+])
+def test_query_fileset_files_props_igvf_with_perturbation(fileset_accession, summary, expected_summary):
     file_object = {
         '@id': '/tabular-files/IGVFFI0000TEST/',
         'accession': 'IGVFFI0000TEST',
         'catalog_class': 'observed data',
         'catalog_collections': ['genomic_elements'],
         'file_set': {
-            '@id': '/analysis-sets/IGVFDS0000TEST/'
+            '@id': f'/analysis-sets/{fileset_accession}/'
         },
         'href': '/tabular-files/IGVFFI0000TEST/@@download/IGVFFI0000TEST.tsv.gz'
     }
     fileset_object = {
-        'accession': 'IGVFDS0000TEST',
+        'accession': fileset_accession,
         '@type': ['AnalysisSet', 'FileSet', 'Item'],
         'lab': {'@id': '/labs/tim-reddy/'},
         'samples': [{'accession': 'IGVFSM0000TEST'}],
         'publications': [],
         'input_file_sets': [{'@id': '/measurement-sets/IGVFMS0000TEST/'}],
-        'simplified_sample_summary': 'K562 cell line treated with drug a, drug b'
+        'simplified_sample_summary': summary
     }
     with patch('adapters.file_fileset_adapter.requests.get', return_value=make_response(fileset_object)):
         with patch.object(FileFileSet, 'get_software_igvf', return_value={'Sceptre'}):
@@ -381,6 +392,7 @@ def test_query_fileset_files_props_igvf_with_perturbation():
                         props, donor_ids, sample_term_ids = FileFileSet.query_fileset_files_props_igvf(
                             file_object)
     assert props['perturbation'] == 'CRISPR interference'
+    assert props['simple_sample_summaries'] == [expected_summary]
     assert props['method'] == 'CRISPR screen'
     assert donor_ids == {'IGVFDO0000TEST'}
     assert sample_term_ids == ['EFO_0002067']

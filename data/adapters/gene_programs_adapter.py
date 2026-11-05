@@ -222,9 +222,6 @@ class GenePrograms(BaseAdapter):
         if gene_validator is not None:
             gene_validator.log()
 
-    def _reference_programs(self):
-        return self.reference_file_accession, self._read_program_genes(self.reference_filepath)
-
     @staticmethod
     def _regulator_number(value, field, optional=False):
         if optional and value.strip().lower() in ('', 'na', 'n/a', 'nan', 'null', '.'):
@@ -267,7 +264,8 @@ class GenePrograms(BaseAdapter):
         return elements
 
     def _parse_regulators(self):
-        defining_accession, programs = self._reference_programs()
+        defining_accession = self.reference_file_accession
+        programs = self._read_program_genes(self.reference_filepath)
         provenance = self._provenance()
         gene_validator = GeneValidator()
         seen_pairs = set()
@@ -349,7 +347,8 @@ class GenePrograms(BaseAdapter):
         return correlation
 
     def _parse_program_correlations(self):
-        defining_accession, programs = self._reference_programs()
+        defining_accession = self.reference_file_accession
+        programs = self._read_program_genes(self.reference_filepath)
         provenance = self._provenance()
         seen_pairs = {}
         columns = {'program_1_id', 'program_2_id', 'pearson_correlation'}

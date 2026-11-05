@@ -893,15 +893,13 @@ class FileFileSet:
 
         # Catalog display overrides; structured treatment metadata stays intact.
         context_overrides = {
-            'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, under conditions of 2 ng/mL interleukin-1 beta for 7 days':
+            'IGVFDS3093XVZE':
                 'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, treated with interleukin-1 beta',
-            'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, under conditions of 20 μg/mL oxidised LDL for 7 days':
+            'IGVFDS1432SULL':
                 'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, treated with oxidised LDL',
         }
-        simple_sample_summaries = [
-            context_overrides.get(summary, summary)
-            for summary in simple_sample_summaries
-        ]
+        if fileset_accession in context_overrides:
+            simple_sample_summaries = [context_overrides[fileset_accession]]
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
