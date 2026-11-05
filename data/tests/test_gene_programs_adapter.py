@@ -204,7 +204,7 @@ def test_missing_samples_allow_nodes_and_membership(tmp_path, metadata, samples,
             if accession == 'IGVFFI6391GCJR':
                 assert doc['biosample_term'] == 'ontology_terms/CL_0000115'
             else:
-                assert 'biosample_term' not in doc
+                assert doc['biosample_term'] is None
 
 
 @pytest.mark.parametrize('context', [

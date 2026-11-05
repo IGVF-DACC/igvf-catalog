@@ -148,8 +148,7 @@ class GenePrograms(BaseAdapter):
             'perturbation': metadata.get('perturbation'),
         }
         samples = metadata.get('samples') or []
-        if samples:
-            provenance['biosample_term'] = samples[0]
+        provenance['biosample_term'] = samples[0] if samples else None
         # Temporary attribution requested for the shared iPSC-to-EC programs.
         # TODO: revisit when biosample context supports multiple terms; the
         # current singular field represents these programs as endothelial cell.

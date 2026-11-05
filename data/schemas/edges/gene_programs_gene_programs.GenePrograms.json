@@ -12,7 +12,8 @@
           "$ref": "../mixins.json#/files_filesets"
         },
         "biosample_term": {
-          "$ref": "../mixins.json#/biosample_term"
+          "$ref": "../mixins.json#/biosample_term",
+          "type": ["string", "null"]
         },
         "biological_context": {
           "$ref": "../mixins.json#/biological_context",
@@ -97,6 +98,7 @@
         }
       },
       "required": [
+        "biosample_term",
         "files_filesets",
         "biological_context",
         "treatments_term_ids",
