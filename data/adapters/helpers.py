@@ -751,6 +751,18 @@ def build_variant_coding_variant_key(variant_id, coding_variant_id):
         return hashlib.sha256(key.encode()).hexdigest()
 
 
+def normalize_ensembl_gene_id(value: str) -> str:
+    """Normalize a human Ensembl gene ID, preserving an optional _PAR_Y suffix.
+
+    Strip whitespace and numeric versions; reject malformed IDs with ValueError.
+    This checks ID syntax only, not membership in the catalog gene collection.
+    """
+    gene = re.sub(r'\.\d+(?=_PAR_Y$|$)', '', value.strip())
+    if not re.fullmatch(r'ENSG[0-9]{11}(?:_PAR_Y)?', gene):
+        raise ValueError(f'Invalid Ensembl gene ID: {gene!r}')
+    return gene
+
+
 def to_float(str):
     MAX_EXPONENT = 307
 

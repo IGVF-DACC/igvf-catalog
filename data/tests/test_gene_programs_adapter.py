@@ -383,7 +383,7 @@ def test_regulator_significance_boundary(tmp_path, metadata, adjusted, significa
 
 @pytest.mark.parametrize('column,value,error', [
     (0, 'GP_99', 'is not defined'),
-    (1, 'TP53', 'Invalid regulator Ensembl'),
+    (1, 'TP53', 'Invalid Ensembl'),
     (2, 'unknown', 'Unsupported regulator genomic_element'),
     (3, '', 'Invalid regulator coordinates'),
     (3, 'chr1:200-100', 'Invalid regulator interval'),
@@ -518,8 +518,8 @@ def test_correlation_elements_use_both_sides_and_upstream_provenance(tmp_path, m
 
 
 @pytest.mark.parametrize('column,value,error', [
-    (0, 'invalid', 'Invalid regulator Ensembl'),
-    (3, 'invalid', 'Invalid regulator Ensembl'),
+    (0, 'invalid', 'Invalid Ensembl'),
+    (3, 'invalid', 'Invalid Ensembl'),
     (4, 'unknown', 'Unsupported regulator genomic_element'),
     (5, 'chr1:20-10', 'Invalid regulator interval'),
     (2, 'invalid', 'Invalid regulator coordinates'),

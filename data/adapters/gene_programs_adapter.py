@@ -19,7 +19,7 @@ from typing import Optional
 from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.gene_validator import GeneValidator
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb, normalize_ensembl_gene_id
 from adapters.writer import Writer
 
 
@@ -129,10 +129,7 @@ class GenePrograms(BaseAdapter):
             gene = row['gene'].strip()
             if not gene:
                 raise ValueError(f'Missing gene for program {program_id}')
-            # Catalog gene keys omit Ensembl versions, retaining PAR suffixes.
-            gene = re.sub(r'\.\d+(?=_PAR_Y$|$)', '', gene)
-            if not re.fullmatch(r'ENSG[0-9]{11}(?:_PAR_Y)?', gene):
-                raise ValueError(f'Invalid Ensembl gene ID: {gene!r}')
+            gene = normalize_ensembl_gene_id(gene)
             try:
                 score = float(row['score'])
             except ValueError as error:
@@ -278,10 +275,7 @@ class GenePrograms(BaseAdapter):
             if program_id not in programs:
                 raise ValueError(
                     f'Program {program_id!r} is not defined in {defining_accession}')
-            gene = re.sub(r'\.\d+(?=_PAR_Y$|$)', '', row['gene'].strip())
-            if not re.fullmatch(r'ENSG[0-9]{11}(?:_PAR_Y)?', gene):
-                raise ValueError(
-                    f'Invalid regulator Ensembl gene ID: {gene!r}')
+            gene = normalize_ensembl_gene_id(row['gene'])
             pair = (program_id, gene)
             if pair in seen_pairs:
                 raise ValueError(
@@ -382,13 +376,6 @@ class GenePrograms(BaseAdapter):
         if not seen_pairs:
             raise ValueError('Program correlation input contains no results')
 
-    @staticmethod
-    def _regulator_gene(value):
-        gene = re.sub(r'\.\d+(?=_PAR_Y$|$)', '', value.strip())
-        if not re.fullmatch(r'ENSG[0-9]{11}(?:_PAR_Y)?', gene):
-            raise ValueError(f'Invalid regulator Ensembl gene ID: {gene!r}')
-        return gene
-
     def _reference_regulators(self):
         elements_by_gene = {}
         seen_annotations = set()
@@ -397,7 +384,7 @@ class GenePrograms(BaseAdapter):
                           row['genomic_element_coordinates'])
             if annotation in seen_annotations:
                 continue
-            gene = self._regulator_gene(row['gene'])
+            gene = normalize_ensembl_gene_id(row['gene'])
             elements_by_gene.setdefault(gene, {}).update(
                 self._regulator_elements(row, gene, self.reference_file_accession))
             seen_annotations.add(annotation)
@@ -434,7 +421,7 @@ class GenePrograms(BaseAdapter):
                                    ('gene', 'genomic_element', 'genomic_element_coordinates'))
                 if annotation not in annotations:
                     gene, element_type, coordinates = annotation
-                    gene = self._regulator_gene(gene)
+                    gene = normalize_ensembl_gene_id(gene)
                     if gene not in upstream_elements:
                         raise ValueError(
                             f'Regulator {gene} is not defined in {upstream_accession}')
