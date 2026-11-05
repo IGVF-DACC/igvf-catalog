@@ -1660,6 +1660,26 @@ export const descriptions = {
     Pagination is 0-based. <br> <br> \
     ' + examples([
       {
+        id: 'semi-qy2h',
+        label: 'Arrayed semi-qY2H',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = ACSF3_ENST00000317447_p.Arg10Trp_c.28C-T',
+              'method = Arrayed semi-qY2H'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = ACSF3',
+              'method = Arrayed semi-qY2H'
+            ]
+          }
+        ]
+      },
+      {
         id: 'dual-ipa',
         label: 'DUAL-IPA',
         examples: [
