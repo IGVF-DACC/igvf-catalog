@@ -68,6 +68,7 @@ export const descriptions = {
             label: 'Programs containing ACTB',
             items: [
               'gene_id = ENSG00000075624',
+              'label = gene program membership',
               'files_fileset = IGVFFI9532OEFJ'
             ]
           },
@@ -75,6 +76,7 @@ export const descriptions = {
             label: 'Programs regulated by AAGAB',
             items: [
               'gene_id = ENSG00000103591',
+              'label = gene program regulation',
               'files_fileset = IGVFFI7611VVSS'
             ]
           }
