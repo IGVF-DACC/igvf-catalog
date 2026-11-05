@@ -9,9 +9,9 @@
         "biosample_term": { "$ref": "../mixins.json#/biosample_term" },
         "biological_context": { "$ref": "../mixins.json#/biological_context", "type": ["string", "null"] },
         "treatments_term_ids": { "$ref": "../mixins.json#/treatments_term_ids" },
-        "perturbation": { "$ref": "../mixins.json#/perturbation", "type": ["string", "null"] },
+        "perturbation": { "$ref": "../mixins.json#/perturbation", "type": ["string", "null"], "enum": ["CRISPR interference", null] },
         "class": { "$ref": "../mixins.json#/class", "enum": ["observed data"] },
-        "method": { "$ref": "../mixins.json#/method", "type": ["string", "null"] },
+        "method": { "$ref": "../mixins.json#/method", "type": ["string", "null"], "enum": ["Perturb-seq", null] },
         "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["gene program"]}
       }
     },

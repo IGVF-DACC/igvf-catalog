@@ -32,7 +32,8 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "enum": ["CRISPR interference", null]
         },
         "class": {
           "$ref": "../mixins.json#/class",
@@ -61,7 +62,8 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "enum": ["Perturb-seq", null]
         },
         "source": {
           "enum": [

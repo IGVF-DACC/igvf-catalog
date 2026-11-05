@@ -23,7 +23,7 @@ ROWS = (
 def metadata():
     with patch('adapters.gene_programs_adapter.get_file_fileset_by_accession_in_arangodb') as lookup:
         lookup.return_value = {
-            'class': 'observed data', 'method': 'cNMF', 'file_set_id': 'IGVFDS1435ERVG',
+            'class': 'observed data', 'method': 'Perturb-seq', 'file_set_id': 'IGVFDS1435ERVG',
         }
         yield lookup
 
@@ -46,7 +46,7 @@ def test_program_nodes(tmp_path, metadata, compressed):
     assert docs[0]['program_id'] == docs[0]['name'] == 'GP_1'
     assert docs[0]['files_filesets'] == 'files_filesets/IGVFFI9532OEFJ'
     assert docs[0]['class'] == 'observed data'
-    assert docs[0]['method'] == 'cNMF'
+    assert docs[0]['method'] == 'Perturb-seq'
     assert docs[0]['label'] == 'gene program'
     assert all('program_annotation' not in doc for doc in docs)
     metadata.assert_called_once_with('IGVFFI9532OEFJ')
@@ -784,7 +784,7 @@ def test_regulator_correlation_mappings(accession, upstream):
     assert Path(pair['reference_filepath']).name == upstream + '.tsv.gz'
 
 
-@pytest.mark.parametrize('method', ['cNMF', None])
+@pytest.mark.parametrize('method', ['Perturb-seq', None])
 @pytest.mark.parametrize('mode,expected', [
     ('gene_program', 'gene program'),
     ('gene_program_membership', 'gene program membership'),
@@ -812,7 +812,7 @@ def test_output_labels_are_descriptive_and_independent_of_method(tmp_path, metad
     adapter = GenePrograms(
         path, label=mode, reference_filepath=reference, validate=True)
     with pytest.raises(ValueError, match='Document validation failed'):
-        adapter.validate_doc({**docs[0], 'label': 'cNMF'})
+        adapter.validate_doc({**docs[0], 'label': 'Perturb-seq'})
     if mode in ('gene_program_membership', 'gene_program_regulation'):
         other = 'gene program regulation' if mode == 'gene_program_membership' else 'gene program membership'
         with pytest.raises(ValueError, match='Document validation failed'):

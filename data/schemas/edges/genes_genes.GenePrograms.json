@@ -28,7 +28,8 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "enum": ["CRISPR interference", null]
         }
       }
     },
@@ -52,7 +53,8 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "enum": ["Perturb-seq", null]
         },
         "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["regulator-regulator correlation"]},
         "_key": {

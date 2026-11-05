@@ -28,7 +28,8 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "enum": ["CRISPR interference", null]
         }
       }
     },
@@ -90,7 +91,8 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "enum": ["Perturb-seq", null]
         },
         "label": {"$ref": "../mixins.json#/label", "type": "string", "enum": ["gene program membership", "gene program regulation"]},
         "genomic_elements": {
@@ -138,7 +140,8 @@
           "title": "Reference Group",
           "type": "string",
           "minLength": 1,
-          "description": "Flexible tag describing the role of the guides used as a reference group to calculate a log2FC."
+          "description": "Flexible tag describing the role of the guides used as a reference group to calculate a log2FC.",
+          "enum": ["non-targeting", "covariate matched cells without the tested perturbation"]
         },
         "fdr_method": {
           "title": "FDR Method",
@@ -146,7 +149,8 @@
             "string",
             "null"
           ],
-          "description": "Method used for multiple testing correction."
+          "description": "Method used for multiple testing correction.",
+          "enum": ["Benjamini-Hochberg", "Benjamini-Hochberg over expressed perturbations", "Storey Q-value", null]
         },
         "significant": {
           "title": "Significant?",
