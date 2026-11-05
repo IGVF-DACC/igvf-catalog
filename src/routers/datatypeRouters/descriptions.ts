@@ -38,8 +38,8 @@ export const descriptions = {
   gene_programs:
     'Retrieve gene program definitions. Program identifiers are local to the defining file; catalog IDs include that file accession. Pagination is 0-based, with at most 100 results per page.<br><br>' + examples([
       {
-        id: 'gene-programs-hcasmc',
-        label: 'HCASMC-hTERT',
+        id: 'gene-programs-perturb-seq',
+        label: 'Perturb-seq',
         examples: [
           {
             label: 'Program definition',
@@ -56,13 +56,13 @@ export const descriptions = {
           }
         ]
       }
-    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
 
   genes_gene_programs:
     'Retrieve gene program membership weights and regulator effects for a gene. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
       {
-        id: 'genes-gene-programs-hcasmc',
-        label: 'HCASMC-hTERT',
+        id: 'genes-gene-programs-perturb-seq',
+        label: 'Perturb-seq',
         examples: [
           {
             label: 'Programs containing ACTB',
@@ -80,13 +80,13 @@ export const descriptions = {
           }
         ]
       }
-    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
 
   gene_programs_genes:
     'Retrieve member genes or regulators for a catalog gene_program_id. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
       {
-        id: 'gene-programs-genes-hcasmc',
-        label: 'HCASMC-hTERT',
+        id: 'gene-programs-genes-perturb-seq',
+        label: 'Perturb-seq',
         examples: [
           {
             label: 'Members of GP_1',
@@ -104,13 +104,13 @@ export const descriptions = {
           }
         ]
       }
-    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
 
   gene_programs_gene_programs:
     'Retrieve program-program correlations in perturbation log2FC. Matches either endpoint; optional associated_gene_program_id restricts the pair. Pearson filters accept gt:, gte:, lt:, lte: and exclude missing coefficients. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
       {
-        id: 'gene-programs-gene-programs-hcasmc',
-        label: 'HCASMC-hTERT',
+        id: 'gene-programs-gene-programs-perturb-seq',
+        label: 'Perturb-seq',
         examples: [
           {
             label: 'Correlations for GP_1',
@@ -130,7 +130,7 @@ export const descriptions = {
           }
         ]
       }
-    ], 'Query examples', 'Examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
 
   genomic_elements: 'Retrieve genomic elements.<br> \
   Example: region = chr1:1157520-1158189, <br> \
@@ -402,8 +402,8 @@ export const descriptions = {
     Pagination is 0-based. <br> <br> \
     ' + examples([
       {
-        id: 'igvf-regulator-correlation',
-        label: 'Gene Program Regulator Correlations',
+        id: 'igvf-perturb-seq',
+        label: 'Perturb-seq',
         examples: [
           {
             label: 'Single regulator pair in IL-1 beta-treated TeloHAEC cells',
