@@ -83,7 +83,7 @@ def test_invalid_inputs_write_no_nodes(tmp_path, metadata, content, error):
     with pytest.raises(ValueError, match=error):
         GenePrograms(path, writer=writer).process_file()
     assert writer.contents == []
-    metadata.assert_not_called()
+    metadata.assert_called_once_with('IGVFFI9532OEFJ')
 
 
 def test_missing_file_metadata(tmp_path, metadata):
@@ -146,7 +146,7 @@ def test_membership_preserves_scores_and_resolves_node_ids(tmp_path, metadata):
     assert len({edge['_key'] for edge in edges}) == 3
     assert {edge['name'] for edge in edges} == {'is a member of'}
     assert {edge['inverse_name'] for edge in edges} == {'has member'}
-    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1]): edge['score'] for edge in edges}
+    scores = {(edge['_from'], edge['_to'].rsplit('_', 1)[-1])              : edge['score'] for edge in edges}
     assert scores == {
         ('genes/ENSG00000119707', '1'): 0.5,
         ('genes/ENSG00000289740', '1'): 0.2,
@@ -495,6 +495,39 @@ def correlation_input(tmp_path, rows=None):
         for row in CORRELATION_ROWS if rows is None else rows:
             output.write('\t'.join(row) + '\n')
     return path
+
+
+@pytest.mark.parametrize('label', GenePrograms.ALLOWED_LABELS)
+def test_parse_tags_input_reference_and_datasets(tmp_path, metadata, label):
+    if label in ('regulator_correlation', 'genomic_element_regulator_correlation'):
+        path = correlation_input(tmp_path, CORRELATION_ROWS[:1])
+        reference = tmp_path / 'IGVFFI7611VVSS.tsv'
+    elif label == 'gene_program_correlation':
+        path, reference = program_correlation_input(tmp_path)
+    else:
+        path, reference = regulator_input(tmp_path)
+        if label in ('gene_program', 'gene_program_membership'):
+            path, reference = reference, None
+    accessions = [path.name.split('.')[0]]
+    if reference:
+        accessions.append(reference.name.split('.')[0])
+    records = {
+        accession: {**metadata.return_value,
+                    'file_set_id': f'IGVFDS{index:04d}TEST'}
+        for index, accession in enumerate(accessions)
+    }
+    metadata.side_effect = records.get
+    writer = SpyWriter()
+    with patch.object(writer, 'add_tag') as add_tag, \
+            patch('adapters.gene_programs_adapter.GeneValidator') as validator:
+        validator.return_value.validate.return_value = True
+        GenePrograms(path, label=label, reference_filepath=reference,
+                     writer=writer).process_file()
+    expected = set(accessions) | {record['file_set_id']
+                                  for record in records.values()}
+    assert {call.args for call in add_tag.call_args_list} == {
+        ('portal_accessions', accession) for accession in expected}
+    assert metadata.call_count == len(accessions)
 
 
 def test_correlation_elements_use_both_sides_and_upstream_provenance(tmp_path, metadata):

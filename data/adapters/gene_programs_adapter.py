@@ -150,14 +150,7 @@ class GenePrograms(BaseAdapter):
 
     def _provenance(self, accession=None):
         accession = accession or self.file_accession
-        metadata = get_file_fileset_by_accession_in_arangodb(
-            accession)
-        if not metadata:
-            raise ValueError(
-                f'Load files_filesets metadata for {accession} before gene programs')
-        self.writer.add_tag('portal_accessions', accession)
-        if metadata.get('file_set_id'):
-            self.writer.add_tag('portal_accessions', metadata['file_set_id'])
+        metadata = self._file_metadata[accession]
         sample_summaries = metadata.get('simple_sample_summaries') or []
         samples = metadata.get('samples') or []
         provenance = {
@@ -181,6 +174,21 @@ class GenePrograms(BaseAdapter):
         return provenance
 
     def parse(self):
+        self._file_metadata = {}
+        accessions = [self.file_accession]
+        if self.reference_filepath:
+            accessions.append(self.reference_file_accession or
+                              get_file_accession(self.reference_filepath))
+        for accession in dict.fromkeys(accessions):
+            metadata = get_file_fileset_by_accession_in_arangodb(accession)
+            if not metadata:
+                raise ValueError(
+                    f'Load files_filesets metadata for {accession} before gene programs')
+            self._file_metadata[accession] = metadata
+            self.writer.add_tag('portal_accessions', accession)
+            if metadata.get('file_set_id'):
+                self.writer.add_tag('portal_accessions',
+                                    metadata['file_set_id'])
         if self.label == 'gene_program_correlation':
             self._parse_program_correlations()
             return
@@ -397,7 +405,6 @@ class GenePrograms(BaseAdapter):
         nodes_only = self.label == 'genomic_element_regulator_correlation'
         provenance = self._provenance(
             upstream_accession if nodes_only else self.file_accession)
-        self.writer.add_tag('portal_accessions', upstream_accession)
         gene_validator = GeneValidator()
         valid_genes = {gene: gene_validator.validate(
             gene) for gene in upstream_elements}
