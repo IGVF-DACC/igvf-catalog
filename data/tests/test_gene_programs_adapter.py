@@ -103,8 +103,29 @@ def test_other_file_types_are_not_yet_supported(tmp_path):
 
 
 def test_input_requires_accession_filename(tmp_path):
-    with pytest.raises(ValueError, match='filename must begin'):
+    with pytest.raises(ValueError, match='Could not derive the file accession'):
         GenePrograms(tmp_path / 'programs.tsv')
+
+
+@pytest.mark.parametrize('label', [
+    'gene_program_regulation', 'genomic_element', 'gene_program_correlation',
+    'regulator_correlation', 'genomic_element_regulator_correlation',
+])
+def test_reference_is_validated_at_initialization(tmp_path, label):
+    path = tmp_path / 'download_IGVFFI7611VVSS.tsv'
+    with pytest.raises(ValueError, match='via --reference-filepath'):
+        GenePrograms(path, label=label)
+    reference = tmp_path / 'download_IGVFFI9532OEFJ.tsv'
+    with pytest.raises(ValueError, match='Missing'):
+        GenePrograms(path, label=label, reference_filepath=reference)
+    reference.touch()
+    adapter = GenePrograms(path, label=label, reference_filepath=reference)
+    assert adapter.file_accession == 'IGVFFI7611VVSS'
+    assert adapter.reference_file_accession == 'IGVFFI9532OEFJ'
+    invalid = tmp_path / 'ENCFF123ABC.tsv'
+    invalid.touch()
+    with pytest.raises(ValueError, match='valid IGVF file accession'):
+        GenePrograms(path, label=label, reference_filepath=invalid)
 
 
 def test_membership_preserves_scores_and_resolves_node_ids(tmp_path, metadata):
@@ -413,7 +434,7 @@ def test_regulator_reference_is_required(tmp_path, metadata, label):
         parse_regulators(path, label, reference_filepath=path)
     invalid = other / 'definitions.tsv'
     invalid.write_text(HEADER + ROWS)
-    with pytest.raises(ValueError, match='filename must begin with its IGVF file accession'):
+    with pytest.raises(ValueError, match='Could not derive the file accession'):
         parse_regulators(path, label, reference_filepath=invalid)
 
 
@@ -437,10 +458,10 @@ def test_duplicate_interval_in_one_result_is_emitted_once(tmp_path, metadata):
 
 
 def test_edge_schema_keeps_membership_and_regulation_distinct(tmp_path, metadata):
-    path, _ = regulator_input(tmp_path)
+    path, reference = regulator_input(tmp_path)
     edge = parse_regulators(path, 'gene_program_regulation')[0]
     adapter = GenePrograms(
-        path, label='gene_program_regulation', validate=True)
+        path, label='gene_program_regulation', reference_filepath=reference, validate=True)
     with pytest.raises(ValueError, match='Document validation failed'):
         adapter.validate_doc({**edge, 'score': 0.4})
     with pytest.raises(ValueError, match='Document validation failed'):
@@ -757,7 +778,8 @@ def test_regulator_correlation_pair_tracking_distinguishes_diagonal(tmp_path, me
 def test_regulator_correlation_schema_references_and_empty_input(tmp_path, metadata):
     path = correlation_input(tmp_path, CORRELATION_ROWS[:1])
     edge = parse_regulators(path, 'regulator_correlation')[0]
-    adapter = GenePrograms(path, label='regulator_correlation', validate=True)
+    adapter = GenePrograms(path, label='regulator_correlation',
+                           reference_filepath=tmp_path / 'IGVFFI7611VVSS.tsv', validate=True)
     for properties in ({'_from': 'gene_programs/GP_1'}, {'pearson_correlation': 2},
                        {'genomic_elements_from': []}, {'genomic_elements_to': ['genes/ENSG00000119707']}):
         with pytest.raises(ValueError, match='Document validation failed'):

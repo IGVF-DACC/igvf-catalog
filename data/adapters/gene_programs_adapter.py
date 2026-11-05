@@ -16,6 +16,7 @@ from pathlib import Path
 import re
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.gene_validator import GeneValidator
 from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
@@ -51,10 +52,31 @@ class GenePrograms(BaseAdapter):
     def __init__(self, filepath, label='gene_program', writer: Optional[Writer] = None,
                  validate=True, reference_filepath=None, **kwargs):
         self.reference_filepath = reference_filepath
-        self.file_accession = Path(filepath).name.split('.')[0]
+        self.reference_file_accession = None
+        self.file_accession = get_file_accession(filepath)
         if not re.fullmatch(r'IGVFFI[0-9]{4}[A-Z]{4}', self.file_accession):
             raise ValueError(
-                'Gene-program input filename must begin with its IGVF file accession')
+                'Gene-program input filename must contain a valid IGVF file accession')
+        if label in ('gene_program_regulation', 'genomic_element', 'gene_program_correlation'):
+            reference_description = 'program definitions'
+            reference_requirement = 'Relationship inputs'
+        elif label in ('regulator_correlation', 'genomic_element_regulator_correlation'):
+            reference_description = 'upstream regulator results'
+            reference_requirement = 'Regulator correlations'
+        else:
+            reference_description = None
+        if reference_description is not None:
+            if not reference_filepath:
+                raise ValueError(
+                    f'{reference_requirement} require {reference_description} via --reference-filepath')
+            if not Path(reference_filepath).is_file():
+                raise ValueError(
+                    f'Missing {reference_description}: {reference_filepath}')
+            self.reference_file_accession = get_file_accession(
+                reference_filepath)
+            if not re.fullmatch(r'IGVFFI[0-9]{4}[A-Z]{4}', self.reference_file_accession):
+                raise ValueError(
+                    'Reference filename must contain a valid IGVF file accession')
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_collection(self):
@@ -69,10 +91,14 @@ class GenePrograms(BaseAdapter):
         return 'edges', 'genes_gene_programs'
 
     @staticmethod
-    def program_key(defining_file_accession, program_id):
-        """Condition-specific relationship files must use the shared defining file."""
+    def _validate_program_id(program_id):
         if not re.fullmatch(r'[A-Za-z0-9_-]+', program_id):
             raise ValueError(f'Invalid program ID: {program_id!r}')
+
+    @classmethod
+    def program_key(cls, defining_file_accession, program_id):
+        """Condition-specific relationship files must use the shared defining file."""
+        cls._validate_program_id(program_id)
         return f'{defining_file_accession}_{program_id}'
 
     @staticmethod
@@ -95,11 +121,11 @@ class GenePrograms(BaseAdapter):
                         f'Malformed gene-program row {reader.line_num}')
                 yield row
 
-    def _read_program_genes(self, filepath=None):
+    def _read_program_genes(self, filepath):
         programs = {}
-        for row in self._rows(filepath or self.filepath, self.REQUIRED_COLUMNS):
+        for row in self._rows(filepath, self.REQUIRED_COLUMNS):
             program_id = row['program_id'].strip()
-            self.program_key(self.file_accession, program_id)
+            self._validate_program_id(program_id)
             gene = row['gene'].strip()
             if not gene:
                 raise ValueError(f'Missing gene for program {program_id}')
@@ -167,7 +193,7 @@ class GenePrograms(BaseAdapter):
         if self.label in ('gene_program_regulation', 'genomic_element'):
             self._parse_regulators()
             return
-        programs = self._read_program_genes()
+        programs = self._read_program_genes(self.filepath)
         provenance = self._provenance()
         gene_validator = GeneValidator() if self.label == 'gene_program_membership' else None
         for program_id, genes in programs.items():
@@ -197,17 +223,7 @@ class GenePrograms(BaseAdapter):
             gene_validator.log()
 
     def _reference_programs(self):
-        if not self.reference_filepath:
-            raise ValueError(
-                'Relationship inputs require program definitions via --reference-filepath')
-        reference = Path(self.reference_filepath)
-        if not reference.is_file():
-            raise ValueError(f'Missing program definitions: {reference}')
-        accession = reference.name.split('.')[0]
-        if not re.fullmatch(r'IGVFFI[0-9]{4}[A-Z]{4}', accession):
-            raise ValueError(
-                'Program definition filename must begin with its IGVF file accession')
-        return accession, self._read_program_genes(reference)
+        return self.reference_file_accession, self._read_program_genes(self.reference_filepath)
 
     @staticmethod
     def _regulator_number(value, field, optional=False):
@@ -222,7 +238,7 @@ class GenePrograms(BaseAdapter):
             raise ValueError(f'Non-finite regulator {field}: {value!r}')
         return number
 
-    def _regulator_elements(self, row, gene, accession=None):
+    def _regulator_elements(self, row, gene, accession):
         if row['genomic_element'].strip() != 'promoter':
             raise ValueError(
                 f'Unsupported regulator genomic_element: {row["genomic_element"]!r}')
@@ -242,7 +258,7 @@ class GenePrograms(BaseAdapter):
                 chrom, start, end, 'CRISPR', assembly='GRCh38')
             # A shared interval can be a promoter for multiple genes. Preserve
             # each gene association without overwriting the scalar promoter_of.
-            key += f'_{gene}_{accession or self.file_accession}'
+            key += f'_{gene}_{accession}'
             elements[key] = {
                 '_key': key, 'name': key, 'chr': chrom, 'start': start, 'end': end,
                 'type': 'tested elements', 'source_annotation': 'promoter',
@@ -273,7 +289,7 @@ class GenePrograms(BaseAdapter):
                 raise ValueError(
                     f'Duplicate regulator result for {program_id}/{gene}')
             seen_pairs.add(pair)
-            elements = self._regulator_elements(row, gene)
+            elements = self._regulator_elements(row, gene, self.file_accession)
             metrics = {
                 'log2FC': self._regulator_number(row['log2FC'], 'log2FC'),
                 'test_statistic': self._regulator_number(row['test_statistic'], 'test_statistic'),
@@ -375,31 +391,20 @@ class GenePrograms(BaseAdapter):
         return gene
 
     def _reference_regulators(self):
-        if not self.reference_filepath:
-            raise ValueError(
-                'Regulator correlations require upstream regulator results via --reference-filepath')
-        reference = Path(self.reference_filepath)
-        if not reference.is_file():
-            raise ValueError(
-                f'Missing upstream regulator results: {reference}')
-        accession = reference.name.split('.')[0]
-        if not re.fullmatch(r'IGVFFI[0-9]{4}[A-Z]{4}', accession):
-            raise ValueError(
-                'Regulator reference filename must begin with its IGVF file accession')
         elements_by_gene = {}
         seen_annotations = set()
-        for row in self._rows(reference, self.REGULATOR_COLUMNS):
+        for row in self._rows(self.reference_filepath, self.REGULATOR_COLUMNS):
             annotation = (row['gene'], row['genomic_element'],
                           row['genomic_element_coordinates'])
             if annotation in seen_annotations:
                 continue
             gene = self._regulator_gene(row['gene'])
             elements_by_gene.setdefault(gene, {}).update(
-                self._regulator_elements(row, gene, accession))
+                self._regulator_elements(row, gene, self.reference_file_accession))
             seen_annotations.add(annotation)
         if not elements_by_gene:
             raise ValueError('Upstream regulator input contains no results')
-        return accession, elements_by_gene
+        return self.reference_file_accession, elements_by_gene
 
     def _parse_regulator_correlations(self):
         upstream_accession, upstream_elements = self._reference_regulators()
