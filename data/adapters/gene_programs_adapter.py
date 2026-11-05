@@ -136,6 +136,7 @@ class GenePrograms(BaseAdapter):
         if metadata.get('file_set_id'):
             self.writer.add_tag('portal_accessions', metadata['file_set_id'])
         sample_summaries = metadata.get('simple_sample_summaries') or []
+        samples = metadata.get('samples') or []
         provenance = {
             'source': 'IGVF',
             'source_url': f'https://data.igvf.org/tabular-files/{accession}/',
@@ -143,12 +144,11 @@ class GenePrograms(BaseAdapter):
             'class': metadata['class'],
             'method': metadata.get('method'),
             'label': self.OUTPUT_LABELS[self.label],
+            'biosample_term': samples[0] if samples else None,
             'biological_context': sample_summaries[0] if sample_summaries else None,
             'treatments_term_ids': metadata.get('treatments_term_ids'),
             'perturbation': metadata.get('perturbation'),
         }
-        samples = metadata.get('samples') or []
-        provenance['biosample_term'] = samples[0] if samples else None
         # Temporary attribution requested for the shared iPSC-to-EC programs.
         # TODO: revisit when biosample context supports multiple terms; the
         # current singular field represents these programs as endothelial cell.
