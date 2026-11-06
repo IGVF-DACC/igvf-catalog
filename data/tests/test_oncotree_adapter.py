@@ -15,7 +15,8 @@ def mock_file_fileset():
     with patch('adapters.oncotree_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'class': 'biological relationship',
-            'method': None
+            'method': None,
+            'file_set_id': 'IGVFFI123XYZW'
         }
         yield mock_get_file_fileset
 
@@ -33,7 +34,6 @@ def test_oncotree_adapter(mock_file_fileset):
     assert adapter.file_accession == SAMPLE_ACCESSION
     assert len(docs) == 4
     mock_file_fileset.assert_called_once_with(SAMPLE_ACCESSION)
-
     tissue = next(doc for doc in docs if doc['_key'] == 'Oncotree_TISSUE')
     assert tissue['term_id'] == 'Oncotree_TISSUE'
     assert tissue['name'] == 'Tissue'
@@ -78,8 +78,10 @@ def test_process_file_writer_closed_on_finish(mock_file_fileset):
     writer = MagicMock()
     oncotree = Oncotree(filepath=SAMPLE_FILEPATH, label='node', writer=writer)
     oncotree.process_file()
-    writer.add_tag.assert_called_once_with(
+    writer.add_tag.assert_any_call(
         'portal_accessions', SAMPLE_ACCESSION)
+    writer.add_tag.assert_any_call(
+        'portal_accessions', 'IGVFFI123XYZW')
     # process_file drives the writer through the context-manager protocol,
     # so the writer is exited (closed) rather than having close() called directly.
     assert writer.__exit__.called

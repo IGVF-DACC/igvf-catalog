@@ -3,8 +3,9 @@ import csv
 import json
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # ENCFF078OEX – ENCODE contains a mapping of ENCODE mouse and human DNase HS regions
@@ -66,7 +67,7 @@ class HumanMouseElementAdapter(BaseAdapter):
     }
 
     def __init__(self, filepath, label='genomic_element_mm_genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = filepath.split('/')[-1].split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         self.source_url = 'https://data.igvf.org/reference-files/' + \
             self.file_accession
 
@@ -89,6 +90,12 @@ class HumanMouseElementAdapter(BaseAdapter):
             return 'genomic_elements_mm_genomic_elements'
 
     def parse(self):
+        self.writer.add_tag('portal_accessions', self.file_accession)
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        file_set_accession = self.file_fileset.get('file_set_id')
+        if file_set_accession:
+            self.writer.add_tag('portal_accessions', file_set_accession)
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             next(reader)

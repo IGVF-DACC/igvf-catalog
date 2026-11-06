@@ -1,10 +1,10 @@
 import csv
 import json
-import os
 import pickle
 import re
 from typing import Optional
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.ontology_term_validator import OntologyTermValidator
@@ -40,7 +40,7 @@ class EBIComplex(BaseAdapter):
     def __init__(self, filepath, label='complex', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
 
     @staticmethod
     def to_ontology_term_key(raw_id, source=None):

@@ -61,7 +61,7 @@ COMPLETE_VARIANT = {
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
 def test_process_file_variants(mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset):
     writer = SpyWriter()
-    adapter = SGE('dummy_accession.tsv.gz', label='variants',
+    adapter = SGE('IGVFFI2810SLAX.tsv.gz', label='variants',
                   writer=writer, validate=True)
     adapter.process_file()
 
@@ -69,8 +69,8 @@ def test_process_file_variants(mock_gzip_open, mock_bulk_check, mock_load_varian
     assert len(writer.contents) > 0
     assert first_item['_key'] == 'NC_000016.10:23603561:G:A'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
-    assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI2810SLAX'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI2810SLAX'
 
 
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=(COMPLETE_VARIANT, None))
@@ -80,17 +80,17 @@ def test_process_file_variants_phenotypes(
         mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset,
         mock_ontology_term_validator):
     writer = SpyWriter()
-    adapter = SGE('dummy_accession.tsv.gz',
+    adapter = SGE('IGVFFI2810SLAX.tsv.gz',
                   label='variants_phenotypes', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_key'] == 'NC_000016.10:23603561:G:A_' + \
-        SGE.PHENOTYPE_TERM + '_dummy_accession'
+        SGE.PHENOTYPE_TERM + '_IGVFFI2810SLAX'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
-    assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI2810SLAX'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI2810SLAX'
 
 
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=(COMPLETE_VARIANT, None))
@@ -105,20 +105,20 @@ def test_process_file_coding_variants_phenotypes(
         return_value='dummy_coding_variant_key'  # Mocked coding variant ID
     )
     writer = SpyWriter()
-    adapter = SGE('dummy_accession.tsv.gz',
+    adapter = SGE('IGVFFI2810SLAX.tsv.gz',
                   label='coding_variants_phenotypes', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert first_item['_key'] == 'dummy_coding_variant_key_' + \
-        SGE.PHENOTYPE_TERM + '_dummy_accession'
+        SGE.PHENOTYPE_TERM + '_IGVFFI2810SLAX'
     assert first_item['_from'] == 'coding_variants/dummy_coding_variant_key'
     assert first_item['_to'] == 'ontology_terms/' + SGE.PHENOTYPE_TERM
     assert first_item['variants'] == 'variants/NC_000016.10:23603561:G:A'
     assert first_item['source'] == 'IGVF'
-    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
-    assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI2810SLAX'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI2810SLAX'
     assert first_item['name'] == SGE.CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME
     assert first_item['inverse_name'] == SGE.CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME
     assert first_item['exon'] == 'PALB2_X13'
@@ -140,13 +140,13 @@ def test_process_file_coding_variants_phenotypes(
 def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError):
-        adapter = SGE('dummy_accession.tsv.gz',
+        adapter = SGE('IGVFFI2810SLAX.tsv.gz',
                       label='invalid_label', writer=writer, validate=True)
 
 
 def test_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
-    adapter = SGE('dummy_accession.tsv.gz',
+    adapter = SGE('IGVFFI2810SLAX.tsv.gz',
                   label='variants_phenotypes', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

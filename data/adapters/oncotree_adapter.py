@@ -65,6 +65,8 @@ class Oncotree(BaseAdapter):
             self.file_accession)
         self.collection_class = file_metadata['class']
         self.method = file_metadata['method']
+        fileset_accession = file_metadata['file_set_id']
+        self.writer.add_tag('portal_accessions', fileset_accession)
 
         for member in get_files_from_folder(self.filepath):
             with member.open() as input_file:

@@ -19,14 +19,14 @@ def mock_bulk_check_variants():
 
 def test_topld_adapter_initialization():
     writer = SpyWriter()
-    adapter = TopLD(filepath='./tests/fixtures/topld_sample.csv',
-                    annotation_filepath='./tests/fixtures/topld_info_annotation.csv',
+    adapter = TopLD(filepath='./tests/fixtures/IGVFFI6426PMAM_topld_sample.csv',
+                    annotation_filepath='./tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
                     writer=writer)
 
-    assert adapter.filepath == './tests/fixtures/topld_sample.csv'
-    assert adapter.annotation_filepath == './tests/fixtures/topld_info_annotation.csv'
+    assert adapter.filepath == './tests/fixtures/IGVFFI6426PMAM_topld_sample.csv'
+    assert adapter.annotation_filepath == './tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv'
     assert adapter.chr == 'chr22'
     assert adapter.ancestry == 'SAS'
     assert adapter.label == 'topld_linkage_disequilibrium'
@@ -37,8 +37,8 @@ def test_topld_adapter_process_file(mocker, mock_bulk_check_variants):
     mocker.patch('adapters.topld_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
-    adapter = TopLD(filepath='./tests/fixtures/topld_sample.csv',
-                    annotation_filepath='./tests/fixtures/topld_info_annotation.csv',
+    adapter = TopLD(filepath='./tests/fixtures/IGVFFI6426PMAM_topld_sample.csv',
+                    annotation_filepath='./tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
                     writer=writer,
@@ -90,8 +90,8 @@ def test_topld_adapter_skips_edge_when_variant_not_loaded(mocker, mock_bulk_chec
     mock_bulk_check_variants.side_effect = None
     mock_bulk_check_variants.return_value = set()
     writer = SpyWriter()
-    adapter = TopLD(filepath='./tests/fixtures/topld_sample.csv',
-                    annotation_filepath='./tests/fixtures/topld_info_annotation.csv',
+    adapter = TopLD(filepath='./tests/fixtures/IGVFFI6426PMAM_topld_sample.csv',
+                    annotation_filepath='./tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
                     writer=writer,
@@ -126,8 +126,8 @@ def test_topld_adapter_variants_label_creates_missing_variant(mocker, mock_bulk_
     }, None)
 
     writer = SpyWriter()
-    adapter = TopLD(filepath='./tests/fixtures/topld_sample.csv',
-                    annotation_filepath='./tests/fixtures/topld_info_annotation.csv',
+    adapter = TopLD(filepath='./tests/fixtures/IGVFFI6426PMAM_topld_sample.csv',
+                    annotation_filepath='./tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
                     label='variants',
@@ -150,8 +150,8 @@ def test_topld_adapter_process_annotations(mocker):
     mocker.patch('adapters.topld_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
-    adapter = TopLD(filepath='./tests/fixtures/topld_sample.csv',
-                    annotation_filepath='./tests/fixtures/topld_info_annotation.csv',
+    adapter = TopLD(filepath='./tests/fixtures/IGVFFI6426PMAM_topld_sample.csv',
+                    annotation_filepath='./tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
                     writer=writer)
@@ -169,8 +169,8 @@ def test_topld_adapter_process_annotations(mocker):
 
 def test_topld_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = TopLD(filepath='./tests/fixtures/topld_sample.csv',
-                    annotation_filepath='./tests/fixtures/topld_info_annotation.csv',
+    adapter = TopLD(filepath='./tests/fixtures/IGVFFI6426PMAM_topld_sample.csv',
+                    annotation_filepath='./tests/fixtures/IGVFFI0965IFWW_topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
                     writer=writer, validate=True)

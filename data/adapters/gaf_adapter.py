@@ -1,11 +1,11 @@
 import gzip
 import json
 import hashlib
-import os
 from typing import Optional
 
 from Bio.UniProt.GOA import gafiterator
 
+from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
@@ -58,7 +58,7 @@ class GAF(BaseAdapter):
     def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, reference_filepath=None, **kwargs):
         self.ontology_term_validator = OntologyTermValidator()
         super().__init__(filepath, label, writer, validate)
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.file_accession = get_file_accession(filepath)
         if self.label == 'rna':
             if not reference_filepath:
                 raise ValueError(
