@@ -156,3 +156,18 @@ def test_encode_mpra_adapter_validate_doc_invalid(mock_file_fileset, mock_igvf_a
 
     with pytest.raises(ValueError, match='Document validation failed:'):
         adapter.validate_doc(invalid_doc)
+
+
+def test_encode_mpra_adapter_portal_accessions_tagged_in_parse(tmp_path, mock_file_fileset, mock_igvf_api):
+    mock_file_fileset.return_value['file_set_id'] = 'IGVFDS0000TEST'
+    effects = tmp_path / 'ENCFF802FUV.bed'
+    effects.write_text('')
+    writer = SpyWriter()
+    with patch.object(writer, 'add_tag') as mock_add_tag:
+        adapter = MPRAAdapter(str(effects), 'genomic_element', writer=writer)
+        mock_add_tag.assert_not_called()
+        adapter.process_file()
+    assert {c.args[0]
+            for c in mock_add_tag.call_args_list} == {'portal_accessions'}
+    assert [c.args[1] for c in mock_add_tag.call_args_list] == [
+        'IGVFFI9999MOCK', 'IGVFDS0000TEST']
