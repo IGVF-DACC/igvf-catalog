@@ -85,7 +85,7 @@ export const genesGenesRelativeFormat = z.object({
   confidence_value_intact: z.number().nullable().optional(),
   pmids: z.array(z.string()).optional(),
   label: z.string(),
-  method: z.string().nullable(),
+  method: z.enum(methods).nullable(),
   class: z.string(),
   source: z.string(),
   source_url: z.string().optional(),

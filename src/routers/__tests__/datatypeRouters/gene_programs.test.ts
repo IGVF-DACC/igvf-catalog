@@ -133,4 +133,8 @@ it('publishes bounded limits and method choices for genes/genes', () => {
   const params = openApiDocument.paths['/genes/genes']?.get?.parameters as any[]
   expect(params.find(p => p.name === 'limit').schema.maximum).toBe(100)
   expect(params.find(p => p.name === 'method').schema.enum).toContain('Perturb-seq')
+  const response = openApiDocument.paths['/genes/genes']?.get?.responses['200'] as any
+  const method = response.content['application/json'].schema.items.properties.method
+  expect(method.enum).toEqual(params.find(p => p.name === 'method').schema.enum)
+  expect(method.nullable).toBe(true)
 })
