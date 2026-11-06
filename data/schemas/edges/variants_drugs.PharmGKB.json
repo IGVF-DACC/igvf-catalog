@@ -75,7 +75,7 @@
                 "description": "Number of study controls. Stored as a string as provided by the source, may be empty",
                 "example": "149"
               },
-              "p-value": {
+              "p_value": {
                 "title": "P-Value",
                 "type": [
                   "string",
@@ -96,7 +96,7 @@
               "study_type",
               "study_cases",
               "study_controls",
-              "p-value",
+              "p_value",
               "biogeographical_groups"
             ],
             "additionalProperties": false
@@ -107,7 +107,7 @@
               "study_type": "cohort",
               "study_cases": "100",
               "study_controls": "",
-              "p-value": "= 0.49",
+              "p_value": "= 0.49",
               "biogeographical_groups": "East Asian"
             }
           ]

@@ -61,8 +61,8 @@ describe('variantsDrugsRouters (integration)', () => {
   })
 
   // Regression test: variants_drugs/1451237464_PA448515 (one of the ~37 PharmGKB edges off
-  // this variant) has study_parameters[0]['p-value'] == null in the DB - PharmGKB rows where
-  // the p-value couldn't be parsed are stored that way rather than dropped. 'p-value' used to
+  // this variant) has study_parameters[0].p_value == null in the DB - PharmGKB rows where
+  // the p-value couldn't be parsed are stored that way rather than dropped. p_value used to
   // be typed z.string().optional() here, which only accepts undefined, not null, so this exact
   // query 500'd with "Output validation failed" in production. limit is set above the real
   // total (37) so the null record is guaranteed to be in the page regardless of sort order.
@@ -87,7 +87,7 @@ describe('variantsDrugsRouters (integration)', () => {
     }
 
     const nullPValueRecord = result.find((record: any) =>
-      record.study_parameters?.some((sp: any) => sp['p-value'] === null)
+      record.study_parameters?.some((sp: any) => sp.p_value === null)
     )
     expect(nullPValueRecord).toBeDefined()
   })

@@ -21,7 +21,7 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
             study_type: 'case-control',
             study_cases: '100',
             study_controls: '100',
-            'p-value': '0.001',
+            p_value: '0.001',
             biogeographical_groups: 'European'
           }
         ],
@@ -94,7 +94,7 @@ describe('variantsDrugsRouters.drugsFromVariants', () => {
             study_type: 'case-control',
             study_cases: '100',
             study_controls: '100',
-            'p-value': '0.001',
+            p_value: '0.001',
             biogeographical_groups: 'European'
           }
         ],
