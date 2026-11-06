@@ -81,7 +81,7 @@ it('returns IGVF regulator correlations through genes/genes with their targeted 
   expect(await call(genesGenesEdgeRouters.genesGenes, { gene_id: 'ENSG1', source: 'IGVF', label: edge.label, method: 'Perturb-seq', files_fileset: 'IGVFFI6502THLB', pearson_correlation: 'lte:-0.5' })).toEqual([edge])
   expect(query()).toContain("record.label == 'regulator-regulator correlation' ?")
   expect(query()).toContain("'genomic_elements_from': record['genomic_elements_from']")
-  expect(query()).toContain('IS_NUMBER(record.pearson_correlation)')
+  expect(query()).toContain('record.pearson_correlation != null')
   expect(query()).toContain("record.files_filesets == 'files_filesets/IGVFFI6502THLB'")
 })
 
@@ -112,14 +112,25 @@ it('registers all gene-program endpoints in OpenAPI', () => {
 
 it('excludes regulator correlations and BioGRID from z-score range filters', async () => {
   await call(genesGenesEdgeRouters.genesGenes, { gene_id: 'ENSG1', z_score: 'lt:1' })
-  expect(query()).toContain('IS_NUMBER(record.z_score)')
+  expect(query()).toContain('record.z_score != null')
 })
 
 it('groups genes/genes as bespoke and includes gene-program examples', () => {
   expect(openApiDocument.paths['/genes/genes']?.get?.tags).toEqual(['Bespoke Endpoints'])
   for (const path of ['/gene-programs', '/genes/gene-programs', '/gene-programs/genes', '/gene-programs/gene-programs']) {
     const description = openApiDocument.paths[path]?.get?.description
-    expect(description).toContain('Query examples')
+    expect(description).toContain('Examples by method')
     expect(description).toContain('IGVFFI9532OEFJ')
   }
+})
+
+it.each([{ limit: 500 }, { method: 'NotAMethod' }])('rejects invalid genes/genes constraints %j', async input => {
+  await expect(call(genesGenesEdgeRouters.genesGenes, { gene_id: 'ENSG1', ...input })).rejects.toThrow()
+  expect(dbModule.db.query).not.toHaveBeenCalled()
+})
+
+it('publishes bounded limits and method choices for genes/genes', () => {
+  const params = openApiDocument.paths['/genes/genes']?.get?.parameters as any[]
+  expect(params.find(p => p.name === 'limit').schema.maximum).toBe(100)
+  expect(params.find(p => p.name === 'method').schema.enum).toContain('Perturb-seq')
 })

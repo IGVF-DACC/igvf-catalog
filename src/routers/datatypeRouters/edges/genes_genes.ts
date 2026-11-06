@@ -39,6 +39,10 @@ const interactionTypes = z.enum([
 const sources = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'source')
 const names = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'name')
 const labels = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'label')
+const methods = Array.from(new Set([
+  ...getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'method'),
+  ...getCollectionEnumValuesOrThrow('edges', 'mm_genes_mm_genes', 'method')
+])).sort() as [string, ...string[]]
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
     associated_gene_id: z.string().trim().optional(),
@@ -48,7 +52,7 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
     z_score: z.string().trim().optional(),
     interaction_type: interactionTypes.optional(),
     label: z.enum(labels).optional(),
-    method: z.string().trim().min(1).optional(),
+    method: z.enum(methods).optional(),
     pearson_correlation: programNumericFilter.optional(),
     source: z.enum(sources).optional(),
     name: z.enum(names).optional(),
@@ -56,7 +60,7 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   })
 ).merge(commonEdgeParamsFormat).merge(programContextQuery).extend({
   page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().optional()
+  limit: z.number().int().positive().max(MAX_PAGE_SIZE).optional()
 })
 
 export const genesGenesRelativeFormat = z.object({
@@ -138,7 +142,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let correlationFilter = ''
   if (input.pearson_correlation !== undefined) {
-    correlationFilter = 'IS_NUMBER(record.pearson_correlation) AND ' +
+    correlationFilter = 'record.pearson_correlation != null AND ' +
       getFilterStatements(regulatorCorrelationSchema, { pearson_correlation: input.pearson_correlation })
     delete input.pearson_correlation
   }
@@ -166,11 +170,12 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   delete input.associated_gene_name
   delete input.associated_synonym
 
-  // Guard numeric ranges: missing/null values otherwise match AQL lt/lte filters,
-  // which would incorrectly include BioGRID and regulator-correlation edges.
+  // Schema-constrained scores are numeric or absent/null. Exclude null explicitly:
+  // IS_NUMBER combined with the endpoint OR triggers an optimizer error on dev.
+  // Without this guard, AQL lt/lte comparisons also include missing values.
   let zScoreFilter = ''
   if (input.z_score !== undefined) {
-    zScoreFilter = 'IS_NUMBER(record.z_score) AND ' + getFilterStatements(CoXPresdbSchema, { z_score: input.z_score })
+    zScoreFilter = 'record.z_score != null AND ' + getFilterStatements(CoXPresdbSchema, { z_score: input.z_score })
     delete input.z_score
   }
 

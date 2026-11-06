@@ -94,6 +94,7 @@ export const descriptions = {
             label: 'Members of GP_1',
             items: [
               'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'label = gene program membership',
               'files_fileset = IGVFFI9532OEFJ'
             ]
           },
@@ -101,6 +102,7 @@ export const descriptions = {
             label: 'Regulators of GP_1',
             items: [
               'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'label = gene program regulation',
               'files_fileset = IGVFFI7611VVSS'
             ]
           }
