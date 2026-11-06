@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/coding_variants_phenotypes.SemiQY2H.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "description": "Coding variant key, phenotype ontology term and source file accession, joined by underscores.",
+          "example": "ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T_GO_0005515_IGVFFI7393MGJK"
+        },
+        "_from": {
+          "example": "coding_variants/ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/GO_0005515",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "norm_dist_rms": {
+          "type": "number",
+          "description": "Normalized RMS Euclidean distance, calculated as sqrt(mean((variant - wt)^2)) across all interactors, normalized by sqrt(number of edges); high values indicate greater disruption of protein interactions"
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI7393MGJK"
+          ]
+        },
+        "name": {
+          "enum": [
+            "mutational effect"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "altered due to mutation"
+          ]
+        },
+        "method": {
+          "enum": [
+            "Arrayed semi-qY2H"
+          ]
+        },
+        "label": {
+          "enum": [
+            "protein variant effect"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "File and fileset reference for this edge",
+          "example": "files_filesets/IGVFFI7393MGJK",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "norm_dist_rms",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "return": "_from, _to, norm_dist_rms, source, source_url, name, inverse_name, method, label, class, files_filesets"
+  },
+  "db_collection_name": "coding_variants_phenotypes"
+}
