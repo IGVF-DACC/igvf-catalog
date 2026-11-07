@@ -3,6 +3,27 @@ import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1, build_spdi
 from unittest.mock import patch, MagicMock
 from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb, get_gene_map_from_arangodb
+from adapters.helpers import normalize_ensembl_gene_id
+
+
+@pytest.mark.parametrize('value, expected', [
+    ('ENSG00000119707', 'ENSG00000119707'),
+    (' ENSG00000119707.15\t', 'ENSG00000119707'),
+    ('ENSG00000119707_PAR_Y', 'ENSG00000119707_PAR_Y'),
+    ('ENSG00000119707.15_PAR_Y', 'ENSG00000119707_PAR_Y'),
+    ('ENSG00000119707_PAR_Y.15', 'ENSG00000119707_PAR_Y'),
+])
+def test_normalize_ensembl_gene_id(value, expected):
+    assert normalize_ensembl_gene_id(value) == expected
+
+
+@pytest.mark.parametrize('value', [
+    '', ' ', 'TP53', 'ENSG123', 'ENSMUSG00000000001',
+    'ENSG00000119707.bad', 'ENSG00000119707_PAR_X', 'ENSG00000119707;',
+])
+def test_normalize_ensembl_gene_id_rejects_invalid_ids(value):
+    with pytest.raises(ValueError, match='Invalid Ensembl gene ID'):
+        normalize_ensembl_gene_id(value)
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():

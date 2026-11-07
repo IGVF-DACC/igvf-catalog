@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { contextFilters, programContextQuery, programNumericFilter } from '../gene_programs_shared'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -10,13 +11,14 @@ import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
+const regulatorCorrelationSchema = getSchema('data/schemas/edges/genes_genes.GenePrograms.json')
 
-const HumangenesGenesSchema = getSchema('data/schemas/edges/genes_genes.GeneGeneBiogrid.json') // union of properties from coxpresdb & biogrid
+const HumangenesGenesSchema = getSchema('data/schemas/edges/genes_genes.GeneGeneBiogrid.json')
 const MousegenesGenesSchema = getSchema('data/schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json')
 const CoXPresdbSchema = getSchema('data/schemas/edges/genes_genes.Coxpresdb.json') // human coexpredb
 const HumangenesSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const MousegenesSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
-// genes_genes holds both BioGRID (fake z_score = 0) and COXPRESdb (real z_score) edges.
+// Human gene edges include BioGRID, COXPRESdb, and IGVF regulator correlations.
 // Filtering must see the union so a real z_score range filter isn't built from a schema
 // that doesn't know about it.
 const HumangenesGenesFilterSchema = getMergedCollectionSchema('edges', 'genes_genes')
@@ -37,14 +39,10 @@ const interactionTypes = z.enum([
 const sources = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'source')
 const names = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'name')
 const labels = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'label')
-const methodsHuman = getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'method')
-const methodsMouse = getCollectionEnumValuesOrThrow('edges', 'mm_genes_mm_genes', 'method')
-// need to combine methodsHuman and methodsMouse, remove duplicates and sort
-const methods = [...methodsHuman, ...methodsMouse]
-  .filter((value, index, self) => self.indexOf(value) === index)
-  .sort((a, b) => a.localeCompare(b))
-const methodsEnum = methods as [string, ...string[]]
-
+const methods = Array.from(new Set([
+  ...getCollectionEnumValuesOrThrow('edges', 'genes_genes', 'method'),
+  ...getCollectionEnumValuesOrThrow('edges', 'mm_genes_mm_genes', 'method')
+])).sort() as [string, ...string[]]
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
     associated_gene_id: z.string().trim().optional(),
@@ -54,17 +52,29 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
     z_score: z.string().trim().optional(),
     interaction_type: interactionTypes.optional(),
     label: z.enum(labels).optional(),
-    method: z.enum(methodsEnum).optional(),
+    method: z.enum(methods).optional(),
+    pearson_correlation: programNumericFilter.optional(),
     source: z.enum(sources).optional(),
     name: z.enum(names).optional(),
     files_fileset: z.string().trim().optional()
   })
-).merge(commonEdgeParamsFormat)
+).merge(commonEdgeParamsFormat).merge(programContextQuery).extend({
+  page: z.number().int().nonnegative().default(0),
+  limit: z.number().int().positive().max(MAX_PAGE_SIZE).optional()
+})
 
 export const genesGenesRelativeFormat = z.object({
   _id: z.string(),
   gene_1: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   gene_2: z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
+  pearson_correlation: z.number().nullish(),
+  genomic_elements_from: z.array(z.string()).nullish(),
+  genomic_elements_to: z.array(z.string()).nullish(),
+  biosample_term: z.string().nullish(),
+  biological_context: z.string().nullish(),
+  treatments_term_ids: z.array(z.string()).nullish(),
+  perturbation: z.string().nullish(),
+  inverse_name: z.string().nullish(),
   z_score: z.number().nullish(),
   associated_process: z.string().nullish(),
   detection_method: z.string().optional(),
@@ -75,7 +85,7 @@ export const genesGenesRelativeFormat = z.object({
   confidence_value_intact: z.number().nullable().optional(),
   pmids: z.array(z.string()).optional(),
   label: z.string(),
-  method: z.string(),
+  method: z.enum(methods).nullable(),
   class: z.string(),
   source: z.string(),
   source_url: z.string().optional(),
@@ -84,8 +94,8 @@ export const genesGenesRelativeFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidGeneFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].includes(item))
-  const isInvalidAssociatedGeneFilter = Object.keys(input).every(item => !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].includes(item))
+  const isInvalidGeneFilter = !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].some(key => typeof input[key] === 'string' && (input[key] as string).trim() !== '')
+  const isInvalidAssociatedGeneFilter = !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].some(key => typeof input[key] === 'string' && (input[key] as string).trim() !== '')
 
   if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter) {
     throw new TRPCError({
@@ -123,9 +133,18 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   }
   delete input.organism
 
-  if (input.files_fileset !== undefined) {
-    input.files_filesets = `files_filesets/${input.files_fileset as string}`
-    delete input.files_fileset
+  const context = contextFilters(input)
+  delete input.files_fileset
+  delete input.biosample_term
+  delete input.biological_context
+  delete input.treatment_term_id
+  Object.assign(input, context)
+
+  let correlationFilter = ''
+  if (input.pearson_correlation !== undefined) {
+    correlationFilter = 'record.pearson_correlation != null AND ' +
+      getFilterStatements(regulatorCorrelationSchema, { pearson_correlation: input.pearson_correlation })
+    delete input.pearson_correlation
   }
 
   const genesCollectionName = genesSchema.db_collection_name as string
@@ -151,18 +170,17 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   delete input.associated_gene_name
   delete input.associated_synonym
 
-  // z_score only exists on COXPRESdb edges (BioGRID doesn't write this field at all), so
-  // it must be filtered using CoXPresdbSchema, not the BioGRID-derived genesGenesSchema
-  // (which no longer declares z_score as a property). BioGRID edges simply lack the
-  // attribute, so a plain range comparison already excludes them without needing an
-  // explicit source guard.
+  // Schema-constrained scores are numeric or absent/null. Exclude null explicitly:
+  // IS_NUMBER combined with the endpoint OR triggers an optimizer error on dev.
+  // Without this guard, AQL lt/lte comparisons also include missing values.
   let zScoreFilter = ''
   if (input.z_score !== undefined) {
-    zScoreFilter = getFilterStatements(CoXPresdbSchema, { z_score: input.z_score })
+    zScoreFilter = 'record.z_score != null AND ' + getFilterStatements(CoXPresdbSchema, { z_score: input.z_score })
     delete input.z_score
   }
 
   const filters = []
+  if (correlationFilter) filters.push(correlationFilter)
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
   const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
   const edgeFilters = getFilterStatements(genesGenesFilterSchema, input)
@@ -216,7 +234,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       'name': record.name,
       'gene_1': ${input.verbose === 'true' ? `(${sourceVerboseQuery})` : 'record._from'},
       'gene_2': ${input.verbose === 'true' ? `(${targetVerboseQuery})` : 'record._to'}},
-      (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}})))
+      (record.label == 'regulator-regulator correlation' ? {${getDBReturnStatements(regulatorCorrelationSchema)}} : record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}})))
   `
 
   return await (await db.query(query)).all()

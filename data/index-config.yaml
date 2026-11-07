@@ -97,6 +97,25 @@ genes:
     fields:
       - start, end
 
+# No score/correlation or context-wide indexes until query plans justify them.
+gene_programs:
+  persistent:
+    fields:
+      - program_id, files_filesets
+
+# Baseline endpoint-plus-file lookups for membership/regulation and correlations.
+genes_gene_programs:
+  persistent:
+    fields:
+      - _from, files_filesets, _key
+      - _to, files_filesets, _key
+
+gene_programs_gene_programs:
+  persistent:
+    fields:
+      - _from, files_filesets, _key
+      - _to, files_filesets, _key
+
 genes_genes:
   zkd_sparse:
     fields:
@@ -105,6 +124,10 @@ genes_genes:
     fields:
       - interaction_type[*], source
       - source
+      # Endpoint-first lookups scoped to an experiment, in pagination order.
+      # Both directions are necessary because correlation pairs are canonicalized.
+      - _from, files_filesets, _key
+      - _to, files_filesets, _key
 
 genes_transcripts_genes:
   persistent:

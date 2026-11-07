@@ -35,6 +35,107 @@ function examples (
 }
 
 export const descriptions = {
+  gene_programs:
+    'Retrieve gene program definitions. Program identifiers are local to the defining file; catalog IDs include that file accession. Pagination is 0-based, with at most 100 results per page.<br><br>' + examples([
+      {
+        id: 'gene-programs-perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Program definition',
+            items: [
+              'id = IGVFFI9532OEFJ_GP_1'
+            ]
+          },
+          {
+            label: 'File-local program identifier',
+            items: [
+              'program_id = GP_1',
+              'files_fileset = IGVFFI9532OEFJ'
+            ]
+          }
+        ]
+      }
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
+  genes_gene_programs:
+    'Retrieve gene program membership weights and regulator effects for a gene. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+      {
+        id: 'genes-gene-programs-perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Programs containing ACTB',
+            items: [
+              'gene_id = ENSG00000075624',
+              'label = gene program membership',
+              'files_fileset = IGVFFI9532OEFJ'
+            ]
+          },
+          {
+            label: 'Programs regulated by AAGAB',
+            items: [
+              'gene_id = ENSG00000103591',
+              'label = gene program regulation',
+              'files_fileset = IGVFFI7611VVSS'
+            ]
+          }
+        ]
+      }
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
+  gene_programs_genes:
+    'Retrieve member genes or regulators for a catalog gene_program_id. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+      {
+        id: 'gene-programs-genes-perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Members of GP_1',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'label = gene program membership',
+              'files_fileset = IGVFFI9532OEFJ'
+            ]
+          },
+          {
+            label: 'Regulators of GP_1',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'label = gene program regulation',
+              'files_fileset = IGVFFI7611VVSS'
+            ]
+          }
+        ]
+      }
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
+  gene_programs_gene_programs:
+    'Retrieve program-program correlations in perturbation log2FC. Matches either endpoint; optional associated_gene_program_id restricts the pair. Pearson filters accept gt:, gte:, lt:, lte: and exclude missing coefficients. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+      {
+        id: 'gene-programs-gene-programs-perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Correlations for GP_1',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'files_fileset = IGVFFI9407YNQA'
+            ]
+          },
+          {
+            label: 'Correlation between GP_1 and GP_2',
+            items: [
+              'gene_program_id = IGVFFI9532OEFJ_GP_1',
+              'associated_gene_program_id = IGVFFI9532OEFJ_GP_2',
+              'files_fileset = IGVFFI9407YNQA',
+              'pearson_correlation = lt:0'
+            ]
+          }
+        ]
+      }
+    ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
+
   genomic_elements: 'Retrieve genomic elements.<br> \
   Example: region = chr1:1157520-1158189, <br> \
   source_annotation = dELS: distal Enhancer-like signal, <br> \
@@ -298,12 +399,27 @@ export const descriptions = {
   ]),
 
   genes_genes:
-    'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
+    'Retrieve coexpressed gene pairs from CoXPresdb, genetic interactions from BioGRID, and IGVF regulator-regulator correlations across gene programs. Filter label and files_fileset to select a relationship and experiment. pearson_correlation accepts gt:, gte:, lt:, lte: and excludes missing coefficients. <br> \
     The following parameters can be used to set thresholds on z_score: gt (>), gte (>=), lt (<), lte (<=). z_score only exists on CoXPresdb edges; BioGRID edges do not have this field at all.<br> \
     At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
+      {
+        id: 'igvf-perturb-seq',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Single regulator pair in IL-1 beta-treated TeloHAEC cells',
+            items: [
+              'gene_id = ENSG00000000003',
+              'associated_gene_id = ENSG00000000005',
+              'label = regulator-regulator correlation',
+              'files_fileset = IGVFFI6502THLB'
+            ]
+          }
+        ]
+      },
       {
         id: 'biogrid',
         label: 'BioGRID',

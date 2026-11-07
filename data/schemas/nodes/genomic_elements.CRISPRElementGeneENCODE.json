@@ -26,7 +26,7 @@
             "negative control"
           ],
           "enum_descriptions": {
-            "enhancer": "An element annotated as potentially regulating transcription from a promoter.",
+            "candidate enhancer": "An element annotated as potentially regulating transcription from a promoter.",
             "negative control": "An element selected as a control without the regulatory activity being tested."
           }
         },

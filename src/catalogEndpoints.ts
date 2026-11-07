@@ -19,6 +19,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/coding-variants', tag: 'Nodes' },
   { path: '/genomic-elements', tag: 'Nodes' },
   { path: '/genes', tag: 'Nodes' },
+  { path: '/gene-programs', tag: 'Nodes' },
   { path: '/genes-structure', tag: 'Nodes' },
   { path: '/transcripts', tag: 'Nodes' },
   { path: '/proteins', tag: 'Nodes' },
@@ -29,6 +30,9 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/ontology-terms', tag: 'Nodes' },
   { path: '/studies', tag: 'Nodes' },
   // IGVF Data
+  { path: '/genes/gene-programs', tag: 'IGVF Data' },
+  { path: '/gene-programs/genes', tag: 'IGVF Data' },
+  { path: '/gene-programs/gene-programs', tag: 'IGVF Data' },
   { path: '/variants/genomic-elements', tag: 'IGVF Data' },
   { path: '/variants/genes', tag: 'IGVF Data' },
   { path: '/variants/proteins', tag: 'IGVF Data' },
@@ -52,6 +56,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/biosamples/variants', tag: 'IGVF Data' },
   { path: '/biosamples/genomic-elements', tag: 'IGVF Data' },
   // Bespoke Endpoints
+  { path: '/genes/genes', tag: 'Bespoke Endpoints' },
   { path: '/variants/freq', tag: 'Bespoke Endpoints' },
   { path: '/gene-regulatory-network', tag: 'Bespoke Endpoints' },
   { path: '/enhancer-gene-predictions', tag: 'Bespoke Endpoints' },
@@ -89,7 +94,6 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/genes/transcripts', tag: 'Biological Context Data' },
   { path: '/genes/proteins', tag: 'Biological Context Data' },
   { path: '/genes/pathways', tag: 'Biological Context Data' },
-  { path: '/genes/genes', tag: 'Biological Context Data' },
   { path: '/genes/diseases', tag: 'Biological Context Data' },
   { path: '/transcripts/genes', tag: 'Biological Context Data' },
   { path: '/transcripts/proteins', tag: 'Biological Context Data' },

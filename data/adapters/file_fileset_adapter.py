@@ -860,6 +860,7 @@ class FileFileSet:
                 'scCRISPR screen',
                 'Multiome Perturb-seq',
                 'in vivo Perturb-seq',
+                'CC-Perturb-seq',
             }):
                 method = 'Perturb-seq'
             elif set(preferred_assay_titles).issubset({
@@ -889,6 +890,16 @@ class FileFileSet:
             simple_sample_summaries = [
                 fileset_object['simplified_sample_summary']
             ]
+
+        # Catalog display overrides; structured treatment metadata stays intact.
+        context_overrides = {
+            'IGVFDS3093XVZE':
+                'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, treated with interleukin-1 beta',
+            'IGVFDS1432SULL':
+                'human TeloHAEC cell line from donor(s) IGVFDO3459DFTW, treated with oxidised LDL',
+        }
+        if fileset_accession in context_overrides:
+            simple_sample_summaries = [context_overrides[fileset_accession]]
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
