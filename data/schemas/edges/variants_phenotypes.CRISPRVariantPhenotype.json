@@ -29,17 +29,20 @@
         "effect_size": {
           "title": "Effect Size",
           "type": "number",
-          "description": "Estimated phenotype effect size (mu or mu_adj)"
+          "description": "Estimated phenotype effect size: mu or mu_adj from BEAN, or the variant log2 fold change from MAGeCK."
         },
         "z_score": {
           "title": "Z-Score",
-          "type": "number",
-          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Z-score of the variant's effect size, as the posterior mean over its uncertainty. Files that calibrate against the negative-control variants report the adjusted z-score (mu_z_adj) instead of the raw one. Null for MAGeCK files, which do not report a z-score."
         },
         "significant": {
           "title": "Significant?",
           "type": "boolean",
-          "description": "Boolean indicator of the significance of the variant effect on the phenotype."
+          "description": "Boolean indicator of the significance of the variant effect on the phenotype: the 95% confidence interval excludes zero (BEAN), or the FDR is below 0.05 (MAGeCK)."
         },
         "num_guides": {
           "title": "Number of Guides",
@@ -73,13 +76,21 @@
           ],
           "description": "Upper bound of the 95% confidence interval for effect size. Taken from the source file when present; otherwise the Wald interval around effect_size using the reported standard deviation."
         },
+        "p_value": {
+          "$ref": "../mixins.json#/p_value",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Uncorrected p-value when reported by the source. For MAGeCK files, the permutation p-value of the negative (depletion) or positive (enrichment) selection test matching the sign of the log2 fold change."
+        },
         "p_value_adj": {
           "$ref": "../mixins.json#/p_value_adj",
           "type": [
             "number",
             "null"
           ],
-          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source."
+          "description": "Multiple-testing-adjusted p-value (FDR) when reported by the source. For MAGeCK files, the FDR of the selection test matching the sign of the log2 fold change."
         },
         "neg_log10_pvalue_adj": {
           "$ref": "../mixins.json#/neg_log10_pvalue_adj",
@@ -154,6 +165,7 @@
         "edit_rate_mean",
         "effect_size_ci95_lower",
         "effect_size_ci95_upper",
+        "p_value",
         "p_value_adj",
         "neg_log10_pvalue_adj",
         "files_filesets",
@@ -165,8 +177,8 @@
     }
   ],
   "accessible_via": {
-    "filter_by_range": "effect_size, z_score, p_value_adj, neg_log10_pvalue_adj",
-    "return": "name, class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value_adj, neg_log10_pvalue_adj"
+    "filter_by_range": "effect_size, z_score, p_value, p_value_adj, neg_log10_pvalue_adj",
+    "return": "name, class, label, method, perturbation, source, source_url, files_filesets, biological_context, biosample_term, effect_size, z_score, significant, num_guides, edit_rate_mean, effect_size_ci95_lower, effect_size_ci95_upper, p_value, p_value_adj, neg_log10_pvalue_adj"
   },
   "db_collection_name": "variants_phenotypes"
 }
