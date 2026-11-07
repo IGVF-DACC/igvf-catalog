@@ -242,18 +242,18 @@ def test_gwas_invalid_doc(gwas_files, spy_writer, mocker):
         gwas.validate_doc(invalid_doc)
 
 
-def test_gwas_pvalue_zero_handling(gwas_files, mocker, mock_ontology_term_validator):
-    """Test handling of pvalue = 0 case (line 137)"""
+def test_gwas_neg_log10_pvalue_from_mantissa_and_exponent(gwas_files, mocker, mock_ontology_term_validator):
+    """pval text underflows; the log comes from mantissa and exponent."""
+    from math import log10
+
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
                 label='variants_phenotypes')
 
-    # Load ontology mapping first
     gwas.load_ontology_name_mapping()
     gwas.file_fileset = {'method': 'GWAS', 'class': 'observed data'}
 
-    # Mock a row with pvalue = 0 (empty string or 0)
     mock_row = [''] * 18
     mock_row[1] = 'NA'
     mock_row[2] = 'EFO_0007010'
@@ -262,18 +262,18 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker, mock_ontology_term_valida
     mock_row[5] = '100'
     mock_row[6] = 'A'
     mock_row[7] = 'T'
-    mock_row[15] = '1'
-    mock_row[16] = '-3'
-    mock_row[17] = '0'  # Set pvalue to 0
+    mock_row[15] = '3'
+    mock_row[16] = '-26677'
+    mock_row[17] = '5e-324'
 
-    # Create tagged_variants data with the expected key
     studies_variants_key = gwas.generate_studies_variants_key(mock_row)
-    tagged_variants = {studies_variants_key: []}
+    result = gwas.process_variants_phenotypes(
+        mock_row, {studies_variants_key: []})
 
-    result = gwas.process_variants_phenotypes(mock_row, tagged_variants)
-
-    # Should use MAX_LOG10_PVALUE when pvalue is 0
-    assert result['neg_log10_pvalue'] == gwas.MAX_LOG10_PVALUE
+    assert result['p_value'] == float('5e-324')
+    assert result['p_val_mantissa'] == 3
+    assert result['p_val_exponent'] == -26677
+    assert result['neg_log10_pvalue'] == -(-26677) - log10(3)
 
 
 def test_gwas_empty_beta_is_null_not_zero(gwas_files, mocker, mock_ontology_term_validator):
