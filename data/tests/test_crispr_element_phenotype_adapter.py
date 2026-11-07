@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from unittest.mock import patch
 from adapters.CRISPR_element_phenotype_adapter import CRISPRElementPhenotype
+from adapters.helpers import MAX_NEG_LOG10_PVALUE
 from adapters.ontology_term_validator import OntologyTermValidator
 from adapters.writer import SpyWriter
 
@@ -156,7 +157,7 @@ def test_crispr_element_phenotype_fractel(
                     'num_guides_nonhit', 'fraction_guides_hit'} & edge.keys()
     assert edges[0]['log2FC'] == pytest.approx(-0.2722013279866264)
     assert edges[0]['p_value'] == edges[0]['p_value_adj'] == 0
-    assert edges[0]['neg_log10_pvalue'] == edges[0]['neg_log10_pvalue_adj'] == 240
+    assert edges[0]['neg_log10_pvalue'] == edges[0]['neg_log10_pvalue_adj'] == MAX_NEG_LOG10_PVALUE
     assert edges[0]['significant'] is True
     assert edges[1]['p_value'] == pytest.approx(1e-7)
     assert edges[1]['p_value_adj'] == pytest.approx(1.0785498489425983e-7)
