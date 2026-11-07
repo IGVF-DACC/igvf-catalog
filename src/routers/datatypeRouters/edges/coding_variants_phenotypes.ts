@@ -73,15 +73,15 @@ export const outputFormat = z.object({
   variant: variantSimplifiedFormat.nullish()
 })
 
-// coding_variants_phenotypes stores MutPred2's property_scores with the raw column
-// headers from its source file (e.g. "Posterior Probability") - remap to snake_case
-// for the API response.
+// coding_variants_phenotypes stores MutPred2's property_scores mostly with the
+// raw column headers from its source file (e.g. "Posterior Probability").
+// p_value is the catalog field from mixins. Remap the rest to snake_case for the API.
 const PROPERTY_SCORES_AQL = `phenoEdges.property_scores == null ? null : (
         FOR p IN phenoEdges.property_scores
         RETURN {
           property: p.Property,
           posterior_probability: p['Posterior Probability'],
-          p_value: p['P-value'],
+          p_value: p.p_value,
           affected_position: p['Affected Position'],
           type: p.Type
         }

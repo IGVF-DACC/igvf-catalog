@@ -57,10 +57,9 @@
                 "description": "Posterior probability that the mechanism is altered",
                 "example": 0.162
               },
-              "P-value": {
-                "title": "P-Value",
-                "type": "number",
-                "description": "P-value for the mechanism prediction",
+              "p_value": {
+                "$ref": "../mixins.json#/p_value",
+                "description": "P-value for the mechanism prediction.",
                 "example": 0.345
               },
               "Effected Position": {
@@ -89,7 +88,7 @@
             "required": [
               "Property",
               "Posterior Probability",
-              "P-value",
+              "p_value",
               "Effected Position",
               "Type"
             ],
@@ -99,7 +98,7 @@
             {
               "Property": "VSL2B_disorder",
               "Posterior Probability": 0.162,
-              "P-value": 0.345,
+              "p_value": 0.345,
               "Effected Position": "Y183",
               "Type": "Gain"
             }
