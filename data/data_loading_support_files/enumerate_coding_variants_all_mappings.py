@@ -231,6 +231,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     hgvsg_ids = []
     spdi_ids = []
     codon_positions = []
+    mapped_alt_codons = []
     for mutation in alt_codons:
         # remove common nucleotides from ref & alt seqs
         try:
@@ -238,6 +239,14 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
                 codon_ref, mutation)
         except Exception as e:
             return
+        # skip delins spanning an exon/intron junction: changed bases are not contiguous on the genome,
+        # so it can't be written as one SPDI, e.g. ENSP00000263080 p.Gly79Val c.236_237delinsTA (GG|intron|C)
+        # the SNV of the same aa change (if any) is still enumerated, e.g. c.236G>T
+        first_idx = c_start - 1 + offset
+        last_idx = first_idx + len(alt) - 1
+        if abs(exons_coordinates[last_idx] - exons_coordinates[first_idx]) != len(alt) - 1:
+            continue
+        mapped_alt_codons.append(mutation)
         codon_positions.append(offset + 1)
         # 0-based; the first pos on ref
         ref_pos = exons_coordinates[c_start - 2 + offset + len(
@@ -271,13 +280,16 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             # didn't do any normalization on spdi, might want to add
             spdi_ids.append(chrom_refseq + ':' +
                             str(ref_pos) + ':' + g_ref + ':' + g_alt)
+    # every alt codon is a delins spanning a junction
+    if not mapped_alt_codons:
+        return
     coding_variants_enumerated_ids = {
         'aa_pos': aa_pos,
         'ref_pos': ref_pos,
         'codon_ref': codon_ref,
         'ref_aa': ref_aa,
         'alt_aa': alt_aa,
-        'alt_codons': alt_codons,
+        'alt_codons': mapped_alt_codons,
         'codon_positions': codon_positions,
         'hgvsc_ids': hgvsc_ids,
         'hgvsp_id': hgvsp_id,
@@ -324,6 +336,8 @@ def main():
             try:
                 coding_variant_mapped = enumerate_coding_variant(
                     hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, seq_reader)
+                if not coding_variant_mapped:
+                    continue
                 coding_variant_id_enumerated[row[0]] = dict()
                 for field, value in coding_variant_mapped.items():
                     coding_variant_id_enumerated[row[0]][field] = value
