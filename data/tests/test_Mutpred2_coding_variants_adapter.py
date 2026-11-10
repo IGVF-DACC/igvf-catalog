@@ -134,6 +134,8 @@ def test_process_file_coding_variants_phenotypes(
     assert len(first_item['property_scores']) == 1
     assert first_item['property_scores'][0]['Property'] == 'VSL2B_disorder'
     assert first_item['property_scores'][0]['Posterior Probability'] == 0.3
+    assert first_item['property_scores'][0]['p_value'] == 0.04
+    assert 'P-value' not in first_item['property_scores'][0]
     assert first_item['method'] == 'MutPred2'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI6893ZOAA'
     assert first_item['source'] == 'IGVF'
@@ -189,7 +191,7 @@ def test_property_scores_rejects_malformed_entry():
         'property_scores': [{
             'Property': 'VSL2B_disorder',
             'Posterior Probability': 0.3,
-            'P-value': 0.04,
+            'p_value': 0.04,
             'Effected Position': 'S869',
             'Type': 'not_a_real_type'
         }],
