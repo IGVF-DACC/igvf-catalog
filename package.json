@@ -44,7 +44,7 @@
     "swagger-ui-express": "^4.6.0",
     "trpc-to-openapi": "^3.5.0",
     "undici": "^7.24.6",
-    "uuid": "^9.0.0",
+    "uuid": "^11.1.1",
     "yaml": "^2.2.1",
     "zod": "^4.6.7"
   },
@@ -56,7 +56,6 @@
     "@types/mock-fs": "^4.13.1",
     "@types/morgan": "^1.9.9",
     "@types/node": "^18.11.18",
-    "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
     "eslint": "^8.31.0",
     "eslint-config-standard-with-typescript": "^26.0.0",
