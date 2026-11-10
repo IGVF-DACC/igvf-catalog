@@ -46,7 +46,9 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(dbModule.db.query).toHaveBeenCalledTimes(1)
@@ -60,7 +62,7 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
     const input = { pmid: '12345', page: 0 } as any
     await expect(
       variantsDrugsRouters.variantsFromDrugs({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -69,7 +71,7 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
     const input = { drug_id: 'DRUG1', phenotype_categories: 'NOT_A_CATEGORY', page: 0 } as any
     await expect(
       variantsDrugsRouters.variantsFromDrugs({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -95,7 +97,7 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
 
     const input = { drug_id: 'DRUG1', page: 0 }
     const result: any = await variantsDrugsRouters.variantsFromDrugs({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -147,7 +149,9 @@ describe('variantsDrugsRouters.drugsFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(dbModule.db.query).toHaveBeenCalledTimes(2)
@@ -160,7 +164,7 @@ describe('variantsDrugsRouters.drugsFromVariants', () => {
     const input = { pmid: '12345', page: 0 } as any
     await expect(
       variantsDrugsRouters.drugsFromVariants({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

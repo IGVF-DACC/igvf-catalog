@@ -46,7 +46,9 @@ describe('studiesRouters.studies', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     // Should convert study_id to _key
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -89,7 +91,9 @@ describe('studiesRouters.studies', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     // Should convert pmid to 'PMID:67890'
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -132,7 +136,9 @@ describe('studiesRouters.studies', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(dbModule.db.query).toHaveBeenCalled()
     expect(result).toEqual(mockResult)

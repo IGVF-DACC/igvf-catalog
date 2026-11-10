@@ -13,7 +13,9 @@ describe('genomicElementsPhenotypesRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -22,7 +24,7 @@ describe('genomicElementsPhenotypesRouters (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.element.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for phenotypesFromGenomicElements record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for phenotypesFromGenomicElements record: ${parsed.error.message}`)
       }
     }
   })
@@ -34,7 +36,9 @@ describe('genomicElementsPhenotypesRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -43,7 +47,7 @@ describe('genomicElementsPhenotypesRouters (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.element.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for genomicElementsFromPhenotypes record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for genomicElementsFromPhenotypes record: ${parsed.error.message}`)
       }
     }
   })

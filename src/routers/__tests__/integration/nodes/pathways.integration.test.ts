@@ -20,7 +20,9 @@ describe('pathwaysRouters.pathways (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -29,7 +31,7 @@ describe('pathwaysRouters.pathways (integration)', () => {
     for (const record of result) {
       const parsed = pathwayFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for id=${testCase.id} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for id=${testCase.id} record: ${parsed.error.message}`)
       }
     }
   })

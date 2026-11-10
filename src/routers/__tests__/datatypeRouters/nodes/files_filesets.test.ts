@@ -45,7 +45,9 @@ describe('filesFilesetsRouters.filesFilesets', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -67,7 +69,9 @@ describe('filesFilesetsRouters.filesFilesets', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(dbModule.db.query).toHaveBeenCalled()
   })
@@ -89,7 +93,9 @@ describe('filesFilesetsRouters.filesFilesets', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     // The transformation should prepend the correct string
     // You can check the query string or rely on the mock to be called

@@ -21,7 +21,9 @@ describe('variantsProteinsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -30,7 +32,7 @@ describe('variantsProteinsRouters (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.source} proteinsFromVariants record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.source} proteinsFromVariants record: ${parsed.error.message}`)
       }
     }
   })
@@ -42,7 +44,9 @@ describe('variantsProteinsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -51,7 +55,7 @@ describe('variantsProteinsRouters (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.source} variantsFromProteins record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.source} variantsFromProteins record: ${parsed.error.message}`)
       }
     }
   })
@@ -75,7 +79,9 @@ describe('variantsProteinsRouters filtered by method (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -84,7 +90,7 @@ describe('variantsProteinsRouters filtered by method (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} proteinsFromVariants record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} proteinsFromVariants record: ${parsed.error.message}`)
       }
     }
   })
@@ -96,7 +102,9 @@ describe('variantsProteinsRouters filtered by method (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -105,7 +113,7 @@ describe('variantsProteinsRouters filtered by method (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} variantsFromProteins record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} variantsFromProteins record: ${parsed.error.message}`)
       }
     }
   })

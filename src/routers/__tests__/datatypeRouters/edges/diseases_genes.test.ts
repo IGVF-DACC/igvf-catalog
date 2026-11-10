@@ -36,7 +36,9 @@ describe('diseasesGenesRouters.genesFromDiseases', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -70,7 +72,9 @@ describe('diseasesGenesRouters.genesFromDiseases', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -101,7 +105,7 @@ describe('diseasesGenesRouters.genesFromDiseases', () => {
 
     const input = { disease_id: 'DOID_123', page: 0 }
     const result = await diseasesGenesRouters.genesFromDiseases({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -116,7 +120,9 @@ describe('diseasesGenesRouters.genesFromDiseases', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -155,7 +161,9 @@ describe('diseasesGenesRouters.diseasesFromGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -187,7 +195,7 @@ describe('diseasesGenesRouters.diseasesFromGenes', () => {
 
     const input = { gene_id: 'ENSG1', page: 0 }
     const result = await diseasesGenesRouters.diseasesFromGenes({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[1][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -202,7 +210,9 @@ describe('diseasesGenesRouters.diseasesFromGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

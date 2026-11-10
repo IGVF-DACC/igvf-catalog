@@ -19,7 +19,9 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples (integration)', () =>
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -28,7 +30,7 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples (integration)', () =>
     for (const record of result) {
       const parsed = returnFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
       expect(record.method).toBe(testCase.method)
     }
@@ -49,7 +51,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants (integration)', () =>
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -58,7 +62,7 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants (integration)', () =>
     for (const record of result) {
       const parsed = returnFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
       expect(record.method).toBe(testCase.method)
     }

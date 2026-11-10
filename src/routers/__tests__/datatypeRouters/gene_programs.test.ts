@@ -7,6 +7,9 @@ import * as dbModule from '../../../database'
 
 jest.mock('../../../database')
 
+// openapi.ts throws at module init if paths is undefined, so this is always defined here.
+const openApiPaths = openApiDocument.paths ?? {}
+
 const context = {
   source: 'IGVF',
   source_url: 'https://data.igvf.org/',
@@ -20,7 +23,7 @@ const context = {
   perturbation: 'CRISPR interference'
 }
 const program = { ...context, _id: 'IGVFFI0156PMEA_GP_1', name: 'GP_1', program_id: 'GP_1', reported_gene_count: 300 }
-const call = async (procedure: (opts: any) => Promise<any>, input: any): Promise<any> => await procedure({ input, rawInput: input, ctx: {}, type: 'query', path: '' })
+const call = async (procedure: (opts: any) => Promise<any>, input: any): Promise<any> => await procedure({ input, getRawInput: async () => input, signal: undefined, batchIndex: 0, ctx: {}, type: 'query', path: '' })
 const mockRows = (rows: any[]): void => {
   jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(rows) } as any)
 }
@@ -105,8 +108,8 @@ it('requires endpoint identifiers rather than scanning edge collections', async 
 
 it('registers all gene-program endpoints in OpenAPI', () => {
   for (const path of ['/gene-programs', '/genes/gene-programs', '/gene-programs/genes', '/gene-programs/gene-programs']) {
-    expect(openApiDocument.paths[path]?.get).toBeDefined()
-    expect(openApiDocument.paths[path]?.get?.tags).toEqual([path === '/gene-programs' ? 'Nodes' : 'IGVF Data'])
+    expect(openApiPaths[path]?.get).toBeDefined()
+    expect(openApiPaths[path]?.get?.tags).toEqual([path === '/gene-programs' ? 'Nodes' : 'IGVF Data'])
   }
 })
 
@@ -116,9 +119,9 @@ it('excludes regulator correlations and BioGRID from z-score range filters', asy
 })
 
 it('groups genes/genes as bespoke and includes gene-program examples', () => {
-  expect(openApiDocument.paths['/genes/genes']?.get?.tags).toEqual(['Bespoke Endpoints'])
+  expect(openApiPaths['/genes/genes']?.get?.tags).toEqual(['Bespoke Endpoints'])
   for (const path of ['/gene-programs', '/genes/gene-programs', '/gene-programs/genes', '/gene-programs/gene-programs']) {
-    const description = openApiDocument.paths[path]?.get?.description
+    const description = openApiPaths[path]?.get?.description
     expect(description).toContain('Examples by method')
     expect(description).toContain('IGVFFI9532OEFJ')
   }
@@ -130,10 +133,10 @@ it.each([{ limit: 500 }, { method: 'NotAMethod' }])('rejects invalid genes/genes
 })
 
 it('publishes bounded limits and method choices for genes/genes', () => {
-  const params = openApiDocument.paths['/genes/genes']?.get?.parameters as any[]
+  const params = openApiPaths['/genes/genes']?.get?.parameters as any[]
   expect(params.find(p => p.name === 'limit').schema.maximum).toBe(100)
   expect(params.find(p => p.name === 'method').schema.enum).toContain('Perturb-seq')
-  const response = openApiDocument.paths['/genes/genes']?.get?.responses['200'] as any
+  const response = openApiPaths['/genes/genes']?.get?.responses?.['200']
   const method = response.content['application/json'].schema.items.properties.method
   expect(method.enum).toEqual(params.find(p => p.name === 'method').schema.enum)
   expect(method.nullable).toBe(true)

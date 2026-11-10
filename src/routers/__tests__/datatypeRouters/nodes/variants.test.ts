@@ -36,7 +36,9 @@ describe('variantsRouters.variants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -66,7 +68,9 @@ describe('variantsRouters.variants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -96,7 +100,9 @@ describe('variantsRouters.variants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect((result as any[]).length).toBeLessThanOrEqual(500)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -116,7 +122,9 @@ describe('variantsRouters.variants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -151,7 +159,9 @@ describe('variantsRouters.variants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(Array.isArray(result)).toBe(true)
     const typedResult = result as any[][]
@@ -168,7 +178,9 @@ describe('variantsRouters.variants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

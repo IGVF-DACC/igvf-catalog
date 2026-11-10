@@ -10,7 +10,9 @@ describe('variantsGenesRouters.deprecatedNearestGenes (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -19,7 +21,7 @@ describe('variantsGenesRouters.deprecatedNearestGenes (integration)', () => {
     for (const record of result) {
       const parsed = geneFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for gene record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for gene record: ${parsed.error.message}`)
       }
     }
   })
@@ -46,7 +48,9 @@ describe('variantsGenesRouters.variantsFromGenes (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -56,7 +60,7 @@ describe('variantsGenesRouters.variantsFromGenes (integration)', () => {
       expect(record.method).toBe(testCase.method)
       const parsed = completeQtlsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -77,7 +81,9 @@ describe('variantsGenesRouters.genesFromVariants (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -87,7 +93,7 @@ describe('variantsGenesRouters.genesFromVariants (integration)', () => {
       expect(record.method).toBe(testCase.method)
       const parsed = completeQtlsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -101,7 +107,9 @@ describe('variantsGenesRouters.qtlSummaryEndpoint (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -110,7 +118,7 @@ describe('variantsGenesRouters.qtlSummaryEndpoint (integration)', () => {
     for (const record of result) {
       const parsed = qtlsSummaryFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for qtl summary record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for qtl summary record: ${parsed.error.message}`)
       }
     }
   })

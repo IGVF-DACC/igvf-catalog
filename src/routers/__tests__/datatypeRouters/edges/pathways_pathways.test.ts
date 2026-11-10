@@ -36,7 +36,9 @@ describe('pathwaysPathwaysRouters.pathwaysFromPathways', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -70,7 +72,9 @@ describe('pathwaysPathwaysRouters.pathwaysFromPathways', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -88,7 +92,9 @@ describe('pathwaysPathwaysRouters.pathwaysFromPathways', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([])
@@ -102,7 +108,9 @@ describe('pathwaysPathwaysRouters.pathwaysFromPathways', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

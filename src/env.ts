@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import envConfig from '../config/development.json'
 
 const DEFAULT_PORT = '2023'

@@ -18,7 +18,9 @@ describe('genesProteinsVariants.genesProteinsFromVariants (integration)', () => 
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -27,7 +29,7 @@ describe('genesProteinsVariants.genesProteinsFromVariants (integration)', () => 
     for (const record of result) {
       const parsed = sequenceVariantRelatedFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for genesProteinsFromVariants record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for genesProteinsFromVariants record: ${parsed.error.message}`)
       }
     }
   })

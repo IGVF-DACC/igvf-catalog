@@ -45,7 +45,9 @@ describe('llmQueryRouters.llmQuery', () => {
       ctx: {},
       type: 'mutation',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual({ query: 'What is the answer?', answer: '42' })
   })
@@ -66,7 +68,9 @@ describe('llmQueryRouters.llmQuery', () => {
       ctx: {},
       type: 'mutation',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual({
       query: 'What is the answer?',
@@ -89,7 +93,9 @@ describe('llmQueryRouters.llmQuery', () => {
         ctx: {},
         type: 'mutation',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -102,7 +108,9 @@ describe('llmQueryRouters.llmQuery', () => {
         ctx: {},
         type: 'mutation',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

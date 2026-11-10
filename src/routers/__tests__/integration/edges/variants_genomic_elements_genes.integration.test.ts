@@ -23,7 +23,9 @@ describe('variantsGenomicElementsGenesRouters.variantsGenomicElementsGenes (inte
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -32,7 +34,7 @@ describe('variantsGenomicElementsGenesRouters.variantsGenomicElementsGenes (inte
     for (const record of result) {
       const parsed = outputFormat.element.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for nearby_genes=${testCase.nearbyGenes} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for nearby_genes=${testCase.nearbyGenes} record: ${parsed.error.message}`)
       }
     }
   })

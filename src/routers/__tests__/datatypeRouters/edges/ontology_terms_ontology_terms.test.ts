@@ -35,7 +35,9 @@ describe('ontologyTermsEdgeRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -71,7 +73,9 @@ describe('ontologyTermsEdgeRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result[0].term.class).toBe('biological relationship')
@@ -127,7 +131,9 @@ describe('ontologyTermsEdgeRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result.vertices.START_1.class).toBe('biological relationship')

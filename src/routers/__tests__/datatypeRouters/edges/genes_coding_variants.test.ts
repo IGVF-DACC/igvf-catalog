@@ -51,7 +51,9 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -99,7 +101,9 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(cachedResult)
     expect(dbModule.db.query).toHaveBeenCalledTimes(1)
@@ -113,7 +117,9 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -155,7 +161,7 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
 
     const input = { gene_id: 'GENE1', page: 0 }
     const result: any = await genesCodingVariantsRouters.codingVariantsFromGenes({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     const liveQuery = query.mock.calls[1][0] as string
@@ -181,7 +187,9 @@ describe('genesCodingVariantsRouters.allCodingVariantsFromGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockScores)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -195,7 +203,9 @@ describe('genesCodingVariantsRouters.allCodingVariantsFromGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -208,7 +218,9 @@ describe('genesCodingVariantsRouters.allCodingVariantsFromGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { getCollectionEnumValuesOrThrow } from './schema'
 
 export const variantsCommonQueryFormat = z.object({

@@ -37,7 +37,9 @@ describe('transcriptsRouters.transcripts', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecord)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -68,7 +70,9 @@ describe('transcriptsRouters.transcripts', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecord)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -87,7 +91,9 @@ describe('transcriptsRouters.transcripts', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

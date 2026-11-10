@@ -37,7 +37,9 @@ describe('genesGenesEdgeRouters.genesGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -80,7 +82,9 @@ describe('genesGenesEdgeRouters.genesGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -95,7 +99,9 @@ describe('genesGenesEdgeRouters.genesGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -108,7 +114,9 @@ describe('genesGenesEdgeRouters.genesGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -142,7 +150,9 @@ describe('genesGenesEdgeRouters.genesGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')

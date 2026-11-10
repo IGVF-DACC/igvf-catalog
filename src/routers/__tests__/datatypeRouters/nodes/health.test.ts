@@ -11,7 +11,9 @@ describe('healthRouters.health', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: undefined
+      getRawInput: async () => undefined,
+      signal: undefined,
+      batchIndex: 0
     }) as {
       status: string
       arangodb: string

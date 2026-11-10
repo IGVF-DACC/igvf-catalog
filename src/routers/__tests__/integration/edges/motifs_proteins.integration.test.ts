@@ -20,7 +20,9 @@ describe('motifsProteinsRouters.proteinsFromMotifs (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -29,7 +31,7 @@ describe('motifsProteinsRouters.proteinsFromMotifs (integration)', () => {
     for (const record of result) {
       const parsed = motifsToProteinsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record ${JSON.stringify(record)}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record ${JSON.stringify(record)}: ${parsed.error.message}`)
       }
     }
   })
@@ -48,7 +50,9 @@ describe('motifsProteinsRouters.motifsFromProteins (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -57,7 +61,7 @@ describe('motifsProteinsRouters.motifsFromProteins (integration)', () => {
     for (const record of result) {
       const parsed = motifsToProteinsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record ${JSON.stringify(record)}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record ${JSON.stringify(record)}: ${parsed.error.message}`)
       }
     }
   })

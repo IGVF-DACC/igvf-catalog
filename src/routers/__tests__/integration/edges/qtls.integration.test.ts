@@ -26,7 +26,9 @@ describe('qtlsRouters.qtls (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -35,7 +37,7 @@ describe('qtlsRouters.qtls (integration)', () => {
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
       expect(record.method).toBe(testCase.method)
     }

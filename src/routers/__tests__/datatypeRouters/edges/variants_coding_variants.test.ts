@@ -54,7 +54,9 @@ describe('variantsCodingVariantsRouters.codingVariantsFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -69,7 +71,9 @@ describe('variantsCodingVariantsRouters.codingVariantsFromVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -103,7 +107,9 @@ describe('variantsCodingVariantsRouters.variantsFromCodingVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -118,7 +124,9 @@ describe('variantsCodingVariantsRouters.variantsFromCodingVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -131,7 +139,9 @@ describe('variantsCodingVariantsRouters.variantsFromCodingVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

@@ -65,7 +65,9 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([returnRecord])
@@ -80,7 +82,9 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -110,7 +114,9 @@ describe('variantsBiosamplesRouters.variantsFromBiosamples', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
@@ -134,7 +140,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([returnRecord])
@@ -152,7 +160,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([{ ...returnRecord, method: 'STARR-seq' }])
@@ -167,7 +177,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -189,7 +201,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
@@ -218,7 +232,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([{ ...returnRecord, method: 'ColocBoost', gene: 'genes/ENSG00000134245', phenotype: 'ontology_terms/EFO_0006340' }])
@@ -245,7 +261,9 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([])
@@ -258,7 +276,7 @@ describe('variantsBiosamplesRouters.biosamplesFromVariants', () => {
 
     const input = { files_fileset: 'IGVFFI0001XXXX', page: 0 }
     const result = await variantsBiosamplesRouters.biosamplesFromVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -279,7 +297,7 @@ describe('mouse MPRA variant routing', () => {
       page: 0
     }
     await variantsBiosamplesRouters.biosamplesFromVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
     expect(query.mock.calls[0][0]).toContain('FOR record IN mm_variants')
     const edgeQuery = query.mock.calls[1][0] as string
@@ -298,7 +316,7 @@ describe('mouse MPRA variant routing', () => {
     })
     const input = { biosample_id: 'CL_0000001', organism: 'Mus musculus', verbose: 'true', page: 0 }
     await variantsBiosamplesRouters.variantsFromBiosamples({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
     const edgeQuery = query.mock.calls.map(([query]) => String(query)).find(query => query.includes('FOR record IN mm_variants_biosamples'))
     expect(edgeQuery).toContain('FOR record IN mm_variants_biosamples')
@@ -312,7 +330,7 @@ describe('mouse MPRA variant routing', () => {
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
     const input = { organism, files_fileset: 'IGVFFI2111LQGF', page: 0 }
     await variantsBiosamplesRouters.biosamplesFromVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
     const prefix = organism === 'Mus musculus' ? 'mm_' : ''
     expect(query.mock.calls[0][0]).toContain(`FOR record IN ${prefix}variants_biosamples`)

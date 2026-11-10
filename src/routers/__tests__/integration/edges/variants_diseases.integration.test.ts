@@ -12,7 +12,9 @@ describe('variantsDiseasesRouters.diseaseFromVariants (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -21,7 +23,7 @@ describe('variantsDiseasesRouters.diseaseFromVariants (integration)', () => {
     for (const record of result) {
       const parsed = variantDiseaseFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for disease record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for disease record: ${parsed.error.message}`)
       }
     }
   })
@@ -35,7 +37,9 @@ describe('variantsDiseasesRouters.variantsFromDiseases (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -44,7 +48,7 @@ describe('variantsDiseasesRouters.variantsFromDiseases (integration)', () => {
     for (const record of result) {
       const parsed = variantDiseaseFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for variant record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for variant record: ${parsed.error.message}`)
       }
     }
   })

@@ -30,7 +30,9 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes (integration)', () 
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -39,7 +41,7 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes (integration)', () 
     for (const record of result) {
       const parsed = codingVariantsScoresFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record: ${parsed.error.message}`)
       }
     }
   })
@@ -58,7 +60,9 @@ describe('genesCodingVariantsRouters.allCodingVariantsFromGenes (integration)', 
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -66,7 +70,7 @@ describe('genesCodingVariantsRouters.allCodingVariantsFromGenes (integration)', 
 
     const parsed = allCodingVariantsScoresFormat.safeParse(result)
     if (!parsed.success) {
-      throw new Error(`Output validation failed for ${testCase.dataset} result: ${parsed.error.toString()}`)
+      throw new Error(`Output validation failed for ${testCase.dataset} result: ${parsed.error.message}`)
     }
   })
 })

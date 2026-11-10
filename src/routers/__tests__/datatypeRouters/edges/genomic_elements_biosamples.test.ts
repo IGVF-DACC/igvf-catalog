@@ -41,7 +41,9 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -52,7 +54,7 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
     const input = { page: 0 } as any
     await expect(
       genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -61,7 +63,7 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
     const input = { method: 'NOT_A_METHOD', page: 0 } as any
     await expect(
       genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -70,7 +72,7 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
     const input = { source: 'NOT_A_SOURCE', page: 0 } as any
     await expect(
       genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -100,7 +102,7 @@ describe('genomicElementsBiosamplesRouters.biosamplesFromGenomicElements', () =>
 
     const input = { region: 'chr1:1000-2000', method: 'MPRA', page: 0 }
     const result = await genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -144,7 +146,9 @@ describe('genomicElementsBiosamplesRouters.genomicElementsFromBiosamples', () =>
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -155,7 +159,7 @@ describe('genomicElementsBiosamplesRouters.genomicElementsFromBiosamples', () =>
     const input = { page: 0 } as any
     await expect(
       genomicElementsBiosamplesRouters.genomicElementsFromBiosamples({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -164,7 +168,7 @@ describe('genomicElementsBiosamplesRouters.genomicElementsFromBiosamples', () =>
     const input = { source: 'NOT_A_SOURCE', page: 0 } as any
     await expect(
       genomicElementsBiosamplesRouters.genomicElementsFromBiosamples({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -179,7 +183,7 @@ describe('MPRA element routing by organism', () => {
     const prefix = organism === 'Mus musculus' ? 'mm_' : ''
     const input = { organism, region: 'chr1:10-20', verbose: 'true', page: 0 }
     await genomicElementsBiosamplesRouters.biosamplesFromGenomicElements({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
     expect(query.mock.calls[0][0]).toContain(`FOR record in ${prefix}genomic_elements`)
     expect(query.mock.calls[0][0]).toContain(`FOR record IN ${prefix}genomic_elements_biosamples`)
@@ -187,7 +191,7 @@ describe('MPRA element routing by organism', () => {
 
     const reverseInput = { organism, biosample_name: 'PYS-2 cell', verbose: 'true', page: 0 }
     await genomicElementsBiosamplesRouters.genomicElementsFromBiosamples({
-      input: reverseInput, ctx: {}, type: 'query', path: '', rawInput: reverseInput
+      input: reverseInput, ctx: {}, type: 'query', path: '', getRawInput: async () => reverseInput, signal: undefined, batchIndex: 0
     })
     expect(query.mock.calls[1][0]).toContain(`FOR record IN ${prefix}genomic_elements_biosamples`)
     expect(query.mock.calls[1][0]).toContain(`FOR otherRecord IN ${prefix}genomic_elements`)

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -35,7 +35,7 @@ const studyParametersDict = z.object({
   biogeographical_groups: z.string().optional()
 })
 
-export const variantsToDrugsFormat = z.object({
+const variantsToDrugsEdgeFields = z.object({
   drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
   gene_names: z.array(z.string()).optional(),
@@ -49,9 +49,22 @@ export const variantsToDrugsFormat = z.object({
   method: z.string().nullish(),
   files_filesets: z.string().nullish(),
   preferred_assay_titles: z.array(z.string()).nullish()
-}).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
+})
 
-export const drugsToVariantsFormat = z.object({
+// zod-openapi's JSON Schema generator can't infer an output type from a bare .transform()
+// (it could return anything), so the post-transform shape - what the resolver actually
+// returns, and what consumers of this schema should validate against - is declared
+// explicitly here (derived from the same pre-transform object, via .omit()/.extend(), so
+// it can't drift out of sync with it) and wired in via .pipe() rather than left for zod to infer.
+export const variantsToDrugsOutputFormat = variantsToDrugsEdgeFields
+  .omit({ _from: true })
+  .extend({ sequence_variant: z.string() })
+
+export const variantsToDrugsFormat = variantsToDrugsEdgeFields
+  .transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
+  .pipe(variantsToDrugsOutputFormat)
+
+const drugsToVariantsEdgeFields = z.object({
   sequence_variant: z.string().or(variantFormat).optional(),
   _to: z.string(),
   gene_names: z.array(z.string()).optional(),
@@ -65,7 +78,15 @@ export const drugsToVariantsFormat = z.object({
   method: z.string().nullish(),
   files_filesets: z.string().nullish(),
   preferred_assay_titles: z.array(z.string()).nullish()
-}).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
+})
+
+export const drugsToVariantsOutputFormat = drugsToVariantsEdgeFields
+  .omit({ _to: true })
+  .extend({ drug: z.string() })
+
+export const drugsToVariantsFormat = drugsToVariantsEdgeFields
+  .transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
+  .pipe(drugsToVariantsOutputFormat)
 
 function validateInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'phenotype_categories'].includes(item)).length === 0) {

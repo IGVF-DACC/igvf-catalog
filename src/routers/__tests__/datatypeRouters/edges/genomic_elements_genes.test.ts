@@ -53,7 +53,9 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -68,7 +70,9 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -132,7 +136,9 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     const aql = String(query.mock.calls[1][0])
@@ -189,7 +195,9 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -240,7 +248,9 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -255,7 +265,9 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -298,7 +310,9 @@ describe('genomicElementsGenesRouters.grn', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -313,7 +327,9 @@ describe('genomicElementsGenesRouters.grn', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -351,7 +367,9 @@ describe('genomicElementsGenesRouters.grn', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     const aql = String(query.mock.calls[0][0])
@@ -374,7 +392,7 @@ describe('mouse element-gene routing', () => {
         verbose: 'true',
         page: 0
       }
-      await genomicElementsGenesRouters[endpoint]({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      await genomicElementsGenesRouters[endpoint]({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
       expect(query).toHaveBeenCalledTimes(4)
       query.mock.calls.forEach(([aql], index) => {
         const text = String(aql)
@@ -393,7 +411,7 @@ describe('mouse element-gene routing', () => {
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([{ _id: 'ENSMUSG00000026043' }]) } as any)
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
     const input = { organism: 'Mus musculus', gene_id: 'ENSMUSG00000026043', page: 0 }
-    await genomicElementsGenesRouters.genomicElementsFromGenes({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.genomicElementsFromGenes({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     expect(String(query.mock.calls[0][0])).toContain('mm_genes')
     expect(query.mock.calls[1][1]).toEqual({ geneIDs: ['mm_genes/ENSMUSG00000026043'] })
   })
@@ -403,7 +421,7 @@ describe('mouse element-gene routing', () => {
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(['mm_genomic_elements/test']) } as any)
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
     const input = { organism: 'Mus musculus', region: 'chr9:116004181-116004247', page: 0 }
-    await genomicElementsGenesRouters.genesFromGenomicElements({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.genesFromGenomicElements({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     expect(String(query.mock.calls[0][0])).toContain('FOR record IN mm_genomic_elements')
     expect(query.mock.calls[1][1]).toEqual({ elementIDs: ['mm_genomic_elements/test'] })
   })
@@ -420,7 +438,7 @@ describe('GRN organism routing', () => {
     const query = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
     const input = { ...genes, organism: 'Mus musculus', neg_log10_pvalue: 'gte:2', page: 1, limit: 10 }
-    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     const aql = String(query.mock.calls[0][0])
     expect(aql).toContain('IN mm_genes')
     expect(aql).toContain('in mm_genomic_elements_mm_genes')
@@ -435,7 +453,7 @@ describe('GRN organism routing', () => {
     const query = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
     const input = { regulator_gene_id: 'ENSG00000123685' }
-    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     expect(String(query.mock.calls[0][0])).toContain('FOR gene IN genes')
     expect(String(query.mock.calls[0][0])).toContain('FOR se IN genomic_elements_genes')
   })
@@ -477,7 +495,9 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual({
@@ -496,7 +516,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
 
     const input = { gene_id: 'ENSG00000000003', score_field: 'score' }
     await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
     expect(query.mock.calls[1][1]).toMatchObject({ page: 0, limit: 25 })
 
@@ -507,7 +527,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
 
     const input2 = { gene_id: 'ENSG00000000003', score_field: 'score', page: 2, limit: 99999 }
     await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-      input: input2, ctx: {}, type: 'query', path: '', rawInput: input2
+      input: input2, ctx: {}, type: 'query', path: '', getRawInput: async () => input2, signal: undefined, batchIndex: 0
     })
     expect(query2.mock.calls[1][1]).toMatchObject({ page: 2, limit: 500 })
   })
@@ -519,7 +539,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
     const input = { gene_id: 'NOT_A_REAL_GENE', score_field: 'score' }
     await expect(
       genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
     expect(query).toHaveBeenCalledTimes(1)
@@ -532,7 +552,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
 
     const input = { gene_id: 'ENSG00000000003', score_field: 'idr', files_fileset: 'NOTAREALFILESET' }
     const result = await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(result).toEqual({
@@ -550,7 +570,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
 
     const input = { gene_id: 'ENSG00000000003', score_field: 'score', biological_context: 'HCASMC-hTERT' }
     await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     const [aql, bindVars] = query.mock.calls[1]
@@ -565,7 +585,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
 
     const input = { gene_id: 'ENSG00000000003', score_field: 'score' }
     await genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     const aql = String(query.mock.calls[1][0])
@@ -584,7 +604,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
     const input = { gene_id: 'ENSG00000000003', score_field: 'score', ...overrides }
     await expect(
       genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
     expect(query).not.toHaveBeenCalled()
@@ -601,7 +621,7 @@ describe('genomicElementsGenesRouters.genesGenomicElementsScoreSummary', () => {
     const input = { gene_id: 'ENSG00000000003', score_field: 'score', ...overrides }
     await expect(
       genomicElementsGenesRouters.genesGenomicElementsScoreSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
     expect(query).not.toHaveBeenCalled()
@@ -620,7 +640,7 @@ describe('MORF gene regulatory network', () => {
     { regulator_gene_name: 'AATF', response_gene_name: 'TOX' }
   ])('joins MORF genes and transcripts for %j', async (genes) => {
     const input = { ...genes, method: 'MORF screen', perturbation: 'ORF overexpression', files_fileset: 'IGVFFI6734IWRB', significant: 'true', neg_log10_pvalue_adj: 'gte:2', page: 1, limit: 10 }
-    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     const aql = String((dbModule.db.query as jest.Mock).mock.calls[0][0])
     const morf = aql.slice(aql.indexOf('LET morf ='))
     expect(morf).toContain('FOR record IN genes_transcripts_genes')
@@ -673,7 +693,7 @@ describe('MORF gene regulatory network', () => {
     }))
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(records) } as any)
     const input = { response_gene_name: 'TOX', verbose }
-    expect(await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })).toEqual(records)
+    expect(await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })).toEqual(records)
     const aql = String((dbModule.db.query as jest.Mock).mock.calls[0][0])
     if (verbose === 'true') {
       expect(aql).toContain('DOCUMENT(relationship._to)')
@@ -707,13 +727,13 @@ describe('MORF gene regulatory network', () => {
     }]
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(records) } as any)
     const input = { response_gene_name: 'TOX' }
-    const result = await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    const result = await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     expect(result).toEqual([{ ...records[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 
   it('does not join human MORF data for mouse requests', async () => {
     const input = { regulator_gene_id: 'ENSMUSG00000027018', organism: 'Mus musculus' }
-    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     expect(String((dbModule.db.query as jest.Mock).mock.calls[0][0])).not.toContain('genes_transcripts_genes')
   })
 })
@@ -727,7 +747,7 @@ describe('GRN directional screen statistics', () => {
     const query = jest.spyOn(dbModule.db, 'query')
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)
     const input = { ...genes, significant: 'true', neg_log10_pvalue_adj: 'gte:2', page: 0, limit: 10 }
-    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     const aql = String(query.mock.calls[query.mock.calls.length - 1][0])
     expect(aql).toContain('log2FC: rawRecord.negative_selection_log2FC')
     expect(aql).toContain('p_value: rawRecord.negative_selection_p_value')

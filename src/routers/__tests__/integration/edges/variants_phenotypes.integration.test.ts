@@ -23,7 +23,9 @@ describe('variantsPhenotypesRouters.phenotypesFromVariants (integration)', () =>
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -32,7 +34,7 @@ describe('variantsPhenotypesRouters.phenotypesFromVariants (integration)', () =>
     for (const record of result) {
       const parsed = variantPhenotypeFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -44,7 +46,9 @@ describe('variantsPhenotypesRouters.phenotypesFromVariants (integration)', () =>
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -53,7 +57,7 @@ describe('variantsPhenotypesRouters.phenotypesFromVariants (integration)', () =>
     for (const record of result) {
       const parsed = variantPhenotypeFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${method} record (verbose): ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${method} record (verbose): ${parsed.error.message}`)
       }
     }
   })

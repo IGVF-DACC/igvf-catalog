@@ -1,4 +1,4 @@
-import { generateOpenApiDocument } from 'trpc-openapi'
+import { generateOpenApiDocument } from 'trpc-to-openapi'
 import { appRouter } from './routers/_app'
 import { envData } from './env'
 import { CATALOG_ENDPOINTS, OPENAPI_TAG_ORDER, PATH_TO_TAG } from './catalogEndpoints'
@@ -143,7 +143,11 @@ let openApiConfig = {
   version: '2.0 - DEV',
   docsUrl: 'https://catalog-api-dev.demo.igvf.org/openapi',
   baseUrl,
-  tags: [...OPENAPI_TAG_ORDER]
+  tags: [...OPENAPI_TAG_ORDER],
+  // trpc-to-openapi defaults to 3.1.0, which represents nullable fields as
+  // `anyOf: [<schema>, { type: 'null' }]` instead of the `nullable: true` + flat
+  // `enum`/`type` shape this API's docs (and Swagger UI) have always used.
+  openApiVersion: '3.0.3' as const
 }
 
 if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
@@ -153,7 +157,8 @@ if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
     version: '1.3.0',
     docsUrl: 'https://api.catalogkg.igvf.org/openapi',
     baseUrl,
-    tags: [...OPENAPI_TAG_ORDER]
+    tags: [...OPENAPI_TAG_ORDER],
+    openApiVersion: '3.0.3' as const
   }
 }
 
@@ -163,7 +168,12 @@ export const openApiDocument = generateOpenApiDocument(appRouter, openApiConfig)
 // Endpoint descriptions and other OpenAPI metadata are left unchanged.
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'] as const
 
-Object.entries(openApiDocument.paths).forEach(([path, pathItem]) => {
+if (openApiDocument.paths === undefined) {
+  throw new Error('Generated OpenAPI document has no paths.')
+}
+const paths = openApiDocument.paths
+
+Object.entries(paths).forEach(([path, pathItem]) => {
   if (pathItem === undefined) {
     return
   }
@@ -179,14 +189,14 @@ Object.entries(openApiDocument.paths).forEach(([path, pathItem]) => {
   })
 })
 
-const newPath: typeof openApiDocument.paths = {}
-const remainingPaths = new Set(Object.keys(openApiDocument.paths))
+const newPath: typeof paths = {}
+const remainingPaths = new Set(Object.keys(paths))
 
 CATALOG_ENDPOINTS.forEach(({ path }) => {
-  if (openApiDocument.paths[path] === undefined) {
+  if (paths[path] === undefined) {
     throw new Error(`Catalog endpoint not found in OpenAPI document: ${path}`)
   }
-  newPath[path] = openApiDocument.paths[path]
+  newPath[path] = paths[path]
   remainingPaths.delete(path)
 })
 

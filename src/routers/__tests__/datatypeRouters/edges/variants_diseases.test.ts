@@ -37,7 +37,9 @@ describe('variantsDiseasesRouters.variantsFromDiseases', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -72,7 +74,9 @@ describe('variantsDiseasesRouters.variantsFromDiseases', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -87,7 +91,9 @@ describe('variantsDiseasesRouters.variantsFromDiseases', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -114,7 +120,7 @@ describe('variantsDiseasesRouters.variantsFromDiseases', () => {
 
     const input = { disease_id: 'MONDO_0009861', page: 0 }
     const result = await variantsDiseasesRouters.variantsFromDiseases({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -156,7 +162,9 @@ describe('variantsDiseasesRouters.diseaseFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -192,7 +200,9 @@ describe('variantsDiseasesRouters.diseaseFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -207,7 +217,9 @@ describe('variantsDiseasesRouters.diseaseFromVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

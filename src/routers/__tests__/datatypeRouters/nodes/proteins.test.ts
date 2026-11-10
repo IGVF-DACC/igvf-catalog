@@ -60,7 +60,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecord)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -89,7 +91,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -131,7 +135,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -160,7 +166,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -187,7 +195,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([mockRecord])
   })
@@ -213,7 +223,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([mockRecord])
   })
@@ -243,7 +255,7 @@ describe('proteinsRouters.proteins', () => {
 
     const callPage = async (page: number): Promise<any> => {
       const input = { name: 'CTCF', page, limit: 5 }
-      return await proteinsRouters.proteins({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      return await proteinsRouters.proteins({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     }
 
     const page0 = await callPage(0)
@@ -274,7 +286,7 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
 
     const input = { name: 'SAM', page: 0, limit: 10 }
-    await proteinsRouters.proteins({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await proteinsRouters.proteins({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
 
     const exactQuery = queries.find(q => !q.includes('STARTS_WITH') && !q.includes('LEVENSHTEIN_MATCH'))
     expect(exactQuery).toContain('SORT record._key')
@@ -306,7 +318,9 @@ describe('proteinsRouters.proteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([mockRecord])
     expect(dbModule.db.query).toHaveBeenCalled()

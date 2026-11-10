@@ -1,7 +1,7 @@
 import { inferAsyncReturnType, initTRPC } from '@trpc/server'
 import * as trpcExpress from '@trpc/server/adapters/express'
 import { v4 as uuid } from 'uuid'
-import { OpenApiMeta } from 'trpc-openapi'
+import { OpenApiMeta } from 'trpc-to-openapi'
 
 export interface Context { requestId: string }
 export const createContext = async ({ res }: trpcExpress.CreateExpressContextOptions): Promise<Context> => {

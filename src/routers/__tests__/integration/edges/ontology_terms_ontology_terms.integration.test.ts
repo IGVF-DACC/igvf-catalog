@@ -17,7 +17,9 @@ describe('ontologyTermsEdgeRouters.ontologyTermChildren (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -26,7 +28,7 @@ describe('ontologyTermsEdgeRouters.ontologyTermChildren (integration)', () => {
     for (const record of result) {
       const parsed = ontologyRelativeFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record ${JSON.stringify(record)}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record ${JSON.stringify(record)}: ${parsed.error.message}`)
       }
     }
   })
@@ -41,7 +43,9 @@ describe('ontologyTermsEdgeRouters.ontologyTermParents (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -50,7 +54,7 @@ describe('ontologyTermsEdgeRouters.ontologyTermParents (integration)', () => {
     for (const record of result) {
       const parsed = ontologyRelativeFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record ${JSON.stringify(record)}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record ${JSON.stringify(record)}: ${parsed.error.message}`)
       }
     }
   })

@@ -62,7 +62,9 @@ describe('codingVariantsRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     // Assert result type to avoid 'unknown' error
@@ -89,7 +91,9 @@ describe('codingVariantsRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     // The query should still run, but limit should be capped
@@ -112,12 +116,14 @@ describe('codingVariantsRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: {
+      getRawInput: async () => ({
         gene_name: 'SAMD11',
         amino_acid_position: '42',
         alt_amino_acid: 'L',
         page: 0
-      }
+      }),
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(getFilterStatementsSpy).toHaveBeenCalledWith(
@@ -141,12 +147,14 @@ describe('codingVariantsRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: {
+      getRawInput: async () => ({
         gene_name: 'SAMD11',
         amino_acid_position: '203',
         alt_amino_acid: '*',
         page: 0
-      }
+      }),
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(getFilterStatementsSpy).toHaveBeenCalledWith(
@@ -171,10 +179,12 @@ describe('codingVariantsRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: {
+      getRawInput: async () => ({
         uniprot_name: 'SAMD11_HUMAN',
         page: 0
-      }
+      }),
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(getFilterStatementsSpy).toHaveBeenCalledWith(
@@ -191,7 +201,9 @@ describe('codingVariantsRouters', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: { page: 0 }
+      getRawInput: async () => ({ page: 0 }),
+      signal: undefined,
+      batchIndex: 0
     })).rejects.toMatchObject({
       code: 'BAD_REQUEST'
     })

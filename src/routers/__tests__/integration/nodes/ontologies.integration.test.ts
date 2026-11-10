@@ -15,7 +15,9 @@ describe('ontologyRouters.ontologyTerm (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -24,7 +26,7 @@ describe('ontologyRouters.ontologyTerm (integration)', () => {
     for (const record of result) {
       const parsed = ontologyFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record: ${parsed.error.message}`)
       }
     }
   })
@@ -61,7 +63,9 @@ describe('ontologyRouters.ontologyTerm (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -70,7 +74,7 @@ describe('ontologyRouters.ontologyTerm (integration)', () => {
     for (const record of result) {
       const parsed = ontologyFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for source=${testCase.source} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for source=${testCase.source} record: ${parsed.error.message}`)
       }
     }
   })
@@ -88,7 +92,9 @@ describe('ontologyRouters.ontologyTerm (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -97,7 +103,7 @@ describe('ontologyRouters.ontologyTerm (integration)', () => {
     for (const record of result) {
       const parsed = ontologyFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for subontology=${testCase.subontology} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for subontology=${testCase.subontology} record: ${parsed.error.message}`)
       }
     }
   })

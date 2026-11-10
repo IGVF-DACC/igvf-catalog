@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -53,7 +53,7 @@ const frequencySources = z.enum([
 
 // af_ frequencies have no 'gnomad_' prefix in the database, removing prefixes for queries
 const frequenciesReturn = []
-for (const frequency in frequencySources.Values) {
+for (const frequency in frequencySources.enum) {
   frequenciesReturn.push(`${frequency}: record['annotations']['${frequency.replace('gnomad_', '')}']`)
 }
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'cadd_rawscore': record['annotations']['cadd_rawscore'], 'cadd_phred': record['annotations']['cadd_phred'], 'GENCODE_category': record['annotations']['funseq_description'] }`
@@ -200,7 +200,7 @@ export const variantFormat = z.object({
   source_url: z.string(),
   // this is a temporary solution, we will add the organism property for human variants when reloading the collection
   organism: z.string().nullable()
-}).transform(({ organism, ...rest }) => ({
+}).overwrite(({ organism, ...rest }) => ({
   organism: organism ?? 'Homo sapiens',
   ...rest
 }))

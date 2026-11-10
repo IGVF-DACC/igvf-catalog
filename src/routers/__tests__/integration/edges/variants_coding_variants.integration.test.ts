@@ -1,7 +1,7 @@
 import { variantsCodingVariantsRouters } from '../../../datatypeRouters/edges/variants_coding_variants'
 import { codingVariantsFormat } from '../../../datatypeRouters/nodes/coding_variants'
 import { variantSimplifiedFormat } from '../../../datatypeRouters/nodes/variants'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 // Hits the real shared dev ArangoDB (config/development.json) - no jest.mock here on purpose.
 const variantsFromCodingVariantsFormat = variantSimplifiedFormat.merge(z.object({ _id: z.string() }))
@@ -14,7 +14,9 @@ describe('variantsCodingVariantsRouters.codingVariantsFromVariants (integration)
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -23,7 +25,7 @@ describe('variantsCodingVariantsRouters.codingVariantsFromVariants (integration)
     for (const record of result) {
       const parsed = codingVariantsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for coding variant record ${record._id as string}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for coding variant record ${record._id as string}: ${parsed.error.message}`)
       }
     }
   })
@@ -41,7 +43,9 @@ describe('variantsCodingVariantsRouters.variantsFromCodingVariants (integration)
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -50,7 +54,7 @@ describe('variantsCodingVariantsRouters.variantsFromCodingVariants (integration)
     for (const record of result) {
       const parsed = variantsFromCodingVariantsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for variant record ${record._id as string}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for variant record ${record._id as string}: ${parsed.error.message}`)
       }
     }
   })

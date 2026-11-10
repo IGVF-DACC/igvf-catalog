@@ -22,7 +22,9 @@ describe('variantsVariantsRouters.variantsFromVariantID (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -31,7 +33,7 @@ describe('variantsVariantsRouters.variantsFromVariantID (integration)', () => {
     for (const record of result) {
       const parsed = variantsVariantsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for variantsFromVariantID record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for variantsFromVariantID record: ${parsed.error.message}`)
       }
     }
   })

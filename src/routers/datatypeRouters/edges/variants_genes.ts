@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, resolveValidatedLimit, withExpandedAssayTitles } from '../_helpers'
