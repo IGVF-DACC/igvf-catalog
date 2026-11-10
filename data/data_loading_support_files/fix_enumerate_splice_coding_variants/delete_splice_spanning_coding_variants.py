@@ -1,8 +1,9 @@
 # Delete the invalid junction-spanning coding variants found by find_splice_spanning_coding_variants.py from the database.
 #
 # One collection per run (--collection), for every bad coding variant in splice_spanning_coding_variants_<accession>.tsv
-# (both files are read, shared ids handled once):
-#   coding_variants_phenotypes: edges <coding_variant_id>_GO_0003674_<accession> for the ESM and MutPred2 accessions
+# (all files are read, shared ids handled once; splice_spanning_coding_variants_VAMP.tsv.gz holds the 34 VAMP-seq only ones):
+#   coding_variants_phenotypes: edges <coding_variant_id>_GO_0003674_<accession> for the ESM and MutPred2 accessions,
+#                               and any other edge from the bad coding variant (e.g. VAMP-seq, other phenotype terms)
 #   variants_coding_variants: edge from the bad SPDI
 #   coding_variants: the node, only if its source is IGVF
 #   variants: the node of each bad SPDI, only if its source is IGVF and no variants_coding_variants edge links it
@@ -25,6 +26,7 @@
 # Usage (run from data/):
 # python data_loading_support_files/fix_enumerate_splice_coding_variants/delete_splice_spanning_coding_variants.py \
 #   --bad-records splice_spanning_coding_variants_IGVFFI8105TNNO.tsv.gz splice_spanning_coding_variants_IGVFFI6893ZOAA.tsv.gz \
+#                 splice_spanning_coding_variants_VAMP.tsv.gz \
 #   --collection coding_variants_phenotypes \
 #   --log-file delete_splice_spanning_coding_variants.coding_variants_phenotypes.log.tsv [--execute]
 
@@ -91,6 +93,16 @@ class Deleter:
         '''batch: list of (coding_variant_id, spdi)'''
         self.delete_edges('coding_variants_phenotypes',
                           phenotype_edge_keys(batch))
+        # edges with other phenotype terms / accessions, e.g. VAMP-seq <coding_variant_id>_OBA_0000128_IGVFFI0629IIQU
+        cursor = with_retry(self.db.aql.execute, '''
+            FOR id IN @ids
+                FOR e IN coding_variants_phenotypes
+                    FILTER e._from == CONCAT('coding_variants/', id)
+                    RETURN e._key
+        ''', bind_vars={'ids': [coding_variant_id for coding_variant_id, _ in batch]}, batch_size=10000)
+        known = set(phenotype_edge_keys(batch))
+        self.remove('coding_variants_phenotypes', [key for key in cursor if key not in known],
+                    'edge of bad coding variant, other phenotype term or accession')
 
     def delete_variant_coding_variant_edges(self, batch):
         self.delete_edges('variants_coding_variants',
@@ -162,7 +174,8 @@ def main():
     parser = argparse.ArgumentParser(
         description='Delete invalid junction-spanning coding variants, their edges and variants from the database. Dry run by default.')
     parser.add_argument('--bad-records', nargs='+', required=True,
-                        help='splice_spanning_coding_variants_<accession>.tsv(.gz) files from find_splice_spanning_coding_variants.py')
+                        help='splice_spanning_coding_variants_<accession>.tsv(.gz) files from find_splice_spanning_coding_variants.py, '
+                        'and splice_spanning_coding_variants_VAMP.tsv(.gz)')
     parser.add_argument('--collection', required=True, choices=COLLECTIONS,
                         help='collection to delete bad records from, collections can be run in any order')
     parser.add_argument('--log-file', required=True,
