@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "IGVF Catalog API",
   "main": "index.js",
-  "engine": {
-    "node": "20.20.2"
+  "engines": {
+    "node": "^24.22.2"
   },
   "scripts": {
     "dev:server": "tsx watch src/index",
