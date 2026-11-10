@@ -74,7 +74,10 @@
         },
         "esm1v_t33_650M_UR90S_1": {
           "title": "ESM1v Model 1 Score",
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Masked-marginals score for the substitution from the esm1v_t33_650M_UR90S_1 model, one of the five ESM-1v models."
         },
         "esm1v_t33_650M_UR90S_2": {
