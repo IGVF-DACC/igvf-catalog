@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { geneSearch } from '../nodes/genes'
-import { paramsFormatType, validRegion } from '../_helpers'
+import { paramsFormatType, validRegion, withExpandedAssayTitles } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat } from '../params'
@@ -51,7 +51,8 @@ export const outputFormat = z.object({
     id: z.string(),
     pmid: z.string().nullish()
   }).nullish(), // EBI eQTL and spliceQTL only
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 })
 
 const SOURCES = z.enum(['AFGR', 'EBI', 'IGVF', 'ENCODE', 'UKB'])
@@ -178,7 +179,8 @@ function qtlReturnObject (geneExpr: string, genomicElementExpr: string, proteinC
     study: HAS(record, 'study') && record.study != null
       ? { id: DOCUMENT(record.study)._key, pmid: DOCUMENT(record.study).pmid }
       : null,
-    files_filesets: record.files_filesets
+    files_filesets: record.files_filesets,
+    preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles
   }`
 }
 
@@ -390,7 +392,7 @@ const qtls = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/qtls', description: descriptions.qtls } })
   .input(inputFormat)
   .output(z.array(outputFormat))
-  .query(async ({ input }) => await qtlSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await qtlSearch(input)))
 
 export const qtlsRouters = {
   qtls

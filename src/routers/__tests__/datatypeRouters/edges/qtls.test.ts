@@ -163,4 +163,50 @@ describe('qtlsRouters.qtls', () => {
       qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+    const geneSearchResult = [{
+      _id: 'ENSG00000012048',
+      name: 'BRCA1',
+      chr: 'chr17',
+      start: 43044295,
+      end: 43125483,
+      gene_type: 'protein_coding',
+      source: 'GENCODE',
+      version: '44',
+      source_url: 'https://www.gencodegenes.org'
+    }]
+    const qtlResult = [{
+      variant: { chr: 'chr17', pos: 43044300, spdi: 'NC_000017.11:43044300:A:G', rsid: ['rs123'], ca_id: 'CA123' },
+      gene: { name: 'BRCA1', id: 'ENSG00000012048' },
+      protein_complex: null,
+      genomic_element: null,
+      source: 'IGVF',
+      method: 'Perturb-seq',
+      regulatory_type: null,
+      gene_consequence: null,
+      biological_context: 'K562',
+      neg_log10_pvalue: 5.2,
+      effect_size: 0.3,
+      posterior_inclusion_probability: null,
+      intron_chr: null,
+      intron_start: null,
+      intron_end: null,
+      study: null,
+      files_filesets: 'files_filesets/IGVFFI0001XXXX',
+      preferred_assay_titles: ['TAP-seq']
+    }]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(geneSearchResult) } as any)
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(qtlResult) } as any)
+
+    const input = { gene_id: 'ENSG00000012048' }
+    const result = await qtlsRouters.qtls({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[1][0]).toContain('preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...qtlResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })

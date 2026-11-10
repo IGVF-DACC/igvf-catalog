@@ -116,6 +116,36 @@ describe('variantsProteinsRouters.variantsFromProteins', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+    const mockResult = [
+      {
+        sequence_variant: 'variants/NC_000015.10:75202391:C:G',
+        protein_complex: 'proteins/ENSP00000281043',
+        name: 'modulates binding of',
+        is_complex: false,
+        method: 'ADASTRA',
+        biosample_term: 'ontology_terms/EFO_0002069',
+        score: -0.0171981040581793,
+        motif: 'motifs/TFDP1_HUMAN_HOCOMOCOv11',
+        motif_log2FC: -0.2727347850176788,
+        files_filesets: 'files_filesets/IGVFFI0001XXXX',
+        preferred_assay_titles: ['TAP-seq']
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { method: 'ADASTRA', page: 0 }
+    const result = await variantsProteinsRouters.variantsFromProteins({
+      input, ctx: {}, type: 'query', path: '', rawInput: input
+    })
+
+    expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('variantsProteinsRouters.proteinsFromVariants', () => {

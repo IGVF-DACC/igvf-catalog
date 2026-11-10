@@ -72,6 +72,73 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes', () => {
       })
     ).rejects.toThrow(TRPCError)
   })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+    const geneRecords = [{ _id: 'ENSG00000116198', name: 'CALML6', chr: 'chr1', start: 1850597, end: 1858437 }]
+    const mockResult = [
+      {
+        name: 'regulates',
+        label: 'perturbation effect on gene expression',
+        method: 'Perturb-seq',
+        class: 'observed data',
+        source: 'IGVF',
+        source_url: 'https://data.igvf.org/tabular-files/IGVFFI0001XXXX/',
+        biological_context: 'K562',
+        biosample_term: 'ontology_terms/EFO_0002067',
+        cell_annotation: null,
+        cell_annotation_term: null,
+        files_filesets: 'files_filesets/IGVFFI0001XXXX',
+        preferred_assay_titles: ['TAP-seq'],
+        perturbation: null,
+        score: null,
+        transcription_start_site: null,
+        rna_pseudobulk_tpm: null,
+        log2FC: -0.42,
+        log2FC_ci95_lower: null,
+        log2FC_ci95_upper: null,
+        effect_size: null,
+        effect_size_ci_95: null,
+        z_score: null,
+        t_score: null,
+        idr: null,
+        pct_1: null,
+        pct_2: null,
+        num_guides: null,
+        num_cells: null,
+        fold_change: null,
+        background_corrected_fold_change: null,
+        cpm_perturb: null,
+        cpm_bg: null,
+        gamma_approximation_ln_p_value: null,
+        hypergeometric_ln_p_value: null,
+        empirical_p_value: null,
+        p_value: 0.001,
+        p_value_adj: 0.004023984,
+        neg_log10_pvalue: null,
+        neg_log10_pvalue_adj: null,
+        significant: true,
+        genomic_element: 'genomic_elements/CRISPR_chr1_3774714_3775214_GRCh38_IGVFFI0001XXXX',
+        gene: 'genes/ENSG00000116198'
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(geneRecords) } as any)
+      .mockResolvedValue({ all: jest.fn().mockResolvedValue(mockResult) } as any)
+
+    const input = { gene_id: 'ENSG00000116198', page: 0 }
+    const result = await genomicElementsGenesRouters.genomicElementsFromGenes({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    const aql = String(query.mock.calls[1][0])
+    expect(aql).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
+  })
 })
 
 describe('genomicElementsGenesRouters.genesFromGenomicElements', () => {
@@ -249,6 +316,47 @@ describe('genomicElementsGenesRouters.grn', () => {
         rawInput: input
       })
     ).rejects.toThrow(TRPCError)
+  })
+
+  it('looks up preferred_assay_titles via files_filesets and expands TAP-seq to include Perturb-seq', async () => {
+    const mockResult = [
+      {
+        response_gene: 'CALML6',
+        genomic_element: { chr: 'chr1', start: 1850597, end: 1858437, regulator_gene: 'SAMD11' },
+        perturbation: null,
+        class: 'observed data',
+        method: 'Perturb-seq',
+        source: 'IGVF',
+        biological_context: 'K562',
+        files_filesets: 'files_filesets/IGVFFI0001XXXX',
+        preferred_assay_titles: ['TAP-seq'],
+        log2FC: 0.5,
+        neg_log10_pvalue: 2.5,
+        neg_log10_pvalue_adj: 1.5,
+        significant: true,
+        perturbation_efficiency_log2FC: -1.2,
+        perturbation_efficiency_neg_log10_pvalue: 4.1,
+        perturbation_efficiency_neg_log10_pvalue_adj: 3.0,
+        perturbation_efficiency_significant: true
+      }
+    ]
+
+    const query = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+      all: jest.fn().mockResolvedValue(mockResult)
+    } as any)
+
+    const input = { response_gene_id: 'ENSG00000116198', page: 0 }
+    const result = await genomicElementsGenesRouters.grn({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      rawInput: input
+    })
+
+    const aql = String(query.mock.calls[0][0])
+    expect(aql).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
+    expect(result).toEqual([{ ...mockResult[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 })
 
@@ -522,6 +630,7 @@ describe('MORF gene regulatory network', () => {
     expect(morf).toContain("record.method IN ['MORF screen']")
     expect(morf).toContain("record.perturbation == 'ORF overexpression'")
     expect(morf).toContain("record.files_filesets == 'files_filesets/IGVFFI6734IWRB'")
+    expect(morf).toContain("'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles")
     expect(morf).toContain('record.significant == true')
     expect(morf).toContain("record['neg_log10_pvalue_adj'] >= 2")
     if ('regulator_gene_id' in genes) expect(morf).toContain("regulator_gene._key == 'ENSG00000275700'")
@@ -572,6 +681,34 @@ describe('MORF gene regulatory network', () => {
     } else {
       expect(aql).not.toContain('DOCUMENT(relationship._to)')
     }
+  })
+
+  it('includes and expands preferred_assay_titles for MORF screen results', async () => {
+    const records = [{
+      response_gene: 'TOX',
+      regulator_gene: 'ACTL6A',
+      genomic_element: null,
+      transcript: 'transcripts/ENST00000450518',
+      perturbation: 'ORF overexpression',
+      method: 'MORF screen',
+      class: 'observed data',
+      source: 'IGVF',
+      biological_context: 'T cell',
+      files_filesets: 'files_filesets/IGVFFI6734IWRB',
+      preferred_assay_titles: ['TAP-seq'],
+      log2FC: 0.5,
+      neg_log10_pvalue: 3,
+      neg_log10_pvalue_adj: 2,
+      significant: true,
+      perturbation_efficiency_log2FC: null,
+      perturbation_efficiency_neg_log10_pvalue: null,
+      perturbation_efficiency_neg_log10_pvalue_adj: null,
+      perturbation_efficiency_significant: null
+    }]
+    jest.spyOn(dbModule.db, 'query').mockResolvedValue({ all: jest.fn().mockResolvedValue(records) } as any)
+    const input = { response_gene_name: 'TOX' }
+    const result = await genomicElementsGenesRouters.grn({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    expect(result).toEqual([{ ...records[0], preferred_assay_titles: ['TAP-seq', 'Perturb-seq'] }])
   })
 
   it('does not join human MORF data for mouse requests', async () => {

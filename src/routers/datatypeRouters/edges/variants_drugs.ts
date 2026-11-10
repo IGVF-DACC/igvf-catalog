@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { drugFormat } from '../nodes/drugs'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
@@ -47,7 +47,8 @@ export const variantsToDrugsFormat = z.object({
   name: z.string(),
   class: z.string().nullish(),
   method: z.string().nullish(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 }).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
 export const drugsToVariantsFormat = z.object({
@@ -62,7 +63,8 @@ export const drugsToVariantsFormat = z.object({
   name: z.string(),
   class: z.string().nullish(),
   method: z.string().nullish(),
-  files_filesets: z.string().nullish()
+  files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish()
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
 function validateInput (input: paramsFormatType): void {
@@ -133,7 +135,8 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
         'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+        'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
   `
   return await (await db.query(query)).all()
@@ -180,7 +183,8 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
         'drug': ${verbose ? `(${drugVerboseQuery})[0]` : 'record._to'},
-        'name': record.name
+        'name': record.name,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
       }
   `
   return await (await db.query(query)).all()
@@ -190,13 +194,13 @@ const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
   .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(drugsToVariantsFormat))
-  .query(async ({ input }) => await variantsFromDrugSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await variantsFromDrugSearch(input)))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
   .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsToDrugsFormat))
-  .query(async ({ input }) => await drugsFromVariantSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await drugsFromVariantSearch(input)))
 
 export const variantsDrugsRouters = {
   variantsFromDrugs,

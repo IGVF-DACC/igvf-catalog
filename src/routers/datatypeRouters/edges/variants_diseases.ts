@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { variantIDSearch } from '../nodes/variants'
 import { ontologyFormat } from '../nodes/ontologies'
-import { getDBReturnStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsCommonQueryFormat } from '../params'
@@ -36,6 +36,7 @@ export const variantDiseaseFormat = z.object({
   method: z.string().nullish(),
   label: z.string().nullish(),
   files_filesets: z.string().nullish(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   name: z.string()
@@ -134,7 +135,8 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
             ${getDBReturnStatements(variantToDiseaseSchema)},
             'name': record.name,
             'source': record.source,
-            'source_url': record.source_url
+            'source_url': record.source_url,
+            'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         }
   `
 
@@ -174,7 +176,8 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
         ${getDBReturnStatements(variantToDiseaseSchema)},
         'name': record.inverse_name,
         'source': record.source,
-        'source_url': record.source_url
+        'source_url': record.source_url,
+        'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
     }
     `
   } else {
@@ -198,7 +201,8 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
             ${getDBReturnStatements(variantToDiseaseSchema)},
             'name': record.inverse_name,
             'source': record.source,
-            'source_url': record.source_url
+            'source_url': record.source_url,
+            'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles
         }
     `
     } else {
@@ -216,13 +220,13 @@ const variantsFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/variants', description: descriptions.diseases_variants } })
   .input(diseasessCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
-  .query(async ({ input }) => await variantFromDiseaseSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await variantFromDiseaseSearch(input)))
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
   .input(variantsCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
-  .query(async ({ input }) => await DiseaseFromVariantSearch(input))
+  .query(async ({ input }) => withExpandedAssayTitles(await DiseaseFromVariantSearch(input)))
 
 export const variantsDiseasesRouters = {
   variantsFromDiseases,

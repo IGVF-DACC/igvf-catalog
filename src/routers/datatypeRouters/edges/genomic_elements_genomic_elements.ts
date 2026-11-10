@@ -4,7 +4,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat } from '../params'
-import { getFilterStatements, preProcessRegionParam } from '../_helpers'
+import { getFilterStatements, preProcessRegionParam, withExpandedAssayTitles } from '../_helpers'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 import { geneFormat } from '../nodes/genes'
 import { descriptions } from '../descriptions'
@@ -55,6 +55,7 @@ const outputFormat = z.array(z.object({
   source: z.string(),
   source_url: z.string(),
   files_filesets: z.string(),
+  preferred_assay_titles: z.array(z.string()).nullish(),
   biological_context: z.string().nullish(),
   biosample_term: z.string().nullish(),
   treatments_term_ids: z.array(z.string()).nullish(),
@@ -129,7 +130,7 @@ const genomicElementsFromGenomicElements = publicProcedure
     const expanded = (endpoint: string): string => input.verbose === 'true'
       ? `MERGE(KEEP(DOCUMENT(record.${endpoint}), '_id', 'name', 'chr', 'start', 'end', 'type', 'source_annotation'), { promoter_of: DOCUMENT(record.${endpoint}).promoter_of == null ? null : DOCUMENT(DOCUMENT(record.${endpoint}).promoter_of) })`
       : `record.${endpoint}`
-    const fields = Object.keys(outputFormat.element.shape).filter(field => !['perturbed_genomic_element', 'accessible_genomic_element'].includes(field))
+    const fields = Object.keys(outputFormat.element.shape).filter(field => !['perturbed_genomic_element', 'accessible_genomic_element', 'preferred_assay_titles'].includes(field))
     const cursor = await db.query(`
       ${nodeQueries.join('\n')}
       FOR record IN ${collection}
@@ -139,10 +140,11 @@ const genomicElementsFromGenomicElements = publicProcedure
         RETURN {
           perturbed_genomic_element: ${expanded('_from')},
           accessible_genomic_element: ${expanded('_to')},
+          preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles,
           ${fields.map(field => `${field}: record.${field}`).join(',\n')}
         }
     `, bindVars)
-    return await cursor.all()
+    return withExpandedAssayTitles(await cursor.all())
   })
 
 export const genomicElementsGenomicElementsRouters = { genomicElementsFromGenomicElements }
