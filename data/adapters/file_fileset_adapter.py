@@ -22,6 +22,14 @@ class FileFileSet:
     OVEREXPRESSION_ATAC_ACCESSIONS = frozenset(
         {'IGVFFI0911IUZS', 'IGVFFI2320OTYL'})
 
+    # Analysis sets whose samples mix CRISPR modalities, keyed by file accession.
+    # IGVFFI4039BVDA (ChrX screen, IGVFDS0120EBCZ) compares SpRY-ABE8e base editing
+    # against a D10A-SpRY nickase without deaminase control. The portal registers
+    # the control samples with modality 'cutting', although D10A only nicks.
+    CRISPR_MODALITY_OVERRIDES = {
+        'IGVFFI4039BVDA': 'base editing',
+    }
+
     CRISPR_PERTURBATION_MAPPING = {
         'interference': 'CRISPR interference',
         'activation': 'CRISPR activation',
@@ -468,7 +476,8 @@ class FileFileSet:
     @staticmethod
     def parse_sample_donor_treatment_igvf(
         samples,
-        method
+        method,
+        accession=None
     ):
         sample_accessions = set()
         sample_term_ids = set()
@@ -533,6 +542,13 @@ class FileFileSet:
                 # Add support for treatment vs. untreated analyses later
 
             simple_sample_summaries.add(simple_sample_summary)
+        override = FileFileSet.CRISPR_MODALITY_OVERRIDES.get(accession)
+        if override is not None:
+            if override not in crispr_modalities:
+                raise ValueError(
+                    f'CRISPR modality override {override!r} for {accession} '
+                    f'not among sample modalities {sorted(crispr_modalities)}.')
+            crispr_modalities = {override}
         if len(crispr_modalities) > 1:
             raise ValueError(
                 'Loading analysis sets with multiple CRISPR modalities is unsupported.')
@@ -884,7 +900,8 @@ class FileFileSet:
         samples = fileset_object.get('samples', [])
         sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids, modality = FileFileSet.parse_sample_donor_treatment_igvf(
             samples,
-            method)
+            method,
+            file_object['accession'])
 
         if fileset_object_type == 'AnalysisSet':
             simple_sample_summaries = [
