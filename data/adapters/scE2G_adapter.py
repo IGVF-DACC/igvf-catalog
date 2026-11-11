@@ -19,14 +19,19 @@ from adapters.gene_validator import GeneValidator
 # ElementChr	ElementStart	ElementEnd	ElementName	ElementClass	GeneSymbol	GeneEnsemblID	GeneTSS	CellType	CellTypeOntologyTerm	CellTypeOntologyTermName	Score	RNA_pseudobulkTPM
 # chr1	169893055	169894554	chr1:169893055-169894554	promoter	SCYL3	ENSG00000000457	169893959	Adrenal medulla chromaffin cell	CL:0000336	Adrenal medulla chromaffin cell	0.996889932534048	22.8574991753656
 #
-# Three header formats are supported:
+# Four header formats are supported:
 # 1. Standard (13 columns): includes ElementClass, Score, RNA_pseudobulkTPM
 # 2. Extended (16 columns): standard plus SampleOntologyTerm, SampleOntologyTermName, Qualifier
 # 3. Alternate (12 columns): no ElementClass or RNA_pseudobulkTPM; uses SampleSummaryShort
+# 4. Compact (11 columns): ElementClass and Score, plus CellAnnotation and isSelfPromoter;
+#    no CellType columns and no RNA_pseudobulkTPM
+#    ElementChr	ElementStart	ElementEnd	ElementName	ElementClass	GeneSymbol	GeneEnsemblID	GeneTSS	CellAnnotation	Score	isSelfPromoter
 #
 # Edge biosample/cell fields prefer files_filesets (samples, simple_sample_summaries,
 # cell_annotation, cell_annotation_term). For the few multi-cell-type files missing those
-# on files_filesets, values are taken from the TSV row.
+# on files_filesets, values are taken from the TSV row. Compact files have those
+# files_filesets fields, so CellAnnotation and isSelfPromoter are not read from the TSV.
+# RNA_pseudobulkTPM is omitted and stored as null.
 
 
 class scE2G(BaseAdapter):

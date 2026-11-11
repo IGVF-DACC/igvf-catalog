@@ -1894,6 +1894,11 @@ genomic element IGVF scE2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI9719LGLD/@@download/IGVFFI9719LGLD.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9779WEGD/@@download/IGVFFI9779WEGD.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9815VYTN/@@download/IGVFFI9815VYTN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8686XVLM/@@download/IGVFFI8686XVLM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9168JXYX/@@download/IGVFFI9168JXYX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7499CXNY/@@download/IGVFFI7499CXNY.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1506MXBW/@@download/IGVFFI1506MXBW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5340JQPZ/@@download/IGVFFI5340JQPZ.tsv.gz
   source: IGVF
   method: scE2G
   type: accessible dna elements
@@ -1982,6 +1987,11 @@ genomic element to gene IGVF scE2G:
     - https://api.data.igvf.org/tabular-files/IGVFFI9719LGLD/@@download/IGVFFI9719LGLD.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9779WEGD/@@download/IGVFFI9779WEGD.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI9815VYTN/@@download/IGVFFI9815VYTN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8686XVLM/@@download/IGVFFI8686XVLM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9168JXYX/@@download/IGVFFI9168JXYX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7499CXNY/@@download/IGVFFI7499CXNY.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1506MXBW/@@download/IGVFFI1506MXBW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5340JQPZ/@@download/IGVFFI5340JQPZ.tsv.gz
   source: IGVF
   method: scE2G
   label: predicted regulatory element effect on gene expression
