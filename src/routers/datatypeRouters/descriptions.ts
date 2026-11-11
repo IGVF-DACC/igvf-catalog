@@ -466,7 +466,52 @@ export const descriptions = {
     ],
     'Examples by source',
     'These examples are grouped by source; use the <code>source</code> filter to return data from a specific source.'
-    ),
+    ) + examples([
+      {
+        id: 'perturb-seq-by-method',
+        label: 'Perturb-seq',
+        examples: [
+          {
+            label: 'Single regulator pair in IL-1 beta-treated TeloHAEC cells',
+            items: [
+              'gene_id = ENSG00000000003',
+              'associated_gene_id = ENSG00000000005',
+              'method = Perturb-seq',
+              'files_fileset = IGVFFI6502THLB'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'biogrid-by-method',
+        label: 'BioGRID',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000112592',
+              'associated_gene_id = ENSG00000163132',
+              'method = phenotypic suppression (sensu BioGRID)',
+              'files_fileset = IGVFFI4317VDGK'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'coxpresdb-by-method',
+        label: 'COXPRESdb',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'gene_id = ENSG00000153048',
+              'associated_gene_id = ENSG00000233369',
+              'method = COXPRESdb'
+            ]
+          }
+        ]
+      }
+    ]),
 
   variants: 'Retrieve genetic variants.<br> \
   Example: organism = Homo sapiens or Mus musculus.<br> \
