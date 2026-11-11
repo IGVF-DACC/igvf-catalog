@@ -30,6 +30,22 @@ app.use(compression())
 app.use(cors())
 
 app.use('/trpc', createExpressMiddleware({ router: appRouter, createContext }))
+// trpc-to-openapi passes empty-string query values (e.g. `?term=`) straight through as '',
+// whereas the old trpc-openapi silently dropped them (treating them as if the param were
+// never passed). Every endpoint here was written against that old behavior - e.g.
+// /autocomplete's required `term` has no .min(1), relying on an empty value being treated
+// as absent rather than becoming a `STARTS_WITH(..., "")` wildcard that matches everything.
+// Stripping empty-string query values here restores that exact semantics in one place
+// instead of auditing/patching every endpoint's optional-string filters individually.
+app.use('/api', (req, _res, next) => {
+  for (const key of Object.keys(req.query)) {
+    if (req.query[key] === '') {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete req.query[key]
+    }
+  }
+  next()
+})
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.use('/api', createOpenApiExpressMiddleware({ router: appRouter, createContext }))
 
