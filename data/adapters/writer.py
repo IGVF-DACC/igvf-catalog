@@ -1,9 +1,21 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import boto3
 import smart_open
 
-from typing import Optional
+
+# zlib's default compromise. gzip's own default is 9, which spends a lot of CPU
+# on repetitive JSONL for a small extra size reduction.
+GZIP_COMPRESSLEVEL = 6
+
+
+def gzip_s3_key(key: str) -> str:
+    # Callers pass the JSONL name. The stored object is gzipped, and ClickHouse
+    # detects that from the .gz suffix. Leave a key that is already gzipped alone.
+    if key.endswith('.gz'):
+        return key
+    return f'{key}.gz'
 
 
 class Writer(ABC):
@@ -47,7 +59,7 @@ class S3Writer(Writer):
 
     def __init__(self, bucket: str, key: str, session: boto3.Session, collections_tag: Optional[str] = None) -> None:
         self.bucket = bucket
-        self.key = key
+        self.key = gzip_s3_key(key)
         self.session = session
         self._s3_uri = None
         self.s3_file = None
@@ -85,8 +97,18 @@ class S3Writer(Writer):
 
     def write(self, content):
         if self.s3_file is None:
-            self.s3_file = smart_open.open(self.destination, mode='w', transport_params={
-                                           'client': self.session.client('s3')})
+            # compression='.gz' forces gzip. Inferring it from the key would
+            # silently write plain bytes if the S3 stream name did not end in
+            # .gz, and compression_kwargs would be ignored. smart-open 9 closes
+            # the S3 upload from close(), including the gzip trailer.
+            self.s3_file = smart_open.open(
+                self.destination,
+                mode='w',
+                newline='\n',
+                compression='.gz',
+                compression_kwargs={'compresslevel': GZIP_COMPRESSLEVEL},
+                transport_params={'client': self.session.client('s3')},
+            )
         self.s3_file.write(content)
 
     def close(self, success: bool = True):

@@ -1,6 +1,9 @@
+import gzip
+
 import pytest
+import smart_open
 from unittest.mock import MagicMock, mock_open
-from adapters.writer import S3Writer, LocalWriter, get_writer
+from adapters.writer import S3Writer, LocalWriter, get_writer, GZIP_COMPRESSLEVEL
 
 
 def test_s3_writer_opens_lazily_on_first_write(mocker):
@@ -22,9 +25,12 @@ def test_s3_writer_opens_lazily_on_first_write(mocker):
     writer.write('content')
 
     mock_smart_open.assert_called_once_with(
-        's3://test-bucket/test-key',
+        's3://test-bucket/test-key.gz',
         mode='w',
-        transport_params={'client': mock_session.client('s3')}
+        newline='\n',
+        compression='.gz',
+        compression_kwargs={'compresslevel': GZIP_COMPRESSLEVEL},
+        transport_params={'client': mock_session.client('s3')},
     )
     assert writer.s3_file is not None
 
@@ -36,9 +42,31 @@ def test_s3_writer_write(mocker):
     writer = S3Writer(bucket='test-bucket',
                       key='test-key', session=MagicMock())
     writer.open()
-    writer.write('test content')
+    writer.write('{"id": "a"}\n')
+    writer.write('{"id": "b"}\n')
 
-    mock_file.write.assert_called_once_with('test content')
+    assert mock_file.write.call_args_list == [
+        mocker.call('{"id": "a"}\n'),
+        mocker.call('{"id": "b"}\n'),
+    ]
+
+
+def test_smart_open_gzip_close_roundtrip(tmp_path):
+    # smart-open 9 must finish the gzip trailer when close() is called, which
+    # is how S3Writer finalizes an upload outside a with-block.
+    path = tmp_path / 'rows.jsonl.gz'
+    handle = smart_open.open(
+        str(path),
+        mode='w',
+        newline='\n',
+        compression='.gz',
+        compression_kwargs={'compresslevel': GZIP_COMPRESSLEVEL},
+    )
+    handle.write('{"id": "a"}\n')
+    handle.close()
+
+    with gzip.open(path, 'rt', newline='\n') as gz:
+        assert gz.read() == '{"id": "a"}\n'
 
 
 def test_s3_writer_close(mocker):
@@ -66,7 +94,7 @@ def test_s3_writer_close_with_tagging(mocker):
     writer.close()
     mock_file.close.assert_called_once()
     mock_s3_client.put_object_tagging.assert_called_once_with(
-        Bucket='test-bucket', Key='test-key',
+        Bucket='test-bucket', Key='test-key.gz',
         Tagging={'TagSet': [{'Key': 'collections', 'Value': 'v123'}]}
     )
 
@@ -113,7 +141,7 @@ def test_s3_writer_waits_for_object_before_tagging(mocker):
     # PutObjectTagging call, so we wait on the object_exists waiter first.
     mock_s3_client.get_waiter.assert_called_once_with('object_exists')
     mock_s3_client.get_waiter.return_value.wait.assert_called_once_with(
-        Bucket='test-bucket', Key='test-key',
+        Bucket='test-bucket', Key='test-key.gz',
         WaiterConfig={'Delay': 1, 'MaxAttempts': 5},
     )
     # Tagging must happen only after waiting for the object to exist.
@@ -153,7 +181,7 @@ def test_s3_writer_close_with_multiple_tags(mocker):
     writer.write('content')
     writer.close()
     mock_s3_client.put_object_tagging.assert_called_once_with(
-        Bucket='test-bucket', Key='test-key',
+        Bucket='test-bucket', Key='test-key.gz',
         Tagging={'TagSet': [
             {'Key': 'collections', 'Value': 'v123'},
             {'Key': 'source', 'Value': 'oncotree'},
@@ -176,7 +204,7 @@ def test_s3_writer_add_tag_appends_value_for_same_key(mocker):
     writer.write('content')
     writer.close()
     mock_s3_client.put_object_tagging.assert_called_once_with(
-        Bucket='test-bucket', Key='test-key',
+        Bucket='test-bucket', Key='test-key.gz',
         Tagging={'TagSet': [
             {'Key': 'portal_accession', 'Value': 'IGVFFI0001 IGVFFI0002 IGVFFI0003'},
         ]}
@@ -198,7 +226,15 @@ def test_s3_writer_close_no_tags_skips_api_call(mocker):
 def test_s3_writer_destination():
     session = MagicMock()
     writer = S3Writer(bucket='test-bucket', key='test-key', session=session)
-    assert writer.destination == 's3://test-bucket/test-key'
+    assert writer.destination == 's3://test-bucket/test-key.gz'
+    assert writer.key == 'test-key.gz'
+
+
+def test_s3_writer_keeps_existing_gz_suffix():
+    writer = S3Writer(bucket='test-bucket',
+                      key='variants/file.jsonl.gz', session=MagicMock())
+    assert writer.key == 'variants/file.jsonl.gz'
+    assert writer.destination == 's3://test-bucket/variants/file.jsonl.gz'
 
 
 def test_local_writer_opens_lazily_on_first_write(mocker):
