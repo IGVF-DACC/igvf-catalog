@@ -10,14 +10,14 @@ Each dataset is listed in the Data Sources file at `igvf-catalog/data/data_sourc
 The Data Sources file lists all datafile links needed to load a dataset into the Catalog. It also describes how to parse each input file. For example:
 
 ```
-# Example: pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
-topld in linkage disequilibrium with:
+# Example: pypy3 data_parser.py --adapter TopLD --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
+TopLD.topld_linkage_disequilibrium:
   collection: variants_variants
   params:
     - chr
     - annotation-filepath
     - ancestry
-  command: pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/topld_{ancestry}_{chr}.jsonl --chr {chr} --annotation-filepath {annotation_datafile} --ancestry {ancestry}
+  command: pypy3 data_parser.py --adapter TopLD --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/topld_{ancestry}_{chr}.jsonl --chr {chr} --annotation-filepath {annotation_datafile} --ancestry {ancestry}
   pypy3: true
   datafiles:
     - AFR:
@@ -37,10 +37,10 @@ This excerpt of the original `data_sources.yaml` lists an incomplete set of 4 fi
 For this specific case, each chromosome for each ancestry requires a data file and an annotation data file. The template of the parameters necessary to run the parser is indicated in the file and an example is given on top of each group:
 
 ```
-pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
+pypy3 data_parser.py --adapter TopLD --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
 ```
 
-In this case, we use the adapter `topld` for loading the datafile `AFR_chr1_no_filter_0.2_1000000_LD.csv` with annotation file `AFR_chr1_no_filter_0.2_1000000_info_annotation.csv`, for the chromosome `chr1`, and ancestry `AFR`. This same template must be applied to all the other files in the list to complete the `variants_variants` collection.
+In this case, we use the adapter `TopLD` for loading the datafile `AFR_chr1_no_filter_0.2_1000000_LD.csv` with annotation file `AFR_chr1_no_filter_0.2_1000000_info_annotation.csv`, for the chromosome `chr1`, and ancestry `AFR`. This same template must be applied to all the other files in the list to complete the `variants_variants` collection.
 
 Each data file must be downloaded from the IGVF Data Portal (https://data.igvf.org).
 

@@ -1,4 +1,4 @@
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions IGVFFI1663LKVQ --output-bucket-key files_filesets/igvf_files_filesets.jsonl --label igvf_file_fileset
+# Example: python3 data_parser.py --adapter FileFileSet --output-bucket igvf-catalog-parsed-collections --accessions IGVFFI1663LKVQ --output-bucket-key files_filesets/igvf_files_filesets.jsonl --label igvf_file_fileset
 igvf file to file_set:
   collection: file_fileset
   pypy3: false
@@ -7,7 +7,7 @@ igvf file to file_set:
     - accessions
   command: >
     python3 data_parser.py
-    --adapter file_fileset
+    --adapter FileFileSet
     --output-bucket igvf-catalog-parsed-collections
     --accessions {igvf_file_accessions}
     --output-bucket-key files_filesets/igvf_files_filesets.jsonl
@@ -21,7 +21,7 @@ igvf donor:
     - accessions
   command: >
     python3 data_parser.py
-    --adapter file_fileset
+    --adapter FileFileSet
     --output-bucket igvf-catalog-parsed-collections
     --accessions {igvf_file_accessions}
     --output-bucket-key files_filesets/igvf_files_filesets_donors.jsonl
@@ -1542,7 +1542,7 @@ igvf_file_accessions:
     - IGVFFI7451JDDG
     - IGVFFI8669GYHG
     - IGVFFI5870RJQU
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
+# Example: python3 data_parser.py --adapter FileFileSet --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:
   collection: file_fileset
   pypy3: false
@@ -1551,13 +1551,13 @@ encode file to file_set:
     - accessions
   command: >
     python3 data_parser.py
-    --adapter file_fileset
+    --adapter FileFileSet
     --output-bucket igvf-catalog-parsed-collections
     --accessions {encode_file_accessions}
     --output-bucket-key files_filesets/encode_files_filesets.jsonl
     --label encode_file_fileset
 
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
+# Example: python3 data_parser.py --adapter FileFileSet --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode donor:
   collection: donor
   pypy3: false
@@ -1566,7 +1566,7 @@ encode donor:
     - accessions
   command: >
     python3 data_parser.py
-    --adapter file_fileset
+    --adapter FileFileSet
     --output-bucket igvf-catalog-parsed-collections
     --accessions {encode_file_accessions}
     --output-bucket-key files_filesets/encode_files_filesets_donors.jsonl
