@@ -388,6 +388,15 @@ def test_convert_aa_letter_code_and_Met1():
     converted_id = convert_aa_letter_code_and_Met1(original_id)
     assert converted_id == 'AFF2_ENST00000370460_p.Met1!_c.2T-G'
 
+    # PAR_Y transcript id contains _
+    original_id = 'DHRSX_ENST00000334651_PAR_Y_p.Met1Ala_c.1_3delinsGCA'
+    converted_id = convert_aa_letter_code_and_Met1(original_id)
+    assert converted_id == 'DHRSX_ENST00000334651_PAR_Y_p.Met1!_c.1_3delinsGCA'
+
+    original_id = 'DHRSX_ENST00000334651_PAR_Y_p.L5P_c.14T-C'
+    converted_id = convert_aa_letter_code_and_Met1(original_id)
+    assert converted_id == 'DHRSX_ENST00000334651_PAR_Y_p.Leu5Pro_c.14T-C'
+
 
 def test_get_file_fileset_by_accession_in_arangodb_returns_document():
     """Test that get_file_fileset_by_accession_in_arangodb returns the correct document."""

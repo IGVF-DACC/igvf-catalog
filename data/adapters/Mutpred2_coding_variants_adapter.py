@@ -137,10 +137,9 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
                         matches = re.findall(
                             r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'])
                         aa_ref, aa_pos, aa_alt = matches[0]
+                        # Met1 changes keep the actual aa change in hgvsp (e.g. p.Met1Ala), same as dbNSFP, only _key uses Met1!
                         aa_change = convert_aa_to_three_letter(
                             row['aa_change'])
-                        if aa_change.startswith('Met1'):
-                            aa_change = 'Met1?'  # to match with dbNSFP
                         _props = {
                             '_key': coding_variant_id,
                             'name': coding_variant_id,

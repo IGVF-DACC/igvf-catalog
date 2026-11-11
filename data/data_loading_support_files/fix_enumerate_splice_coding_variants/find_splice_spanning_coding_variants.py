@@ -18,7 +18,7 @@
 # Read-only on the database. DB connection is read from ../config/development.json.
 #
 # Usage (run from data/):
-# python data_loading_support_files/find_splice_spanning_coding_variants.py \
+# python data_loading_support_files/fix_enumerate_splice_coding_variants/find_splice_spanning_coding_variants.py \
 #   --mapping-files ~/dataset/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz \
 #   --output-dir . --cleaned-output-dir ~/dataset/cleaned
 
@@ -31,8 +31,9 @@ import sys
 import time
 from collections import Counter, OrderedDict
 
-sys.path.insert(0, os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))))
+# data/, two levels up from data_loading_support_files/fix_enumerate_splice_coding_variants/
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))))
 
 from arango.exceptions import AQLQueryExecuteError, DocumentGetError  # noqa: E402
 from adapters.helpers import convert_aa_letter_code_and_Met1  # noqa: E402

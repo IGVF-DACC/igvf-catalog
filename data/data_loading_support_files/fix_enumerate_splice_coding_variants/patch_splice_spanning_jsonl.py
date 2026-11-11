@@ -16,7 +16,7 @@
 # --jsonl-files and --output-dir can be local paths or s3:// uris (streamed, nothing stored locally; the coding_variants files are ~300GB each).
 #
 # Usage (run from data/):
-# python data_loading_support_files/patch_splice_spanning_jsonl.py \
+# python data_loading_support_files/fix_enumerate_splice_coding_variants/patch_splice_spanning_jsonl.py \
 #   --deletion-log delete_splice_spanning_coding_variants.log.tsv \
 #   --jsonl-files s3://igvf-catalog-parsed-collections/coding_variants/coding_variants_ESM_IGVFFI8105TNNO.jsonl \
 #   --output-dir s3://igvf-catalog-parsed-collections/coding_variants_patched [--aws-profile default]
