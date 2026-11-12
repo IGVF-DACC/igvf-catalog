@@ -6,7 +6,7 @@ import { variantSearch, singleVariantQueryFormat, variantFormat, variantSimplifi
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat, pageParam, limitParam } from '../params'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
@@ -322,7 +322,7 @@ const variantsFromVariantID = publicProcedure
 
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant-ld/summary', description: descriptions.variants_variants_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), page: z.number().default(0), limit: z.number().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), page: pageParam, limit: limitParam })))
   .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))
 

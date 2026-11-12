@@ -6,7 +6,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
-import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, variantsCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, variantsCommonQueryFormat, pageParam, limitParam } from '../params'
 import { getCollectionEnumValuesOrThrow, getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
 
@@ -774,7 +774,7 @@ const genomicElementsFromVariantsCount = publicProcedure
 
 const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
-  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: z.number().optional(), page: z.number().default(0) })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), files_fileset: z.string().optional(), method: z.enum(PREDICTION_METHODS).optional(), limit: limitParam, page: pageParam })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => withExpandedAssayTitles(await findPredictionsFromVariant(input)))
 

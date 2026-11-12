@@ -86,28 +86,40 @@ export const commonPathwayQueryFormat = z.object({
   biological_process: z.string().trim().optional()
 })
 
+// Shared paging params: page is a non-negative integer, limit a positive integer.
+// Use these everywhere instead of declaring page/limit per router, so invalid values
+// are rejected with HTTP 400 and the OpenAPI spec types them as integers.
+export const pageParam = z.number().int().nonnegative().default(0)
+// Base page-size schema for routers that add their own .max() / .default()
+export const pageSizeParam = z.number().int().positive()
+export const limitParam = pageSizeParam.optional()
+export const pagingParamsFormat = z.object({
+  page: pageParam,
+  limit: limitParam
+})
+
 export const commonHumanEdgeParamsFormat = z.object({
   organism: z.enum(['Homo sapiens']).default('Homo sapiens'),
   verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 export const commonEdgeParamsFormat = z.object({
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 export const commonHumanNodesParamsFormat = z.object({
   organism: z.enum(['Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 export const commonNodesParamsFormat = z.object({
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })

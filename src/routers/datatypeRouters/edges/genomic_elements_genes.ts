@@ -7,7 +7,7 @@ import { transcriptFormat } from '../nodes/transcripts'
 import { escapeAqlString, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, resolveValidatedLimit, withExpandedAssayTitles, withHgncPrefix } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
+import { commonEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat, pageParam, limitParam } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow, getMergedCollectionSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
@@ -106,8 +106,8 @@ const geneScoreSummaryQueryFormat = z.object({
   // Paginates the groups list itself, not the underlying edges - the aggregation still runs
   // over every matching edge regardless of page/limit (total_edge_count always reflects the
   // full match set), since a gene can have thousands of distinct provenance combinations.
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 const geneScoreSummaryGroupFormat = z.object({

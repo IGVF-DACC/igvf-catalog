@@ -5,6 +5,7 @@ import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { db } from '../../../database'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
+import { pageParam, limitParam } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -35,8 +36,8 @@ const filesFilesetsQueryFormat = z.object({
   has_genome_browser_link: z.enum(['true', 'false']).optional(),
   source: z.enum(SOURCE).optional(),
   class: z.enum(CLASS).optional(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ preferred_assay_title, fileset_id, file_fileset_id, donor_id, sample_term, sample_summary, ...rest }) => ({
   _key: file_fileset_id,
