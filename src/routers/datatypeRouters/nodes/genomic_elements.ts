@@ -4,7 +4,7 @@ import { publicProcedure } from '../../../trpc'
 import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
-import { commonNodesParamsFormat } from '../params'
+import { commonNodesParamsFormat, limitParam } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
@@ -89,7 +89,7 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
 
 const genomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements', description: descriptions.genomic_elements } })
-  .input(genomicElementsQueryFormat.merge(z.object({ files_fileset: z.string().optional(), limit: z.number().optional() })))
+  .input(genomicElementsQueryFormat.merge(z.object({ files_fileset: z.string().optional(), limit: limitParam })))
   .output(z.array(genomicElementFormat))
   .query(async ({ input }) => await genomicElementSearch(input))
 

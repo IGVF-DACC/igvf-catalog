@@ -36,9 +36,7 @@ const inputFormat = z.object({
   p_value_adj: identifier,
   neg_log10_pvalue: identifier,
   neg_log10_pvalue_adj: identifier,
-  ...commonHumanEdgeParamsFormat.shape,
-  page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().optional()
+  ...commonHumanEdgeParamsFormat.shape
 })
 
 const outputFormat = z.object({

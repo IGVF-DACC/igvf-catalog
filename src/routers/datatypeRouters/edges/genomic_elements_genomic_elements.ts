@@ -30,9 +30,7 @@ const inputFormat = z.object({
   p_value_adj: textFilter,
   neg_log10_pvalue: textFilter,
   neg_log10_pvalue_adj: textFilter,
-  ...commonHumanEdgeParamsFormat.shape,
-  page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().optional()
+  ...commonHumanEdgeParamsFormat.shape
 })
 const elementFormat = z.object({
   _id: z.string(),

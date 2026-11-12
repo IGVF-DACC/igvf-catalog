@@ -29,15 +29,9 @@ const edgeQueryFormat = z.object({
 
 const genomicElementQueryFormat = z.object({
   region: z.string().trim().optional()
-}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat).extend({
-  page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().optional()
-})
+}).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
 
-const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat).extend({
-  page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().optional()
-})
+const phenotypeQueryFormat = edgeQueryFormat.merge(commonHumanEdgeParamsFormat)
 
 const elementOutputFormat = z.object({
   _id: z.string(),
