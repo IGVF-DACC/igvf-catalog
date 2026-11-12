@@ -222,6 +222,8 @@ def main():
                 try:
                     coding_variants = enumerate_coding_variant(
                         hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, seq_reader)
+                    if not coding_variants:
+                        continue
                     variant_ids = coding_variants['spdi_ids']
                     coding_variant_ids = coding_variants['mutation_ids']
                     # Met1 case -> revise _key to match with dbNSFP

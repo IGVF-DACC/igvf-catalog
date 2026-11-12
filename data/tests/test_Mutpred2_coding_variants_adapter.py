@@ -209,25 +209,22 @@ def test_property_scores_rejects_malformed_entry():
         adapter.validate_doc(doc)
 
 
-def test_met1_aa_change_handling():
-    """Test handling of Met1 amino acid changes"""
+SAMPLE_MAPPING_TSV_MET1 = (
+    f'ENST00000258439.8\tM1F\tTMEM127_ENST00000258439.8_p.M1F_c.1_3delinsTTC\tc.1_3delinsTTC\tNC_000002.12:96265378:CAT:GAA\tNC_000002.12:g.96265379_96265381delinsGAA\tTTC\t1\tATG\tENSP00000258439.3\tTMEM127_HUMAN\t0.279\t{mechanisms_json}\n'
+)
+
+
+@patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV_MET1)
+def test_met1_aa_change_handling(mock_gzip_open):
+    """Met1 changes use Met1! in _key, and keep the actual aa change in hgvsp, same as dbNSFP"""
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        SAMPLE_FILEPATH, writer=writer, validate=True)
+        SAMPLE_FILEPATH, label='coding_variants', writer=writer, validate=True)
+    adapter.process_file()
 
-    # Create a test row with Met1 amino acid change
-    test_row = {
-        'aa_change': 'Met1Val',
-        'codon_ref': 'ATG',
-        'gene_name': 'TEST_GENE',
-        'property_scores': [{'Posterior Probability': 0.5}]
-    }
-
-    # Mock the process_file method to test the Met1 handling logic
-    with patch.object(adapter, 'writer') as mock_writer:
-        # This will test the Met1 handling code path
-        aa_change = test_row['aa_change']
-        if aa_change.startswith('Met1'):
-            aa_change = 'Met1?'  # to match with dbNSFP
-
-        assert aa_change == 'Met1?'
+    first_item = json.loads(writer.contents[0])
+    assert first_item['_key'] == 'TMEM127_ENST00000258439_p.Met1!_c.1_3delinsTTC'
+    assert first_item['ref'] == 'M'
+    assert first_item['alt'] == 'F'
+    assert first_item['aapos'] == 1
+    assert first_item['hgvsp'] == 'p.Met1Phe'

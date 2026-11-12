@@ -949,8 +949,11 @@ def convert_aa_to_three_letter(aa_change):
 def convert_aa_letter_code_and_Met1(coding_variant_id):
     # convert one letter aa code to three letter code from mapping file
     # for change from start codon Met1 e.g. Met1Ala convert to Met1! in _key, to match with coding variants loaded from dbNSFP
+    # note we changed hgvsp field for dbNSFP coding variants from Met1? to e.g. Met1Ala but we didn't change their _key
     # e.g. DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC -> DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC
-    aa_change = coding_variant_id.split('_')[2].split('.')[1]
+    # split on _p. since transcript id can contain _, e.g. DHRSX_ENST00000334651_PAR_Y_p.Met1Ala_c.1_3delinsGCA
+    gene_transcript, aa_change_hgvsc = coding_variant_id.split('_p.', 1)
+    aa_change, hgvsc = aa_change_hgvsc.split('_', 1)
     matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', aa_change)
     aa_ref, aa_pos, aa_alt = matches[0]
     if len(aa_ref) == 1:
@@ -959,8 +962,7 @@ def convert_aa_letter_code_and_Met1(coding_variant_id):
         aa_change = aa_ref + str(aa_pos) + aa_alt
     if aa_ref == 'Met' and aa_pos == '1':
         aa_change = 'Met1!'
-    converted_id = '_'.join(coding_variant_id.split(
-        '_')[:2]) + '_p.' + aa_change + '_' + '_'.join(coding_variant_id.split('_')[3:])
+    converted_id = gene_transcript + '_p.' + aa_change + '_' + hgvsc
     return converted_id
 
 

@@ -132,7 +132,7 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     assert first_item['protein_id'] == 'ENSP00000359489'
     assert first_item['transcript_id'] == 'ENST00000370460'
     assert first_item['protein_name'] == 'AFF2_HUMAN'
-    assert first_item['hgvsp'] == 'p.Met1?'
+    assert first_item['hgvsp'] == 'p.Met1Ala'
     assert first_item['hgvsc'] == 'c.1_3delinsGCA'
     assert first_item['codonpos'] == 1
 
@@ -164,6 +164,23 @@ def test_process_file_coding_variants_phenotypes(
     assert first_item['name'] == 'mutational effect'
     assert first_item['inverse_name'] == 'altered due to mutation'
     assert first_item['label'] == 'predicted protein variant effect'
+
+
+@patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV.replace('-5.383840847015381\n', '-0.1\n'))
+def test_process_file_coding_variants_phenotypes_no_score_threshold(
+        mock_gzip_open, mock_file_fileset, mock_ontology_term_validator):
+    writer = SpyWriter()
+    adapter = ESM1vCodingVariantsScores(
+        SAMPLE_FILEPATH,
+        label='coding_variants_phenotypes',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+
+    items = [json.loads(line) for line in writer.contents if line != '\n']
+    assert len(items) == 2
+    assert items[0]['esm_1v_score'] == -0.1
 
 
 def test_validate_doc_invalid():

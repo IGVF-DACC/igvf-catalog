@@ -186,9 +186,8 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                 matches = re.findall(
                     r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
                 aa_ref, aa_pos, aa_alt = matches[0]
+                # Met1 changes keep the actual aa change in hgvsp (e.g. p.Met1Ala), same as dbNSFP, only _key uses Met1!
                 aa_change = row['aa_change'].split('.')[1]
-                if aa_change.startswith('Met1'):
-                    aa_change = 'Met1?'  # to match with dbNSFP
                 _props = {
                     '_key': coding_variant_id,
                     'name': coding_variant_id,
@@ -213,35 +212,34 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                 self.writer.write('\n')
         elif self.label == 'coding_variants_phenotypes':
             score = float(row['combined_score'])
-            # only load rows with score < log(0.5)
-            if score < -0.6931:
-                for coding_variant_id in coding_variant_ids:
-                    _props = {
-                        '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.file_accession]),
-                        '_from': 'coding_variants/' + coding_variant_id,
-                        '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                        'name': self.PHENOTYPE_EDGE_NAME,
-                        'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
-                        'esm_1v_score': score,  # property scores passing threshold
-                        'files_filesets': 'files_filesets/' + self.file_accession,
-                        'method': self.file_fileset.get('method'),
-                        'label': self.COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES,
-                        'class': self.file_fileset.get('class'),
-                        'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
-                        'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
-                        'source': self.SOURCE,
-                        'source_url': self.source_url
-                    }
-                    for field in self.MAPPING_FILE_HEADER:
-                        # also load intermediate scores from model for now, could skip if not useful
-                        if field.startswith('esm1v'):
-                            prop = {}
-                            value = row[field]
-                            prop[field] = float(
-                                value) if value != '' else None
-                            _props.update(prop)
+            # no threshold applied, load all rows
+            for coding_variant_id in coding_variant_ids:
+                _props = {
+                    '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.file_accession]),
+                    '_from': 'coding_variants/' + coding_variant_id,
+                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                    'name': self.PHENOTYPE_EDGE_NAME,
+                    'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
+                    'esm_1v_score': score,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
+                    'method': self.file_fileset.get('method'),
+                    'label': self.COLLECTION_LABEL_CODING_VARIANTS_PHENOTYPES,
+                    'class': self.file_fileset.get('class'),
+                    'biosample_term': self.file_fileset.get('samples')[0] if self.file_fileset.get('samples') else None,
+                    'biological_context': self.file_fileset.get('simple_sample_summaries')[0] if self.file_fileset.get('simple_sample_summaries') else None,
+                    'source': self.SOURCE,
+                    'source_url': self.source_url
+                }
+                for field in self.MAPPING_FILE_HEADER:
+                    # also load intermediate scores from model for now, could skip if not useful
+                    if field.startswith('esm1v'):
+                        prop = {}
+                        value = row[field]
+                        prop[field] = float(
+                            value) if value != '' else None
+                        _props.update(prop)
 
-                    if self.validate:
-                        self.validate_doc(_props)
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')

@@ -3526,7 +3526,6 @@ coding variant to phenotype ESM:
   datafiles:
     - s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz # derived from https://api.data.igvf.org/tabular-files/IGVFFI8105TNNO/@@download/IGVFFI8105TNNO.tsv.gz
   source: IGVF
-  threshold: -0.6931 # only load rows with score < log(0.5)
 
 genomic_element IGVF CRISPR accessibility:
   collection: genomic_elements
