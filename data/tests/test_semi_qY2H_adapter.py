@@ -61,7 +61,7 @@ MOCKED_FILE_FILESET = {
 @patch('adapters.semi_qY2H_adapter.bulk_query_coding_variants_from_spdi_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('adapters.semi_qY2H_adapter.requests.get')
 @patch('gzip.open', new_callable=mock_open, read_data=PPI_TSV)
-def test_process_file_coding_variants_PPI(
+def test_process_file_coding_variants_proteins_proteins(
     mock_gzip_open, mock_requests_get, mock_coding_variants, mock_ppi_edges, mock_file_fileset, caplog
 ):
     mock_requests_get.return_value.json.return_value = MOCKED_ORF_PROTEIN_MAP
@@ -69,7 +69,7 @@ def test_process_file_coding_variants_PPI(
     writer = SpyWriter()
     adapter = SemiQY2H(
         'IGVFFI2460BBXY.tsv.gz',
-        label='coding_variants_PPI',
+        label='coding_variants_proteins_proteins',
         writer=writer,
         validate=True
     )
@@ -77,7 +77,7 @@ def test_process_file_coding_variants_PPI(
         adapter.process_file()
 
     records = [json.loads(c) for c in writer.contents if c != '\n']
-    # row A matches two proteins_proteins edges -> one coding_variants_PPI edge per match
+    # row A matches two proteins_proteins edges -> one coding_variants_proteins_proteins edge per match
     assert len(records) == 2
 
     expected_ppi_keys = {
@@ -129,7 +129,7 @@ def test_multiple_coding_variants_logs_warning_and_uses_first_PPI(
     writer = SpyWriter()
     adapter = SemiQY2H(
         'IGVFFI2460BBXY.tsv.gz',
-        label='coding_variants_PPI',
+        label='coding_variants_proteins_proteins',
         writer=writer,
         validate=True
     )
@@ -184,7 +184,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
 
 def test_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants_PPI, coding_variants_phenotypes'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants_proteins_proteins, coding_variants_phenotypes'):
         SemiQY2H(
             'IGVFFI2460BBXY.tsv.gz',
             label='invalid_label',

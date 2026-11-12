@@ -111,8 +111,8 @@
         }
     },
     "edges": {
-        "coding_variants_PPI": {
-            "SemiQY2H": "schemas/edges/coding_variants_PPI.SemiQY2H.json"
+        "coding_variants_proteins_proteins": {
+            "SemiQY2H": "schemas/edges/coding_variants_proteins_proteins.SemiQY2H.json"
         },
         "coding_variants_phenotypes": {
             "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",

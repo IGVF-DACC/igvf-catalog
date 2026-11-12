@@ -24,19 +24,20 @@ from adapters.writer import Writer
 
 
 class SemiQY2H(BaseAdapter):
-    ALLOWED_LABELS = ['coding_variants_PPI', 'coding_variants_phenotypes']
+    ALLOWED_LABELS = ['coding_variants_proteins_proteins',
+                      'coding_variants_phenotypes']
     SOURCE = 'IGVF'
     IGVF_API = 'https://api.data.igvf.org'
     ORF_SEARCH_CHUNK_SIZE = 100
 
     PROTEIN_BINDING_TERM = 'GO_0005515'  # protein binding
-    CODING_VARIANTS_PPI_EDGE_NAME = 'modulates interaction of'
-    CODING_VARIANTS_PPI_EDGE_INVERSE_NAME = 'interaction modulated by'
+    CODING_VARIANTS_PROTEINS_PROTEINS_EDGE_NAME = 'modulates interaction of'
+    CODING_VARIANTS_PROTEINS_PROTEINS_EDGE_INVERSE_NAME = 'interaction modulated by'
     CODING_VARIANTS_PHENOTYPES_EDGE_NAME = 'mutational effect'
     CODING_VARIANTS_PHENOTYPES_EDGE_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL = 'protein variant effect'
 
-    def __init__(self, filepath, label='coding_variants_PPI', writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label='coding_variants_proteins_proteins', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         super().__init__(filepath, label, writer, validate)
@@ -92,12 +93,12 @@ class SemiQY2H(BaseAdapter):
                 f'file_fileset not found for {self.file_accession}, file_fileset fields will be None')
             file_fileset = {}
 
-        if self.label == 'coding_variants_PPI':
-            self.parse_coding_variants_PPI(file_fileset)
+        if self.label == 'coding_variants_proteins_proteins':
+            self.parse_coding_variants_proteins_proteins(file_fileset)
         else:
             self.parse_coding_variants_phenotypes(file_fileset)
 
-    def parse_coding_variants_PPI(self, file_fileset):
+    def parse_coding_variants_proteins_proteins(self, file_fileset):
         with gzip.open(self.filepath, 'rt') as edge_file:
             rows = [row for row in csv.DictReader(
                 edge_file, delimiter='\t') if row['allele_type'] == 'variant']
@@ -148,8 +149,8 @@ class SemiQY2H(BaseAdapter):
                     '_key': coding_variant_keys[0] + '_' + ppi_edge_key + '_' + self.file_accession,
                     '_from': 'coding_variants/' + coding_variant_keys[0],
                     '_to': 'proteins_proteins/' + ppi_edge_key,
-                    'name': self.CODING_VARIANTS_PPI_EDGE_NAME,
-                    'inverse_name': self.CODING_VARIANTS_PPI_EDGE_INVERSE_NAME,
+                    'name': self.CODING_VARIANTS_PROTEINS_PROTEINS_EDGE_NAME,
+                    'inverse_name': self.CODING_VARIANTS_PROTEINS_PROTEINS_EDGE_INVERSE_NAME,
                     'consensus_score': float(row['consensus_score']),
                     'wt_consensus_score': float(row['wt_consensus_score']),
                     'log2FC': float(row['log2fc']),
