@@ -113,6 +113,7 @@
         },
         "neg_log10_pvalue": {
           "$ref": "../mixins.json#/neg_log10_pvalue",
+          "description": "Negative log10 of the association p-value, calculated as -p_val_exponent - log10(p_val_mantissa). The stored p_value underflows to 5e-324 once the exponent is below about -324, so -log10(p_value) is not used.",
           "example": 1
         },
         "tagged_variants": {
