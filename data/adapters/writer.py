@@ -94,9 +94,7 @@ class S3Writer(Writer):
 
     def write(self, content):
         if self.s3_file is None:
-            # compression='.gz' forces gzip. Inferring it from the key would
-            # silently write plain bytes if the S3 stream name did not end in
-            # .gz, and compression_kwargs would be ignored. smart-open 9 closes
+            # compression='.gz' forces gzip. smart-open 9 closes
             # the S3 upload from close(), including the gzip trailer.
             self.s3_file = smart_open.open(
                 self.destination,

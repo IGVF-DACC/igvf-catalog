@@ -126,7 +126,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms/' + ontology_name + '-primary.jsonl.gz',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag,
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     writer_secondary = get_writer(
@@ -135,7 +135,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms/' + ontology_name + '-secondary.jsonl.gz',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag,
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     writer_edge_primary = get_writer(
@@ -144,7 +144,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl.gz',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag,
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     writer_edge_secondary = get_writer(
@@ -153,7 +153,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
         key='ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl.gz',
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag,
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](
@@ -171,7 +171,7 @@ else:
         key=non_adapter_signature_namespace.output_bucket_key,
         session=boto3.Session(
             profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag,
+        collections_tag=non_adapter_signature_namespace.collections_tag
     )
 
     adapter_kwargs = {
