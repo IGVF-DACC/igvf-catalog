@@ -230,11 +230,57 @@ def test_s3_writer_destination():
     assert writer.key == 'test-key.gz'
 
 
-def test_s3_writer_keeps_existing_gz_suffix():
-    writer = S3Writer(bucket='test-bucket',
-                      key='variants/file.jsonl.gz', session=MagicMock())
+def test_s3_writer_keeps_existing_gz_suffix(caplog):
+    with caplog.at_level('WARNING'):
+        writer = S3Writer(bucket='test-bucket',
+                          key='variants/file.jsonl.gz', session=MagicMock())
     assert writer.key == 'variants/file.jsonl.gz'
     assert writer.destination == 's3://test-bucket/variants/file.jsonl.gz'
+    assert caplog.records == []
+
+
+def test_s3_writer_warns_when_compress_key_lacks_gz_suffix(caplog):
+    with caplog.at_level('WARNING'):
+        writer = S3Writer(bucket='test-bucket',
+                          key='variants/file.jsonl', session=MagicMock())
+    assert writer.key == 'variants/file.jsonl.gz'
+    assert any(
+        'does not end with .gz' in record.message
+        and 'variants/file.jsonl' in record.message
+        for record in caplog.records
+    )
+
+
+def test_s3_writer_uncompressed_writes_plain_key(mocker, caplog):
+    mock_session = MagicMock()
+    mock_smart_open = mocker.patch(
+        'adapters.writer.smart_open.open', return_value=MagicMock())
+
+    with caplog.at_level('WARNING'):
+        writer = S3Writer(bucket='test-bucket', key='test-key',
+                          session=mock_session, compress=False)
+    assert writer.key == 'test-key'
+    assert writer.destination == 's3://test-bucket/test-key'
+    assert caplog.records == []
+
+    writer.open()
+    writer.write('content')
+
+    mock_smart_open.assert_called_once_with(
+        's3://test-bucket/test-key',
+        mode='w',
+        newline='\n',
+        compression='disable',
+        transport_params={'client': mock_session.client('s3')},
+    )
+
+
+def test_s3_writer_uncompressed_strips_gz_suffix():
+    writer = S3Writer(bucket='test-bucket',
+                      key='variants/file.jsonl.gz', session=MagicMock(),
+                      compress=False)
+    assert writer.key == 'variants/file.jsonl'
+    assert writer.destination == 's3://test-bucket/variants/file.jsonl'
 
 
 def test_local_writer_opens_lazily_on_first_write(mocker):
@@ -292,15 +338,39 @@ def test_local_writer_destination():
     assert writer.destination == '/path/to/file.txt'
 
 
-def test_get_writer_local(mocker):
+def test_get_writer_local(caplog):
     filepath = '/path/to/file.txt'
-    writer = get_writer(filepath=filepath)
+    with caplog.at_level('INFO'):
+        writer = get_writer(filepath=filepath)
     assert isinstance(writer, LocalWriter)
+    assert f'Using local writer for filepath: {filepath}' in caplog.text
 
 
-def test_get_writer_s3(mocker):
+def test_get_writer_s3(caplog):
     bucket = 'test-bucket'
     key = 'test-key'
     session = MagicMock()
-    writer = get_writer(bucket=bucket, key=key, session=session)
+    with caplog.at_level('INFO'):
+        writer = get_writer(bucket=bucket, key=key, session=session)
     assert isinstance(writer, S3Writer)
+    assert writer.key == 'test-key.gz'
+    assert f'Using S3 writer for bucket: {bucket}, key: {key}' in caplog.text
+
+
+def test_get_writer_s3_requires_bucket_and_key(caplog):
+    session = MagicMock()
+    with caplog.at_level('INFO'):
+        with pytest.raises(ValueError, match='both bucket and key are required when writing to S3'):
+            get_writer(bucket='test-bucket', session=session)
+        with pytest.raises(ValueError, match='both bucket and key are required when writing to S3'):
+            get_writer(key='test-key', session=session)
+        with pytest.raises(ValueError, match='both bucket and key are required when writing to S3'):
+            get_writer(session=session)
+    assert 'Using S3 writer' not in caplog.text
+
+
+def test_get_writer_s3_uncompressed():
+    writer = get_writer(bucket='test-bucket', key='test-key',
+                        session=MagicMock(), compress=False)
+    assert isinstance(writer, S3Writer)
+    assert writer.key == 'test-key'
