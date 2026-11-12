@@ -15,7 +15,7 @@ def test_s3_writer_opens_lazily_on_first_write(mocker):
         'adapters.writer.smart_open.open', return_value=MagicMock())
 
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session)
+                      key='test-key.gz', session=mock_session)
     writer.open()
 
     # open() defers: no S3 object is created until something is actually written
@@ -40,7 +40,7 @@ def test_s3_writer_write(mocker):
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
 
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=MagicMock())
+                      key='test-key.gz', session=MagicMock())
     writer.open()
     writer.write('{"id": "a"}\n')
     writer.write('{"id": "b"}\n')
@@ -74,7 +74,7 @@ def test_s3_writer_close(mocker):
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
 
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=MagicMock())
+                      key='test-key.gz', session=MagicMock())
     writer.open()
     writer.write('content')
     writer.close()
@@ -88,7 +88,7 @@ def test_s3_writer_close_with_tagging(mocker):
     mock_s3_client = mock_session.client('s3')
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session, collections_tag='v123')
+                      key='test-key.gz', session=mock_session, collections_tag='v123')
     writer.open()
     writer.write('content')
     writer.close()
@@ -104,7 +104,7 @@ def test_s3_writer_close_without_write_creates_nothing(mocker):
     mock_smart_open = mocker.patch(
         'adapters.writer.smart_open.open', return_value=MagicMock())
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session, collections_tag='v123')
+                      key='test-key.gz', session=mock_session, collections_tag='v123')
     writer.open()
     writer.close()
     # No write happened, so no object should be created and no tag applied.
@@ -117,7 +117,7 @@ def test_s3_writer_context_manager_no_file_on_early_failure(mocker):
     mock_smart_open = mocker.patch(
         'adapters.writer.smart_open.open', return_value=MagicMock())
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session, collections_tag='v123')
+                      key='test-key.gz', session=mock_session, collections_tag='v123')
     with pytest.raises(RuntimeError):
         with writer:
             raise RuntimeError('setup failed before writing')
@@ -132,7 +132,7 @@ def test_s3_writer_waits_for_object_before_tagging(mocker):
     mock_s3_client = mock_session.client('s3')
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session, collections_tag='v123')
+                      key='test-key.gz', session=mock_session, collections_tag='v123')
     writer.open()
     writer.write('content')
     writer.close()
@@ -158,7 +158,7 @@ def test_s3_writer_no_wait_when_no_tags(mocker):
     mock_s3_client = mock_session.client('s3')
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session)
+                      key='test-key.gz', session=mock_session)
     writer.open()
     writer.write('content')
     writer.close()
@@ -174,7 +174,7 @@ def test_s3_writer_close_with_multiple_tags(mocker):
     mock_s3_client = mock_session.client('s3')
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session, collections_tag='v123')
+                      key='test-key.gz', session=mock_session, collections_tag='v123')
     writer.add_tag('source', 'oncotree')
     writer.add_tag('format', 'jsonl')
     writer.open()
@@ -196,7 +196,7 @@ def test_s3_writer_add_tag_appends_value_for_same_key(mocker):
     mock_s3_client = mock_session.client('s3')
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session)
+                      key='test-key.gz', session=mock_session)
     writer.add_tag('portal_accession', 'IGVFFI0001')
     writer.add_tag('portal_accession', 'IGVFFI0002')
     writer.add_tag('portal_accession', 'IGVFFI0003')
@@ -216,7 +216,7 @@ def test_s3_writer_close_no_tags_skips_api_call(mocker):
     mock_session = MagicMock()
     mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
     writer = S3Writer(bucket='test-bucket',
-                      key='test-key', session=mock_session)
+                      key='test-key.gz', session=mock_session)
     writer.open()
     writer.write('content')
     writer.close()
@@ -225,62 +225,22 @@ def test_s3_writer_close_no_tags_skips_api_call(mocker):
 
 def test_s3_writer_destination():
     session = MagicMock()
-    writer = S3Writer(bucket='test-bucket', key='test-key', session=session)
+    writer = S3Writer(bucket='test-bucket', key='test-key.gz', session=session)
     assert writer.destination == 's3://test-bucket/test-key.gz'
     assert writer.key == 'test-key.gz'
 
 
-def test_s3_writer_keeps_existing_gz_suffix(caplog):
-    with caplog.at_level('WARNING'):
-        writer = S3Writer(bucket='test-bucket',
-                          key='variants/file.jsonl.gz', session=MagicMock())
+def test_s3_writer_keeps_gz_key():
+    writer = S3Writer(bucket='test-bucket',
+                      key='variants/file.jsonl.gz', session=MagicMock())
     assert writer.key == 'variants/file.jsonl.gz'
     assert writer.destination == 's3://test-bucket/variants/file.jsonl.gz'
-    assert caplog.records == []
 
 
-def test_s3_writer_warns_when_compress_key_lacks_gz_suffix(caplog):
-    with caplog.at_level('WARNING'):
-        writer = S3Writer(bucket='test-bucket',
-                          key='variants/file.jsonl', session=MagicMock())
-    assert writer.key == 'variants/file.jsonl.gz'
-    assert any(
-        'does not end with .gz' in record.message
-        and 'variants/file.jsonl' in record.message
-        for record in caplog.records
-    )
-
-
-def test_s3_writer_uncompressed_writes_plain_key(mocker, caplog):
-    mock_session = MagicMock()
-    mock_smart_open = mocker.patch(
-        'adapters.writer.smart_open.open', return_value=MagicMock())
-
-    with caplog.at_level('WARNING'):
-        writer = S3Writer(bucket='test-bucket', key='test-key',
-                          session=mock_session, compress=False)
-    assert writer.key == 'test-key'
-    assert writer.destination == 's3://test-bucket/test-key'
-    assert caplog.records == []
-
-    writer.open()
-    writer.write('content')
-
-    mock_smart_open.assert_called_once_with(
-        's3://test-bucket/test-key',
-        mode='w',
-        newline='\n',
-        compression='disable',
-        transport_params={'client': mock_session.client('s3')},
-    )
-
-
-def test_s3_writer_uncompressed_strips_gz_suffix():
-    writer = S3Writer(bucket='test-bucket',
-                      key='variants/file.jsonl.gz', session=MagicMock(),
-                      compress=False)
-    assert writer.key == 'variants/file.jsonl'
-    assert writer.destination == 's3://test-bucket/variants/file.jsonl'
+def test_s3_writer_rejects_key_without_gz_suffix():
+    with pytest.raises(ValueError, match=r'S3 key must end with \.gz'):
+        S3Writer(bucket='test-bucket',
+                 key='variants/file.jsonl', session=MagicMock())
 
 
 def test_local_writer_opens_lazily_on_first_write(mocker):
@@ -348,12 +308,12 @@ def test_get_writer_local(caplog):
 
 def test_get_writer_s3(caplog):
     bucket = 'test-bucket'
-    key = 'test-key'
+    key = 'test-key.gz'
     session = MagicMock()
     with caplog.at_level('INFO'):
         writer = get_writer(bucket=bucket, key=key, session=session)
     assert isinstance(writer, S3Writer)
-    assert writer.key == 'test-key.gz'
+    assert writer.key == key
     assert f'Using S3 writer for bucket: {bucket}, key: {key}' in caplog.text
 
 
@@ -363,14 +323,7 @@ def test_get_writer_s3_requires_bucket_and_key(caplog):
         with pytest.raises(ValueError, match='both bucket and key are required when writing to S3'):
             get_writer(bucket='test-bucket', session=session)
         with pytest.raises(ValueError, match='both bucket and key are required when writing to S3'):
-            get_writer(key='test-key', session=session)
+            get_writer(key='test-key.gz', session=session)
         with pytest.raises(ValueError, match='both bucket and key are required when writing to S3'):
             get_writer(session=session)
     assert 'Using S3 writer' not in caplog.text
-
-
-def test_get_writer_s3_uncompressed():
-    writer = get_writer(bucket='test-bucket', key='test-key',
-                        session=MagicMock(), compress=False)
-    assert isinstance(writer, S3Writer)
-    assert writer.key == 'test-key'

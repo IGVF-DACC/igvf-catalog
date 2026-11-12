@@ -13,25 +13,6 @@ logger = logging.getLogger(__name__)
 GZIP_COMPRESSLEVEL = 6
 
 
-def gzip_s3_key(key: str, compress: bool = True) -> str:
-    # Callers pass the JSONL name. Compressed objects are gzipped, and ClickHouse
-    # detects that from the .gz suffix. Leave a key that is already gzipped alone.
-    # Uncompressed objects keep the caller's name, with a trailing .gz removed so
-    # the suffix matches the bytes.
-    if compress:
-        if key.endswith('.gz'):
-            return key
-        logger.warning(
-            'Compress is enabled but S3 key %s does not end with .gz; '
-            'the object will be stored as %s.gz',
-            key, key,
-        )
-        return f'{key}.gz'
-    if key.endswith('.gz'):
-        return key[:-len('.gz')]
-    return key
-
-
 class Writer(ABC):
     def __init__(self):
         pass
@@ -71,10 +52,11 @@ class Writer(ABC):
 
 class S3Writer(Writer):
 
-    def __init__(self, bucket: str, key: str, session: boto3.Session, collections_tag: Optional[str] = None, *, compress: bool = True) -> None:
+    def __init__(self, bucket: str, key: str, session: boto3.Session, collections_tag: Optional[str] = None) -> None:
+        if not key.endswith('.gz'):
+            raise ValueError(f'S3 key must end with .gz, got {key!r}')
         self.bucket = bucket
-        self.compress = compress
-        self.key = gzip_s3_key(key, compress=compress)
+        self.key = key
         self.session = session
         self._s3_uri = None
         self.s3_file = None
@@ -112,23 +94,18 @@ class S3Writer(Writer):
 
     def write(self, content):
         if self.s3_file is None:
-            # Force the compression mode. Inferring it from the key would
+            # compression='.gz' forces gzip. Inferring it from the key would
             # silently write plain bytes if the S3 stream name did not end in
-            # .gz, and compression_kwargs would be ignored. 'disable' writes
-            # the bytes as-is. smart-open 9 closes the S3 upload from close(),
-            # including the gzip trailer when compressing.
-            open_kwargs = {
-                'mode': 'w',
-                'newline': '\n',
-                'transport_params': {'client': self.session.client('s3')},
-            }
-            if self.compress:
-                open_kwargs['compression'] = '.gz'
-                open_kwargs['compression_kwargs'] = {
-                    'compresslevel': GZIP_COMPRESSLEVEL}
-            else:
-                open_kwargs['compression'] = 'disable'
-            self.s3_file = smart_open.open(self.destination, **open_kwargs)
+            # .gz, and compression_kwargs would be ignored. smart-open 9 closes
+            # the S3 upload from close(), including the gzip trailer.
+            self.s3_file = smart_open.open(
+                self.destination,
+                mode='w',
+                newline='\n',
+                compression='.gz',
+                compression_kwargs={'compresslevel': GZIP_COMPRESSLEVEL},
+                transport_params={'client': self.session.client('s3')},
+            )
         self.s3_file.write(content)
 
     def close(self, success: bool = True):
@@ -208,7 +185,6 @@ def get_writer(
         key: Optional[str] = None,
         session: Optional[boto3.Session] = None,
         collections_tag: Optional[str] = None,
-        compress: bool = True,
 ) -> Writer:
     if filepath is not None:
         logger.info(f'Using local writer for filepath: {filepath}')
@@ -218,4 +194,4 @@ def get_writer(
             raise ValueError(
                 'both bucket and key are required when writing to S3')
         logger.info(f'Using S3 writer for bucket: {bucket}, key: {key}')
-        return S3Writer(bucket, key, session, collections_tag, compress=compress)
+        return S3Writer(bucket, key, session, collections_tag)
