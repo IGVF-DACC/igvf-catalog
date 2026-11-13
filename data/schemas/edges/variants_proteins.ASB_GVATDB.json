@@ -36,7 +36,9 @@
           "description": "FDR of the preferential binding score."
         },
         "neg_log10_pvalue": {
-          "$ref": "../mixins.json#/neg_log10_pvalue"
+          "$ref": "../mixins.json#/neg_log10_pvalue",
+          "description": "Negative log 10 p-value of the preferential binding score, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "experiment": {
           "title": "GVATdb Experiment ID",
@@ -76,7 +78,9 @@
           "description": "Preferential binding score: area between the reference and alternate enrichment curves. Negative values mean the TF prefers the alternate allele."
         },
         "neg_log10_pvalue_adj": {
-          "$ref": "../mixins.json#/neg_log10_pvalue_adj"
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
+          "description": "Adjusted negative log 10 p-value of the preferential binding score, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "source": {
           "enum": [

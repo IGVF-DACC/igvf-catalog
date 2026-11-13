@@ -129,7 +129,9 @@
           "description": "Nominal p-value of association between the variant and the molecular trait."
         },
         "neg_log10_pvalue": {
-          "$ref": "../mixins.json#/neg_log10_pvalue"
+          "$ref": "../mixins.json#/neg_log10_pvalue",
+          "description": "Negative log 10 p-value of association between the variant and the molecular trait, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "effect_size": {
           "title": "Effect Size",

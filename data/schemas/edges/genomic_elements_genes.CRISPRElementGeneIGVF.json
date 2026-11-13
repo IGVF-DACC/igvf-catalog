@@ -98,10 +98,14 @@
           "type": [
             "number",
             "null"
-          ]
+          ],
+          "description": "Negative log 10 p-value, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "neg_log10_pvalue_adj": {
-          "$ref": "../mixins.json#/neg_log10_pvalue_adj"
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
+          "description": "Adjusted negative log 10 p-value, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "log2FC": {
           "$ref": "../mixins.json#/log2FC",
@@ -242,12 +246,14 @@
             "number",
             "null"
           ],
-          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction"
+          "description": "Negative selection result: Negative log 10 p-value of the measurement or prediction, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "negative_selection_neg_log10_pvalue_adj": {
           "title": "Negative Selection Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Negative selection result: Adjusted negative log 10 p-value of the measurement or prediction, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "negative_selection_significant": {
           "title": "Negative Selection Significant?",
@@ -284,12 +290,14 @@
             "number",
             "null"
           ],
-          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction"
+          "description": "Positive selection result: Negative log 10 p-value of the measurement or prediction, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "positive_selection_neg_log10_pvalue_adj": {
           "title": "Positive Selection Adjusted Negative Log10 P-Value",
           "type": "number",
-          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction"
+          "description": "Positive selection result: Adjusted negative log 10 p-value of the measurement or prediction, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "positive_selection_significant": {
           "title": "Positive Selection Significant?",
