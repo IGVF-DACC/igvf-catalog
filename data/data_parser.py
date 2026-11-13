@@ -119,41 +119,39 @@ for arg in vars(args):
 
 if non_adapter_signature_namespace.adapter == 'ontology':
     ontology_name = adapter_signature_namespace.ontology
+    # A local prefix and an S3 bucket are different destinations. Pass only the
+    # one in use so get_writer can reject a run that asks for both.
+    local_prefix = non_adapter_signature_namespace.output_local_path
+    session = boto3.Session(
+        profile_name=non_adapter_signature_namespace.aws_profile)
+    collections_tag = non_adapter_signature_namespace.collections_tag
+    bucket = non_adapter_signature_namespace.output_bucket
 
-    writer_primary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-primary.jsonl',
-        bucket=non_adapter_signature_namespace.output_bucket,
-        key='ontology_terms/' + ontology_name + '-primary.jsonl.gz',
-        session=boto3.Session(
-            profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag
+    def ontology_writer(suffix: str, key: str):
+        filepath = None if local_prefix is None else f'{local_prefix}{suffix}'
+        return get_writer(
+            filepath=filepath,
+            bucket=bucket,
+            key=None if filepath is not None and bucket is None else key,
+            session=session,
+            collections_tag=collections_tag,
+        )
+
+    writer_primary = ontology_writer(
+        '-ontology-terms-primary.jsonl',
+        'ontology_terms/' + ontology_name + '-primary.jsonl.gz',
     )
-
-    writer_secondary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-secondary.jsonl',
-        bucket=non_adapter_signature_namespace.output_bucket,
-        key='ontology_terms/' + ontology_name + '-secondary.jsonl.gz',
-        session=boto3.Session(
-            profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag
+    writer_secondary = ontology_writer(
+        '-ontology-terms-secondary.jsonl',
+        'ontology_terms/' + ontology_name + '-secondary.jsonl.gz',
     )
-
-    writer_edge_primary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-primary.jsonl',
-        bucket=non_adapter_signature_namespace.output_bucket,
-        key='ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl.gz',
-        session=boto3.Session(
-            profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag
+    writer_edge_primary = ontology_writer(
+        '-ontology-terms-edge-primary.jsonl',
+        'ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl.gz',
     )
-
-    writer_edge_secondary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-secondary.jsonl',
-        bucket=non_adapter_signature_namespace.output_bucket,
-        key='ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl.gz',
-        session=boto3.Session(
-            profile_name=non_adapter_signature_namespace.aws_profile),
-        collections_tag=non_adapter_signature_namespace.collections_tag
+    writer_edge_secondary = ontology_writer(
+        '-ontology-terms-edge-secondary.jsonl',
+        'ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl.gz',
     )
 
     adapter = KEY_TO_ADAPTER[non_adapter_signature_namespace.adapter](

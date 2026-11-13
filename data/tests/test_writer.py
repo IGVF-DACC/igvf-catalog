@@ -306,6 +306,16 @@ def test_get_writer_local(caplog):
     assert f'Using local writer for filepath: {filepath}' in caplog.text
 
 
+def test_get_writer_rejects_local_path_combined_with_s3():
+    filepath = '/path/to/file.txt'
+    with pytest.raises(ValueError, match='cannot be combined with'):
+        get_writer(filepath=filepath, bucket='test-bucket', key='test-key.gz')
+    with pytest.raises(ValueError, match='cannot be combined with'):
+        get_writer(filepath=filepath, bucket='test-bucket')
+    with pytest.raises(ValueError, match='cannot be combined with'):
+        get_writer(filepath=filepath, key='test-key.gz')
+
+
 def test_get_writer_s3(caplog):
     bucket = 'test-bucket'
     key = 'test-key.gz'

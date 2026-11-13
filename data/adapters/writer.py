@@ -185,6 +185,10 @@ def get_writer(
         collections_tag: Optional[str] = None,
 ) -> Writer:
     if filepath is not None:
+        if bucket is not None or key is not None:
+            raise ValueError(
+                f'local filepath {filepath!r} cannot be combined with '
+                f'S3 bucket {bucket!r} and key {key!r}')
         logger.info(f'Using local writer for filepath: {filepath}')
         return LocalWriter(filepath)
     else:
