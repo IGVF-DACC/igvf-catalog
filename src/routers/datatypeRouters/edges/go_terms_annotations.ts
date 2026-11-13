@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { commonNodesParamsFormat } from '../params'
+import { commonNodesParamsFormat, pageParam, limitParam } from '../params'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 
 const MAX_PAGE_SIZE = 100
@@ -25,8 +25,8 @@ const goTermQueryFormat = z.object({
 const queryFormat = z.object({
   query: z.string(),
   name: z.enum(geneProductsTermsName).optional(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 const goAnnotationFormat = z.object({

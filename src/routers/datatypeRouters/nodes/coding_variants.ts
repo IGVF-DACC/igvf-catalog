@@ -6,6 +6,7 @@ import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { getSchema } from '../schema'
 import { TRPCError } from '@trpc/server'
+import { pageParam, limitParam } from '../params'
 
 const MAX_PAGE_SIZE = 25
 
@@ -32,8 +33,8 @@ const codingVariantsQueryFormat = z.object({
   amino_acid_position: z.string().optional(),
   alt_amino_acid: z.enum(ALT_AMINO_ACID_CODES).optional(),
   transcript_id: z.string().optional(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ amino_acid_position, alt_amino_acid, name, uniprot_name, ...rest }) => ({
   ...rest,

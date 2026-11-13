@@ -6,6 +6,7 @@ import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { getSchema } from '../schema'
+import { pageParam, limitParam } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -15,7 +16,7 @@ const drugCollectionName = drugSchema.db_collection_name as string
 export const drugsQueryFormat = z.object({
   drug_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
-  page: z.number().default(0)
+  page: pageParam
 })
 
 export const drugFormat = z.object({
@@ -83,7 +84,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
 
 const drugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs', description: descriptions.drugs } })
-  .input(drugsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(drugsQueryFormat.merge(z.object({ limit: limitParam })))
   .output(z.array(drugFormat))
   .query(async ({ input }) => await drugSearch(input))
 

@@ -4,7 +4,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { expandPreferredAssayTitles, getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
-import { commonHumanEdgeParamsFormat, genesCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, pageParam, limitParam } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
 import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
 import { geneSearch } from '../nodes/genes'
@@ -21,8 +21,8 @@ const geneQueryFormat = genesCommonQueryFormat.merge(z.object({
 const allVariantsQueryFormat = z.object({
   gene_id: z.string(),
   dataset: z.enum(DATASETS),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 export const allCodingVariantsScoresFormat = z.array(z.number().optional())

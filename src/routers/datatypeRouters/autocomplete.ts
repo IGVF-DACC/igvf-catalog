@@ -3,12 +3,13 @@ import { paramsFormatType } from './_helpers'
 import { z } from 'zod/v4'
 import { db } from '../../database'
 import { descriptions } from './descriptions'
+import { pageParam } from './params'
 
 const PAGE_SIZE = 500
 
 const autocompleteQueryFormat = z.object({
   term: z.string().trim(),
-  page: z.number().default(0).optional()
+  page: pageParam
 })
 
 const autocompleteFormat = z.object({

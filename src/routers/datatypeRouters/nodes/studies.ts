@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { getSchema } from '../schema'
+import { pageParam } from '../params'
 
 const schemaObj = getSchema('data/schemas/nodes/studies.GWAS.json')
 const studyCollectionName = schemaObj.db_collection_name as string
@@ -13,7 +14,7 @@ const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),
   pmid: z.string().trim().optional(),
   files_fileset: z.string().trim().optional(),
-  page: z.number().default(0)
+  page: pageParam
 })
 
 export const studyFormat = z.object({

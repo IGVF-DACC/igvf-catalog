@@ -1,5 +1,6 @@
 import { z } from 'zod/v4'
 import { TRPCError } from '@trpc/server'
+import { pageParam, pageSizeParam } from './params'
 
 export const programContextFormat = z.object({
   source: z.string(),
@@ -22,8 +23,8 @@ export const programContextQuery = z.object({
 })
 
 export const programPagination = z.object({
-  page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().max(100).default(25)
+  page: pageParam,
+  limit: pageSizeParam.max(100).default(25)
 })
 
 // Validate before constructing range filters, including operators and extra colons.
