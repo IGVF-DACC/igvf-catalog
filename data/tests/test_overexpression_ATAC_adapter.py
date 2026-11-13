@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
+from adapters.helpers import MAX_NEG_LOG10_PVALUE
 from adapters.overexpression_ATAC_adapter import OverexpressionATAC
 from adapters.writer import SpyWriter
 
@@ -61,8 +62,8 @@ def test_zero_missing_pvalues_and_significance_boundary(tmp_path):
                  'chr1_10_20\t1\tNA\tNA\tNA\tNA\tNA\n'
                  'chr1_20_30\t1\t2\t1\t2\t0.01\t0.05\n')
     assert docs[0]['significant'] is True
-    assert docs[0]['neg_log10_pvalue'] == 240
-    assert docs[0]['neg_log10_pvalue_adj'] == 240
+    assert docs[0]['neg_log10_pvalue'] == MAX_NEG_LOG10_PVALUE
+    assert docs[0]['neg_log10_pvalue_adj'] == MAX_NEG_LOG10_PVALUE
     assert docs[1]['stat'] is None
     assert docs[1]['log2FC'] is None
     assert docs[1]['p_value_adj'] is None

@@ -109,10 +109,14 @@
           "type": [
             "number",
             "null"
-          ]
+          ],
+          "description": "Negative log 10 p-value, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "neg_log10_pvalue_adj": {
-          "$ref": "../mixins.json#/neg_log10_pvalue_adj"
+          "$ref": "../mixins.json#/neg_log10_pvalue_adj",
+          "description": "Adjusted negative log 10 p-value, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "log2FC": {
           "$ref": "../mixins.json#/log2FC",

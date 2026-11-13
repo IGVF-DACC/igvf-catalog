@@ -7,6 +7,7 @@ from typing import Optional
 from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
+    MAX_NEG_LOG10_PVALUE,
     build_variant_id,
     bulk_check_variants_in_arangodb,
     get_file_fileset_by_accession_in_arangodb,
@@ -29,7 +30,6 @@ class AFGRSQtl(BaseAdapter):
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
-    MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
 
     def __init__(self, filepath, label='AFGR_sqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
@@ -125,7 +125,8 @@ class AFGRSQtl(BaseAdapter):
 
         pvalue = float(row[9])
         if pvalue == 0:
-            log_pvalue = AFGRSQtl.MAX_LOG10_PVALUE
+            # large negative log10 pvalue in real data is below 400
+            log_pvalue = MAX_NEG_LOG10_PVALUE
         else:
             log_pvalue = -1 * log10(pvalue)
 

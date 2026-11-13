@@ -10,6 +10,7 @@ from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.gene_validator import GeneValidator
 from adapters.helpers import (
+    MAX_NEG_LOG10_PVALUE,
     get_file_fileset_by_accession_in_arangodb,
     get_gene_map_from_arangodb,
 )
@@ -41,7 +42,6 @@ class MORFGeneTranscriptGene(BaseAdapter):
     SOURCE = 'IGVF'
     COLLECTION_LABEL = 'gene overexpression effect on gene expression'
     SIGNIFICANCE_THRESHOLD = 0.05
-    MAX_LOG10_PVALUE = 240
     CONTROL_MORF_IDS = frozenset({'GFP_1', 'mCherry_1'})
     EXCLUSION_PATH = Path(__file__).resolve(
     ).parents[1] / 'data_loading_support_files/MORF_screen/excluded_constructs.tsv'
@@ -145,7 +145,7 @@ class MORFGeneTranscriptGene(BaseAdapter):
             raise ValueError(
                 f'P-value must be between 0 and 1, got {p_value!r}')
         if p_value == 0:
-            return cls.MAX_LOG10_PVALUE
+            return MAX_NEG_LOG10_PVALUE
         return -1 * math.log10(p_value)
 
     @classmethod

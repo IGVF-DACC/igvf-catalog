@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Tuple
 
 from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import MAX_NEG_LOG10_PVALUE, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
 
@@ -59,8 +59,6 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     SIGNIFICANCE_THRESHOLD = 0.05
     # Two-tailed normal critical value for SIGNIFICANCE_THRESHOLD (≈ normsinv(0.975)).
     Z_SCORE_SIGNIFICANCE_THRESHOLD = 1.959963984540054
-    # CRISPR_element_gene_ENCODE_adapter; max log10pvalue from file is 235
-    MAX_LOG10_PVALUE = 240
     OPTIONAL_EDGE_METRIC_FIELDS = frozenset({
         'p_value',
         'p_value_adj',
@@ -505,7 +503,8 @@ class CRISPRElementGeneIGVF(BaseAdapter):
     @classmethod
     def _neg_log10_pvalue(cls, p_value: float) -> float:
         if p_value <= 0:
-            return cls.MAX_LOG10_PVALUE
+            # CRISPR_element_gene_ENCODE_adapter; max neg_log10_pvalue from file is 235
+            return MAX_NEG_LOG10_PVALUE
         return -math.log10(p_value)
 
     def _passes_row_prefilters(

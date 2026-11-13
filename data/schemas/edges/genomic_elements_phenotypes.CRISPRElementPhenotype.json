@@ -40,7 +40,9 @@
           "description": "P-value for the element's association with the screened phenotype."
         },
         "neg_log10_pvalue": {
-          "$ref": "../mixins.json#/neg_log10_pvalue"
+          "$ref": "../mixins.json#/neg_log10_pvalue",
+          "description": "Negative log 10 p-value, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "p_value_adj": {
           "$ref": "../mixins.json#/p_value_adj",
@@ -48,7 +50,8 @@
         },
         "neg_log10_pvalue_adj": {
           "$ref": "../mixins.json#/neg_log10_pvalue_adj",
-          "description": "Negative log 10 FDR-adjusted p-value, capped at 240 for zero p-values."
+          "description": "Negative log 10 FDR-adjusted p-value, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "significant": {
           "title": "Significant?",

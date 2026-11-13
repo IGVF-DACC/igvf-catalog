@@ -21,6 +21,9 @@ from functools import lru_cache
 
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
 
+# Stored when a p-value is exact 0, or a calculation such as exp() turns it into 0.
+MAX_NEG_LOG10_PVALUE = 400
+
 # UTA connects via psycopg2/libpq. On some macOS setups, disabling GSS
 # negotiation avoids connect-time crashes; only libpq 12+ accepts gssencmode.
 _psycopg2_gss_workaround_installed = False

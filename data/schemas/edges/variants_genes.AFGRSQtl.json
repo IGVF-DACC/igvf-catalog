@@ -48,7 +48,9 @@
           "pattern": "^chr"
         },
         "neg_log10_pvalue": {
-          "$ref": "../mixins.json#/neg_log10_pvalue"
+          "$ref": "../mixins.json#/neg_log10_pvalue",
+          "description": "Negative log 10 p-value of association between the variant and the splice junction, capped at 400 for zero p-values.",
+          "maximum": 400
         },
         "p_value": {
           "$ref": "../mixins.json#/p_value",

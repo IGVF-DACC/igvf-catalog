@@ -12,7 +12,7 @@ import re
 
 from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
+from adapters.helpers import MAX_NEG_LOG10_PVALUE, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from db.arango_db import ArangoDB
 
 
@@ -21,7 +21,6 @@ class OverexpressionATAC(BaseAdapter):
     GENE_TRANSCRIPT = 'ENSG00000123685_ENST00000243440'
     FILE_ACCESSIONS = frozenset({'IGVFFI0911IUZS', 'IGVFFI2320OTYL'})
     SIGNIFICANCE_THRESHOLD = 0.05
-    MAX_LOG10_PVALUE = 240
     METRICS = {'log2FC': 'log2FoldChange', 'standard_error': 'lfcSE',
                'base_mean': 'baseMean', 'stat': 'stat', 'p_value': 'pvalue', 'p_value_adj': 'padj'}
 
@@ -70,7 +69,7 @@ class OverexpressionATAC(BaseAdapter):
             if value is not None and not 0 <= value <= 1:
                 raise ValueError(f'{field} must be between 0 and 1')
             metrics[transformed] = (None if value is None else
-                                    self.MAX_LOG10_PVALUE if value == 0 else -math.log10(value))
+                                    MAX_NEG_LOG10_PVALUE if value == 0 else -math.log10(value))
         metrics['significant'] = (metrics['p_value_adj'] is not None and
                                   metrics['p_value_adj'] < self.SIGNIFICANCE_THRESHOLD)
         return metrics

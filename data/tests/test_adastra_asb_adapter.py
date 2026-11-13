@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from adapters.adastra_asb_adapter import ASB
+from adapters.helpers import MAX_NEG_LOG10_PVALUE
 from adapters.writer import SpyWriter
 
 
@@ -190,8 +191,8 @@ def test_adastra_asb_adapter_caps_zero_fdrp_instead_of_infinity(mock_build_varia
 
     for content in non_empty_contents:
         item = json.loads(content)
-        assert item['neg_log10_pvalue_adj_ref'] == ASB.MAX_LOG10_PVALUE
-        assert item['neg_log10_pvalue_adj_alt'] == ASB.MAX_LOG10_PVALUE
+        assert item['neg_log10_pvalue_adj_ref'] == MAX_NEG_LOG10_PVALUE
+        assert item['neg_log10_pvalue_adj_alt'] == MAX_NEG_LOG10_PVALUE
         # allow_nan=False raises on Infinity/NaN, guaranteeing valid JSON output.
         json.dumps(item, allow_nan=False)
 
