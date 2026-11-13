@@ -20,7 +20,7 @@
 # Matched SNVs (bad_coding_variant_id with matched_snv_keys) need no change, their phenotype edges are already loaded with the same score.
 #
 # Dry run by default: reads only, logs what would be deleted. Pass --execute to delete.
-# Every deleted (or to be deleted) and kept _key is written to --log-file.
+# Every deleted (or to be deleted) and kept _key is written to --log-file, with its source for nodes (empty for edges).
 # DB connection is read from ../config/development.json, --execute needs a user with write access.
 #
 # Usage (run from data/):
@@ -51,7 +51,7 @@ PHENOTYPE_TERM = 'GO_0003674'
 FILE_ACCESSIONS = ['IGVFFI8105TNNO', 'IGVFFI6893ZOAA']
 SOURCE = 'IGVF'
 BATCH_SIZE = 1000
-LOG_HEADER = ['collection', '_key', 'action', 'reason']
+LOG_HEADER = ['collection', '_key', 'action', 'reason', 'source']
 COLLECTIONS = ['coding_variants_phenotypes',
                'variants_coding_variants', 'coding_variants', 'variants']
 
@@ -69,19 +69,21 @@ class Deleter:
                             bind_vars={'collection': collection, 'keys': keys}, batch_size=10000)
         return {d['_key']: d['source'] for d in cursor}
 
-    def remove(self, collection, keys, reason):
+    def remove(self, collection, keys, reason, sources=None):
+        '''sources: {key: source}, logged for nodes'''
         if not keys:
             return
         action = 'deleted' if self.execute else 'to delete'
         for key in keys:
-            self.log_writer.writerow([collection, key, action, reason])
+            self.log_writer.writerow(
+                [collection, key, action, reason, (sources or {}).get(key, '')])
         self.stats[f'{collection} {action}'] += len(keys)
         if self.execute:
             with_retry(self.db.aql.execute, 'FOR k IN @keys REMOVE k IN @@collection OPTIONS { ignoreErrors: true }',
                        bind_vars={'keys': keys, '@collection': collection})
 
-    def keep(self, collection, key, reason):
-        self.log_writer.writerow([collection, key, 'kept', reason])
+    def keep(self, collection, key, reason, source=''):
+        self.log_writer.writerow([collection, key, 'kept', reason, source])
         self.stats[f'{collection} kept ({reason})'] += 1
 
     def delete_edges(self, collection, keys):
@@ -115,13 +117,13 @@ class Deleter:
         to_delete = []
         for key, source in found.items():
             if source != SOURCE:
-                self.keep(collection, key, f'source {source}')
+                self.keep(collection, key, f'source {source}', source)
             elif valid_links and valid_links.get(key):
                 self.keep(collection, key, 'valid coding variant: ' +
-                          ','.join(valid_links[key][:5]))
+                          ','.join(valid_links[key][:5]), source)
             else:
                 to_delete.append(key)
-        self.remove(collection, to_delete, reason)
+        self.remove(collection, to_delete, reason, found)
 
     def delete_coding_variants(self, batch):
         # no edge check: coding variant ids are unique to the bad aa change, no valid record links to them
