@@ -159,10 +159,6 @@ def parse_yaml_file(yaml_file_path):
                 f"Warning: Skipping '{key}' in {yaml_file_path} - no valid datafiles found")
             continue
 
-        # Extract additional fields
-        other_fields = ['source', 'label', 'biological_process', 'method', 'type',
-                        'source_annotation', 'molecular_function', 'version', 'threshold', 'relationship']
-
         # Create a row for each datafile
         for datafile_info in datafiles_to_process:
             datafile = datafile_info.get('datafile')
@@ -190,10 +186,6 @@ def parse_yaml_file(yaml_file_path):
                 'notes': notes,
                 '_key': datafile  # Keep original _key for backward compatibility
             }
-
-            # Add all other fields from config
-            for field in other_fields:
-                result_entry.update({field: config.get(field, None)})
 
             # Add reference_filepath if it exists in the mapping
             if 'reference_filepath' in datafile_info:
@@ -363,8 +355,8 @@ def parse_multiple_yaml_files(yaml_files, tsv_file_path, single_excel_file='coll
     # Define column order (core fields first, then additional fields)
     core_columns = ['source_file', 'collection',
                     'yaml_entry_name', 'adapter_name', 'datafile', 'files_filesets_key', 'reference_filepath', 'notes', 'nested_context']
-    other_fields = ['source', 'file_set_id', 'lab', 'label', 'biological_process', 'method', 'files_filesets_method', 'type', 'simple_sample_summaries', 'samples',
-                    'source_annotation', 'molecular_function', 'version', 'threshold', 'relationship']
+    other_fields = ['file_set_id', 'lab', 'files_filesets_method',
+                    'simple_sample_summaries', 'samples']
 
     # Reorder columns - only include columns that exist in the DataFrame
     column_order = [col for col in core_columns +
@@ -382,40 +374,8 @@ def parse_multiple_yaml_files(yaml_files, tsv_file_path, single_excel_file='coll
         except Exception as e:
             print(f'Warning: Could not create master sheet: {e}')
 
-        # Create sheets split by source values if source column exists
-        if 'source' in combined_df.columns:
-            # Create sheet for ENCODE
-            encode_df = combined_df[combined_df['source'] == 'ENCODE']
-            encode_df = drop_empty_columns(encode_df)
-            if not encode_df.empty:
-                encode_df.to_excel(writer, sheet_name='ENCODE', index=False)
-                print(f'Created ENCODE sheet with {len(encode_df)} rows')
-            else:
-                print('No ENCODE data found')
-
-            # Create sheet for IGVF
-            igvf_df = combined_df[combined_df['source'] == 'IGVF']
-            igvf_df = drop_empty_columns(igvf_df)
-            if not igvf_df.empty:
-                igvf_df.to_excel(writer, sheet_name='IGVF', index=False)
-                print(f'Created IGVF sheet with {len(igvf_df)} rows')
-            else:
-                print('No IGVF data found')
-
-            # Create sheet for External sources (everything not ENCODE or IGVF)
-            other_sources_df = combined_df[~combined_df['source'].isin(
-                ['ENCODE', 'IGVF'])]
-            other_sources_df = drop_empty_columns(other_sources_df)
-            if not other_sources_df.empty:
-                other_sources_df.to_excel(
-                    writer, sheet_name='External_sources', index=False)
-                print(
-                    f'Created External_sources sheet with {len(other_sources_df)} rows')
-            else:
-                print('No External sources data found')
-
     print(
-        f'Created single Excel file with multiple sheets: {single_excel_file}')
+        f'Created Excel file: {single_excel_file}')
     return combined_df
 
 
@@ -454,7 +414,7 @@ def main():
                 f"Collections found: {', '.join(result_df['collection'].unique())}")
             print(f'Columns in final output: {list(result_df.columns)}')
             print(f'\nFiles created:')
-            print(f'- Single Excel with all sheets: collections_summary.xlsx')
+            print(f'- Excel file: collections_summary.xlsx')
         else:
             print('No data was processed from any YAML files.')
 

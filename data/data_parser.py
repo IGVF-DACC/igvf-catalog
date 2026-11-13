@@ -2,6 +2,10 @@ import argparse
 import boto3
 from active_adapters import KEY_TO_ADAPTER
 
+from adapters.favor_adapter import Favor
+from adapters.file_fileset_adapter import FileFileSet
+from adapters.mpra_adapter import MPRAAdapter
+from adapters.ontologies_adapter import Ontology
 from adapters.writer import get_writer
 
 
@@ -53,7 +57,7 @@ parser.add_argument('--phenotype_term', type=str,
 parser.add_argument('--filepath', type=str,
                     help='The path to the input file or archive.')
 parser.add_argument('--reference-filepath', type=str, nargs='+',
-                    help='Related reference input path. MPRA accepts one or more sequence-design paths. Other adapters require one path.')
+                    help='Related reference input path. MPRAAdapter accepts one or more sequence-design paths. Other adapters require one path.')
 parser.add_argument('--drug-reference-filepath', type=str,
                     help='PharmGKB chemicals TSV for drug name→ID mapping (IGVFFI2997DUKO). Required for variant_drug and variant_drug_gene.')
 parser.add_argument('--variant-reference-filepath', type=str,
@@ -72,29 +76,28 @@ parser.add_argument(
 )
 parser.add_argument('--validate', action=argparse.BooleanOptionalAction, default=None,
                     help='Enable schema validation for parsed records. Defaults to enabled, '
-                         'except for the variant-loading adapters (favor, mouse_variant), which '
-                         'default to disabled due to known pre-existing schema mismatches in '
-                         'their source data. Pass --validate or --no-validate to override the '
-                         'default for any adapter.')
+                         'except for Favor, which defaults to disabled due to known '
+                         'pre-existing schema mismatches in its source data. Pass --validate '
+                         'or --no-validate to override the default for any adapter.')
 
 args = parser.parse_args()
-# Preserve the scalar contract for all existing non-MPRA adapters.
-if args.reference_filepath is not None and args.adapter != 'mpra':
+# Preserve the scalar contract for adapters other than MPRAAdapter.
+if args.reference_filepath is not None and args.adapter != MPRAAdapter.__name__:
     if len(args.reference_filepath) != 1:
         parser.error(
-            'Multiple --reference-filepath values are supported only by MPRA')
+            'Multiple --reference-filepath values are supported only by MPRAAdapter')
     args.reference_filepath = args.reference_filepath[0]
 
-if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:
+if args.adapter != FileFileSet.__name__ and not args.filepath:
     parser.error(
-        '--filepath is required unless using the "file_fileset" adapter')
+        '--filepath is required unless using the FileFileSet adapter')
 
 # Validation defaults to on, except for the variant-loading adapters, whose source data is
 # known to contain records that currently fail schema validation (see base_adapter.py's
 # validate_doc, which raises rather than skips -- turning validation on by default for these
 # would abort the entire load on the first bad record). --validate/--no-validate always wins
 # when explicitly passed, for any adapter.
-VARIANT_LOADING_ADAPTERS = {'favor'}
+VARIANT_LOADING_ADAPTERS = {Favor.__name__}
 if args.validate is None:
     args.validate = args.adapter not in VARIANT_LOADING_ADAPTERS
 
@@ -117,7 +120,7 @@ for arg in vars(args):
     else:
         setattr(adapter_signature_namespace, arg, getattr(args, arg))
 
-if non_adapter_signature_namespace.adapter == 'ontology':
+if non_adapter_signature_namespace.adapter == Ontology.__name__:
     ontology_name = adapter_signature_namespace.ontology
 
     writer_primary = get_writer(

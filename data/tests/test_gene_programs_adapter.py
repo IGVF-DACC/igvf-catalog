@@ -320,7 +320,7 @@ def test_regulation_and_elements_link_to_shared_programs(
     config_path = Path(__file__).resolve(
     ).parents[1] / 'data_sources/data_sources.yaml'
     config = yaml.safe_load(config_path.read_text())
-    for source in ('gene gene program regulation IGVF', 'genomic element gene program regulators IGVF'):
+    for source in ('GenePrograms.gene_program_regulation', 'GenePrograms.genomic_element'):
         entry = config[source]
         assert '--reference-filepath {reference_filepath}' in entry['command']
         mappings = entry['file_mappings']
@@ -575,8 +575,8 @@ def test_correlation_elements_data_source_covers_all_correlation_files():
     config_path = Path(__file__).resolve(
     ).parents[1] / 'data_sources/data_sources.yaml'
     config = yaml.safe_load(config_path.read_text())
-    source = config['genomic element gene program regulator correlations IGVF']
-    assert source['file_mappings'] == config['gene gene regulator correlation IGVF']['file_mappings']
+    source = config['GenePrograms.genomic_element_regulator_correlation']
+    assert source['file_mappings'] == config['GenePrograms.regulator_correlation']['file_mappings']
     assert len(source['file_mappings']) == 8
     assert '--label genomic_element_regulator_correlation' in source['command']
     assert '--reference-filepath {reference_filepath}' in source['command']
@@ -628,7 +628,7 @@ def program_correlation_input(tmp_path, rows=None, accession='IGVFFI9407YNQA',
 def test_program_correlations_reference_existing_programs(tmp_path, metadata, accession, reference_accession):
     config = yaml.safe_load((Path(__file__).resolve(
     ).parents[1] / 'data_sources/data_sources.yaml').read_text())
-    source = config['gene program gene program correlation IGVF']
+    source = config['GenePrograms.gene_program_correlation']
     assert '--label gene_program_correlation' in source['command']
     assert '--reference-filepath {reference_filepath}' in source['command']
     assert len(source['file_mappings']) == 8
@@ -831,7 +831,7 @@ def test_regulator_correlation_schema_references_and_empty_input(tmp_path, metad
 def test_regulator_correlation_mappings(accession, upstream):
     config = yaml.safe_load((Path(__file__).resolve(
     ).parents[1] / 'data_sources/data_sources.yaml').read_text())
-    source = config['gene gene regulator correlation IGVF']
+    source = config['GenePrograms.regulator_correlation']
     assert '--label regulator_correlation' in source['command']
     assert '--reference-filepath {reference_filepath}' in source['command']
     pair = next(m for m in source['file_mappings'] if Path(
