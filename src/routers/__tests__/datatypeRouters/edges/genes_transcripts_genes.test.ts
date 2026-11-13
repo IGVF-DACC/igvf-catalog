@@ -3,7 +3,7 @@ import { db } from '../../../../database'
 import { CATALOG_ENDPOINTS } from '../../../../catalogEndpoints'
 
 jest.mock('../../../../database')
-const call = async (input: Record<string, unknown>): Promise<any> => await genesTranscriptsGenesRouters.genesTranscriptsGenes({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+const call = async (input: Record<string, unknown>): Promise<any> => await genesTranscriptsGenesRouters.genesTranscriptsGenes({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
 
 beforeEach(() => {
   jest.clearAllMocks()

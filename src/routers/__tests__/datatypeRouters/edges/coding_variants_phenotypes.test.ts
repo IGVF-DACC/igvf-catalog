@@ -56,7 +56,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -100,7 +102,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -111,7 +115,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
     const input = { page: 0 } as any
     await expect(
       codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -120,7 +124,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
     const input = { method: 'NOT_A_METHOD', page: 0 } as any
     await expect(
       codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -165,7 +169,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -204,7 +210,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes', () => {
 
     const input = { phenotype_id: 'PHENOTYPE1', page: 0 }
     const result = await codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(phenoEdges.files_filesets).preferred_assay_titles')
@@ -264,7 +270,9 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -275,7 +283,7 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
     const input = { page: 0 } as any
     await expect(
       codingVariantsPhenotypesRouters.phenotypesFromCodingVariants({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -320,7 +328,9 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -359,7 +369,7 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants', () => {
 
     const input = { coding_variant_name: 'CV1', page: 0 }
     const result = await codingVariantsPhenotypesRouters.phenotypesFromCodingVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(phenoEdges.files_filesets).preferred_assay_titles')
@@ -388,7 +398,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsCountFromGene', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(cachedResult)
@@ -408,7 +420,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsCountFromGene', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -428,7 +442,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsCountFromGene', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -439,7 +455,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsCountFromGene', () => {
     const input = {} as any
     await expect(
       codingVariantsPhenotypesRouters.codingVariantsCountFromGene({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -473,7 +489,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsSummary', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -484,7 +502,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsSummary', () => {
     const input = {} as any
     await expect(
       codingVariantsPhenotypesRouters.codingVariantsSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -518,7 +536,9 @@ describe('codingVariantsPhenotypesRouters.deprecatedCodingVariantsSummary', () =
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -529,7 +549,7 @@ describe('codingVariantsPhenotypesRouters.deprecatedCodingVariantsSummary', () =
     const input = {} as any
     await expect(
       codingVariantsPhenotypesRouters.deprecatedCodingVariantsSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

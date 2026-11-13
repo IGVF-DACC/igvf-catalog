@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -36,7 +36,7 @@ const variantReturnFormat = z.object({
   hgvs: z.string().optional()
 })
 
-export const diseasesToGenesFormat = z.object({
+const diseasesToGenesEdgeFields = z.object({
   pmids: z.array(z.string()).nullish(),
   term_name: z.string().optional(),
   gene_name: z.string().optional(),
@@ -60,10 +60,27 @@ export const diseasesToGenesFormat = z.object({
   inheritance_mode: z.string().nullish(), // ClinGen variant path only
   variants: z.array(variantReturnFormat).optional(),
   name: z.string()
-// eslint-disable-next-line @typescript-eslint/naming-convention
-}).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
+})
+
+// zod-openapi's JSON Schema generator can't infer an output type from a bare .transform()
+// (it could return anything), so the post-transform shape is declared explicitly here
+// (derived from the same pre-transform object, via .omit()/.extend(), so it can't drift
+// out of sync with it) and wired in via .pipe() rather than left for zod to infer.
+export const diseasesToGenesOutputFormat = diseasesToGenesEdgeFields
+  .omit({ association_type: true, inheritance_mode: true })
+  .extend({
+    Orphanet_association_type: z.string().nullish(),
+    ClinGen_inheritance_mode: z.string().nullish()
+  })
+
+export const diseasesToGenesFormat = diseasesToGenesEdgeFields
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  .transform(({ inheritance_mode, ...rest }) => ({ ClinGen_inheritance_mode: inheritance_mode, ...rest }))
+  .transform(({ association_type, inheritance_mode, ...rest }) => ({
+    ...rest,
+    ...(association_type !== undefined ? { Orphanet_association_type: association_type } : {}),
+    ...(inheritance_mode !== undefined ? { ClinGen_inheritance_mode: inheritance_mode } : {})
+  }))
+  .pipe(diseasesToGenesOutputFormat)
 
 const SOURCES = getCollectionEnumValuesOrThrow('edges', 'diseases_genes', 'source')
 const VARIANT_DISEASE_SOURCE = 'ClinGen'

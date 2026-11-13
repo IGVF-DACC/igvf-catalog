@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const chrEnum = [
   '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',

@@ -31,7 +31,7 @@ jobs:
       - run: pre-commit run --all-files
   trpc:
     docker:
-      - image: cimg/node:20.20.2
+      - image: cimg/node:24.22.2
     working_directory: ~/igvf-catalog
     steps:
       - checkout
@@ -47,7 +47,7 @@ jobs:
           fail_on_error: false
   trpc-integration:
     docker:
-      - image: cimg/node:20.20.2
+      - image: cimg/node:24.22.2
     working_directory: ~/igvf-catalog
     # ENV=production only selects src/env.ts's env-var-override code path here - it has
     # nothing to do with a real prod deploy. The actual db-dev connection details come from
@@ -87,7 +87,7 @@ jobs:
           fail_on_error: false
   build:
     docker:
-      - image: cimg/node:20.20.2
+      - image: cimg/node:24.22.2
     resource_class: medium
     working_directory: ~/igvf-catalog
     steps:

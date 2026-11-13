@@ -22,7 +22,9 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants (integrat
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -31,7 +33,7 @@ describe('codingVariantsPhenotypesRouters.phenotypesFromCodingVariants (integrat
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -56,7 +58,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes (integrat
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -65,7 +69,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsFromPhenotypes (integrat
     for (const record of result) {
       const parsed = outputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -79,7 +83,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsCountFromGene (integrati
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -88,7 +94,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsCountFromGene (integrati
     for (const record of result) {
       const parsed = codingVariantsPhenotypeAggregationFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for count record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for count record: ${parsed.error.message}`)
       }
     }
   })
@@ -102,7 +108,9 @@ describe('codingVariantsPhenotypesRouters.codingVariantsSummary (integration)', 
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -111,7 +119,7 @@ describe('codingVariantsPhenotypesRouters.codingVariantsSummary (integration)', 
     for (const record of result) {
       const parsed = scoreSummaryOutputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for score summary record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for score summary record: ${parsed.error.message}`)
       }
     }
   })
@@ -128,7 +136,9 @@ describe('codingVariantsPhenotypesRouters.deprecatedCodingVariantsSummary (integ
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -137,7 +147,7 @@ describe('codingVariantsPhenotypesRouters.deprecatedCodingVariantsSummary (integ
     for (const record of result) {
       const parsed = scoreSummaryOutputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for score summary record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for score summary record: ${parsed.error.message}`)
       }
     }
   })

@@ -31,7 +31,9 @@ describe('motifsRouters.motifs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -50,7 +52,9 @@ describe('motifsRouters.motifs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(dbModule.db.query).toHaveBeenCalled()
   })
@@ -76,7 +80,9 @@ describe('motifsRouters.motifs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
   })
@@ -94,7 +100,9 @@ describe('motifsRouters.motifs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     const passedInput = getFilterStatementsSpy.mock.calls[0][1]

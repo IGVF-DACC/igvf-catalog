@@ -47,7 +47,9 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mainQueryResult)
@@ -88,7 +90,9 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mainQueryResult)
@@ -103,7 +107,7 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
     const input = { gene_id: 'DOES_NOT_EXIST', page: 0 }
     await expect(
       enhancerGenePredictionsRouters.enhancerGenePredictions({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -112,7 +116,7 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
     const input = { page: 0 } as any
     await expect(
       enhancerGenePredictionsRouters.enhancerGenePredictions({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -148,7 +152,7 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
 
     const input = { gene_id: 'GENE1', page: 0 }
     const result: any = await enhancerGenePredictionsRouters.enhancerGenePredictions({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[1][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -159,7 +163,7 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions', () => {
     const input = { gene_id: 'GENE1', method: 'NOT_A_METHOD', page: 0 } as any
     await expect(
       enhancerGenePredictionsRouters.enhancerGenePredictions({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

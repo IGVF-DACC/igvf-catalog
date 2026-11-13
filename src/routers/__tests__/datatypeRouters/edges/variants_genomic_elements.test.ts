@@ -37,7 +37,9 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -52,7 +54,9 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -64,7 +68,9 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })).rejects.toThrow(TRPCError)
     expect(dbModule.db.query).not.toHaveBeenCalled()
   })
@@ -94,7 +100,7 @@ describe('variantsGenomicElementsRouters.predictionsFromVariants', () => {
 
     const input = { spdi: 'NC_000001.11:69634:A:G', page: 0 }
     const result = await variantsGenomicElementsRouters.predictionsFromVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain("'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles")
@@ -128,7 +134,9 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () =
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(finalResult)
@@ -147,7 +155,9 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () =
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
     expect(dbModule.db.query).toHaveBeenCalledTimes(1)
@@ -161,7 +171,9 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () =
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -173,7 +185,9 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariantsCount', () =
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })).rejects.toThrow(TRPCError)
     expect(dbModule.db.query).not.toHaveBeenCalled()
   })
@@ -213,7 +227,9 @@ describe('variantsGenomicElementsRouters.genomicElementsPredictionsFromVariant',
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult[0])
@@ -232,7 +248,9 @@ describe('variantsGenomicElementsRouters.genomicElementsPredictionsFromVariant',
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -245,7 +263,9 @@ describe('variantsGenomicElementsRouters.genomicElementsPredictionsFromVariant',
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -304,7 +324,9 @@ describe('variantsGenomicElementsRouters.variantsFromGenomicElements', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -319,7 +341,9 @@ describe('variantsGenomicElementsRouters.variantsFromGenomicElements', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -378,7 +402,9 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult)
@@ -393,7 +419,9 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariants', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -433,7 +461,7 @@ describe('variantsGenomicElementsRouters.genomicElementsFromVariants', () => {
 
     const input = { method: 'caQTL', page: 0 }
     const result = await variantsGenomicElementsRouters.genomicElementsFromVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain("'preferred_assay_titles': DOCUMENT(record.files_filesets).preferred_assay_titles")
@@ -462,7 +490,9 @@ describe('variantsGenomicElementsRouters.variantsRegionSummary', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(mockResult[0])
@@ -477,7 +507,9 @@ describe('variantsGenomicElementsRouters.variantsRegionSummary', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -490,7 +522,9 @@ describe('variantsGenomicElementsRouters.variantsRegionSummary', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

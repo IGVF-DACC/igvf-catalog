@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { publicProcedure } from '../../../trpc'
 import { db } from '../../../database'
 import { paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
@@ -109,7 +109,7 @@ export const codingVariantsFormat = z.object({
   CADD_raw_score: z.number().nullable(),
   source: z.string(),
   source_url: z.string()
-}).transform(({ name, ...rest }) => ({
+}).overwrite(({ name, ...rest }) => ({
   name: (name === null) ? null : name.replaceAll('!', '?').replaceAll('-', '>'),
   ...rest
 }))

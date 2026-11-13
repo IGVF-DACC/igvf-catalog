@@ -14,7 +14,9 @@ describe('complexesProteinsRouters.complexesFromProteins (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -23,7 +25,7 @@ describe('complexesProteinsRouters.complexesFromProteins (integration)', () => {
     for (const record of result) {
       const parsed = proteinComplexFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record (verbose=${verbose}): ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record (verbose=${verbose}): ${parsed.error.message}`)
       }
     }
   })
@@ -39,7 +41,9 @@ describe('complexesProteinsRouters.proteinsFromComplexes (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -48,7 +52,7 @@ describe('complexesProteinsRouters.proteinsFromComplexes (integration)', () => {
     for (const record of result) {
       const parsed = proteinComplexFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record (verbose=${verbose}): ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record (verbose=${verbose}): ${parsed.error.message}`)
       }
     }
   })

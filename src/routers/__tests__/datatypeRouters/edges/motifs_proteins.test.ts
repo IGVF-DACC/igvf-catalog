@@ -31,7 +31,9 @@ describe('motifsProteinsRouters.motifsFromProteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(combinedResult)
@@ -61,7 +63,9 @@ describe('motifsProteinsRouters.motifsFromProteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(combinedResult)
@@ -88,7 +92,7 @@ describe('motifsProteinsRouters.motifsFromProteins', () => {
 
     const input = { protein_id: 'ENSP00000281043', page: 0 }
     const result = await motifsProteinsRouters.motifsFromProteins({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -124,7 +128,9 @@ describe('motifsProteinsRouters.proteinsFromMotifs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(combinedResult)
@@ -142,7 +148,9 @@ describe('motifsProteinsRouters.proteinsFromMotifs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([])

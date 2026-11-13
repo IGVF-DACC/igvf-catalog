@@ -3,7 +3,7 @@ import { db } from '../../../../database'
 
 jest.mock('../../../../database')
 
-const call = async (input: any): Promise<any> => await genomicElementsGenomicElementsRouters.genomicElementsFromGenomicElements({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+const call = async (input: any): Promise<any> => await genomicElementsGenomicElementsRouters.genomicElementsFromGenomicElements({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
 
 beforeEach(() => {
   jest.clearAllMocks()

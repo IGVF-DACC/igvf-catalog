@@ -51,7 +51,9 @@ describe('qtlsRouters.qtls', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(qtlResult)
@@ -84,7 +86,9 @@ describe('qtlsRouters.qtls', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(qtlResult)
@@ -115,7 +119,9 @@ describe('qtlsRouters.qtls', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(qtlResult)
@@ -125,42 +131,42 @@ describe('qtlsRouters.qtls', () => {
   it('throws BAD_REQUEST when no gene, variant or region property is defined', async () => {
     const input = {}
     await expect(
-      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     ).rejects.toThrow(TRPCError)
   })
 
   it('throws BAD_REQUEST when both gene and variant inputs are defined', async () => {
     const input = { gene_id: 'ENSG00000012048', variant_id: 'NC_000017.11:43044300:A:G' }
     await expect(
-      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     ).rejects.toThrow(TRPCError)
   })
 
   it('throws BAD_REQUEST when both gene and region inputs are defined', async () => {
     const input = { gene_id: 'ENSG00000012048', region: 'chr17:43044000-43045000' }
     await expect(
-      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     ).rejects.toThrow(TRPCError)
   })
 
   it('throws BAD_REQUEST when both variant and region inputs are defined', async () => {
     const input = { variant_id: 'NC_000017.11:43044300:A:G', region: 'chr17:43044000-43045000' }
     await expect(
-      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     ).rejects.toThrow(TRPCError)
   })
 
   it('throws BAD_REQUEST for an invalid region format', async () => {
     const input = { region: 'not-a-region' }
     await expect(
-      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     ).rejects.toThrow(TRPCError)
   })
 
   it('throws BAD_REQUEST when the region span exceeds 10kb', async () => {
     const input = { region: 'chr17:43000000-43020000' }
     await expect(
-      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      qtlsRouters.qtls({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
     ).rejects.toThrow(TRPCError)
   })
 
@@ -203,7 +209,7 @@ describe('qtlsRouters.qtls', () => {
 
     const input = { gene_id: 'ENSG00000012048' }
     const result = await qtlsRouters.qtls({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[1][0]).toContain('preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles')

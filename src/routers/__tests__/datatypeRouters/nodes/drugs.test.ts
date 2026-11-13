@@ -24,7 +24,9 @@ describe('drugsRouters.drugs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecord)
   })
@@ -44,7 +46,9 @@ describe('drugsRouters.drugs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecords)
   })
@@ -61,7 +65,9 @@ describe('drugsRouters.drugs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([{ _id: '3', name: 'DrugC', source: 'src', source_url: 'url' }])
   })
@@ -73,7 +79,9 @@ describe('drugsRouters.drugs', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: { page: 0 }
+        getRawInput: async () => ({ page: 0 }),
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -90,7 +98,9 @@ describe('drugsRouters.drugs', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([{ _id: '4', name: 'DrugD', source: 'src', source_url: 'url' }])
   })

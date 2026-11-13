@@ -38,7 +38,9 @@ describe('goTermsAnnotations.goTermsFromAnnotations', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([goAnnotation])
@@ -59,7 +61,9 @@ describe('goTermsAnnotations.goTermsFromAnnotations', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([proteinAnnotation])
@@ -77,7 +81,9 @@ describe('goTermsAnnotations.goTermsFromAnnotations', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([])
@@ -92,7 +98,9 @@ describe('goTermsAnnotations.goTermsFromAnnotations', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -104,7 +112,7 @@ describe('goTermsAnnotations.goTermsFromAnnotations', () => {
 
     const input = { query: 'ENST00000357654', page: 0 }
     const result = await goTermsAnnotations.goTermsFromAnnotations({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[1][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -128,7 +136,9 @@ describe('goTermsAnnotations.annotationsFromGoTerms', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([goAnnotation])
@@ -143,7 +153,9 @@ describe('goTermsAnnotations.annotationsFromGoTerms', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: input
+        getRawInput: async () => input,
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -155,7 +167,7 @@ describe('goTermsAnnotations.annotationsFromGoTerms', () => {
 
     const input = { go_term_id: 'GO_0006281', page: 0 }
     const result = await goTermsAnnotations.annotationsFromGoTerms({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')

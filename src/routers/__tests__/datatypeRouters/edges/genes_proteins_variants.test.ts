@@ -50,7 +50,9 @@ describe('genesProteinsVariants.variantsFromGeneProteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result[0].related[0].gene).toEqual(verboseGeneResult[0])
@@ -91,7 +93,7 @@ describe('genesProteinsVariants.variantsFromGeneProteins', () => {
 
     const input = { query: 'GENE1', page: 0 }
     const result: any = await genesProteinsVariants.variantsFromGeneProteins({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[2][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -140,7 +142,9 @@ describe('genesProteinsVariants.genesProteinsFromVariants', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result[0].related[0].protein).toEqual(verboseProteinResult[0])
@@ -178,7 +182,7 @@ describe('genesProteinsVariants.genesProteinsFromVariants', () => {
 
     const input = { variant_id: 'NC_000001.11:69433:A:G', page: 0 }
     const result: any = await genesProteinsVariants.genesProteinsFromVariants({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })
 
     expect(query.mock.calls[0][0]).toContain('DOCUMENT(record.files_filesets).preferred_assay_titles')
@@ -213,7 +217,9 @@ describe('genesProteinsVariants.genesProteinsGenesProteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual(finalResult)
@@ -231,7 +237,9 @@ describe('genesProteinsVariants.genesProteinsGenesProteins', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(result).toEqual([])

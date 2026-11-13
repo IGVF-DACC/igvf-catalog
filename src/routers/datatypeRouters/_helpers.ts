@@ -296,7 +296,7 @@ export function getFilterStatements (
 
         // e.g: input['intersect'] = 'start-end:12345-54321'
         if (element === 'intersect') {
-          const rangeValue = value?.split(':') as string[]
+          const rangeValue = value?.split(':')
           const fieldOperands = rangeValue[0].split('-')
           const rangeOperands = rangeValue[1].split('-')
           assertValidNumericOperand(element, rangeOperands[0])
@@ -321,7 +321,7 @@ export function getFilterStatements (
         }
 
         if (stringOperator === 'range') {
-          const rangeValue = value?.split(':') as string[]
+          const rangeValue = value?.split(':')
           const rangeOperands = rangeValue[1].split('-')
           assertValidNumericOperand(element, rangeOperands[0])
           assertValidNumericOperand(element, rangeOperands[1])

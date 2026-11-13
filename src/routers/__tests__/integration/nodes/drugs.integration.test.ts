@@ -14,7 +14,9 @@ describe('drugsRouters.drugs (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -23,7 +25,7 @@ describe('drugsRouters.drugs (integration)', () => {
     for (const record of result) {
       const parsed = drugFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record ${record._id as string}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record ${record._id as string}: ${parsed.error.message}`)
       }
     }
   })

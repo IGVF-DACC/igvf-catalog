@@ -19,7 +19,9 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes (integration)', (
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -28,7 +30,7 @@ describe('genomicElementsGenesRouters.genomicElementsFromGenes (integration)', (
     for (const record of result) {
       const parsed = outputFormat.element.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -44,7 +46,9 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements (integration)', (
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -53,7 +57,7 @@ describe('genomicElementsGenesRouters.genesFromGenomicElements (integration)', (
     for (const record of result) {
       const parsed = outputFormat.element.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -74,7 +78,9 @@ describe('genomicElementsGenesRouters.grn (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -83,7 +89,7 @@ describe('genomicElementsGenesRouters.grn (integration)', () => {
     for (const record of result) {
       const parsed = grnOutputFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.method} GRN record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.method} GRN record: ${parsed.error.message}`)
       }
     }
   })

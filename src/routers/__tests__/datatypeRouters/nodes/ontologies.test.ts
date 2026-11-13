@@ -58,7 +58,9 @@ describe('ontologyRouters.ontologyTerm', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -76,7 +78,9 @@ describe('ontologyRouters.ontologyTerm', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(fuzzyResult)
   })
@@ -109,11 +113,11 @@ describe('ontologyRouters.ontologyTerm', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('uri, term_id, name')
 
     const page0Input = { name: 'lupus', page: 0, limit: 25 }
-    const page0 = await ontologyRouters.ontologyTerm({ input: page0Input, ctx: {}, type: 'query', path: '', rawInput: page0Input }) as any[]
+    const page0 = await ontologyRouters.ontologyTerm({ input: page0Input, ctx: {}, type: 'query', path: '', getRawInput: async () => page0Input, signal: undefined, batchIndex: 0 }) as any[]
     const page1Input = { name: 'lupus', page: 1, limit: 25 }
-    const page1 = await ontologyRouters.ontologyTerm({ input: page1Input, ctx: {}, type: 'query', path: '', rawInput: page1Input }) as any[]
+    const page1 = await ontologyRouters.ontologyTerm({ input: page1Input, ctx: {}, type: 'query', path: '', getRawInput: async () => page1Input, signal: undefined, batchIndex: 0 }) as any[]
     const page2Input = { name: 'lupus', page: 2, limit: 25 }
-    const page2 = await ontologyRouters.ontologyTerm({ input: page2Input, ctx: {}, type: 'query', path: '', rawInput: page2Input }) as any[]
+    const page2 = await ontologyRouters.ontologyTerm({ input: page2Input, ctx: {}, type: 'query', path: '', getRawInput: async () => page2Input, signal: undefined, batchIndex: 0 }) as any[]
 
     expect(page0).toHaveLength(25)
     expect(page1).toHaveLength(2)
@@ -133,7 +137,9 @@ describe('ontologyRouters.ontologyTerm', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(dbModule.db.query).toHaveBeenCalled()
   })
@@ -149,7 +155,9 @@ describe('ontologyRouters.ontologyTerm', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([])
   })
@@ -169,7 +177,7 @@ describe('ontologyRouters.ontologyTerm', () => {
     jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('uri, term_id, name')
 
     const input = { name: 'cancer lung', page: 0, limit: 25 }
-    await ontologyRouters.ontologyTerm({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+    await ontologyRouters.ontologyTerm({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
 
     const prefixQuery = queries.find(q => q.includes('STARTS_WITH'))
     expect(prefixQuery).toContain('SORT record.name, record._key')
@@ -189,7 +197,9 @@ describe('ontologyRouters.ontologyTerm', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     const passedInput = getFilterStatementsSpy.mock.calls[0][1]

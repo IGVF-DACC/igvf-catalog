@@ -17,7 +17,9 @@ describe('proteinsProteinsRouters.proteinsProteins (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -29,7 +31,7 @@ describe('proteinsProteinsRouters.proteinsProteins (integration)', () => {
     for (const record of matchingSource) {
       const parsed = proteinsProteinsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for ${testCase.source} record ${record._id as string}: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for ${testCase.source} record ${record._id as string}: ${parsed.error.message}`)
       }
     }
   })

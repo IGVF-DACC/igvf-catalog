@@ -18,7 +18,9 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions (integration)',
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -26,7 +28,7 @@ describe('enhancerGenePredictionsRouters.enhancerGenePredictions (integration)',
 
     const parsed = genesGenomicElementsOutputFormat.safeParse(result)
     if (!parsed.success) {
-      throw new Error(`Output validation failed for ${testCase.method} result: ${parsed.error.toString()}`)
+      throw new Error(`Output validation failed for ${testCase.method} result: ${parsed.error.message}`)
     }
   })
 })

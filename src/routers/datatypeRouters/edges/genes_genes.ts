@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { contextFilters, programContextQuery, programNumericFilter } from '../gene_programs_shared'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
@@ -95,8 +95,8 @@ export const genesGenesRelativeFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidGeneFilter = !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].some(key => typeof input[key] === 'string' && (input[key] as string).trim() !== '')
-  const isInvalidAssociatedGeneFilter = !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].some(key => typeof input[key] === 'string' && (input[key] as string).trim() !== '')
+  const isInvalidGeneFilter = !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].some(key => typeof input[key] === 'string' && (input[key]).trim() !== '')
+  const isInvalidAssociatedGeneFilter = !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].some(key => typeof input[key] === 'string' && (input[key]).trim() !== '')
 
   if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter) {
     throw new TRPCError({

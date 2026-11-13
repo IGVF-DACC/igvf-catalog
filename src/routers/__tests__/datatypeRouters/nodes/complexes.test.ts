@@ -24,7 +24,9 @@ describe('complexesRouters.complexes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecord)
   })
@@ -44,7 +46,9 @@ describe('complexesRouters.complexes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecords)
   })
@@ -64,7 +68,9 @@ describe('complexesRouters.complexes', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockRecords)
   })
@@ -76,7 +82,9 @@ describe('complexesRouters.complexes', () => {
         ctx: {},
         type: 'query',
         path: '',
-        rawInput: { page: 0 }
+        getRawInput: async () => ({ page: 0 }),
+        signal: undefined,
+        batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

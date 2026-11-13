@@ -16,7 +16,9 @@ describe('motifsRouters.motifs (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -25,7 +27,7 @@ describe('motifsRouters.motifs (integration)', () => {
     for (const record of result) {
       const parsed = motifFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for method=${testCase.method} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for method=${testCase.method} record: ${parsed.error.message}`)
       }
     }
   })
@@ -42,7 +44,9 @@ describe('motifsRouters.motifs (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -51,7 +55,7 @@ describe('motifsRouters.motifs (integration)', () => {
     for (const record of result) {
       const parsed = motifFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for source=${testCase.source} record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for source=${testCase.source} record: ${parsed.error.message}`)
       }
     }
   })

@@ -70,7 +70,9 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(dbModule.db.query).toHaveBeenCalledTimes(2)
@@ -88,7 +90,7 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
     const input = { page: 0 } as any
     await expect(
       variantsVariantsRouters.variantsFromVariantIDSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -101,7 +103,7 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
     const input = { variant_id: 'DOES_NOT_EXIST', page: 0 }
     await expect(
       variantsVariantsRouters.variantsFromVariantIDSummary({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -109,7 +111,7 @@ describe('variantsVariantsRouters.variantsFromVariantIDSummary', () => {
   it('rejects organism=Mus musculus - this collection has no mouse data', async () => {
     const input = { variant_id: 'NC_000001.11:69633:TGT:GAA', organism: 'Mus musculus', page: 0 }
     await expect(variantsVariantsRouters.variantsFromVariantIDSummary({
-      input, ctx: {}, type: 'query', path: '', rawInput: input
+      input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
     })).rejects.toThrow(TRPCError)
     expect(dbModule.db.query).not.toHaveBeenCalled()
   })
@@ -160,7 +162,9 @@ describe('variantsVariantsRouters.variantsFromVariantID', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(dbModule.db.query).toHaveBeenCalledTimes(3)
@@ -177,7 +181,7 @@ describe('variantsVariantsRouters.variantsFromVariantID', () => {
     const input = { page: 0 } as any
     await expect(
       variantsVariantsRouters.variantsFromVariantID({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -186,7 +190,7 @@ describe('variantsVariantsRouters.variantsFromVariantID', () => {
     const input = { variant_id: 'V1', r2: 'not-a-number', page: 0 } as any
     await expect(
       variantsVariantsRouters.variantsFromVariantID({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -195,7 +199,7 @@ describe('variantsVariantsRouters.variantsFromVariantID', () => {
     const input = { variant_id: 'V1', d_prime: 'not-a-number', page: 0 } as any
     await expect(
       variantsVariantsRouters.variantsFromVariantID({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })
@@ -204,7 +208,7 @@ describe('variantsVariantsRouters.variantsFromVariantID', () => {
     const input = { variant_id: 'V1', ancestry: 'NOT_A_REAL_ANCESTRY', page: 0 } as any
     await expect(
       variantsVariantsRouters.variantsFromVariantID({
-        input, ctx: {}, type: 'query', path: '', rawInput: input
+        input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0
       })
     ).rejects.toThrow(TRPCError)
   })

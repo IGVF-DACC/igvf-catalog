@@ -22,7 +22,9 @@ describe('autocompleteRouters.autocomplete', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResults)
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -39,7 +41,9 @@ describe('autocompleteRouters.autocomplete', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual([])
     expect(dbModule.db.query).toHaveBeenCalled()
@@ -59,7 +63,9 @@ describe('autocompleteRouters.autocomplete', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
     expect(result).toEqual(mockResults)
     expect(dbModule.db.query).toHaveBeenCalled()

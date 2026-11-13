@@ -20,7 +20,9 @@ describe('genesStructureRouters.genesStructure (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -29,7 +31,7 @@ describe('genesStructureRouters.genesStructure (integration)', () => {
     for (const record of result) {
       const parsed = GeneStructureFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record: ${parsed.error.message}`)
       }
     }
   })
@@ -41,7 +43,9 @@ describe('genesStructureRouters.genesStructure (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -50,7 +54,7 @@ describe('genesStructureRouters.genesStructure (integration)', () => {
     for (const record of result) {
       const parsed = GeneStructureFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record: ${parsed.error.message}`)
       }
     }
   })
@@ -62,7 +66,9 @@ describe('genesStructureRouters.genesStructure (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -71,7 +77,7 @@ describe('genesStructureRouters.genesStructure (integration)', () => {
     for (const record of result) {
       const parsed = GeneStructureFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for record: ${parsed.error.message}`)
       }
     }
   })

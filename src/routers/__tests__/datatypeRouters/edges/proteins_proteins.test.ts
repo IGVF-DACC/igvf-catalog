@@ -5,7 +5,7 @@ import { TRPCError } from '@trpc/server'
 jest.mock('../../../../database')
 
 const callProcedure = async (procedure: any, input: Record<string, unknown>): Promise<any> =>
-  procedure({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+  procedure({ input, ctx: {}, type: 'query', path: '', getRawInput: async () => input, signal: undefined, batchIndex: 0 })
 
 const buildInteractionRecord = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
   _id: 'proteins_proteins/ENSP00000340898_ENSP00000341289',

@@ -12,7 +12,9 @@ describe('genesTranscriptsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -21,7 +23,7 @@ describe('genesTranscriptsRouters (integration)', () => {
     for (const record of result) {
       const parsed = genesTranscriptsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for transcriptsFromGenes record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for transcriptsFromGenes record: ${parsed.error.message}`)
       }
     }
   })
@@ -35,7 +37,9 @@ describe('genesTranscriptsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -44,7 +48,7 @@ describe('genesTranscriptsRouters (integration)', () => {
     for (const record of result) {
       const parsed = genesTranscriptsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for transcriptsFromGenes (region) record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for transcriptsFromGenes (region) record: ${parsed.error.message}`)
       }
     }
   })
@@ -56,7 +60,9 @@ describe('genesTranscriptsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -65,7 +71,7 @@ describe('genesTranscriptsRouters (integration)', () => {
     for (const record of result) {
       const parsed = genesTranscriptsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for genesFromTranscripts record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for genesFromTranscripts record: ${parsed.error.message}`)
       }
     }
   })
@@ -77,7 +83,9 @@ describe('genesTranscriptsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -86,7 +94,7 @@ describe('genesTranscriptsRouters (integration)', () => {
     for (const record of result) {
       const parsed = genesProteinsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for proteinsFromGenes record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for proteinsFromGenes record: ${parsed.error.message}`)
       }
     }
   })
@@ -99,7 +107,9 @@ describe('genesTranscriptsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -108,7 +118,7 @@ describe('genesTranscriptsRouters (integration)', () => {
     for (const record of result) {
       const parsed = genesProteinsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for proteinsFromGenes (region) record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for proteinsFromGenes (region) record: ${parsed.error.message}`)
       }
     }
   })
@@ -120,7 +130,9 @@ describe('genesTranscriptsRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -129,7 +141,7 @@ describe('genesTranscriptsRouters (integration)', () => {
     for (const record of result) {
       const parsed = genesProteinsFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for genesFromProteins record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for genesFromProteins record: ${parsed.error.message}`)
       }
     }
   })

@@ -1,5 +1,5 @@
 import { descriptions } from '../descriptions'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { getDBReturnStatements, getFilterStatements, escapeAqlString } from '../_helpers'

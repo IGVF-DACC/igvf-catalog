@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -114,7 +114,7 @@ function searchViewQueryBody (
   const searchFilters = []
   for (const field in fields) {
     if (fields[field] !== undefined) {
-      searchFilters.push(buildMatch(field, fields[field] as string))
+      searchFilters.push(buildMatch(field, fields[field]))
     }
   }
 

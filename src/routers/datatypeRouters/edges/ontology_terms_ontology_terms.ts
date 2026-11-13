@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { db } from '../../../database'
 import { Edge, PathArangoDB, Paths, QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'

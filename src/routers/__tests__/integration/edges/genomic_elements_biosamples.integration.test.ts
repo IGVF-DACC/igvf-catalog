@@ -17,7 +17,9 @@ describe('genomicElementsBiosamplesRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -26,7 +28,7 @@ describe('genomicElementsBiosamplesRouters (integration)', () => {
     for (const record of result) {
       const parsed = genomicElementsToBiosampleFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for biosamplesFromGenomicElements (${source}) record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for biosamplesFromGenomicElements (${source}) record: ${parsed.error.message}`)
       }
     }
   })
@@ -38,7 +40,9 @@ describe('genomicElementsBiosamplesRouters (integration)', () => {
       ctx: {},
       type: 'query',
       path: '',
-      rawInput: input
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
     })
 
     expect(Array.isArray(result)).toBe(true)
@@ -47,7 +51,7 @@ describe('genomicElementsBiosamplesRouters (integration)', () => {
     for (const record of result) {
       const parsed = genomicElementsToBiosampleFormat.safeParse(record)
       if (!parsed.success) {
-        throw new Error(`Output validation failed for genomicElementsFromBiosamples (${source}) record: ${parsed.error.toString()}`)
+        throw new Error(`Output validation failed for genomicElementsFromBiosamples (${source}) record: ${parsed.error.message}`)
       }
     }
   })
