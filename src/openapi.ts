@@ -185,6 +185,7 @@ Object.entries(paths).forEach(([path, pathItem]) => {
     const operation = pathItem[method]
     if (operation !== undefined) {
       operation.tags = [tag]
+      delete operation.security
     }
   })
 })
