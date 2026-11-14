@@ -6,12 +6,14 @@ import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles, withHgncPrefix } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion, withExpandedAssayTitles, withHgncPrefix } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
+const MAX_PERTURBED_REGION_SPAN = 10000
 const regulatorCorrelationSchema = getSchema('data/schemas/edges/genes_genes.GenePrograms.json')
+const genomicElementsSchema = getSchema('data/schemas/nodes/genomic_elements.GenePrograms.json')
 
 const HumangenesGenesSchema = getSchema('data/schemas/edges/genes_genes.GeneGeneBiogrid.json')
 const MousegenesGenesSchema = getSchema('data/schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json')
@@ -56,7 +58,8 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
     pearson_correlation: programNumericFilter.optional(),
     source: z.enum(sources).optional(),
     name: z.enum(names).optional(),
-    files_fileset: z.string().trim().optional()
+    files_fileset: z.string().trim().optional(),
+    perturbed_region: z.string().trim().optional()
   })
 ).merge(commonEdgeParamsFormat).merge(programContextQuery).extend({
   page: z.number().int().nonnegative().default(0),
@@ -97,8 +100,9 @@ export const genesGenesRelativeFormat = z.object({
 function validateInput (input: paramsFormatType): void {
   const isInvalidGeneFilter = !['gene_id', 'hgnc_id', 'gene_name', 'synonym'].some(key => typeof input[key] === 'string' && (input[key] as string).trim() !== '')
   const isInvalidAssociatedGeneFilter = !['associated_gene_id', 'associated_hgnc_id', 'associated_gene_name', 'associated_synonym'].some(key => typeof input[key] === 'string' && (input[key] as string).trim() !== '')
+  const hasPerturbedRegion = typeof input.perturbed_region === 'string' && input.perturbed_region.trim() !== ''
 
-  if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter) {
+  if (isInvalidGeneFilter && isInvalidAssociatedGeneFilter && !hasPerturbedRegion) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one gene must be defined.'
@@ -180,8 +184,35 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     delete input.z_score
   }
 
+  // genomic_elements_from/_to only exist on regulator-regulator correlation rows (the
+  // CRISPR-targeted elements behind each Perturb-seq pair), so this filter naturally only
+  // ever matches those rows. Resolving to candidate ids first (rather than filtering by
+  // region directly on genes_genes, which has no chr/start/end of its own) lets the
+  // genomic_elements_from[*]/genomic_elements_to[*] indexes drive the `ANY IN` membership
+  // check instead of scanning every row.
+  let perturbedElementsQuery = ''
+  if (input.perturbed_region !== undefined) {
+    const regionParts = validRegion(input.perturbed_region as string)
+    if (regionParts === null) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Region format invalid. Please use the format as the example: "chr2:12345-54321".'
+      })
+    }
+    if (Number(regionParts[3]) - Number(regionParts[2]) > MAX_PERTURBED_REGION_SPAN) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `perturbed_region must not span more than ${MAX_PERTURBED_REGION_SPAN} bases.`
+      })
+    }
+    const perturbedElementsFilter = getFilterStatements(genomicElementsSchema, preProcessRegionParam({ region: input.perturbed_region })).replaceAll('record', 'element')
+    perturbedElementsQuery = `LET perturbedElementIDs = (FOR element IN genomic_elements FILTER ${perturbedElementsFilter} RETURN element._id)`
+    delete input.perturbed_region
+  }
+
   const filters = []
   if (correlationFilter) filters.push(correlationFilter)
+  if (perturbedElementsQuery) filters.push('(record.genomic_elements_from ANY IN perturbedElementIDs OR record.genomic_elements_to ANY IN perturbedElementIDs)')
   const gene = getFilterStatements(genesSchema, geneInput).replaceAll('record', 'gene')
   const associatedGene = getFilterStatements(genesSchema, associatedGeneInput).replaceAll('record', 'associatedGene')
   const edgeFilters = getFilterStatements(genesGenesFilterSchema, input)
@@ -225,6 +256,8 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       ? `FOR associatedGene IN ${genesCollectionName}
         FILTER ${associatedGene}`
       : ''}
+
+    ${perturbedElementsQuery}
 
     FOR record IN ${genesGenesCollectionName}
     FILTER ${combinedFilter}

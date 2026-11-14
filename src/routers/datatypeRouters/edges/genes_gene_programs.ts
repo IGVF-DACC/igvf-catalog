@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { getDBReturnStatements, getFilterStatements, withHgncPrefix } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, preProcessRegionParam, withHgncPrefix } from '../_helpers'
 import { getSchema } from '../schema'
 import { geneFormat } from '../nodes/genes'
 import { geneProgramFormat, geneProgramSchema } from '../nodes/gene_programs'
@@ -16,6 +16,7 @@ const queryFormat = programContextQuery.merge(programPagination).extend({
   gene_name: z.string().trim().min(1).optional(),
   hgnc_id: z.string().trim().min(1).optional(),
   synonym: z.string().trim().min(1).optional(),
+  region: z.string().trim().optional(),
   gene_program_id: z.string().trim().min(1).optional().describe('Catalog program key including its defining file accession, or document ID.'),
   label: z.enum(['gene program membership', 'gene program regulation']).optional(),
   score: programNumericFilter.optional(),
@@ -42,12 +43,13 @@ const outputFormat = programContextFormat.extend({
 })
 
 async function findRelationships (input: z.infer<typeof queryFormat>, reverse: boolean): Promise<any[]> {
-  const geneFilter = getFilterStatements(geneSchema, {
+  const geneFilter = getFilterStatements(geneSchema, preProcessRegionParam({
     _key: input.gene_id === undefined ? undefined : documentId('genes', input.gene_id).split('/')[1],
     name: input.gene_name,
     hgnc: input.hgnc_id === undefined ? undefined : withHgncPrefix(input.hgnc_id),
-    synonyms: input.synonym
-  }).replaceAll('record', 'gene')
+    synonyms: input.synonym,
+    region: input.region
+  })).replaceAll('record', 'gene')
   if (reverse ? input.gene_program_id === undefined : !geneFilter) {
     throw new TRPCError({ code: 'BAD_REQUEST', message: reverse ? 'gene_program_id is required.' : 'At least one gene identifier is required.' })
   }

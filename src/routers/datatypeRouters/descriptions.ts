@@ -59,7 +59,7 @@ export const descriptions = {
     ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
 
   genes_gene_programs:
-    'Retrieve gene program membership weights and regulator effects for a gene. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+    'Retrieve gene program membership weights and regulator effects for a gene. Identify the gene by gene_id, hgnc_id, gene_name, synonym, or region. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
       {
         id: 'genes-gene-programs-perturb-seq',
         label: 'Perturb-seq',
@@ -85,7 +85,7 @@ export const descriptions = {
     ], 'Examples by method', 'Perturb-seq examples from the HCASMC-hTERT gene-program dataset. Membership uses the definition file; regulation and correlation use their respective result files.'),
 
   gene_programs_genes:
-    'Retrieve member genes or regulators for a catalog gene_program_id. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
+    'Retrieve member genes or regulators for a catalog gene_program_id. Optionally narrow by gene_id, hgnc_id, gene_name, synonym, or region. Filter label to distinguish membership from regulation. Numeric filters accept gt:, gte:, lt:, lte:. Pagination is 0-based; maximum page size is 100.<br><br>' + examples([
       {
         id: 'gene-programs-genes-perturb-seq',
         label: 'Perturb-seq',
@@ -401,7 +401,7 @@ export const descriptions = {
   genes_genes:
     'Retrieve coexpressed gene pairs from CoXPresdb, genetic interactions from BioGRID, and IGVF regulator-regulator correlations across gene programs. Filter label and files_fileset to select a relationship and experiment. pearson_correlation accepts gt:, gte:, lt:, lte: and excludes missing coefficients. <br> \
     The following parameters can be used to set thresholds on z_score: gt (>), gte (>=), lt (<), lte (<=). z_score only exists on CoXPresdb edges; BioGRID edges do not have this field at all.<br> \
-    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym. <br> \
+    At least one of these fields is required: gene_id, hgnc_id, gene_name, synonym, perturbed_region. perturbed_region matches the CRISPR-targeted genomic element(s) behind a regulator-regulator correlation pair and only ever matches those rows; it must not span more than 10,000 bases.<br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based. <br> <br> \
     ' + examples([
@@ -415,6 +415,13 @@ export const descriptions = {
               'gene_id = ENSG00000000003',
               'associated_gene_id = ENSG00000000005',
               'label = regulator-regulator correlation',
+              'files_fileset = IGVFFI6502THLB'
+            ]
+          },
+          {
+            label: 'Same pair, found by the targeted element\'s region instead of gene_id',
+            items: [
+              'perturbed_region = chrX:100636450-100636801',
               'files_fileset = IGVFFI6502THLB'
             ]
           }

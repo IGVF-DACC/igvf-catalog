@@ -51,6 +51,15 @@ it('returns membership weights without requiring regulator metrics', async () =>
   expect(query()).toContain("record['score'] >= 0.2")
 })
 
+it('finds genes by region without requiring a gene identifier', async () => {
+  const edge = { ...context, _id: 'genes_gene_programs/member', gene: 'genes/ENSG1', gene_program: 'gene_programs/P1', label: 'gene program membership', name: 'is a member of', inverse_name: 'has member', score: 0.5 }
+  mockRows([edge])
+  expect(await call(genesGeneProgramsRouters.geneProgramsFromGenes, { region: 'chr1:12345-54321' })).toEqual([edge])
+  expect(query()).toContain('FOR gene IN genes')
+  expect(query()).toContain("gene.chr == 'chr1'")
+  expect(query()).toContain('record._from == gene._id')
+})
+
 it('returns regulation context and metrics with inverse relationship naming', async () => {
   const edge = { ...context, _id: 'genes_gene_programs/regulator', gene: 'genes/ENSG1', gene_program: program, label: 'gene program regulation', name: 'regulated by', inverse_name: 'regulates', log2FC: -0.4, neg_log10_pvalue_adj: null, significant: null, genomic_elements: ['genomic_elements/promoter'] }
   mockRows([edge])
@@ -83,6 +92,20 @@ it('returns IGVF regulator correlations through genes/genes with their targeted 
   expect(query()).toContain("'genomic_elements_from': record['genomic_elements_from']")
   expect(query()).toContain('record.pearson_correlation != null')
   expect(query()).toContain("record.files_filesets == 'files_filesets/IGVFFI6502THLB'")
+})
+
+it('finds regulator correlations by perturbed_region without requiring a gene identifier', async () => {
+  const edge = { ...context, _id: 'genes_genes/pair', gene_1: 'genes/ENSG1', gene_2: 'genes/ENSG2', name: 'correlated with', inverse_name: 'correlated with', label: 'regulator-regulator correlation', pearson_correlation: -0.7, genomic_elements_from: ['genomic_elements/A'], genomic_elements_to: ['genomic_elements/B'] }
+  mockRows([edge])
+  expect(await call(genesGenesEdgeRouters.genesGenes, { perturbed_region: 'chrX:100636450-100636801' })).toEqual([edge])
+  expect(query()).toContain('LET perturbedElementIDs = (FOR element IN genomic_elements FILTER')
+  expect(query()).toContain("element.chr == 'chrX'")
+  expect(query()).toContain('record.genomic_elements_from ANY IN perturbedElementIDs OR record.genomic_elements_to ANY IN perturbedElementIDs')
+})
+
+it('rejects a perturbed_region spanning more than 10,000 bases', async () => {
+  await expect(call(genesGenesEdgeRouters.genesGenes, { perturbed_region: 'chrX:100000-200000' })).rejects.toThrow('must not span more than 10000 bases')
+  expect(dbModule.db.query).not.toHaveBeenCalled()
 })
 
 it.each(['gt:NaN', 'gt:1:2', 'wat:0.5', 'Infinity', ''])('rejects invalid Pearson filter %s before querying', async value => {
