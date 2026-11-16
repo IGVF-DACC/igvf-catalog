@@ -7,7 +7,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, withExpandedAssayTitles, withHgncPrefix } from '../_helpers'
-import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
+import { commonEdgeParamsFormat, genesCommonQueryFormat, pageSizeParam } from '../params'
 import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
@@ -59,8 +59,7 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
     files_fileset: z.string().trim().optional()
   })
 ).merge(commonEdgeParamsFormat).merge(programContextQuery).extend({
-  page: z.number().int().nonnegative().default(0),
-  limit: z.number().int().positive().max(MAX_PAGE_SIZE).optional()
+  limit: pageSizeParam.max(MAX_PAGE_SIZE).optional()
 })
 
 export const genesGenesRelativeFormat = z.object({

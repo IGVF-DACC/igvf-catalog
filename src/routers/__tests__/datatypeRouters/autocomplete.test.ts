@@ -70,4 +70,19 @@ describe('autocompleteRouters.autocomplete', () => {
     expect(result).toEqual(mockResults)
     expect(dbModule.db.query).toHaveBeenCalled()
   })
+
+  it.each([{ page: -1 }, { page: 0.5 }])('rejects an invalid page %j', async (overrides) => {
+    const query = jest.spyOn(dbModule.db, 'query')
+    const input = { term: 'GENE', ...overrides }
+    await expect(autocompleteRouters.autocomplete({
+      input,
+      ctx: {},
+      type: 'query',
+      path: '',
+      getRawInput: async () => input,
+      signal: undefined,
+      batchIndex: 0
+    })).rejects.toThrow()
+    expect(query).not.toHaveBeenCalled()
+  })
 })

@@ -6,6 +6,7 @@ import { paramsFormatType, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { getSchema } from '../schema'
+import { pageParam } from '../params'
 
 const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
 const complexCollectionName = complexSchema.db_collection_name as string
@@ -14,7 +15,7 @@ const complexQueryFormat = z.object({
   complex_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   description: z.string().trim().optional(),
-  page: z.number().default(0)
+  page: pageParam
 })
 
 export const complexFormat = z.object({

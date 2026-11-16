@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { expandPreferredAssayTitles, getDBReturnStatements, getFilterStatements, paramsFormatType, verboseItems } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { getSchema } from '../schema'
+import { pageParam, limitParam } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -28,14 +29,14 @@ const variantToProteinCollectionName = variantToProteinSchema.db_collection_name
 
 const variantQueryFormat = z.object({
   variant_id: z.string(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 const queryFormat = z.object({
   query: z.string(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 const relatedGeneFormat = z.object({

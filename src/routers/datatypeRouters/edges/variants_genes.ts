@@ -6,7 +6,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat, geneSearch, nearestGeneSearch } from '../nodes/genes'
-import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat, pageParam, limitParam } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
 import { getCollectionEnumValuesOrThrow, getMergedCollectionSchema, getSchema } from '../schema'
@@ -128,8 +128,8 @@ const geneVariantScoreSummaryQueryFormat = z.object({
   // Paginates the groups list itself, not the underlying edges - the aggregation still runs
   // over every matching edge regardless of page/limit, matching the sibling
   // /genes/genomic-elements/score-summary endpoint's pagination convention.
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 })
 
 const geneVariantScoreSummaryGroupFormat = z.object({
@@ -834,7 +834,7 @@ const deprecatedNearestGenes = publicProcedure
 
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), page: z.number().optional().default(0), limit: z.number().optional(), files_fileset: z.string().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ organism: z.enum(['Homo sapiens']).default('Homo sapiens'), page: pageParam, limit: limitParam, files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 

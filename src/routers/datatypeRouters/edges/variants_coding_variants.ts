@@ -13,6 +13,7 @@ import {
   ALT_AMINO_ACID_CODES
 } from '../nodes/coding_variants'
 import { getSchema } from '../schema'
+import { pageParam, limitParam } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -30,8 +31,8 @@ const variantsFromCodingVariantsQueryFormat = z.object({
   amino_acid_position: z.string().optional(),
   alt_amino_acid: z.enum(ALT_AMINO_ACID_CODES).optional(),
   transcript_id: z.string().optional(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ amino_acid_position, alt_amino_acid, coding_variant_name, uniprot_name, ...rest }) => ({
   ...rest,
@@ -127,7 +128,7 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
 
 const codingVariantsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
-  .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
+  .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ page: pageParam, limit: limitParam })))
   .output(z.array(codingVariantsFormat))
   .query(async ({ input }) => await findCodingVariants(input))
 

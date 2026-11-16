@@ -6,7 +6,7 @@ import { geneSearch } from '../nodes/genes'
 import { expandPreferredAssayTitles, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { genesCommonQueryFormat } from '../params'
+import { genesCommonQueryFormat, pageParam, limitParam } from '../params'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
@@ -18,8 +18,8 @@ const geneCollectionName = geneSchema.db_collection_name as string
 const genesGenomicElementsInputFormat = genesCommonQueryFormat.merge(z.object({
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  page: pageParam,
+  limit: limitParam
 }))
 
 const elementOutputFormat = z.object({
