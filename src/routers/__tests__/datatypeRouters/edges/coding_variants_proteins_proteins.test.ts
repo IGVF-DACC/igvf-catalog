@@ -54,6 +54,13 @@ describe('codingVariantsProteinsProteinsRouters.proteinsProteinsFromCodingVarian
     expect(query()).toContain("record['log2FC'] < 0")
   })
 
+  it('narrows to a specific interaction partner via associated_dbxrefs', async () => {
+    mockRows([edge])
+    await call(codingVariantsProteinsProteinsRouters.proteinsProteinsFromCodingVariants, { gene_name: 'ACSF3', associated_dbxrefs: 'UniProtKB:Q9BQE5' })
+    expect(query()).toContain('FOR associatedProtein IN proteins')
+    expect(query()).toContain("'UniProtKB:Q9BQE5' in associatedProtein.dbxrefs[*].id")
+  })
+
   it('rejects a request with no coding variant identifier', async () => {
     await expect(call(codingVariantsProteinsProteinsRouters.proteinsProteinsFromCodingVariants, {})).rejects.toThrow('At least one coding variant parameter must be defined')
     expect(dbModule.db.query).not.toHaveBeenCalled()
@@ -77,6 +84,14 @@ describe('codingVariantsProteinsProteinsRouters.codingVariantsFromProteinsProtei
     expect(query()).toContain('FOR protein IN proteins')
     expect(query()).toContain('FOR associatedProtein IN proteins')
     expect(query()).toContain('(ppi._from == protein._id OR ppi._to == protein._id) AND (ppi._from == associatedProtein._id OR ppi._to == associatedProtein._id)')
+  })
+
+  it('finds coding variants by dbxrefs', async () => {
+    mockRows([edge])
+    const result = await call(codingVariantsProteinsProteinsRouters.codingVariantsFromProteinsProteins, { dbxrefs: 'UniProtKB:Q9BQE5' })
+    expect(result).toEqual([edge])
+    expect(query()).toContain('FOR protein IN proteins')
+    expect(query()).toContain("'UniProtKB:Q9BQE5' in protein.dbxrefs[*].id")
   })
 
   it('rejects a request with no protein identifier', async () => {

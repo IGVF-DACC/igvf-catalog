@@ -67,6 +67,7 @@ const codingVariantsFromProteinsProteinsQueryFormat = z.object({
   associated_protein_id: z.string().trim().optional(),
   associated_protein_name: z.string().trim().optional(),
   associated_uniprot_name: z.string().trim().optional(),
+  associated_dbxrefs: z.string().trim().optional(),
   method: methods.optional(),
   files_fileset: z.string().trim().optional(),
   consensus_score: z.string().trim().optional(),
@@ -87,6 +88,7 @@ const proteinsProteinsFromCodingVariantsQueryFormat = proteinsCommonQueryFormat.
   associated_protein_name: z.string().trim().optional(),
   associated_uniprot_name: z.string().trim().optional(),
   associated_uniprot_full_name: z.string().trim().optional(),
+  associated_dbxrefs: z.string().trim().optional(),
   method: methods.optional(),
   files_fileset: z.string().trim().optional(),
   consensus_score: z.string().trim().optional(),
@@ -105,12 +107,12 @@ function validateCodingVariantInput (input: paramsFormatType): void {
 }
 
 function validateProteinInput (input: paramsFormatType): void {
-  const isInvalidProteinFilter = !['protein_id', 'protein_name', 'uniprot_name', 'uniprot_full_name'].some(key => input[key] !== undefined)
-  const isInvalidAssociatedProteinFilter = !['associated_protein_id', 'associated_protein_name', 'associated_uniprot_name', 'associated_uniprot_full_name'].some(key => input[key] !== undefined)
+  const isInvalidProteinFilter = !['protein_id', 'protein_name', 'uniprot_name', 'uniprot_full_name', 'dbxrefs'].some(key => input[key] !== undefined)
+  const isInvalidAssociatedProteinFilter = !['associated_protein_id', 'associated_protein_name', 'associated_uniprot_name', 'associated_uniprot_full_name', 'associated_dbxrefs'].some(key => input[key] !== undefined)
   if (isInvalidProteinFilter && isInvalidAssociatedProteinFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one protein must be defined: protein_id, protein_name, uniprot_name, uniprot_full_name (or the associated_ equivalents).'
+      message: 'At least one protein must be defined: protein_id, protein_name, uniprot_name, uniprot_full_name, dbxrefs (or the associated_ equivalents).'
     })
   }
 }
@@ -158,11 +160,13 @@ async function findProteinsProteinsFromCodingVariants (input: paramsFormatType):
   const associatedProteinInput: paramsFormatType = {
     _key: input.associated_protein_id,
     name: input.associated_protein_name,
-    uniprot_names: input.associated_uniprot_name
+    uniprot_names: input.associated_uniprot_name,
+    dbxrefs: input.associated_dbxrefs
   }
   delete input.associated_protein_id
   delete input.associated_protein_name
   delete input.associated_uniprot_name
+  delete input.associated_dbxrefs
 
   let associatedProtein = getFilterStatements(proteinSchema, associatedProteinInput).replaceAll('record', 'associatedProtein')
   if (associatedProteinInput._key !== undefined) {
@@ -229,23 +233,27 @@ async function findCodingVariantsFromProteinsProteins (input: paramsFormatType):
     _key: input.protein_id,
     name: input.protein_name,
     uniprot_names: input.uniprot_name,
-    uniprot_full_names: input.uniprot_full_name
+    uniprot_full_names: input.uniprot_full_name,
+    dbxrefs: input.dbxrefs
   }
   delete input.protein_id
   delete input.protein_name
   delete input.uniprot_name
   delete input.uniprot_full_name
+  delete input.dbxrefs
 
   const associatedProteinInput: paramsFormatType = {
     _key: input.associated_protein_id,
     name: input.associated_protein_name,
     uniprot_names: input.associated_uniprot_name,
-    uniprot_full_names: input.associated_uniprot_full_name
+    uniprot_full_names: input.associated_uniprot_full_name,
+    dbxrefs: input.associated_dbxrefs
   }
   delete input.associated_protein_id
   delete input.associated_protein_name
   delete input.associated_uniprot_name
   delete input.associated_uniprot_full_name
+  delete input.associated_dbxrefs
 
   let protein = getFilterStatements(proteinSchema, proteinInput).replaceAll('record', 'protein')
   if (proteinInput._key !== undefined) {
