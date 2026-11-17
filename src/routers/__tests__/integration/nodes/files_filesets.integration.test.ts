@@ -9,13 +9,21 @@ import { getCollectionEnumValuesOrThrow } from '../../../datatypeRouters/schema'
 // point-style query per case (LIMIT 5).
 describe('filesFilesetsRouters.filesFilesets (integration)', () => {
   it('returns schema-valid records for a real file_fileset_id', async () => {
-    const input = { file_fileset_id: 'ENCFF022FVI', limit: 5 }
+    // file_fileset_id is the one param this router's input schema renames (-> _key).
+    // Calling the procedure directly merges the schema-parsed getRawInput() result onto
+    // the literal `input` object rather than replacing it, so passing the raw param name
+    // in both `input` and `getRawInput` (as every other case here safely does, since their
+    // params aren't renamed) leaves a stray, unrecognized `file_fileset_id` key alongside
+    // the correctly-derived `_key` - getFilterStatements then builds an extra, always-false
+    // `record.file_fileset_id == ...` clause from it. Keeping `input` empty and supplying
+    // the raw param only via getRawInput avoids that stray key.
+    const rawInput = { file_fileset_id: 'ENCFF022FVI', limit: 5 }
     const result: any = await filesFilesetsRouters.filesFilesets({
-      input,
+      input: {},
       ctx: {},
       type: 'query',
       path: '',
-      getRawInput: async () => input,
+      getRawInput: async () => rawInput,
       signal: undefined,
       batchIndex: 0
     })
