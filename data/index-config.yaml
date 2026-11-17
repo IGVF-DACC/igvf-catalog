@@ -29,6 +29,18 @@ coding_variants_phenotypes:
     fields:
       - abundance_score
 
+coding_variants_proteins_proteins:
+  persistent:
+    fields:
+      - _from, files_filesets, _key
+      - _to, files_filesets, _key
+      - method, files_filesets
+  zkd_sparse:
+    fields:
+      - consensus_score
+      - wt_consensus_score
+      - log2FC
+
 complexes:
   inverted:
     fields: name, description

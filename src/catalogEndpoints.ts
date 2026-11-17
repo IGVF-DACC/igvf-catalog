@@ -40,6 +40,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/variants/biosamples', tag: 'IGVF Data' },
   { path: '/proteins/variants', tag: 'IGVF Data' },
   { path: '/proteins/proteins', tag: 'IGVF Data' },
+  { path: '/ppi/coding-variants', tag: 'IGVF Data' },
   { path: '/phenotypes/variants', tag: 'IGVF Data' },
   { path: '/phenotypes/coding-variants', tag: 'IGVF Data' },
   { path: '/phenotypes/genomic-elements', tag: 'IGVF Data' },
@@ -53,6 +54,7 @@ export const CATALOG_ENDPOINTS: ReadonlyArray<{ path: string, tag: OpenApiTag }>
   { path: '/genes/variants', tag: 'IGVF Data' },
   { path: '/genes/genomic-elements', tag: 'IGVF Data' },
   { path: '/coding-variants/phenotypes', tag: 'IGVF Data' },
+  { path: '/coding-variants/ppi', tag: 'IGVF Data' },
   { path: '/biosamples/variants', tag: 'IGVF Data' },
   { path: '/biosamples/genomic-elements', tag: 'IGVF Data' },
   // Bespoke Endpoints
