@@ -37,7 +37,7 @@ class Ontology:
         'clo': 'https://api.data.igvf.org/reference-files/IGVFFI0354CFDI/@@download/IGVFFI0354CFDI.owl.gz',
         'cl': 'https://api.data.igvf.org/reference-files/IGVFFI1876TWNM/@@download/IGVFFI1876TWNM.owl.gz',
         'pcl': 'https://api.data.igvf.org/reference-files/IGVFFI5988GBLY/@@download/IGVFFI5988GBLY.owl.gz',
-        'hpo': 'https://api.data.igvf.org/reference-files/IGVFFI0664IPKB/@@download/IGVFFI0664IPKB.owl.gz',
+        'hp': 'https://api.data.igvf.org/reference-files/IGVFFI0664IPKB/@@download/IGVFFI0664IPKB.owl.gz',
         'mondo': 'https://api.data.igvf.org/reference-files/IGVFFI7520SEBS/@@download/IGVFFI7520SEBS.owl.gz',
         'go': 'https://api.data.igvf.org/reference-files/IGVFFI7433WATG/@@download/IGVFFI7433WATG.owl.gz',
         'efo': 'https://api.data.igvf.org/reference-files/IGVFFI8049QQIN/@@download/IGVFFI8049QQIN.owl.gz',
@@ -47,7 +47,8 @@ class Ontology:
         'ncit': 'https://api.data.igvf.org/reference-files/IGVFFI3556AFVR/@@download/IGVFFI3556AFVR.owl.gz',
         'oba': 'https://api.data.igvf.org/reference-files/IGVFFI0656AUEU/@@download/IGVFFI0656AUEU.owl.gz',
         'doid': 'https://api.data.igvf.org/reference-files/IGVFFI6329ZTOH/@@download/IGVFFI6329ZTOH.owl.gz',
-        'obi': 'https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz'
+        'obi': 'https://api.data.igvf.org/reference-files/IGVFFI0416NIIE/@@download/IGVFFI0416NIIE.owl.gz',
+        'xco': 'https://api.data.igvf.org/reference-files/IGVFFI1486NXTD/@@download/IGVFFI1486NXTD.owl.gz'
     }
 
     SOURCE_LINKS = {
@@ -62,13 +63,20 @@ class Ontology:
         'oncotree': 'https://github.com/cBioPortal/oncotree',
         'uberon': 'https://obophenotype.github.io/uberon/',
         'vario': 'http://variationontology.org/',
-        'hpo': 'https://hpo.jax.org/',
+        'hp': 'https://hpo.jax.org/',
         'encode': 'https://encodeproject.org',
         'bao': 'http://bioassayontology.org/',
         'oba': 'https://github.com/obophenotype/bio-attribute-ontology',
         'orphanet': 'https://www.orpha.net/',
         'doid': 'https://disease-ontology.org/',
-        'obi': 'https://obi-ontology.org/'
+        'obi': 'https://obi-ontology.org/',
+        'xco': 'https://obofoundry.org/ontology/xco.html'
+    }
+
+    # Catalog source label when it is not the ontology key in uppercase.
+    # The key is the term-id prefix (hp matches HP_*); parsed records stay HPO.
+    SOURCE_NAMES = {
+        'hp': 'HPO',
     }
 
     GO_SUBONTOLGIES = ['molecular_function',
@@ -375,7 +383,7 @@ class Ontology:
                     '_to': 'ontology_terms/' + to_node_key,
                     'name': self.predicate_name(predicate_for_props),
                     'type_uri': str(predicate_for_props),
-                    'source': self.ontology.upper(),
+                    'source': self.source_name(),
                     'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower()),
                     'class': self.collection_class,
                     'method': self.method,
@@ -420,7 +428,7 @@ class Ontology:
                 'description': ' '.join(set(self.get_all_property_values_from_node(node, 'descriptions'))),
                 'synonyms': list(set(self.get_all_property_values_from_node(node, 'related_synonyms') +
                                      self.get_all_property_values_from_node(node, 'exact_synonyms'))),
-                'source': self.ontology.upper(),
+                'source': self.source_name(),
                 'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower()),
                 'subontology': go_namespaces.get(node, None),
                 'class': self.collection_class,
@@ -431,8 +439,16 @@ class Ontology:
             if self.validate:
                 self.validate_doc(props, 'node')
 
-            self.save_props(props, primary=(
-                self.ontology in term_id.lower()), prop_type='node')
+            # Own terms are primary; terms imported from another ontology are secondary.
+            # Match the id prefix as a token so CL keeps CL_* and not CLM_* or CLO_*.
+            self.save_props(
+                props,
+                primary=term_id.lower().startswith(self.ontology.lower() + '_'),
+                prop_type='node')
+
+    def source_name(self):
+        key = self.ontology.lower()
+        return Ontology.SOURCE_NAMES.get(key, key.upper())
 
     def save_props(self, props, primary=True, prop_type='node'):
         save_to = self.outputs[prop_type]['primary']
@@ -550,7 +566,7 @@ class Ontology:
                 return (restriction_predicate_str, some_values_from_nodes)
             else:
                 # for DERIVES_FROM, we need to get the intersectionOf from the blank node
-                if restriction_predicate_str == str(self.DERIVES_FROM) and self.ontology.lower() in ['uberon', 'efo', 'obi', 'doid', 'hpo', 'mondo', 'oba']:
+                if restriction_predicate_str == str(self.DERIVES_FROM) and self.ontology.lower() in ['uberon', 'efo', 'obi', 'doid', 'hp', 'mondo', 'oba']:
                     # get intersectionOf from this blank node
                     intersection_of = self.get_all_property_nodes_from_node(
                         some_values_from_nodes[0], 'intersection_of')
@@ -611,25 +627,15 @@ class Ontology:
             Ontology.RELATED_SYNONYM)
 
     def cache_predicate(self, predicate):
-        return list(self.graph.subject_objects(predicate=predicate))
+        by_subject = {}
+        for subject, obj in self.graph.subject_objects(predicate=predicate):
+            by_subject.setdefault(subject, []).append(obj)
+        return by_subject
 
     # get all values for a given property from a node
     def get_all_property_values_from_node(self, node, collection):
-        values = []
-        for subject_object in self.cache[collection]:
-            subject, object = subject_object
-            if subject == node:
-                values.append(str(object))
-
-        return values
+        return [str(obj) for obj in self.cache[collection].get(node, [])]
 
     # get all nodes for a given property from a node
     def get_all_property_nodes_from_node(self, node, collection):
-        values = []
-        for subject_object in self.cache[collection]:
-            subject, object = subject_object
-
-            if subject == node:
-                values.append(object)
-
-        return values
+        return list(self.cache[collection].get(node, []))

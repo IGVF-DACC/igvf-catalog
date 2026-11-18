@@ -56,7 +56,8 @@
             "ORPHANET",
             "PCL",
             "UBERON",
-            "VARIO"
+            "VARIO",
+            "XCO"
           ]
         },
         "source_url": {
