@@ -1,9 +1,16 @@
+import logging
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import boto3
 import smart_open
 
-from typing import Optional
+logger = logging.getLogger(__name__)
+
+
+# zlib's default compromise. gzip's own default is 9, which spends a lot of CPU
+# on repetitive JSONL for a small extra size reduction.
+GZIP_COMPRESSLEVEL = 6
 
 
 class Writer(ABC):
@@ -46,6 +53,8 @@ class Writer(ABC):
 class S3Writer(Writer):
 
     def __init__(self, bucket: str, key: str, session: boto3.Session, collections_tag: Optional[str] = None) -> None:
+        if not key.endswith('.gz'):
+            raise ValueError(f'S3 key must end with .gz, got {key!r}')
         self.bucket = bucket
         self.key = key
         self.session = session
@@ -85,8 +94,16 @@ class S3Writer(Writer):
 
     def write(self, content):
         if self.s3_file is None:
-            self.s3_file = smart_open.open(self.destination, mode='w', transport_params={
-                                           'client': self.session.client('s3')})
+            # compression='.gz' forces gzip. smart-open 9 closes
+            # the S3 upload from close(), including the gzip trailer.
+            self.s3_file = smart_open.open(
+                self.destination,
+                mode='w',
+                newline='\n',
+                compression='.gz',
+                compression_kwargs={'compresslevel': GZIP_COMPRESSLEVEL},
+                transport_params={'client': self.session.client('s3')},
+            )
         self.s3_file.write(content)
 
     def close(self, success: bool = True):
@@ -165,9 +182,18 @@ def get_writer(
         bucket: Optional[str] = None,
         key: Optional[str] = None,
         session: Optional[boto3.Session] = None,
-        collections_tag: Optional[str] = None
+        collections_tag: Optional[str] = None,
 ) -> Writer:
     if filepath is not None:
+        if bucket is not None or key is not None:
+            raise ValueError(
+                f'local filepath {filepath!r} cannot be combined with '
+                f'S3 bucket {bucket!r} and key {key!r}')
+        logger.info(f'Using local writer for filepath: {filepath}')
         return LocalWriter(filepath)
     else:
+        if bucket is None or key is None:
+            raise ValueError(
+                'both bucket and key are required when writing to S3')
+        logger.info(f'Using S3 writer for bucket: {bucket}, key: {key}')
         return S3Writer(bucket, key, session, collections_tag)
