@@ -1,4 +1,4 @@
-FROM public.ecr.aws/nginx/nginx:1.29.8
+FROM public.ecr.aws/nginx/nginx:1.31.9
 
 RUN rm /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
