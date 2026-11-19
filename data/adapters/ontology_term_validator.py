@@ -21,7 +21,7 @@ class OntologyTermValidator:
 
     - OBO Foundry-style IRIs (``http://purl.obolibrary.org/obo/{TERM_KEY}``),
       including MONDO, GO, HP, UBERON, DOID, CL, CLO, CHEBI, NCIT, OBA, OBI,
-      PCL, VARIO, BAO, and other OLS ontologies that use that IRI pattern
+      PCL, VARIO, BAO, XCO, and other OLS ontologies that use that IRI pattern
     - EFO (``http://www.ebi.ac.uk/efo/{TERM_KEY}``, OLS id ``efo``)
     - ORPHANET / Orphanet (``http://www.orpha.net/ORDO/{TERM_KEY}``,
       OLS id ``ordo``)

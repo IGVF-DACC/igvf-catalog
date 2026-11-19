@@ -98,7 +98,8 @@
             "OBA",
             "OBI",
             "DOID",
-            "ORPHANET"
+            "ORPHANET",
+            "XCO"
           ]
         },
         "source_url": {
@@ -121,7 +122,8 @@
             "https://github.com/obophenotype/bio-attribute-ontology",
             "https://obi-ontology.org/",
             "https://disease-ontology.org/",
-            "https://www.orpha.net/"
+            "https://www.orpha.net/",
+            "https://obofoundry.org/ontology/xco.html"
           ]
         },
         "class": {
