@@ -259,14 +259,14 @@ const getQueryLimit = (input: paramsFormatType): number => {
 
 const getRestrictiveFiltersArray = (input: paramsFormatType): string[] => {
   const restrictiveFiltersArray: string[] = []
-  if ('neg_log10_pvalue' in input) {
+  if (input.neg_log10_pvalue !== undefined) {
     // Upper bound for ZKD index on (neg_log10_pvalue, effect_size); does not change response values
     restrictiveFiltersArray.push(`record.neg_log10_pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.neg_log10_pvalue as string).includes(':')) {
       raiseInvalidParameters('neg_log10_pvalue')
     }
   }
-  if ('effect_size' in input) {
+  if (input.effect_size !== undefined) {
     restrictiveFiltersArray.push(`record.effect_size <= ${MAX_SLOPE}`)
     if (!(input.effect_size as string).includes(':')) {
       raiseInvalidParameters('effect_size')
