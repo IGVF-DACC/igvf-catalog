@@ -37,7 +37,7 @@ describe('qtlsRouters.qtls', () => {
       intron_chr: null,
       intron_start: null,
       intron_end: null,
-      study: { id: 'STUDY1', pmid: '12345678' },
+      study: { id: 'STUDY1', pmids: ['PMID:12345678'] },
       files_filesets: 'files_filesets/IGVFFI0001XXXX'
     }]
 
@@ -72,7 +72,7 @@ describe('qtlsRouters.qtls', () => {
       biological_context: 'liver',
       neg_log10_pvalue: 5.2,
       effect_size: 0.3,
-      study: { id: 'STUDY1', pmid: '12345678' },
+      study: { id: 'STUDY1', pmids: ['PMID:12345678'] },
       files_filesets: 'files_filesets/IGVFFI0001XXXX'
     }]
 

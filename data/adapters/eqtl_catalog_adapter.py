@@ -325,7 +325,7 @@ class EQTLCatalog(BaseAdapter):
                     _props = {
                         '_key': _id,
                         'name': row[2],
-                        'pmid': row[9],
+                        'pmids': ['PMID:' + row[9]] if row[9] else [],
                         'study_type': row[10],
                         'source': self.source,
                         'source_url': self.STUDY_SOURCE_URL,

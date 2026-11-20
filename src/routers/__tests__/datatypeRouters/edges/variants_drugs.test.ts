@@ -14,7 +14,7 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
       {
         _to: 'drugs/DRUG1',
         gene_symbol: ['CYP2D6'],
-        pmid: '12345678',
+        pmids: ['PMID:12345678'],
         study_parameters: [
           {
             study_parameter_id: 'SP1',
@@ -79,7 +79,7 @@ describe('variantsDrugsRouters.variantsFromDrugs', () => {
   it('looks up preferred_assay_titles via files_filesets and expands TAP-seq groupings', async () => {
     const mockResult = [{
       _to: 'drugs/DRUG1',
-      pmid: '12345678',
+      pmids: ['PMID:12345678'],
       phenotype_categories: ['Toxicity'],
       source: 'pharmGKB',
       source_url: 'https://api.pharmgkb.org/v1/data/annotation/1',
@@ -117,7 +117,7 @@ describe('variantsDrugsRouters.drugsFromVariants', () => {
       {
         _from: 'variants/NC_000001.11:69633:TGT:GAA',
         gene_symbol: ['CYP2D6'],
-        pmid: '12345678',
+        pmids: ['PMID:12345678'],
         study_parameters: [
           {
             study_parameter_id: 'SP1',

@@ -150,15 +150,7 @@
           ]
         },
         "pmids": {
-          "title": "PubMed IDs",
-          "type": "array",
-          "description": "Pubmed identifiers.",
-          "items": {
-            "type": "string"
-          },
-          "example": [
-            "28106320"
-          ]
+          "$ref": "../mixins.json#/pmids"
         },
         "method": {
           "enum": [

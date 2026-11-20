@@ -110,5 +110,17 @@
     "title": "Log2 Fold Change",
     "description": "Log2 fold change of the measured or predicted effect.",
     "type": "number"
+  },
+  "pmids": {
+    "title": "PubMed IDs",
+    "type": "array",
+    "description": "PubMed identifiers for publications supporting this record.",
+    "items": {
+      "type": "string",
+      "pattern": "^PMID:(?:unassigned)?[0-9]+$"
+    },
+    "example": [
+      "PMID:23836931"
+    ]
   }
 }

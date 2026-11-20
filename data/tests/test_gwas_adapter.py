@@ -117,7 +117,7 @@ def test_gwas_studies(gwas_files, spy_writer, mocker):
             assert 'n_cases' in data
             assert 'n_initial' in data
             assert 'n_replication' in data
-            assert 'pmid' in data
+            assert 'pmids' in data
             assert 'pub_author' in data
             assert 'pub_date' in data
             assert 'source_url' in data

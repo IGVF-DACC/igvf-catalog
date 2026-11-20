@@ -49,14 +49,7 @@
           ]
         },
         "pmids": {
-          "title": "PubMed IDs",
-          "type": "array",
-          "description": "Pubmed identifiers.",
-          "example": [
-            "http://pubmed.ncbi.nlm.nih.gov/2574002",
-            "http://pubmed.ncbi.nlm.nih.gov/2574002",
-            "http://pubmed.ncbi.nlm.nih.gov/9450897"
-          ]
+          "$ref": "../mixins.json#/pmids"
         },
         "name": {
           "enum": [
