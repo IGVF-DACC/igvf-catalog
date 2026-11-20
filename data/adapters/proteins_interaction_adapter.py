@@ -10,6 +10,18 @@ from adapters.writer import Writer
 from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 from adapters.protein_map import ProteinMap
 
+# Original source files can be downloaded from:
+# https://downloads.thebiogrid.org/File/BioGRID/Release-Archive/BIOGRID-5.0.263/BIOGRID-ALL-5.0.263.tab3.zip
+# https://www.ebi.ac.uk/intact/interactomes => Homo sapiens (miTab2.7) and Mus musculus (miTab2.7)
+#
+# Merged PPI files are generated from the following sources:
+# python3 data/scripts/merge_ppi_sources.py \
+#    --biogrid data/dataset/ppis/BIOGRID-ALL-5.0.263.tab3.txt \
+#    --intact-human data/dataset/ppis/human.txt \
+#    --intact-mouse data/dataset/ppis/mouse.txt \
+#    --out-human merged_PPI.UniProt.csv \
+#    --out-mouse merged_PPI_mouse.UniProt.csv
+
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
 # P0CL82,P36888,[28625976],genetic interference,MI:0254,sensu biogrid,MI:2371,,,BioGRID
