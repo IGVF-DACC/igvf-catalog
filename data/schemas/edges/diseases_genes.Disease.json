@@ -45,15 +45,7 @@
           "example": "associated_with"
         },
         "pmids": {
-          "title": "PubMed IDs",
-          "type": "array",
-          "description": "Pubmed identifiers.",
-          "items": {
-            "type": "string"
-          },
-          "example": [
-            "22587682"
-          ]
+          "$ref": "../mixins.json#/pmids"
         },
         "term_name": {
           "title": "Term Name",

@@ -74,7 +74,7 @@ class GeneGeneBiogrid(BaseAdapter):
                 if row[3] != 'genetic interference':
                     continue
 
-                pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
+                pmid_prefix = 'PMID:'
                 pmids = [pmid.replace("'", '') for pmid in row[2].replace(
                     '[', '').replace(']', '').split(', ')]
 
@@ -112,7 +112,7 @@ class GeneGeneBiogrid(BaseAdapter):
                             'confidence_value_intact': float(row[-2]) if row[-2] else None,
                             # should be BioGRID for all edges loaded
                             'source': row[-1],
-                            'pmids': [pmid_url + pmid for pmid in pmids],
+                            'pmids': [pmid_prefix + pmid for pmid in pmids],
                             'name': 'interacts with',
                             'inverse_name': 'interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515',

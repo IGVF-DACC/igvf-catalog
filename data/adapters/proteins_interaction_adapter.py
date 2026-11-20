@@ -75,7 +75,7 @@ class ProteinsInteraction(BaseAdapter):
 
                 for protein_from_ensembl in ensembl_ids_from:
                     for protein_to_ensembl in ensembl_ids_to:
-                        pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
+                        pmid_prefix = 'PMID:'
                         pmids = [pmid.replace("'", '') for pmid in row[2].replace(
                             '[', '').replace(']', '').split(', ')]
 
@@ -104,7 +104,7 @@ class ProteinsInteraction(BaseAdapter):
                             'confidence_value_biogrid': float(row[7]) if row[7] else None,
                             'confidence_value_intact': float(row[-2]) if row[-2] else None,
                             'source': source,
-                            'pmids': [pmid_url + pmid for pmid in pmids],
+                            'pmids': [pmid_prefix + pmid for pmid in pmids],
                             'organism': self.organism,
                             'name': 'physically interacts with',
                             'inverse_name': 'physically interacts with',

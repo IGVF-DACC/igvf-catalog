@@ -135,7 +135,7 @@ class ClinGen(BaseAdapter):
             self.ontology_term_validator.preload(mondo_ids)
 
         unmatched = 0
-        pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
+        pmid_prefix = 'PMID:'
 
         for row in rows:
             variant_keys = self.resolve_variant_keys(row)
@@ -156,7 +156,7 @@ class ClinGen(BaseAdapter):
             inheritance_mode = row.get('Mode of Inheritance')
             pmids_raw = row.get('PubMed Articles') or ''
             pmids = [
-                pmid_url + pmid.strip()
+                pmid_prefix + pmid.strip()
                 for pmid in pmids_raw.split(',')
                 if pmid.strip()
             ]

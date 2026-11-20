@@ -95,7 +95,7 @@ class Disease(BaseAdapter):
                 pmids = []
                 if source is not None:
                     # can have multiple e.g. 16150725[PMID]_16150725[PMID]_21771795[PMID]
-                    pmids = [pmid.replace('[PMID]', '')
+                    pmids = ['PMID:' + pmid.replace('[PMID]', '')
                              for pmid in source.split('_')]
 
                 gene = assoc.find('Gene')

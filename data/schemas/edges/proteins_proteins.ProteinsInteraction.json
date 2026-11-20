@@ -631,16 +631,7 @@
           ]
         },
         "pmids": {
-          "title": "PubMed IDs",
-          "type": "array",
-          "description": "Pubmed identifiers.",
-          "example": [
-            "http://pubmed.ncbi.nlm.nih.gov/23836931"
-          ],
-          "items": {
-            "type": "string",
-            "pattern": "^http://pubmed\\.ncbi\\.nlm\\.nih\\.gov/(?:unassigned)?[0-9]+$"
-          }
+          "$ref": "../mixins.json#/pmids"
         },
         "organism": {
           "$ref": "../mixins.json#/organism",

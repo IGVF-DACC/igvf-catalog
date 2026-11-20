@@ -198,8 +198,8 @@ def test_eqtl_catalog_adapter_study_label():
         assert first_item['_key'] == 'QTS000001'
         assert 'name' in first_item
         assert first_item['name'] == 'Alasoo_2018'
-        assert 'pmid' in first_item
-        assert first_item['pmid'] == '29379200'
+        assert 'pmids' in first_item
+        assert first_item['pmids'] == ['PMID:29379200']
         assert 'study_type' in first_item
         assert first_item['study_type'] == 'bulk'
         assert 'source' in first_item

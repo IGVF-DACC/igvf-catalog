@@ -67,8 +67,7 @@ function edgeQuery (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
-    const pmidUrl = 'http://pubmed.ncbi.nlm.nih.gov/'
-    input.pmid = pmidUrl + (input.pmid as string)
+    input.pmid = 'PMID:' + (input.pmid as string)
     query.push(`'${input.pmid}' IN record.pmids`)
     delete input.pmid
   }

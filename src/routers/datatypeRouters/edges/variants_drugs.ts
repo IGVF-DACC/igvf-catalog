@@ -39,7 +39,7 @@ const variantsToDrugsEdgeFields = z.object({
   drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
   gene_names: z.array(z.string()).optional(),
-  pmid: z.string().optional(),
+  pmids: z.array(z.string()).optional(),
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
@@ -68,7 +68,7 @@ const drugsToVariantsEdgeFields = z.object({
   sequence_variant: z.string().or(variantFormat).optional(),
   _to: z.string(),
   gene_names: z.array(z.string()).optional(),
-  pmid: z.string().optional(),
+  pmids: z.array(z.string()).optional(),
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
@@ -101,7 +101,7 @@ function getCustomFilters (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
-    query.push(`record.pmid == '${input.pmid as string}'`)
+    query.push(`'PMID:${input.pmid as string}' IN record.pmids`)
     delete input.pmid
   }
 
