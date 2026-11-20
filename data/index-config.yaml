@@ -574,6 +574,7 @@ variants_proteins:
       - source, files_filesets, method
       - gene, method, _key
       - source, class, files_filesets, method
+      - _to, _key
 
 variants_variants:
   persistent:
