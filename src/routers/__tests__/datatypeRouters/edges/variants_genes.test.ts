@@ -134,6 +134,63 @@ describe('variantsGenesRouters', () => {
       expect(dbModule.db.query).toHaveBeenCalledTimes(2)
     })
 
+    it('does not crash over the real HTTP/openapi input path when neg_log10_pvalue/effect_size are omitted', async () => {
+      // Regression test for a bug only reachable through real HTTP requests (not direct
+      // procedure calls with a hand-built `input` object): trpc-to-openapi's query-string
+      // parsing runs the full zod schema .parse(), which leaves optional keys like
+      // neg_log10_pvalue/effect_size present on the parsed object with value `undefined`
+      // rather than omitting them - so `'neg_log10_pvalue' in input` was true even when the
+      // caller never passed it, and `(undefined).includes(':')` crashed. Passing `input: {}`
+      // and supplying the raw query object only via getRawInput forces that same full-schema
+      // parse (see the files_filesets integration test for the same tRPC v11 quirk), which a
+      // literal `input` object (as every other test in this file uses) does not reproduce.
+      const variantIdResult = ['variants/NC_000001.11:40241653:TGAA:TGAAATTGAA']
+      const mockResult = [{
+        gene: 'genes/ENSG00000259943',
+        sequence_variant: 'variants/NC_000001.11:40241653:TGAA:TGAAATTGAA',
+        effect_size: 0.3136334,
+        neg_log10_pvalue: 7.472837,
+        neg_log10_pvalue_adj: null,
+        log2FC: null,
+        posterior_inclusion_probability: null,
+        coefficient_stddev: null,
+        power: null,
+        significant: null,
+        standard_error: null,
+        z_score: null,
+        credible_set_min_r2: null,
+        method: 'eQTL',
+        perturbation: null,
+        source: 'AFGR',
+        source_url: 'https://github.com/smontgomlab/AFGR',
+        label: 'eQTL',
+        p_value: 3.36638e-8,
+        chr: 'chr1',
+        biological_context: 'lymphoblastoid cell line',
+        biosample_term: 'ontology_terms/EFO_0005292',
+        name: 'modulates expression of',
+        class: null,
+        files_filesets: 'files_filesets/IGVFFI8011XYOB'
+      }]
+
+      jest.spyOn(dbModule.db, 'query')
+        .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(variantIdResult) } as any)
+        .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mockResult) } as any)
+
+      const rawInput = { region: 'chr1:40241650-40241759', method: 'eQTL', organism: 'Homo sapiens', verbose: 'false', page: 0 }
+      const result = await variantsGenesRouters.genesFromVariants({
+        input: {},
+        ctx: {},
+        type: 'query',
+        path: '',
+        getRawInput: async () => rawInput,
+        signal: undefined,
+        batchIndex: 0
+      } as any)
+
+      expect(result).toEqual(mockResult)
+    })
+
     it('throws BAD_REQUEST when neg_log10_pvalue is not a range query', async () => {
       const input = { method: 'CRISPR screen', neg_log10_pvalue: '5', page: 0 }
       await expect(callProcedure(variantsGenesRouters.genesFromVariants, input)).rejects.toThrow(TRPCError)
