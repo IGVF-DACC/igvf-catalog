@@ -1897,6 +1897,69 @@ export const descriptions = {
       }
     ]),
 
+  coding_variants_proteins_proteins:
+    'Retrieve protein-protein interactions (PPI) tested against a coding variant, from Vidal-lab arrayed semi-qY2H assays. consensus_score/wt_consensus_score are arrayed semi-qY2H interaction scores for the variant and reference PPI; log2FC is their log2 fold change.<br> \
+    At least one of these fields is required: coding_variant_name, hgvsp, protein_id, uniprot_name, gene_name, amino_acid_position, alt_amino_acid, transcript_id. Optionally narrow to a specific interaction partner with associated_protein_id, associated_protein_name, associated_uniprot_name, or associated_dbxrefs. consensus_score, wt_consensus_score, and log2FC accept gt:, gte:, lt:, lte:.<br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'semi-qy2h',
+        label: 'Arrayed semi-qY2H',
+        examples: [
+          {
+            label: 'Single result',
+            items: [
+              'coding_variant_name = ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T',
+              'method = Arrayed semi-qY2H'
+            ]
+          },
+          {
+            label: 'Narrowed to a specific interaction partner',
+            items: [
+              'coding_variant_name = ACSF3_ENST00000317447_p.Pro243Leu_c.728C-T',
+              'associated_protein_name = KRT40'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'gene_name = ACSF3',
+              'method = Arrayed semi-qY2H'
+            ]
+          }
+        ]
+      }
+    ]),
+
+  proteins_proteins_coding_variants:
+    'Retrieve coding variants tested against a protein-protein interaction (PPI), from Vidal-lab arrayed semi-qY2H assays. consensus_score/wt_consensus_score are arrayed semi-qY2H interaction scores for the variant and reference PPI; log2FC is their log2 fold change.<br> \
+    At least one of these fields is required (either protein in the pair): protein_id, protein_name, uniprot_name, uniprot_full_name, dbxrefs, associated_protein_id, associated_protein_name, associated_uniprot_name, associated_uniprot_full_name, associated_dbxrefs. consensus_score, wt_consensus_score, and log2FC accept gt:, gte:, lt:, lte:.<br> \
+    The limit parameter controls the page size and can not exceed 100. <br> \
+    Pagination is 0-based. <br> <br> \
+    ' + examples([
+      {
+        id: 'semi-qy2h',
+        label: 'Arrayed semi-qY2H',
+        examples: [
+          {
+            label: 'Single interaction pair',
+            items: [
+              'protein_name = ACSF3',
+              'associated_protein_name = KRT40'
+            ]
+          },
+          {
+            label: 'Group results',
+            items: [
+              'protein_name = ACSF3',
+              'method = Arrayed semi-qY2H'
+            ]
+          }
+        ]
+      }
+    ]),
+
   llm_query: 'Ask a question that interests you. This API is password protected.<br> \
   Set verbose = true to retrieve AQL and AQL results.<br> \
   Example: query = Tell me about the gene SAMD11.',
