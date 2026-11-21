@@ -135,7 +135,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined, page: number): Promise<any> {
   if (method !== undefined) {
     const query = `
-      LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
+      LET doc = DOCUMENT(genes_coding_variants_scores_cache, "${input.gene_id as string}")
 
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
@@ -170,7 +170,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
   }
 
   const query = `
-    FOR doc IN genes_coding_variants_scores
+    FOR doc IN genes_coding_variants_scores_cache
       FILTER doc._key == "${input.gene_id as string}"
       RETURN (
         FOR v IN doc.variant_scores
