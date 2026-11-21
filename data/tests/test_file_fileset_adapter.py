@@ -300,6 +300,44 @@ def test_parse_sample_donor_treatment_igvf_multiple_crispr_modalities_error():
             FileFileSet.parse_sample_donor_treatment_igvf(samples, method)
 
 
+def _mixed_base_editing_cutting_samples():
+    return [
+        {
+            'accession': accession,
+            'donors': [{'accession': 'IGVFDO0965QSBA'}],
+            'sample_terms': [{'term_name': 'HUDEP-2', '@id': '/sample-terms/EFO_0011012/'}],
+            'classifications': ['cell line'],
+            'construct_library_sets': [],
+            'modifications': [{'@id': f'/crispr-modifications/{modification}/', 'modality': modality}]
+        }
+        for accession, modification, modality in [
+            ('IGVFSM0001AAAA', 'IGVFCM0001AAAA', 'base editing'),
+            ('IGVFSM0002BBBB', 'IGVFCM0002BBBB', 'cutting'),
+        ]
+    ]
+
+
+def test_parse_sample_donor_treatment_igvf_modality_override():
+    samples = [{'accession': 'IGVFSM0001AAAA'},
+               {'accession': 'IGVFSM0002BBBB'}]
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=_mixed_base_editing_cutting_samples()):
+        *_unused, modality = FileFileSet.parse_sample_donor_treatment_igvf(
+            samples, 'CRISPR screen', 'IGVFFI4039BVDA')
+    assert modality == 'base editing'
+    assert FileFileSet.get_perturbation(
+        modality, 'CRISPR screen') == 'CRISPR base editing'
+
+
+def test_parse_sample_donor_treatment_igvf_override_absent_modality_error():
+    samples = [{'accession': 'IGVFSM0001AAAA'},
+               {'accession': 'IGVFSM0002BBBB'}]
+    with patch.object(FileFileSet, 'get_batch_objects', return_value=_mixed_base_editing_cutting_samples()), \
+            patch.dict(FileFileSet.CRISPR_MODALITY_OVERRIDES, {'IGVFFI4039BVDA': 'interference'}):
+        with pytest.raises(ValueError, match='not among sample modalities'):
+            FileFileSet.parse_sample_donor_treatment_igvf(
+                samples, 'CRISPR screen', 'IGVFFI4039BVDA')
+
+
 def decompose_analysis_set_to_measurement_set_igvf():
     analysis_set_id = '/analysis-sets/IGVFDS7801YPEU/'
     with patch('adapters.file_fileset_adapter.requests.get', side_effect=request_side_effect):
