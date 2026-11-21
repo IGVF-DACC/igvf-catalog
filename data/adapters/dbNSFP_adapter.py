@@ -4,6 +4,7 @@ from typing import Optional
 from adapters.archive_utils import get_file_accession
 from adapters.base import BaseAdapter
 from adapters.helpers import (
+    AA_TABLE_REV,
     build_variant_coding_variant_key,
     build_variant_id,
     bulk_check_variants_in_arangodb,
@@ -153,6 +154,9 @@ class DbNSFP(BaseAdapter):
             alt = '*'
         if ref == 'X':
             ref = '*'
+
+        if hgvsp == 'p.Met1?':
+            hgvsp = hgvsp.replace('?', AA_TABLE_REV[alt])
 
         to_json = {
             '_key': key,
