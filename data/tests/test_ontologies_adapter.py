@@ -166,6 +166,52 @@ def test_is_blank_and_clear_cache(ontology_instance):
     assert hasattr(ontology_instance, 'cache')
 
 
+def test_source_name_keeps_hpo_label_for_hp_prefix():
+    assert Ontology('dummy.owl', 'hp', None, None,
+                    None, None).source_name() == 'HPO'
+    assert Ontology('dummy.owl', 'cl', None, None,
+                    None, None).source_name() == 'CL'
+
+
+def test_process_nodes_writes_imported_terms_as_secondary(mock_writers):
+    ont = Ontology('dummy.owl', 'cl', None, None, None, None)
+    ont.outputs = {
+        'node': {
+            'primary': mock_writers['node_primary_writer'],
+            'secondary': mock_writers['node_secondary_writer'],
+        },
+        'edge': {
+            'primary': mock_writers['edge_primary_writer'],
+            'secondary': mock_writers['edge_secondary_writer'],
+        },
+    }
+    ont.collection_class = 'biological relationship'
+    ont.method = None
+    ont.cache = {
+        'term_names': {},
+        'descriptions': {},
+        'related_synonyms': {},
+        'exact_synonyms': {},
+    }
+
+    ont.process_nodes([
+        URIRef('http://purl.obolibrary.org/obo/CL_0000001'),
+        URIRef('http://purl.obolibrary.org/obo/CLM_0000001'),
+        URIRef('http://purl.obolibrary.org/obo/GO_0008150'),
+    ])
+
+    primary_ids = [
+        json.loads(call.args[0])['term_id']
+        for call in mock_writers['node_primary_writer'].write.call_args_list
+    ]
+    secondary_ids = [
+        json.loads(call.args[0])['term_id']
+        for call in mock_writers['node_secondary_writer'].write.call_args_list
+    ]
+    assert primary_ids == ['CL_0000001']
+    assert secondary_ids == ['CLM_0000001', 'GO_0008150']
+
+
 def test_save_props_primary_and_secondary(ontology_instance, mock_writers):
     props = {'_key': 'A', 'uri': 'uri', 'term_id': 'A', 'name': 'name', 'description': '',
              'synonyms': [], 'source': 'GO', 'source_url': '', 'subontology': None}
@@ -181,25 +227,47 @@ def test_save_props_primary_and_secondary(ontology_instance, mock_writers):
 
 def test_get_all_property_values_and_nodes_from_node(ontology_instance):
     ontology_instance.cache = {
-        'term_names': [(URIRef('A'), Literal('NameA')), (URIRef('B'), Literal('NameB'))],
-        'descriptions': [(URIRef('A'), Literal('DescA'))],
-        'related_synonyms': [],
-        'exact_synonyms': [],
-        'node_types': [],
-        'on_property': [],
-        'some_values_from': [],
-        'all_values_from': [],
-        'intersection_of': [],
+        'term_names': {
+            URIRef('A'): [Literal('NameA')],
+            URIRef('B'): [Literal('NameB')],
+        },
+        'descriptions': {URIRef('A'): [Literal('DescA')]},
+        'related_synonyms': {},
+        'exact_synonyms': {},
+        'node_types': {},
+        'on_property': {},
+        'some_values_from': {},
+        'all_values_from': {},
+        'intersection_of': {},
     }
     assert ontology_instance.get_all_property_values_from_node(
         URIRef('A'), 'term_names') == ['NameA']
     assert ontology_instance.get_all_property_nodes_from_node(
         URIRef('A'), 'term_names') == [Literal('NameA')]
+    assert ontology_instance.get_all_property_values_from_node(
+        URIRef('missing'), 'term_names') == []
+
+
+def test_cache_predicate_indexes_objects_by_subject(ontology_instance):
+    subject_a = URIRef('A')
+    subject_b = URIRef('B')
+    ontology_instance.graph = MagicMock()
+    ontology_instance.graph.subject_objects.return_value = [
+        (subject_a, Literal('one')),
+        (subject_b, Literal('two')),
+        (subject_a, Literal('three')),
+    ]
+
+    cached = ontology_instance.cache_predicate(Ontology.LABEL)
+
+    assert cached[subject_a] == [Literal('one'), Literal('three')]
+    assert cached[subject_b] == [Literal('two')]
 
 
 def test_is_a_restriction_block(ontology_instance):
-    ontology_instance.cache = {'node_types': [
-        (BNode('x'), Ontology.RESTRICTION)]}
+    ontology_instance.cache = {
+        'node_types': {BNode('x'): [Ontology.RESTRICTION]}
+    }
     assert ontology_instance.is_a_restriction_block(BNode('x'))
 
 
