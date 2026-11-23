@@ -1,4 +1,5 @@
 import json
+import math
 from unittest.mock import patch
 
 import pytest
@@ -392,3 +393,138 @@ def test_invalid_trailing_coordinates(suffix):
         CRISPRVariantPhenotype._to_loadable_variant_id(
             f'19_11116804_hg38_A_{suffix}'
         )
+
+
+CHRX_SCORES_PATH = './samples/crispr_IGVFFI4039BVDA.example.csv'
+CHRX_VARIANT_LIST_PATH = './samples/crispr_IGVFFI7806CLOH.example.csv'
+
+CHRX_CONCORDANT = {
+    'NC_000023.11:56802295:T:C',
+    'NC_000023.11:134660265:A:G',
+    'NC_000023.11:110639463:G:A',
+}
+
+
+@pytest.fixture
+def chrx_inputs():
+    return CHRX_SCORES_PATH, CHRX_VARIANT_LIST_PATH
+
+
+@patch('adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=set())
+@patch('adapters.CRISPR_variant_phenotype_adapter.load_variant', side_effect=_mock_load_variant)
+def test_variant_chrx_loads_only_concordant(mock_load, mock_bulk, mock_file_fileset, chrx_inputs):
+    scores, variant_list = chrx_inputs
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR base editing'
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath=str(scores),
+        label='variant',
+        writer=writer,
+        validate=True,
+        reference_filepath=str(variant_list),
+    )
+    adapter.process_file()
+
+    loaded_ids = {call.args[0] for call in mock_load.call_args_list}
+    assert loaded_ids == CHRX_CONCORDANT
+    docs = [json.loads(line) for line in writer.contents]
+    assert {doc['spdi'] for doc in docs} == CHRX_CONCORDANT
+    assert all(doc['files_filesets'] ==
+               'files_filesets/IGVFFI4039BVDA' for doc in docs)
+
+
+@patch('adapters.CRISPR_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=CHRX_CONCORDANT)
+@patch('adapters.CRISPR_variant_phenotype_adapter.load_variant', side_effect=_mock_load_variant)
+def test_variant_phenotype_chrx_mageck(mock_load, mock_bulk, mock_file_fileset, mock_ontology_term_validator, chrx_inputs):
+    scores, variant_list = chrx_inputs
+    mock_file_fileset.return_value['perturbation'] = 'CRISPR base editing'
+    mock_file_fileset.return_value['simple_sample_summaries'] = [
+        'human HUDEP-2 cell line from donor(s) IGVFDO0965QSBA']
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath=str(scores),
+        label='variant_phenotype',
+        writer=writer,
+        validate=True,
+        reference_filepath=str(variant_list),
+    )
+    adapter.process_file()
+
+    mock_ontology_term_validator.ensure.assert_called_once_with('GO_0008283')
+    docs = {json.loads(line)['_key']: json.loads(line)
+            for line in writer.contents}
+    assert len(docs) == 3
+
+    depleted = docs['NC_000023.11:56802295:T:C_GO_0008283_IGVFFI4039BVDA']
+    assert depleted['_to'] == 'ontology_terms/GO_0008283'
+    assert depleted['effect_size'] == pytest.approx(-1.6533)
+    assert depleted['p_value'] == pytest.approx(2.219e-06)
+    assert depleted['p_value_adj'] == pytest.approx(0.001238)
+    assert depleted['neg_log10_pvalue_adj'] == pytest.approx(
+        -math.log10(0.001238))
+    assert depleted['significant'] is True
+    assert depleted['num_guides'] == 5
+    assert depleted['z_score'] is None
+    assert depleted['effect_size_ci95_lower'] is None
+    assert depleted['effect_size_ci95_upper'] is None
+    assert depleted['edit_rate_mean'] is None
+    assert depleted['perturbation'] == 'CRISPR base editing'
+
+    enriched = docs['NC_000023.11:134660265:A:G_GO_0008283_IGVFFI4039BVDA']
+    assert enriched['effect_size'] == pytest.approx(1.4633)
+    assert enriched['p_value'] == pytest.approx(2.219e-06)
+    assert enriched['p_value_adj'] == pytest.approx(9e-05)
+    assert enriched['significant'] is True
+
+    # Positive fold change uses the pos| test even though neg| has the smaller p.
+    nonsig = docs['NC_000023.11:110639463:G:A_GO_0008283_IGVFFI4039BVDA']
+    assert nonsig['p_value'] == pytest.approx(0.20397)
+    assert nonsig['p_value_adj'] == pytest.approx(0.601873)
+    assert nonsig['significant'] is False
+
+
+def test_chrx_missing_reference_filepath(mock_file_fileset, chrx_inputs):
+    scores, _variant_list = chrx_inputs
+    with pytest.raises(ValueError, match='requires reference_filepath for IGVFFI7806CLOH'):
+        CRISPRVariantPhenotype(
+            filepath=str(scores),
+            label='variant',
+            writer=SpyWriter(),
+        )
+
+
+def test_chrx_wrong_reference_accession(mock_file_fileset, chrx_inputs):
+    scores, _variant_list = chrx_inputs
+    wrong = ABE_PATH
+    with pytest.raises(ValueError, match='Expected variant list IGVFFI7806CLOH'):
+        CRISPRVariantPhenotype(
+            filepath=str(scores),
+            label='variant',
+            writer=SpyWriter(),
+            reference_filepath=str(wrong),
+        )
+
+
+def test_chrx_variant_list_missing_columns(mock_file_fileset, chrx_inputs, tmp_path):
+    scores, _variant_list = chrx_inputs
+    bad = tmp_path / 'IGVFFI7806CLOH.csv'
+    bad.write_text('element_id,rsid\nNC_000023.11:56802295:T:C,rs1317882\n')
+    with pytest.raises(ValueError, match="missing columns: \\['type'\\]"):
+        CRISPRVariantPhenotype(
+            filepath=str(scores),
+            label='variant',
+            writer=SpyWriter(),
+            reference_filepath=str(bad),
+        )
+
+
+def test_chrx_ontology_term_needs_no_reference(mock_file_fileset, chrx_inputs):
+    scores, _variant_list = chrx_inputs
+    writer = SpyWriter()
+    adapter = CRISPRVariantPhenotype(
+        filepath=str(scores),
+        label='ontology_term',
+        writer=writer,
+    )
+    adapter.process_file()
+    assert writer.contents == []
