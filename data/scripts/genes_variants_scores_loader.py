@@ -9,11 +9,10 @@
 # 4. Run the script: python genes_variants_scores_loader.py
 
 from arango import ArangoClient
-from arango.http import DefaultHTTPClient
 import json
 
 DB_NAME = 'igvf'
-COLLECTION_NAME = 'genes_coding_variants_scores'
+COLLECTION_NAME = 'genes_coding_variants_scores_cache'
 ARANGODB_URL = 'http://localhost:8529'
 USERNAME = 'username'
 PASSWORD = 'password'
@@ -31,7 +30,15 @@ GENES = 'list_of_gene_ids_and_names_per_line.txt'
 # ["ENSG00000284332","MIR1302-2"]
 # ["ENSG00000237613","FAM138A"]
 
-client = ArangoClient(http_client=DefaultHTTPClient(request_timeout=999999))
+
+# The default python-arango HTTP client times out requests after 60s. This script's
+# per-gene aggregation query joins across coding_variants/variants_coding_variants/
+# coding_variants_phenotypes (close to a billion rows each) - a cold cache touch on a
+# large gene can legitimately take longer than that even though the query itself
+# completes fine given more time, so genes were silently falling into the except/Failed
+# branch below. db/arango_db.py's shared ArangoDB() wrapper already disables this
+# timeout (request_timeout=None) for exactly this reason; match that here.
+client = ArangoClient(request_timeout=None)
 db = client.db(DB_NAME, username=USERNAME, password=PASSWORD)
 collection = db.collection(COLLECTION_NAME)
 
@@ -148,5 +155,5 @@ with open(GENES, 'r') as file:
             results = [doc for doc in cursor]
             collection.insert(results[0])
             print(i)
-        except:
-            print('Failed ' + data[0] + ' \n')
+        except Exception as e:
+            print(f'Failed {data[0]}: {e}\n')
