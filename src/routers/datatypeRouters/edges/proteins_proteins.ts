@@ -86,7 +86,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.verbose
 
   if (input.pmid !== undefined && input.pmid !== '') {
-    input.pmids = 'PMID:' + (input.pmid as string)
+    input.pmids = input.pmid as string
     delete input.pmid
   }
 

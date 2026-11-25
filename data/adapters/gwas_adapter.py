@@ -81,7 +81,7 @@ class GWAS(BaseAdapter):
             'n_cases': row[20],
             'n_initial': row[21],
             'n_replication': row[22],
-            'pmids': [row[23]] if row[23] else [],
+            'pmids': [row[23].replace('PMID:', '')] if row[23] else [],
             'pub_author': row[24],
             'pub_date': row[25],
             'pub_journal': row[26],

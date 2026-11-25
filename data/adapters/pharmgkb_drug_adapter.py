@@ -328,7 +328,7 @@ class PharmGKB(BaseAdapter):
                                             '_from': _from,
                                             '_to': _to,
                                             'gene_names': gene_names,
-                                            'pmids': ['PMID:' + variant_drug_row[4]] if variant_drug_row[4] else [],
+                                            'pmids': [variant_drug_row[4]] if variant_drug_row[4] else [],
                                             'study_parameters': study_info,
                                             'phenotype_categories': _normalize_phenotype_categories(variant_drug_row[5]),
                                             'name': 'associated with',

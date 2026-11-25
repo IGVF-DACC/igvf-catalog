@@ -51,7 +51,7 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.pmid !== undefined) {
-    input.pmids = 'PMID:' + (input.pmid as string)
+    input.pmids = input.pmid as string
     delete input.pmid
   }
 

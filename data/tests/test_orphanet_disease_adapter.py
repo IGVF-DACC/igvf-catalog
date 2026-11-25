@@ -46,7 +46,7 @@ def test_process_file(sample_filepath, spy_writer, mock_file_fileset):
         assert 'name' in data
         assert 'inverse_name' in data
         assert 'pmids' in data
-        assert data['pmids'] == ['PMID:22587682']
+        assert data['pmids'] == ['22587682']
         assert 'term_name' in data
         assert 'gene_name' in data
         assert 'association_type' in data

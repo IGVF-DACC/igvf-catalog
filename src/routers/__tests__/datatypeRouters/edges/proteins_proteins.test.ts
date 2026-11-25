@@ -23,7 +23,7 @@ const buildInteractionRecord = (overrides: Record<string, unknown> = {}): Record
   source_url: 'https://data.igvf.org/reference-files/IGVFFI4317VDGK',
   source: 'IntAct',
   organism: 'Homo sapiens',
-  pmids: ['PMID:23836931'],
+  pmids: ['23836931'],
   name: 'physically interacts with',
   files_filesets: 'files_filesets/IGVFFI4317VDGK',
   ...overrides

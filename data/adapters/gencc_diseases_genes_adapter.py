@@ -75,7 +75,7 @@ class GenccDiseasesGenes(BaseAdapter):
             submitter = row[13]
             pmids = []
             if row[27]:
-                pmids = ['PMID:' + pmid.strip()
+                pmids = [pmid.strip()
                          for pmid in row[27].split(',') if pmid.strip()]
 
             for gene_id in gene_ids:

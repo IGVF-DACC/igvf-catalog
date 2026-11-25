@@ -117,10 +117,10 @@
     "description": "PubMed identifiers for publications supporting this record.",
     "items": {
       "type": "string",
-      "pattern": "^PMID:(?:unassigned)?[0-9]+$"
+      "pattern": "^(?:unassigned)?[0-9]+$"
     },
     "example": [
-      "PMID:23836931"
+      "23836931"
     ]
   }
 }

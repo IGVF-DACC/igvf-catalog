@@ -101,7 +101,7 @@ function getCustomFilters (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
-    query.push(`'PMID:${input.pmid as string}' IN record.pmids`)
+    query.push(`'${input.pmid as string}' IN record.pmids`)
     delete input.pmid
   }
 
