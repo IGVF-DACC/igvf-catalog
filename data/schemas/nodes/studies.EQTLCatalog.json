@@ -14,11 +14,8 @@
         "name": {
           "example": "OneK1K"
         },
-        "pmid": {
-          "title": "PubMed ID",
-          "type": "string",
-          "description": "PubMed identifier.",
-          "example": "35389779"
+        "pmids": {
+          "$ref": "../mixins.json#/pmids"
         },
         "study_type": {
           "title": "Study Type",
@@ -43,7 +40,7 @@
         }
       },
       "required": [
-        "pmid",
+        "pmids",
         "study_type",
         "files_filesets"
       ],
@@ -51,7 +48,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, name, pmid, study_type, source, source_url, files_filesets"
+    "return": "_id, name, pmids, study_type, source, source_url, files_filesets"
   },
   "db_collection_name": "studies"
 }

@@ -44,11 +44,8 @@
           "description": "Replication sample size of the study.",
           "example": "1000"
         },
-        "pmid": {
-          "title": "PubMed ID",
-          "type": "string",
-          "description": "PubMed identifier.",
-          "example": "PMID:32778093"
+        "pmids": {
+          "$ref": "../mixins.json#/pmids"
         },
         "pub_author": {
           "title": "Publication Author",
@@ -133,7 +130,7 @@
         "n_cases",
         "n_initial",
         "n_replication",
-        "pmid",
+        "pmids",
         "pub_author",
         "pub_date",
         "pub_journal",
@@ -151,7 +148,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, files_filesets, study_type, version"
+    "return": "_id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmids, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, files_filesets, study_type, version"
   },
   "db_collection_name": "studies"
 }

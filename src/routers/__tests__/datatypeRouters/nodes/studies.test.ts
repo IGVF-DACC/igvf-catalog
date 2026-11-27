@@ -14,7 +14,7 @@ describe('studiesRouters.studies', () => {
     const mockResult = [{
       _id: 'S1',
       name: 'StudyA',
-      pmid: 'PMID:12345',
+      pmids: ['12345'],
       source: 'GWAS Catalog',
       ancestry_initial: null,
       ancestry_replication: null,
@@ -38,7 +38,7 @@ describe('studiesRouters.studies', () => {
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('_key == "S1"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, pmid, source')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, pmids, source')
 
     const input = { study_id: 'S1', page: 0 }
     const result = await studiesRouters.studies({
@@ -59,7 +59,7 @@ describe('studiesRouters.studies', () => {
     const mockResult = [{
       _id: 'S2',
       name: 'StudyB',
-      pmid: 'PMID:67890',
+      pmids: ['67890'],
       source: 'GWAS Catalog',
       ancestry_initial: null,
       ancestry_replication: null,
@@ -82,8 +82,8 @@ describe('studiesRouters.studies', () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('pmid == "PMID:67890"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, pmid, source')
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('pmids == "67890"')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, name, pmids, source')
 
     const input = { pmid: '67890', page: 0 }
     const result = await studiesRouters.studies({
@@ -95,7 +95,7 @@ describe('studiesRouters.studies', () => {
       signal: undefined,
       batchIndex: 0
     })
-    // Should convert pmid to 'PMID:67890'
+    // Should convert pmid to a bound filter value
     expect(dbModule.db.query).toHaveBeenCalled()
     expect(result).toEqual(mockResult)
   })
@@ -104,7 +104,7 @@ describe('studiesRouters.studies', () => {
     const mockResult = [{
       _id: 'S3',
       name: 'StudyC',
-      pmid: 'PMID:67890',
+      pmids: ['67890'],
       source: 'GWAS Catalog',
       ancestry_initial: null,
       ancestry_replication: null,

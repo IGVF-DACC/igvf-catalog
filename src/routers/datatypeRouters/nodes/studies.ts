@@ -27,7 +27,7 @@ export const studyFormat = z.object({
   n_cases: z.string().nullable(),
   n_initial: z.string().nullable(),
   n_replication: z.string().nullable(),
-  pmid: z.string().nullable(),
+  pmids: z.array(z.string()).nullable(),
   pub_author: z.string().nullable(),
   pub_date: z.string().nullable(),
   pub_journal: z.string().nullable(),
@@ -51,7 +51,8 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.pmid !== undefined) {
-    input.pmid = 'PMID:' + (input.pmid as string)
+    input.pmids = input.pmid as string
+    delete input.pmid
   }
 
   if (input.files_fileset !== undefined) {

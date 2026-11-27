@@ -49,7 +49,7 @@ export const outputFormat = z.object({
   intron_end: z.number().nullish(), // spliceQTL only
   study: z.object({
     id: z.string(),
-    pmid: z.string().nullish()
+    pmids: z.array(z.string()).nullish()
   }).nullish(), // EBI eQTL and spliceQTL only
   files_filesets: z.string().nullish(),
   preferred_assay_titles: z.array(z.string()).nullish()
@@ -177,7 +177,7 @@ function qtlReturnObject (geneExpr: string, genomicElementExpr: string, proteinC
     intron_start: record.intron_start,
     intron_end: record.intron_end,
     study: HAS(record, 'study') && record.study != null
-      ? { id: DOCUMENT(record.study)._key, pmid: DOCUMENT(record.study).pmid }
+      ? { id: DOCUMENT(record.study)._key, pmids: DOCUMENT(record.study).pmids }
       : null,
     files_filesets: record.files_filesets,
     preferred_assay_titles: DOCUMENT(record.files_filesets).preferred_assay_titles
